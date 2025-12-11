@@ -1,4 +1,5 @@
 
+
 export interface User {
   id: string;
   name: string;
@@ -169,6 +170,8 @@ declare global {
         openTelegramLink: (url: string) => void;
         setHeaderColor?: (color: string) => void;
         setBackgroundColor?: (color: string) => void;
+        onEvent: (eventType: string, eventHandler: Function) => void;
+        offEvent: (eventType: string, eventHandler: Function) => void;
         
         // UI Elements
         MainButton: {

@@ -22,16 +22,32 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
+    // Basic setup for viewport
+    const setViewport = () => {
+        if (window.Telegram?.WebApp) {
+            // Expand to full height
+            window.Telegram.WebApp.expand();
+            // Force CSS variable for 100vh fix on mobile
+            document.documentElement.style.setProperty('--tg-viewport-height', `${window.Telegram.WebApp.viewportHeight}px`);
+        }
+    };
+
     // Safety check for window.Telegram
     if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
       const tg = window.Telegram.WebApp;
       
+      // Call expand immediately
+      tg.expand();
+      setViewport();
+
       // Notify Telegram that the Mini App is ready to be displayed
-      tg.ready();
-      setIsReady(true);
+      // Wrap in timeout to ensure React has mounted the initial frame
+      setTimeout(() => {
+          tg.ready();
+          setIsReady(true);
+      }, 100);
 
       try {
-        tg.expand(); // Try to expand to full height
         tg.enableClosingConfirmation(); 
         
         // Set header color
@@ -50,9 +66,19 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
       if (tg.colorScheme === 'dark') {
           document.documentElement.classList.add('dark');
       }
+
+      // Listener for viewport changes
+      tg.onEvent('viewportChanged', setViewport);
+
     } else {
         // Fallback for browser testing
         setIsReady(true);
+    }
+
+    return () => {
+        if (window.Telegram?.WebApp) {
+            window.Telegram.WebApp.offEvent('viewportChanged', setViewport);
+        }
     }
   }, []);
 
@@ -78,7 +104,11 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
     };
   }, [location, navigate]);
 
-  return <>{children}</>;
+  return (
+      <div style={{ minHeight: 'var(--tg-viewport-height, 100vh)' }} className="bg-slate-950">
+          {children}
+      </div>
+  );
 };
 
 export default function App() {

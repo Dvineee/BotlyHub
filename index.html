@@ -5,8 +5,30 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Bot Platform</title>
+    
+    <!-- DEBUGGING: Global Error Handler (Displays errors on screen) -->
+    <script>
+      window.onerror = function(msg, url, lineNo, columnNo, error) {
+        var errorDiv = document.createElement("div");
+        errorDiv.style.cssText = "position:fixed; top:0; left:0; right:0; background:#991b1b; color:white; padding:20px; z-index:99999; font-family:monospace; font-size:12px; white-space:pre-wrap; overflow:auto; max-height:50vh;";
+        errorDiv.innerText = "CRITICAL ERROR:\n" + msg + "\nAt: " + url + ":" + lineNo + "\n" + (error ? error.stack : '');
+        document.body.appendChild(errorDiv);
+        return false;
+      };
+      window.addEventListener('unhandledrejection', function(event) {
+        var errorDiv = document.createElement("div");
+        errorDiv.style.cssText = "position:fixed; bottom:0; left:0; right:0; background:#b45309; color:white; padding:20px; z-index:99999; font-family:monospace; font-size:12px; white-space:pre-wrap; overflow:auto; max-height:50vh;";
+        errorDiv.innerText = "PROMISE REJECTION:\n" + event.reason;
+        document.body.appendChild(errorDiv);
+      });
+    </script>
+
     <!-- Telegram Web App Script -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <!-- Mobile Console (Eruda) -->
+    <script src="//cdn.jsdelivr.net/npm/eruda"></script>
+    <script>eruda.init();</script>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
