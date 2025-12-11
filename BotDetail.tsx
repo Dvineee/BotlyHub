@@ -74,9 +74,9 @@ const BotDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col">
-      {/* Header */}
-      <div className="p-4 flex items-center justify-between sticky top-0 z-10 bg-slate-950/80 backdrop-blur-md border-b border-slate-900/50">
+    <div className="min-h-screen bg-slate-950 pb-24">
+      {/* Header - Sticky */}
+      <div className="p-4 flex items-center justify-between sticky top-0 z-20 bg-slate-950/80 backdrop-blur-md border-b border-slate-900/50">
         <button onClick={() => navigate(-1)} className="p-2 hover:bg-slate-800 rounded-full transition-colors">
           <ChevronLeft className="w-6 h-6 text-slate-200" />
         </button>
@@ -86,7 +86,7 @@ const BotDetail = () => {
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto pb-28 px-6">
+      <div className="px-6">
           
           {/* Hero Section */}
           <div className="flex flex-col items-center mt-6 mb-8">
