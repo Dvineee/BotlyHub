@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="tr" class="dark">
   <head>
@@ -11,10 +12,10 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Eruda for debugging (You can remove this in final production if desired) -->
+    <!-- Eruda for debugging on Mobile -->
     <script src="//cdn.jsdelivr.net/npm/eruda"></script>
     <script>
-      // Only init eruda if we are on mobile/telegram to debug
+      // Sadece mobil veya Telegram ortamında hata ayıklayıcıyı aç
       if (window.Telegram && window.Telegram.WebApp.platform !== 'unknown') {
         eruda.init();
       }
@@ -22,22 +23,24 @@
   <script type="importmap">
 {
   "imports": {
-    "react-router-dom": "https://esm.sh/react-router-dom@^7.10.1",
-    "react/": "https://esm.sh/react@^19.2.1/",
     "react": "https://esm.sh/react@^19.2.1",
     "react-dom/": "https://esm.sh/react-dom@^19.2.1/",
-    "vite": "https://esm.sh/vite@^7.2.7",
-    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2",
+    "@tonconnect/ui-react": "https://esm.sh/@tonconnect/ui-react@^2.3.1",
+    "react/": "https://esm.sh/react@^19.2.1/",
+    "react-router-dom": "https://esm.sh/react-router-dom@^7.10.1",
+    "lucide-react": "https://esm.sh/lucide-react@^0.560.0",
     "recharts": "https://esm.sh/recharts@^3.5.1",
     "crypto-js": "https://esm.sh/crypto-js@^4.2.0",
-    "lucide-react": "https://esm.sh/lucide-react@^0.560.0",
-    "@tonconnect/ui-react": "https://esm.sh/@tonconnect/ui-react@^2.3.1"
+    "vite": "https://esm.sh/vite@^7.2.7",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2"
   }
 }
 </script>
 </head>
   <body>
+    <!-- React Root -->
     <div id="root">
+      <!-- Başlangıç Loader'ı -->
       <div id="loader">
         <div class="spinner"></div>
         <div style="font-size: 14px; opacity: 0.7;">Yükleniyor...</div>

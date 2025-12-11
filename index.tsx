@@ -1,9 +1,12 @@
+
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import { TranslationProvider } from './TranslationContext';
 import { TonConnectUIProvider } from '@tonconnect/ui-react';
-import './index.css'; // Import Tailwind CSS
+import './index.css';
+
+console.log("Application initializing...");
 
 // --- Error Boundary for Production Debugging ---
 interface ErrorBoundaryProps {
@@ -64,18 +67,24 @@ if (!rootElement) {
   throw new Error("Could not find root element to mount to");
 }
 
-const manifestUrl = 'https://ton-connect.github.io/demo-dapp-with-react-ui/tonconnect-manifest.json';
+try {
+  const manifestUrl = 'https://ton-connect.github.io/demo-dapp-with-react-ui/tonconnect-manifest.json';
+  const root = createRoot(rootElement);
 
-const root = createRoot(rootElement);
-
-root.render(
-  <React.StrictMode>
-    <ErrorBoundary>
-      <TonConnectUIProvider manifestUrl={manifestUrl}>
-        <TranslationProvider>
-          <App />
-        </TranslationProvider>
-      </TonConnectUIProvider>
-    </ErrorBoundary>
-  </React.StrictMode>
-);
+  root.render(
+    <React.StrictMode>
+      <ErrorBoundary>
+        <TonConnectUIProvider manifestUrl={manifestUrl}>
+          <TranslationProvider>
+            <App />
+          </TranslationProvider>
+        </TonConnectUIProvider>
+      </ErrorBoundary>
+    </React.StrictMode>
+  );
+  console.log("React mount successful");
+} catch (e) {
+  console.error("Critical mount error:", e);
+  // Fallback error display if React completely fails to mount
+  rootElement.innerHTML = `<div style="color:red; padding:20px;">CRITICAL STARTUP ERROR: ${e}</div>`;
+}
