@@ -1,9 +1,65 @@
 
-import React from 'react';
+import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import { TranslationProvider } from './TranslationContext';
 import { TonConnectUIProvider } from '@tonconnect/ui-react';
+
+// --- Error Boundary for Production Debugging ---
+// Bu bileşen, uygulama çökerse hatayı ekrana basar.
+
+interface ErrorBoundaryProps {
+  children: ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+  errorInfo: ErrorInfo | null;
+}
+
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  public state: ErrorBoundaryState = { hasError: false, error: null, errorInfo: null };
+
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error("Uncaught error:", error, errorInfo);
+    this.setState({ error, errorInfo });
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: 20, color: '#fff', backgroundColor: '#991b1b', height: '100vh', overflow: 'auto', fontFamily: 'monospace' }}>
+          <h2>⚠️ Uygulama Hatası</h2>
+          <p>Bir şeyler ters gitti.</p>
+          <br/>
+          <strong>Hata:</strong> {this.state.error?.toString()}
+          <br/><br/>
+          <details style={{ whiteSpace: 'pre-wrap' }}>
+            {this.state.errorInfo?.componentStack}
+          </details>
+          <br/>
+          <button 
+            onClick={() => window.location.reload()} 
+            style={{ padding: '10px 20px', borderRadius: 8, border: 'none', backgroundColor: '#fff', color: '#991b1b', fontWeight: 'bold' }}
+          >
+            Sayfayı Yenile
+          </button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -11,18 +67,19 @@ if (!rootElement) {
 }
 
 // PRODUCTION UYARISI:
-// Canlıya alırken bu URL'i kendi sunucunuzdaki 'tonconnect-manifest.json' dosyasının
-// HTTPS adresi ile değiştirin. Aksi takdirde cüzdan bağlantıları çalışmayabilir.
-// Örn: https://your-domain.com/tonconnect-manifest.json
+// Manifest URL'in HTTPS ve erişilebilir olduğundan emin olun.
 const manifestUrl = 'https://ton-connect.github.io/demo-dapp-with-react-ui/tonconnect-manifest.json';
 
 const root = createRoot(rootElement);
+
 root.render(
   <React.StrictMode>
-    <TonConnectUIProvider manifestUrl={manifestUrl}>
-      <TranslationProvider>
-        <App />
-      </TranslationProvider>
-    </TonConnectUIProvider>
+    <ErrorBoundary>
+      <TonConnectUIProvider manifestUrl={manifestUrl}>
+        <TranslationProvider>
+          <App />
+        </TranslationProvider>
+      </TonConnectUIProvider>
+    </ErrorBoundary>
   </React.StrictMode>
 );

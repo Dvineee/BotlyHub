@@ -167,6 +167,8 @@ declare global {
         showPopup: (params: any, callback?: (id: string) => void) => void;
         openLink: (url: string, options?: { try_instant_view?: boolean }) => void;
         openTelegramLink: (url: string) => void;
+        setHeaderColor?: (color: string) => void;
+        setBackgroundColor?: (color: string) => void;
         
         // UI Elements
         MainButton: {

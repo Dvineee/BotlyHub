@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+
+import React, { useEffect, useState } from 'react';
 import { HashRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import Home from './pages/Home';
 import UserList from './pages/UserList';
@@ -18,23 +19,40 @@ import AccountSettings from './pages/AccountSettings';
 const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    const tg = window.Telegram?.WebApp;
-    if (tg) {
-      // Initialize Telegram WebApp
+    // Safety check for window.Telegram
+    if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
+      const tg = window.Telegram.WebApp;
+      
+      // Notify Telegram that the Mini App is ready to be displayed
       tg.ready();
+      setIsReady(true);
+
       try {
         tg.expand(); // Try to expand to full height
-        tg.enableClosingConfirmation(); // Prevent accidental closes on Swipe Down
+        tg.enableClosingConfirmation(); 
+        
+        // Set header color
+        if (tg.setHeaderColor) {
+            tg.setHeaderColor('#020617'); // Match slate-950
+        }
+        if (tg.setBackgroundColor) {
+            tg.setBackgroundColor('#020617');
+        }
+
       } catch (e) {
-        console.warn('Telegram expand/confirmation not available', e);
+        console.warn('Telegram API initialization warning:', e);
       }
       
-      // Fix colors to match theme (Optional sync)
+      // Fix colors to match theme
       if (tg.colorScheme === 'dark') {
           document.documentElement.classList.add('dark');
       }
+    } else {
+        // Fallback for browser testing
+        setIsReady(true);
     }
   }, []);
 
@@ -51,7 +69,6 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
       tg.BackButton.hide();
     } else {
       tg.BackButton.show();
-      // Remove previous listeners to avoid duplicates
       tg.BackButton.offClick(handleBack); 
       tg.BackButton.onClick(handleBack);
     }
@@ -68,8 +85,8 @@ export default function App() {
   return (
     <HashRouter>
       <TelegramWrapper>
-        <div className="min-h-screen bg-slate-950 text-white transition-colors duration-300">
-          <div className="max-w-md mx-auto min-h-screen bg-slate-950 shadow-2xl relative overflow-hidden">
+        <div className="min-h-screen w-full bg-slate-950 text-white transition-colors duration-300 flex flex-col">
+          <div className="max-w-md w-full mx-auto min-h-screen bg-slate-950 shadow-2xl relative overflow-hidden flex-1">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/search" element={<SearchPage />} />
