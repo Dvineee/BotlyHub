@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { HashRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import Home from './pages/Home';
@@ -21,33 +22,35 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    // Basic setup for viewport
     const initTelegram = () => {
-        if (window.Telegram?.WebApp) {
-            const tg = window.Telegram.WebApp;
-            
-            // Expand to full height
-            tg.expand();
-            
-            // Set colors immediately
-            if (tg.setHeaderColor) tg.setHeaderColor('#020617');
-            if (tg.setBackgroundColor) tg.setBackgroundColor('#020617');
+        try {
+            if (window.Telegram?.WebApp) {
+                const tg = window.Telegram.WebApp;
+                
+                // Expand to full height (Supported in all versions)
+                tg.expand();
+                
+                // Version Check: Colors (Supported in 6.1+)
+                if (tg.isVersionAtLeast('6.1')) {
+                    if (tg.setHeaderColor) tg.setHeaderColor('#020617');
+                    if (tg.setBackgroundColor) tg.setBackgroundColor('#020617');
+                }
 
-            // Force CSS variable for 100vh fix on mobile
-            // Use window.innerHeight fallback if viewportHeight is 0 initially
-            const vh = tg.viewportHeight || window.innerHeight;
-            document.documentElement.style.setProperty('--tg-viewport-height', `${vh}px`);
-            
-            // Notify Telegram we are ready
-            tg.ready();
-            setIsReady(true);
-        } else {
-            // Browser fallback
+                // Force CSS variable for 100vh fix on mobile
+                const vh = tg.viewportHeight || window.innerHeight;
+                document.documentElement.style.setProperty('--tg-viewport-height', `${vh}px`);
+                
+                // Notify Telegram we are ready
+                tg.ready();
+            }
+        } catch (e) {
+            console.error("Telegram init failed:", e);
+        } finally {
+            // ALWAYS finish loading state, even if Telegram API fails/is old
             setIsReady(true);
         }
     };
 
-    // Try to init
     initTelegram();
 
     // Event listener for viewport changes (keyboard open/close)
@@ -69,6 +72,9 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
     if (!tg) return;
+
+    // Version Check: BackButton (Supported in 6.1+)
+    if (!tg.isVersionAtLeast('6.1')) return;
 
     const handleBack = () => {
       navigate(-1);

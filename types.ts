@@ -157,6 +157,7 @@ declare global {
         viewportStableHeight: number;
         headerColor: string;
         backgroundColor: string;
+        isVersionAtLeast: (version: string) => boolean;
         
         // Methods
         ready: () => void;

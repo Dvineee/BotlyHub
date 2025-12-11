@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 
 // Çeviri Sözlüğü
@@ -124,32 +125,21 @@ export const TranslationProvider = ({ children }: TranslationProviderProps) => {
   const [language, setLanguage] = useState<Language>('tr');
 
   useEffect(() => {
-    const initializeLanguage = async () => {
-      try {
-        // Attempt 1: IP Geolocation (often blocked by privacy tools/CORS)
-        // Using a timeout to prevent long hanging requests
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 3000);
-
-        const response = await fetch('https://ipapi.co/json/', { signal: controller.signal });
-        clearTimeout(timeoutId);
-
-        if (response.ok) {
-          const data = await response.json();
-          // If country code is NOT Turkey (TR), switch to English
-          if (data.country_code && data.country_code !== 'TR') {
-            setLanguage('en');
-            return;
-          }
+    // FIX: Removed fetch to ipapi.co to solve CORS/429 errors and Black Screen issues.
+    // We use Telegram's native data which is instant and reliable.
+    const initializeLanguage = () => {
+      // 1. Check Telegram User Data (Best method)
+      const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+      if (tgUser && tgUser.language_code) {
+        // If language code starts with 'en', switch to English
+        if (tgUser.language_code.toLowerCase().startsWith('en')) {
+          setLanguage('en');
+          return;
         }
-        // If response not ok or code is TR, fall through to browser check or keep default
-      } catch (error) {
-        // Silent failure on IP check (Network error, CORS, etc.)
       }
 
-      // Attempt 2: Browser Language Fallback
-      // If IP check failed or didn't return a decisive result, check browser settings
-      if (navigator.language && !navigator.language.toLowerCase().startsWith('tr')) {
+      // 2. Fallback to Browser Language
+      if (navigator.language && navigator.language.toLowerCase().startsWith('en')) {
          setLanguage('en');
       }
     };
