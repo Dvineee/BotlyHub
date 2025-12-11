@@ -11,10 +11,9 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Eruda for debugging on Mobile -->
+    <!-- Eruda for debugging on Mobile (Only active on Telegram Platform) -->
     <script src="//cdn.jsdelivr.net/npm/eruda"></script>
     <script>
-      // Sadece mobil veya Telegram ortamında hata ayıklayıcıyı aç
       if (window.Telegram && window.Telegram.WebApp.platform !== 'unknown') {
         eruda.init();
       }
@@ -27,7 +26,7 @@
         margin: 0;
         padding: 0;
         overflow: hidden; /* Prevent scroll during load */
-        -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
+        -webkit-tap-highlight-color: transparent;
       }
       #loader {
         position: fixed;
@@ -54,7 +53,6 @@
         to { transform: rotate(360deg); }
       }
     </style>
-    <!-- REMOVED IMPORTMAP TO PREVENT REACT VERSION CONFLICTS -->
   <script type="importmap">
 {
   "imports": {

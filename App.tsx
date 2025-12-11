@@ -33,13 +33,11 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
             tg.expand();
 
             // Set Header & Background Colors (Safe Check)
-            // We use try-catch specifically for these calls as they can be flaky on old Android versions
             try {
                 if (tg.isVersionAtLeast && tg.isVersionAtLeast('6.1')) {
                     tg.setHeaderColor?.('#020617');
                     tg.setBackgroundColor?.('#020617');
                 } else {
-                    // Fallback for v6.0
                     tg.setHeaderColor?.('#020617');
                     tg.setBackgroundColor?.('#020617');
                 }
@@ -94,7 +92,6 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
     const isSupported = tg.isVersionAtLeast ? tg.isVersionAtLeast('6.1') : false;
     
     if (!isSupported) {
-        // If not supported, ensure it's hidden just in case
         try { tg.BackButton.hide(); } catch(e) {}
         return;
     }
@@ -129,7 +126,7 @@ export default function App() {
     <HashRouter>
       <TelegramWrapper>
         <div className="min-h-screen w-full bg-slate-950 text-white transition-colors duration-300 flex flex-col">
-          <div className="max-w-md w-full mx-auto min-h-screen bg-slate-950 shadow-2xl relative overflow-hidden flex-1">
+          <div className="max-w-md w-full mx-auto min-h-screen bg-slate-950 shadow-2xl relative flex-1">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/search" element={<SearchPage />} />
