@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { HashRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import Home from './pages/Home';
@@ -22,21 +21,38 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
+    // 1. Loader'ı manuel olarak kaldırma fonksiyonu
+    const removeLoader = () => {
+      const loader = document.getElementById('loader');
+      if (loader) {
+        loader.style.opacity = '0';
+        setTimeout(() => loader.remove(), 500);
+      }
+      setIsReady(true);
+    };
+
     const initTelegram = () => {
         try {
             if (window.Telegram?.WebApp) {
                 const tg = window.Telegram.WebApp;
                 
-                // Expand to full height (Supported in all versions)
+                // Expand to full height
                 tg.expand();
                 
-                // Version Check: Colors (Supported in 6.1+)
-                if (tg.isVersionAtLeast('6.1')) {
-                    if (tg.setHeaderColor) tg.setHeaderColor('#020617');
-                    if (tg.setBackgroundColor) tg.setBackgroundColor('#020617');
+                // Version Check for Colors (6.1+)
+                if (tg.isVersionAtLeast && tg.isVersionAtLeast('6.1')) {
+                    // Mavi ekranı engellemek için header ve bg rengini koyu yapıyoruz
+                    tg.setHeaderColor?.('#020617');
+                    tg.setBackgroundColor?.('#020617');
+                } else {
+                    // Fallback for older versions (try catch block prevents crash)
+                    try {
+                        tg.setHeaderColor?.('#020617');
+                        tg.setBackgroundColor?.('#020617');
+                    } catch (e) { console.warn("Color setting failed", e); }
                 }
 
-                // Force CSS variable for 100vh fix on mobile
+                // Force CSS variable
                 const vh = tg.viewportHeight || window.innerHeight;
                 document.documentElement.style.setProperty('--tg-viewport-height', `${vh}px`);
                 
@@ -46,14 +62,23 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
         } catch (e) {
             console.error("Telegram init failed:", e);
         } finally {
-            // ALWAYS finish loading state, even if Telegram API fails/is old
-            setIsReady(true);
+            // Hata olsa bile uygulamayı aç
+            removeLoader();
         }
     };
 
+    // 2. Başlat
     initTelegram();
 
-    // Event listener for viewport changes (keyboard open/close)
+    // 3. Failsafe Timeout: Eğer Telegram API 1 saniye içinde yanıt vermezse uygulamayı zorla aç
+    const timeoutId = setTimeout(() => {
+        if (!isReady) {
+            console.warn("Telegram init timed out, forcing app load");
+            removeLoader();
+        }
+    }, 1000);
+
+    // Event listener for viewport changes
     const handleViewportChanged = () => {
          if (window.Telegram?.WebApp) {
              const vh = window.Telegram.WebApp.viewportHeight;
@@ -61,10 +86,11 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
          }
     };
 
-    window.Telegram?.WebApp?.onEvent('viewportChanged', handleViewportChanged);
+    window.Telegram?.WebApp?.onEvent?.('viewportChanged', handleViewportChanged);
 
     return () => {
-        window.Telegram?.WebApp?.offEvent('viewportChanged', handleViewportChanged);
+        clearTimeout(timeoutId);
+        window.Telegram?.WebApp?.offEvent?.('viewportChanged', handleViewportChanged);
     }
   }, []);
 
@@ -73,32 +99,28 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
     const tg = window.Telegram?.WebApp;
     if (!tg) return;
 
-    // Version Check: BackButton (Supported in 6.1+)
-    if (!tg.isVersionAtLeast('6.1')) return;
+    // isVersionAtLeast kontrolü yoksa veya versiyon düşükse butonu hiç elleme
+    if (!tg.isVersionAtLeast || !tg.isVersionAtLeast('6.1')) return;
 
     const handleBack = () => {
       navigate(-1);
     };
 
     if (location.pathname === '/') {
-      tg.BackButton.hide();
+      tg.BackButton?.hide();
     } else {
-      tg.BackButton.show();
-      tg.BackButton.offClick(handleBack); 
-      tg.BackButton.onClick(handleBack);
+      tg.BackButton?.show();
+      tg.BackButton?.offClick(handleBack); 
+      tg.BackButton?.onClick(handleBack);
     }
 
     return () => {
-      tg.BackButton.offClick(handleBack);
+      tg.BackButton?.offClick(handleBack);
     };
   }, [location, navigate]);
 
   if (!isReady) {
-      return (
-          <div className="fixed inset-0 bg-slate-950 flex items-center justify-center text-white">
-              <div className="w-8 h-8 border-2 border-white/20 border-t-blue-500 rounded-full animate-spin"></div>
-          </div>
-      );
+      return null; // index.html'deki loader zaten gösteriliyor
   }
 
   return (
