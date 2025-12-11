@@ -283,7 +283,7 @@ const Home = () => {
                                ? 'bg-blue-600 border-blue-600 text-white'
                                : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
                            }`}
-                       >
+                   >
                            <cat.icon size={14} />
                            {t(cat.label)}
                        </button>
@@ -314,7 +314,7 @@ const Home = () => {
       {/* Header */}
       <div className="flex justify-between items-center mb-6 relative z-50">
         <div className="flex items-center gap-2">
-            <svg width="150" height="40" viewBox="0 0 150 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="170" height="40" viewBox="0 0 170 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     <linearGradient id="hub_gradient" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
                         <stop stopColor="#6366f1" /> {/* Indigo */}
@@ -333,7 +333,7 @@ const Home = () => {
                 <circle cx="20" cy="20" r="4" fill="white" />
                 
                 {/* Text */}
-                <text x="46" y="27" fontFamily="'Inter', sans-serif" fontWeight="700" fontSize="20" className="fill-white" letterSpacing="-0.5">BotlyHub</text>
+                <text x="46" y="27" fontFamily="'Inter', sans-serif" fontWeight="700" fontSize="20" className="fill-white" letterSpacing="-0.5">BotlyHub V1</text>
             </svg>
         </div>
 
