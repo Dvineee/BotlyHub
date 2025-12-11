@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { HashRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import Home from './pages/Home';
 import UserList from './pages/UserList';
@@ -18,110 +18,104 @@ import AccountSettings from './pages/AccountSettings';
 const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    // 1. Loader'ı manuel olarak kaldırma fonksiyonu
-    const removeLoader = () => {
-      const loader = document.getElementById('loader');
-      if (loader) {
-        loader.style.opacity = '0';
-        setTimeout(() => loader.remove(), 500);
-      }
-      setIsReady(true);
-    };
-
+    // 1. Initialize Telegram WebApp Features
     const initTelegram = () => {
+        const tg = window.Telegram?.WebApp;
+        if (!tg) {
+            console.warn("Telegram WebApp API not found.");
+            return;
+        }
+
         try {
-            if (window.Telegram?.WebApp) {
-                const tg = window.Telegram.WebApp;
-                
-                // Expand to full height
-                tg.expand();
-                
-                // Version Check for Colors (6.1+)
+            // Expand to full height (Always supported)
+            tg.expand();
+
+            // Set Header & Background Colors (Safe Check)
+            // We use try-catch specifically for these calls as they can be flaky on old Android versions
+            try {
                 if (tg.isVersionAtLeast && tg.isVersionAtLeast('6.1')) {
-                    // Mavi ekranı engellemek için header ve bg rengini koyu yapıyoruz
                     tg.setHeaderColor?.('#020617');
                     tg.setBackgroundColor?.('#020617');
                 } else {
-                    // Fallback for older versions (try catch block prevents crash)
-                    try {
-                        tg.setHeaderColor?.('#020617');
-                        tg.setBackgroundColor?.('#020617');
-                    } catch (e) { console.warn("Color setting failed", e); }
+                    // Fallback for v6.0
+                    tg.setHeaderColor?.('#020617');
+                    tg.setBackgroundColor?.('#020617');
                 }
+            } catch (e) {
+                console.warn("Error setting Telegram colors:", e);
+            }
 
-                // Force CSS variable
+            // Handle Viewport Height for Mobile Keyboards
+            const setViewport = () => {
                 const vh = tg.viewportHeight || window.innerHeight;
                 document.documentElement.style.setProperty('--tg-viewport-height', `${vh}px`);
-                
-                // Notify Telegram we are ready
-                tg.ready();
-            }
+            };
+            
+            setViewport();
+            tg.onEvent('viewportChanged', setViewport);
+            
+            // Signal Telegram that we are ready
+            tg.ready();
+
+            return () => {
+                tg.offEvent('viewportChanged', setViewport);
+            };
         } catch (e) {
-            console.error("Telegram init failed:", e);
-        } finally {
-            // Hata olsa bile uygulamayı aç
-            removeLoader();
+            console.error("Critical Telegram init error:", e);
         }
     };
 
-    // 2. Başlat
-    initTelegram();
+    const cleanup = initTelegram();
 
-    // 3. Failsafe Timeout: Eğer Telegram API 1 saniye içinde yanıt vermezse uygulamayı zorla aç
-    const timeoutId = setTimeout(() => {
-        if (!isReady) {
-            console.warn("Telegram init timed out, forcing app load");
-            removeLoader();
+    // 2. Remove Loader (Always remove it, regardless of Telegram success/fail)
+    // We use a small delay to ensure React has painted the initial frame
+    const timer = setTimeout(() => {
+        const loader = document.getElementById('loader');
+        if (loader) {
+            loader.style.opacity = '0';
+            setTimeout(() => loader.remove(), 300);
         }
-    }, 1000);
-
-    // Event listener for viewport changes
-    const handleViewportChanged = () => {
-         if (window.Telegram?.WebApp) {
-             const vh = window.Telegram.WebApp.viewportHeight;
-             document.documentElement.style.setProperty('--tg-viewport-height', `${vh}px`);
-         }
-    };
-
-    window.Telegram?.WebApp?.onEvent?.('viewportChanged', handleViewportChanged);
+    }, 100);
 
     return () => {
-        clearTimeout(timeoutId);
-        window.Telegram?.WebApp?.offEvent?.('viewportChanged', handleViewportChanged);
-    }
+        clearTimeout(timer);
+        if (typeof cleanup === 'function') cleanup();
+    };
   }, []);
 
-  // Handle Native Back Button
+  // Handle Native Back Button Logic separately to avoid re-running init logic
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
-    if (!tg) return;
+    if (!tg || !tg.BackButton) return;
 
-    // isVersionAtLeast kontrolü yoksa veya versiyon düşükse butonu hiç elleme
-    if (!tg.isVersionAtLeast || !tg.isVersionAtLeast('6.1')) return;
+    // Safety check for version
+    const isSupported = tg.isVersionAtLeast ? tg.isVersionAtLeast('6.1') : false;
+    
+    if (!isSupported) {
+        // If not supported, ensure it's hidden just in case
+        try { tg.BackButton.hide(); } catch(e) {}
+        return;
+    }
 
     const handleBack = () => {
-      navigate(-1);
+        // If we are at root, don't do anything (Telegram handles closing)
+        if (location.pathname === '/') return;
+        navigate(-1);
     };
 
     if (location.pathname === '/') {
-      tg.BackButton?.hide();
+        tg.BackButton.hide();
     } else {
-      tg.BackButton?.show();
-      tg.BackButton?.offClick(handleBack); 
-      tg.BackButton?.onClick(handleBack);
+        tg.BackButton.show();
+        tg.BackButton.onClick(handleBack);
     }
 
     return () => {
-      tg.BackButton?.offClick(handleBack);
+        tg.BackButton.offClick(handleBack);
     };
   }, [location, navigate]);
-
-  if (!isReady) {
-      return null; // index.html'deki loader zaten gösteriliyor
-  }
 
   return (
       <div style={{ minHeight: 'var(--tg-viewport-height, 100vh)' }} className="bg-slate-950">

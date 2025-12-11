@@ -10,5 +10,7 @@ export default defineConfig({
   server: {
     host: true, // Telefondan test ederken yerel IP ile erişim için gerekli
   },
-  base: './', // Telegram WebApp için gerekli göreceli yollar
+  // Telegram Web Apps often run in a subpath or verify root access differently.
+  // './' ensures assets are loaded relative to index.html
+  base: './', 
 });

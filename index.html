@@ -27,6 +27,7 @@
         margin: 0;
         padding: 0;
         overflow: hidden; /* Prevent scroll during load */
+        -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
       }
       #loader {
         position: fixed;
@@ -38,6 +39,7 @@
         background-color: #020617;
         color: white;
         z-index: 9999;
+        transition: opacity 0.3s ease;
       }
       .spinner {
         width: 40px;
@@ -52,6 +54,7 @@
         to { transform: rotate(360deg); }
       }
     </style>
+    <!-- REMOVED IMPORTMAP TO PREVENT REACT VERSION CONFLICTS -->
   <script type="importmap">
 {
   "imports": {
@@ -75,7 +78,7 @@
       <!-- Başlangıç Loader'ı -->
       <div id="loader">
         <div class="spinner"></div>
-        <div style="font-size: 14px; opacity: 0.7;">Yükleniyor...</div>
+        <div style="font-size: 14px; opacity: 0.7; font-family: 'Inter', sans-serif;">Yükleniyor...</div>
       </div>
     </div>
     
