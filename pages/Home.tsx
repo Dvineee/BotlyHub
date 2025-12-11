@@ -314,7 +314,7 @@ const Home = () => {
       {/* Header */}
       <div className="flex justify-between items-center mb-6 relative z-50">
         <div className="flex items-center gap-2">
-            <svg width="170" height="40" viewBox="0 0 170 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="200" height="40" viewBox="0 0 200 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     <linearGradient id="hub_gradient" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
                         <stop stopColor="#6366f1" /> {/* Indigo */}
