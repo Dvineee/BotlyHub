@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="tr" class="dark">
   <head>
@@ -6,110 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>BotlyHub V1</title>
     
-    <!-- DEBUGGING: Global Error Handler (Displays errors on screen) -->
-    <script>
-      window.onerror = function(msg, url, lineNo, columnNo, error) {
-        var errorDiv = document.createElement("div");
-        errorDiv.style.cssText = "position:fixed; top:0; left:0; right:0; background:#991b1b; color:white; padding:20px; z-index:99999; font-family:monospace; font-size:12px; white-space:pre-wrap; overflow:auto; max-height:50vh;";
-        errorDiv.innerText = "CRITICAL ERROR:\n" + msg + "\nAt: " + url + ":" + lineNo + "\n" + (error ? error.stack : '');
-        document.body.appendChild(errorDiv);
-        return false;
-      };
-      window.addEventListener('unhandledrejection', function(event) {
-        var errorDiv = document.createElement("div");
-        errorDiv.style.cssText = "position:fixed; bottom:0; left:0; right:0; background:#b45309; color:white; padding:20px; z-index:99999; font-family:monospace; font-size:12px; white-space:pre-wrap; overflow:auto; max-height:50vh;";
-        errorDiv.innerText = "PROMISE REJECTION:\n" + event.reason;
-        document.body.appendChild(errorDiv);
-      });
-    </script>
-
     <!-- Telegram Web App Script -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
-    <!-- Mobile Console (Eruda) -->
-    <script src="//cdn.jsdelivr.net/npm/eruda"></script>
-    <script>eruda.init();</script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Eruda for debugging (You can remove this in final production if desired) -->
+    <script src="//cdn.jsdelivr.net/npm/eruda"></script>
     <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              slate: {
-                850: '#1e293b',
-              }
-            }
-          }
-        },
-        darkMode: 'class'
+      // Only init eruda if we are on mobile/telegram to debug
+      if (window.Telegram && window.Telegram.WebApp.platform !== 'unknown') {
+        eruda.init();
       }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-      body {
-        font-family: 'Inter', sans-serif;
-        background-color: #020617; /* matches slate-950 */
-        overflow-x: hidden;
-        margin: 0;
-        padding: 0;
-        min-height: 100vh;
-      }
-      /* Hide scrollbar */
-      .no-scrollbar::-webkit-scrollbar { display: none; }
-      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-      
-      /* Loader Styles */
-      #loader {
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        background-color: #020617;
-        color: white;
-        z-index: 9999;
-        transition: opacity 0.5s ease;
-      }
-      .spinner {
-        width: 40px;
-        height: 40px;
-        border: 4px solid rgba(255, 255, 255, 0.1);
-        border-left-color: #3b82f6;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin-bottom: 16px;
-      }
-      @keyframes spin {
-        to { transform: rotate(360deg); }
-      }
-    </style>
   <script type="importmap">
 {
   "imports": {
-    "lucide-react": "https://aistudiocdn.com/lucide-react@0.292.0",
-    "react": "https://esm.sh/react@18.2.0",
-    "react/": "https://esm.sh/react@18.2.0/",
-    "react-dom": "https://esm.sh/react-dom@18.2.0",
-    "react-dom/": "https://esm.sh/react-dom@18.2.0/",
-    "react-router-dom": "https://esm.sh/react-router-dom@6.20.0?external=react,react-dom",
-    "recharts": "https://esm.sh/recharts@2.10.3?external=react,react-dom",
-    "crypto-js": "https://esm.sh/crypto-js@4.2.0",
-    "@tonconnect/ui-react": "https://esm.sh/@tonconnect/ui-react@2.0.0?external=react,react-dom",
-    "ethers": "https://esm.sh/ethers@6.11.1"
+    "react-router-dom": "https://esm.sh/react-router-dom@^7.10.1",
+    "react/": "https://esm.sh/react@^19.2.1/",
+    "react": "https://esm.sh/react@^19.2.1",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.1/",
+    "vite": "https://esm.sh/vite@^7.2.7",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2",
+    "recharts": "https://esm.sh/recharts@^3.5.1",
+    "crypto-js": "https://esm.sh/crypto-js@^4.2.0",
+    "lucide-react": "https://esm.sh/lucide-react@^0.560.0",
+    "@tonconnect/ui-react": "https://esm.sh/@tonconnect/ui-react@^2.3.1"
   }
 }
 </script>
 </head>
   <body>
-    <!-- Initial Loader: React will replace content inside root, but we can put a loader here initially -->
     <div id="root">
       <div id="loader">
         <div class="spinner"></div>
         <div style="font-size: 14px; opacity: 0.7;">Yükleniyor...</div>
       </div>
     </div>
-    <script type="module" src="./index.tsx"></script>
+    
+    <!-- Vite Entry Point -->
+    <script type="module" src="/index.tsx"></script>
   </body>
 </html>

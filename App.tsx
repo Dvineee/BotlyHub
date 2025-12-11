@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { HashRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import Home from './pages/Home';
@@ -23,62 +22,46 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
 
   useEffect(() => {
     // Basic setup for viewport
-    const setViewport = () => {
+    const initTelegram = () => {
         if (window.Telegram?.WebApp) {
+            const tg = window.Telegram.WebApp;
+            
             // Expand to full height
-            window.Telegram.WebApp.expand();
+            tg.expand();
+            
+            // Set colors immediately
+            if (tg.setHeaderColor) tg.setHeaderColor('#020617');
+            if (tg.setBackgroundColor) tg.setBackgroundColor('#020617');
+
             // Force CSS variable for 100vh fix on mobile
-            document.documentElement.style.setProperty('--tg-viewport-height', `${window.Telegram.WebApp.viewportHeight}px`);
+            // Use window.innerHeight fallback if viewportHeight is 0 initially
+            const vh = tg.viewportHeight || window.innerHeight;
+            document.documentElement.style.setProperty('--tg-viewport-height', `${vh}px`);
+            
+            // Notify Telegram we are ready
+            tg.ready();
+            setIsReady(true);
+        } else {
+            // Browser fallback
+            setIsReady(true);
         }
     };
 
-    // Safety check for window.Telegram
-    if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
-      const tg = window.Telegram.WebApp;
-      
-      // Call expand immediately
-      tg.expand();
-      setViewport();
+    // Try to init
+    initTelegram();
 
-      // Notify Telegram that the Mini App is ready to be displayed
-      // Wrap in timeout to ensure React has mounted the initial frame
-      setTimeout(() => {
-          tg.ready();
-          setIsReady(true);
-      }, 100);
+    // Event listener for viewport changes (keyboard open/close)
+    const handleViewportChanged = () => {
+         if (window.Telegram?.WebApp) {
+             const vh = window.Telegram.WebApp.viewportHeight;
+             document.documentElement.style.setProperty('--tg-viewport-height', `${vh}px`);
+         }
+    };
 
-      try {
-        tg.enableClosingConfirmation(); 
-        
-        // Set header color
-        if (tg.setHeaderColor) {
-            tg.setHeaderColor('#020617'); // Match slate-950
-        }
-        if (tg.setBackgroundColor) {
-            tg.setBackgroundColor('#020617');
-        }
-
-      } catch (e) {
-        console.warn('Telegram API initialization warning:', e);
-      }
-      
-      // Fix colors to match theme
-      if (tg.colorScheme === 'dark') {
-          document.documentElement.classList.add('dark');
-      }
-
-      // Listener for viewport changes
-      tg.onEvent('viewportChanged', setViewport);
-
-    } else {
-        // Fallback for browser testing
-        setIsReady(true);
-    }
+    window.Telegram?.WebApp?.onEvent('viewportChanged', handleViewportChanged);
 
     return () => {
-        if (window.Telegram?.WebApp) {
-            window.Telegram.WebApp.offEvent('viewportChanged', setViewport);
-        }
+        window.Telegram?.WebApp?.offEvent('viewportChanged', handleViewportChanged);
     }
   }, []);
 
@@ -103,6 +86,14 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
       tg.BackButton.offClick(handleBack);
     };
   }, [location, navigate]);
+
+  if (!isReady) {
+      return (
+          <div className="fixed inset-0 bg-slate-950 flex items-center justify-center text-white">
+              <div className="w-8 h-8 border-2 border-white/20 border-t-blue-500 rounded-full animate-spin"></div>
+          </div>
+      );
+  }
 
   return (
       <div style={{ minHeight: 'var(--tg-viewport-height, 100vh)' }} className="bg-slate-950">
