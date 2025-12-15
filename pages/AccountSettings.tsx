@@ -1,21 +1,46 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronLeft, Mail, Phone, Save, Trash2, Smartphone, RefreshCw, ShieldCheck, BadgeCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTelegram } from '../hooks/useTelegram';
 
 const AccountSettings = () => {
   const navigate = useNavigate();
+  const { user } = useTelegram();
   const [isLoading, setIsLoading] = useState(false);
 
-  // Mock User Data State - In a real TMA, this comes from Telegram.WebApp.initDataUnsafe
   const [formData, setFormData] = useState({
-    fullName: 'Ali Yılmaz',
-    username: 'aliyilmaz',
-    telegramId: '123456789',
+    fullName: '',
+    username: '',
+    telegramId: '',
     language: 'tr',
-    email: '', // Optional in TMA
-    phone: ''  // Optional in TMA
+    email: '',
+    phone: ''
   });
+
+  // Telegram verilerini form'a yükle
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        fullName: `${user.first_name} ${user.last_name || ''}`.trim(),
+        username: user.username || '',
+        telegramId: user.id.toString(),
+        language: user.language_code || 'tr',
+      }));
+    } else {
+        // Fallback for browser testing
+        setFormData(prev => ({
+            ...prev,
+            fullName: 'Misafir Kullanıcı',
+            username: 'misafir',
+            telegramId: '000000',
+        }));
+    }
+  }, [user]);
+
+  const avatarUrl = user?.photo_url 
+    ? user.photo_url 
+    : `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.fullName || 'User')}&background=3b82f6&color=fff&size=200`;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -47,15 +72,15 @@ const AccountSettings = () => {
           </div>
           
           <div className="flex items-center gap-4 relative z-10">
-              <div className="w-20 h-20 rounded-full p-1 bg-blue-500/20 border-2 border-blue-500 overflow-hidden">
-                  <img src="https://picsum.photos/seed/me/200" alt="Profile" className="w-full h-full object-cover rounded-full" />
+              <div className="w-20 h-20 rounded-full p-1 bg-blue-500/20 border-2 border-blue-500 overflow-hidden bg-slate-800">
+                  <img src={avatarUrl} alt="Profile" className="w-full h-full object-cover rounded-full" />
               </div>
               <div>
                   <h2 className="text-xl font-bold text-white flex items-center gap-2">
                       {formData.fullName}
                       <BadgeCheck size={18} className="text-blue-400" />
                   </h2>
-                  <p className="text-blue-200 text-sm font-medium">@{formData.username}</p>
+                  <p className="text-blue-200 text-sm font-medium">@{formData.username || 'username_yok'}</p>
                   <p className="text-slate-400 text-xs mt-1 flex items-center gap-1">
                       <Smartphone size={10} /> Telegram ID: {formData.telegramId}
                   </p>
@@ -63,7 +88,10 @@ const AccountSettings = () => {
           </div>
           
           <div className="mt-6 flex gap-2">
-              <button className="flex-1 bg-slate-800/50 hover:bg-slate-800 border border-slate-700 text-slate-300 text-xs font-bold py-2 rounded-lg flex items-center justify-center gap-2 transition-colors">
+              <button 
+                  onClick={() => window.location.reload()}
+                  className="flex-1 bg-slate-800/50 hover:bg-slate-800 border border-slate-700 text-slate-300 text-xs font-bold py-2 rounded-lg flex items-center justify-center gap-2 transition-colors"
+              >
                   <RefreshCw size={14} /> Bilgileri Senkronize Et
               </button>
           </div>

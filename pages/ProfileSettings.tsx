@@ -1,11 +1,12 @@
-
 import React, { useEffect, useState } from 'react';
 import { ChevronLeft, User, CreditCard, Bell, Globe, ChevronRight, Crown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { subscriptionPlans } from '../data';
+import { useTelegram } from '../hooks/useTelegram';
 
 const ProfileSettings = () => {
   const navigate = useNavigate();
+  const { user } = useTelegram();
   const [currentPlanName, setCurrentPlanName] = useState('Başlangıç');
 
   useEffect(() => {
@@ -15,6 +16,15 @@ const ProfileSettings = () => {
           if (plan) setCurrentPlanName(plan.name);
       }
   }, []);
+
+  // Kullanıcı adı veya isim yoksa varsayılan değerler
+  const displayName = user ? `${user.first_name} ${user.last_name || ''}`.trim() : 'Misafir Kullanıcı';
+  const displayUsername = user?.username ? `@${user.username}` : (user?.id ? `ID: ${user.id}` : '@misafir');
+  
+  // Profil fotoğrafı yoksa baş harflerden avatar oluşturma (Placeholder API)
+  const avatarUrl = user?.photo_url 
+    ? user.photo_url 
+    : `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=334155&color=fff&size=200`;
 
   const MenuItem = ({ icon: Icon, label, value, hasArrow = true, onClick }: { icon: any, label: string, value?: string, hasArrow?: boolean, onClick?: () => void }) => (
     <div 
@@ -45,12 +55,12 @@ const ProfileSettings = () => {
 
         {/* Profile Card */}
         <div className="flex items-center gap-4 mb-8 p-4 bg-slate-900 rounded-2xl border border-slate-800 shadow-sm">
-             <div className="w-16 h-16 rounded-full bg-slate-700 flex items-center justify-center overflow-hidden">
-                 <img src="https://picsum.photos/seed/me/200" alt="Me" className="w-full h-full object-cover" />
+             <div className="w-16 h-16 rounded-full bg-slate-700 flex items-center justify-center overflow-hidden border-2 border-slate-800">
+                 <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover" />
              </div>
              <div>
-                 <h2 className="font-bold text-lg text-white">Kullanıcı Adı</h2>
-                 <p className="text-slate-500 text-sm">kullanici@eposta.com</p>
+                 <h2 className="font-bold text-lg text-white">{displayName}</h2>
+                 <p className="text-slate-500 text-sm">{displayUsername}</p>
                  <div className="mt-2 inline-flex items-center gap-1 bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded text-xs font-bold border border-blue-500/20">
                     <Crown size={12} />
                     <span>{currentPlanName}</span>
