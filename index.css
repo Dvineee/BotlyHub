@@ -4,8 +4,8 @@
 
 @layer base {
   html {
-    background-color: #020617; /* Matches Slate-950 */
-    overscroll-behavior-y: none; /* Prevents bounce but allows scroll */
+    background-color: #020617; 
+    overscroll-behavior-y: none;
     height: 100%;
   }
   
@@ -14,8 +14,14 @@
     margin: 0;
     padding: 0;
     min-height: 100%;
-    overflow-y: auto; /* Ensure body can scroll */
+    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    
+    /* Safe Area Support for Notch/Home Bar */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
   }
 
   #root {
