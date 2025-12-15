@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, Plus, Megaphone, Users, DollarSign, AlertCircle, Radio, Info, X } from 'lucide-react';
+import { ChevronLeft, Plus, Megaphone, Users, DollarSign, AlertCircle, Radio, Info, X, Loader2, CheckCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Channel, UserBot } from '../types';
 
@@ -9,6 +9,10 @@ const MyChannels = () => {
   const [channels, setChannels] = useState<Channel[]>([]);
   const [bots, setBots] = useState<UserBot[]>([]);
   const [showInfo, setShowInfo] = useState(false);
+  
+  // Simulation States
+  const [isScanning, setIsScanning] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
 
   // Load channels and bots from local storage
   useEffect(() => {
@@ -18,34 +22,49 @@ const MyChannels = () => {
     setChannels(userChannels);
   }, []);
 
+  // Show toast message helper
+  const showToast = (msg: string) => {
+      setToast(msg);
+      setTimeout(() => setToast(null), 3000);
+  };
+
   const simulateConnectChannel = () => {
-      if (bots.length === 0) {
-          alert("Kanal bağlamak için önce en az bir bota sahip olmalısınız.");
-          return;
-      }
+      setIsScanning(true);
 
-      // Random mock channel generator
-      const randomId = Math.random().toString(36).substr(2, 9);
-      const names = ["Sohbet Grubu", "Duyurular", "Oyun Odası", "Müzik Paylaşım", "Kripto Analiz"];
-      const randomName = names[Math.floor(Math.random() * names.length)] + " " + Math.floor(Math.random() * 100);
-      
-      // Assign random 1-2 bots to this channel
-      const shuffledBots = [...bots].sort(() => 0.5 - Math.random());
-      const selectedBots = shuffledBots.slice(0, Math.floor(Math.random() * 2) + 1).map(b => b.id);
+      // Simulate API/Network Delay
+      setTimeout(() => {
+          // Random mock channel generator
+          const randomId = Math.random().toString(36).substr(2, 9);
+          const prefixes = ["Sohbet", "Duyuru", "Fan", "Ticaret", "Kripto", "Oyun", "Destek"];
+          const suffixes = ["Grubu", "Kanalı", "Odası", "Hub", "TR", "Global"];
+          const randomName = `${prefixes[Math.floor(Math.random() * prefixes.length)]} ${suffixes[Math.floor(Math.random() * suffixes.length)]}`;
+          
+          // Assign random bots if available, otherwise empty
+          let selectedBots: string[] = [];
+          if (bots.length > 0) {
+              const shuffledBots = [...bots].sort(() => 0.5 - Math.random());
+              // Pick 0 to 2 bots randomly
+              const count = Math.floor(Math.random() * 2) + 1;
+              selectedBots = shuffledBots.slice(0, count).map(b => b.id);
+          }
 
-      const newChannel: Channel = {
-          id: randomId,
-          name: randomName,
-          memberCount: Math.floor(Math.random() * 4500) + 100,
-          icon: `https://picsum.photos/seed/${randomId}/100`,
-          isAdEnabled: true,
-          connectedBotIds: selectedBots,
-          revenue: parseFloat((Math.random() * 500).toFixed(2))
-      };
+          const newChannel: Channel = {
+              id: randomId,
+              name: randomName,
+              memberCount: Math.floor(Math.random() * 4500) + 100,
+              icon: `https://picsum.photos/seed/${randomId}/100`,
+              isAdEnabled: true,
+              connectedBotIds: selectedBots,
+              revenue: parseFloat((Math.random() * 500).toFixed(2))
+          };
 
-      const updatedChannels = [...channels, newChannel];
-      setChannels(updatedChannels);
-      localStorage.setItem('userChannels', JSON.stringify(updatedChannels));
+          const updatedChannels = [...channels, newChannel];
+          setChannels(updatedChannels);
+          localStorage.setItem('userChannels', JSON.stringify(updatedChannels));
+          
+          setIsScanning(false);
+          showToast(`"${randomName}" başarıyla bağlandı!`);
+      }, 2000);
   };
 
   const toggleChannelAdGlobal = (channelId: string) => {
@@ -70,11 +89,20 @@ const MyChannels = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 p-4 pt-8 pb-20">
+    <div className="min-h-screen bg-slate-950 p-4 pt-8 pb-20 relative">
+      
+      {/* Toast Notification */}
+      {toast && (
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-emerald-600 text-white px-4 py-3 rounded-full shadow-2xl flex items-center gap-2 animate-in fade-in slide-in-from-top-4 w-max max-w-[90%]">
+            <CheckCircle2 size={18} />
+            <span className="font-bold text-xs">{toast}</span>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
-            <button onClick={() => navigate('/')} className="p-2 hover:bg-slate-900 rounded-full">
+            <button onClick={() => navigate('/')} className="p-2 hover:bg-slate-900 rounded-full transition-colors">
                 <ChevronLeft className="w-6 h-6 text-slate-200" />
             </button>
             <h1 className="text-xl font-bold text-white">Kanallarım</h1>
@@ -95,13 +123,13 @@ const MyChannels = () => {
                   <button onClick={() => setShowInfo(false)} className="absolute top-4 right-4 text-slate-500 hover:text-white"><X size={20} /></button>
                   <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                       <Megaphone size={20} className="text-blue-500" />
-                      Nasıl Çalışır?
+                      Nasıl Çalışır? (Demo)
                   </h3>
                   <ol className="space-y-4 text-sm text-slate-300 list-decimal pl-4">
                       <li>Satın aldığınız botu <span className="text-white font-bold">Botu Başlat</span> diyerek Telegram'da açın.</li>
                       <li>Botu yönetmek istediğiniz Kanal veya Gruba <span className="text-white font-bold">Yönetici</span> olarak ekleyin.</li>
-                      <li>Uygulamaya dönüp <span className="text-white font-bold">Kanal Bağla</span> butonuna basın.</li>
-                      <li>Kanalınız otomatik olarak burada görünecektir.</li>
+                      <li>Uygulamaya dönüp <span className="text-white font-bold">Kanal Tara</span> butonuna basın.</li>
+                      <li>Sistem yöneticisi olduğunuz kanalları otomatik bulacaktır.</li>
                       <li><span className="text-emerald-400 font-bold">Gelir Modu</span>'nu açarak reklam yayınlamaya başlayın.</li>
                   </ol>
                   <button onClick={() => setShowInfo(false)} className="w-full mt-6 bg-slate-800 text-white py-3 rounded-xl font-bold text-sm">Anlaşıldı</button>
@@ -113,25 +141,44 @@ const MyChannels = () => {
       <div className="space-y-4">
         {channels.length === 0 ? (
              <div className="flex flex-col items-center justify-center py-12 text-slate-500 bg-slate-900/50 rounded-2xl border border-slate-800/50 border-dashed">
-                <Megaphone size={48} className="mb-4 opacity-20" />
-                <p>Henüz bağlı bir kanalınız yok.</p>
-                <p className="text-xs text-slate-600 mt-2 text-center max-w-[200px]">Sağ üstteki bilgi butonuna tıklayarak nasıl bağlayacağınızı öğrenin.</p>
+                <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mb-4">
+                    {isScanning ? <Loader2 size={32} className="animate-spin text-blue-500" /> : <Megaphone size={32} className="opacity-40" />}
+                </div>
+                
+                <p className="font-medium text-slate-300">{isScanning ? 'Kanallar taranıyor...' : 'Henüz bağlı bir kanalınız yok.'}</p>
+                <p className="text-xs text-slate-600 mt-2 text-center max-w-[200px]">
+                    {isScanning ? 'Lütfen bekleyin, Telegram API ile iletişim kuruluyor.' : 'Bot eklediğiniz kanalları otomatik olarak bulabiliriz.'}
+                </p>
+                
                 <button 
                     onClick={simulateConnectChannel}
-                    className="mt-6 bg-blue-600 hover:bg-blue-500 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-colors shadow-lg shadow-blue-900/30"
+                    disabled={isScanning}
+                    className="mt-6 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white px-6 py-3 rounded-xl text-sm font-bold transition-all shadow-lg shadow-blue-900/30 flex items-center gap-2"
                 >
-                    <Plus size={16} className="inline mr-2" />
-                    Kanalı Otomatik Bul (Sim)
+                    {isScanning ? (
+                        <>
+                            <Loader2 size={16} className="animate-spin" />
+                            Taranıyor...
+                        </>
+                    ) : (
+                        <>
+                            <Plus size={16} />
+                            Kanalı Otomatik Bul
+                        </>
+                    )}
                 </button>
             </div>
         ) : (
             <>
-                <div className="flex justify-end mb-2">
+                <div className="flex justify-between items-center mb-2 px-1">
+                    <span className="text-xs font-bold text-slate-500">{channels.length} Kanal Bağlı</span>
                     <button 
                         onClick={simulateConnectChannel}
-                        className="text-xs font-bold text-blue-400 hover:text-blue-300 flex items-center gap-1"
+                        disabled={isScanning}
+                        className="text-xs font-bold text-blue-400 hover:text-blue-300 flex items-center gap-1 disabled:opacity-50"
                     >
-                        <Plus size={14} /> Yeni Kanal Tara
+                        {isScanning ? <Loader2 size={12} className="animate-spin" /> : <Plus size={14} />} 
+                        {isScanning ? 'Aranıyor...' : 'Yeni Kanal Tara'}
                     </button>
                 </div>
                 {channels.map((channel) => {
@@ -139,13 +186,13 @@ const MyChannels = () => {
                     const channelBots = bots.filter(b => channel.connectedBotIds.includes(b.id));
 
                     return (
-                        <div key={channel.id} className="bg-slate-900 rounded-2xl p-4 border border-slate-800 relative overflow-hidden shadow-sm">
+                        <div key={channel.id} className="bg-slate-900 rounded-2xl p-4 border border-slate-800 relative overflow-hidden shadow-sm animate-in slide-in-from-bottom-2">
                             {/* Channel Header */}
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center gap-3">
                                     <img src={channel.icon} alt={channel.name} className="w-14 h-14 rounded-full object-cover border-2 border-slate-800 bg-slate-800" />
                                     <div>
-                                        <h3 className="font-bold text-lg text-white">{channel.name}</h3>
+                                        <h3 className="font-bold text-lg text-white max-w-[150px] truncate">{channel.name}</h3>
                                         <div className="flex items-center gap-2 text-slate-500 text-xs mt-1">
                                             <Users size={12} />
                                             <span>{channel.memberCount.toLocaleString()} Üye</span>
@@ -181,7 +228,13 @@ const MyChannels = () => {
 
                             {/* Connected Bots Section */}
                             <div className="pt-2">
-                                <p className="text-[10px] font-bold text-slate-500 uppercase mb-2 pl-1">Bağlı Botlar ve Durum</p>
+                                <div className="flex justify-between items-center mb-2 px-1">
+                                    <p className="text-[10px] font-bold text-slate-500 uppercase">Bağlı Botlar</p>
+                                    {channelBots.length === 0 && (
+                                        <span className="text-[10px] text-red-400">Bot bulunamadı</span>
+                                    )}
+                                </div>
+                                
                                 <div className="space-y-2">
                                     {channelBots.map(bot => {
                                         const isPublishing = activeAdBot?.id === bot.id;
@@ -219,8 +272,14 @@ const MyChannels = () => {
                                     })}
                                 </div>
                                 
-                                {channel.isAdEnabled && !activeAdBot && channelBots.some(b => b.isAdEnabled) === false && (
-                                    <div className="mt-3 flex items-center gap-2 text-slate-500 text-[10px] bg-slate-950/50 p-2 rounded">
+                                {channelBots.length === 0 && (
+                                    <div className="text-center py-2 border border-dashed border-slate-800 rounded-lg">
+                                        <p className="text-[10px] text-slate-500">Bu kanalda yönetici olduğunuz bir bot bulunamadı.</p>
+                                    </div>
+                                )}
+
+                                {channelBots.length > 0 && channel.isAdEnabled && !activeAdBot && channelBots.some(b => b.isAdEnabled) === false && (
+                                    <div className="mt-3 flex items-center gap-2 text-slate-500 text-[10px] bg-slate-950/50 p-2 rounded border border-slate-800">
                                         <AlertCircle size={12} />
                                         <span>Hiçbir botun reklam özelliği açık değil.</span>
                                     </div>
