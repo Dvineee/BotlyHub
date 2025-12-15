@@ -1,13 +1,14 @@
-
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, Share2, Bookmark, Check, Play, Send } from 'lucide-react';
+import { ChevronLeft, Share2, Bookmark, Send } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { mockBots } from '../data';
 import { UserBot } from '../types';
+import { useTelegram } from '../hooks/useTelegram';
 
 const BotDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { haptic, openLink, notification } = useTelegram();
   const [isOwned, setIsOwned] = useState(false);
 
   // Find the bot from the mock database
@@ -25,10 +26,16 @@ const BotDetail = () => {
   }
 
   const handleAction = () => {
+      // Trigger Haptic Feedback
+      haptic('medium');
+
       if (isOwned) {
-          // In a real Telegram app, this would use Telegram.WebApp.openTelegramLink
-          // to open the bot conversation: https://t.me/bot_username
-          alert("Telegram botu başlatılıyor: t.me/" + bot.name.replace(/\s/g, ''));
+          // Construct a dummy username based on name (remove spaces)
+          const botUsername = bot.name.replace(/\s+/g, '') + "_bot";
+          const url = `https://t.me/${botUsername}`;
+
+          // Use custom hook to open native link
+          openLink(url);
           return;
       }
 
@@ -45,7 +52,18 @@ const BotDetail = () => {
           localStorage.setItem('ownedBots', JSON.stringify([...currentBots, newBot]));
           
           setIsOwned(true);
-          // Don't redirect immediately, let user decide to start it
+          
+          // Success Feedback
+          notification('success');
+          
+          // Show quick native popup if available
+          if(window.Telegram?.WebApp?.showPopup) {
+              window.Telegram.WebApp.showPopup({
+                  title: 'Başarılı!',
+                  message: 'Bot kütüphanenize eklendi.',
+                  buttons: [{type: 'ok'}]
+              });
+          }
       } else {
           // Paid bot logic: Go to payment
           navigate(`/payment/${id}`);
@@ -53,19 +71,22 @@ const BotDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col">
-      {/* Header */}
-      <div className="p-4 flex items-center justify-between sticky top-0 z-10 bg-slate-950/80 backdrop-blur-md border-b border-slate-900/50">
+    <div className="min-h-screen bg-slate-950 pb-24">
+      {/* Header - Sticky */}
+      <div className="p-4 flex items-center justify-between sticky top-0 z-20 bg-slate-950/80 backdrop-blur-md border-b border-slate-900/50">
         <button onClick={() => navigate(-1)} className="p-2 hover:bg-slate-800 rounded-full transition-colors">
           <ChevronLeft className="w-6 h-6 text-slate-200" />
         </button>
         <h1 className="text-lg font-bold text-white max-w-[200px] truncate">{bot.name}</h1>
-        <button className="p-2 hover:bg-slate-800 rounded-full transition-colors">
+        <button 
+            onClick={() => { haptic('light'); }}
+            className="p-2 hover:bg-slate-800 rounded-full transition-colors"
+        >
             <Share2 className="w-6 h-6 text-slate-400" />
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto pb-28 px-6">
+      <div className="px-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
           
           {/* Hero Section */}
           <div className="flex flex-col items-center mt-6 mb-8">
@@ -97,7 +118,7 @@ const BotDetail = () => {
                    </div>
                    <div className="flex-1 min-w-0">
                       <h4 className="text-xs font-bold text-slate-200 truncate">Sponsor: UltraBot</h4>
-                      <p className="text-[10px] text-slate-500 leading-tight mt-0.5 truncate">Sunucunu en iyi araçlarla yönet.</p>
+                      <p className="text-xs text-slate-500 leading-tight mt-0.5 truncate">Sunucunu en iyi araçlarla yönet.</p>
                    </div>
                    <button className="bg-slate-800 hover:bg-slate-700 text-white text-[10px] font-bold py-1.5 px-3 rounded-lg transition-colors flex-shrink-0 border border-slate-700">
                        İncele
@@ -123,7 +144,7 @@ const BotDetail = () => {
       </div>
 
       {/* Sticky Bottom Action */}
-      <div className="fixed bottom-0 left-0 right-0 bg-slate-950/90 backdrop-blur-lg border-t border-slate-800 p-4 pb-8 z-50">
+      <div className="fixed bottom-0 left-0 right-0 bg-slate-950/90 backdrop-blur-lg border-t border-slate-800 p-4 pb-8 z-50 safe-area-bottom">
           <div className="max-w-md mx-auto flex gap-3">
               <button 
                  className={`flex-1 transition-all text-white font-bold py-3.5 rounded-xl shadow-lg flex items-center justify-center gap-2 ${
@@ -144,7 +165,10 @@ const BotDetail = () => {
                       </>
                   )}
               </button>
-              <button className="bg-slate-800 hover:bg-slate-700 text-slate-300 p-3.5 rounded-xl border border-slate-700 transition-colors">
+              <button 
+                onClick={() => haptic('light')}
+                className="bg-slate-800 hover:bg-slate-700 text-slate-300 p-3.5 rounded-xl border border-slate-700 transition-colors"
+              >
                   <Bookmark className="w-6 h-6" />
               </button>
           </div>
