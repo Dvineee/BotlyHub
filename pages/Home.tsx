@@ -333,7 +333,7 @@ const Home = () => {
                 <circle cx="20" cy="20" r="4" fill="white" />
                 
                 {/* Text */}
-                <text x="46" y="27" fontFamily="'Inter', sans-serif" fontWeight="700" fontSize="20" className="fill-white" letterSpacing="-0.5">BotlyHub V1</text>
+                <text x="46" y="27" fontFamily="'Inter', sans-serif" fontWeight="700" fontSize="20" className="fill-white" letterSpacing="-0.5">BotlyHub V2</text>
             </svg>
         </div>
 
