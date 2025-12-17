@@ -10,7 +10,7 @@ console.log("Application initializing...");
 
 // --- Error Boundary for Production Debugging ---
 interface ErrorBoundaryProps {
-  // Fix: children must be optional for class components used with JSX children blocks
+  // children must be optional for class components used with JSX children blocks
   children?: ReactNode;
 }
 
@@ -20,26 +20,26 @@ interface ErrorBoundaryState {
   errorInfo: ErrorInfo | null;
 }
 
-// Fix: Use Component directly to ensure props, state, and setState are correctly inherited and recognized by TypeScript
+// Fixed: Import Component directly and extend it to ensure TypeScript correctly identifies inherited properties like state, setState, and props.
 class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
-    // Fix: Correctly initialize state inherited from React Component base class
+    // Correctly initialize state property inherited from Component
     this.state = { hasError: false, error: null, errorInfo: null };
   }
 
-  static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
-    return { hasError: true, error };
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error, errorInfo: null };
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error("Uncaught error:", error, errorInfo);
-    // Fix: Access setState from the inherited Component class
+    // Accessing setState from the base Component class
     this.setState({ error, errorInfo });
   }
 
   render() {
-    // Fix: Access state property from the inherited Component class
+    // Accessing state property from the Component base class
     if (this.state.hasError) {
       return (
         <div style={{ padding: 20, color: '#fff', backgroundColor: '#991b1b', height: '100vh', overflow: 'auto', fontFamily: 'monospace', zIndex: 99999, position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}>
@@ -62,7 +62,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       );
     }
 
-    // Fix: Access props property from the inherited Component class
+    // Accessing props property from the Component base class
     return this.props.children;
   }
 }

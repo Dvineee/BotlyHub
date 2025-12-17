@@ -1,10 +1,13 @@
 
 import { createClient } from '@supabase/supabase-js';
-import { Bot, User, Channel, CryptoTransaction } from '../types';
+import { Bot, User, CryptoTransaction } from '../types';
 
-// These should be configured in your environment variables for production.
-const SUPABASE_URL = (import.meta as any).env?.VITE_SUPABASE_URL || 'https://placeholder.supabase.co';
-const SUPABASE_ANON_KEY = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || 'placeholder-key';
+/**
+ * SUPABASE BAĞLANTISI
+ * Bu bilgiler senin projenin kimlik kartıdır.
+ */
+const SUPABASE_URL = 'https://ybnxfwqrduuinzgnbymc.supabase.co'; 
+const SUPABASE_ANON_KEY = 'sb_publishable_VeYQ304ZpUpj3ymB3ihpjw_jt49W1G-'; 
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -13,33 +16,30 @@ const STORAGE_KEYS = {
 };
 
 export class DatabaseService {
-  /**
-   * IMPORTANT: Ensure your Supabase database has 'bots', 'users', 'transactions', and 'channels' tables.
-   */
-
-  // --- Bots ---
+  
+  // --- Bot Yönetimi (Market Verileri) ---
   static async getBots(): Promise<Bot[]> {
     try {
       const { data, error } = await supabase
         .from('bots')
         .select('*')
-        .order('id', { ascending: false });
+        .order('created_at', { ascending: false });
       
       if (error) throw error;
       return data || [];
     } catch (e) {
-      console.warn('DB Error fetching bots, check your Supabase config:', e);
+      console.error('Botlar yüklenirken hata oluştu:', e);
       return [];
     }
   }
 
   static async saveBot(bot: Partial<Bot>) {
+    // ID yoksa yeni oluşturur, varsa günceller (Admin Paneli için)
     const { error } = await supabase
       .from('bots')
       .upsert({ 
         ...bot, 
-        id: bot.id || Math.random().toString(36).substr(2, 9),
-        created_at: bot.id ? undefined : new Date().toISOString()
+        id: bot.id || Math.random().toString(36).substr(2, 9)
       });
     
     if (error) throw error;
@@ -54,7 +54,7 @@ export class DatabaseService {
     if (error) throw error;
   }
 
-  // --- Users ---
+  // --- Kullanıcı Yönetimi ---
   static async getUsers(): Promise<User[]> {
     try {
       const { data, error } = await supabase
@@ -65,7 +65,7 @@ export class DatabaseService {
       if (error) throw error;
       return data || [];
     } catch (e) {
-      console.warn('DB Error fetching users:', e);
+      console.error('Kullanıcılar yüklenirken hata:', e);
       return [];
     }
   }
@@ -78,7 +78,7 @@ export class DatabaseService {
     if (error) throw error;
   }
 
-  // --- Transactions ---
+  // --- Finansal İşlemler (Para Yatırma/Çekme Geçmişi) ---
   static async getTransactions(): Promise<CryptoTransaction[]> {
     try {
       const { data, error } = await supabase
@@ -89,12 +89,12 @@ export class DatabaseService {
       if (error) throw error;
       return data || [];
     } catch (e) {
-      console.warn('DB Error fetching transactions:', e);
+      console.error('İşlemler yüklenirken hata:', e);
       return [];
     }
   }
 
-  // --- Admin Auth Session Management ---
+  // --- Admin Yetkilendirme (Dashboard Girişi) ---
   static setAdminSession(token: string) {
     localStorage.setItem(STORAGE_KEYS.ADMIN_AUTH, token);
   }
@@ -108,6 +108,6 @@ export class DatabaseService {
   }
 
   static async init() {
-    console.log("BotlyHub V3 Database Engine Initialized.");
+    console.log("BotlyHub V3: Supabase Bulut Motoru Aktif.");
   }
 }
