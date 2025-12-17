@@ -1,72 +1,115 @@
 
+import { createClient } from '@supabase/supabase-js';
 import { Bot, User, Channel, CryptoTransaction } from '../types';
-import { mockBots } from '../data';
+
+// NOTE: These should be provided in your environment variables for production.
+// For the context of this Mini App, we initialize with placeholders or 
+// environment variables if available.
+const SUPABASE_URL = (import.meta as any).env?.VITE_SUPABASE_URL || 'https://placeholder.supabase.co';
+const SUPABASE_ANON_KEY = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || 'placeholder-key';
+
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const STORAGE_KEYS = {
-  BOTS: 'db_bots_v3',
-  USERS: 'db_users_v3',
-  CHANNELS: 'db_channels_v3',
-  TRANSACTIONS: 'db_transactions_v3',
-  ADMIN_AUTH: 'db_admin_session'
+  ADMIN_AUTH: 'db_admin_session_v3'
 };
 
 export class DatabaseService {
-  // --- Initialize DB with seed data if empty ---
-  static async init() {
-    if (!localStorage.getItem(STORAGE_KEYS.BOTS)) {
-      localStorage.setItem(STORAGE_KEYS.BOTS, JSON.stringify(mockBots));
-    }
-    if (!localStorage.getItem(STORAGE_KEYS.USERS)) {
-      const initialUsers = [
-        { id: '1', name: 'Admin User', username: 'admin', role: 'Admin', status: 'Active', badges: ['Premium'], joinDate: new Date().toISOString() }
-      ];
-      localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(initialUsers));
-    }
-  }
+  /**
+   * Note for implementation:
+   * You need to create 'bots', 'users', 'transactions', and 'channels' tables in your Supabase dashboard.
+   */
 
   // --- Bots ---
   static async getBots(): Promise<Bot[]> {
-    return JSON.parse(localStorage.getItem(STORAGE_KEYS.BOTS) || '[]');
+    const { data, error } = await supabase
+      .from('bots')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (error) {
+      console.error('Error fetching bots:', error);
+      return [];
+    }
+    return data || [];
   }
 
   static async saveBot(bot: Bot) {
-    const bots = await this.getBots();
-    const index = bots.findIndex(b => b.id === bot.id);
-    if (index > -1) bots[index] = bot;
-    else bots.push(bot);
-    localStorage.setItem(STORAGE_KEYS.BOTS, JSON.stringify(bots));
+    const { error } = await supabase
+      .from('bots')
+      .upsert(bot);
+    
+    if (error) throw error;
   }
 
   static async deleteBot(id: string) {
-    const bots = await this.getBots();
-    const filtered = bots.filter(b => b.id !== id);
-    localStorage.setItem(STORAGE_KEYS.BOTS, JSON.stringify(filtered));
+    const { error } = await supabase
+      .from('bots')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
   }
 
   // --- Users ---
   static async getUsers(): Promise<User[]> {
-    return JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS) || '[]');
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .order('joinDate', { ascending: false });
+    
+    if (error) {
+      console.error('Error fetching users:', error);
+      return [];
+    }
+    return data || [];
   }
 
   static async updateUser(user: User) {
-    const users = await this.getUsers();
-    const index = users.findIndex(u => u.id === user.id);
-    if (index > -1) users[index] = user;
-    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+    const { error } = await supabase
+      .from('users')
+      .upsert(user);
+    
+    if (error) throw error;
   }
 
   // --- Transactions ---
   static async getTransactions(): Promise<CryptoTransaction[]> {
-    return JSON.parse(localStorage.getItem(STORAGE_KEYS.TRANSACTIONS) || '[]');
+    const { data, error } = await supabase
+      .from('transactions')
+      .select('*')
+      .order('date', { ascending: false });
+    
+    if (error) {
+      console.error('Error fetching transactions:', error);
+      return [];
+    }
+    return data || [];
   }
 
   static async addTransaction(tx: CryptoTransaction) {
-    const txs = await this.getTransactions();
-    txs.unshift(tx);
-    localStorage.setItem(STORAGE_KEYS.TRANSACTIONS, JSON.stringify(txs));
+    const { error } = await supabase
+      .from('transactions')
+      .insert(tx);
+    
+    if (error) throw error;
+  }
+
+  // --- Channels ---
+  static async getChannels(): Promise<Channel[]> {
+    const { data, error } = await supabase
+      .from('channels')
+      .select('*');
+    
+    if (error) {
+      console.error('Error fetching channels:', error);
+      return [];
+    }
+    return data || [];
   }
 
   // --- Admin Auth ---
+  // Note: For real world use Supabase Auth, here we simulate session persistence
   static setAdminSession(token: string) {
     localStorage.setItem(STORAGE_KEYS.ADMIN_AUTH, token);
   }
@@ -77,5 +120,11 @@ export class DatabaseService {
 
   static logoutAdmin() {
     localStorage.removeItem(STORAGE_KEYS.ADMIN_AUTH);
+  }
+
+  // Initialize DB logic (Seed if needed - only for dev/testing)
+  static async init() {
+    console.log("Real Database Connection Initialized");
+    // You can add logic here to check if tables exist or if seeds are needed.
   }
 }
