@@ -4,7 +4,6 @@ import { Bot, User, CryptoTransaction } from '../types';
 
 /**
  * SUPABASE BAĞLANTISI
- * Bu bilgiler senin projenin kimlik kartıdır.
  */
 const SUPABASE_URL = 'https://ybnxfwqrduuinzgnbymc.supabase.co'; 
 const SUPABASE_ANON_KEY = 'sb_publishable_VeYQ304ZpUpj3ymB3ihpjw_jt49W1G-'; 
@@ -17,7 +16,7 @@ const STORAGE_KEYS = {
 
 export class DatabaseService {
   
-  // --- Bot Yönetimi (Market Verileri) ---
+  // --- Bot Yönetimi ---
   static async getBots(): Promise<Bot[]> {
     try {
       const { data, error } = await supabase
@@ -33,8 +32,24 @@ export class DatabaseService {
     }
   }
 
+  // Yeni eklenen fonksiyon: ID ile bot çekme
+  static async getBotById(id: string): Promise<Bot | null> {
+    try {
+      const { data, error } = await supabase
+        .from('bots')
+        .select('*')
+        .eq('id', id)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    } catch (e) {
+      console.error('Bot detayları yüklenirken hata:', e);
+      return null;
+    }
+  }
+
   static async saveBot(bot: Partial<Bot>) {
-    // ID yoksa yeni oluşturur, varsa günceller (Admin Paneli için)
     const { error } = await supabase
       .from('bots')
       .upsert({ 
@@ -65,36 +80,28 @@ export class DatabaseService {
       if (error) throw error;
       return data || [];
     } catch (e) {
-      console.error('Kullanıcılar yüklenirken hata:', e);
       return [];
     }
   }
 
   static async updateUser(user: Partial<User>) {
-    const { error } = await supabase
-      .from('users')
-      .upsert(user);
-    
+    const { error } = await supabase.from('users').upsert(user);
     if (error) throw error;
   }
 
-  // --- Finansal İşlemler (Para Yatırma/Çekme Geçmişi) ---
   static async getTransactions(): Promise<CryptoTransaction[]> {
     try {
       const { data, error } = await supabase
         .from('transactions')
         .select('*')
         .order('date', { ascending: false });
-      
       if (error) throw error;
       return data || [];
     } catch (e) {
-      console.error('İşlemler yüklenirken hata:', e);
       return [];
     }
   }
 
-  // --- Admin Yetkilendirme (Dashboard Girişi) ---
   static setAdminSession(token: string) {
     localStorage.setItem(STORAGE_KEYS.ADMIN_AUTH, token);
   }
@@ -108,6 +115,6 @@ export class DatabaseService {
   }
 
   static async init() {
-    console.log("BotlyHub V3: Supabase Bulut Motoru Aktif.");
+    console.log("BotlyHub V3 Engine Ready.");
   }
 }

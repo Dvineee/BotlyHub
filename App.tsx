@@ -1,5 +1,6 @@
 
 import React, { useEffect, Suspense, lazy } from 'react';
+// Fix: Use standard react-router-dom exports for v6
 import { HashRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { DatabaseService } from './services/DatabaseService';

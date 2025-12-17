@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, Copy, QrCode, ArrowUpRight, ArrowDownLeft, Wallet as WalletIcon, BarChart3, Search, X, CheckCircle2, ChevronRight, ChevronDown, Shield, Eye, EyeOff, Key, Download, RefreshCw, AlertTriangle, LogOut, Settings, Trash2, Fingerprint, Zap, Lock, Send, History, Check } from 'lucide-react';
+// Fix: Import useNavigate from react-router-dom correctly
 import { useNavigate } from 'react-router-dom';
 import { AreaChart, Area, Tooltip, ResponsiveContainer } from 'recharts';
 import { CryptoAsset, BotRevenue, NetworkOption, CryptoTransaction } from '../types';
@@ -102,7 +103,7 @@ const Earnings = () => {
               return { ...net, address: addr };
           });
           
-          // Simulating non-zero balance for demo after creation
+          // Simulating non-zero balance for demo after demo
           const mockBalance = Math.random() > 0.5 ? parseFloat((Math.random() * 100).toFixed(4)) : 0;
           
           return { ...asset, balance: mockBalance, networks: newNetworks };

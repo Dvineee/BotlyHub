@@ -1,5 +1,7 @@
+
 import React, { useState } from 'react';
 import { Search, SlidersHorizontal, Plus } from 'lucide-react';
+// Fix: Import useNavigate from react-router-dom correctly
 import { useNavigate } from 'react-router-dom';
 import { User } from '../types';
 

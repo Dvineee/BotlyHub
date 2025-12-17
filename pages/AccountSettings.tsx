@@ -1,5 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, Mail, Phone, Save, Trash2, Smartphone, RefreshCw, ShieldCheck, BadgeCheck } from 'lucide-react';
+// Fix: Import useNavigate from react-router-dom correctly
 import { useNavigate } from 'react-router-dom';
 import { useTelegram } from '../hooks/useTelegram';
 

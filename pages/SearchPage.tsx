@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, ChevronLeft, X } from 'lucide-react';
+// Fix: Import useNavigate and useSearchParams from react-router-dom correctly
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { mockBots, categories } from '../data';
 import { useTranslation } from '../TranslationContext';

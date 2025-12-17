@@ -1,46 +1,72 @@
+
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, Share2, Bookmark, Send } from 'lucide-react';
+// Fix: Import missing X icon and router hooks correctly
+import { ChevronLeft, Share2, Bookmark, Send, Loader2, X } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { mockBots } from '../data';
-import { UserBot } from '../types';
+import { Bot, UserBot } from '../types';
 import { useTelegram } from '../hooks/useTelegram';
+import { DatabaseService } from '../services/DatabaseService';
 
 const BotDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { haptic, openLink, notification } = useTelegram();
+  
+  const [bot, setBot] = useState<Bot | null>(null);
   const [isOwned, setIsOwned] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Find the bot from the mock database
-  const bot = mockBots.find(b => b.id === id);
-
-  // Check if bot is already owned
+  // Fetch Bot from DB
   useEffect(() => {
-    const ownedBots = JSON.parse(localStorage.getItem('ownedBots') || '[]');
-    const owned = ownedBots.find((b: UserBot) => b.id === id);
-    if (owned) setIsOwned(true);
+    const fetchBotData = async () => {
+      if (!id) return;
+      setIsLoading(true);
+      const data = await DatabaseService.getBotById(id);
+      setBot(data);
+      
+      // Check if owned locally
+      const ownedBots = JSON.parse(localStorage.getItem('ownedBots') || '[]');
+      const owned = ownedBots.find((b: UserBot) => b.id === id);
+      if (owned) setIsOwned(true);
+      
+      setIsLoading(false);
+    };
+    fetchBotData();
   }, [id]);
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-500">
+        <Loader2 className="animate-spin text-blue-500 mb-2" size={32} />
+        <span>Bot detayları yükleniyor...</span>
+      </div>
+    );
+  }
+
   if (!bot) {
-      return <div className="p-8 text-center text-slate-500">Bot bulunamadı.</div>;
+    return (
+      <div className="min-h-screen bg-slate-950 p-8 text-center text-slate-500 flex flex-col items-center justify-center">
+        <div className="bg-slate-900 p-4 rounded-full mb-4">
+           <X className="text-red-500" size={40} />
+        </div>
+        <p className="text-lg font-bold text-white mb-2">Bot bulunamadı.</p>
+        <p className="text-sm mb-6">Bu bot sistemden kaldırılmış olabilir veya yanlış bir bağlantı kullandınız.</p>
+        <button onClick={() => navigate('/')} className="bg-slate-800 text-white px-6 py-2 rounded-xl text-sm font-bold border border-slate-700">Market'e Dön</button>
+      </div>
+    );
   }
 
   const handleAction = () => {
-      // Trigger Haptic Feedback
       haptic('medium');
 
       if (isOwned) {
-          // Construct a dummy username based on name (remove spaces)
           const botUsername = bot.name.replace(/\s+/g, '') + "_bot";
           const url = `https://t.me/${botUsername}`;
-
-          // Use custom hook to open native link
           openLink(url);
           return;
       }
 
       if (bot.price === 0) {
-          // Free bot logic: Add directly to library
           const newBot: UserBot = {
               ...bot,
               isAdEnabled: false,
@@ -52,11 +78,8 @@ const BotDetail = () => {
           localStorage.setItem('ownedBots', JSON.stringify([...currentBots, newBot]));
           
           setIsOwned(true);
-          
-          // Success Feedback
           notification('success');
           
-          // Show quick native popup if available
           if(window.Telegram?.WebApp?.showPopup) {
               window.Telegram.WebApp.showPopup({
                   title: 'Başarılı!',
@@ -65,7 +88,6 @@ const BotDetail = () => {
               });
           }
       } else {
-          // Paid bot logic: Go to payment
           navigate(`/payment/${id}`);
       }
   };
@@ -99,7 +121,7 @@ const BotDetail = () => {
                   <span className="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 uppercase tracking-wide">
                       {bot.category}
                   </span>
-                  {bot.isPremium && (
+                  {(bot as any).isPremium && (
                       <span className="text-xs font-bold px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 uppercase tracking-wide">
                           Premium
                       </span>
@@ -110,7 +132,7 @@ const BotDetail = () => {
               </p>
           </div>
 
-          {/* Horizontal Ad Banner */}
+          {/* Promotional Banner */}
           <div className="mt-6 p-0.5 border border-blue-900/30 rounded-xl shadow-sm bg-slate-900/30">
              <div className="bg-slate-900/80 rounded-[10px] p-3 flex items-center justify-between h-full gap-3">
                    <div className="w-10 h-10 bg-slate-800 rounded-lg flex-shrink-0 overflow-hidden">
@@ -126,7 +148,7 @@ const BotDetail = () => {
              </div>
           </div>
 
-          {/* Screenshots Mock */}
+          {/* Screenshots Placeholder */}
           <div className="mt-8">
                <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4 pl-1">Önizleme</h3>
                <div className="flex gap-3 overflow-x-auto no-scrollbar -mx-6 px-6 pb-2">

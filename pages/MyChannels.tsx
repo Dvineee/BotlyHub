@@ -1,5 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, Plus, Megaphone, Users, Info, X } from 'lucide-react';
+// Fix: Import useNavigate from react-router-dom correctly
 import { useNavigate } from 'react-router-dom';
 import { Channel, UserBot } from '../types';
 

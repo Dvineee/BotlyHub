@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { ChevronLeft, Bell, Bot, BarChart2, ShieldAlert, Ban, X } from 'lucide-react';
+// Fix: Import useNavigate and useParams from react-router-dom correctly
 import { useNavigate, useParams } from 'react-router-dom';
 
 const UserDetail = () => {

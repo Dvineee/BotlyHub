@@ -1,5 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
+// Fix: Import standard react-router-dom components and hooks for v6 correctly
 import { useNavigate, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, Users, Bot, CreditCard, Settings, 

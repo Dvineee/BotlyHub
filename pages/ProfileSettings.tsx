@@ -1,5 +1,7 @@
+
 import React, { useEffect, useState } from 'react';
 import { ChevronLeft, User, CreditCard, Bell, Globe, ChevronRight, Crown } from 'lucide-react';
+// Fix: Import useNavigate from react-router-dom correctly
 import { useNavigate } from 'react-router-dom';
 import { subscriptionPlans } from '../data';
 import { useTelegram } from '../hooks/useTelegram';

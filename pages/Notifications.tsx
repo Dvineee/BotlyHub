@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { ChevronLeft, Bell, ShieldCheck, Wallet, Info, CheckCheck, Trash2, Bot } from 'lucide-react';
+// Fix: Import useNavigate from react-router-dom correctly
 import { useNavigate } from 'react-router-dom';
 import { mockNotifications } from '../data';
 import { Notification } from '../types';

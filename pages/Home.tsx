@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Search, Sparkles, TrendingUp, BarChart3, ChevronRight, LayoutGrid, Store, User, Bot as BotIcon, Megaphone, DollarSign, X, Package, Loader2 } from 'lucide-react';
+// Fix: Import useNavigate from react-router-dom correctly
 import { useNavigate } from 'react-router-dom';
 import { Bot, ExtendedBot } from '../types';
 import { categories } from '../data';
@@ -170,10 +171,10 @@ const Home = () => {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
         <input 
           type="text" 
-          value={searchQuery}
+          value={searchQuery} 
           placeholder={t('search_placeholder')}
           onChange={handleSearchInput}
-          className="w-full bg-slate-900 border border-slate-800 rounded-xl py-3 pl-10 pr-10 text-sm focus:outline-none focus:border-blue-500 transition-colors cursor-text shadow-lg shadow-slate-950/50 text-white"
+          className="w-full bg-slate-900 border border-slate-800 rounded-xl py-3 pr-10 pl-10 text-sm focus:outline-none focus:border-blue-500 transition-colors cursor-text shadow-lg shadow-slate-950/50 text-white"
         />
         {isSearchActive && <button onClick={clearSearch} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white bg-slate-800 rounded-full p-0.5"><X size={16} /></button>}
       </div>

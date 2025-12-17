@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { ChevronLeft, Check } from 'lucide-react';
+// Fix: Import useNavigate from react-router-dom correctly
 import { useNavigate } from 'react-router-dom';
 import { subscriptionPlans } from '../data';
 

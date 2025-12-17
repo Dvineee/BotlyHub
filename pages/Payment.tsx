@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { ChevronLeft, Star, Wallet, CheckCircle2, Loader2, ShieldCheck } from 'lucide-react';
+// Fix: Import useNavigate and useParams from react-router-dom correctly
 import { useNavigate, useParams } from 'react-router-dom';
 import { mockBots, subscriptionPlans } from '../data';
 import { UserBot } from '../types';
