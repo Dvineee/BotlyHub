@@ -5,7 +5,7 @@ import {
   LayoutDashboard, Users, Bot, CreditCard, Settings, 
   LogOut, Menu, X, TrendingUp, DollarSign, Package, 
   ArrowUpRight, BarChart3, Bell, Loader2, RefreshCw, 
-  Plus, Edit2, Trash2, Save, Mail, Phone, Image as ImageIcon, Link as LinkIcon, Sparkles, Megaphone
+  Plus, Edit2, Trash2, Save, Mail, Phone, Image as ImageIcon, Link as LinkIcon, Sparkles, Megaphone, Calendar
 } from 'lucide-react';
 import { DatabaseService } from '../../services/DatabaseService';
 import { User, Bot as BotType, Announcement } from '../../types';
@@ -60,7 +60,7 @@ const AdminDashboard = () => {
               <img src="https://ui-avatars.com/api/?name=A&background=2563eb&color=fff" className="w-10 h-10 rounded-xl border border-slate-700" />
            </div>
         </header>
-        <div className="p-8 max-w-6xl mx-auto">
+        <div className="p-8 max-w-7xl mx-auto">
           <Routes>
             <Route path="/" element={<div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in fade-in"><StatCard label="Top. Kullanıcı" value="1,240" icon={Users} color="blue"/><StatCard label="Yayındaki Bot" value="48" icon={Bot} color="emerald"/><StatCard label="Duyuru Sayısı" value="5" icon={Megaphone} color="purple"/></div>} />
             <Route path="/users" element={<UserManagement />} />
@@ -72,6 +72,98 @@ const AdminDashboard = () => {
     </div>
   );
 };
+
+const UserManagement = () => {
+  const [users, setUsers] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => { load(); }, []);
+  const load = async () => {
+      setIsLoading(true);
+      setUsers(await DatabaseService.getUsers());
+      setIsLoading(false);
+  };
+
+  const formatDate = (dateStr: string) => {
+      try {
+          return new Date(dateStr).toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' });
+      } catch (e) { return dateStr; }
+  };
+
+  return (
+    <div className="animate-in fade-in">
+      <div className="flex justify-between items-center mb-8">
+          <h1 className="text-2xl font-black">Kullanıcı Yönetimi</h1>
+          <button onClick={load} className="p-2.5 bg-slate-800 rounded-xl hover:bg-slate-700 transition-colors">
+              <RefreshCw size={20} className={isLoading ? 'animate-spin' : ''} />
+          </button>
+      </div>
+
+      <div className="bg-slate-900 rounded-[32px] border border-slate-800 overflow-hidden shadow-2xl">
+        <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead className="bg-slate-800/50 text-[10px] text-slate-500 uppercase font-black tracking-widest border-b border-slate-800">
+                <tr>
+                  <th className="p-6">Kullanıcı Profil</th>
+                  <th className="p-6">İletişim Bilgileri</th>
+                  <th className="p-6">Kayıt Tarihi</th>
+                  <th className="p-6 text-center">Durum / Rol</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800">
+                {users.length > 0 ? users.map(u => (
+                  <tr key={u.id} className="hover:bg-slate-800/30 transition-colors">
+                    <td className="p-6 flex items-center gap-4">
+                      <img src={u.avatar} className="w-12 h-12 rounded-2xl border border-slate-800" />
+                      <div>
+                          <p className="font-bold text-white text-sm">{u.name}</p>
+                          <p className="text-[10px] text-slate-500 font-medium">@{u.username || 'user'}</p>
+                          <p className="text-[9px] text-blue-500/80 mt-1 font-mono">UID: {u.id}</p>
+                      </div>
+                    </td>
+                    <td className="p-6">
+                       <div className="flex flex-col gap-1.5">
+                            <div className="flex items-center gap-2 text-xs text-slate-400">
+                                <Mail size={12} className="text-slate-600" />
+                                <span>{u.email || <span className="text-slate-700 italic">Belirtilmemiş</span>}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-xs text-slate-400">
+                                <Phone size={12} className="text-slate-600" />
+                                <span>{u.phone || <span className="text-slate-700 italic">Belirtilmemiş</span>}</span>
+                            </div>
+                       </div>
+                    </td>
+                    <td className="p-6">
+                        <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
+                            <Calendar size={12} className="text-slate-600" />
+                            <span>{formatDate(u.joinDate)}</span>
+                        </div>
+                    </td>
+                    <td className="p-6 text-center">
+                        <div className="flex flex-col items-center gap-2">
+                            <span className={`text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-tighter ${u.status === 'Active' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'bg-red-500/10 text-red-500 border border-red-500/20'}`}>
+                                {u.status}
+                            </span>
+                            <span className="text-[9px] font-bold text-slate-600 uppercase tracking-widest">{u.role}</span>
+                        </div>
+                    </td>
+                  </tr>
+                )) : (
+                    <tr>
+                        <td colSpan={4} className="p-20 text-center">
+                            {isLoading ? <Loader2 className="animate-spin mx-auto text-blue-500" /> : <p className="text-slate-600 font-bold italic">Kullanıcı bulunamadı.</p>}
+                        </td>
+                    </tr>
+                )}
+              </tbody>
+            </table>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ... Rest of the file (BotManagement, AnnouncementManagement, StatCard) remains the same ...
 
 const AnnouncementManagement = () => {
     const [anns, setAnns] = useState<Announcement[]>([]);
@@ -228,46 +320,6 @@ const BotManagement = () => {
           </div>
         </div>
       )}
-    </div>
-  );
-};
-
-const UserManagement = () => {
-  const [users, setUsers] = useState<User[]>([]);
-  useEffect(() => { load(); }, []);
-  const load = async () => setUsers(await DatabaseService.getUsers());
-
-  return (
-    <div className="animate-in fade-in">
-      <h1 className="text-2xl font-black mb-8">Kullanıcı Yönetimi</h1>
-      <div className="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden">
-        <table className="w-full text-left">
-          <thead className="bg-slate-800/50 text-[10px] text-slate-400 uppercase font-black">
-            <tr>
-              <th className="p-5">Kullanıcı</th>
-              <th className="p-5">İletişim</th>
-              <th className="p-5 text-center">Durum</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-800">
-            {users.map(u => (
-              <tr key={u.id} className="hover:bg-slate-800/30">
-                <td className="p-5 flex items-center gap-4">
-                  <img src={u.avatar} className="w-10 h-10 rounded-xl" />
-                  <div><p className="font-bold text-sm">{u.name}</p><p className="text-[10px] text-slate-500">@{u.username}</p></div>
-                </td>
-                <td className="p-5">
-                   <p className="text-xs text-blue-400">{u.email || '-'}</p>
-                   <p className="text-xs text-emerald-400">{u.phone || '-'}</p>
-                </td>
-                <td className="p-5 text-center">
-                    <span className={`text-[10px] font-black px-2 py-1 rounded-full uppercase ${u.status === 'Active' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>{u.status}</span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
     </div>
   );
 };

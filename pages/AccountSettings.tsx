@@ -4,20 +4,22 @@ import { ChevronLeft, Mail, Phone, Save, Loader2, ShieldCheck } from 'lucide-rea
 import { useNavigate } from 'react-router-dom';
 import { useTelegram } from '../hooks/useTelegram';
 import { DatabaseService } from '../services/DatabaseService';
+import { User } from '../types';
 
 const AccountSettings = () => {
   const navigate = useNavigate();
-  const { user } = useTelegram();
+  const { user, haptic, notification } = useTelegram();
   const [isLoading, setIsLoading] = useState(false);
+  const [userData, setUserData] = useState<User | null>(null);
   const [formData, setFormData] = useState({ email: '', phone: '+90 ' });
 
   useEffect(() => {
-    // Mevcut veriyi çekip form alanlarını dolduralım
     const loadUserData = async () => {
         if (!user) return;
         const users = await DatabaseService.getUsers();
         const currentUser = users.find(u => u.id === user.id.toString());
         if (currentUser) {
+            setUserData(currentUser);
             setFormData({
                 email: currentUser.email || '',
                 phone: currentUser.phone || '+90 '
@@ -28,52 +30,63 @@ const AccountSettings = () => {
   }, [user]);
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    // Kullanıcının +90 kısmını silmesini engelle
-    if (val.startsWith('+90 ')) {
-        setFormData({ ...formData, phone: val });
-    } else if (val === '' || val === '+' || val === '+9') {
-        setFormData({ ...formData, phone: '+90 ' });
+    let val = e.target.value;
+    
+    // Eğer kullanıcı +90 kısmını sildiyse veya değiştirdiyse geri getir
+    if (!val.startsWith('+90 ')) {
+        val = '+90 ' + val.replace(/^\+90\s*/, '');
     }
+    
+    // Sadece sayı ve boşluklara izin ver (isteğe bağlı ama güvenli)
+    const suffix = val.slice(4);
+    const cleanedSuffix = suffix.replace(/[^\d\s]/g, '');
+    
+    setFormData({ ...formData, phone: '+90 ' + cleanedSuffix });
   };
 
   const handleSave = async () => {
     if (!user) return;
-    if (!formData.email.includes('@')) {
+
+    // Basit Validasyonlar
+    if (!formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
         alert('Lütfen geçerli bir e-posta adresi girin.');
         return;
     }
-    if (formData.phone.length < 14) {
+    if (formData.phone.trim().length < 13) {
         alert('Lütfen telefon numaranızı eksiksiz girin.');
         return;
     }
 
     setIsLoading(true);
+    haptic('medium');
+
     try {
-        await DatabaseService.syncUser({
+        // Mevcut kullanıcı verisiyle birleştir (Role ve Badges'ları kaybetmemek için)
+        const updatePayload: Partial<User> = {
+            ...userData,
             id: user.id.toString(),
             name: `${user.first_name} ${user.last_name || ''}`.trim(),
             username: user.username || 'user',
-            avatar: user.photo_url || '',
-            role: 'User',
-            status: 'Active',
-            joinDate: new Date().toISOString(),
+            avatar: user.photo_url || `https://ui-avatars.com/api/?name=${user.first_name}`,
             email: formData.email,
-            phone: formData.phone
-        });
+            phone: formData.phone,
+            joinDate: userData?.joinDate || new Date().toISOString(),
+            status: userData?.status || 'Active',
+            role: userData?.role || 'User'
+        };
+
+        await DatabaseService.syncUser(updatePayload);
         
-        // Haptic feedback
-        if (window.Telegram?.WebApp?.HapticFeedback) {
-            window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-        }
-        
-        alert('Bilgileriniz başarıyla güncellendi ve veritabanına kaydedildi.');
+        notification('success');
+        alert('Bilgileriniz başarıyla veritabanına kaydedildi.');
         navigate('/settings');
     } catch (e) {
-        console.error(e);
-        alert('Kaydetme sırasında bir hata oluştu. Lütfen tekrar deneyin.');
+        console.error("Save Error:", e);
+        notification('error');
+        alert('Veritabanına erişilirken bir hata oluştu. Lütfen bağlantınızı kontrol edin.');
+    } finally {
+        setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   return (
@@ -86,16 +99,16 @@ const AccountSettings = () => {
       <div className="bg-blue-600/5 border border-blue-500/10 p-6 rounded-[32px] mb-8">
           <div className="flex items-center gap-3 mb-4 text-blue-400">
               <ShieldCheck size={24} />
-              <h3 className="font-bold">Neden Gereklidir?</h3>
+              <h3 className="font-bold">Güvenlik Kontrolü</h3>
           </div>
           <p className="text-xs text-slate-500 leading-relaxed font-medium">
-              Ödemelerinizi güvenle alabilmeniz ve hesabınızın doğruluğunu teyit edebilmemiz için iletişim bilgilerinize ihtiyacımız var. Verileriniz şifrelenmiş olarak saklanır.
+              Bu bilgiler, pazar yerindeki işlemlerinizi doğrulamak ve size özel destek sunabilmek için gereklidir.
           </p>
       </div>
 
       <div className="space-y-6">
           <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-600 block ml-2 uppercase tracking-[0.2em]">İletişim E-postası</label>
+              <label className="text-[10px] font-black text-slate-600 block ml-2 uppercase tracking-[0.2em]">E-posta Adresi</label>
               <div className="relative group">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-blue-500 transition-colors" size={18} />
                   <input 
@@ -109,7 +122,7 @@ const AccountSettings = () => {
           </div>
 
           <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-600 block ml-2 uppercase tracking-[0.2em]">Telefon Numarası</label>
+              <label className="text-[10px] font-black text-slate-600 block ml-2 uppercase tracking-[0.2em]">Telefon (Sabit +90)</label>
               <div className="relative group">
                   <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-blue-500 transition-colors" size={18} />
                   <input 
@@ -128,13 +141,9 @@ const AccountSettings = () => {
                 disabled={isLoading} 
                 className="w-full bg-blue-600 hover:bg-blue-500 py-5 rounded-[24px] font-black text-white flex items-center justify-center gap-3 shadow-lg shadow-blue-900/20 active:scale-95 transition-all disabled:opacity-50"
               >
-                  {isLoading ? <Loader2 className="animate-spin" size={20} /> : <><Save size={20}/><span>Bilgileri Kaydet ve Doğrula</span></>}
+                  {isLoading ? <Loader2 className="animate-spin" size={20} /> : <><Save size={20}/><span>Değişiklikleri Veritabanına Yaz</span></>}
               </button>
           </div>
-          
-          <p className="text-[10px] text-slate-700 text-center px-8 italic font-medium">
-              Kaydet butonuna bastığınızda verileriniz BotlyHub bulut sunucularına güvenle iletilecektir.
-          </p>
       </div>
     </div>
   );

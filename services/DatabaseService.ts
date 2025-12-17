@@ -63,11 +63,29 @@ export class DatabaseService {
   // --- Kullanıcı & Kanal Metodları ---
   static async syncUser(user: Partial<User>) {
     if (!user.id) return;
-    await supabase.from('users').upsert(user);
+    // upsert işlemi 'id' üzerinden çakışma yönetimi yapar
+    const { data, error } = await supabase
+      .from('users')
+      .upsert(user, { onConflict: 'id' })
+      .select();
+
+    if (error) {
+      console.error("Supabase syncUser Error:", error.message);
+      throw error;
+    }
+    return data;
   }
 
   static async getUsers(): Promise<User[]> {
-    const { data, error } = await supabase.from('users').select('*').order('joinDate', { ascending: false });
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .order('joinDate', { ascending: false });
+    
+    if (error) {
+      console.error("Supabase getUsers Error:", error.message);
+      return [];
+    }
     return data || [];
   }
 
@@ -77,7 +95,8 @@ export class DatabaseService {
   }
 
   static async saveChannel(channel: Partial<Channel>) {
-    await supabase.from('channels').upsert(channel);
+    const { error } = await supabase.from('channels').upsert(channel);
+    if (error) throw error;
   }
 
   static setAdminSession(token: string) { localStorage.setItem('admin_v3_session', token); }
