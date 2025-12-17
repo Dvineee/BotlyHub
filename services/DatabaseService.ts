@@ -19,14 +19,20 @@ export class DatabaseService {
       if (error) throw error;
       return data || [];
     } catch (e) {
+      console.error("getBots error:", e);
       return [];
     }
   }
 
   static async getBotById(id: string): Promise<Bot | null> {
-    const { data, error } = await supabase.from('bots').select('*').eq('id', id).single();
-    if (error) return null;
-    return data;
+    try {
+      const { data, error } = await supabase.from('bots').select('*').eq('id', id).single();
+      if (error) throw error;
+      return data;
+    } catch (e) {
+      console.error("getBotById error:", e);
+      return null;
+    }
   }
 
   static async saveBot(bot: Partial<Bot>) {
@@ -34,7 +40,7 @@ export class DatabaseService {
       ...bot,
       id: bot.id || Math.random().toString(36).substr(2, 9),
       screenshots: bot.screenshots || []
-    });
+    }, { onConflict: 'id' });
     if (error) throw error;
   }
 
@@ -43,11 +49,14 @@ export class DatabaseService {
     if (error) throw error;
   }
 
-  // --- Duyuru Metodları ---
   static async getAnnouncements(): Promise<Announcement[]> {
-    const { data, error } = await supabase.from('announcements').select('*').eq('is_active', true);
-    if (error) return [];
-    return data || [];
+    try {
+      const { data, error } = await supabase.from('announcements').select('*').eq('is_active', true);
+      if (error) throw error;
+      return data || [];
+    } catch (e) {
+      return [];
+    }
   }
 
   static async saveAnnouncement(ann: Partial<Announcement>) {
@@ -60,38 +69,65 @@ export class DatabaseService {
     if (error) throw error;
   }
 
-  // --- Kullanıcı & Kanal Metodları ---
+  /**
+   * Kullanıcı verilerini senkronize eder.
+   * Eğer kullanıcı yoksa oluşturur, varsa günceller.
+   */
   static async syncUser(user: Partial<User>) {
-    if (!user.id) return;
-    // upsert işlemi 'id' üzerinden çakışma yönetimi yapar
+    if (!user.id) {
+      throw new Error("Kullanıcı ID'si eksik. Kayıt yapılamaz.");
+    }
+    
+    // Veritabanı sütunlarıyla birebir eşleme
+    const payload = {
+      id: user.id.toString(),
+      name: user.name || '',
+      username: user.username || '',
+      avatar: user.avatar || '',
+      email: user.email || '',
+      phone: user.phone || '',
+      role: user.role || 'User',
+      status: user.status || 'Active',
+      badges: user.badges || [],
+      joinDate: user.joinDate || new Date().toISOString()
+    };
+
     const { data, error } = await supabase
       .from('users')
-      .upsert(user, { onConflict: 'id' })
+      .upsert(payload, { onConflict: 'id' })
       .select();
 
     if (error) {
-      console.error("Supabase syncUser Error:", error.message);
-      throw error;
+      console.error("Supabase Upsert Hatası Detayı:", error);
+      throw new Error(`Veritabanı Hatası: ${error.message} (Kod: ${error.code})`);
     }
+
     return data;
   }
 
   static async getUsers(): Promise<User[]> {
-    const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .order('joinDate', { ascending: false });
-    
-    if (error) {
-      console.error("Supabase getUsers Error:", error.message);
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .order('joinDate', { ascending: false });
+      
+      if (error) throw error;
+      return data || [];
+    } catch (e) {
+      console.error("getUsers error:", e);
       return [];
     }
-    return data || [];
   }
 
   static async getChannels(userId: string): Promise<Channel[]> {
-    const { data, error } = await supabase.from('channels').select('*').eq('user_id', userId);
-    return data || [];
+    try {
+      const { data, error } = await supabase.from('channels').select('*').eq('user_id', userId);
+      if (error) throw error;
+      return data || [];
+    } catch (e) {
+      return [];
+    }
   }
 
   static async saveChannel(channel: Partial<Channel>) {
@@ -104,6 +140,13 @@ export class DatabaseService {
   static logoutAdmin() { localStorage.removeItem('admin_v3_session'); }
 
   static async init() {
-    console.log("BotlyHub V3 Engine Connected.");
+    try {
+      // Bağlantı testi
+      const { count, error } = await supabase.from('users').select('*', { count: 'estimated', head: true });
+      if (error) console.warn("Veritabanı bağlantı uyarısı:", error.message);
+      else console.log("Database Engine V3 Ready.");
+    } catch (e) {
+      console.error("Database Init Error:", e);
+    }
   }
 }
