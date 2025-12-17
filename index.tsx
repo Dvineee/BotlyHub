@@ -9,7 +9,8 @@ console.log("Application initializing...");
 
 // --- Error Boundary for Production Debugging ---
 interface ErrorBoundaryProps {
-  children: ReactNode;
+  // Fix: children must be optional for class components used with JSX children blocks
+  children?: ReactNode;
 }
 
 interface ErrorBoundaryState {
@@ -18,9 +19,11 @@ interface ErrorBoundaryState {
   errorInfo: ErrorInfo | null;
 }
 
-class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+// Fix: Explicitly extending React.Component with generic Props and State to ensure correct inheritance
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
+    // Fix: Initialize state property from React.Component
     this.state = { hasError: false, error: null, errorInfo: null };
   }
 
@@ -30,10 +33,12 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error("Uncaught error:", error, errorInfo);
+    // Fix: Call setState inherited from React.Component
     this.setState({ error, errorInfo });
   }
 
   render() {
+    // Fix: Access state property from React.Component
     if (this.state.hasError) {
       return (
         <div style={{ padding: 20, color: '#fff', backgroundColor: '#991b1b', height: '100vh', overflow: 'auto', fontFamily: 'monospace', zIndex: 99999, position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}>
@@ -56,6 +61,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       );
     }
 
+    // Fix: Access props property from React.Component
     return this.props.children;
   }
 }
