@@ -1,13 +1,14 @@
 
-import React, { useState } from 'react';
-import { Search, Sparkles, TrendingUp, BarChart3, ChevronRight, LayoutGrid, Store, User, Bot as BotIcon, Megaphone, DollarSign, X, Package } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, Sparkles, TrendingUp, BarChart3, ChevronRight, LayoutGrid, Store, User, Bot as BotIcon, Megaphone, DollarSign, X, Package, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { ExtendedBot } from '../types';
-import { mockBots, categories } from '../data';
+import { Bot, ExtendedBot } from '../types';
+import { categories } from '../data';
 import { useTranslation } from '../TranslationContext';
+import { DatabaseService } from '../services/DatabaseService';
 
 // Helper component for rendering a single bot card
-const BotCard: React.FC<{ bot: ExtendedBot }> = ({ bot }) => {
+const BotCard: React.FC<{ bot: Bot }> = ({ bot }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   
@@ -24,7 +25,8 @@ const BotCard: React.FC<{ bot: ExtendedBot }> = ({ bot }) => {
                 <h3 className="font-bold text-lg truncate text-slate-200">
                     {bot.name}
                 </h3>
-                {bot.isPremium && (
+                {/* Database'den gelen veride isPremium alanı ExtendedBot tipinde olabilir */}
+                {(bot as any).isPremium && (
                     <span className="bg-indigo-500/10 text-indigo-400 text-[10px] font-bold px-1.5 py-0.5 rounded border border-indigo-500/20">
                         {t('premium')}
                     </span>
@@ -46,6 +48,21 @@ const Home = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeSearchCategory, setActiveSearchCategory] = useState('all');
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
+  
+  // Real Database State
+  const [bots, setBots] = useState<Bot[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch Bots from Supabase
+  useEffect(() => {
+    const fetchBots = async () => {
+      setIsLoading(true);
+      const data = await DatabaseService.getBots();
+      setBots(data);
+      setIsLoading(false);
+    };
+    fetchBots();
+  }, []);
 
   const isSearchActive = searchQuery.trim().length > 0 || isOverlayOpen;
   const topCategories = categories.slice(0, 4);
@@ -78,7 +95,7 @@ const Home = () => {
       setIsOverlayOpen(false);
   };
 
-  const filteredBots = mockBots.filter(bot => {
+  const filteredBots = bots.filter(bot => {
       const matchesText = bot.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           bot.description.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = activeSearchCategory === 'all' || bot.category === activeSearchCategory;
@@ -86,8 +103,8 @@ const Home = () => {
   });
 
   const CategorySection = ({ title, categoryId }: { title: string, categoryId: string }) => {
-    const bots = mockBots.filter(b => b.category === categoryId).slice(0, 3);
-    if (bots.length === 0) return null;
+    const sectionBots = bots.filter(b => b.category === categoryId).slice(0, 3);
+    if (sectionBots.length === 0) return null;
     return (
       <div className="mb-6">
          <div className="flex justify-between items-center mb-1 px-1">
@@ -98,7 +115,7 @@ const Home = () => {
             </button>
          </div>
          <div className="flex flex-col gap-2">
-            {bots.map((bot) => <BotCard key={bot.id} bot={bot} />)}
+            {sectionBots.map((bot) => <BotCard key={bot.id} bot={bot} />)}
          </div>
       </div>
     );
@@ -162,7 +179,12 @@ const Home = () => {
       </div>
 
       {/* Conditional Rendering */}
-      {!isSearchActive ? (
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center py-20">
+          <Loader2 className="animate-spin text-blue-500 mb-2" size={32} />
+          <span className="text-slate-500 text-sm">Botlar yükleniyor...</span>
+        </div>
+      ) : !isSearchActive ? (
         <div className="animate-in fade-in duration-300">
            {/* Promo Slider */}
            <div className="mb-6">
@@ -205,9 +227,23 @@ const Home = () => {
              ))}
            </div>
 
-           <CategorySection title={t('sec_productivity')} categoryId="productivity" />
-           <CategorySection title={t('sec_games')} categoryId="games" />
-           <CategorySection title={t('sec_finance')} categoryId="finance" />
+           {bots.length === 0 ? (
+             <div className="text-center py-10 bg-slate-900/50 rounded-2xl border border-dashed border-slate-800">
+               <p className="text-slate-500 text-sm italic">Henüz bot eklenmemiş. Admin panelinden bot ekleyebilirsiniz.</p>
+             </div>
+           ) : (
+             <>
+               <CategorySection title={t('sec_productivity')} categoryId="productivity" />
+               <CategorySection title={t('sec_games')} categoryId="games" />
+               <CategorySection title={t('sec_finance')} categoryId="finance" />
+               <div className="mt-4 px-1">
+                 <h2 className="text-lg font-semibold text-slate-200 mb-4">Tüm Botlar</h2>
+                 <div className="flex flex-col gap-2">
+                    {bots.slice(0, 10).map((bot) => <BotCard key={bot.id} bot={bot} />)}
+                 </div>
+               </div>
+             </>
+           )}
         </div>
       ) : (
         <div className="animate-in fade-in zoom-in-95 duration-200 min-h-[50vh]">
