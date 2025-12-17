@@ -1,19 +1,15 @@
 
 import { createClient } from '@supabase/supabase-js';
-import { Bot, User, CryptoTransaction, Channel } from '../types';
+import { Bot, User, Channel, CryptoTransaction } from '../types';
 
 const SUPABASE_URL = 'https://ybnxfwqrduuinzgnbymc.supabase.co'; 
 const SUPABASE_ANON_KEY = 'sb_publishable_VeYQ304ZpUpj3ymB3ihpjw_jt49W1G-'; 
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const STORAGE_KEYS = {
-  ADMIN_AUTH: 'db_admin_session_v3'
-};
-
 export class DatabaseService {
   
-  // --- Bot Yönetimi ---
+  // --- Bot Metodları ---
   static async getBots(category?: string): Promise<Bot[]> {
     try {
       let query = supabase.from('bots').select('*').order('created_at', { ascending: false });
@@ -24,26 +20,21 @@ export class DatabaseService {
       if (error) throw error;
       return data || [];
     } catch (e) {
-      console.error('Botlar yüklenirken hata oluştu:', e);
+      console.error('Error fetching bots:', e);
       return [];
     }
   }
 
   static async getBotById(id: string): Promise<Bot | null> {
-    try {
-      const { data, error } = await supabase.from('bots').select('*').eq('id', id).single();
-      if (error) throw error;
-      return data;
-    } catch (e) {
-      return null;
-    }
+    const { data, error } = await supabase.from('bots').select('*').eq('id', id).single();
+    if (error) return null;
+    return data;
   }
 
   static async saveBot(bot: Partial<Bot>) {
-    const botId = bot.id || Math.random().toString(36).substr(2, 9);
-    const { error } = await supabase.from('bots').upsert({ 
-      ...bot, 
-      id: botId,
+    const { error } = await supabase.from('bots').upsert({
+      ...bot,
+      id: bot.id || Math.random().toString(36).substr(2, 9),
       screenshots: bot.screenshots || []
     });
     if (error) throw error;
@@ -54,15 +45,27 @@ export class DatabaseService {
     if (error) throw error;
   }
 
-  // --- Kanal Yönetimi ---
+  // --- Kullanıcı Metodları ---
+  static async syncUser(user: Partial<User>) {
+    if (!user.id) return;
+    const { error } = await supabase.from('users').upsert({
+      ...user,
+      joinDate: user.joinDate || new Date().toISOString()
+    });
+    if (error) throw error;
+  }
+
+  static async getUsers(): Promise<User[]> {
+    const { data, error } = await supabase.from('users').select('*').order('joinDate', { ascending: false });
+    if (error) return [];
+    return data || [];
+  }
+
+  // --- Kanal Metodları ---
   static async getChannels(userId: string): Promise<Channel[]> {
-    try {
-      const { data, error } = await supabase.from('channels').select('*').eq('user_id', userId);
-      if (error) throw error;
-      return data || [];
-    } catch (e) {
-      return [];
-    }
+    const { data, error } = await supabase.from('channels').select('*').eq('user_id', userId).order('created_at', { ascending: false });
+    if (error) return [];
+    return data || [];
   }
 
   static async saveChannel(channel: Partial<Channel>) {
@@ -70,35 +73,12 @@ export class DatabaseService {
     if (error) throw error;
   }
 
-  // --- Kullanıcı Yönetimi ---
-  static async getUsers(): Promise<User[]> {
-    try {
-      const { data, error } = await supabase.from('users').select('*').order('joinDate', { ascending: false });
-      if (error) throw error;
-      return data || [];
-    } catch (e) {
-      return [];
-    }
-  }
-
-  static async syncUser(user: Partial<User>) {
-    const { error } = await supabase.from('users').upsert(user);
-    if (error) throw error;
-  }
-
-  static setAdminSession(token: string) {
-    localStorage.setItem(STORAGE_KEYS.ADMIN_AUTH, token);
-  }
-
-  static isAdminLoggedIn(): boolean {
-    return !!localStorage.getItem(STORAGE_KEYS.ADMIN_AUTH);
-  }
-
-  static logoutAdmin() {
-    localStorage.removeItem(STORAGE_KEYS.ADMIN_AUTH);
-  }
+  // --- Admin Session ---
+  static setAdminSession(token: string) { localStorage.setItem('admin_v3_session', token); }
+  static isAdminLoggedIn(): boolean { return !!localStorage.getItem('admin_v3_session'); }
+  static logoutAdmin() { localStorage.removeItem('admin_v3_session'); }
 
   static async init() {
-    console.log("BotlyHub V3 Engine Connected.");
+    console.log("BotlyHub V3 Live Sync Ready.");
   }
 }
