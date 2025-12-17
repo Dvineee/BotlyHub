@@ -1,5 +1,5 @@
 
-import React, { ErrorInfo, ReactNode } from 'react';
+import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import { TranslationProvider } from './TranslationContext';
@@ -20,11 +20,11 @@ interface ErrorBoundaryState {
   errorInfo: ErrorInfo | null;
 }
 
-// Fix: Use React.Component explicitly to ensure props, state, and setState are correctly inherited and recognized by TypeScript
-class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+// Fix: Use Component directly to ensure props, state, and setState are correctly inherited and recognized by TypeScript
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
-    // Fix: Correctly initialize state inherited from React.Component
+    // Fix: Correctly initialize state inherited from React Component base class
     this.state = { hasError: false, error: null, errorInfo: null };
   }
 
@@ -34,12 +34,12 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error("Uncaught error:", error, errorInfo);
-    // Fix: Call setState from the inherited React.Component class
+    // Fix: Access setState from the inherited Component class
     this.setState({ error, errorInfo });
   }
 
   render() {
-    // Fix: Access state property from the inherited React.Component class
+    // Fix: Access state property from the inherited Component class
     if (this.state.hasError) {
       return (
         <div style={{ padding: 20, color: '#fff', backgroundColor: '#991b1b', height: '100vh', overflow: 'auto', fontFamily: 'monospace', zIndex: 99999, position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}>
@@ -62,7 +62,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
       );
     }
 
-    // Fix: Access props property from the inherited React.Component class
+    // Fix: Access props property from the inherited Component class
     return this.props.children;
   }
 }

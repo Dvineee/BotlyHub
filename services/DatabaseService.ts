@@ -2,7 +2,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { Bot, User, Channel, CryptoTransaction } from '../types';
 
-// Bu değerler normalde .env dosyasında tutulur.
+// These should be configured in your environment variables for production.
 const SUPABASE_URL = (import.meta as any).env?.VITE_SUPABASE_URL || 'https://placeholder.supabase.co';
 const SUPABASE_ANON_KEY = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || 'placeholder-key';
 
@@ -13,24 +13,34 @@ const STORAGE_KEYS = {
 };
 
 export class DatabaseService {
+  /**
+   * IMPORTANT: Ensure your Supabase database has 'bots', 'users', 'transactions', and 'channels' tables.
+   */
+
   // --- Bots ---
   static async getBots(): Promise<Bot[]> {
-    const { data, error } = await supabase
-      .from('bots')
-      .select('*')
-      .order('id', { ascending: false });
-    
-    if (error) {
-      console.error('Error fetching bots:', error);
+    try {
+      const { data, error } = await supabase
+        .from('bots')
+        .select('*')
+        .order('id', { ascending: false });
+      
+      if (error) throw error;
+      return data || [];
+    } catch (e) {
+      console.warn('DB Error fetching bots, check your Supabase config:', e);
       return [];
     }
-    return data || [];
   }
 
   static async saveBot(bot: Partial<Bot>) {
     const { error } = await supabase
       .from('bots')
-      .upsert({ ...bot, id: bot.id || Math.random().toString(36).substr(2, 9) });
+      .upsert({ 
+        ...bot, 
+        id: bot.id || Math.random().toString(36).substr(2, 9),
+        created_at: bot.id ? undefined : new Date().toISOString()
+      });
     
     if (error) throw error;
   }
@@ -46,16 +56,18 @@ export class DatabaseService {
 
   // --- Users ---
   static async getUsers(): Promise<User[]> {
-    const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .order('joinDate', { ascending: false });
-    
-    if (error) {
-      console.error('Error fetching users:', error);
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .order('joinDate', { ascending: false });
+      
+      if (error) throw error;
+      return data || [];
+    } catch (e) {
+      console.warn('DB Error fetching users:', e);
       return [];
     }
-    return data || [];
   }
 
   static async updateUser(user: Partial<User>) {
@@ -68,19 +80,21 @@ export class DatabaseService {
 
   // --- Transactions ---
   static async getTransactions(): Promise<CryptoTransaction[]> {
-    const { data, error } = await supabase
-      .from('transactions')
-      .select('*')
-      .order('date', { ascending: false });
-    
-    if (error) {
-      console.error('Error fetching transactions:', error);
+    try {
+      const { data, error } = await supabase
+        .from('transactions')
+        .select('*')
+        .order('date', { ascending: false });
+      
+      if (error) throw error;
+      return data || [];
+    } catch (e) {
+      console.warn('DB Error fetching transactions:', e);
       return [];
     }
-    return data || [];
   }
 
-  // --- Admin Auth ---
+  // --- Admin Auth Session Management ---
   static setAdminSession(token: string) {
     localStorage.setItem(STORAGE_KEYS.ADMIN_AUTH, token);
   }
@@ -94,6 +108,6 @@ export class DatabaseService {
   }
 
   static async init() {
-    console.log("Database Engine V3 Ready.");
+    console.log("BotlyHub V3 Database Engine Initialized.");
   }
 }
