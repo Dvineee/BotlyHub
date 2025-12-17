@@ -1,5 +1,9 @@
-import { useEffect, useState } from 'react';
 
+import { useEffect, useState } from 'react';
+// Fixed: Explicitly import types to ensure global window augmentation is recognized
+import '../types';
+
+// Fixed: Property 'Telegram' now exists on 'Window' thanks to augmentation in types.ts
 const tg = window.Telegram?.WebApp;
 
 export function useTelegram() {

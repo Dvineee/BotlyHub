@@ -21,10 +21,21 @@ export interface Bot {
   icon: string;
   price: number;
   category: string;
-  bot_link: string; // Telegram bot link (e.g., t.me/mybot)
-  screenshots: string[]; // Array of image URLs
+  bot_link: string;
+  screenshots: string[];
   isNew?: boolean;
   features?: string[];
+}
+
+export interface Announcement {
+  id: string;
+  title: string;
+  description: string;
+  button_text: string;
+  button_link: string;
+  icon_name: string;
+  color_scheme: string;
+  is_active: boolean;
 }
 
 export interface ExtendedBot extends Bot {
@@ -48,8 +59,7 @@ export interface Channel {
   revenue: number;
 }
 
-// Fixed: Expanded ChainType to include all supported networks used in the WalletService
-export type ChainType = 'TON' | 'BSC' | 'TRX' | 'SOL';
+export type ChainType = 'TON' | 'BSC' | 'TRX' | 'SOL' | 'STARS';
 
 export interface CryptoTransaction {
   id: string;
@@ -84,41 +94,11 @@ export interface Notification {
   isRead: boolean;
 }
 
+// Fixed: Declare Telegram property on the global Window object to satisfy TypeScript
 declare global {
   interface Window {
     Telegram?: {
-      WebApp?: {
-        initData: string;
-        initDataUnsafe: any;
-        version: string;
-        platform: string;
-        colorScheme: 'light' | 'dark';
-        themeParams: any;
-        isExpanded: boolean;
-        viewportHeight: number;
-        viewportStableHeight: number;
-        headerColor: string;
-        backgroundColor: string;
-        isVersionAtLeast: (version: string) => boolean;
-        ready: () => void;
-        expand: () => void;
-        close: () => void;
-        openInvoice: (url: string, callback?: (status: string) => void) => void;
-        showPopup: (params: any, callback?: (id: string) => void) => void;
-        openLink: (url: string, options?: { try_instant_view?: boolean }) => void;
-        openTelegramLink: (url: string) => void;
-        setHeaderColor?: (color: string) => void;
-        setBackgroundColor?: (color: string) => void;
-        onEvent: (eventType: string, eventHandler: Function) => void;
-        offEvent: (eventType: string, eventHandler: Function) => void;
-        MainButton: any;
-        BackButton: any;
-        HapticFeedback: {
-          impactOccurred: (style: 'light' | 'medium' | 'heavy' | 'rigid' | 'soft') => void;
-          notificationOccurred: (type: 'error' | 'success' | 'warning') => void;
-          selectionChanged: () => void;
-        };
-      };
+      WebApp: any;
     };
   }
 }

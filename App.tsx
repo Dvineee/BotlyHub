@@ -4,6 +4,8 @@ import React, { useEffect, Suspense, lazy } from 'react';
 import { HashRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { DatabaseService } from './services/DatabaseService';
+// Fixed: Explicitly import types to ensure global window augmentation is recognized
+import './types';
 
 // Lazy Load Pages
 const Home = lazy(() => import('./pages/Home'));
@@ -40,6 +42,7 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
     DatabaseService.init();
 
     if (!isAdminPath) {
+      // Fixed: Property 'Telegram' now exists on 'Window' thanks to augmentation in types.ts
       const tg = window.Telegram?.WebApp;
       if (tg) {
         tg.expand();
@@ -61,6 +64,7 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
 
   useEffect(() => {
     if (isAdminPath) return;
+    // Fixed: Property 'Telegram' now exists on 'Window' thanks to augmentation in types.ts
     const tg = window.Telegram?.WebApp;
     if (!tg?.BackButton) return;
 

@@ -1,5 +1,7 @@
 
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+// Fixed: Explicitly import types to ensure global window augmentation is recognized
+import './types';
 
 // Çeviri Sözlüğü
 const translations = {
@@ -129,6 +131,7 @@ export const TranslationProvider = ({ children }: TranslationProviderProps) => {
     // We use Telegram's native data which is instant and reliable.
     const initializeLanguage = () => {
       // 1. Check Telegram User Data (Best method)
+      // Fixed: Property 'Telegram' now exists on 'Window' thanks to augmentation in types.ts
       const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
       if (tgUser && tgUser.language_code) {
         // If language code starts with 'en', switch to English

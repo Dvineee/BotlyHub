@@ -1,6 +1,6 @@
 
 import { createClient } from '@supabase/supabase-js';
-import { Bot, User, Channel, CryptoTransaction } from '../types';
+import { Bot, User, Channel, Announcement } from '../types';
 
 const SUPABASE_URL = 'https://ybnxfwqrduuinzgnbymc.supabase.co'; 
 const SUPABASE_ANON_KEY = 'sb_publishable_VeYQ304ZpUpj3ymB3ihpjw_jt49W1G-'; 
@@ -9,7 +9,6 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export class DatabaseService {
   
-  // --- Bot Metodları ---
   static async getBots(category?: string): Promise<Bot[]> {
     try {
       let query = supabase.from('bots').select('*').order('created_at', { ascending: false });
@@ -20,7 +19,6 @@ export class DatabaseService {
       if (error) throw error;
       return data || [];
     } catch (e) {
-      console.error('Error fetching bots:', e);
       return [];
     }
   }
@@ -45,40 +43,48 @@ export class DatabaseService {
     if (error) throw error;
   }
 
-  // --- Kullanıcı Metodları ---
+  // --- Duyuru Metodları ---
+  static async getAnnouncements(): Promise<Announcement[]> {
+    const { data, error } = await supabase.from('announcements').select('*').eq('is_active', true);
+    if (error) return [];
+    return data || [];
+  }
+
+  static async saveAnnouncement(ann: Partial<Announcement>) {
+    const { error } = await supabase.from('announcements').upsert(ann);
+    if (error) throw error;
+  }
+
+  static async deleteAnnouncement(id: string) {
+    const { error } = await supabase.from('announcements').delete().eq('id', id);
+    if (error) throw error;
+  }
+
+  // --- Kullanıcı & Kanal Metodları ---
   static async syncUser(user: Partial<User>) {
     if (!user.id) return;
-    const { error } = await supabase.from('users').upsert({
-      ...user,
-      joinDate: user.joinDate || new Date().toISOString()
-    });
-    if (error) throw error;
+    await supabase.from('users').upsert(user);
   }
 
   static async getUsers(): Promise<User[]> {
     const { data, error } = await supabase.from('users').select('*').order('joinDate', { ascending: false });
-    if (error) return [];
     return data || [];
   }
 
-  // --- Kanal Metodları ---
   static async getChannels(userId: string): Promise<Channel[]> {
-    const { data, error } = await supabase.from('channels').select('*').eq('user_id', userId).order('created_at', { ascending: false });
-    if (error) return [];
+    const { data, error } = await supabase.from('channels').select('*').eq('user_id', userId);
     return data || [];
   }
 
   static async saveChannel(channel: Partial<Channel>) {
-    const { error } = await supabase.from('channels').upsert(channel);
-    if (error) throw error;
+    await supabase.from('channels').upsert(channel);
   }
 
-  // --- Admin Session ---
   static setAdminSession(token: string) { localStorage.setItem('admin_v3_session', token); }
   static isAdminLoggedIn(): boolean { return !!localStorage.getItem('admin_v3_session'); }
   static logoutAdmin() { localStorage.removeItem('admin_v3_session'); }
 
   static async init() {
-    console.log("BotlyHub V3 Live Sync Ready.");
+    console.log("BotlyHub V3 Engine Connected.");
   }
 }
