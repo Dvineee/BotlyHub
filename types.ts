@@ -1,5 +1,4 @@
 
-
 export interface User {
   id: string;
   name: string;
@@ -9,6 +8,8 @@ export interface User {
   status: 'Active' | 'Passive';
   badges: string[];
   joinDate: string;
+  email?: string;
+  phone?: string;
   isRestricted?: boolean;
   canPublishAds?: boolean;
 }
@@ -20,6 +21,8 @@ export interface Bot {
   icon: string;
   price: number;
   category: string;
+  bot_link: string; // Telegram bot link (e.g., t.me/mybot)
+  screenshots: string[]; // Array of image URLs
   isNew?: boolean;
   features?: string[];
 }
@@ -34,61 +37,19 @@ export interface UserBot extends Bot {
   expiryDate?: string;
 }
 
-export interface Transaction {
-  id: string;
-  amount: number;
-  date: string;
-  status: 'Completed' | 'Pending';
-  method: string;
-}
-
-export interface ChartDataPoint {
-  name: string;
-  value: number;
-}
-
 export interface Channel {
   id: string;
+  user_id: string;
   name: string;
   memberCount: number;
   icon: string;
-  isAdEnabled: boolean; // Global switch for the channel
+  isAdEnabled: boolean;
   connectedBotIds: string[];
   revenue: number;
 }
 
-// --- New Crypto & Wallet Types ---
-
-export type ChainType = 'TON' | 'TRX' | 'BSC' | 'SOL';
-
-export interface NetworkOption {
-  id: string;
-  name: string; // e.g. "Tron (TRC20)"
-  protocol: string; // "TRC20"
-  address: string;
-  chainId?: number;
-}
-
-export interface CryptoAsset {
-  id: string;
-  symbol: string;
-  name: string;
-  balance: number;
-  price: number; // Current market price in TRY/USD
-  change24h: number; // Percentage
-  color: string; // For placeholder icons
-  networks: NetworkOption[];
-}
-
-export interface Wallet {
-  chain: ChainType;
-  address: string;
-  balance: number;
-  symbol: string;
-  networkName: string;
-  publicKey?: string;
-  // Private key is never stored in plaintext in the state interface
-}
+// Fixed: Expanded ChainType to include all supported networks used in the WalletService
+export type ChainType = 'TON' | 'BSC' | 'TRX' | 'SOL';
 
 export interface CryptoTransaction {
   id: string;
@@ -102,15 +63,6 @@ export interface CryptoTransaction {
   hash: string;
 }
 
-export interface BotRevenue {
-  botId: string;
-  botName: string;
-  icon: string;
-  totalEarnings: number;
-  dailyChange: number; // percentage
-}
-
-// --- Subscription Types ---
 export interface SubscriptionPlan {
   id: string;
   name: string;
@@ -118,22 +70,20 @@ export interface SubscriptionPlan {
   billingPeriod: 'Aylık' | 'Yıllık';
   description: string;
   features: string[];
-  color: string; // Tailwind class for border/bg accents
-  icon: any; // Lucide icon
+  color: string;
+  icon: any;
   isPopular?: boolean;
 }
 
-// --- Notification Types ---
 export interface Notification {
   id: string;
   type: 'system' | 'payment' | 'security' | 'bot';
   title: string;
   message: string;
-  date: string; // ISO string
+  date: string;
   isRead: boolean;
 }
 
-// --- Telegram WebApp Types ---
 declare global {
   interface Window {
     Telegram?: {
@@ -143,28 +93,16 @@ declare global {
         version: string;
         platform: string;
         colorScheme: 'light' | 'dark';
-        themeParams: {
-          bg_color?: string;
-          text_color?: string;
-          hint_color?: string;
-          link_color?: string;
-          button_color?: string;
-          button_text_color?: string;
-          secondary_bg_color?: string;
-        };
+        themeParams: any;
         isExpanded: boolean;
         viewportHeight: number;
         viewportStableHeight: number;
         headerColor: string;
         backgroundColor: string;
         isVersionAtLeast: (version: string) => boolean;
-        
-        // Methods
         ready: () => void;
         expand: () => void;
         close: () => void;
-        enableClosingConfirmation: () => void;
-        disableClosingConfirmation: () => void;
         openInvoice: (url: string, callback?: (status: string) => void) => void;
         showPopup: (params: any, callback?: (id: string) => void) => void;
         openLink: (url: string, options?: { try_instant_view?: boolean }) => void;
@@ -173,33 +111,8 @@ declare global {
         setBackgroundColor?: (color: string) => void;
         onEvent: (eventType: string, eventHandler: Function) => void;
         offEvent: (eventType: string, eventHandler: Function) => void;
-        
-        // UI Elements
-        MainButton: {
-          text: string;
-          color: string;
-          textColor: string;
-          isVisible: boolean;
-          isActive: boolean;
-          isProgressVisible: boolean;
-          show: () => void;
-          hide: () => void;
-          enable: () => void;
-          disable: () => void;
-          showProgress: (leaveActive: boolean) => void;
-          hideProgress: () => void;
-          onClick: (callback: () => void) => void;
-          offClick: (callback: () => void) => void;
-          setText: (text: string) => void;
-          setParams: (params: any) => void;
-        };
-        BackButton: {
-          isVisible: boolean;
-          show: () => void;
-          hide: () => void;
-          onClick: (callback: () => void) => void;
-          offClick: (callback: () => void) => void;
-        };
+        MainButton: any;
+        BackButton: any;
         HapticFeedback: {
           impactOccurred: (style: 'light' | 'medium' | 'heavy' | 'rigid' | 'soft') => void;
           notificationOccurred: (type: 'error' | 'success' | 'warning') => void;

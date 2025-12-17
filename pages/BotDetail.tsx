@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect } from 'react';
-// Fix: Import missing X icon and router hooks correctly
 import { ChevronLeft, Share2, Bookmark, Send, Loader2, X } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Bot, UserBot } from '../types';
@@ -16,7 +15,6 @@ const BotDetail = () => {
   const [isOwned, setIsOwned] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch Bot from DB
   useEffect(() => {
     const fetchBotData = async () => {
       if (!id) return;
@@ -24,7 +22,6 @@ const BotDetail = () => {
       const data = await DatabaseService.getBotById(id);
       setBot(data);
       
-      // Check if owned locally
       const ownedBots = JSON.parse(localStorage.getItem('ownedBots') || '[]');
       const owned = ownedBots.find((b: UserBot) => b.id === id);
       if (owned) setIsOwned(true);
@@ -38,7 +35,7 @@ const BotDetail = () => {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-500">
         <Loader2 className="animate-spin text-blue-500 mb-2" size={32} />
-        <span>Bot detayları yükleniyor...</span>
+        <span>Yükleniyor...</span>
       </div>
     );
   }
@@ -46,47 +43,28 @@ const BotDetail = () => {
   if (!bot) {
     return (
       <div className="min-h-screen bg-slate-950 p-8 text-center text-slate-500 flex flex-col items-center justify-center">
-        <div className="bg-slate-900 p-4 rounded-full mb-4">
-           <X className="text-red-500" size={40} />
-        </div>
         <p className="text-lg font-bold text-white mb-2">Bot bulunamadı.</p>
-        <p className="text-sm mb-6">Bu bot sistemden kaldırılmış olabilir veya yanlış bir bağlantı kullandınız.</p>
-        <button onClick={() => navigate('/')} className="bg-slate-800 text-white px-6 py-2 rounded-xl text-sm font-bold border border-slate-700">Market'e Dön</button>
+        <button onClick={() => navigate('/')} className="bg-slate-800 text-white px-6 py-2 rounded-xl text-sm font-bold">Market'e Dön</button>
       </div>
     );
   }
 
   const handleAction = () => {
       haptic('medium');
-
       if (isOwned) {
-          const botUsername = bot.name.replace(/\s+/g, '') + "_bot";
-          const url = `https://t.me/${botUsername}`;
-          openLink(url);
+          openLink(bot.bot_link);
           return;
       }
-
       if (bot.price === 0) {
           const newBot: UserBot = {
               ...bot,
               isAdEnabled: false,
-              isActive: true,
-              expiryDate: undefined
+              isActive: true
           };
-          
           const currentBots = JSON.parse(localStorage.getItem('ownedBots') || '[]');
           localStorage.setItem('ownedBots', JSON.stringify([...currentBots, newBot]));
-          
           setIsOwned(true);
           notification('success');
-          
-          if(window.Telegram?.WebApp?.showPopup) {
-              window.Telegram.WebApp.showPopup({
-                  title: 'Başarılı!',
-                  message: 'Bot kütüphanenize eklendi.',
-                  buttons: [{type: 'ok'}]
-              });
-          }
       } else {
           navigate(`/payment/${id}`);
       }
@@ -94,106 +72,45 @@ const BotDetail = () => {
 
   return (
     <div className="min-h-screen bg-slate-950 pb-24">
-      {/* Header - Sticky */}
       <div className="p-4 flex items-center justify-between sticky top-0 z-20 bg-slate-950/80 backdrop-blur-md border-b border-slate-900/50">
-        <button onClick={() => navigate(-1)} className="p-2 hover:bg-slate-800 rounded-full transition-colors">
-          <ChevronLeft className="w-6 h-6 text-slate-200" />
-        </button>
-        <h1 className="text-lg font-bold text-white max-w-[200px] truncate">{bot.name}</h1>
-        <button 
-            onClick={() => { haptic('light'); }}
-            className="p-2 hover:bg-slate-800 rounded-full transition-colors"
-        >
-            <Share2 className="w-6 h-6 text-slate-400" />
-        </button>
+        <button onClick={() => navigate(-1)} className="p-2 hover:bg-slate-800 rounded-full"><ChevronLeft className="w-6 h-6 text-slate-200" /></button>
+        <h1 className="text-lg font-bold text-white truncate">{bot.name}</h1>
+        <button onClick={() => haptic('light')} className="p-2 hover:bg-slate-800 rounded-full"><Share2 className="w-6 h-6 text-slate-400" /></button>
       </div>
 
-      <div className="px-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          
-          {/* Hero Section */}
+      <div className="px-6">
           <div className="flex flex-col items-center mt-6 mb-8">
-              <div className="w-32 h-32 rounded-3xl bg-slate-800 flex items-center justify-center border-4 border-slate-800 shadow-2xl relative overflow-hidden group">
-                   <img src={bot.icon} alt={bot.name} className="w-full h-full object-cover rounded-3xl opacity-100 group-hover:scale-110 transition-transform duration-500" />
+              <div className="w-32 h-32 rounded-3xl bg-slate-800 border-4 border-slate-800 shadow-2xl overflow-hidden">
+                   <img src={bot.icon} alt={bot.name} className="w-full h-full object-cover" />
               </div>
-              
               <h2 className="text-2xl font-bold mt-5 text-center text-white">{bot.name}</h2>
-              <div className="flex items-center gap-2 mt-2">
-                  <span className="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 uppercase tracking-wide">
-                      {bot.category}
-                  </span>
-                  {(bot as any).isPremium && (
-                      <span className="text-xs font-bold px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 uppercase tracking-wide">
-                          Premium
-                      </span>
-                  )}
-              </div>
-              <p className="text-center text-slate-400 mt-4 leading-relaxed max-w-sm text-sm">
-                  {bot.description}
-              </p>
+              <span className="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 uppercase mt-2">{bot.category}</span>
+              <p className="text-center text-slate-400 mt-4 text-sm leading-relaxed">{bot.description}</p>
           </div>
 
-          {/* Promotional Banner */}
-          <div className="mt-6 p-0.5 border border-blue-900/30 rounded-xl shadow-sm bg-slate-900/30">
-             <div className="bg-slate-900/80 rounded-[10px] p-3 flex items-center justify-between h-full gap-3">
-                   <div className="w-10 h-10 bg-slate-800 rounded-lg flex-shrink-0 overflow-hidden">
-                     <img src="https://picsum.photos/seed/ad/100" className="w-full h-full object-cover opacity-80" alt="Ad Logo" />
-                   </div>
-                   <div className="flex-1 min-w-0">
-                      <h4 className="text-xs font-bold text-slate-200 truncate">Sponsor: UltraBot</h4>
-                      <p className="text-xs text-slate-500 leading-tight mt-0.5 truncate">Sunucunu en iyi araçlarla yönet.</p>
-                   </div>
-                   <button className="bg-slate-800 hover:bg-slate-700 text-white text-[10px] font-bold py-1.5 px-3 rounded-lg transition-colors flex-shrink-0 border border-slate-700">
-                       İncele
-                   </button>
-             </div>
-          </div>
-
-          {/* Screenshots Placeholder */}
           <div className="mt-8">
-               <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4 pl-1">Önizleme</h3>
-               <div className="flex gap-3 overflow-x-auto no-scrollbar -mx-6 px-6 pb-2">
-                   {[1,2,3].map(i => (
-                       <div key={i} className="min-w-[160px] aspect-[9/16] bg-slate-800 rounded-xl border border-slate-700 overflow-hidden relative shadow-md">
-                            <div className="p-3 space-y-2 opacity-50">
-                                <div className="w-full h-1.5 bg-slate-600 rounded-full"></div>
-                                <div className="w-2/3 h-1.5 bg-slate-600 rounded-full"></div>
-                                <div className="w-full h-24 bg-slate-700/50 rounded-lg mt-3"></div>
-                            </div>
-                       </div>
-                   ))}
+               <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Önizleme</h3>
+               <div className="flex gap-3 overflow-x-auto no-scrollbar -mx-6 px-6">
+                   {bot.screenshots && bot.screenshots.length > 0 ? (
+                       bot.screenshots.map((url, i) => (
+                           <div key={i} className="min-w-[200px] aspect-[9/16] bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-lg">
+                                <img src={url} className="w-full h-full object-cover" alt={`Screenshot ${i}`} />
+                           </div>
+                       ))
+                   ) : (
+                       <div className="w-full p-10 text-center border border-dashed border-slate-800 rounded-xl text-slate-600 italic text-sm">Görsel eklenmemiş.</div>
+                   )}
                </div>
           </div>
       </div>
 
-      {/* Sticky Bottom Action */}
-      <div className="fixed bottom-0 left-0 right-0 bg-slate-950/90 backdrop-blur-lg border-t border-slate-800 p-4 pb-8 z-50 safe-area-bottom">
-          <div className="max-w-md mx-auto flex gap-3">
-              <button 
-                 className={`flex-1 transition-all text-white font-bold py-3.5 rounded-xl shadow-lg flex items-center justify-center gap-2 ${
-                     isOwned 
-                     ? 'bg-blue-600 hover:bg-blue-500 shadow-blue-900/30' 
-                     : (bot.price === 0 ? 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-900/30' : 'bg-blue-600 hover:bg-blue-500 shadow-blue-900/30 active:scale-[0.98]')
-                 }`}
-                 onClick={handleAction}
-              >
-                  {isOwned ? (
-                      <>
-                        <Send size={18} />
-                        <span>Botu Başlat</span>
-                      </>
-                  ) : (
-                      <>
-                        {bot.price === 0 ? 'Hemen Ekle - Ücretsiz' : `Satın Al - ₺${bot.price}`}
-                      </>
-                  )}
-              </button>
-              <button 
-                onClick={() => haptic('light')}
-                className="bg-slate-800 hover:bg-slate-700 text-slate-300 p-3.5 rounded-xl border border-slate-700 transition-colors"
-              >
-                  <Bookmark className="w-6 h-6" />
-              </button>
-          </div>
+      <div className="fixed bottom-0 left-0 right-0 bg-slate-950/90 backdrop-blur-lg border-t border-slate-800 p-4 pb-8 z-50">
+          <button 
+             className={`w-full text-white font-bold py-4 rounded-xl shadow-lg flex items-center justify-center gap-2 ${isOwned ? 'bg-blue-600' : 'bg-emerald-600'}`}
+             onClick={handleAction}
+          >
+              {isOwned ? <><Send size={18} /><span>Botu Telegram'da Başlat</span></> : (bot.price === 0 ? 'Hemen Ekle - Ücretsiz' : `Satın Al - ₺${bot.price}`)}
+          </button>
       </div>
     </div>
   );

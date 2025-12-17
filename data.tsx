@@ -13,17 +13,18 @@ export const categories = [
   { id: 'moderation', label: 'cat_moderation', icon: Shield },
 ];
 
+// Fixed: Added mandatory bot_link and screenshots to all mock bots to match the Bot interface
 export const mockBots: ExtendedBot[] = [
-  { id: '1', name: 'Task Master', description: 'Görevleri yönetin', price: 29.99, icon: 'https://picsum.photos/seed/task/200', category: 'productivity', isNew: true, isPremium: true },
-  { id: '2', name: 'GameBot Pro', description: 'Oyun sunucusu yönetimi', price: 0, icon: 'https://picsum.photos/seed/game/200', category: 'games' },
-  { id: '3', name: 'CryptoAlert', description: 'Anlık fiyat takibi', price: 99.99, icon: 'https://picsum.photos/seed/crypto/200', category: 'utilities', isPremium: true },
-  { id: '4', name: 'ModBot', description: 'Otomatik moderasyon', price: 49.50, icon: 'https://picsum.photos/seed/mod/200', category: 'moderation', isPremium: true },
-  { id: '5', name: 'MusicFy', description: 'Yüksek kaliteli müzik', price: 19.99, icon: 'https://picsum.photos/seed/music/200', category: 'music' },
-  { id: '6', name: 'NotionSync', description: 'Notion entegrasyonu', price: 35.00, icon: 'https://picsum.photos/seed/notion/200', category: 'productivity', isPremium: true },
-  { id: '7', name: 'FocusFlow', description: 'Pomodoro zamanlayıcı', price: 0, icon: 'https://picsum.photos/seed/focus/200', category: 'productivity' },
-  { id: '8', name: 'RPG Master', description: 'Rol yapma oyunu', price: 15.00, icon: 'https://picsum.photos/seed/rpg/200', category: 'games' },
-  { id: '9', name: 'QuizKing', description: 'Bilgi yarışması botu', price: 0, icon: 'https://picsum.photos/seed/quiz/200', category: 'games' },
-  { id: '10', name: 'StockBot', description: 'Borsa takibi', price: 120.00, icon: 'https://picsum.photos/seed/stock/200', category: 'finance', isPremium: true },
+  { id: '1', name: 'Task Master', description: 'Görevleri yönetin', price: 29.99, icon: 'https://picsum.photos/seed/task/200', category: 'productivity', isNew: true, isPremium: true, bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
+  { id: '2', name: 'GameBot Pro', description: 'Oyun sunucusu yönetimi', price: 0, icon: 'https://picsum.photos/seed/game/200', category: 'games', bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
+  { id: '3', name: 'CryptoAlert', description: 'Anlık fiyat takibi', price: 99.99, icon: 'https://picsum.photos/seed/crypto/200', category: 'utilities', isPremium: true, bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
+  { id: '4', name: 'ModBot', description: 'Otomatik moderasyon', price: 49.50, icon: 'https://picsum.photos/seed/mod/200', category: 'moderation', isPremium: true, bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
+  { id: '5', name: 'MusicFy', description: 'Yüksek kaliteli müzik', price: 19.99, icon: 'https://picsum.photos/seed/music/200', category: 'music', bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
+  { id: '6', name: 'NotionSync', description: 'Notion entegrasyonu', price: 35.00, icon: 'https://picsum.photos/seed/notion/200', category: 'productivity', isPremium: true, bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
+  { id: '7', name: 'FocusFlow', description: 'Pomodoro zamanlayıcı', price: 0, icon: 'https://picsum.photos/seed/focus/200', category: 'productivity', bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
+  { id: '8', name: 'RPG Master', description: 'Rol yapma oyunu', price: 15.00, icon: 'https://picsum.photos/seed/rpg/200', category: 'games', bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
+  { id: '9', name: 'QuizKing', description: 'Bilgi yarışması botu', price: 0, icon: 'https://picsum.photos/seed/quiz/200', category: 'games', bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
+  { id: '10', name: 'StockBot', description: 'Borsa takibi', price: 120.00, icon: 'https://picsum.photos/seed/stock/200', category: 'finance', isPremium: true, bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
 ];
 
 export const subscriptionPlans: SubscriptionPlan[] = [
