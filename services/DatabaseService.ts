@@ -69,17 +69,13 @@ export class DatabaseService {
     if (error) throw error;
   }
 
-  /**
-   * Kullanıcı verilerini senkronize eder.
-   * Eğer kullanıcı yoksa oluşturur, varsa günceller.
-   */
   static async syncUser(user: Partial<User>) {
     if (!user.id) {
-      throw new Error("Kullanıcı ID'si eksik. Kayıt yapılamaz.");
+      throw new Error("Kullanıcı ID'si eksik.");
     }
     
-    // Veritabanı sütunlarıyla birebir eşleme
-    const payload = {
+    // Veritabanına gönderilecek payload
+    const payload: any = {
       id: user.id.toString(),
       name: user.name || '',
       username: user.username || '',
@@ -88,9 +84,13 @@ export class DatabaseService {
       phone: user.phone || '',
       role: user.role || 'User',
       status: user.status || 'Active',
-      badges: user.badges || [],
-      joinDate: user.joinDate || new Date().toISOString()
+      badges: user.badges || []
     };
+
+    // joinDate sadece yeni kayıtta veya mevcut değer yoksa gönderilmeli
+    if (user.joinDate) {
+        payload.joinDate = user.joinDate;
+    }
 
     const { data, error } = await supabase
       .from('users')
@@ -98,8 +98,12 @@ export class DatabaseService {
       .select();
 
     if (error) {
-      console.error("Supabase Upsert Hatası Detayı:", error);
-      throw new Error(`Veritabanı Hatası: ${error.message} (Kod: ${error.code})`);
+      console.error("Supabase Hatası:", error);
+      // Eğer hala email hatası alıyorsanız, SQL Editor kısmında email sütununu eklediğinizden emin olun.
+      if (error.code === 'PGRST204') {
+          throw new Error("Veritabanında 'email' sütunu bulunamadı. Lütfen SQL Editor üzerinden tabloyu güncelleyin.");
+      }
+      throw new Error(`Veritabanı Hatası: ${error.message}`);
     }
 
     return data;
@@ -110,12 +114,11 @@ export class DatabaseService {
       const { data, error } = await supabase
         .from('users')
         .select('*')
-        .order('joinDate', { ascending: false });
+        .order('id', { ascending: false });
       
       if (error) throw error;
       return data || [];
     } catch (e) {
-      console.error("getUsers error:", e);
       return [];
     }
   }
@@ -140,13 +143,6 @@ export class DatabaseService {
   static logoutAdmin() { localStorage.removeItem('admin_v3_session'); }
 
   static async init() {
-    try {
-      // Bağlantı testi
-      const { count, error } = await supabase.from('users').select('*', { count: 'estimated', head: true });
-      if (error) console.warn("Veritabanı bağlantı uyarısı:", error.message);
-      else console.log("Database Engine V3 Ready.");
-    } catch (e) {
-      console.error("Database Init Error:", e);
-    }
+    console.log("Database Sync Service v3.1 Ready.");
   }
 }
