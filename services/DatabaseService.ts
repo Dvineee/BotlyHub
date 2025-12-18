@@ -9,10 +9,31 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export class DatabaseService {
   
+  // --- Dashboard Stats ---
+  static async getAdminStats() {
+    try {
+      const [users, bots, notifications, anns] = await Promise.all([
+        supabase.from('users').select('id', { count: 'exact', head: true }),
+        supabase.from('bots').select('id', { count: 'exact', head: true }),
+        supabase.from('notifications').select('id', { count: 'exact', head: true }),
+        supabase.from('announcements').select('id', { count: 'exact', head: true })
+      ]);
+
+      return {
+        userCount: users.count || 0,
+        botCount: bots.count || 0,
+        notifCount: notifications.count || 0,
+        annCount: anns.count || 0
+      };
+    } catch (e) {
+      return { userCount: 0, botCount: 0, notifCount: 0, annCount: 0 };
+    }
+  }
+
   // --- Bot Management ---
   static async getBots(category?: string): Promise<Bot[]> {
     try {
-      let query = supabase.from('bots').select('*').order('created_at', { ascending: false });
+      let query = supabase.from('bots').select('*').order('id', { ascending: false });
       if (category && category !== 'all') {
         query = query.eq('category', category);
       }
@@ -20,7 +41,6 @@ export class DatabaseService {
       if (error) throw error;
       return data || [];
     } catch (e) {
-      console.error("getBots error:", e);
       return [];
     }
   }
@@ -40,7 +60,7 @@ export class DatabaseService {
       ...bot,
       id: bot.id || Math.random().toString(36).substr(2, 9),
       screenshots: bot.screenshots || []
-    }, { onConflict: 'id' });
+    });
     if (error) throw error;
   }
 
@@ -93,7 +113,8 @@ export class DatabaseService {
   static async saveAnnouncement(ann: Partial<Announcement>) {
     const { error } = await supabase.from('announcements').upsert({
         ...ann,
-        id: ann.id || Math.random().toString(36).substr(2, 9)
+        id: ann.id || Math.random().toString(36).substr(2, 9),
+        is_active: ann.is_active ?? true
     });
     if (error) throw error;
   }
@@ -135,8 +156,12 @@ export class DatabaseService {
       if (error) throw error;
   }
 
+  static async syncUser(user: Partial<User>) {
+    const { error } = await supabase.from('users').upsert(user, { onConflict: 'id' });
+    if (error) throw error;
+  }
+
   // --- Channel Management ---
-  // Added missing getChannels method
   static async getChannels(userId: string): Promise<Channel[]> {
     try {
       const { data, error } = await supabase.from('channels').select('*').eq('user_id', userId);
@@ -147,19 +172,11 @@ export class DatabaseService {
     }
   }
 
-  // Added missing saveChannel method
   static async saveChannel(channel: Partial<Channel>) {
     const { error } = await supabase.from('channels').upsert({
       ...channel,
       id: channel.id || Math.random().toString(36).substr(2, 9)
     });
-    if (error) throw error;
-  }
-
-  // --- User Sync ---
-  // Added missing syncUser method
-  static async syncUser(user: Partial<User>) {
-    const { error } = await supabase.from('users').upsert(user, { onConflict: 'id' });
     if (error) throw error;
   }
 
@@ -169,6 +186,6 @@ export class DatabaseService {
   static logoutAdmin() { localStorage.removeItem('admin_v3_session'); }
 
   static async init() {
-    console.log("Database Sync Service v3.5 - SaaS Ready");
+    console.log("Database Sync Service v3.8 - Full Enterprise Ready");
   }
 }
