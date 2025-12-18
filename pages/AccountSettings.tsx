@@ -101,7 +101,7 @@ const AccountSettings = () => {
     <div className="min-h-screen bg-[#020617] p-6 pt-10 pb-20">
       <div className="flex items-center gap-4 mb-10">
         <button onClick={() => navigate('/settings')} className="p-3 bg-slate-900/60 border border-slate-800 rounded-2xl text-slate-400 active:scale-90 transition-transform">
-          <ChevronLeft size size={22} />
+          <ChevronLeft size={22} />
         </button>
         <h1 className="text-xl font-black text-white tracking-tight">Hesap Doğrulama</h1>
       </div>
