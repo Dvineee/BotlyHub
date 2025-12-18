@@ -1,6 +1,6 @@
 
 import { createClient } from '@supabase/supabase-js';
-import { Bot, User, Channel, Announcement, Notification, UserBot } from '../types';
+import { Bot, User, Channel, Announcement, Notification } from '../types';
 
 const SUPABASE_URL = 'https://ybnxfwqrduuinzgnbymc.supabase.co'; 
 const SUPABASE_ANON_KEY = 'sb_publishable_VeYQ304ZpUpj3ymB3ihpjw_jt49W1G-'; 
@@ -128,8 +128,11 @@ export class DatabaseService {
   // --- Settings Management ---
   static async getSettings() {
     try {
-        const { data, error } = await supabase.from('settings').select('*').eq('id', 1).single();
-        if (error) return null;
+        const { data, error } = await supabase.from('settings').select('*').eq('id', 1).maybeSingle();
+        if (error) {
+            console.error("Settings Fetch Error:", error.message);
+            return null;
+        }
         return data;
     } catch (e) {
         return null;
@@ -137,8 +140,15 @@ export class DatabaseService {
   }
 
   static async saveSettings(settings: any) {
-    const { error } = await supabase.from('settings').upsert({ id: 1, ...settings }, { onConflict: 'id' });
-    if (error) throw error;
+    const { error } = await supabase.from('settings').upsert({ 
+        id: 1, 
+        ...settings 
+    }, { onConflict: 'id' });
+    
+    if (error) {
+        // Eğer tablo yoksa hatayı yakalayıp kullanıcıya şema oluşturması gerektiğini belirtmek için fırlatıyoruz
+        throw new Error(error.message);
+    }
   }
 
   // --- User Management ---
@@ -162,19 +172,24 @@ export class DatabaseService {
     if (error) throw error;
   }
 
-  // --- User Assets (FOR ADMIN ONLY - FULL REAL DATA) ---
+  // --- User Assets & Logs (REAL-TIME DATA) ---
   static async getUserDetailedAssets(userId: string) {
-      const [channels, notifications, userBots] = await Promise.all([
-          supabase.from('channels').select('*').eq('user_id', userId),
-          supabase.from('notifications').select('*').eq('user_id', userId).order('date', { ascending: false }),
-          supabase.from('user_bots').select('*, bots(*)').eq('user_id', userId)
-      ]);
-      
-      return {
-          channels: channels.data || [],
-          logs: notifications.data || [],
-          bots: (userBots.data || []).map((ub: any) => ub.bots).filter(Boolean) as Bot[]
-      };
+      try {
+        const [channels, notifications, userBots] = await Promise.all([
+            supabase.from('channels').select('*').eq('user_id', userId),
+            supabase.from('notifications').select('*').eq('user_id', userId).order('date', { ascending: false }),
+            supabase.from('user_bots').select('*, bots(*)').eq('user_id', userId)
+        ]);
+        
+        return {
+            channels: channels.data || [],
+            logs: notifications.data || [],
+            bots: (userBots.data || []).map((ub: any) => ub.bots).filter(Boolean) as Bot[]
+        };
+      } catch (e) {
+          console.error("User detailed fetch error:", e);
+          return { channels: [], logs: [], bots: [] };
+      }
   }
 
   // --- Channel Management ---
@@ -202,6 +217,6 @@ export class DatabaseService {
   static logoutAdmin() { localStorage.removeItem('admin_v3_session'); }
 
   static async init() {
-    console.log("Database Sync Service v4.1 - Real Data Audit Ready");
+    console.log("Database Sync Service v4.2 - Production Stable");
   }
 }

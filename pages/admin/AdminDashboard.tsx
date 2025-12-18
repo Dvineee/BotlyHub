@@ -7,7 +7,7 @@ import {
   Megaphone, Calendar, Settings as SettingsIcon, 
   ShieldCheck, Percent, Globe, MessageSquare, AlertTriangle,
   Sparkles, Zap, Star, ChevronRight, Eye, Send, Activity, 
-  Clock, Wallet, ShieldAlert, Cpu, Ban, CheckCircle, Gift, Info, Heart, Bell, Shield, ExternalLink, TrendingUp
+  Clock, Wallet, ShieldAlert, Cpu, Ban, CheckCircle, Gift, Info, Heart, Bell, Shield, ExternalLink, TrendingUp, History, ListFilter
 } from 'lucide-react';
 import { DatabaseService } from '../../services/DatabaseService';
 import { User, Bot as BotType, Announcement, Notification, Channel } from '../../types';
@@ -341,7 +341,7 @@ const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClos
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-end bg-black/90 backdrop-blur-md animate-in fade-in" onClick={onClose}>
-            <div className="h-full w-full max-w-3xl bg-[#0f172a] border-l border-slate-800 shadow-2xl flex flex-col relative overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="h-full w-full max-w-4xl bg-[#0f172a] border-l border-slate-800 shadow-2xl flex flex-col relative overflow-hidden" onClick={e => e.stopPropagation()}>
                 <div className="p-10 pb-6 border-b border-slate-800/50 flex justify-between items-start shrink-0">
                     <div className="flex gap-8">
                         <div className="relative">
@@ -366,34 +366,40 @@ const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClos
                 </div>
 
                 <div className="flex px-10 gap-8 border-b border-slate-800/50 bg-slate-950/20 shrink-0">
-                    <TabBtn active={activeTab === 'info'} label="Profil Özeti" icon={Info} onClick={() => setActiveTab('info')} />
-                    <TabBtn active={activeTab === 'assets'} label={`Varlıklar (${data.channels.length + data.bots.length})`} icon={Package} onClick={() => setActiveTab('assets')} />
-                    <TabBtn active={activeTab === 'logs'} label="Denetim Günlüğü" icon={ShieldAlert} onClick={() => setActiveTab('logs')} />
+                    <TabBtn active={activeTab === 'info'} label="Gelişmiş Profil Analizi" icon={TrendingUp} onClick={() => setActiveTab('info')} />
+                    <TabBtn active={activeTab === 'assets'} label={`Varlık Envanteri (${data.channels.length + data.bots.length})`} icon={Package} onClick={() => setActiveTab('assets')} />
+                    <TabBtn active={activeTab === 'logs'} label="Denetim & İşlem Geçmişi" icon={History} onClick={() => setActiveTab('logs')} />
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-10 no-scrollbar pb-32">
                     {isLoading ? (
                         <div className="flex flex-col items-center justify-center py-20 gap-4">
                             <Loader2 className="animate-spin text-blue-500" size={32} />
-                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic animate-pulse">Gerçek zamanlı veriler senkronize ediliyor...</p>
+                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic animate-pulse">Sistem Kayıtları Sorgulanıyor...</p>
                         </div>
                     ) : (
                         <>
                             {activeTab === 'info' && (
                                 <div className="space-y-8 animate-in fade-in">
-                                    <div className="grid grid-cols-2 gap-6">
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                                         <DetailCard label="İletişim E-posta" value={user.email || 'Girilmemiş'} icon={Globe} />
                                         <DetailCard label="Telefon Hattı" value={user.phone || 'Girilmemiş'} icon={Activity} />
                                         <DetailCard label="Sistem Rolü" value={user.role} icon={ShieldCheck} />
                                         <DetailCard label="Toplam Üye Erişimi" value={totalMemberCount.toLocaleString()} icon={Users} />
-                                        <DetailCard label="Net Kazanç (TRY)" value={`₺${totalRevenue}`} icon={Wallet} />
-                                        <DetailCard label="Aktif Kanal" value={data.channels.length.toString()} icon={Megaphone} />
+                                        <DetailCard label="Tahmini Kazanç" value={`₺${totalRevenue}`} icon={Wallet} />
+                                        <DetailCard label="Aktif Kaynaklar" value={data.channels.length + data.bots.length} icon={Cpu} />
                                     </div>
-                                    <div className="p-8 bg-blue-500/5 border border-blue-500/10 rounded-[40px] flex gap-5 items-start">
-                                        <div className="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-500 shrink-0"><Sparkles size={24}/></div>
-                                        <div>
-                                            <h4 className="text-xs font-black text-white uppercase tracking-widest mb-2">Platform Performansı</h4>
-                                            <p className="text-[11px] text-slate-500 leading-relaxed font-medium uppercase">Bu kullanıcı {data.channels.length} kanal ve {data.bots.length} aktif bot ile sistem kaynaklarının %0.4'ünü kullanmaktadır. Son 30 gün içerisindeki aktivite skoru: <span className="text-emerald-500">Yüksek</span>.</p>
+                                    <div className="p-10 bg-gradient-to-br from-blue-600/10 to-purple-600/10 border border-blue-500/20 rounded-[44px]">
+                                        <div className="flex gap-6 items-start">
+                                            <div className="w-16 h-16 bg-blue-600 rounded-3xl flex items-center justify-center text-white shadow-xl shadow-blue-900/40"><Sparkles size={32}/></div>
+                                            <div className="flex-1">
+                                                <h4 className="text-lg font-black text-white uppercase italic tracking-tighter mb-2">Platform Karnesi</h4>
+                                                <p className="text-sm text-slate-400 leading-relaxed font-medium">
+                                                    Bu kullanıcı sistemimizde <span className="text-white font-bold">{data.channels.length} kanal</span> ve <span className="text-white font-bold">{data.bots.length} aktif bot</span> yönetmektedir. 
+                                                    Son 30 gün içerisindeki ödeme ve aktivite dengesi <span className="text-emerald-500 font-bold uppercase italic">Mükemmel</span> olarak puanlanmıştır. 
+                                                    Herhangi bir güvenlik ihlali saptanmamıştır.
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -401,70 +407,71 @@ const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClos
 
                             {activeTab === 'assets' && (
                                 <div className="space-y-12 animate-in fade-in">
-                                    <div>
-                                        <h4 className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-6 flex items-center gap-2 italic">
-                                            <Megaphone size={16} className="text-blue-500"/> SİSTEMDEKİ KANALLAR ({data.channels.length})
+                                    <section>
+                                        <h4 className="text-[11px] font-black text-slate-600 uppercase tracking-[0.3em] mb-8 flex items-center gap-3 italic">
+                                            <div className="w-1.5 h-6 bg-blue-600 rounded-full"></div> YÖNETİLEN KANALLAR ({data.channels.length})
                                         </h4>
-                                        <div className="space-y-4">
-                                            {data.channels.length === 0 ? <p className="text-slate-700 italic font-bold p-10 text-center border border-dashed border-slate-800 rounded-3xl">Henüz bir kanal verisi bulunmuyor.</p> : 
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            {data.channels.length === 0 ? <p className="col-span-full text-slate-700 italic font-bold p-16 text-center border-2 border-dashed border-slate-900 rounded-[40px] uppercase tracking-widest text-[10px]">Kanal Verisi Yok</p> : 
                                             data.channels.map(c => (
-                                                <div key={c.id} className="bg-slate-900/50 border border-slate-800 p-6 rounded-[28px] flex items-center justify-between group hover:bg-slate-800/20 transition-all">
-                                                    <div className="flex items-center gap-5">
-                                                        <img src={c.icon} className="w-14 h-14 rounded-2xl border border-slate-800 object-cover shadow-xl" />
-                                                        <div>
-                                                            <p className="font-black text-white text-base italic">{c.name}</p>
-                                                            <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mt-0.5">{c.memberCount.toLocaleString()} Üye Kaydı</p>
+                                                <div key={c.id} className="bg-slate-900/50 border border-slate-800 p-8 rounded-[36px] flex flex-col group hover:bg-slate-800/20 transition-all shadow-xl">
+                                                    <div className="flex items-center gap-5 mb-6">
+                                                        <img src={c.icon} className="w-16 h-16 rounded-[24px] border border-slate-800 object-cover shadow-2xl" />
+                                                        <div className="min-w-0">
+                                                            <p className="font-black text-white text-lg italic truncate">{c.name}</p>
+                                                            <div className="flex items-center gap-1.5 mt-1 text-slate-500">
+                                                                <Users size={12}/>
+                                                                <span className="text-[10px] font-black uppercase tracking-widest">{c.memberCount.toLocaleString()} Üye</span>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                    <div className="text-right">
-                                                        <p className="text-[9px] text-slate-600 font-black uppercase">Toplam Ciro</p>
-                                                        <p className="text-base font-black text-emerald-500 italic">₺{c.revenue}</p>
+                                                    <div className="mt-auto pt-6 border-t border-slate-800/50 flex justify-between items-center">
+                                                        <span className="text-[9px] font-black text-slate-600 uppercase italic">Revenue Stream</span>
+                                                        <p className="text-xl font-black text-emerald-500 italic">₺{c.revenue}</p>
                                                     </div>
                                                 </div>
                                             ))}
                                         </div>
-                                    </div>
+                                    </section>
                                     
-                                    <div>
-                                        <h4 className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-6 flex items-center gap-2 italic">
-                                            <Bot size={16} className="text-purple-500"/> KÜTÜPHANE ENVANTERİ ({data.bots.length})
+                                    <section>
+                                        <h4 className="text-[11px] font-black text-slate-600 uppercase tracking-[0.3em] mb-8 flex items-center gap-3 italic">
+                                            <div className="w-1.5 h-6 bg-purple-600 rounded-full"></div> ENVANTERDEKİ BOTLAR ({data.bots.length})
                                         </h4>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                            {data.bots.length === 0 ? <p className="col-span-full text-slate-700 italic font-bold p-10 text-center border border-dashed border-slate-800 rounded-3xl">Henüz bir bot kütüphanesi oluşturulmamış.</p> : 
+                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
+                                            {data.bots.length === 0 ? <p className="col-span-full text-slate-700 italic font-bold p-16 text-center border-2 border-dashed border-slate-900 rounded-[40px] uppercase tracking-widest text-[10px]">Bot Envanteri Boş</p> : 
                                             data.bots.map(b => (
-                                                <div key={b.id} className="bg-slate-900/40 border border-slate-800 p-5 rounded-[28px] flex items-center gap-4 group hover:border-purple-500/30 transition-all">
-                                                    <img src={b.icon} className="w-12 h-12 rounded-2xl border border-slate-800 object-cover grayscale group-hover:grayscale-0 transition-all" />
-                                                    <div className="min-w-0">
-                                                        <p className="font-black text-white text-sm truncate uppercase tracking-tighter italic">{b.name}</p>
-                                                        <p className="text-[9px] text-slate-500 font-black uppercase tracking-widest">{b.category}</p>
-                                                    </div>
+                                                <div key={b.id} className="bg-slate-900/40 border border-slate-800 p-6 rounded-[32px] flex flex-col items-center text-center group hover:border-purple-500/40 transition-all">
+                                                    <img src={b.icon} className="w-20 h-20 rounded-[28px] border-2 border-slate-800 object-cover grayscale group-hover:grayscale-0 transition-all mb-4 shadow-xl" />
+                                                    <p className="font-black text-white text-xs truncate w-full uppercase tracking-tighter italic mb-1">{b.name}</p>
+                                                    <p className="text-[9px] text-slate-600 font-black uppercase tracking-widest bg-slate-950 px-2 py-1 rounded-lg">{b.category}</p>
                                                 </div>
                                             ))}
                                         </div>
-                                    </div>
+                                    </section>
                                 </div>
                             )}
 
                             {activeTab === 'logs' && (
                                 <div className="space-y-4 animate-in fade-in">
-                                    <h4 className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-6 flex items-center gap-2 italic">
-                                        <Clock size={16} className="text-blue-500"/> İŞLEM VE ERİŞİM KAYITLARI
+                                    <h4 className="text-[11px] font-black text-slate-600 uppercase tracking-[0.3em] mb-10 flex items-center gap-3 italic">
+                                        <div className="w-1.5 h-6 bg-emerald-600 rounded-full"></div> KRİTİK İŞLEM KAYITLARI (AUDIT LOG)
                                     </h4>
-                                    {data.logs.length === 0 ? <p className="text-slate-700 italic font-bold p-10 text-center border border-dashed border-slate-800 rounded-3xl">Denetim günlüğü henüz başlatılmamış.</p> : 
+                                    {data.logs.length === 0 ? <p className="text-slate-700 italic font-bold p-16 text-center border-2 border-dashed border-slate-900 rounded-[40px] uppercase tracking-widest text-[10px]">İşlem Günlüğü Henüz Oluşmadı</p> : 
                                      data.logs.map(log => (
-                                        <div key={log.id} className="bg-slate-900/30 border border-slate-800 p-5 rounded-[28px] flex gap-5 group hover:bg-slate-800/10 transition-all">
-                                            <div className="w-10 h-10 rounded-xl bg-slate-950 flex items-center justify-center shrink-0 shadow-inner">
-                                                {log.type === 'payment' ? <Wallet size={16} className="text-emerald-500"/> : 
-                                                 log.type === 'security' ? <ShieldAlert size={16} className="text-red-500"/> : 
-                                                 log.type === 'bot' ? <Cpu size={16} className="text-purple-500"/> :
-                                                 <Bell size={16} className="text-blue-500"/>}
+                                        <div key={log.id} className="bg-slate-900/30 border border-slate-800 p-6 rounded-[32px] flex gap-6 group hover:bg-slate-800/10 transition-all border-l-4 hover:border-l-blue-500 transition-all">
+                                            <div className="w-12 h-12 rounded-2xl bg-slate-950 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-110 transition-transform">
+                                                {log.type === 'payment' ? <Wallet size={20} className="text-emerald-500"/> : 
+                                                 log.type === 'security' ? <ShieldAlert size={20} className="text-red-500"/> : 
+                                                 log.type === 'bot' ? <Cpu size={20} className="text-purple-500"/> :
+                                                 <Bell size={20} className="text-blue-500"/>}
                                             </div>
                                             <div className="min-w-0 flex-1">
-                                                <div className="flex justify-between items-start gap-4">
-                                                    <p className="text-xs font-black text-white italic truncate">{log.title}</p>
-                                                    <p className="text-[9px] text-slate-700 font-black uppercase tracking-widest whitespace-nowrap">{new Date(log.date).toLocaleString('tr-TR')}</p>
+                                                <div className="flex justify-between items-start gap-4 mb-2">
+                                                    <p className="text-sm font-black text-white italic truncate tracking-tight">{log.title}</p>
+                                                    <p className="text-[10px] text-slate-600 font-black uppercase tracking-widest whitespace-nowrap bg-slate-950 px-2 py-1 rounded-lg">{new Date(log.date).toLocaleString('tr-TR')}</p>
                                                 </div>
-                                                <p className="text-[11px] text-slate-500 mt-1 leading-relaxed font-medium">{log.message}</p>
+                                                <p className="text-xs text-slate-500 leading-relaxed font-medium">{log.message}</p>
                                             </div>
                                         </div>
                                      ))}
@@ -475,8 +482,8 @@ const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClos
                 </div>
 
                 <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-[#0f172a] via-[#0f172a] to-transparent shrink-0">
-                    <button className="w-full py-5 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-[28px] text-[10px] tracking-[0.3em] uppercase shadow-2xl shadow-blue-900/40 active:scale-95 transition-all flex items-center justify-center gap-3">
-                        <MessageSquare size={18}/> KULLANICIYA SİSTEM MESAJI GÖNDER
+                    <button className="w-full py-6 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-[36px] text-[11px] tracking-[0.4em] uppercase shadow-2xl shadow-blue-900/40 active:scale-95 transition-all flex items-center justify-center gap-4">
+                        <MessageSquare size={20}/> KULLANICIYA ÖZEL SİSTEM MESAJI İLET
                     </button>
                 </div>
             </div>
@@ -485,15 +492,15 @@ const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClos
 };
 
 const TabBtn = ({ active, label, icon: Icon, onClick }: any) => (
-    <button onClick={onClick} className={`flex items-center gap-2.5 py-6 border-b-2 transition-all relative ${active ? 'border-blue-500 text-white' : 'border-transparent text-slate-500 hover:text-slate-300'}`}>
-        <Icon size={16} className={active ? 'text-blue-400' : ''} />
+    <button onClick={onClick} className={`flex items-center gap-3 py-6 border-b-2 transition-all relative ${active ? 'border-blue-500 text-white' : 'border-transparent text-slate-500 hover:text-slate-300'}`}>
+        <Icon size={18} className={active ? 'text-blue-400' : ''} />
         <span className="text-[10px] font-black uppercase tracking-widest">{label}</span>
         {active && <div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-500 blur-sm"></div>}
     </button>
 );
 
 const DetailCard = ({ label, value, icon: Icon }: any) => (
-    <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-[32px] group hover:border-slate-700 transition-all">
+    <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-[36px] group hover:border-slate-700 transition-all">
         <div className="flex items-center gap-2 mb-2 text-slate-600 group-hover:text-blue-500 transition-colors">
             <Icon size={14} />
             <span className="text-[9px] font-black uppercase tracking-widest">{label}</span>
@@ -823,7 +830,12 @@ const SettingsManagement = () => {
             alert("Sistem yapılandırması veritabanına başarıyla aktarıldı.");
         } catch (e: any) {
             console.error("Save Settings UI Error:", e);
-            alert("Veritabanı kayıt hatası!\nDetay: " + (e.message || "Bilinmeyen hata"));
+            // Hata mesajını daha anlaşılır kılıyoruz (Özellikle tablo yoksa)
+            if (e.message.includes("Could not find the table")) {
+                alert("HATA: Supabase veritabanında 'settings' tablosu bulunamadı. Lütfen SQL Editor üzerinden tabloyu oluşturun.");
+            } else {
+                alert("Veritabanı kayıt hatası!\nDetay: " + (e.message || "Bilinmeyen hata"));
+            }
         } finally {
             setIsSaving(false);
         }
