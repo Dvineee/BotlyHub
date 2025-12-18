@@ -5,7 +5,6 @@ import { Settings, ShieldAlert, Cpu, Sparkles } from 'lucide-react';
 const Maintenance = () => {
   return (
     <div className="min-h-screen bg-[#020617] flex items-center justify-center p-6 relative overflow-hidden">
-      {/* Background Decor */}
       <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-600/10 rounded-full blur-[120px] animate-pulse"></div>
       <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-purple-600/10 rounded-full blur-[120px] animate-pulse delay-700"></div>
 
@@ -29,14 +28,7 @@ const Maintenance = () => {
                 <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-500"><Cpu size={20} /></div>
                 <div>
                     <p className="text-xs font-black text-white uppercase tracking-widest">Çekirdek Güncelleme</p>
-                    <p className="text-[10px] text-slate-500">V3.5 Veritabanı optimizasyonu süratle devam ediyor.</p>
-                </div>
-            </div>
-            <div className="bg-slate-900/50 border border-slate-800 p-4 rounded-2xl flex items-center gap-4 text-left group hover:border-purple-500/30 transition-colors">
-                <div className="w-10 h-10 bg-purple-500/10 rounded-xl flex items-center justify-center text-purple-500"><Sparkles size={20} /></div>
-                <div>
-                    <p className="text-xs font-black text-white uppercase tracking-widest">Arayüz İyileştirme</p>
-                    <p className="text-[10px] text-slate-500">Görsel performans ve akıcılık artırılıyor.</p>
+                    <p className="text-[10px] text-slate-500">Optimizasyon çalışmaları devam ediyor.</p>
                 </div>
             </div>
         </div>
