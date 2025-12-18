@@ -1,36 +1,49 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Sparkles, ChevronRight, LayoutGrid, DollarSign, Loader2, ShieldCheck, Star, Store, User, Bot as BotIcon, Megaphone, X } from 'lucide-react';
+import { Search, Sparkles, ChevronRight, LayoutGrid, DollarSign, Loader2, ShieldCheck, Star, Store, User, Bot as BotIcon, Megaphone, X, Zap, Gift, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Bot, Announcement } from '../types';
 import { categories } from '../data';
 import { useTranslation } from '../TranslationContext';
 import { DatabaseService } from '../services/DatabaseService';
 
-const PromoCard = ({ ann }: { ann: Announcement }) => {
+const iconMap: Record<string, any> = {
+  Sparkles, Megaphone, Zap, Gift, Star, Info, BotIcon
+};
+
+const PromoCard = ({ ann, onShowPopup }: { ann: Announcement, onShowPopup: (ann: Announcement) => void }) => {
   const navigate = useNavigate();
   const colors: Record<string, string> = {
     purple: 'from-[#6366f1] to-[#a855f7]',
     emerald: 'from-[#10b981] to-[#34d399]',
-    blue: 'from-[#3b82f6] to-[#60a5fa]'
+    blue: 'from-[#3b82f6] to-[#60a5fa]',
+    orange: 'from-[#f59e0b] to-[#ef4444]'
+  };
+
+  const IconComp = iconMap[ann.icon_name] || Sparkles;
+
+  const handleAction = () => {
+    if (ann.action_type === 'popup') {
+        onShowPopup(ann);
+    } else {
+        if (ann.button_link.startsWith('/')) navigate(ann.button_link);
+        else window.open(ann.button_link);
+    }
   };
 
   return (
-    <div className={`min-w-[300px] h-44 bg-gradient-to-br ${colors[ann.color_scheme] || colors.purple} p-6 rounded-[32px] relative overflow-hidden shadow-2xl`}>
+    <div className={`min-w-[300px] h-44 bg-gradient-to-br ${colors[ann.color_scheme] || colors.purple} p-6 rounded-[32px] relative overflow-hidden shadow-2xl shrink-0 transition-transform active:scale-[0.98] cursor-pointer`} onClick={handleAction}>
         <div className="relative z-10 flex flex-col h-full justify-between">
             <div>
                 <h3 className="text-white font-black text-2xl mb-1">{ann.title}</h3>
-                <p className="text-white/80 text-xs max-w-[200px] leading-snug">{ann.description}</p>
+                <p className="text-white/80 text-xs max-w-[200px] leading-snug line-clamp-2">{ann.description}</p>
             </div>
-            <button 
-                onClick={() => ann.button_link.startsWith('/') ? navigate(ann.button_link) : window.open(ann.button_link)}
-                className="bg-white text-slate-950 text-[11px] font-bold py-2.5 px-6 rounded-xl w-fit shadow-md transition-transform active:scale-95"
-            >
-                {ann.button_text}
-            </button>
+            <div className="bg-white/20 backdrop-blur-md text-white text-[11px] font-bold py-2 px-5 rounded-xl w-fit border border-white/30">
+                {ann.button_text || 'İncele'}
+            </div>
         </div>
-        <div className="absolute -right-6 -bottom-6 opacity-30 transform rotate-12 pointer-events-none">
-            <Sparkles size={160} className="text-white" />
+        <div className="absolute -right-6 -bottom-6 opacity-20 transform rotate-12 pointer-events-none">
+            <IconComp size={160} className="text-white" />
         </div>
     </div>
   );
@@ -71,8 +84,8 @@ const Home = () => {
   const [activeCategory, setActiveCategory] = useState('all');
   const [bots, setBots] = useState<Bot[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-  const [recentBots, setRecentBots] = useState<Bot[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedAnn, setSelectedAnn] = useState<Announcement | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const loadData = async (catId: string = 'all') => {
@@ -83,7 +96,6 @@ const Home = () => {
     ]);
     setBots(botData);
     if (annData.length > 0) setAnnouncements(annData);
-    setRecentBots(JSON.parse(localStorage.getItem('recentlyViewed') || '[]'));
     setIsLoading(false);
   };
 
@@ -104,11 +116,6 @@ const Home = () => {
     b.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleCategoryClick = (id: string) => {
-    setActiveCategory(id);
-    setSearchQuery(''); // Kategori değişince aramayı sıfırla
-  };
-
   return (
     <div className="p-4 pt-8 min-h-screen bg-[#020617] pb-24 font-sans text-slate-200">
       {/* Header */}
@@ -119,7 +126,7 @@ const Home = () => {
                     <div className="w-2 h-2 bg-white rounded-full"></div>
                 </div>
             </div>
-            <h1 className="text-xl font-black text-white tracking-tight">BotlyHub V2</h1>
+            <h1 className="text-xl font-black text-white tracking-tight">BotlyHub V3</h1>
         </div>
         <div className="flex items-center gap-3">
             <button onClick={() => navigate('/earnings')} className="p-2.5 bg-slate-900/60 border border-slate-800 rounded-full text-[#10b981] shadow-sm active:scale-95 transition-transform"><DollarSign size={20} /></button>
@@ -155,30 +162,14 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Admin Button */}
-      {!searchQuery && (
-        <button 
-            onClick={() => navigate('/a/admin')}
-            className="w-full bg-[#1e293b]/40 border border-blue-500/20 text-blue-400/90 py-4 rounded-2xl text-[11px] font-black flex items-center justify-center gap-2 mb-8 tracking-widest uppercase shadow-sm active:scale-95 transition-transform"
-        >
-            <ShieldCheck size={16} />
-            Yönetici Paneline Git
-        </button>
-      )}
-
       {isLoading && bots.length === 0 ? (
           <div className="flex justify-center py-20"><Loader2 className="animate-spin text-purple-500" /></div>
       ) : (
           <>
-            {/* Promo Sliders - Only show when not searching */}
-            {!searchQuery && activeCategory === 'all' && (
+            {/* Promo Sliders */}
+            {!searchQuery && activeCategory === 'all' && announcements.length > 0 && (
                 <div className="flex gap-4 overflow-x-auto no-scrollbar -mx-4 px-4 mb-10 pb-2">
-                    {announcements.length > 0 ? announcements.map(ann => <PromoCard key={ann.id} ann={ann} />) : (
-                        <div className="min-w-[300px] h-44 bg-slate-900 rounded-[32px] border border-slate-800 flex flex-col items-center justify-center gap-3">
-                            <Star size={32} className="text-slate-700" />
-                            <p className="text-slate-600 text-[10px] font-black uppercase tracking-[0.2em]">BotlyHub Premium</p>
-                        </div>
-                    )}
+                    {announcements.map(ann => <PromoCard key={ann.id} ann={ann} onShowPopup={(a) => setSelectedAnn(a)} />)}
                 </div>
             )}
 
@@ -187,7 +178,7 @@ const Home = () => {
                 {categories.map((cat) => (
                     <button 
                         key={cat.id} 
-                        onClick={() => handleCategoryClick(cat.id)}
+                        onClick={() => setActiveCategory(cat.id)}
                         className={`flex flex-col items-center justify-center gap-2.5 p-4 rounded-2xl border transition-all active:scale-95 shadow-sm ${
                             activeCategory === cat.id 
                             ? 'bg-blue-600/10 border-blue-500/50 text-blue-400' 
@@ -205,7 +196,6 @@ const Home = () => {
                 <h2 className="text-lg font-black text-white tracking-tight">
                     {searchQuery ? 'Arama Sonuçları' : (activeCategory === 'all' ? 'Öne Çıkan Botlar' : `${t(categories.find(c => c.id === activeCategory)?.label || '')} Botları`)}
                 </h2>
-                {searchQuery && <span className="text-xs font-bold text-slate-500">{filteredBots.length} sonuç</span>}
             </div>
 
             {/* Bot List */}
@@ -217,10 +207,7 @@ const Home = () => {
                         <div className="p-6 bg-slate-900 rounded-full text-slate-700">
                              <Search size={40} />
                         </div>
-                        <div>
-                            <p className="text-slate-400 font-bold">Aradığın botu bulamadık</p>
-                            <p className="text-slate-600 text-xs mt-1 px-10">Başka anahtar kelimeler dene veya tüm kategorilere göz at.</p>
-                        </div>
+                        <p className="text-slate-400 font-bold">Bot bulunamadı.</p>
                     </div>
                 )}
             </div>
@@ -230,6 +217,44 @@ const Home = () => {
                 <p className="text-slate-800 text-[10px] font-black tracking-[0.3em] uppercase">@teest44_BOT</p>
             </div>
           </>
+      )}
+
+      {/* Announcement Popup Modal */}
+      {selectedAnn && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-6 bg-black/90 backdrop-blur-md animate-in fade-in" onClick={() => setSelectedAnn(null)}>
+            <div className="bg-[#0f172a] border border-slate-800 w-full max-w-sm rounded-[40px] p-8 shadow-2xl relative overflow-hidden" onClick={e => e.stopPropagation()}>
+                <div className={`absolute top-0 left-0 w-full h-2 bg-gradient-to-r ${
+                    selectedAnn.color_scheme === 'purple' ? 'from-indigo-500 to-purple-500' :
+                    selectedAnn.color_scheme === 'emerald' ? 'from-emerald-500 to-teal-500' :
+                    'from-blue-500 to-cyan-500'
+                }`} />
+                
+                <button onClick={() => setSelectedAnn(null)} className="absolute top-6 right-6 text-slate-500 hover:text-white p-2 bg-slate-800/50 rounded-full transition-colors"><X size={20}/></button>
+                
+                <div className="mb-8 pt-4">
+                    <div className="w-16 h-16 bg-slate-900 rounded-[24px] border border-slate-800 flex items-center justify-center mb-6">
+                        {React.createElement(iconMap[selectedAnn.icon_name] || Sparkles, { size: 32, className: 'text-blue-400' })}
+                    </div>
+                    <h3 className="text-2xl font-black text-white mb-3">{selectedAnn.title}</h3>
+                    <div className="text-slate-400 text-sm leading-relaxed max-h-[40vh] overflow-y-auto no-scrollbar whitespace-pre-line">
+                        {selectedAnn.content_detail || selectedAnn.description}
+                    </div>
+                </div>
+                
+                {selectedAnn.button_link && (
+                    <button 
+                        onClick={() => {
+                            if (selectedAnn.button_link.startsWith('/')) navigate(selectedAnn.button_link);
+                            else window.open(selectedAnn.button_link);
+                            setSelectedAnn(null);
+                        }}
+                        className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-2xl shadow-xl shadow-blue-900/20 transition-all active:scale-95"
+                    >
+                        {selectedAnn.button_text || 'Hemen Göz At'}
+                    </button>
+                )}
+            </div>
+        </div>
       )}
     </div>
   );

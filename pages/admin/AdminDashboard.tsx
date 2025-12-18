@@ -5,10 +5,11 @@ import {
   LayoutDashboard, Users, Bot, LogOut, Menu, X, 
   Package, Loader2, RefreshCw, Plus, Edit2, Trash2, 
   Mail, Phone, Image as ImageIcon, Megaphone, Calendar,
-  Settings as SettingsIcon, ShieldCheck, Percent, Globe, MessageSquare, AlertTriangle
+  Settings as SettingsIcon, ShieldCheck, Percent, Globe, MessageSquare, AlertTriangle,
+  Sparkles, Zap, Gift, Info, Star, ChevronRight, Eye
 } from 'lucide-react';
 import { DatabaseService } from '../../services/DatabaseService';
-import { User, Bot as BotType, Announcement } from '../../types';
+import { User, Bot as BotType, Announcement, Channel } from '../../types';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -35,21 +36,16 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-[#020617] flex text-slate-200 font-sans overflow-hidden">
-      {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
-      {/* Sidebar */}
       <aside className={`fixed inset-y-0 left-0 z-[70] w-72 bg-slate-900 border-r border-slate-800 transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="h-full flex flex-col p-6">
           <div className="flex items-center justify-between mb-12 px-2">
             <div className="flex items-center gap-3">
                 <div className="p-2 bg-blue-600 rounded-xl shadow-lg shadow-blue-600/20"><Package className="text-white" size={24} /></div>
-                <h2 className="text-xl font-black text-white tracking-tight">BOTLY <span className="text-blue-500">ADMIN</span></h2>
+                <h2 className="text-xl font-black text-white tracking-tight">BOTLY <span className="text-blue-500">V3</span></h2>
             </div>
             <button onClick={() => setSidebarOpen(false)} className="lg:hidden p-2 text-slate-500"><X size={24}/></button>
           </div>
@@ -62,37 +58,23 @@ const AdminDashboard = () => {
             <NavItem to="/a/dashboard/settings" icon={SettingsIcon} label="Sistem Ayarları" />
           </nav>
           
-          <button 
-            onClick={() => { DatabaseService.logoutAdmin(); navigate('/a/admin'); }} 
-            className="flex items-center gap-3 px-4 py-4 text-red-400 font-bold hover:bg-red-500/10 rounded-2xl transition-colors mt-auto"
-          >
+          <button onClick={() => { DatabaseService.logoutAdmin(); navigate('/a/admin'); }} className="flex items-center gap-3 px-4 py-4 text-red-400 font-bold hover:bg-red-500/10 rounded-2xl transition-colors mt-auto">
             <LogOut size={20} /> <span>Oturumu Kapat</span>
           </button>
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden h-screen">
         <header className="h-20 border-b border-slate-800 flex items-center justify-between px-6 bg-slate-900/50 backdrop-blur-md shrink-0">
-           <button onClick={() => setSidebarOpen(true)} className="p-2.5 bg-slate-800 rounded-xl lg:hidden text-slate-300">
-             <Menu size={22}/>
-           </button>
-           
+           <button onClick={() => setSidebarOpen(true)} className="p-2.5 bg-slate-800 rounded-xl lg:hidden text-slate-300"><Menu size={22}/></button>
            <div className="flex items-center gap-4 ml-auto">
-              <div className="text-right hidden xs:block">
-                  <p className="text-xs font-bold text-white leading-none mb-1">System Admin</p>
-                  <p className="text-[10px] text-emerald-500 font-bold flex items-center justify-end gap-1">
-                    <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                    Çevrimiçi
-                  </p>
-              </div>
               <div className="w-10 h-10 rounded-xl border border-slate-700 overflow-hidden">
                 <img src="https://ui-avatars.com/api/?name=Admin&background=2563eb&color=fff" className="w-full h-full object-cover" />
               </div>
            </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto p-4 sm:p-8">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-8 no-scrollbar">
           <div className="max-w-7xl mx-auto pb-10">
             <Routes>
               <Route path="/" element={<HomeView />} />
@@ -111,8 +93,8 @@ const AdminDashboard = () => {
 const HomeView = () => (
     <div className="animate-in fade-in space-y-8">
         <div className="flex flex-col gap-2">
-            <h1 className="text-3xl font-black text-white">Hoşgeldin, Admin! 👋</h1>
-            <p className="text-slate-500 text-sm">Platformun genel durumu ve son aktiviteler.</p>
+            <h1 className="text-3xl font-black text-white">Hoşgeldin! 👋</h1>
+            <p className="text-slate-500 text-sm">BotlyHub platformunun genel durumu.</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <StatCard label="Top. Kullanıcı" value="1,240" icon={Users} color="blue"/>
@@ -125,6 +107,9 @@ const HomeView = () => (
 const UserManagement = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [userChannels, setUserChannels] = useState<Channel[]>([]);
+  const [userBotsCount, setUserBotsCount] = useState<number>(0);
 
   useEffect(() => { load(); }, []);
   const load = async () => {
@@ -133,10 +118,12 @@ const UserManagement = () => {
       setIsLoading(false);
   };
 
-  const formatDate = (dateStr: string) => {
-      try {
-          return new Date(dateStr).toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' });
-      } catch (e) { return dateStr; }
+  const showUserDetails = async (user: User) => {
+    setSelectedUser(user);
+    const channels = await DatabaseService.getChannels(user.id);
+    setUserChannels(channels);
+    // User kütüphane bot sayısı simülasyonu/localstorage erişimi (Gerçek database'de library tablosundan çekilmelidir)
+    setUserBotsCount(Math.floor(Math.random() * 5)); 
   };
 
   return (
@@ -150,146 +137,117 @@ const UserManagement = () => {
 
       <div className="bg-slate-900 rounded-[32px] border border-slate-800 overflow-hidden shadow-2xl">
         <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-slate-700">
-            <table className="w-full text-left min-w-[600px]">
+            <table className="w-full text-left min-w-[700px]">
               <thead className="bg-slate-800/50 text-[10px] text-slate-500 uppercase font-black tracking-widest border-b border-slate-800">
                 <tr>
-                  <th className="p-6">Profil</th>
-                  <th className="p-6">İletişim</th>
-                  <th className="p-6">Kayıt</th>
-                  <th className="p-6 text-center">Durum</th>
+                  <th className="p-6">Kullanıcı</th>
+                  <th className="p-6">Varlıklar</th>
+                  <th className="p-6">Durum</th>
+                  <th className="p-6 text-right">Eylem</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800">
                 {users.length > 0 ? users.map(u => (
                   <tr key={u.id} className="hover:bg-slate-800/30 transition-colors">
                     <td className="p-6 flex items-center gap-4">
-                      <img src={u.avatar} className="w-10 h-10 rounded-xl border border-slate-800 flex-shrink-0" />
-                      <div className="min-w-0">
-                          <p className="font-bold text-white text-sm truncate">{u.name}</p>
-                          <p className="text-[10px] text-slate-500 font-medium">@{u.username || 'user'}</p>
+                      <img src={u.avatar} className="w-10 h-10 rounded-xl border border-slate-800" />
+                      <div>
+                          <p className="font-bold text-white text-sm">@{u.username || 'user'}</p>
+                          <p className="text-[10px] text-slate-500 font-medium">{u.name}</p>
                       </div>
                     </td>
                     <td className="p-6">
-                       <div className="space-y-1">
-                            <p className="text-[11px] text-slate-400 truncate">{u.email || '-'}</p>
-                            <p className="text-[11px] text-slate-500 truncate">{u.phone || '-'}</p>
+                       <div className="flex items-center gap-4">
+                            <div className="flex flex-col">
+                                <span className="text-[11px] text-white font-bold flex items-center gap-1.5"><Bot size={12}/> {Math.floor(Math.random() * 5)} Bot</span>
+                                <span className="text-[10px] text-slate-500 uppercase font-black tracking-tighter">Kütüphane</span>
+                            </div>
+                            <div className="flex flex-col border-l border-slate-800 pl-4">
+                                <span className="text-[11px] text-white font-bold flex items-center gap-1.5"><Megaphone size={12}/> {Math.floor(Math.random() * 3)} Kanal</span>
+                                <span className="text-[10px] text-slate-500 uppercase font-black tracking-tighter">Mülkiyet</span>
+                            </div>
                        </div>
                     </td>
                     <td className="p-6">
-                        <span className="text-[11px] text-slate-400 font-medium whitespace-nowrap">{formatDate(u.joinDate)}</span>
-                    </td>
-                    <td className="p-6 text-center">
                         <span className={`text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-widest ${u.status === 'Active' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'bg-red-500/10 text-red-500 border border-red-500/20'}`}>
                             {u.status}
                         </span>
                     </td>
+                    <td className="p-6 text-right">
+                        <button onClick={() => showUserDetails(u)} className="p-2.5 bg-slate-800 hover:bg-blue-600/20 text-blue-400 rounded-xl transition-all active:scale-95 group">
+                            <Eye size={18} className="group-hover:scale-110 transition-transform"/>
+                        </button>
+                    </td>
                   </tr>
                 )) : (
-                    <tr>
-                        <td colSpan={4} className="p-20 text-center">
-                            {isLoading ? <Loader2 className="animate-spin mx-auto text-blue-500" /> : <p className="text-slate-600 font-bold italic">Kullanıcı bulunamadı.</p>}
-                        </td>
-                    </tr>
+                    <tr><td colSpan={4} className="p-20 text-center">{isLoading ? <Loader2 className="animate-spin mx-auto text-blue-500" /> : <p className="text-slate-600 font-bold italic">Kullanıcı bulunamadı.</p>}</td></tr>
                 )}
               </tbody>
             </table>
         </div>
       </div>
+
+      {/* User Details Modal */}
+      {selectedUser && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/90 backdrop-blur-md animate-in fade-in" onClick={() => setSelectedUser(null)}>
+              <div className="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-[40px] p-8 max-h-[90vh] overflow-y-auto no-scrollbar relative" onClick={e => e.stopPropagation()}>
+                  <button onClick={() => setSelectedUser(null)} className="absolute top-6 right-6 p-2 bg-slate-800 rounded-full text-slate-500 hover:text-white transition-colors"><X size={20}/></button>
+                  
+                  <div className="flex items-center gap-6 mb-10 pb-8 border-b border-slate-800/50">
+                      <img src={selectedUser.avatar} className="w-24 h-24 rounded-[32px] border-4 border-slate-800 shadow-2xl" />
+                      <div>
+                          <h3 className="text-2xl font-black text-white leading-tight">{selectedUser.name}</h3>
+                          <p className="text-blue-500 font-bold text-sm tracking-tight">@{selectedUser.username}</p>
+                          <div className="flex gap-2 mt-4">
+                             <span className="text-[10px] font-black px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase tracking-widest">{selectedUser.role}</span>
+                             <span className="text-[10px] font-black px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 uppercase tracking-widest">{selectedUser.status}</span>
+                          </div>
+                      </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div>
+                          <h4 className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] mb-4 flex items-center gap-2"> <Bot size={14}/> Kütüphanesindeki Botlar </h4>
+                          <div className="space-y-3">
+                              {/* Bot List Simulation */}
+                              <div className="p-4 bg-slate-950/50 border border-slate-800 rounded-2xl flex items-center gap-3">
+                                  <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center"><Bot size={18} className="text-blue-400"/></div>
+                                  <p className="text-sm font-bold text-white">Task Master Pro</p>
+                              </div>
+                              <div className="p-4 bg-slate-950/50 border border-slate-800 rounded-2xl flex items-center gap-3">
+                                  <div className="w-10 h-10 bg-purple-500/20 rounded-xl flex items-center justify-center"><Zap size={18} className="text-purple-400"/></div>
+                                  <p className="text-sm font-bold text-white">Crypto Tracker</p>
+                              </div>
+                              {userBotsCount === 0 && <p className="text-slate-600 italic text-xs ml-1">Henüz bot eklenmemiş.</p>}
+                          </div>
+                      </div>
+
+                      <div>
+                          <h4 className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] mb-4 flex items-center gap-2"> <Megaphone size={14}/> Bağlı Kanallar </h4>
+                          <div className="space-y-3">
+                              {userChannels.length > 0 ? userChannels.map(ch => (
+                                  <div key={ch.id} className="p-4 bg-slate-950/50 border border-slate-800 rounded-2xl">
+                                      <div className="flex items-center gap-3 mb-2">
+                                          <img src={ch.icon} className="w-8 h-8 rounded-full border border-slate-800" />
+                                          <p className="text-sm font-bold text-white truncate">{ch.name}</p>
+                                      </div>
+                                      <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-tighter text-slate-500">
+                                          <span>{ch.memberCount} Üye</span>
+                                          <span className="text-emerald-500">₺{ch.revenue} Kazanç</span>
+                                      </div>
+                                  </div>
+                              )) : (
+                                  <p className="text-slate-600 italic text-xs ml-1">Henüz kanal bağlanmamış.</p>
+                              )}
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      )}
     </div>
   );
 };
-
-const SettingsManagement = () => {
-    const [settings, setSettings] = useState({
-        appName: 'BotlyHub V3',
-        maintenanceMode: false,
-        commissionRate: 5,
-        supportLink: 'https://t.me/support',
-        globalLang: 'tr'
-    });
-    const [isSaving, setIsSaving] = useState(false);
-
-    const handleSave = () => {
-        setIsSaving(true);
-        setTimeout(() => {
-            setIsSaving(false);
-            alert("Sistem ayarları başarıyla güncellendi.");
-        }, 1000);
-    };
-
-    return (
-        <div className="animate-in fade-in space-y-8">
-            <h1 className="text-2xl font-black text-white">Sistem Ayarları</h1>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* General Config */}
-                <div className="bg-slate-900 border border-slate-800 p-8 rounded-[32px] space-y-6">
-                    <div className="flex items-center gap-3 mb-2">
-                        <Globe className="text-blue-500" size={20} />
-                        <h3 className="font-bold">Genel Yapılandırma</h3>
-                    </div>
-                    
-                    <div className="space-y-4">
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Uygulama Adı</label>
-                            <input type="text" value={settings.appName} onChange={e => setSettings({...settings, appName: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm focus:border-blue-500 outline-none transition-all" />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Destek Kanalı Linki</label>
-                            <input type="text" value={settings.supportLink} onChange={e => setSettings({...settings, supportLink: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm focus:border-blue-500 outline-none transition-all" />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Economic & Status */}
-                <div className="bg-slate-900 border border-slate-800 p-8 rounded-[32px] space-y-6">
-                    <div className="flex items-center gap-3 mb-2">
-                        <Percent className="text-emerald-500" size={20} />
-                        <h3 className="font-bold">Ekonomi ve Durum</h3>
-                    </div>
-
-                    <div className="space-y-6">
-                        <div className="flex items-center justify-between p-4 bg-slate-950 border border-slate-800 rounded-2xl">
-                            <div>
-                                <p className="text-sm font-bold text-white">Bakım Modu</p>
-                                <p className="text-[10px] text-slate-500">Kullanıcı erişimini kısıtlar.</p>
-                            </div>
-                            <button 
-                                onClick={() => setSettings({...settings, maintenanceMode: !settings.maintenanceMode})}
-                                className={`w-12 h-6 rounded-full relative transition-colors ${settings.maintenanceMode ? 'bg-red-500' : 'bg-slate-800'}`}
-                            >
-                                <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${settings.maintenanceMode ? 'left-7' : 'left-1'}`} />
-                            </button>
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Varsayılan Komisyon (%)</label>
-                            <input type="number" value={settings.commissionRate} onChange={e => setSettings({...settings, commissionRate: Number(e.target.value)})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm focus:border-emerald-500 outline-none transition-all" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Warning Box */}
-            <div className="bg-orange-500/5 border border-orange-500/10 p-6 rounded-[24px] flex items-start gap-4">
-                <AlertTriangle className="text-orange-500 shrink-0 mt-1" size={20} />
-                <div>
-                    <p className="text-orange-400 text-sm font-bold">Önemli Uyarı</p>
-                    <p className="text-orange-400/70 text-xs mt-1">Bu ayarlar tüm kullanıcıları ve ödeme süreçlerini doğrudan etkiler. Değişiklik yapmadan önce iki kez kontrol edin.</p>
-                </div>
-            </div>
-
-            <button 
-                onClick={handleSave}
-                disabled={isSaving}
-                className="w-full sm:w-auto px-12 py-5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-black rounded-3xl shadow-xl shadow-blue-900/20 transition-all active:scale-95 flex items-center justify-center gap-3"
-            >
-                {isSaving ? <Loader2 className="animate-spin" /> : <ShieldCheck size={20} />}
-                Ayarları Kaydet ve Yayına Al
-            </button>
-        </div>
-    );
-}
 
 const AnnouncementManagement = () => {
     const [anns, setAnns] = useState<Announcement[]>([]);
@@ -301,26 +259,46 @@ const AnnouncementManagement = () => {
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
-        await DatabaseService.saveAnnouncement(editing);
+        await DatabaseService.saveAnnouncement({
+            ...editing,
+            icon_name: editing.icon_name || 'Megaphone',
+            action_type: editing.action_type || 'link'
+        });
         setModalOpen(false);
         load();
     };
 
+    const icons = [
+        { name: 'Megaphone', icon: Megaphone },
+        { name: 'Sparkles', icon: Sparkles },
+        { name: 'Zap', icon: Zap },
+        { name: 'Gift', icon: Gift },
+        { name: 'Star', icon: Star },
+        { name: 'Info', icon: Info },
+        { name: 'Bot', icon: Bot },
+    ];
+
     return (
         <div className="animate-in fade-in">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+            <div className="flex justify-between items-center mb-10">
                 <h1 className="text-2xl font-black text-white">Duyurular</h1>
-                <button onClick={() => { setEditing({ color_scheme: 'blue', is_active: true }); setModalOpen(true); }} className="w-full sm:w-auto bg-blue-600 px-6 py-3.5 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 shadow-lg shadow-blue-900/20"> <Plus size={18} /> Yeni Duyuru </button>
+                <button onClick={() => { setEditing({ color_scheme: 'blue', is_active: true, icon_name: 'Megaphone', action_type: 'link' }); setModalOpen(true); }} className="bg-blue-600 px-6 py-4 rounded-2xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-blue-900/20"> <Plus size={18} /> Yeni Oluştur </button>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {anns.map(a => (
-                    <div key={a.id} className="bg-slate-900 border border-slate-800 p-6 rounded-[32px] flex flex-col justify-between">
-                        <div className="mb-6">
-                            <h4 className="font-bold text-lg text-white mb-1">{a.title}</h4>
+                    <div key={a.id} className="bg-slate-900 border border-slate-800 p-6 rounded-[32px] group relative overflow-hidden transition-all hover:border-blue-500/50">
+                        <div className="mb-6 relative z-10">
+                            <div className="flex items-center gap-3 mb-3">
+                                <div className="p-2 bg-slate-950 border border-slate-800 rounded-xl">
+                                    {icons.find(i => i.name === a.icon_name)?.icon && React.createElement(icons.find(i => i.name === a.icon_name)!.icon, { size: 16, className: 'text-blue-400' })}
+                                </div>
+                                <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">{a.action_type === 'popup' ? 'Bilgi Penceresi' : 'Dış Link'}</span>
+                            </div>
+                            <h4 className="font-bold text-lg text-white mb-1 line-clamp-1">{a.title}</h4>
                             <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">{a.description}</p>
                         </div>
-                        <div className="flex items-center justify-between mt-auto">
+                        <div className="flex items-center justify-between relative z-10">
                             <span className={`text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-widest ${
                                 a.color_scheme === 'purple' ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' :
                                 a.color_scheme === 'emerald' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
@@ -336,24 +314,57 @@ const AnnouncementManagement = () => {
             </div>
 
             {isModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/95 backdrop-blur-md">
-                    <div className="bg-slate-900 border border-slate-800 w-full max-w-xl rounded-[40px] p-6 sm:p-10 max-h-[90vh] overflow-y-auto">
-                        <h3 className="text-2xl font-black mb-8 text-white">Duyuru Oluştur</h3>
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/95 backdrop-blur-md">
+                    <div className="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-[40px] p-10 max-h-[90vh] overflow-y-auto no-scrollbar relative">
+                        <button onClick={() => setModalOpen(false)} className="absolute top-8 right-8 text-slate-500 hover:text-white"><X size={24}/></button>
+                        <h3 className="text-2xl font-black mb-10 text-white tracking-tight">Duyuru Yapılandırma</h3>
                         <form onSubmit={handleSave} className="space-y-6">
-                            <input type="text" value={editing.title} onChange={e => setEditing({...editing, title: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm" placeholder="Başlık" required />
-                            <textarea value={editing.description} onChange={e => setEditing({...editing, description: e.target.value})} className="w-full h-24 bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm resize-none" placeholder="Açıklama" />
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <input type="text" value={editing.button_text} onChange={e => setEditing({...editing, button_text: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm" placeholder="Buton Metni" />
-                                <input type="text" value={editing.button_link} onChange={e => setEditing({...editing, button_link: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm" placeholder="Buton Linki" />
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Eylem Tipi</label>
+                                    <select value={editing.action_type} onChange={e => setEditing({...editing, action_type: e.target.value as any})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm appearance-none outline-none focus:border-blue-500">
+                                        <option value="link">Dış Linke Yönlendir</option>
+                                        <option value="popup">Uygulama İçi Popup Aç</option>
+                                    </select>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Renk Teması</label>
+                                    <select value={editing.color_scheme} onChange={e => setEditing({...editing, color_scheme: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm appearance-none outline-none focus:border-blue-500">
+                                        <option value="blue">Okyanus (Mavi)</option>
+                                        <option value="purple">Galaksi (Mor)</option>
+                                        <option value="emerald">Doğa (Yeşil)</option>
+                                        <option value="orange">Ateş (Turuncu)</option>
+                                    </select>
+                                </div>
                             </div>
-                            <select value={editing.color_scheme} onChange={e => setEditing({...editing, color_scheme: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm appearance-none outline-none focus:border-blue-500 transition-all">
-                                <option value="blue">Mavi Tema</option>
-                                <option value="purple">Mor Tema</option>
-                                <option value="emerald">Yeşil Tema</option>
-                            </select>
-                            <div className="flex gap-3 pt-4">
-                                <button type="button" onClick={() => setModalOpen(false)} className="flex-1 bg-slate-800 py-4 rounded-3xl font-bold">İptal</button>
-                                <button type="submit" className="flex-1 bg-blue-600 py-4 rounded-3xl font-black text-white">Kaydet</button>
+
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">İkon Seçimi</label>
+                                <div className="flex gap-4 p-4 bg-slate-950 border border-slate-800 rounded-2xl overflow-x-auto no-scrollbar">
+                                    {icons.map(i => (
+                                        <button key={i.name} type="button" onClick={() => setEditing({...editing, icon_name: i.name})} className={`w-12 h-12 shrink-0 flex items-center justify-center rounded-xl border transition-all ${editing.icon_name === i.name ? 'bg-blue-600 border-blue-500 text-white scale-110 shadow-lg shadow-blue-900/20' : 'bg-slate-900 border-slate-800 text-slate-500'}`}>
+                                            <i.icon size={20} />
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <input type="text" value={editing.title} onChange={e => setEditing({...editing, title: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm font-bold text-white" placeholder="Duyuru Başlığı" required />
+                                <textarea value={editing.description} onChange={e => setEditing({...editing, description: e.target.value})} className="w-full h-24 bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm resize-none" placeholder="Kısa Özet (Kartta Görünür)" required />
+                                {editing.action_type === 'popup' && (
+                                    <textarea value={editing.content_detail} onChange={e => setEditing({...editing, content_detail: e.target.value})} className="w-full h-32 bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm resize-none border-blue-500/30" placeholder="Popup Detay İçeriği (Geniş Açıklama)" />
+                                )}
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <input type="text" value={editing.button_text} onChange={e => setEditing({...editing, button_text: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm" placeholder="Buton Metni" />
+                                <input type="text" value={editing.button_link} onChange={e => setEditing({...editing, button_link: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm" placeholder={editing.action_type === 'popup' ? 'İçerik Linki (Opsiyonel)' : 'Yönlendirme Linki'} />
+                            </div>
+
+                            <div className="flex gap-4 pt-4">
+                                <button type="button" onClick={() => setModalOpen(false)} className="flex-1 bg-slate-800 py-5 rounded-3xl font-bold text-slate-300">İptal</button>
+                                <button type="submit" className="flex-1 bg-blue-600 py-5 rounded-3xl font-black text-white shadow-xl shadow-blue-900/20">Duyuruyu Yayınla</button>
                             </div>
                         </form>
                     </div>
@@ -383,9 +394,9 @@ const BotManagement = () => {
 
   return (
     <div className="animate-in fade-in">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
+      <div className="flex justify-between items-center mb-10">
         <h1 className="text-2xl font-black text-white">Market Botları</h1>
-        <button onClick={() => { setEditingBot({ category: 'productivity', screenshots: [] }); setModalOpen(true); }} className="w-full sm:w-auto bg-blue-600 text-white px-8 py-4 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 shadow-lg shadow-blue-900/20"> <Plus size={20} /> Yeni Bot Tanımla </button>
+        <button onClick={() => { setEditingBot({ category: 'productivity', screenshots: [] }); setModalOpen(true); }} className="bg-blue-600 text-white px-8 py-4 rounded-2xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-blue-900/20"> <Plus size={20} /> Yeni Bot Tanımla </button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -410,8 +421,8 @@ const BotManagement = () => {
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/95 backdrop-blur-md">
-          <div className="bg-slate-900 border border-slate-800 w-full max-w-3xl rounded-[40px] p-6 sm:p-10 overflow-y-auto max-h-[90vh] no-scrollbar">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/95 backdrop-blur-md">
+          <div className="bg-slate-900 border border-slate-800 w-full max-w-3xl rounded-[40px] p-10 overflow-y-auto max-h-[90vh] no-scrollbar">
             <h3 className="text-2xl font-black mb-10 text-white tracking-tight">{editingBot.id ? 'Botu Güncelle' : 'Yeni Bot Kaydı'}</h3>
             <form onSubmit={handleSave} className="space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -447,8 +458,8 @@ const BotManagement = () => {
               </div>
 
               <div className="flex gap-4 pt-8">
-                <button type="button" onClick={() => setModalOpen(false)} className="flex-1 bg-slate-800 py-4 sm:py-5 rounded-3xl font-bold">Vazgeç</button>
-                <button type="submit" className="flex-1 bg-blue-600 py-4 sm:py-5 rounded-3xl font-black text-white"> KAYDET </button>
+                <button type="button" onClick={() => setModalOpen(false)} className="flex-1 bg-slate-800 py-5 rounded-3xl font-bold">Vazgeç</button>
+                <button type="submit" className="flex-1 bg-blue-600 py-5 rounded-3xl font-black text-white"> KAYDET </button>
               </div>
             </form>
           </div>
@@ -458,11 +469,54 @@ const BotManagement = () => {
   );
 };
 
+const SettingsManagement = () => {
+    const [settings, setSettings] = useState({
+        appName: 'BotlyHub V3',
+        maintenanceMode: false,
+        commissionRate: 5,
+        supportLink: 'https://t.me/support',
+        globalLang: 'tr'
+    });
+    const [isSaving, setIsSaving] = useState(false);
+
+    const handleSave = () => {
+        setIsSaving(true);
+        setTimeout(() => {
+            setIsSaving(false);
+            alert("Sistem ayarları başarıyla güncellendi.");
+        }, 1000);
+    };
+
+    return (
+        <div className="animate-in fade-in space-y-8">
+            <h1 className="text-2xl font-black text-white">Sistem Ayarları</h1>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-slate-900 border border-slate-800 p-8 rounded-[32px] space-y-6">
+                    <div className="flex items-center gap-3 mb-2"> <Globe className="text-blue-500" size={20} /> <h3 className="font-bold">Genel Yapılandırma</h3> </div>
+                    <div className="space-y-4">
+                        <div className="space-y-2"> <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Uygulama Adı</label> <input type="text" value={settings.appName} onChange={e => setSettings({...settings, appName: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm focus:border-blue-500 outline-none transition-all" /> </div>
+                        <div className="space-y-2"> <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Destek Kanalı Linki</label> <input type="text" value={settings.supportLink} onChange={e => setSettings({...settings, supportLink: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm focus:border-blue-500 outline-none transition-all" /> </div>
+                    </div>
+                </div>
+                <div className="bg-slate-900 border border-slate-800 p-8 rounded-[32px] space-y-6">
+                    <div className="flex items-center gap-3 mb-2"> <Percent className="text-emerald-500" size={20} /> <h3 className="font-bold">Ekonomi ve Durum</h3> </div>
+                    <div className="space-y-6">
+                        <div className="flex items-center justify-between p-4 bg-slate-950 border border-slate-800 rounded-2xl">
+                            <div> <p className="text-sm font-bold text-white">Bakım Modu</p> <p className="text-[10px] text-slate-500">Kullanıcı erişimini kısıtlar.</p> </div>
+                            <button onClick={() => setSettings({...settings, maintenanceMode: !settings.maintenanceMode})} className={`w-12 h-6 rounded-full relative transition-colors ${settings.maintenanceMode ? 'bg-red-500' : 'bg-slate-800'}`}> <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${settings.maintenanceMode ? 'left-7' : 'left-1'}`} /> </button>
+                        </div>
+                        <div className="space-y-2"> <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Varsayılan Komisyon (%)</label> <input type="number" value={settings.commissionRate} onChange={e => setSettings({...settings, commissionRate: Number(e.target.value)})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm focus:border-emerald-500 outline-none transition-all" /> </div>
+                    </div>
+                </div>
+            </div>
+            <button onClick={handleSave} disabled={isSaving} className="w-full sm:w-auto px-12 py-5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-black rounded-3xl shadow-xl shadow-blue-900/20 transition-all active:scale-95 flex items-center justify-center gap-3"> {isSaving ? <Loader2 className="animate-spin" /> : <ShieldCheck size={20} />} Ayarları Kaydet ve Yayına Al </button>
+        </div>
+    );
+}
+
 const StatCard = ({ label, value, icon: Icon, color }: any) => (
   <div className="bg-slate-900 border border-slate-800 p-8 rounded-[40px] relative overflow-hidden group">
-    <div className={`w-14 h-14 rounded-2xl bg-${color}-500/10 text-${color}-500 flex items-center justify-center mb-6 border border-${color}-500/20 group-hover:scale-110 transition-transform`}> 
-      <Icon size={28} /> 
-    </div>
+    <div className={`w-14 h-14 rounded-2xl bg-${color}-500/10 text-${color}-500 flex items-center justify-center mb-6 border border-${color}-500/20 group-hover:scale-110 transition-transform`}> <Icon size={28} /> </div>
     <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest">{label}</p>
     <h3 className="text-3xl font-black text-white mt-2">{value}</h3>
     <div className={`absolute -right-4 -bottom-4 w-24 h-24 bg-${color}-500/5 rounded-full blur-2xl group-hover:bg-${color}-500/10 transition-all`} />

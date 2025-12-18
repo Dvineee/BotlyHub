@@ -36,6 +36,8 @@ export interface Announcement {
   icon_name: string;
   color_scheme: string;
   is_active: boolean;
+  action_type: 'link' | 'popup';
+  content_detail?: string;
 }
 
 export interface ExtendedBot extends Bot {
@@ -94,7 +96,6 @@ export interface Notification {
   isRead: boolean;
 }
 
-// Fixed: Declare Telegram property on the global Window object to satisfy TypeScript
 declare global {
   interface Window {
     Telegram?: {
