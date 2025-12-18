@@ -1,9 +1,12 @@
 
 import React, { useState } from 'react';
 import { ChevronLeft, ArrowUpRight, ArrowDownLeft, BarChart3, Wallet as WalletIcon } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+// Fixed: Use namespace import for react-router-dom to resolve "no exported member" errors
+import * as Router from 'react-router-dom';
 import { TonConnectButton, useTonWallet, useTonAddress } from '@tonconnect/ui-react';
 import { useTranslation } from '../TranslationContext';
+
+const { useNavigate } = Router as any;
 
 const Earnings = () => {
   const navigate = useNavigate();

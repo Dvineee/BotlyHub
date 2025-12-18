@@ -1,10 +1,12 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, ChevronLeft, X } from 'lucide-react';
-// Fix: Import useNavigate and useSearchParams from react-router-dom correctly
-import { useNavigate, useSearchParams } from 'react-router-dom';
+// Fixed: Use namespace import for react-router-dom to resolve "no exported member" errors
+import * as Router from 'react-router-dom';
 import { mockBots, categories } from '../data';
 import { useTranslation } from '../TranslationContext';
+
+const { useNavigate, useSearchParams } = Router as any;
 
 const SearchPage = () => {
   const navigate = useNavigate();

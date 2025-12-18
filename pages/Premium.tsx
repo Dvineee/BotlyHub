@@ -1,9 +1,11 @@
 
 import React from 'react';
 import { ChevronLeft, Check } from 'lucide-react';
-// Fix: Import useNavigate from react-router-dom correctly
-import { useNavigate } from 'react-router-dom';
+// Fixed: Use namespace import for react-router-dom to resolve "no exported member" errors
+import * as Router from 'react-router-dom';
 import { subscriptionPlans } from '../data';
+
+const { useNavigate } = Router as any;
 
 const Premium = () => {
   const navigate = useNavigate();

@@ -49,12 +49,11 @@ export class DatabaseService {
     if (error) throw error;
   }
 
-  // --- Notification System (ACTIVE) ---
+  // --- Notification System ---
   static async getNotifications(userId?: string): Promise<Notification[]> {
     try {
       let query = supabase.from('notifications').select('*').order('date', { ascending: false });
       if (userId) {
-          // Global bildirimler + kullanıcıya özel bildirimler
           query = query.or(`user_id.eq.${userId},target_type.eq.global`);
       }
       const { data, error } = await query;
@@ -83,7 +82,7 @@ export class DatabaseService {
   // --- Announcement Management ---
   static async getAnnouncements(): Promise<Announcement[]> {
     try {
-      const { data, error } = await supabase.from('announcements').select('*').eq('is_active', true);
+      const { data, error } = await supabase.from('announcements').select('*').order('id', { ascending: false });
       if (error) throw error;
       return data || [];
     } catch (e) {
@@ -92,7 +91,10 @@ export class DatabaseService {
   }
 
   static async saveAnnouncement(ann: Partial<Announcement>) {
-    const { error } = await supabase.from('announcements').upsert(ann);
+    const { error } = await supabase.from('announcements').upsert({
+        ...ann,
+        id: ann.id || Math.random().toString(36).substr(2, 9)
+    });
     if (error) throw error;
   }
 
@@ -101,25 +103,23 @@ export class DatabaseService {
     if (error) throw error;
   }
 
-  // --- User & Channel Management ---
-  static async syncUser(user: Partial<User>) {
-    const payload: any = {
-      id: user.id.toString(),
-      name: user.name || '',
-      username: user.username || '',
-      avatar: user.avatar || '',
-      email: user.email || '',
-      phone: user.phone || '',
-      role: user.role || 'User',
-      status: user.status || 'Active',
-      badges: user.badges || []
-    };
-    if (user.joinDate) payload.joinDate = user.joinDate;
-    const { data, error } = await supabase.from('users').upsert(payload, { onConflict: 'id' }).select();
-    if (error) throw error;
-    return data;
+  // --- Settings Management ---
+  static async getSettings() {
+    try {
+        const { data, error } = await supabase.from('settings').select('*').single();
+        if (error) return null;
+        return data;
+    } catch (e) {
+        return null;
+    }
   }
 
+  static async saveSettings(settings: any) {
+    const { error } = await supabase.from('settings').upsert({ id: 1, ...settings });
+    if (error) throw error;
+  }
+
+  // --- User Management ---
   static async getUsers(): Promise<User[]> {
     try {
       const { data, error } = await supabase.from('users').select('*').order('id', { ascending: false });
@@ -130,6 +130,13 @@ export class DatabaseService {
     }
   }
 
+  static async updateUserStatus(userId: string, status: string) {
+      const { error } = await supabase.from('users').update({ status }).eq('id', userId);
+      if (error) throw error;
+  }
+
+  // --- Channel Management ---
+  // Added missing getChannels method
   static async getChannels(userId: string): Promise<Channel[]> {
     try {
       const { data, error } = await supabase.from('channels').select('*').eq('user_id', userId);
@@ -140,8 +147,19 @@ export class DatabaseService {
     }
   }
 
+  // Added missing saveChannel method
   static async saveChannel(channel: Partial<Channel>) {
-    const { error } = await supabase.from('channels').upsert(channel);
+    const { error } = await supabase.from('channels').upsert({
+      ...channel,
+      id: channel.id || Math.random().toString(36).substr(2, 9)
+    });
+    if (error) throw error;
+  }
+
+  // --- User Sync ---
+  // Added missing syncUser method
+  static async syncUser(user: Partial<User>) {
+    const { error } = await supabase.from('users').upsert(user, { onConflict: 'id' });
     if (error) throw error;
   }
 
@@ -151,6 +169,6 @@ export class DatabaseService {
   static logoutAdmin() { localStorage.removeItem('admin_v3_session'); }
 
   static async init() {
-    console.log("Database Sync Service v3.2 Ready with Notification Support.");
+    console.log("Database Sync Service v3.5 - SaaS Ready");
   }
 }

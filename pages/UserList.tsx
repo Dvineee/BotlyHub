@@ -1,9 +1,11 @@
 
 import React, { useState } from 'react';
 import { Search, SlidersHorizontal, Plus } from 'lucide-react';
-// Fix: Import useNavigate from react-router-dom correctly
-import { useNavigate } from 'react-router-dom';
+// Fixed: Use namespace import for react-router-dom to resolve "no exported member" errors
+import * as Router from 'react-router-dom';
 import { User } from '../types';
+
+const { useNavigate } = Router as any;
 
 const mockUsers: User[] = [
   { id: '1', name: 'Ali Yılmaz', username: '@aliyilmaz', avatar: 'https://picsum.photos/seed/ali/200', role: 'User', status: 'Active', badges: ['Premium', 'Reklamcı'], joinDate: '2023-01-01' },

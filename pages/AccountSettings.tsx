@@ -1,10 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, Mail, Phone, Save, Loader2, ShieldCheck, AlertCircle } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+// Fixed: Use namespace import for react-router-dom to resolve "no exported member" errors
+import * as Router from 'react-router-dom';
 import { useTelegram } from '../hooks/useTelegram';
 import { DatabaseService } from '../services/DatabaseService';
 import { User } from '../types';
+
+const { useNavigate } = Router as any;
 
 const AccountSettings = () => {
   const navigate = useNavigate();
@@ -77,6 +80,7 @@ const AccountSettings = () => {
             badges: userData?.badges || []
         };
 
+        // Fixed: syncUser method is now implemented in DatabaseService
         await DatabaseService.syncUser(payload);
         
         notification('success');
@@ -97,7 +101,7 @@ const AccountSettings = () => {
     <div className="min-h-screen bg-[#020617] p-6 pt-10 pb-20">
       <div className="flex items-center gap-4 mb-10">
         <button onClick={() => navigate('/settings')} className="p-3 bg-slate-900/60 border border-slate-800 rounded-2xl text-slate-400 active:scale-90 transition-transform">
-          <ChevronLeft size={22} />
+          <ChevronLeft size size={22} />
         </button>
         <h1 className="text-xl font-black text-white tracking-tight">Hesap Doğrulama</h1>
       </div>
@@ -131,7 +135,7 @@ const AccountSettings = () => {
                     type="email" 
                     value={formData.email} 
                     onChange={e => setFormData({...formData, email: e.target.value})} 
-                    className="w-full bg-[#0f172a]/60 border border-slate-800 rounded-2xl py-4.5 pl-12 pr-4 text-sm text-white focus:ring-1 ring-blue-500/40 outline-none transition-all" 
+                    className="w-full bg-[#0f172a]/60 border border-slate-800 rounded-2xl py-4 pl-12 pr-4 text-sm text-white focus:ring-1 ring-blue-500/40 outline-none transition-all" 
                     placeholder="ornek@mail.com" 
                   />
               </div>
@@ -145,7 +149,7 @@ const AccountSettings = () => {
                     type="tel" 
                     value={formData.phone} 
                     onChange={handlePhoneChange}
-                    className="w-full bg-[#0f172a]/60 border border-slate-800 rounded-2xl py-4.5 pl-12 pr-4 text-sm text-white focus:ring-1 ring-blue-500/40 outline-none transition-all font-medium" 
+                    className="w-full bg-[#0f172a]/60 border border-slate-800 rounded-2xl py-4 pl-12 pr-4 text-sm text-white focus:ring-1 ring-blue-500/40 outline-none transition-all font-medium" 
                     placeholder="+90 5XX XXX XX XX" 
                   />
               </div>

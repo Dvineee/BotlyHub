@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, Star, Wallet, CheckCircle2, Loader2, ShieldCheck, Zap } from 'lucide-react';
-import { useNavigate, useParams } from 'react-router-dom';
+// Fixed: Use namespace import for react-router-dom to resolve "no exported member" errors
+import * as Router from 'react-router-dom';
 import { subscriptionPlans } from '../data';
 import { UserBot, Bot } from '../types';
 import { useTonConnectUI } from '@tonconnect/ui-react';
@@ -9,10 +10,12 @@ import { DatabaseService } from '../services/DatabaseService';
 import { useTelegram } from '../hooks/useTelegram';
 import { WalletService } from '../services/WalletService';
 
+const { useNavigate, useParams } = Router as any;
+
 const Payment = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { tg, haptic, notification } = useTelegram();
+  const { haptic, notification, tg } = useTelegram();
   const [isLoading, setIsLoading] = useState(false);
   const [targetBot, setTargetBot] = useState<Bot | null>(null);
   const [tonConnectUI] = useTonConnectUI();

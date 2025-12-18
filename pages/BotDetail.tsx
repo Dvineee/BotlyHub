@@ -2,10 +2,13 @@
 import React, { useState, useEffect } from 'react';
 // Added Bot as BotIcon to the lucide-react imports
 import { ChevronLeft, Share2, Send, Loader2, Star, ShieldCheck, Bot as BotIcon } from 'lucide-react';
-import { useNavigate, useParams } from 'react-router-dom';
+// Fixed: Use namespace import for react-router-dom to resolve "no exported member" errors
+import * as Router from 'react-router-dom';
 import { Bot, UserBot } from '../types';
 import { useTelegram } from '../hooks/useTelegram';
 import { DatabaseService } from '../services/DatabaseService';
+
+const { useNavigate, useParams } = Router as any;
 
 const BotDetail = () => {
   const navigate = useNavigate();

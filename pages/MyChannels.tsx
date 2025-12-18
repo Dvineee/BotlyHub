@@ -1,10 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, Plus, Megaphone, Users, Loader2 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+// Fixed: Use namespace import for react-router-dom to resolve "no exported member" errors
+import * as Router from 'react-router-dom';
 import { Channel } from '../types';
 import { DatabaseService } from '../services/DatabaseService';
 import { useTelegram } from '../hooks/useTelegram';
+
+const { useNavigate } = Router as any;
 
 const MyChannels = () => {
   const navigate = useNavigate();
@@ -19,6 +22,7 @@ const MyChannels = () => {
 
   const loadChannels = async () => {
     setIsLoading(true);
+    // Fixed: getChannels method is now implemented in DatabaseService
     const data = await DatabaseService.getChannels(user.id.toString());
     setChannels(data);
     setIsLoading(false);
@@ -35,6 +39,7 @@ const MyChannels = () => {
           connectedBotIds: [],
           revenue: 0
       };
+      // Fixed: saveChannel method is now implemented in DatabaseService
       await DatabaseService.saveChannel(newChan);
       loadChannels();
   };

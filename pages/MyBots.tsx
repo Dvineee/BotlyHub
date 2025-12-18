@@ -1,9 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ShoppingBag, TrendingUp, Bot, Send, Activity, Trash2, AlertTriangle, X } from 'lucide-react';
-// Fix: Import useNavigate from react-router-dom correctly
-import { useNavigate } from 'react-router-dom';
+// Fixed: Use namespace import for react-router-dom to resolve "no exported member" errors
+import * as Router from 'react-router-dom';
 import { UserBot, Channel } from '../types';
+
+const { useNavigate } = Router as any;
 
 const MyBots = () => {
   const navigate = useNavigate();

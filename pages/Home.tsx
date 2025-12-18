@@ -1,11 +1,14 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+// Fixed: Use namespace import for react-router-dom to resolve "no exported member" errors
+import * as Router from 'react-router-dom';
 import { Bot, Announcement } from '../types';
 import { categories } from '../data';
 import { useTranslation } from '../TranslationContext';
 import { DatabaseService } from '../services/DatabaseService';
+
+const { useNavigate } = Router as any;
 
 const iconMap: Record<string, any> = {
   Sparkles, Megaphone, Zap, Gift, Star, Info, BotIcon

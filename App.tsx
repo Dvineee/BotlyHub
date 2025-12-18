@@ -1,9 +1,13 @@
 
 import React, { useEffect, Suspense, lazy, useState } from 'react';
-import { HashRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+// Fixed: Use namespace import for react-router-dom to resolve "no exported member" errors
+import * as Router from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { DatabaseService } from './services/DatabaseService';
 import './types';
+
+// Destructure router components and hooks from the namespace
+const { HashRouter, Routes, Route, useLocation, useNavigate } = Router as any;
 
 // Lazy Load Pages
 const Home = lazy(() => import('./pages/Home'));
@@ -26,7 +30,7 @@ const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const PageLoader = () => (
   <div className="flex flex-col items-center justify-center min-h-[50vh] text-slate-500">
     <Loader2 className="w-8 h-8 animate-spin text-blue-500 mb-2" />
-    <span className="text-xs font-medium">Yükleniyor...</span>
+    <span className="text-xs font-medium uppercase tracking-widest font-black opacity-40">Senkronize Ediliyor</span>
   </div>
 );
 
@@ -39,9 +43,17 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
   useEffect(() => {
     DatabaseService.init();
     
-    // Bakım modu kontrolü (LocalStorage simülasyonu)
-    const maintenanceStatus = localStorage.getItem('maintenance_mode') === 'true';
-    setIsMaintenance(maintenanceStatus);
+    const checkMaintenance = async () => {
+        if (isAdminPath) return;
+        const settings = await DatabaseService.getSettings();
+        if (settings && settings.maintenanceMode) {
+            setIsMaintenance(true);
+        } else {
+            const localStatus = localStorage.getItem('maintenance_mode') === 'true';
+            setIsMaintenance(localStatus);
+        }
+    };
+    checkMaintenance();
 
     if (!isAdminPath) {
       const tg = window.Telegram?.WebApp;
@@ -82,13 +94,12 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
     return () => tg.BackButton.offClick(handleBack);
   }, [location, navigate, isAdminPath]);
 
-  // Eğer bakım modu aktifse ve admin yolunda değilsek Bakım sayfasını göster
   if (isMaintenance && !isAdminPath) {
       return <Maintenance />;
   }
 
   return (
-    <div className={`${isAdminPath ? 'bg-slate-50 dark:bg-slate-950' : 'bg-slate-950'} flex flex-col min-h-screen`}>
+    <div className={`${isAdminPath ? 'bg-[#020617]' : 'bg-slate-950'} flex flex-col min-h-screen`}>
       {children}
     </div>
   );

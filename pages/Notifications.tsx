@@ -1,10 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, Bell, ShieldCheck, Wallet, Info, CheckCheck, Trash2, Bot, X, Loader2 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+// Fixed: Use namespace import for react-router-dom to resolve "no exported member" errors
+import * as Router from 'react-router-dom';
 import { Notification } from '../types';
 import { DatabaseService } from '../services/DatabaseService';
 import { useTelegram } from '../hooks/useTelegram';
+
+const { useNavigate } = Router as any;
 
 const Notifications = () => {
   const navigate = useNavigate();

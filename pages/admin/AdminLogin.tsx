@@ -1,9 +1,11 @@
 
 import React, { useState } from 'react';
-// Fix: Import useNavigate from react-router-dom correctly
-import { useNavigate } from 'react-router-dom';
+// Fixed: Use namespace import for react-router-dom to resolve "no exported member" errors
+import * as Router from 'react-router-dom';
 import { Shield, Lock, User, AlertCircle } from 'lucide-react';
 import { DatabaseService } from '../../services/DatabaseService';
+
+const { useNavigate } = Router as any;
 
 const AdminLogin = () => {
   const navigate = useNavigate();

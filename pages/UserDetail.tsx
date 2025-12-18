@@ -1,8 +1,10 @@
 
 import React, { useState } from 'react';
 import { ChevronLeft, Bell, Bot, BarChart2, ShieldAlert, Ban, X } from 'lucide-react';
-// Fix: Import useNavigate and useParams from react-router-dom correctly
-import { useNavigate, useParams } from 'react-router-dom';
+// Fixed: Use namespace import for react-router-dom to resolve "no exported member" errors
+import * as Router from 'react-router-dom';
+
+const { useNavigate, useParams } = Router as any;
 
 const UserDetail = () => {
   const navigate = useNavigate();

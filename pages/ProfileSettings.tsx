@@ -1,10 +1,12 @@
 
 import React, { useEffect, useState } from 'react';
 import { ChevronLeft, User, CreditCard, Bell, Globe, ChevronRight, Crown } from 'lucide-react';
-// Fix: Import useNavigate from react-router-dom correctly
-import { useNavigate } from 'react-router-dom';
+// Fixed: Use namespace import for react-router-dom to resolve "no exported member" errors
+import * as Router from 'react-router-dom';
 import { subscriptionPlans } from '../data';
 import { useTelegram } from '../hooks/useTelegram';
+
+const { useNavigate } = Router as any;
 
 const ProfileSettings = () => {
   const navigate = useNavigate();
@@ -64,8 +66,10 @@ const ProfileSettings = () => {
                  <h2 className="font-bold text-lg text-white">{displayName}</h2>
                  <p className="text-slate-500 text-sm">{displayUsername}</p>
                  <div className="mt-2 inline-flex items-center gap-1 bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded text-xs font-bold border border-blue-500/20">
-                    <Crown size={12} />
-                    <span>{currentPlanName}</span>
+                    <div className="flex items-center gap-1">
+                        <Crown size={12} />
+                        <span>{currentPlanName}</span>
+                    </div>
                  </div>
              </div>
         </div>
