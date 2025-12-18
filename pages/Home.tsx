@@ -27,13 +27,16 @@ const PromoCard = ({ ann, onShowPopup }: { ann: Announcement, onShowPopup: (ann:
     } else {
         const link = ann.button_link;
         if (!link) return;
-        // Dış link yönlendirme düzeltmesi
+        
+        // Profesyonel yönlendirme mantığı
         if (link.startsWith('http://') || link.startsWith('https://')) {
             window.location.href = link;
         } else if (link.startsWith('/')) {
             navigate(link);
         } else {
-            window.location.href = `https://${link}`;
+            // Telegram kullanıcı adı veya direkt domain girilmişse
+            const formattedLink = link.startsWith('@') ? `https://t.me/${link.substring(1)}` : `https://${link}`;
+            window.location.href = formattedLink;
         }
     }
   };
@@ -45,16 +48,15 @@ const PromoCard = ({ ann, onShowPopup }: { ann: Announcement, onShowPopup: (ann:
     >
         <div className="relative z-10 flex flex-col h-full justify-between">
             <div>
-                <h3 className="text-white font-black text-2xl mb-1">{ann.title}</h3>
-                <p className="text-white/80 text-xs max-w-[200px] leading-snug line-clamp-2">{ann.description}</p>
+                <h3 className="text-white font-black text-2xl mb-1 tracking-tight">{ann.title}</h3>
+                <p className="text-white/80 text-xs max-w-[200px] leading-snug line-clamp-2 font-medium">{ann.description}</p>
             </div>
-            <div className="bg-white/20 backdrop-blur-md text-white text-[11px] font-bold py-2 px-5 rounded-xl w-fit border border-white/30">
+            <div className="bg-white/20 backdrop-blur-md text-white text-[11px] font-bold py-2.5 px-6 rounded-xl w-fit border border-white/30 uppercase tracking-widest">
                 {ann.button_text || 'İncele'}
             </div>
         </div>
-        {/* İkonu karttan kaldırdık, sadece modalda görünecek */}
         <div className="absolute -right-6 -bottom-6 opacity-10 transform rotate-12 pointer-events-none">
-            <Megaphone size={160} className="text-white" />
+            {React.createElement(iconMap[ann.icon_name] || Megaphone, { size: 160, className: 'text-white' })}
         </div>
     </div>
   );
@@ -72,15 +74,15 @@ const BotCard: React.FC<{ bot: Bot }> = ({ bot }) => {
 
   return (
     <div onClick={handleClick} className="flex items-center py-4 px-3 cursor-pointer group hover:bg-slate-900/60 rounded-2xl transition-all border border-transparent hover:border-slate-800/50 mb-1">
-        <img src={bot.icon} alt={bot.name} className="w-16 h-16 rounded-[22px] object-cover bg-slate-900 shadow-xl border border-slate-800" />
+        <img src={bot.icon} alt={bot.name} className="w-16 h-16 rounded-[22px] object-cover bg-slate-900 shadow-xl border border-slate-800 flex-shrink-0" />
         <div className="flex-1 ml-4 min-w-0 mr-2">
             <div className="flex items-center gap-2 mb-0.5">
                 <h3 className="font-bold text-base text-slate-100 truncate">{bot.name}</h3>
                 {bot.price > 0 && <span className="bg-indigo-500/10 text-indigo-400 text-[9px] font-bold px-1.5 py-0.5 rounded border border-indigo-500/20 uppercase tracking-tighter">Premium</span>}
             </div>
-            <p className="text-xs text-slate-500 truncate">{bot.description}</p>
+            <p className="text-xs text-slate-500 truncate font-medium">{bot.description}</p>
         </div>
-        <button className="bg-slate-800/80 text-white text-[11px] font-black py-2.5 px-6 rounded-full border border-slate-700/50 shadow-sm active:scale-90 transition-transform">
+        <button className="bg-slate-800/80 text-white text-[11px] font-black py-2.5 px-6 rounded-full border border-slate-700/50 shadow-sm active:scale-90 transition-transform uppercase tracking-widest">
             Aç
         </button>
     </div>
@@ -135,7 +137,7 @@ const Home = () => {
             <div className="w-10 h-10 bg-[#7c3aed] rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/20">
                 <BotIcon size={20} className="text-white" />
             </div>
-            <h1 className="text-xl font-black text-white tracking-tight">BotlyHub V3</h1>
+            <h1 className="text-xl font-black text-white tracking-tight uppercase italic">BotlyHub V3</h1>
         </div>
         <div className="flex items-center gap-3">
             <button onClick={() => navigate('/earnings')} className="p-2.5 bg-slate-900/60 border border-slate-800 rounded-full text-[#10b981] shadow-sm active:scale-95 transition-transform"><DollarSign size={20} /></button>
@@ -197,43 +199,64 @@ const Home = () => {
             </div>
 
             <div className="space-y-1">
+                <div className="flex justify-between items-center mb-6 px-1">
+                    <h2 className="text-lg font-black text-white tracking-tight uppercase">
+                        {searchQuery ? 'Arama Sonuçları' : (activeCategory === 'all' ? 'Öne Çıkanlar' : `${t(categories.find(c => c.id === activeCategory)?.label || '')}`)}
+                    </h2>
+                </div>
                 {filteredBots.length > 0 ? (
                     filteredBots.map(bot => <BotCard key={bot.id} bot={bot} />)
                 ) : (
                     <div className="py-20 text-center flex flex-col items-center gap-4">
-                        <p className="text-slate-500 font-bold">Bot bulunamadı.</p>
+                        <p className="text-slate-600 font-bold italic">Bot bulunamadı.</p>
                     </div>
                 )}
             </div>
           </>
       )}
 
-      {/* GÖRSELDEKİ MODAL TASARIMI */}
+      {/* GÖRSELDEKİ ÖZEL MODAL TASARIMI */}
       {selectedAnn && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-6 bg-black/90 backdrop-blur-sm animate-in fade-in" onClick={() => setSelectedAnn(null)}>
             <div className="bg-[#0f172a] w-full max-w-[280px] rounded-[24px] overflow-hidden shadow-2xl relative" onClick={e => e.stopPropagation()}>
-                {/* Üst Gradyan Şerit */}
+                {/* Üst İnce Gradyan Şerit */}
                 <div className="w-full h-[6px] bg-gradient-to-r from-[#6366f1] to-[#a855f7]" />
                 
-                {/* Kapat Butonu */}
+                {/* Kapat Butonu (Görseldeki gibi sağ üstte) */}
                 <button 
                   onClick={() => setSelectedAnn(null)} 
-                  className="absolute top-4 right-4 w-7 h-7 bg-slate-800/50 rounded-full flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+                  className="absolute top-4 right-4 w-8 h-8 bg-slate-800/40 rounded-full flex items-center justify-center text-slate-500 hover:text-white transition-colors"
                 >
                   <X size={16}/>
                 </button>
                 
-                <div className="p-8">
-                    {/* İkon Kutusu (Görseldeki gibi) */}
-                    <div className="w-12 h-12 bg-[#1e293b]/80 border border-slate-800 rounded-2xl flex items-center justify-center mb-6 shadow-inner">
-                        {React.createElement(iconMap[selectedAnn.icon_name] || Info, { size: 24, className: 'text-blue-400' })}
+                <div className="p-8 pb-10">
+                    {/* Sol Üst İkon Kutusu (Görseldeki gibi) */}
+                    <div className="w-12 h-12 bg-[#1e293b]/60 border border-slate-800 rounded-2xl flex items-center justify-center mb-6 shadow-inner">
+                        {React.createElement(iconMap[selectedAnn.icon_name] || Sparkles, { size: 24, className: 'text-blue-400' })}
                     </div>
                     
-                    {/* Başlık ve Açıklama */}
-                    <h3 className="text-lg font-black text-white mb-2 tracking-tight">{selectedAnn.title}</h3>
-                    <p className="text-slate-500 text-sm leading-snug font-medium">
+                    {/* Başlık ve Açıklama (Görseldeki stil) */}
+                    <h3 className="text-xl font-black text-white mb-2 tracking-tight">{selectedAnn.title}</h3>
+                    <div className="text-slate-500 text-sm leading-snug font-medium whitespace-pre-line">
                         {selectedAnn.content_detail || selectedAnn.description}
-                    </p>
+                    </div>
+
+                    {/* Aksiyon Butonu (Opsiyonel, modalın altına eklenebilir) */}
+                    {selectedAnn.action_type === 'link' && selectedAnn.button_link && (
+                        <button 
+                            onClick={() => {
+                                const link = selectedAnn.button_link;
+                                if (link.startsWith('http')) window.location.href = link;
+                                else if (link.startsWith('/')) navigate(link);
+                                else window.location.href = `https://${link}`;
+                                setSelectedAnn(null);
+                            }}
+                            className="mt-8 w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-xl text-xs uppercase tracking-widest transition-all active:scale-95"
+                        >
+                            {selectedAnn.button_text || 'Hemen Göz At'}
+                        </button>
+                    )}
                 </div>
             </div>
         </div>
