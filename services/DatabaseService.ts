@@ -162,19 +162,18 @@ export class DatabaseService {
     if (error) throw error;
   }
 
-  // --- User Assets (FOR ADMIN ONLY) ---
+  // --- User Assets (FOR ADMIN ONLY - FULL REAL DATA) ---
   static async getUserDetailedAssets(userId: string) {
-      const [channels, notifications] = await Promise.all([
+      const [channels, notifications, userBots] = await Promise.all([
           supabase.from('channels').select('*').eq('user_id', userId),
-          supabase.from('notifications').select('*').eq('user_id', userId).order('date', { ascending: false })
+          supabase.from('notifications').select('*').eq('user_id', userId).order('date', { ascending: false }),
+          supabase.from('user_bots').select('*, bots(*)').eq('user_id', userId)
       ]);
       
-      // Bots are usually stored in local storage for this demo architecture, 
-      // but in a production system we'd query a 'user_bots' table.
-      // For now, return these real DB results.
       return {
           channels: channels.data || [],
-          logs: notifications.data || []
+          logs: notifications.data || [],
+          bots: (userBots.data || []).map((ub: any) => ub.bots).filter(Boolean) as Bot[]
       };
   }
 
@@ -203,6 +202,6 @@ export class DatabaseService {
   static logoutAdmin() { localStorage.removeItem('admin_v3_session'); }
 
   static async init() {
-    console.log("Database Sync Service v4.0 - User Assets Enabled");
+    console.log("Database Sync Service v4.1 - Real Data Audit Ready");
   }
 }
