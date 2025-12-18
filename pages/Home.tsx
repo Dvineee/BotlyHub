@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star } from 'lucide-react';
+import { Search, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield } from 'lucide-react';
 // Fixed: Use namespace import for react-router-dom to resolve "no exported member" errors
 import * as Router from 'react-router-dom';
 import { Bot, Announcement } from '../types';
@@ -11,7 +11,7 @@ import { DatabaseService } from '../services/DatabaseService';
 const { useNavigate } = Router as any;
 
 const iconMap: Record<string, any> = {
-  Sparkles, Megaphone, Zap, Gift, Star, Info, BotIcon
+  Sparkles, Megaphone, Zap, Gift, Star, Info, BotIcon, Heart, Bell, Shield
 };
 
 const PromoCard = ({ ann, onShowPopup }: { ann: Announcement, onShowPopup: (ann: Announcement) => void }) => {
@@ -111,7 +111,7 @@ const Home = () => {
         DatabaseService.getAnnouncements()
     ]);
     setBots(botData);
-    if (annData.length > 0) setAnnouncements(annData);
+    if (annData.length > 0) setAnnouncements(annData.filter(a => a.is_active));
     setIsLoading(false);
   };
 
@@ -183,7 +183,7 @@ const Home = () => {
                 </div>
             )}
 
-            {/* Categories Grid (Bir önceki tasarımdaki gibi) */}
+            {/* Categories Grid */}
             <div className="grid grid-cols-4 gap-3 mb-10">
                 {categories.map((cat) => (
                     <button 
@@ -218,34 +218,25 @@ const Home = () => {
           </>
       )}
 
-      {/* GÖRSELDEKİ ÖZEL MODAL TASARIMI */}
+      {/* MODAL TASARIMI */}
       {selectedAnn && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-6 bg-black/90 backdrop-blur-sm animate-in fade-in" onClick={() => setSelectedAnn(null)}>
             <div className="bg-[#0f172a] w-full max-w-[280px] rounded-[24px] overflow-hidden shadow-2xl relative" onClick={e => e.stopPropagation()}>
-                {/* Üst İnce Gradyan Şerit */}
                 <div className="w-full h-[6px] bg-gradient-to-r from-[#6366f1] to-[#a855f7]" />
-                
-                {/* Kapat Butonu (Görseldeki gibi sağ üstte) */}
                 <button 
                   onClick={() => setSelectedAnn(null)} 
                   className="absolute top-4 right-4 w-8 h-8 bg-slate-800/40 rounded-full flex items-center justify-center text-slate-500 hover:text-white transition-colors"
                 >
                   <X size={16}/>
                 </button>
-                
                 <div className="p-8 pb-10">
-                    {/* Sol Üst İkon Kutusu (Görseldeki gibi) */}
                     <div className="w-12 h-12 bg-[#1e293b]/60 border border-slate-800 rounded-2xl flex items-center justify-center mb-6 shadow-inner">
                         {React.createElement(iconMap[selectedAnn.icon_name] || Sparkles, { size: 24, className: 'text-blue-400' })}
                     </div>
-                    
-                    {/* Başlık ve Açıklama (Görseldeki stil) */}
                     <h3 className="text-xl font-black text-white mb-2 tracking-tight">{selectedAnn.title}</h3>
                     <div className="text-slate-500 text-sm leading-snug font-medium whitespace-pre-line">
                         {selectedAnn.content_detail || selectedAnn.description}
                     </div>
-
-                    {/* Aksiyon Butonu (Opsiyonel, modalın altına eklenebilir) */}
                     {selectedAnn.action_type === 'link' && selectedAnn.button_link && (
                         <button 
                             onClick={() => {

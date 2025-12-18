@@ -7,13 +7,27 @@ import {
   Megaphone, Calendar, Settings as SettingsIcon, 
   ShieldCheck, Percent, Globe, MessageSquare, AlertTriangle,
   Sparkles, Zap, Star, ChevronRight, Eye, Send, Activity, 
-  Clock, Wallet, ShieldAlert, Cpu, Ban, CheckCircle
+  Clock, Wallet, ShieldAlert, Cpu, Ban, CheckCircle, Gift, Info, Heart, Bell, Shield
 } from 'lucide-react';
 import { DatabaseService } from '../../services/DatabaseService';
 import { User, Bot as BotType, Announcement, Notification } from '../../types';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const { useNavigate, Routes, Route, Link, useLocation } = Router as any;
+
+// Admin Panelinde Seçilebilir İkon Listesi
+const AVAILABLE_ICONS = [
+  { name: 'Megaphone', icon: Megaphone },
+  { name: 'Zap', icon: Zap },
+  { name: 'Sparkles', icon: Sparkles },
+  { name: 'Gift', icon: Gift },
+  { name: 'Star', icon: Star },
+  { name: 'Info', icon: Info },
+  { name: 'BotIcon', icon: Bot },
+  { name: 'Heart', icon: Heart },
+  { name: 'Bell', icon: Bell },
+  { name: 'Shield', icon: Shield }
+];
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -40,14 +54,12 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-[#020617] flex text-slate-200 font-sans overflow-hidden">
-      {/* Sidebar - Command Center Style */}
       <aside className={`fixed inset-y-0 left-0 z-[70] w-72 bg-[#0f172a] border-r border-slate-800/50 transition-transform lg:relative lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="h-full flex flex-col p-6">
           <div className="flex items-center gap-3 mb-12 px-2">
             <div className="p-2 bg-blue-600 rounded-xl"><Package size={22} className="text-white"/></div>
             <h2 className="text-xl font-black text-white italic tracking-tighter">BOTLY HUB <span className="text-blue-500">PRO</span></h2>
           </div>
-          
           <nav className="flex-1 space-y-2">
             <NavItem to="/a/dashboard" icon={LayoutDashboard} label="Kontrol Paneli" />
             <NavItem to="/a/dashboard/users" icon={Users} label="Kullanıcılar" />
@@ -56,7 +68,6 @@ const AdminDashboard = () => {
             <NavItem to="/a/dashboard/announcements" icon={Megaphone} label="Duyuru Yönetimi" />
             <NavItem to="/a/dashboard/settings" icon={SettingsIcon} label="Sistem Ayarları" />
           </nav>
-          
           <button onClick={() => { DatabaseService.logoutAdmin(); navigate('/a/admin'); }} className="mt-auto flex items-center gap-3 px-4 py-4 text-red-500 font-black text-[10px] tracking-widest uppercase hover:bg-red-500/5 rounded-2xl transition-colors">
             <LogOut size={18} /> Çıkış Yap
           </button>
@@ -64,16 +75,13 @@ const AdminDashboard = () => {
       </aside>
 
       <main className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
         <header className="h-20 border-b border-slate-800/50 flex items-center justify-between px-8 bg-[#020617]/50 backdrop-blur-xl shrink-0">
            <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2.5 bg-slate-800 rounded-xl text-slate-400"><Menu size={20}/></button>
-           
            <div className="hidden sm:flex items-center gap-6 text-[10px] font-black text-slate-600 uppercase tracking-widest">
               <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div> Canlı Veri Akışı</div>
               <div className="w-px h-4 bg-slate-800"></div>
               <div className="flex items-center gap-2"><Activity size={14}/> Sistem Stabil</div>
            </div>
-
            <div className="flex items-center gap-4 ml-auto">
               <div className="text-right mr-2 hidden sm:block">
                   <p className="text-xs font-black text-white">Administrator</p>
@@ -83,7 +91,6 @@ const AdminDashboard = () => {
            </div>
         </header>
 
-        {/* Content Area */}
         <div className="flex-1 overflow-y-auto p-6 sm:p-10 bg-[#020617] no-scrollbar">
           <div className="max-w-[1400px] mx-auto pb-10">
             <Routes>
@@ -105,10 +112,7 @@ const HomeView = () => {
     const [stats, setStats] = useState({ userCount: 0, botCount: 0, notifCount: 0, annCount: 0 });
     const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        load();
-    }, []);
-
+    useEffect(() => { load(); }, []);
     const load = async () => {
         setIsLoading(true);
         const data = await DatabaseService.getAdminStats();
@@ -373,12 +377,12 @@ const BotManagement = () => {
                         <form onSubmit={handleSave} className="space-y-6">
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Bot İsmi</label>
-                                <input type="text" required value={editingBot.name} onChange={e => setEditingBot({...editingBot, name: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none transition-all shadow-inner" />
+                                <input type="text" required value={editingBot.name} onChange={e => setEditingBot({...editingBot, name: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none transition-all shadow-inner" />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Kategori</label>
-                                    <select value={editingBot.category} onChange={e => setEditingBot({...editingBot, category: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none appearance-none">
+                                    <select value={editingBot.category} onChange={e => setEditingBot({...editingBot, category: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none appearance-none">
                                         <option value="productivity">Üretkenlik</option>
                                         <option value="games">Oyun</option>
                                         <option value="utilities">Araçlar</option>
@@ -389,16 +393,20 @@ const BotManagement = () => {
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Fiyat (Stars)</label>
-                                    <input type="number" required value={editingBot.price} onChange={e => setEditingBot({...editingBot, price: Number(e.target.value)})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none shadow-inner" />
+                                    <input type="number" required value={editingBot.price} onChange={e => setEditingBot({...editingBot, price: Number((e.target as any).value)})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none shadow-inner" />
                                 </div>
                             </div>
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Detaylı Açıklama</label>
-                                <textarea required value={editingBot.description} onChange={e => setEditingBot({...editingBot, description: e.target.value})} className="w-full h-32 bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm resize-none focus:border-blue-500 outline-none font-medium leading-relaxed" />
+                                <textarea required value={editingBot.description} onChange={e => setEditingBot({...editingBot, description: (e.target as any).value})} className="w-full h-32 bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm resize-none focus:border-blue-500 outline-none font-medium leading-relaxed" />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Bot Linki (@username)</label>
+                                <input type="text" required value={editingBot.bot_link} onChange={e => setEditingBot({...editingBot, bot_link: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none" placeholder="https://t.me/example_bot" />
                             </div>
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">İkon URL</label>
-                                <input type="text" required value={editingBot.icon} onChange={e => setEditingBot({...editingBot, icon: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none" />
+                                <input type="text" required value={editingBot.icon} onChange={e => setEditingBot({...editingBot, icon: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none" />
                             </div>
                             <button type="submit" className="w-full py-6 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-3xl text-[10px] tracking-[0.3em] uppercase shadow-2xl shadow-blue-900/30 active:scale-95 transition-all mt-4">KAYITLARI YAYINLA</button>
                         </form>
@@ -440,7 +448,7 @@ const NotificationCenter = () => {
                         <div className="grid grid-cols-2 gap-6">
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Bildirim Tipi</label>
-                                <select value={form.type} onChange={e => setForm({...form, type: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold focus:border-blue-500 outline-none appearance-none">
+                                <select value={form.type} onChange={e => setForm({...form, type: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold focus:border-blue-500 outline-none appearance-none">
                                     <option value="system">Duyuru</option>
                                     <option value="payment">Ödeme</option>
                                     <option value="security">Güvenlik</option>
@@ -449,12 +457,12 @@ const NotificationCenter = () => {
                             </div>
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Kısa Başlık</label>
-                                <input required type="text" value={form.title} onChange={e => setForm({...form, title: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold focus:border-blue-500 outline-none" placeholder="Örn: Yeni Özellik!" />
+                                <input required type="text" value={form.title} onChange={e => setForm({...form, title: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold focus:border-blue-500 outline-none" placeholder="Örn: Yeni Özellik!" />
                             </div>
                         </div>
                         <div className="space-y-2">
                             <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Mesaj Detayı</label>
-                            <textarea required value={form.message} onChange={e => setForm({...form, message: e.target.value})} className="w-full h-40 bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm resize-none focus:border-blue-500 outline-none font-medium leading-relaxed" placeholder="Tüm kullanıcılara ulaştırılacak mesaj..." />
+                            <textarea required value={form.message} onChange={e => setForm({...form, message: (e.target as any).value})} className="w-full h-40 bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm resize-none focus:border-blue-500 outline-none font-medium leading-relaxed" placeholder="Tüm kullanıcılara ulaştırılacak mesaj..." />
                         </div>
                         <button type="submit" disabled={isLoading} className="w-full py-6 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-3xl text-[10px] tracking-[0.3em] uppercase shadow-2xl shadow-blue-900/40 active:scale-95 transition-all">
                             {isLoading ? <Loader2 className="animate-spin mx-auto"/> : 'HEMEN YAYINLA'}
@@ -518,7 +526,7 @@ const AnnouncementManagement = () => {
                  anns.map(a => (
                     <div key={a.id} className="bg-[#0f172a] border border-slate-800 p-8 rounded-[40px] group relative overflow-hidden transition-all hover:border-blue-500/50 flex flex-col shadow-2xl">
                         <div className={`w-14 h-14 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-center mb-8 shadow-inner`}>
-                            <Megaphone size={24} className="text-blue-500"/>
+                            {React.createElement(AVAILABLE_ICONS.find(i => i.name === a.icon_name)?.icon || Megaphone, { size: 24, className: 'text-blue-500' })}
                         </div>
                         <h4 className="font-black text-xl text-white mb-3 italic tracking-tight">{a.title}</h4>
                         <p className="text-sm text-slate-500 line-clamp-2 mb-10 font-medium leading-relaxed">{a.description}</p>
@@ -542,20 +550,37 @@ const AnnouncementManagement = () => {
                         <form onSubmit={handleSave} className="space-y-6">
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Kart Başlığı</label>
-                                <input type="text" required value={editingAnn.title} onChange={e => setEditingAnn({...editingAnn, title: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none transition-all shadow-inner" />
+                                <input type="text" required value={editingAnn.title} onChange={e => setEditingAnn({...editingAnn, title: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none transition-all shadow-inner" />
                             </div>
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Kısa Promo Metni</label>
-                                <textarea required value={editingAnn.description} onChange={e => setEditingAnn({...editingAnn, description: e.target.value})} className="w-full h-24 bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm resize-none focus:border-blue-500 outline-none font-medium leading-relaxed" />
+                                <textarea required value={editingAnn.description} onChange={e => setEditingAnn({...editingAnn, description: (e.target as any).value})} className="w-full h-24 bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm resize-none focus:border-blue-500 outline-none font-medium leading-relaxed" />
                             </div>
+
+                            <div className="space-y-3">
+                                <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Kart İkonu Belirle</label>
+                                <div className="grid grid-cols-5 gap-3 bg-slate-950 p-4 rounded-2xl border border-slate-800">
+                                    {AVAILABLE_ICONS.map(i => (
+                                        <button 
+                                            key={i.name} 
+                                            type="button"
+                                            onClick={() => setEditingAnn({...editingAnn, icon_name: i.name})}
+                                            className={`p-3 rounded-xl flex items-center justify-center transition-all ${editingAnn.icon_name === i.name ? 'bg-blue-600 text-white' : 'bg-slate-900 text-slate-500 hover:text-slate-300'}`}
+                                        >
+                                            <i.icon size={20} />
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Buton Metni</label>
-                                    <input type="text" required value={editingAnn.button_text} onChange={e => setEditingAnn({...editingAnn, button_text: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold focus:border-blue-500 outline-none" />
+                                    <input type="text" required value={editingAnn.button_text} onChange={e => setEditingAnn({...editingAnn, button_text: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold focus:border-blue-500 outline-none" />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Renk Paleti</label>
-                                    <select value={editingAnn.color_scheme} onChange={e => setEditingAnn({...editingAnn, color_scheme: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold focus:border-blue-500 outline-none appearance-none">
+                                    <select value={editingAnn.color_scheme} onChange={e => setEditingAnn({...editingAnn, color_scheme: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold focus:border-blue-500 outline-none appearance-none">
                                         <option value="purple">Modern Mor</option>
                                         <option value="blue">Okyanus Mavi</option>
                                         <option value="emerald">Canlı Yeşil</option>
@@ -565,7 +590,7 @@ const AnnouncementManagement = () => {
                             </div>
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Hedef (@user / link)</label>
-                                <input type="text" value={editingAnn.button_link} onChange={e => setEditingAnn({...editingAnn, button_link: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold focus:border-blue-500 outline-none shadow-inner" placeholder="@username veya /sayfa" />
+                                <input type="text" value={editingAnn.button_link} onChange={e => setEditingAnn({...editingAnn, button_link: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold focus:border-blue-500 outline-none shadow-inner" placeholder="@username veya /sayfa" />
                             </div>
                             <div className="flex items-center justify-between p-6 bg-slate-950 border border-slate-800 rounded-3xl">
                                 <div>
@@ -592,7 +617,9 @@ const SettingsManagement = () => {
         maintenanceMode: false,
         commissionRate: 5,
         supportLink: 'https://t.me/support',
-        termsUrl: 'https://botlyhub.com/terms'
+        termsUrl: 'https://botlyhub.com/terms',
+        instagramUrl: '',
+        telegramChannelUrl: ''
     });
     const [isSaving, setIsSaving] = useState(false);
 
@@ -618,25 +645,31 @@ const SettingsManagement = () => {
     return (
         <div className="animate-in fade-in space-y-12 pb-20">
             <div>
-                <h2 className="text-3xl font-black text-white italic tracking-tighter uppercase italic">SİSTEM <span className="text-blue-500">YAPILANDIRMASI</span></h2>
+                <h2 className="text-3xl font-black text-white italic tracking-tighter uppercase">SİSTEM <span className="text-blue-500">YAPILANDIRMASI</span></h2>
                 <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mt-1">Platform Çekirdek Parametreleri (Gelişmiş)</p>
             </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                 <div className="bg-[#0f172a] border border-slate-800 p-12 rounded-[48px] space-y-10 shadow-2xl">
-                    <h3 className="font-black text-lg text-white mb-6 uppercase italic flex items-center gap-4"><Globe size={24} className="text-blue-500"/> Marka & Linkler</h3>
+                    <h3 className="font-black text-lg text-white mb-6 uppercase italic flex items-center gap-4"><Globe size={24} className="text-blue-500"/> Marka & Sosyal Linkler</h3>
                     <div className="space-y-8">
                         <div className="space-y-3"> 
                             <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Uygulama Görünen Adı</label> 
-                            <input type="text" value={settings.appName} onChange={e => setSettings({...settings, appName: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none transition-all shadow-inner" /> 
+                            <input type="text" value={settings.appName} onChange={e => setSettings({...settings, appName: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none transition-all shadow-inner" /> 
                         </div>
                         <div className="space-y-3"> 
                             <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Telegram Destek Kanalı</label> 
-                            <input type="text" value={settings.supportLink} onChange={e => setSettings({...settings, supportLink: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none transition-all shadow-inner" /> 
+                            <input type="text" value={settings.supportLink} onChange={e => setSettings({...settings, supportLink: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none transition-all shadow-inner" /> 
                         </div>
-                        <div className="space-y-3"> 
-                            <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Kullanım Koşulları URL</label> 
-                            <input type="text" value={settings.termsUrl} onChange={e => setSettings({...settings, termsUrl: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none transition-all shadow-inner" /> 
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-3"> 
+                                <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Instagram</label> 
+                                <input type="text" value={settings.instagramUrl} onChange={e => setSettings({...settings, instagramUrl: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none" placeholder="@username" /> 
+                            </div>
+                            <div className="space-y-3"> 
+                                <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Haber Kanalı</label> 
+                                <input type="text" value={settings.telegramChannelUrl} onChange={e => setSettings({...settings, telegramChannelUrl: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none" placeholder="t.me/kanal" /> 
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -656,7 +689,7 @@ const SettingsManagement = () => {
                         <div className="space-y-3"> 
                             <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Global Komisyon Oranı (%)</label> 
                             <div className="relative">
-                                <input type="number" value={settings.commissionRate} onChange={e => setSettings({...settings, commissionRate: Number(e.target.value)})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-emerald-500 outline-none transition-all shadow-inner" /> 
+                                <input type="number" value={settings.commissionRate} onChange={e => setSettings({...settings, commissionRate: Number((e.target as any).value)})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-emerald-500 outline-none transition-all shadow-inner" /> 
                                 <div className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-700 font-black">%</div>
                             </div>
                         </div>
