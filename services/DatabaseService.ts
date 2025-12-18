@@ -1,6 +1,6 @@
 
 import { createClient } from '@supabase/supabase-js';
-import { Bot, User, Channel, Announcement, Notification } from '../types';
+import { Bot, User, Channel, Announcement, Notification, UserBot } from '../types';
 
 const SUPABASE_URL = 'https://ybnxfwqrduuinzgnbymc.supabase.co'; 
 const SUPABASE_ANON_KEY = 'sb_publishable_VeYQ304ZpUpj3ymB3ihpjw_jt49W1G-'; 
@@ -129,10 +129,7 @@ export class DatabaseService {
   static async getSettings() {
     try {
         const { data, error } = await supabase.from('settings').select('*').eq('id', 1).single();
-        if (error) {
-            console.warn("Settings fetch warning:", error.message);
-            return null;
-        }
+        if (error) return null;
         return data;
     } catch (e) {
         return null;
@@ -140,16 +137,8 @@ export class DatabaseService {
   }
 
   static async saveSettings(settings: any) {
-    // ID'nin sayısal olduğundan ve conflict stratejisinin doğru olduğundan emin oluyoruz.
-    const { error } = await supabase.from('settings').upsert({ 
-        id: 1, 
-        ...settings 
-    }, { onConflict: 'id' });
-    
-    if (error) {
-        console.error("Detailed SaveSettings Error:", error);
-        throw error;
-    }
+    const { error } = await supabase.from('settings').upsert({ id: 1, ...settings }, { onConflict: 'id' });
+    if (error) throw error;
   }
 
   // --- User Management ---
@@ -171,6 +160,22 @@ export class DatabaseService {
   static async syncUser(user: Partial<User>) {
     const { error } = await supabase.from('users').upsert(user, { onConflict: 'id' });
     if (error) throw error;
+  }
+
+  // --- User Assets (FOR ADMIN ONLY) ---
+  static async getUserDetailedAssets(userId: string) {
+      const [channels, notifications] = await Promise.all([
+          supabase.from('channels').select('*').eq('user_id', userId),
+          supabase.from('notifications').select('*').eq('user_id', userId).order('date', { ascending: false })
+      ]);
+      
+      // Bots are usually stored in local storage for this demo architecture, 
+      // but in a production system we'd query a 'user_bots' table.
+      // For now, return these real DB results.
+      return {
+          channels: channels.data || [],
+          logs: notifications.data || []
+      };
   }
 
   // --- Channel Management ---
@@ -198,6 +203,6 @@ export class DatabaseService {
   static logoutAdmin() { localStorage.removeItem('admin_v3_session'); }
 
   static async init() {
-    console.log("Database Sync Service v3.9 - Conflict Handling Fixed");
+    console.log("Database Sync Service v4.0 - User Assets Enabled");
   }
 }

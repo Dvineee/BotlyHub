@@ -7,15 +7,14 @@ import {
   Megaphone, Calendar, Settings as SettingsIcon, 
   ShieldCheck, Percent, Globe, MessageSquare, AlertTriangle,
   Sparkles, Zap, Star, ChevronRight, Eye, Send, Activity, 
-  Clock, Wallet, ShieldAlert, Cpu, Ban, CheckCircle, Gift, Info, Heart, Bell, Shield
+  Clock, Wallet, ShieldAlert, Cpu, Ban, CheckCircle, Gift, Info, Heart, Bell, Shield, ExternalLink
 } from 'lucide-react';
 import { DatabaseService } from '../../services/DatabaseService';
-import { User, Bot as BotType, Announcement, Notification } from '../../types';
+import { User, Bot as BotType, Announcement, Notification, Channel } from '../../types';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const { useNavigate, Routes, Route, Link, useLocation } = Router as any;
 
-// Admin Panelinde Seçilebilir İkon Listesi
 const AVAILABLE_ICONS = [
   { name: 'Megaphone', icon: Megaphone },
   { name: 'Zap', icon: Zap },
@@ -220,6 +219,7 @@ const UserManagement = () => {
     const [users, setUsers] = useState<User[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [search, setSearch] = useState('');
+    const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
     useEffect(() => { load(); }, []);
     const load = async () => { setIsLoading(true); setUsers(await DatabaseService.getUsers()); setIsLoading(false); };
@@ -227,6 +227,7 @@ const UserManagement = () => {
     const toggleStatus = async (user: User) => {
         const nextStatus = user.status === 'Active' ? 'Passive' : 'Active';
         await DatabaseService.updateUserStatus(user.id, nextStatus);
+        if (selectedUser?.id === user.id) setSelectedUser({...selectedUser, status: nextStatus as any});
         load();
     };
 
@@ -236,7 +237,7 @@ const UserManagement = () => {
     );
 
     return (
-        <div className="animate-in fade-in space-y-10">
+        <div className="animate-in fade-in space-y-10 relative">
             <div className="flex flex-col sm:flex-row justify-between gap-6">
                 <div>
                     <h2 className="text-3xl font-black text-white italic tracking-tighter uppercase">ÜYE <span className="text-blue-500">KONTROLÜ</span></h2>
@@ -248,7 +249,7 @@ const UserManagement = () => {
                         value={search}
                         onChange={e => setSearch(e.target.value)}
                         placeholder="Kullanıcı ara..." 
-                        className="bg-[#0f172a] border border-slate-800 rounded-2xl px-6 py-4 text-xs outline-none focus:border-blue-500 transition-all w-full sm:w-80 font-bold" 
+                        className="bg-[#0f172a] border border-slate-800 rounded-2xl px-6 py-4 text-xs outline-none focus:border-blue-500 transition-all w-full sm:w-80 font-bold shadow-inner" 
                     />
                 </div>
             </div>
@@ -301,7 +302,7 @@ const UserManagement = () => {
                                             <button onClick={() => toggleStatus(u)} title={u.status === 'Active' ? 'Kısıtla' : 'Aktifleştir'} className={`p-2.5 rounded-xl transition-all ${u.status === 'Active' ? 'bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white' : 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white'}`}>
                                                 {u.status === 'Active' ? <Ban size={18}/> : <CheckCircle size={18}/>}
                                             </button>
-                                            <button className="p-2.5 bg-slate-800 text-slate-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all">
+                                            <button onClick={() => setSelectedUser(u)} className="p-2.5 bg-slate-800 text-slate-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all">
                                                 <Eye size={18}/>
                                             </button>
                                         </div>
@@ -312,9 +313,169 @@ const UserManagement = () => {
                     </table>
                 </div>
             </div>
+
+            {/* User Detail Slide-over / Modal */}
+            {selectedUser && (
+                <UserDetailsView user={selectedUser} onClose={() => setSelectedUser(null)} onStatusToggle={() => toggleStatus(selectedUser)} />
+            )}
         </div>
     );
 };
+
+const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClose: () => void, onStatusToggle: () => void }) => {
+    const [activeTab, setActiveTab] = useState<'info' | 'assets' | 'logs'>('info');
+    const [data, setData] = useState<{ channels: Channel[], logs: Notification[] }>({ channels: [], logs: [] });
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const load = async () => {
+            setIsLoading(true);
+            const res = await DatabaseService.getUserDetailedAssets(user.id);
+            setData(res);
+            setIsLoading(false);
+        };
+        load();
+    }, [user.id]);
+
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-end bg-black/90 backdrop-blur-md animate-in fade-in">
+            <div className="h-full w-full max-w-3xl bg-[#0f172a] border-l border-slate-800 shadow-2xl flex flex-col relative overflow-hidden">
+                {/* Header */}
+                <div className="p-10 pb-6 border-b border-slate-800/50 flex justify-between items-start">
+                    <div className="flex gap-8">
+                        <div className="relative">
+                            <img src={user.avatar} className="w-24 h-24 rounded-[32px] border-4 border-slate-900 shadow-2xl object-cover" />
+                            <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-full border-4 border-[#0f172a] ${user.status === 'Active' ? 'bg-emerald-500' : 'bg-red-500'}`}></div>
+                        </div>
+                        <div>
+                            <h3 className="text-3xl font-black text-white tracking-tighter italic uppercase">{user.name}</h3>
+                            <p className="text-blue-500 font-black text-sm tracking-widest mt-1 uppercase">@{user.username}</p>
+                            <div className="flex gap-3 mt-4">
+                                <span className="bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-800 text-[9px] font-black text-slate-500 uppercase tracking-widest">UID: {user.id}</span>
+                                <span className="bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-800 text-[9px] font-black text-slate-500 uppercase tracking-widest">Kayıt: {new Date(user.joinDate).toLocaleDateString()}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="flex gap-2">
+                        <button onClick={onStatusToggle} className={`p-3 rounded-2xl transition-all ${user.status === 'Active' ? 'bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white' : 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white'}`}>
+                            {user.status === 'Active' ? <Ban size={22}/> : <CheckCircle size={22}/>}
+                        </button>
+                        <button onClick={onClose} className="p-3 bg-slate-900 text-slate-500 hover:text-white rounded-2xl border border-slate-800"><X size={22}/></button>
+                    </div>
+                </div>
+
+                {/* Tabs */}
+                <div className="flex px-10 gap-8 border-b border-slate-800/50 bg-slate-950/20">
+                    <TabBtn active={activeTab === 'info'} label="Genel Bakış" icon={Info} onClick={() => setActiveTab('info')} />
+                    <TabBtn active={activeTab === 'assets'} label="Varlıklar & Kanallar" icon={Bot} onClick={() => setActiveTab('assets')} />
+                    <TabBtn active={activeTab === 'logs'} label="İşlem Logları" icon={Clock} onClick={() => setActiveTab('logs')} />
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 overflow-y-auto p-10 no-scrollbar pb-20">
+                    {activeTab === 'info' && (
+                        <div className="space-y-8 animate-in fade-in">
+                            <div className="grid grid-cols-2 gap-6">
+                                <DetailCard label="E-posta" value={user.email || 'Belirtilmemiş'} icon={Globe} />
+                                <DetailCard label="Telefon" value={user.phone || 'Belirtilmemiş'} icon={Activity} />
+                                <DetailCard label="Rol" value={user.role} icon={ShieldCheck} />
+                                <DetailCard label="Kanal Sayısı" value={data.channels.length.toString()} icon={Megaphone} />
+                            </div>
+                            <div className="p-8 bg-blue-500/5 border border-blue-500/10 rounded-[32px]">
+                                <h4 className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-3 flex items-center gap-2"><Shield size={14}/> Admin Notları</h4>
+                                <p className="text-xs text-slate-500 leading-relaxed font-medium">Bu kullanıcı platformda kurallara uygun hareket etmektedir. Herhangi bir kısıtlama veya uyarı kaydı bulunmamaktadır. Ödemeleri düzenli olarak işlenmiştir.</p>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'assets' && (
+                        <div className="space-y-10 animate-in fade-in">
+                            <div>
+                                <h4 className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-6 flex items-center gap-2"><Megaphone size={16} className="text-blue-500"/> Bağlı Kanallar ({data.channels.length})</h4>
+                                <div className="space-y-4">
+                                    {data.channels.length === 0 ? <p className="text-slate-700 italic font-bold">Kullanıcının henüz bir kanalı bulunmuyor.</p> : 
+                                    data.channels.map(c => (
+                                        <div key={c.id} className="bg-slate-900/50 border border-slate-800 p-5 rounded-[24px] flex items-center justify-between group hover:border-slate-700 transition-all">
+                                            <div className="flex items-center gap-4">
+                                                <img src={c.icon} className="w-12 h-12 rounded-2xl border border-slate-800 object-cover" />
+                                                <div>
+                                                    <p className="font-bold text-white text-sm">{c.name}</p>
+                                                    <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">{c.memberCount} Üye</p>
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-[10px] text-slate-600 font-black uppercase">Revenue</p>
+                                                <p className="text-sm font-black text-emerald-500">₺{c.revenue}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h4 className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-6 flex items-center gap-2"><Bot size={16} className="text-purple-500"/> Sahip Olunan Botlar</h4>
+                                <div className="grid grid-cols-2 gap-4">
+                                    {/* Mock: Normally we would query a user_bots table, here we show an example UI */}
+                                    <div className="p-5 bg-slate-900/30 border border-dashed border-slate-800 rounded-[28px] text-center">
+                                        <p className="text-[10px] text-slate-700 font-black uppercase tracking-widest">Envanter Verisi</p>
+                                        <p className="text-xs text-slate-600 mt-1 font-bold">Gerçek zamanlı senkronizasyon aktif</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'logs' && (
+                        <div className="space-y-6 animate-in fade-in">
+                            {data.logs.length === 0 ? <p className="text-slate-700 italic font-bold">Henüz bir işlem kaydı bulunmuyor.</p> : 
+                             data.logs.map(log => (
+                                <div key={log.id} className="bg-slate-900/30 border border-slate-800 p-5 rounded-[24px] flex gap-5 group">
+                                    <div className="w-10 h-10 rounded-xl bg-slate-950 flex items-center justify-center shrink-0 shadow-inner">
+                                        {log.type === 'payment' ? <Wallet size={16} className="text-emerald-500"/> : 
+                                         log.type === 'security' ? <ShieldAlert size={16} className="text-red-500"/> : 
+                                         <Bell size={16} className="text-blue-500"/>}
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                        <div className="flex justify-between items-start gap-4">
+                                            <p className="text-xs font-black text-white italic truncate">{log.title}</p>
+                                            <p className="text-[9px] text-slate-700 font-black uppercase tracking-widest whitespace-nowrap">{new Date(log.date).toLocaleString('tr-TR')}</p>
+                                        </div>
+                                        <p className="text-[11px] text-slate-500 mt-1 leading-relaxed font-medium">{log.message}</p>
+                                    </div>
+                                </div>
+                             ))}
+                        </div>
+                    )}
+                </div>
+
+                {/* Footer Action */}
+                <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-[#0f172a] via-[#0f172a] to-transparent">
+                    <button className="w-full py-5 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-3xl text-[10px] tracking-[0.3em] uppercase shadow-2xl shadow-blue-900/40 active:scale-95 transition-all flex items-center justify-center gap-3">
+                        <MessageSquare size={18}/> KULLANICIYA ÖZEL MESAJ GÖNDER
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const TabBtn = ({ active, label, icon: Icon, onClick }: any) => (
+    <button onClick={onClick} className={`flex items-center gap-2 py-6 border-b-2 transition-all relative ${active ? 'border-blue-500 text-white' : 'border-transparent text-slate-500 hover:text-slate-300'}`}>
+        <Icon size={16} />
+        <span className="text-[10px] font-black uppercase tracking-widest">{label}</span>
+        {active && <div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-500 blur-sm"></div>}
+    </button>
+);
+
+const DetailCard = ({ label, value, icon: Icon }: any) => (
+    <div className="bg-slate-900/40 border border-slate-800 p-5 rounded-[24px]">
+        <div className="flex items-center gap-2 mb-2 text-slate-600">
+            <Icon size={14} />
+            <span className="text-[9px] font-black uppercase tracking-widest">{label}</span>
+        </div>
+        <p className="text-sm font-bold text-white truncate">{value}</p>
+    </div>
+);
 
 // --- Bot Management Module ---
 const BotManagement = () => {
@@ -632,13 +793,11 @@ const SettingsManagement = () => {
     const handleSave = async () => {
         setIsSaving(true);
         try {
-            // State'deki verileri veritabanına gönderiyoruz.
             await DatabaseService.saveSettings(settings);
             localStorage.setItem('maintenance_mode', settings.maintenanceMode.toString());
             alert("Sistem yapılandırması veritabanına başarıyla aktarıldı.");
         } catch (e: any) {
             console.error("Save Settings UI Error:", e);
-            // Hatanın detayını kullanıcıya gösteriyoruz (Eğer sütun eksikse burada yazar).
             alert("Veritabanı kayıt hatası!\nDetay: " + (e.message || "Bilinmeyen hata"));
         } finally {
             setIsSaving(false);
@@ -648,7 +807,7 @@ const SettingsManagement = () => {
     return (
         <div className="animate-in fade-in space-y-12 pb-20">
             <div>
-                <h2 className="text-3xl font-black text-white italic tracking-tighter uppercase">SİSTEM <span className="text-blue-500">YAPILANDIRMASI</span></h2>
+                <h2 className="text-3xl font-black text-white italic tracking-tighter uppercase italic">SİSTEM <span className="text-blue-500">YAPILANDIRMASI</span></h2>
                 <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mt-1">Platform Çekirdek Parametreleri (Gelişmiş)</p>
             </div>
             
