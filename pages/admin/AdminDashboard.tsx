@@ -138,8 +138,8 @@ const UserManagement = () => {
               <thead className="bg-slate-800/50 text-[10px] text-slate-500 uppercase font-black tracking-widest border-b border-slate-800">
                 <tr>
                   <th className="p-6">Kullanıcı Bilgileri</th>
-                  <th className="p-6">İletişim</th>
                   <th className="p-6 text-center">Varlık Özeti</th>
+                  <th className="p-6">İletişim</th>
                   <th className="p-6">Durum</th>
                   <th className="p-6 text-right">Eylem</th>
                 </tr>
@@ -155,12 +155,6 @@ const UserManagement = () => {
                       </div>
                     </td>
                     <td className="p-6">
-                        <div className="space-y-1">
-                            <p className="text-[11px] text-slate-300 font-medium">{u.email || '-'}</p>
-                            <p className="text-[10px] text-slate-500">{u.phone || '-'}</p>
-                        </div>
-                    </td>
-                    <td className="p-6">
                        <div className="flex items-center justify-center gap-4">
                             <div className="flex flex-col items-center">
                                 <span className="text-[11px] text-white font-bold flex items-center gap-1.5"><Bot size={12}/> {Math.floor(Math.random() * 5)}</span>
@@ -172,6 +166,12 @@ const UserManagement = () => {
                                 <span className="text-[8px] text-slate-500 uppercase font-black">Kanal</span>
                             </div>
                        </div>
+                    </td>
+                    <td className="p-6">
+                        <div className="space-y-1">
+                            <p className="text-[11px] text-slate-300 font-medium">{u.email || '-'}</p>
+                            <p className="text-[10px] text-slate-500">{u.phone || '-'}</p>
+                        </div>
                     </td>
                     <td className="p-6">
                         <span className={`text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-widest ${u.status === 'Active' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'bg-red-500/10 text-red-500 border border-red-500/20'}`}>
