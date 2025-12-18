@@ -632,11 +632,14 @@ const SettingsManagement = () => {
     const handleSave = async () => {
         setIsSaving(true);
         try {
+            // State'deki verileri veritabanına gönderiyoruz.
             await DatabaseService.saveSettings(settings);
             localStorage.setItem('maintenance_mode', settings.maintenanceMode.toString());
             alert("Sistem yapılandırması veritabanına başarıyla aktarıldı.");
-        } catch (e) {
-            alert("Veritabanı kayıt hatası.");
+        } catch (e: any) {
+            console.error("Save Settings UI Error:", e);
+            // Hatanın detayını kullanıcıya gösteriyoruz (Eğer sütun eksikse burada yazar).
+            alert("Veritabanı kayıt hatası!\nDetay: " + (e.message || "Bilinmeyen hata"));
         } finally {
             setIsSaving(false);
         }

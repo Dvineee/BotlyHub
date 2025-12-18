@@ -26,6 +26,7 @@ export class DatabaseService {
         annCount: anns.count || 0
       };
     } catch (e) {
+      console.error("Stats Error:", e);
       return { userCount: 0, botCount: 0, notifCount: 0, annCount: 0 };
     }
   }
@@ -60,7 +61,7 @@ export class DatabaseService {
       ...bot,
       id: bot.id || Math.random().toString(36).substr(2, 9),
       screenshots: bot.screenshots || []
-    });
+    }, { onConflict: 'id' });
     if (error) throw error;
   }
 
@@ -115,7 +116,7 @@ export class DatabaseService {
         ...ann,
         id: ann.id || Math.random().toString(36).substr(2, 9),
         is_active: ann.is_active ?? true
-    });
+    }, { onConflict: 'id' });
     if (error) throw error;
   }
 
@@ -127,8 +128,11 @@ export class DatabaseService {
   // --- Settings Management ---
   static async getSettings() {
     try {
-        const { data, error } = await supabase.from('settings').select('*').single();
-        if (error) return null;
+        const { data, error } = await supabase.from('settings').select('*').eq('id', 1).single();
+        if (error) {
+            console.warn("Settings fetch warning:", error.message);
+            return null;
+        }
         return data;
     } catch (e) {
         return null;
@@ -136,8 +140,16 @@ export class DatabaseService {
   }
 
   static async saveSettings(settings: any) {
-    const { error } = await supabase.from('settings').upsert({ id: 1, ...settings });
-    if (error) throw error;
+    // ID'nin sayısal olduğundan ve conflict stratejisinin doğru olduğundan emin oluyoruz.
+    const { error } = await supabase.from('settings').upsert({ 
+        id: 1, 
+        ...settings 
+    }, { onConflict: 'id' });
+    
+    if (error) {
+        console.error("Detailed SaveSettings Error:", error);
+        throw error;
+    }
   }
 
   // --- User Management ---
@@ -176,7 +188,7 @@ export class DatabaseService {
     const { error } = await supabase.from('channels').upsert({
       ...channel,
       id: channel.id || Math.random().toString(36).substr(2, 9)
-    });
+    }, { onConflict: 'id' });
     if (error) throw error;
   }
 
@@ -186,6 +198,6 @@ export class DatabaseService {
   static logoutAdmin() { localStorage.removeItem('admin_v3_session'); }
 
   static async init() {
-    console.log("Database Sync Service v3.8 - Full Enterprise Ready");
+    console.log("Database Sync Service v3.9 - Conflict Handling Fixed");
   }
 }
