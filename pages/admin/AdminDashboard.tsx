@@ -109,7 +109,6 @@ const UserManagement = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [userChannels, setUserChannels] = useState<Channel[]>([]);
-  const [userBotsCount, setUserBotsCount] = useState<number>(0);
 
   useEffect(() => { load(); }, []);
   const load = async () => {
@@ -122,8 +121,6 @@ const UserManagement = () => {
     setSelectedUser(user);
     const channels = await DatabaseService.getChannels(user.id);
     setUserChannels(channels);
-    // User kütüphane bot sayısı simülasyonu/localstorage erişimi (Gerçek database'de library tablosundan çekilmelidir)
-    setUserBotsCount(Math.floor(Math.random() * 5)); 
   };
 
   return (
@@ -137,11 +134,12 @@ const UserManagement = () => {
 
       <div className="bg-slate-900 rounded-[32px] border border-slate-800 overflow-hidden shadow-2xl">
         <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-slate-700">
-            <table className="w-full text-left min-w-[700px]">
+            <table className="w-full text-left min-w-[800px]">
               <thead className="bg-slate-800/50 text-[10px] text-slate-500 uppercase font-black tracking-widest border-b border-slate-800">
                 <tr>
-                  <th className="p-6">Kullanıcı</th>
-                  <th className="p-6">Varlıklar</th>
+                  <th className="p-6">Kullanıcı Bilgileri</th>
+                  <th className="p-6">İletişim</th>
+                  <th className="p-6 text-center">Varlık Özeti</th>
                   <th className="p-6">Durum</th>
                   <th className="p-6 text-right">Eylem</th>
                 </tr>
@@ -157,14 +155,21 @@ const UserManagement = () => {
                       </div>
                     </td>
                     <td className="p-6">
-                       <div className="flex items-center gap-4">
-                            <div className="flex flex-col">
-                                <span className="text-[11px] text-white font-bold flex items-center gap-1.5"><Bot size={12}/> {Math.floor(Math.random() * 5)} Bot</span>
-                                <span className="text-[10px] text-slate-500 uppercase font-black tracking-tighter">Kütüphane</span>
+                        <div className="space-y-1">
+                            <p className="text-[11px] text-slate-300 font-medium">{u.email || '-'}</p>
+                            <p className="text-[10px] text-slate-500">{u.phone || '-'}</p>
+                        </div>
+                    </td>
+                    <td className="p-6">
+                       <div className="flex items-center justify-center gap-4">
+                            <div className="flex flex-col items-center">
+                                <span className="text-[11px] text-white font-bold flex items-center gap-1.5"><Bot size={12}/> {Math.floor(Math.random() * 5)}</span>
+                                <span className="text-[8px] text-slate-500 uppercase font-black">Bot</span>
                             </div>
-                            <div className="flex flex-col border-l border-slate-800 pl-4">
-                                <span className="text-[11px] text-white font-bold flex items-center gap-1.5"><Megaphone size={12}/> {Math.floor(Math.random() * 3)} Kanal</span>
-                                <span className="text-[10px] text-slate-500 uppercase font-black tracking-tighter">Mülkiyet</span>
+                            <div className="w-px h-6 bg-slate-800" />
+                            <div className="flex flex-col items-center">
+                                <span className="text-[11px] text-white font-bold flex items-center gap-1.5"><Megaphone size={12}/> {Math.floor(Math.random() * 3)}</span>
+                                <span className="text-[8px] text-slate-500 uppercase font-black">Kanal</span>
                             </div>
                        </div>
                     </td>
@@ -180,7 +185,7 @@ const UserManagement = () => {
                     </td>
                   </tr>
                 )) : (
-                    <tr><td colSpan={4} className="p-20 text-center">{isLoading ? <Loader2 className="animate-spin mx-auto text-blue-500" /> : <p className="text-slate-600 font-bold italic">Kullanıcı bulunamadı.</p>}</td></tr>
+                    <tr><td colSpan={5} className="p-20 text-center">{isLoading ? <Loader2 className="animate-spin mx-auto text-blue-500" /> : <p className="text-slate-600 font-bold italic">Kullanıcı bulunamadı.</p>}</td></tr>
                 )}
               </tbody>
             </table>
@@ -190,15 +195,15 @@ const UserManagement = () => {
       {/* User Details Modal */}
       {selectedUser && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/90 backdrop-blur-md animate-in fade-in" onClick={() => setSelectedUser(null)}>
-              <div className="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-[40px] p-8 max-h-[90vh] overflow-y-auto no-scrollbar relative" onClick={e => e.stopPropagation()}>
+              <div className="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-[40px] p-8 max-h-[90vh] overflow-y-auto no-scrollbar relative shadow-2xl" onClick={e => e.stopPropagation()}>
                   <button onClick={() => setSelectedUser(null)} className="absolute top-6 right-6 p-2 bg-slate-800 rounded-full text-slate-500 hover:text-white transition-colors"><X size={20}/></button>
                   
-                  <div className="flex items-center gap-6 mb-10 pb-8 border-b border-slate-800/50">
+                  <div className="flex flex-col sm:flex-row items-center gap-6 mb-10 pb-8 border-b border-slate-800/50 text-center sm:text-left">
                       <img src={selectedUser.avatar} className="w-24 h-24 rounded-[32px] border-4 border-slate-800 shadow-2xl" />
                       <div>
                           <h3 className="text-2xl font-black text-white leading-tight">{selectedUser.name}</h3>
                           <p className="text-blue-500 font-bold text-sm tracking-tight">@{selectedUser.username}</p>
-                          <div className="flex gap-2 mt-4">
+                          <div className="flex justify-center sm:justify-start gap-2 mt-4">
                              <span className="text-[10px] font-black px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase tracking-widest">{selectedUser.role}</span>
                              <span className="text-[10px] font-black px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 uppercase tracking-widest">{selectedUser.status}</span>
                           </div>
@@ -207,18 +212,22 @@ const UserManagement = () => {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       <div>
-                          <h4 className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] mb-4 flex items-center gap-2"> <Bot size={14}/> Kütüphanesindeki Botlar </h4>
+                          <h4 className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] mb-4 flex items-center gap-2"> <Bot size={14}/> Kütüphane Botları </h4>
                           <div className="space-y-3">
-                              {/* Bot List Simulation */}
                               <div className="p-4 bg-slate-950/50 border border-slate-800 rounded-2xl flex items-center gap-3">
                                   <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center"><Bot size={18} className="text-blue-400"/></div>
-                                  <p className="text-sm font-bold text-white">Task Master Pro</p>
+                                  <div>
+                                      <p className="text-sm font-bold text-white">Task Master Pro</p>
+                                      <p className="text-[10px] text-slate-500 uppercase font-black">Productivity</p>
+                                  </div>
                               </div>
                               <div className="p-4 bg-slate-950/50 border border-slate-800 rounded-2xl flex items-center gap-3">
                                   <div className="w-10 h-10 bg-purple-500/20 rounded-xl flex items-center justify-center"><Zap size={18} className="text-purple-400"/></div>
-                                  <p className="text-sm font-bold text-white">Crypto Tracker</p>
+                                  <div>
+                                      <p className="text-sm font-bold text-white">Crypto Tracker</p>
+                                      <p className="text-[10px] text-slate-500 uppercase font-black">Finance</p>
+                                  </div>
                               </div>
-                              {userBotsCount === 0 && <p className="text-slate-600 italic text-xs ml-1">Henüz bot eklenmemiş.</p>}
                           </div>
                       </div>
 
@@ -227,17 +236,19 @@ const UserManagement = () => {
                           <div className="space-y-3">
                               {userChannels.length > 0 ? userChannels.map(ch => (
                                   <div key={ch.id} className="p-4 bg-slate-950/50 border border-slate-800 rounded-2xl">
-                                      <div className="flex items-center gap-3 mb-2">
+                                      <div className="flex items-center gap-3 mb-3">
                                           <img src={ch.icon} className="w-8 h-8 rounded-full border border-slate-800" />
                                           <p className="text-sm font-bold text-white truncate">{ch.name}</p>
                                       </div>
-                                      <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-tighter text-slate-500">
+                                      <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-tighter text-slate-500 bg-slate-900 p-2 rounded-lg">
                                           <span>{ch.memberCount} Üye</span>
                                           <span className="text-emerald-500">₺{ch.revenue} Kazanç</span>
                                       </div>
                                   </div>
                               )) : (
-                                  <p className="text-slate-600 italic text-xs ml-1">Henüz kanal bağlanmamış.</p>
+                                  <div className="py-8 text-center border border-dashed border-slate-800 rounded-2xl">
+                                      <p className="text-slate-600 italic text-xs">Bağlı kanal bulunamadı.</p>
+                                  </div>
                               )}
                           </div>
                       </div>
@@ -282,7 +293,7 @@ const AnnouncementManagement = () => {
         <div className="animate-in fade-in">
             <div className="flex justify-between items-center mb-10">
                 <h1 className="text-2xl font-black text-white">Duyurular</h1>
-                <button onClick={() => { setEditing({ color_scheme: 'blue', is_active: true, icon_name: 'Megaphone', action_type: 'link' }); setModalOpen(true); }} className="bg-blue-600 px-6 py-4 rounded-2xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-blue-900/20"> <Plus size={18} /> Yeni Oluştur </button>
+                <button onClick={() => { setEditing({ color_scheme: 'blue', is_active: true, icon_name: 'Megaphone', action_type: 'link' }); setModalOpen(true); }} className="bg-blue-600 px-6 py-4 rounded-2xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-blue-900/20"> <Plus size={18} /> Yeni Duyuru </button>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -302,6 +313,7 @@ const AnnouncementManagement = () => {
                             <span className={`text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-widest ${
                                 a.color_scheme === 'purple' ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' :
                                 a.color_scheme === 'emerald' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
+                                a.color_scheme === 'orange' ? 'bg-orange-500/10 text-orange-400 border border-orange-500/20' :
                                 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
                             }`}>{a.color_scheme}</span>
                             <div className="flex gap-2">
@@ -315,7 +327,7 @@ const AnnouncementManagement = () => {
 
             {isModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/95 backdrop-blur-md">
-                    <div className="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-[40px] p-10 max-h-[90vh] overflow-y-auto no-scrollbar relative">
+                    <div className="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-[40px] p-10 max-h-[90vh] overflow-y-auto no-scrollbar relative shadow-2xl">
                         <button onClick={() => setModalOpen(false)} className="absolute top-8 right-8 text-slate-500 hover:text-white"><X size={24}/></button>
                         <h3 className="text-2xl font-black mb-10 text-white tracking-tight">Duyuru Yapılandırma</h3>
                         <form onSubmit={handleSave} className="space-y-6">
@@ -350,7 +362,7 @@ const AnnouncementManagement = () => {
                             </div>
 
                             <div className="space-y-4">
-                                <input type="text" value={editing.title} onChange={e => setEditing({...editing, title: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm font-bold text-white" placeholder="Duyuru Başlığı" required />
+                                <input type="text" value={editing.title} onChange={e => setEditing({...editing, title: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm font-bold text-white shadow-inner" placeholder="Duyuru Başlığı" required />
                                 <textarea value={editing.description} onChange={e => setEditing({...editing, description: e.target.value})} className="w-full h-24 bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm resize-none" placeholder="Kısa Özet (Kartta Görünür)" required />
                                 {editing.action_type === 'popup' && (
                                     <textarea value={editing.content_detail} onChange={e => setEditing({...editing, content_detail: e.target.value})} className="w-full h-32 bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm resize-none border-blue-500/30" placeholder="Popup Detay İçeriği (Geniş Açıklama)" />
@@ -359,12 +371,12 @@ const AnnouncementManagement = () => {
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <input type="text" value={editing.button_text} onChange={e => setEditing({...editing, button_text: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm" placeholder="Buton Metni" />
-                                <input type="text" value={editing.button_link} onChange={e => setEditing({...editing, button_link: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm" placeholder={editing.action_type === 'popup' ? 'İçerik Linki (Opsiyonel)' : 'Yönlendirme Linki'} />
+                                <input type="text" value={editing.button_link} onChange={e => setEditing({...editing, button_link: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm" placeholder={editing.action_type === 'popup' ? 'Ekstra Link (Opsiyonel)' : 'Yönlendirme Linki'} />
                             </div>
 
                             <div className="flex gap-4 pt-4">
-                                <button type="button" onClick={() => setModalOpen(false)} className="flex-1 bg-slate-800 py-5 rounded-3xl font-bold text-slate-300">İptal</button>
-                                <button type="submit" className="flex-1 bg-blue-600 py-5 rounded-3xl font-black text-white shadow-xl shadow-blue-900/20">Duyuruyu Yayınla</button>
+                                <button type="button" onClick={() => setModalOpen(false)} className="flex-1 bg-slate-800 py-5 rounded-3xl font-bold text-slate-300 transition-colors hover:bg-slate-700">İptal</button>
+                                <button type="submit" className="flex-1 bg-blue-600 py-5 rounded-3xl font-black text-white shadow-xl shadow-blue-900/20 transition-all active:scale-95">Duyuruyu Yayınla</button>
                             </div>
                         </form>
                     </div>
