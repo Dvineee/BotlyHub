@@ -484,7 +484,7 @@ const BotManagement = () => {
 const SettingsManagement = () => {
     const [settings, setSettings] = useState({
         appName: 'BotlyHub V3',
-        maintenanceMode: false,
+        maintenanceMode: localStorage.getItem('maintenance_mode') === 'true',
         commissionRate: 5,
         supportLink: 'https://t.me/support',
         globalLang: 'tr'
@@ -493,10 +493,12 @@ const SettingsManagement = () => {
 
     const handleSave = () => {
         setIsSaving(true);
+        // Bakım modunu yerel depolamaya kaydet
+        localStorage.setItem('maintenance_mode', settings.maintenanceMode.toString());
         setTimeout(() => {
             setIsSaving(false);
-            alert("Sistem ayarları başarıyla güncellendi.");
-        }, 1000);
+            alert("Sistem ayarları başarıyla güncellendi. Bakım modu: " + (settings.maintenanceMode ? "AKTİF" : "KAPALI"));
+        }, 800);
     };
 
     return (

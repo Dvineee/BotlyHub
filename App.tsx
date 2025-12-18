@@ -1,10 +1,8 @@
 
-import React, { useEffect, Suspense, lazy } from 'react';
-// Fix: Use standard react-router-dom exports for v6
+import React, { useEffect, Suspense, lazy, useState } from 'react';
 import { HashRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { DatabaseService } from './services/DatabaseService';
-// Fixed: Explicitly import types to ensure global window augmentation is recognized
 import './types';
 
 // Lazy Load Pages
@@ -19,12 +17,12 @@ const Premium = lazy(() => import('./pages/Premium'));
 const Notifications = lazy(() => import('./pages/Notifications'));
 const AccountSettings = lazy(() => import('./pages/AccountSettings'));
 const Earnings = lazy(() => import('./pages/Earnings'));
+const Maintenance = lazy(() => import('./pages/Maintenance'));
 
 // Admin Pages
 const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 
-// Loading Component
 const PageLoader = () => (
   <div className="flex flex-col items-center justify-center min-h-[50vh] text-slate-500">
     <Loader2 className="w-8 h-8 animate-spin text-blue-500 mb-2" />
@@ -32,17 +30,20 @@ const PageLoader = () => (
   </div>
 );
 
-// Telegram Wrapper
 const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const isAdminPath = location.pathname.startsWith('/a/');
+  const [isMaintenance, setIsMaintenance] = useState(false);
 
   useEffect(() => {
     DatabaseService.init();
+    
+    // Bakım modu kontrolü (LocalStorage simülasyonu)
+    const maintenanceStatus = localStorage.getItem('maintenance_mode') === 'true';
+    setIsMaintenance(maintenanceStatus);
 
     if (!isAdminPath) {
-      // Fixed: Property 'Telegram' now exists on 'Window' thanks to augmentation in types.ts
       const tg = window.Telegram?.WebApp;
       if (tg) {
         tg.expand();
@@ -64,7 +65,6 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
 
   useEffect(() => {
     if (isAdminPath) return;
-    // Fixed: Property 'Telegram' now exists on 'Window' thanks to augmentation in types.ts
     const tg = window.Telegram?.WebApp;
     if (!tg?.BackButton) return;
 
@@ -82,6 +82,11 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
     return () => tg.BackButton.offClick(handleBack);
   }, [location, navigate, isAdminPath]);
 
+  // Eğer bakım modu aktifse ve admin yolunda değilsek Bakım sayfasını göster
+  if (isMaintenance && !isAdminPath) {
+      return <Maintenance />;
+  }
+
   return (
     <div className={`${isAdminPath ? 'bg-slate-50 dark:bg-slate-950' : 'bg-slate-950'} flex flex-col min-h-screen`}>
       {children}
@@ -95,7 +100,6 @@ export default function App() {
       <TelegramWrapper>
         <Suspense fallback={<PageLoader />}>
           <Routes>
-            {/* User Mobile App Routes */}
             <Route path="/" element={<Home />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/bot/:id" element={<BotDetail />} />
@@ -107,8 +111,6 @@ export default function App() {
             <Route path="/premium" element={<Premium />} />
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/earnings" element={<Earnings />} />
-
-            {/* Admin Web Panel Routes */}
             <Route path="/a/admin" element={<AdminLogin />} />
             <Route path="/a/dashboard/*" element={<AdminDashboard />} />
           </Routes>
