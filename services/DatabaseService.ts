@@ -70,6 +70,37 @@ export class DatabaseService {
     if (error) throw error;
   }
 
+  // --- User-Bot Library Management ---
+  /**
+   * Kullanıcının kütüphanesine bot ekler (Database Sync)
+   */
+  static async addUserBot(userId: string, botId: string, isPremium: boolean = false) {
+    const { error } = await supabase.from('user_bots').upsert({
+        user_id: userId,
+        bot_id: botId,
+        is_active: true,
+        is_ad_enabled: false,
+        is_premium: isPremium,
+        acquired_at: new Date().toISOString()
+    }, { onConflict: 'user_id, bot_id' });
+    if (error) throw error;
+  }
+
+  static async getUserBots(userId: string): Promise<Bot[]> {
+    try {
+        const { data, error } = await supabase
+            .from('user_bots')
+            .select('*, bots(*)')
+            .eq('user_id', userId);
+        
+        if (error) throw error;
+        return (data || []).map((item: any) => item.bots).filter(Boolean);
+    } catch (e) {
+        console.error("Fetch user bots error:", e);
+        return [];
+    }
+  }
+
   // --- Notification System & Audit Logs ---
   static async getNotifications(userId?: string): Promise<Notification[]> {
     try {

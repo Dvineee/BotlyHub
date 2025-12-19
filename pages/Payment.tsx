@@ -15,7 +15,7 @@ const { useNavigate, useParams } = Router as any;
 const Payment = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { haptic, notification, tg } = useTelegram();
+  const { haptic, user, notification, tg } = useTelegram();
   const [isLoading, setIsLoading] = useState(false);
   const [targetBot, setTargetBot] = useState<Bot | null>(null);
   const [tonConnectUI] = useTonConnectUI();
@@ -27,13 +27,27 @@ const Payment = () => {
   const plan = subscriptionPlans.find(p => p.id === id);
   const item = targetBot || plan;
 
-  const handleSuccess = () => {
+  const handleSuccess = async () => {
       haptic('heavy');
       notification('success');
+      
       if (targetBot) {
+          // 1. Veritabanı Senkronizasyonu (Admin Görünürlüğü İçin)
+          if (user?.id) {
+              try {
+                  await DatabaseService.addUserBot(user.id.toString(), targetBot.id, true);
+              } catch (e) {
+                  console.error("Database sync error during payment:", e);
+              }
+          }
+
+          // 2. LocalStorage Sync
           const ownedBots = JSON.parse(localStorage.getItem('ownedBots') || '[]');
           localStorage.setItem('ownedBots', JSON.stringify([...ownedBots, { ...targetBot, isAdEnabled: false, isActive: true }]));
+      } else if (plan) {
+          localStorage.setItem('userPlan', plan.id);
       }
+      
       navigate(targetBot ? '/my-bots' : '/settings');
   };
 
@@ -64,7 +78,7 @@ const Payment = () => {
           const priceInTON = parseFloat(((item?.price || 0) / 100).toFixed(2));
           const transaction = WalletService.createTonTransaction(priceInTON);
           await tonConnectUI.sendTransaction(transaction);
-          handleSuccess();
+          await handleSuccess();
       } catch (e) {
           notification('error');
           alert("Ödeme iptal edildi veya bir hata oluştu.");

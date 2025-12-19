@@ -12,12 +12,13 @@ const { useNavigate, useParams } = Router as any;
 const BotDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { haptic, openLink, notification, tg } = useTelegram();
+  const { haptic, user, notification, tg } = useTelegram();
   const { t } = useTranslation();
   
   const [bot, setBot] = useState<Bot | null>(null);
   const [isOwned, setIsOwned] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     const fetchBotData = async () => {
@@ -32,8 +33,10 @@ const BotDetail = () => {
     fetchBotData();
   }, [id]);
 
-  const handleAction = () => {
+  const handleAction = async () => {
+      if (isProcessing) return;
       haptic('medium');
+      
       if (isOwned) {
           if (tg && bot?.bot_link) {
               tg.openTelegramLink(bot.bot_link);
@@ -44,10 +47,26 @@ const BotDetail = () => {
       }
       
       if (bot?.price === 0) {
-          const ownedBots = JSON.parse(localStorage.getItem('ownedBots') || '[]');
-          localStorage.setItem('ownedBots', JSON.stringify([...ownedBots, { ...bot, isAdEnabled: false, isActive: true }]));
-          setIsOwned(true);
-          notification('success');
+          setIsProcessing(true);
+          try {
+              // 1. Veritabanı Kaydı (Admin panelinden görülmesi için kritik)
+              if (user?.id) {
+                  await DatabaseService.addUserBot(user.id.toString(), bot.id);
+              }
+              
+              // 2. LocalStorage Sync
+              const ownedBots = JSON.parse(localStorage.getItem('ownedBots') || '[]');
+              localStorage.setItem('ownedBots', JSON.stringify([...ownedBots, { ...bot, isAdEnabled: false, isActive: true }]));
+              
+              setIsOwned(true);
+              notification('success');
+              alert(t('add_to_library') + " Başarılı!");
+          } catch (e) {
+              console.error("Acquisition error:", e);
+              notification('error');
+          } finally {
+              setIsProcessing(false);
+          }
       } else {
           navigate(`/payment/${id}`);
       }
@@ -73,7 +92,6 @@ const BotDetail = () => {
           <h2 className="text-3xl font-black mt-8 text-white text-center leading-tight">{bot.name}</h2>
           
           <div className="flex gap-2 mt-4">
-              {/* Kategori Veritabanından gelen değeri (örn: Productivity) küçültüp sözlükten buluyoruz */}
               <span className="text-[10px] font-black px-3 py-1.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 uppercase tracking-widest">
                 {t('cat_' + (bot.category || '').toLowerCase())}
               </span>
@@ -104,9 +122,10 @@ const BotDetail = () => {
       <div className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-[#020617] via-[#020617]/90 to-transparent z-30 pb-10">
           <button 
              onClick={handleAction}
-             className={`w-full py-5 rounded-[28px] text-white font-black shadow-2xl transition-all active:scale-95 flex items-center justify-center gap-3 ${isOwned ? 'bg-blue-600 shadow-blue-500/20' : 'bg-[#7c3aed] shadow-purple-500/20'}`}
+             disabled={isProcessing}
+             className={`w-full py-5 rounded-[28px] text-white font-black shadow-2xl transition-all active:scale-95 flex items-center justify-center gap-3 ${isOwned ? 'bg-blue-600 shadow-blue-500/20' : 'bg-[#7c3aed] shadow-purple-500/20'} disabled:opacity-50`}
           >
-              {isOwned ? <><Send size={20} /> {t('start_bot')}</> : (bot.price === 0 ? t('add_to_library') : `Stars ${bot.price} - ${t('buy_now')}`)}
+              {isProcessing ? <Loader2 className="animate-spin"/> : (isOwned ? <><Send size={20} /> {t('start_bot')}</> : (bot.price === 0 ? t('add_to_library') : `Stars ${bot.price} - ${t('buy_now')}`))}
           </button>
       </div>
     </div>

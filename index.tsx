@@ -10,12 +10,16 @@ import './index.css';
  * Uygulama Hata Yakalayıcı (ErrorBoundary)
  * Beklenmedik uygulama hatalarını yakalar ve kullanıcıya güvenli bir geri dönüş sunar.
  */
-// Fixed: Marked children as optional to resolve missing children error in some TS configurations
-interface Props { children?: ReactNode; }
-interface State { hasError: boolean; error: Error | null; }
+interface Props { 
+  children: ReactNode; 
+}
+interface State { 
+  hasError: boolean; 
+  error: Error | null; 
+}
 
-// Fixed: Explicitly use React.Component and a constructor to ensure this.props and this.state are correctly recognized by TypeScript
-class ErrorBoundary extends React.Component<Props, State> {
+// Fixed: Inherit from Component with explicit generic types to ensure 'this.state' and 'this.props' are correctly typed and recognized by the compiler.
+class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = { hasError: false, error: null };
@@ -47,7 +51,7 @@ class ErrorBoundary extends React.Component<Props, State> {
         </div>
       );
     }
-    // Fixed: Accessed children via this.props safely, property now recognized via inheritance
+    // Fixed: Properly return children from props as ensured by the interface.
     return this.props.children;
   }
 }
@@ -57,6 +61,7 @@ if (rootElement) {
   const manifestUrl = 'https://ton-connect.github.io/demo-dapp-with-react-ui/tonconnect-manifest.json';
   const root = createRoot(rootElement);
 
+  // root.render expects a ReactNode. We provide a tree starting with StrictMode and ErrorBoundary.
   root.render(
     <React.StrictMode>
       <ErrorBoundary>
