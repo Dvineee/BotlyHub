@@ -10,8 +10,8 @@ console.log("Application initializing...");
 
 // --- Error Boundary for Production Debugging ---
 interface ErrorBoundaryProps {
-  // children must be optional for class components used with JSX children blocks
-  children?: ReactNode;
+  // Fixed: children is required as it must wrap the app
+  children: ReactNode;
 }
 
 interface ErrorBoundaryState {
@@ -20,26 +20,26 @@ interface ErrorBoundaryState {
   errorInfo: ErrorInfo | null;
 }
 
-// Fixed: Explicitly extend React.Component to ensure TypeScript correctly identifies inherited properties (state, setState, props)
-class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+// Fixed: Inheriting from Component class directly with generic parameters for props and state to ensure inherited properties are recognized
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
-    // Initialize state inherited from React.Component
+    // Fixed: state is now correctly recognized as inherited from Component
     this.state = { hasError: false, error: null, errorInfo: null };
   }
 
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    return { hasError: true, error, errorInfo: null };
+  static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
+    return { hasError: true, error };
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error("Uncaught error:", error, errorInfo);
-    // Correctly calling setState from the React.Component base class
+    // Fixed: setState is recognized as inherited from Component
     this.setState({ error, errorInfo });
   }
 
   render() {
-    // Accessing state property from the React.Component base class
+    // Fixed: state property is recognized on the class instance
     if (this.state.hasError) {
       return (
         <div style={{ padding: 20, color: '#fff', backgroundColor: '#991b1b', height: '100vh', overflow: 'auto', fontFamily: 'monospace', zIndex: 99999, position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}>
@@ -62,7 +62,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
       );
     }
 
-    // Accessing props property from the React.Component base class
+    // Fixed: props property is recognized on the class instance
     return this.props.children;
   }
 }
@@ -78,6 +78,7 @@ try {
 
   root.render(
     <React.StrictMode>
+      {/* Fixed: ErrorBoundary correctly receives children prop from JSX body, resolving missing children prop error */}
       <ErrorBoundary>
         <TonConnectUIProvider manifestUrl={manifestUrl}>
           <TranslationProvider>

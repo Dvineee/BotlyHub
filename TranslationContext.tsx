@@ -15,24 +15,7 @@ const translations = {
     "no_results": "Sonuç bulunamadı.",
     "search_all_cats": "Tüm Kategorilerde Ara",
     
-    // Promo Cards
-    "get_premium": "Premium Ol",
-    "get_premium_desc": "Tüm özelliklere sınırsız erişim sağla ve rozet kazan.",
-    "view_packages": "Paketleri İncele",
-    "earn_income": "Gelir Kazan",
-    "earn_income_desc": "Botlarınızdan reklam geliri elde etmeye başlayın.",
-    "go_to_panel": "Panele Git",
-    "stats": "İstatistikler",
-    "stats_desc": "Kullanıcı etkileşimlerini ve bot performansını izle.",
-    "see_details": "Detayları Gör",
-
-    // Sections
-    "recently_viewed": "Son Bakılanlar",
-    "clear": "Temizle",
-    "other_popular": "Diğer Popüler Botlar",
-    "all": "Tümü",
-    
-    // Categories
+    // Categories (Kullanıcı Tarafı)
     "cat_all": "Hepsi",
     "cat_productivity": "Üretkenlik",
     "cat_games": "Eğlence & Oyun",
@@ -40,20 +23,21 @@ const translations = {
     "cat_finance": "Finans & Ekonomi",
     "cat_music": "Müzik & Ses",
     "cat_moderation": "Grup Yönetimi",
-
-    // Section Titles
-    "sec_productivity": "Üretkenlik Botları",
-    "sec_games": "Eğlence ve Oyun",
-    "sec_finance": "Finans Araçları",
-
-    // Footer
-    "channel": "Kanalımız",
-    "contact": "İletişim",
-    "add_bot": "Botunu Ekle",
     
-    // Bot Card
+    // Bot Detail & Actions
     "open": "Aç",
-    "premium": "Premium"
+    "premium": "Premium",
+    "verified": "Doğrulanmış",
+    "preview_screens": "Bot Önizleme Ekranları",
+    "no_images": "Görsel bulunmuyor",
+    "add_to_library": "Kütüphaneye Ekle",
+    "buy_now": "Satın Al",
+    "start_bot": "Botu Başlat",
+    "share_copied": "Link kopyalandı!",
+
+    // Sections
+    "featured": "Öne Çıkanlar",
+    "search_results": "Arama Sonuçları"
   },
   en: {
     "market": "Market",
@@ -64,19 +48,6 @@ const translations = {
     "results_found": "results found",
     "no_results": "No results found.",
     "search_all_cats": "Search in All Categories",
-    "get_premium": "Get Premium",
-    "get_premium_desc": "Get unlimited access to all features and earn a badge.",
-    "view_packages": "View Packages",
-    "earn_income": "Earn Income",
-    "earn_income_desc": "Start earning ad revenue from your bots.",
-    "go_to_panel": "Go to Dashboard",
-    "stats": "Analytics",
-    "stats_desc": "Track user interactions and bot performance.",
-    "see_details": "See Details",
-    "recently_viewed": "Recently Viewed",
-    "clear": "Clear",
-    "other_popular": "Other Popular Bots",
-    "all": "All",
     "cat_all": "All",
     "cat_productivity": "Productivity",
     "cat_games": "Games",
@@ -84,14 +55,15 @@ const translations = {
     "cat_finance": "Finance",
     "cat_music": "Music",
     "cat_moderation": "Moderation",
-    "sec_productivity": "Productivity Bots",
-    "sec_games": "Fun & Games",
-    "sec_finance": "Finance Tools",
-    "channel": "Our Channel",
-    "contact": "Contact",
-    "add_bot": "Add Your Bot",
     "open": "Open",
-    "premium": "Premium"
+    "premium": "Premium",
+    "verified": "Verified",
+    "preview_screens": "Bot Preview Screens",
+    "no_images": "No images available",
+    "add_to_library": "Add to Library",
+    "buy_now": "Buy Now",
+    "start_bot": "Start Bot",
+    "share_copied": "Link copied!"
   }
 };
 
@@ -105,24 +77,14 @@ interface TranslationContextType {
 
 const TranslationContext = createContext<TranslationContextType | undefined>(undefined);
 
-interface TranslationProviderProps {
-  children?: ReactNode;
-}
-
-export const TranslationProvider = ({ children }: TranslationProviderProps) => {
+export const TranslationProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLanguage] = useState<Language>('tr');
 
   useEffect(() => {
     const initializeLanguage = () => {
       const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
-      if (tgUser && tgUser.language_code) {
-        if (tgUser.language_code.toLowerCase().startsWith('en')) {
-          setLanguage('en');
-          return;
-        }
-      }
-      if (navigator.language && navigator.language.toLowerCase().startsWith('en')) {
-         setLanguage('en');
+      if (tgUser?.language_code?.toLowerCase().startsWith('en')) {
+        setLanguage('en');
       }
     };
     initializeLanguage();
@@ -142,8 +104,6 @@ export const TranslationProvider = ({ children }: TranslationProviderProps) => {
 
 export const useTranslation = () => {
   const context = useContext(TranslationContext);
-  if (!context) {
-    throw new Error('useTranslation must be used within a TranslationProvider');
-  }
+  if (!context) throw new Error('useTranslation must be used within a TranslationProvider');
   return context;
 };
