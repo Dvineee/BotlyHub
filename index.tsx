@@ -10,22 +10,22 @@ import './index.css';
  * Uygulama Hata Yakalayıcı (ErrorBoundary)
  * Beklenmedik uygulama hatalarını yakalar ve kullanıcıya güvenli bir geri dönüş sunar.
  */
-interface Props { 
+interface ErrorBoundaryProps { 
   children: ReactNode; 
 }
-interface State { 
+interface ErrorBoundaryState { 
   hasError: boolean; 
   error: Error | null; 
 }
 
-// Fixed: Inherit from Component with explicit generic types to ensure 'this.state' and 'this.props' are correctly typed and recognized by the compiler.
-class ErrorBoundary extends Component<Props, State> {
-  constructor(props: Props) {
+// Fixed: Inherit from React.Component with explicit generic types to ensure 'this.state' and 'this.props' are correctly typed and recognized by the compiler.
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false, error: null };
   }
 
-  static getDerivedStateFromError(error: Error): State {
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error };
   }
 
@@ -34,6 +34,7 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   render() {
+    // Fixed: Access state via 'this.state' as it is now correctly inherited and typed.
     if (this.state.hasError) {
       return (
         <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center p-8 text-center">
@@ -51,7 +52,7 @@ class ErrorBoundary extends Component<Props, State> {
         </div>
       );
     }
-    // Fixed: Properly return children from props as ensured by the interface.
+    // Fixed: Properly return children from props using 'this.props.children'.
     return this.props.children;
   }
 }

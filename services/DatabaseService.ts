@@ -71,9 +71,6 @@ export class DatabaseService {
   }
 
   // --- User-Bot Library Management ---
-  /**
-   * Kullanıcının kütüphanesine bot ekler (Database Sync)
-   */
   static async addUserBot(userId: string, botId: string, isPremium: boolean = false) {
     const { error } = await supabase.from('user_bots').upsert({
         user_id: userId,
@@ -160,10 +157,7 @@ export class DatabaseService {
   static async getSettings() {
     try {
         const { data, error } = await supabase.from('settings').select('*').eq('id', 1).maybeSingle();
-        if (error) {
-            console.error("Settings Fetch Error:", error.message);
-            return null;
-        }
+        if (error) return null;
         return data;
     } catch (e) {
         return null;
@@ -175,7 +169,6 @@ export class DatabaseService {
         id: 1, 
         ...settings 
     }, { onConflict: 'id' });
-    
     if (error) throw new Error(error.message);
   }
 
@@ -200,7 +193,7 @@ export class DatabaseService {
     if (error) throw error;
   }
 
-  // --- User Deep Dive Assets & Audit (REAL DATA) ---
+  // --- User Deep Dive Assets & Audit (ENRICHED DATA) ---
   static async getUserDetailedAssets(userId: string) {
       try {
         const [channels, logs, userBots] = await Promise.all([
@@ -212,11 +205,19 @@ export class DatabaseService {
         return {
             channels: channels.data || [],
             logs: logs.data || [],
-            bots: (userBots.data || []).map((ub: any) => ub.bots).filter(Boolean) as Bot[]
+            // Return bot metadata ALONG with user-specific ownership data
+            userBots: (userBots.data || []).map((ub: any) => ({
+                bot: ub.bots,
+                ownership: {
+                    is_active: ub.is_active,
+                    is_premium: ub.is_premium,
+                    acquired_at: ub.acquired_at
+                }
+            })).filter((item: any) => item.bot !== null)
         };
       } catch (e) {
           console.error("Critical: User assets fetch failed:", e);
-          return { channels: [], logs: [], bots: [] };
+          return { channels: [], logs: [], userBots: [] };
       }
   }
 
@@ -245,6 +246,6 @@ export class DatabaseService {
   static logoutAdmin() { localStorage.removeItem('admin_v3_session'); }
 
   static async init() {
-    console.log("Database Sync Service v4.3 - Audit Protocol Active");
+    console.log("Database Sync Service v4.4 - Audit Protocol Active");
   }
 }

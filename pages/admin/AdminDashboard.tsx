@@ -332,7 +332,7 @@ const UserManagement = () => {
 
 const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClose: () => void, onStatusToggle: () => void }) => {
     const [activeTab, setActiveTab] = useState<'info' | 'assets' | 'logs'>('info');
-    const [data, setData] = useState<{ channels: Channel[], logs: Notification[], bots: BotType[] }>({ channels: [], logs: [], bots: [] });
+    const [data, setData] = useState<{ channels: Channel[], logs: Notification[], userBots: any[] }>({ channels: [], logs: [], userBots: [] });
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -371,14 +371,14 @@ const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClos
                         <button onClick={onStatusToggle} className={`p-3 rounded-2xl transition-all ${user.status === 'Active' ? 'bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white' : 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white'}`}>
                             {user.status === 'Active' ? <Ban size={22}/> : <CheckCircle size={22}/>}
                         </button>
-                        <button onClose={onClose} className="p-3 bg-slate-900 text-slate-500 hover:text-white rounded-2xl border border-slate-800 transition-colors"><X size={22} onClick={onClose}/></button>
+                        <button onClick={onClose} className="p-3 bg-slate-900 text-slate-500 hover:text-white rounded-2xl border border-slate-800 transition-colors"><X size={22}/></button>
                     </div>
                 </div>
 
                 {/* Tabs */}
                 <div className="flex px-10 gap-8 border-b border-slate-800/50 bg-slate-950/20 shrink-0">
                     <TabBtn active={activeTab === 'info'} label="Profil Analizi" icon={TrendingUp} onClick={() => setActiveTab('info')} />
-                    <TabBtn active={activeTab === 'assets'} label={`Varlıklar (${data.channels.length + data.bots.length})`} icon={Package} onClick={() => setActiveTab('assets')} />
+                    <TabBtn active={activeTab === 'assets'} label={`Varlıklar (${data.channels.length + data.userBots.length})`} icon={Package} onClick={() => setActiveTab('assets')} />
                     <TabBtn active={activeTab === 'logs'} label="İşlem Geçmişi" icon={History} onClick={() => setActiveTab('logs')} />
                 </div>
 
@@ -399,7 +399,7 @@ const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClos
                                         <DetailCard label="Sistem Rolü" value={user.role} icon={ShieldCheck} />
                                         <DetailCard label="Üye Erişimi" value={totalMemberCount.toLocaleString()} icon={Users} />
                                         <DetailCard label="Ciro" value={`₺${totalRevenue}`} icon={Wallet} />
-                                        <DetailCard label="Aktif Kaynak" value={data.channels.length + data.bots.length} icon={Cpu} />
+                                        <DetailCard label="Aktif Kaynak" value={data.channels.length + data.userBots.length} icon={Cpu} />
                                     </div>
                                     <div className="p-10 bg-gradient-to-br from-blue-600/10 to-purple-600/10 border border-blue-500/20 rounded-[44px]">
                                         <div className="flex gap-6 items-start">
@@ -407,7 +407,7 @@ const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClos
                                             <div className="flex-1">
                                                 <h4 className="text-lg font-black text-white uppercase italic tracking-tighter mb-2">Platform Karnesi</h4>
                                                 <p className="text-sm text-slate-400 leading-relaxed font-medium">
-                                                    Bu kullanıcı sistemimizde <span className="text-white font-bold">{data.channels.length} kanal</span> ve <span className="text-white font-bold">{data.bots.length} aktif bot</span> yönetmektedir. 
+                                                    Bu kullanıcı sistemimizde <span className="text-white font-bold">{data.channels.length} kanal</span> ve <span className="text-white font-bold">{data.userBots.length} aktif bot</span> yönetmektedir. 
                                                     Aktivite skoru <span className="text-emerald-500 font-bold uppercase italic">Mükemmel</span> olarak puanlanmıştır. 
                                                 </p>
                                             </div>
@@ -444,17 +444,35 @@ const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClos
                                     
                                     <section>
                                         <h4 className="text-[11px] font-black text-slate-600 uppercase tracking-[0.3em] mb-8 flex items-center gap-3 italic">
-                                            <div className="w-1.5 h-6 bg-purple-600 rounded-full"></div> ENVANTER ({data.bots.length})
+                                            <div className="w-1.5 h-6 bg-purple-600 rounded-full"></div> ENVANTER ({data.userBots.length})
                                         </h4>
-                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
-                                            {data.bots.length === 0 ? <p className="col-span-full text-slate-700 italic font-bold p-16 text-center border-2 border-dashed border-slate-900 rounded-[40px] text-[10px]">Bot Envanteri Boş</p> : 
-                                            data.bots.map(b => (
-                                                <div key={b.id} className="bg-slate-900/40 border border-slate-800 p-6 rounded-[32px] flex flex-col items-center text-center group hover:border-purple-500/40 transition-all">
-                                                    <img src={b.icon} className="w-20 h-20 rounded-[28px] border-2 border-slate-800 object-cover grayscale group-hover:grayscale-0 transition-all mb-4 shadow-xl" />
-                                                    <p className="font-black text-white text-xs truncate w-full uppercase tracking-tighter italic mb-1">{b.name}</p>
-                                                    <p className="text-[9px] text-slate-600 font-black uppercase tracking-widest bg-slate-950 px-2 py-1 rounded-lg">
-                                                        {CATEGORY_NAMES[b.category] || b.category}
-                                                    </p>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                            {data.userBots.length === 0 ? <p className="col-span-full text-slate-700 italic font-bold p-16 text-center border-2 border-dashed border-slate-900 rounded-[40px] text-[10px]">Bot Envanteri Boş</p> : 
+                                            data.userBots.map((item, idx) => (
+                                                <div key={idx} className="bg-slate-900/40 border border-slate-800 p-6 rounded-[32px] flex flex-col group hover:border-purple-500/40 transition-all shadow-lg relative">
+                                                    <div className="flex gap-4 items-center mb-4">
+                                                        <img src={item.bot.icon} className="w-16 h-16 rounded-[24px] border border-slate-800 object-cover shadow-xl" />
+                                                        <div className="min-w-0 flex-1">
+                                                            <p className="font-black text-white text-sm italic truncate tracking-tight">{item.bot.name}</p>
+                                                            <p className="text-[9px] text-slate-600 font-black uppercase tracking-widest mt-1">
+                                                                {CATEGORY_NAMES[item.bot.category] || item.bot.category}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div className="flex flex-wrap gap-1.5 mt-auto">
+                                                        <span className={`text-[8px] font-black px-2 py-1 rounded-lg uppercase tracking-widest border ${item.ownership.is_active ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-red-500/10 text-red-500 border-red-500/20'}`}>
+                                                            {item.ownership.is_active ? 'AKTİF' : 'PASİF'}
+                                                        </span>
+                                                        {item.ownership.is_premium && (
+                                                            <span className="text-[8px] font-black px-2 py-1 rounded-lg uppercase tracking-widest bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 flex items-center gap-1">
+                                                                <Star size={8} fill="currentColor"/> PREMIUM
+                                                            </span>
+                                                        )}
+                                                        <span className="text-[8px] font-black px-2 py-1 rounded-lg uppercase bg-slate-800 text-slate-500 border border-slate-700">
+                                                            {new Date(item.ownership.acquired_at).toLocaleDateString()}
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             ))}
                                         </div>
@@ -469,7 +487,7 @@ const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClos
                                     </h4>
                                     {data.logs.length === 0 ? <p className="text-slate-700 italic font-bold p-16 text-center border-2 border-dashed border-slate-900 rounded-[40px] text-[10px]">Kayıt Bulunmuyor</p> : 
                                      data.logs.map(log => (
-                                        <div key={log.id} className="bg-slate-900/30 border border-slate-800 p-6 rounded-[32px] flex gap-6 group hover:bg-slate-800/10 transition-all border-l-4 hover:border-l-blue-500 transition-all">
+                                        <div key={log.id} className="bg-slate-900/30 border border-slate-800 p-6 rounded-[32px] flex gap-6 group hover:bg-slate-800/10 border-l-4 hover:border-l-blue-500 transition-all">
                                             <div className="w-12 h-12 rounded-2xl bg-slate-950 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-110 transition-transform">
                                                 {log.type === 'payment' ? <Wallet size={20} className="text-emerald-500"/> : 
                                                  log.type === 'security' ? <ShieldAlert size={20} className="text-red-500"/> : 
