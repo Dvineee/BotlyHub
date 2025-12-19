@@ -30,47 +30,8 @@ export class DatabaseService {
     }
   }
 
-  static async getBots(category?: string): Promise<Bot[]> {
-    try {
-      let query = supabase.from('bots').select('*').order('id', { ascending: false });
-      if (category && category !== 'all') {
-        query = query.eq('category', category);
-      }
-      const { data, error } = await query;
-      if (error) throw error;
-      return data || [];
-    } catch (e) {
-      return [];
-    }
-  }
-
-  static async getBotById(id: string): Promise<Bot | null> {
-    try {
-      const { data, error } = await supabase.from('bots').select('*').eq('id', id).maybeSingle();
-      if (error) throw error;
-      return data;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  static async saveBot(bot: Partial<Bot>) {
-    const { error } = await supabase.from('bots').upsert({
-      ...bot,
-      id: bot.id || Math.random().toString(36).substr(2, 9),
-      screenshots: bot.screenshots || []
-    }, { onConflict: 'id' });
-    if (error) throw error;
-  }
-
-  static async deleteBot(id: string) {
-    const { error } = await supabase.from('bots').delete().eq('id', id);
-    if (error) throw error;
-  }
-
   static async getAllPurchases() {
       try {
-          // user_bots tablosundan kullanıcı ve bot detaylarını join ile çekiyoruz
           const { data, error } = await supabase
               .from('user_bots')
               .select(`
@@ -83,34 +44,39 @@ export class DatabaseService {
           if (error) throw error;
           return data || [];
       } catch (e) {
-          console.error("Error fetching purchases:", e);
+          console.error("Purchase Fetch Error:", e);
           return [];
       }
   }
 
   static async addUserBot(userData: any, botData: Bot, isPremium: boolean = false) {
+    if (!userData || !botData) throw new Error("Eksik veri: Kullanıcı veya Bot bilgisi yok.");
+    
     const userId = (userData.id || userData).toString();
     const botId = botData.id.toString();
     
     try {
-        // 1. Kullanıcıyı senkronize et (Eğer yoksa oluştur)
+        // 1. ADIM: Kullanıcıyı senkronize et (Foreign Key hatasını önlemek için ŞART)
+        // Eğer kullanıcı veritabanında yoksa, user_bots kaydı eklenemez.
         const { data: userExists } = await supabase.from('users').select('id').eq('id', userId).maybeSingle();
+        
         if (!userExists) {
+            console.log("Kullanıcı bulunamadı, yeni kayıt oluşturuluyor...");
             await this.syncUser({
                 id: userId,
-                name: userData.first_name ? `${userData.first_name} ${userData.last_name || ''}`.trim() : (userData.name || 'User'),
+                name: userData.first_name ? `${userData.first_name} ${userData.last_name || ''}`.trim() : (userData.name || 'Bilinmeyen Kullanıcı'),
                 username: userData.username || 'user',
                 avatar: userData.photo_url || `https://ui-avatars.com/api/?name=User`
             });
         }
 
-        // 2. Botun varlığını doğrula
+        // 2. ADIM: Botun sistemde kayıtlı olduğundan emin ol
         const { data: botExists } = await supabase.from('bots').select('id').eq('id', botId).maybeSingle();
         if (!botExists) {
             await this.saveBot(botData);
         }
 
-        // 3. İşlem Kaydı (Satın Alma / Edinme)
+        // 3. ADIM: user_bots tablosuna kaydet (Satın Alma Gerçekleşiyor)
         const payload = {
             user_id: userId,
             bot_id: botId,
@@ -119,14 +85,12 @@ export class DatabaseService {
             acquired_at: new Date().toISOString()
         };
 
-        // Doğrudan upsert dene
         const { error: upsertError } = await supabase
             .from('user_bots')
             .upsert(payload, { onConflict: 'user_id,bot_id' });
         
-        // Eğer onConflict hatası gelirse manuel kontrol yap (Fallback)
         if (upsertError) {
-            console.warn("Upsert failed, trying manual check/insert:", upsertError.message);
+            // Upsert başarısız olursa manuel kontrol ve müdahale (Constraint koruması)
             const { data: existing } = await supabase
                 .from('user_bots')
                 .select('*')
@@ -135,32 +99,25 @@ export class DatabaseService {
                 .maybeSingle();
 
             if (existing) {
-                const { error: updateError } = await supabase
-                    .from('user_bots')
-                    .update(payload)
-                    .eq('user_id', userId)
-                    .eq('bot_id', botId);
-                if (updateError) throw updateError;
+                await supabase.from('user_bots').update(payload).eq('user_id', userId).eq('bot_id', botId);
             } else {
-                const { error: insertError } = await supabase
-                    .from('user_bots')
-                    .insert(payload);
-                if (insertError) throw insertError;
+                await supabase.from('user_bots').insert(payload);
             }
         }
 
-        // 4. İşlem başarılı bildirimi gönder (Kullanıcıya log düşür)
+        // 4. ADIM: Bildirim ve Log
         await this.sendNotification({
             user_id: userId,
             type: isPremium ? 'payment' : 'bot',
-            title: isPremium ? 'Premium Bot Alındı' : 'Kütüphaneye Eklendi',
-            message: `${botData.name} adlı botu artık kullanabilirsiniz.`,
+            title: isPremium ? 'Premium Bot Aktif Edildi' : 'Kütüphaneye Eklendi',
+            message: `${botData.name} artık sizinle! Keyifli kullanımlar.`,
             target_type: 'user'
         });
 
+        return true;
     } catch (e: any) {
-        console.error("Critical Database Error in addUserBot:", e);
-        throw new Error(e.message || "İşlem tamamlanamadı.");
+        console.error("DATABASE_CRITICAL_ERROR (addUserBot):", e);
+        throw e;
     }
   }
 
@@ -214,6 +171,44 @@ export class DatabaseService {
       } catch (e) {
           return { channels: [], logs: [], userBots: [] };
       }
+  }
+
+  static async getBots(category?: string): Promise<Bot[]> {
+    try {
+      let query = supabase.from('bots').select('*').order('id', { ascending: false });
+      if (category && category !== 'all') {
+        query = query.eq('category', category);
+      }
+      const { data, error } = await query;
+      if (error) throw error;
+      return data || [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  static async getBotById(id: string): Promise<Bot | null> {
+    try {
+      const { data, error } = await supabase.from('bots').select('*').eq('id', id).maybeSingle();
+      if (error) throw error;
+      return data;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  static async saveBot(bot: Partial<Bot>) {
+    const { error } = await supabase.from('bots').upsert({
+      ...bot,
+      id: bot.id || Math.random().toString(36).substr(2, 9),
+      screenshots: bot.screenshots || []
+    }, { onConflict: 'id' });
+    if (error) throw error;
+  }
+
+  static async deleteBot(id: string) {
+    const { error } = await supabase.from('bots').delete().eq('id', id);
+    if (error) throw error;
   }
 
   static async getChannels(userId: string): Promise<Channel[]> {

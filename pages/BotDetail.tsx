@@ -24,10 +24,8 @@ const BotDetail = () => {
     const fetchBotData = async () => {
       if (!id) return;
       setIsLoading(true);
-      // Önce veritabanından çekmeyi dene
       let data = await DatabaseService.getBotById(id);
       
-      // Eğer DB'de yoksa mock datadan bul (ve DB'ye kaydetmek üzere hazırla)
       if (!data) {
           const { mockBots } = await import('../data');
           data = mockBots.find(b => b.id === id) || null;
@@ -57,13 +55,9 @@ const BotDetail = () => {
       if (bot.price === 0) {
           setIsProcessing(true);
           try {
-              // Veritabanı Kaydı - Tüm kullanıcı objesini gönderiyoruz
-              if (user) {
-                  await DatabaseService.addUserBot(user, bot);
-              } else {
-                  // Telegram dışı testler için
-                  await DatabaseService.addUserBot({ id: 'test_user', first_name: 'Test' }, bot);
-              }
+              // Mevcut kullanıcı nesnesiyle veritabanına ekle
+              const userData = user || { id: 'test_user', first_name: 'Misafir', username: 'guest' };
+              await DatabaseService.addUserBot(userData, bot, false);
               
               // LocalStorage Sync
               const ownedBots = JSON.parse(localStorage.getItem('ownedBots') || '[]');
@@ -71,11 +65,11 @@ const BotDetail = () => {
               
               setIsOwned(true);
               notification('success');
-              alert(t('add_to_library') + " Başarılı!");
+              alert("Bot kütüphanenize başarıyla eklendi!");
           } catch (e: any) {
               console.error("Acquisition error:", e);
               notification('error');
-              alert("Hata: " + e.message);
+              alert("Hata oluştu: " + (e.message || "Bilinmeyen hata"));
           } finally {
               setIsProcessing(false);
           }

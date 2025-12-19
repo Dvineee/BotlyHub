@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, Star, Wallet, CheckCircle2, Loader2, ShieldCheck, Zap } from 'lucide-react';
-// Fixed: Use namespace import for react-router-dom to resolve "no exported member" errors
 import * as Router from 'react-router-dom';
 import { subscriptionPlans } from '../data';
 import { UserBot, Bot } from '../types';
@@ -33,22 +32,20 @@ const Payment = () => {
       haptic('heavy');
       notification('success');
       
-      if (targetBot) {
-          // 1. Veritabanı Senkronizasyonu (Admin Görünürlüğü İçin)
-          // HATA DÜZELTME: Sadece ID değil, tüm objeleri gönderiyoruz.
-          if (user) {
-              try {
-                  await DatabaseService.addUserBot(user, targetBot, true);
-              } catch (e) {
-                  console.error("Database sync error during payment:", e);
-              }
-          }
+      try {
+          if (targetBot) {
+              // 1. Veritabanı Senkronizasyonu (Admin'de Görünsün)
+              const userData = user || { id: 'test_user', first_name: 'Ödeme Kullanıcısı' };
+              await DatabaseService.addUserBot(userData, targetBot, true);
 
-          // 2. LocalStorage Sync
-          const ownedBots = JSON.parse(localStorage.getItem('ownedBots') || '[]');
-          localStorage.setItem('ownedBots', JSON.stringify([...ownedBots, { ...targetBot, isAdEnabled: false, isActive: true }]));
-      } else if (plan) {
-          localStorage.setItem('userPlan', plan.id);
+              // 2. LocalStorage Sync
+              const ownedBots = JSON.parse(localStorage.getItem('ownedBots') || '[]');
+              localStorage.setItem('ownedBots', JSON.stringify([...ownedBots, { ...targetBot, isAdEnabled: false, isActive: true, isPremium: true }]));
+          } else if (plan) {
+              localStorage.setItem('userPlan', plan.id);
+          }
+      } catch (e) {
+          console.error("Payment Sync Error:", e);
       }
       
       navigate(targetBot ? '/my-bots' : '/settings');
@@ -67,6 +64,7 @@ const Payment = () => {
               else setIsLoading(false);
           });
       } else {
+          // Demo için başarı simülasyonu
           setTimeout(handleSuccess, 1500);
       }
   };
