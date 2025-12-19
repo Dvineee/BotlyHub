@@ -15,6 +15,15 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 
 const { useNavigate, Routes, Route, Link, useLocation } = Router as any;
 
+const CATEGORY_NAMES: Record<string, string> = {
+    'productivity': 'Üretkenlik',
+    'games': 'Eğlence & Oyun',
+    'utilities': 'Araçlar & Servisler',
+    'finance': 'Finans & Ekonomi',
+    'music': 'Müzik & Ses',
+    'moderation': 'Grup Yönetimi'
+};
+
 const AVAILABLE_ICONS = [
   { name: 'Megaphone', icon: Megaphone },
   { name: 'Zap', icon: Zap },
@@ -342,6 +351,7 @@ const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClos
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-end bg-black/90 backdrop-blur-md animate-in fade-in" onClick={onClose}>
             <div className="h-full w-full max-w-4xl bg-[#0f172a] border-l border-slate-800 shadow-2xl flex flex-col relative overflow-hidden" onClick={e => e.stopPropagation()}>
+                {/* Header */}
                 <div className="p-10 pb-6 border-b border-slate-800/50 flex justify-between items-start shrink-0">
                     <div className="flex gap-8">
                         <div className="relative">
@@ -361,33 +371,35 @@ const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClos
                         <button onClick={onStatusToggle} className={`p-3 rounded-2xl transition-all ${user.status === 'Active' ? 'bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white' : 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white'}`}>
                             {user.status === 'Active' ? <Ban size={22}/> : <CheckCircle size={22}/>}
                         </button>
-                        <button onClick={onClose} className="p-3 bg-slate-900 text-slate-500 hover:text-white rounded-2xl border border-slate-800 transition-colors"><X size={22}/></button>
+                        <button onClose={onClose} className="p-3 bg-slate-900 text-slate-500 hover:text-white rounded-2xl border border-slate-800 transition-colors"><X size={22} onClick={onClose}/></button>
                     </div>
                 </div>
 
+                {/* Tabs */}
                 <div className="flex px-10 gap-8 border-b border-slate-800/50 bg-slate-950/20 shrink-0">
-                    <TabBtn active={activeTab === 'info'} label="Gelişmiş Profil Analizi" icon={TrendingUp} onClick={() => setActiveTab('info')} />
-                    <TabBtn active={activeTab === 'assets'} label={`Varlık Envanteri (${data.channels.length + data.bots.length})`} icon={Package} onClick={() => setActiveTab('assets')} />
-                    <TabBtn active={activeTab === 'logs'} label="Denetim & İşlem Geçmişi" icon={History} onClick={() => setActiveTab('logs')} />
+                    <TabBtn active={activeTab === 'info'} label="Profil Analizi" icon={TrendingUp} onClick={() => setActiveTab('info')} />
+                    <TabBtn active={activeTab === 'assets'} label={`Varlıklar (${data.channels.length + data.bots.length})`} icon={Package} onClick={() => setActiveTab('assets')} />
+                    <TabBtn active={activeTab === 'logs'} label="İşlem Geçmişi" icon={History} onClick={() => setActiveTab('logs')} />
                 </div>
 
+                {/* Content */}
                 <div className="flex-1 overflow-y-auto p-10 no-scrollbar pb-32">
                     {isLoading ? (
                         <div className="flex flex-col items-center justify-center py-20 gap-4">
                             <Loader2 className="animate-spin text-blue-500" size={32} />
-                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic animate-pulse">Sistem Kayıtları Sorgulanıyor...</p>
+                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic animate-pulse">Kayıtlar Sorgulanıyor...</p>
                         </div>
                     ) : (
                         <>
                             {activeTab === 'info' && (
                                 <div className="space-y-8 animate-in fade-in">
                                     <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                                        <DetailCard label="İletişim E-posta" value={user.email || 'Girilmemiş'} icon={Globe} />
-                                        <DetailCard label="Telefon Hattı" value={user.phone || 'Girilmemiş'} icon={Activity} />
+                                        <DetailCard label="E-posta" value={user.email || 'Girilmemiş'} icon={Globe} />
+                                        <DetailCard label="Telefon" value={user.phone || 'Girilmemiş'} icon={Activity} />
                                         <DetailCard label="Sistem Rolü" value={user.role} icon={ShieldCheck} />
-                                        <DetailCard label="Toplam Üye Erişimi" value={totalMemberCount.toLocaleString()} icon={Users} />
-                                        <DetailCard label="Tahmini Kazanç" value={`₺${totalRevenue}`} icon={Wallet} />
-                                        <DetailCard label="Aktif Kaynaklar" value={data.channels.length + data.bots.length} icon={Cpu} />
+                                        <DetailCard label="Üye Erişimi" value={totalMemberCount.toLocaleString()} icon={Users} />
+                                        <DetailCard label="Ciro" value={`₺${totalRevenue}`} icon={Wallet} />
+                                        <DetailCard label="Aktif Kaynak" value={data.channels.length + data.bots.length} icon={Cpu} />
                                     </div>
                                     <div className="p-10 bg-gradient-to-br from-blue-600/10 to-purple-600/10 border border-blue-500/20 rounded-[44px]">
                                         <div className="flex gap-6 items-start">
@@ -396,8 +408,7 @@ const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClos
                                                 <h4 className="text-lg font-black text-white uppercase italic tracking-tighter mb-2">Platform Karnesi</h4>
                                                 <p className="text-sm text-slate-400 leading-relaxed font-medium">
                                                     Bu kullanıcı sistemimizde <span className="text-white font-bold">{data.channels.length} kanal</span> ve <span className="text-white font-bold">{data.bots.length} aktif bot</span> yönetmektedir. 
-                                                    Son 30 gün içerisindeki ödeme ve aktivite dengesi <span className="text-emerald-500 font-bold uppercase italic">Mükemmel</span> olarak puanlanmıştır. 
-                                                    Herhangi bir güvenlik ihlali saptanmamıştır.
+                                                    Aktivite skoru <span className="text-emerald-500 font-bold uppercase italic">Mükemmel</span> olarak puanlanmıştır. 
                                                 </p>
                                             </div>
                                         </div>
@@ -409,24 +420,21 @@ const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClos
                                 <div className="space-y-12 animate-in fade-in">
                                     <section>
                                         <h4 className="text-[11px] font-black text-slate-600 uppercase tracking-[0.3em] mb-8 flex items-center gap-3 italic">
-                                            <div className="w-1.5 h-6 bg-blue-600 rounded-full"></div> YÖNETİLEN KANALLAR ({data.channels.length})
+                                            <div className="w-1.5 h-6 bg-blue-600 rounded-full"></div> KANALLAR ({data.channels.length})
                                         </h4>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            {data.channels.length === 0 ? <p className="col-span-full text-slate-700 italic font-bold p-16 text-center border-2 border-dashed border-slate-900 rounded-[40px] uppercase tracking-widest text-[10px]">Kanal Verisi Yok</p> : 
+                                            {data.channels.length === 0 ? <p className="col-span-full text-slate-700 italic font-bold p-16 text-center border-2 border-dashed border-slate-900 rounded-[40px] text-[10px]">Kanal Verisi Yok</p> : 
                                             data.channels.map(c => (
                                                 <div key={c.id} className="bg-slate-900/50 border border-slate-800 p-8 rounded-[36px] flex flex-col group hover:bg-slate-800/20 transition-all shadow-xl">
                                                     <div className="flex items-center gap-5 mb-6">
                                                         <img src={c.icon} className="w-16 h-16 rounded-[24px] border border-slate-800 object-cover shadow-2xl" />
                                                         <div className="min-w-0">
                                                             <p className="font-black text-white text-lg italic truncate">{c.name}</p>
-                                                            <div className="flex items-center gap-1.5 mt-1 text-slate-500">
-                                                                <Users size={12}/>
-                                                                <span className="text-[10px] font-black uppercase tracking-widest">{c.memberCount.toLocaleString()} Üye</span>
-                                                            </div>
+                                                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{c.memberCount.toLocaleString()} Üye</span>
                                                         </div>
                                                     </div>
                                                     <div className="mt-auto pt-6 border-t border-slate-800/50 flex justify-between items-center">
-                                                        <span className="text-[9px] font-black text-slate-600 uppercase italic">Revenue Stream</span>
+                                                        <span className="text-[9px] font-black text-slate-600 uppercase italic">Kazanç</span>
                                                         <p className="text-xl font-black text-emerald-500 italic">₺{c.revenue}</p>
                                                     </div>
                                                 </div>
@@ -436,15 +444,17 @@ const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClos
                                     
                                     <section>
                                         <h4 className="text-[11px] font-black text-slate-600 uppercase tracking-[0.3em] mb-8 flex items-center gap-3 italic">
-                                            <div className="w-1.5 h-6 bg-purple-600 rounded-full"></div> ENVANTERDEKİ BOTLAR ({data.bots.length})
+                                            <div className="w-1.5 h-6 bg-purple-600 rounded-full"></div> ENVANTER ({data.bots.length})
                                         </h4>
                                         <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
-                                            {data.bots.length === 0 ? <p className="col-span-full text-slate-700 italic font-bold p-16 text-center border-2 border-dashed border-slate-900 rounded-[40px] uppercase tracking-widest text-[10px]">Bot Envanteri Boş</p> : 
+                                            {data.bots.length === 0 ? <p className="col-span-full text-slate-700 italic font-bold p-16 text-center border-2 border-dashed border-slate-900 rounded-[40px] text-[10px]">Bot Envanteri Boş</p> : 
                                             data.bots.map(b => (
                                                 <div key={b.id} className="bg-slate-900/40 border border-slate-800 p-6 rounded-[32px] flex flex-col items-center text-center group hover:border-purple-500/40 transition-all">
                                                     <img src={b.icon} className="w-20 h-20 rounded-[28px] border-2 border-slate-800 object-cover grayscale group-hover:grayscale-0 transition-all mb-4 shadow-xl" />
                                                     <p className="font-black text-white text-xs truncate w-full uppercase tracking-tighter italic mb-1">{b.name}</p>
-                                                    <p className="text-[9px] text-slate-600 font-black uppercase tracking-widest bg-slate-950 px-2 py-1 rounded-lg">{b.category}</p>
+                                                    <p className="text-[9px] text-slate-600 font-black uppercase tracking-widest bg-slate-950 px-2 py-1 rounded-lg">
+                                                        {CATEGORY_NAMES[b.category] || b.category}
+                                                    </p>
                                                 </div>
                                             ))}
                                         </div>
@@ -455,9 +465,9 @@ const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClos
                             {activeTab === 'logs' && (
                                 <div className="space-y-4 animate-in fade-in">
                                     <h4 className="text-[11px] font-black text-slate-600 uppercase tracking-[0.3em] mb-10 flex items-center gap-3 italic">
-                                        <div className="w-1.5 h-6 bg-emerald-600 rounded-full"></div> KRİTİK İŞLEM KAYITLARI (AUDIT LOG)
+                                        <div className="w-1.5 h-6 bg-emerald-600 rounded-full"></div> İŞLEM KAYITLARI
                                     </h4>
-                                    {data.logs.length === 0 ? <p className="text-slate-700 italic font-bold p-16 text-center border-2 border-dashed border-slate-900 rounded-[40px] uppercase tracking-widest text-[10px]">İşlem Günlüğü Henüz Oluşmadı</p> : 
+                                    {data.logs.length === 0 ? <p className="text-slate-700 italic font-bold p-16 text-center border-2 border-dashed border-slate-900 rounded-[40px] text-[10px]">Kayıt Bulunmuyor</p> : 
                                      data.logs.map(log => (
                                         <div key={log.id} className="bg-slate-900/30 border border-slate-800 p-6 rounded-[32px] flex gap-6 group hover:bg-slate-800/10 transition-all border-l-4 hover:border-l-blue-500 transition-all">
                                             <div className="w-12 h-12 rounded-2xl bg-slate-950 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-110 transition-transform">
@@ -468,7 +478,7 @@ const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClos
                                             </div>
                                             <div className="min-w-0 flex-1">
                                                 <div className="flex justify-between items-start gap-4 mb-2">
-                                                    <p className="text-sm font-black text-white italic truncate tracking-tight">{log.title}</p>
+                                                    <p className="text-sm font-black text-white italic truncate">{log.title}</p>
                                                     <p className="text-[10px] text-slate-600 font-black uppercase tracking-widest whitespace-nowrap bg-slate-950 px-2 py-1 rounded-lg">{new Date(log.date).toLocaleString('tr-TR')}</p>
                                                 </div>
                                                 <p className="text-xs text-slate-500 leading-relaxed font-medium">{log.message}</p>
@@ -481,9 +491,10 @@ const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClos
                     )}
                 </div>
 
+                {/* Footer */}
                 <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-[#0f172a] via-[#0f172a] to-transparent shrink-0">
                     <button className="w-full py-6 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-[36px] text-[11px] tracking-[0.4em] uppercase shadow-2xl shadow-blue-900/40 active:scale-95 transition-all flex items-center justify-center gap-4">
-                        <MessageSquare size={20}/> KULLANICIYA ÖZEL SİSTEM MESAJI İLET
+                        <MessageSquare size={20}/> KULLANICIYA MESAJ İLET
                     </button>
                 </div>
             </div>
@@ -509,7 +520,7 @@ const DetailCard = ({ label, value, icon: Icon }: any) => (
     </div>
 );
 
-// --- Bot Management Module ---
+// --- Market Bot Management ---
 const BotManagement = () => {
     const [bots, setBots] = useState<BotType[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -531,21 +542,23 @@ const BotManagement = () => {
         <div className="animate-in fade-in space-y-10">
             <div className="flex justify-between items-center">
                 <h2 className="text-3xl font-black text-white italic tracking-tighter uppercase">MARKET <span className="text-blue-500">YÖNETİMİ</span></h2>
-                <button onClick={() => { setEditingBot({ name: '', description: '', price: 0, category: 'productivity', bot_link: '', icon: '', screenshots: [] }); setIsModalOpen(true); }} className="px-8 py-4 bg-blue-600 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white flex items-center gap-2 shadow-lg shadow-blue-900/20 hover:scale-105 active:scale-95 transition-all">
+                <button onClick={() => { setEditingBot({ name: '', description: '', price: 0, category: 'productivity', bot_link: '', icon: '', screenshots: [] }); setIsModalOpen(true); }} className="px-8 py-4 bg-blue-600 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white flex items-center gap-2 shadow-lg shadow-blue-900/20 active:scale-95 transition-all">
                     <Plus size={18}/> Yeni Bot Ekle
                 </button>
             </div>
 
             {isLoading ? <div className="p-40 text-center font-bold italic animate-pulse text-slate-500">Market Yükleniyor...</div> : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {bots.length === 0 ? <div className="col-span-full py-20 text-center text-slate-600 font-bold border-2 border-dashed border-slate-800 rounded-3xl">Mağazada henüz bot bulunmuyor.</div> : 
+                    {bots.length === 0 ? <div className="col-span-full py-20 text-center text-slate-600 font-bold border-2 border-dashed border-slate-800 rounded-3xl uppercase tracking-widest text-[10px]">Mağaza Boş</div> : 
                      bots.map(b => (
                         <div key={b.id} className="bg-[#0f172a] border border-slate-800 p-8 rounded-[40px] hover:border-blue-500/40 transition-all flex flex-col group shadow-2xl relative overflow-hidden">
                             <div className="flex gap-6 mb-8">
                                 <img src={b.icon} className="w-20 h-20 rounded-[28px] object-cover border-2 border-slate-800 bg-slate-900 shadow-xl" />
                                 <div className="min-w-0">
                                     <h4 className="font-black text-white text-lg truncate group-hover:text-blue-400 transition-colors italic tracking-tight">{b.name}</h4>
-                                    <p className="text-[9px] text-slate-500 font-black uppercase tracking-[0.2em] mt-2 bg-slate-800 w-fit px-2 py-1 rounded-md">{b.category}</p>
+                                    <p className="text-[9px] text-slate-500 font-black uppercase tracking-[0.2em] mt-2 bg-slate-800 w-fit px-2 py-1 rounded-md">
+                                        {CATEGORY_NAMES[b.category] || b.category}
+                                    </p>
                                     <div className="flex items-center gap-1.5 mt-3 text-yellow-500">
                                         <Star size={14} fill="currentColor"/>
                                         <span className="font-black text-sm text-white">{b.price} Stars</span>
@@ -610,7 +623,7 @@ const BotManagement = () => {
     );
 };
 
-// --- Notification Center Module ---
+// --- Notification Center ---
 const NotificationCenter = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [form, setForm] = useState({ title: '', message: '', type: 'system' as any });
@@ -666,7 +679,7 @@ const NotificationCenter = () => {
                 <div className="flex-1 flex flex-col">
                     <h3 className="text-xl font-black text-white italic tracking-tighter uppercase mb-6 flex items-center gap-3"><Clock className="text-purple-500"/> Yayın Geçmişi</h3>
                     <div className="space-y-4 flex-1 overflow-y-auto no-scrollbar pr-2 max-h-[600px]">
-                        {history.filter(n => n.target_type === 'global').length === 0 ? <p className="text-slate-700 italic font-bold p-10 text-center">Henüz global bir yayın yapılmadı.</p> : 
+                        {history.filter(n => n.target_type === 'global').length === 0 ? <p className="text-slate-700 italic font-bold p-10 text-center text-[10px] uppercase tracking-widest">Global Yayın Yok</p> : 
                          history.filter(n => n.target_type === 'global').map(n => (
                             <div key={n.id} className="bg-slate-900/40 border border-slate-800 p-6 rounded-[32px] flex gap-5 hover:bg-slate-800/30 transition-all group">
                                 <div className="w-12 h-12 rounded-2xl bg-slate-950 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-105 transition-transform">
@@ -688,7 +701,7 @@ const NotificationCenter = () => {
     );
 };
 
-// --- Announcement Management Module ---
+// --- Announcement Management ---
 const AnnouncementManagement = () => {
     const [anns, setAnns] = useState<Announcement[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -715,7 +728,7 @@ const AnnouncementManagement = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {anns.length === 0 ? <div className="col-span-full py-32 text-center text-slate-700 font-black uppercase tracking-[0.2em] border-2 border-dashed border-slate-900 rounded-[40px]">Aktif kampanya bulunmuyor.</div> : 
+                {anns.length === 0 ? <div className="col-span-full py-32 text-center text-slate-700 font-black uppercase tracking-[0.2em] border-2 border-dashed border-slate-900 rounded-[40px] text-[10px]">Aktif kampanya yok</div> : 
                  anns.map(a => (
                     <div key={a.id} className="bg-[#0f172a] border border-slate-800 p-8 rounded-[40px] group relative overflow-hidden transition-all hover:border-blue-500/50 flex flex-col shadow-2xl">
                         <div className={`w-14 h-14 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-center mb-8 shadow-inner`}>
@@ -803,7 +816,7 @@ const AnnouncementManagement = () => {
     );
 };
 
-// --- Settings Management Module ---
+// --- Settings Management ---
 const SettingsManagement = () => {
     const [settings, setSettings] = useState({
         appName: 'BotlyHub V3',
@@ -814,7 +827,7 @@ const SettingsManagement = () => {
         instagramUrl: '',
         telegramChannelUrl: ''
     });
-    const [isSaving, setIsSaving] = useState(false);
+    const [isSaving, setIsLoading] = useState(false);
 
     useEffect(() => { load(); }, []);
     const load = async () => {
@@ -823,21 +836,16 @@ const SettingsManagement = () => {
     };
 
     const handleSave = async () => {
-        setIsSaving(true);
+        setIsLoading(true);
         try {
             await DatabaseService.saveSettings(settings);
             localStorage.setItem('maintenance_mode', settings.maintenanceMode.toString());
-            alert("Sistem yapılandırması veritabanına başarıyla aktarıldı.");
+            alert("Sistem yapılandırması başarıyla kaydedildi.");
         } catch (e: any) {
-            console.error("Save Settings UI Error:", e);
-            // Hata mesajını daha anlaşılır kılıyoruz (Özellikle tablo yoksa)
-            if (e.message.includes("Could not find the table")) {
-                alert("HATA: Supabase veritabanında 'settings' tablosu bulunamadı. Lütfen SQL Editor üzerinden tabloyu oluşturun.");
-            } else {
-                alert("Veritabanı kayıt hatası!\nDetay: " + (e.message || "Bilinmeyen hata"));
-            }
+            console.error("Critical: Settings save error:", e);
+            alert("Veritabanı hatası!\nLütfen Supabase SQL Editor'den tabloları oluşturduğunuzdan emin olun.");
         } finally {
-            setIsSaving(false);
+            setIsLoading(false);
         }
     };
 
@@ -845,63 +853,46 @@ const SettingsManagement = () => {
         <div className="animate-in fade-in space-y-12 pb-20">
             <div>
                 <h2 className="text-3xl font-black text-white italic tracking-tighter uppercase italic">SİSTEM <span className="text-blue-500">YAPILANDIRMASI</span></h2>
-                <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mt-1">Platform Çekirdek Parametreleri (Gelişmiş)</p>
+                <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mt-1">Platform Çekirdek Parametreleri</p>
             </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                 <div className="bg-[#0f172a] border border-slate-800 p-12 rounded-[48px] space-y-10 shadow-2xl">
-                    <h3 className="font-black text-lg text-white mb-6 uppercase italic flex items-center gap-4"><Globe size={24} className="text-blue-500"/> Marka & Sosyal Linkler</h3>
+                    <h3 className="font-black text-lg text-white mb-6 uppercase italic flex items-center gap-4"><Globe size={24} className="text-blue-500"/> Marka & Sosyal</h3>
                     <div className="space-y-8">
                         <div className="space-y-3"> 
-                            <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Uygulama Görünen Adı</label> 
+                            <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Uygulama Adı</label> 
                             <input type="text" value={settings.appName} onChange={e => setSettings({...settings, appName: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none transition-all shadow-inner" /> 
                         </div>
                         <div className="space-y-3"> 
-                            <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Telegram Destek Kanalı</label> 
-                            <input type="text" value={settings.supportLink} onChange={e => setSettings({...settings, supportLink: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none transition-all shadow-inner" /> 
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-3"> 
-                                <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Instagram</label> 
-                                <input type="text" value={settings.instagramUrl} onChange={e => setSettings({...settings, instagramUrl: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none" placeholder="@username" /> 
-                            </div>
-                            <div className="space-y-3"> 
-                                <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Haber Kanalı</label> 
-                                <input type="text" value={settings.telegramChannelUrl} onChange={e => setSettings({...settings, telegramChannelUrl: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none" placeholder="t.me/kanal" /> 
-                            </div>
+                            <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Destek Kanalı</label> 
+                            <input type="text" value={settings.supportLink} onChange={e => setSettings({...settings, supportLink: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none" /> 
                         </div>
                     </div>
                 </div>
 
                 <div className="bg-[#0f172a] border border-slate-800 p-12 rounded-[48px] space-y-10 shadow-2xl">
-                    <h3 className="font-black text-lg text-white mb-6 uppercase italic flex items-center gap-4"><Percent size={24} className="text-emerald-500"/> Finansal & Kritik Ayarlar</h3>
+                    <h3 className="font-black text-lg text-white mb-6 uppercase italic flex items-center gap-4"><Percent size={24} className="text-emerald-500"/> Kritik Ayarlar</h3>
                     <div className="space-y-10">
-                        <div className="flex items-center justify-between p-8 bg-slate-950 border border-slate-800 rounded-[32px] group">
+                        <div className="flex items-center justify-between p-8 bg-slate-950 border border-slate-800 rounded-[32px]">
                             <div> 
-                                <p className="text-sm font-black text-white group-hover:text-red-500 transition-colors">BAKIM MODU (MAINTENANCE)</p> 
-                                <p className="text-[10px] text-slate-600 font-bold uppercase mt-1">Erişimi kısıtla ve bakım ekranını göster</p> 
+                                <p className="text-sm font-black text-white">BAKIM MODU</p> 
+                                <p className="text-[10px] text-slate-600 font-bold uppercase mt-1">Platformu erişime kapatır</p> 
                             </div>
                             <button onClick={() => setSettings({...settings, maintenanceMode: !settings.maintenanceMode})} className={`w-16 h-8 rounded-full relative transition-all shadow-lg ${settings.maintenanceMode ? 'bg-red-600' : 'bg-slate-800'}`}> 
                                 <div className={`absolute top-1.5 w-5 h-5 bg-white rounded-full transition-all shadow-inner ${settings.maintenanceMode ? 'left-9' : 'left-2'}`} /> 
                             </button>
                         </div>
                         <div className="space-y-3"> 
-                            <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Global Komisyon Oranı (%)</label> 
-                            <div className="relative">
-                                <input type="number" value={settings.commissionRate} onChange={e => setSettings({...settings, commissionRate: Number((e.target as any).value)})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-emerald-500 outline-none transition-all shadow-inner" /> 
-                                <div className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-700 font-black">%</div>
-                            </div>
-                        </div>
-                        <div className="p-8 bg-blue-500/5 border border-blue-500/10 rounded-[32px] flex items-start gap-4">
-                            <ShieldCheck className="text-blue-500 shrink-0" size={24}/>
-                            <p className="text-[11px] text-slate-500 font-medium leading-relaxed uppercase">Bu ayarlar tüm kullanıcıları ve platform ekonomisini anlık olarak etkiler. Değişiklik yapmadan önce veritabanı yedeklemesini kontrol edin.</p>
+                            <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Komisyon Oranı (%)</label> 
+                            <input type="number" value={settings.commissionRate} onChange={e => setSettings({...settings, commissionRate: Number((e.target as any).value)})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-emerald-500 outline-none" /> 
                         </div>
                     </div>
                 </div>
             </div>
 
-            <button onClick={handleSave} disabled={isSaving} className="w-full py-7 bg-blue-600 hover:bg-blue-500 text-white font-black text-[12px] uppercase tracking-[0.4em] rounded-[32px] shadow-2xl shadow-blue-900/40 transition-all active:scale-95 flex items-center justify-center gap-4 disabled:opacity-50 mt-10"> 
-                {isSaving ? <Loader2 className="animate-spin" /> : <ShieldCheck size={22} />} TÜM SİSTEMİ VERİTABANINA YAYINLA
+            <button onClick={handleSave} disabled={isSaving} className="w-full py-7 bg-blue-600 hover:bg-blue-500 text-white font-black text-[12px] uppercase tracking-[0.4em] rounded-[32px] shadow-2xl transition-all active:scale-95 flex items-center justify-center gap-4 disabled:opacity-50 mt-10"> 
+                {isSaving ? <Loader2 className="animate-spin" /> : <ShieldCheck size={22} />} TÜM SİSTEMİ YAYINLA
             </button>
         </div>
     );

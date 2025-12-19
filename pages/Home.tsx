@@ -14,7 +14,8 @@ const iconMap: Record<string, any> = {
   Sparkles, Megaphone, Zap, Gift, Star, Info, BotIcon, Heart, Bell, Shield
 };
 
-const PromoCard = ({ ann, onShowPopup }: { ann: Announcement, onShowPopup: (ann: Announcement) => void }) => {
+// Fixed: Explicitly typing as React.FC to allow 'key' prop in iterations and resolve property assignment errors
+const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) => void }> = ({ ann, onShowPopup }) => {
   const navigate = useNavigate();
   const colors: Record<string, string> = {
     purple: 'from-[#6366f1] to-[#a855f7]',

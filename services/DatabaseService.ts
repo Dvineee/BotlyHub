@@ -48,7 +48,7 @@ export class DatabaseService {
 
   static async getBotById(id: string): Promise<Bot | null> {
     try {
-      const { data, error } = await supabase.from('bots').select('*').eq('id', id).single();
+      const { data, error } = await supabase.from('bots').select('*').eq('id', id).maybeSingle();
       if (error) throw error;
       return data;
     } catch (e) {
@@ -70,7 +70,7 @@ export class DatabaseService {
     if (error) throw error;
   }
 
-  // --- Notification System ---
+  // --- Notification System & Audit Logs ---
   static async getNotifications(userId?: string): Promise<Notification[]> {
     try {
       let query = supabase.from('notifications').select('*').order('date', { ascending: false });
@@ -88,7 +88,7 @@ export class DatabaseService {
   static async sendNotification(notification: Partial<Notification>) {
     const { error } = await supabase.from('notifications').insert({
         ...notification,
-        id: Math.random().toString(36).substr(2, 9),
+        id: notification.id || Math.random().toString(36).substr(2, 9),
         date: new Date().toISOString(),
         isRead: false
     });
@@ -145,10 +145,7 @@ export class DatabaseService {
         ...settings 
     }, { onConflict: 'id' });
     
-    if (error) {
-        // Eğer tablo yoksa hatayı yakalayıp kullanıcıya şema oluşturması gerektiğini belirtmek için fırlatıyoruz
-        throw new Error(error.message);
-    }
+    if (error) throw new Error(error.message);
   }
 
   // --- User Management ---
@@ -172,10 +169,10 @@ export class DatabaseService {
     if (error) throw error;
   }
 
-  // --- User Assets & Logs (REAL-TIME DATA) ---
+  // --- User Deep Dive Assets & Audit (REAL DATA) ---
   static async getUserDetailedAssets(userId: string) {
       try {
-        const [channels, notifications, userBots] = await Promise.all([
+        const [channels, logs, userBots] = await Promise.all([
             supabase.from('channels').select('*').eq('user_id', userId),
             supabase.from('notifications').select('*').eq('user_id', userId).order('date', { ascending: false }),
             supabase.from('user_bots').select('*, bots(*)').eq('user_id', userId)
@@ -183,11 +180,11 @@ export class DatabaseService {
         
         return {
             channels: channels.data || [],
-            logs: notifications.data || [],
+            logs: logs.data || [],
             bots: (userBots.data || []).map((ub: any) => ub.bots).filter(Boolean) as Bot[]
         };
       } catch (e) {
-          console.error("User detailed fetch error:", e);
+          console.error("Critical: User assets fetch failed:", e);
           return { channels: [], logs: [], bots: [] };
       }
   }
@@ -217,6 +214,6 @@ export class DatabaseService {
   static logoutAdmin() { localStorage.removeItem('admin_v3_session'); }
 
   static async init() {
-    console.log("Database Sync Service v4.2 - Production Stable");
+    console.log("Database Sync Service v4.3 - Audit Protocol Active");
   }
 }

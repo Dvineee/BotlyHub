@@ -2,7 +2,6 @@
 import { Layout, Briefcase, Gamepad2, Zap, Wallet, Music, Shield, Star, Crown, Gem } from 'lucide-react';
 import { ExtendedBot, SubscriptionPlan, Notification } from './types';
 
-// Updated labels to use Translation Keys defined in TranslationContext
 export const categories = [
   { id: 'all', label: 'cat_all', icon: Layout },
   { id: 'productivity', label: 'cat_productivity', icon: Briefcase },
@@ -13,18 +12,17 @@ export const categories = [
   { id: 'moderation', label: 'cat_moderation', icon: Shield },
 ];
 
-// Fixed: Added mandatory bot_link and screenshots to all mock bots to match the Bot interface
 export const mockBots: ExtendedBot[] = [
-  { id: '1', name: 'Task Master', description: 'Görevleri yönetin', price: 29.99, icon: 'https://picsum.photos/seed/task/200', category: 'productivity', isNew: true, isPremium: true, bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
-  { id: '2', name: 'GameBot Pro', description: 'Oyun sunucusu yönetimi', price: 0, icon: 'https://picsum.photos/seed/game/200', category: 'games', bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
-  { id: '3', name: 'CryptoAlert', description: 'Anlık fiyat takibi', price: 99.99, icon: 'https://picsum.photos/seed/crypto/200', category: 'utilities', isPremium: true, bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
-  { id: '4', name: 'ModBot', description: 'Otomatik moderasyon', price: 49.50, icon: 'https://picsum.photos/seed/mod/200', category: 'moderation', isPremium: true, bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
-  { id: '5', name: 'MusicFy', description: 'Yüksek kaliteli müzik', price: 19.99, icon: 'https://picsum.photos/seed/music/200', category: 'music', bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
-  { id: '6', name: 'NotionSync', description: 'Notion entegrasyonu', price: 35.00, icon: 'https://picsum.photos/seed/notion/200', category: 'productivity', isPremium: true, bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
-  { id: '7', name: 'FocusFlow', description: 'Pomodoro zamanlayıcı', price: 0, icon: 'https://picsum.photos/seed/focus/200', category: 'productivity', bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
-  { id: '8', name: 'RPG Master', description: 'Rol yapma oyunu', price: 15.00, icon: 'https://picsum.photos/seed/rpg/200', category: 'games', bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
-  { id: '9', name: 'QuizKing', description: 'Bilgi yarışması botu', price: 0, icon: 'https://picsum.photos/seed/quiz/200', category: 'games', bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
-  { id: '10', name: 'StockBot', description: 'Borsa takibi', price: 120.00, icon: 'https://picsum.photos/seed/stock/200', category: 'finance', isPremium: true, bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
+  { id: '1', name: 'Task Master', description: 'Günlük görevlerinizi ve iş akışınızı yönetin.', price: 29.99, icon: 'https://picsum.photos/seed/task/200', category: 'productivity', isNew: true, isPremium: true, bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
+  { id: '2', name: 'GameBot Pro', description: 'Topluluk içi oyun sunucusu yönetimi.', price: 0, icon: 'https://picsum.photos/seed/game/200', category: 'games', bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
+  { id: '3', name: 'CryptoAlert', description: 'Kripto varlıklar için anlık fiyat ve sinyal takibi.', price: 99.99, icon: 'https://picsum.photos/seed/crypto/200', category: 'utilities', isPremium: true, bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
+  { id: '4', name: 'ModBot', description: 'Gelişmiş otomatik grup moderasyon sistemi.', price: 49.50, icon: 'https://picsum.photos/seed/mod/200', category: 'moderation', isPremium: true, bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
+  { id: '5', name: 'MusicFy', description: 'Kanallarda yüksek kaliteli müzik yayını.', price: 19.99, icon: 'https://picsum.photos/seed/music/200', category: 'music', bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
+  { id: '6', name: 'NotionSync', description: 'Telegram verilerini Notion ile senkronize edin.', price: 35.00, icon: 'https://picsum.photos/seed/notion/200', category: 'productivity', isPremium: true, bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
+  { id: '7', name: 'FocusFlow', description: 'Pomodoro tekniği ile odaklanma sayacı.', price: 0, icon: 'https://picsum.photos/seed/focus/200', category: 'productivity', bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
+  { id: '8', name: 'RPG Master', description: 'Sohbet tabanlı devasa rol yapma oyunu.', price: 15.00, icon: 'https://picsum.photos/seed/rpg/200', category: 'games', bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
+  { id: '9', name: 'QuizKing', description: 'Arkadaşlarınızla yarışabileceğiniz bilgi yarışması.', price: 0, icon: 'https://picsum.photos/seed/quiz/200', category: 'games', bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
+  { id: '10', name: 'StockBot', description: 'Borsa ve hisse senedi teknik analizi.', price: 120.00, icon: 'https://picsum.photos/seed/stock/200', category: 'finance', isPremium: true, bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
 ];
 
 export const subscriptionPlans: SubscriptionPlan[] = [
@@ -85,7 +83,7 @@ export const mockNotifications: Notification[] = [
     type: 'payment',
     title: 'Ödeme Başarılı',
     message: 'Task Master botu için 29.99₺ ödemeniz başarıyla alındı.',
-    date: new Date().toISOString(), // Today
+    date: new Date().toISOString(),
     isRead: false
   },
   {
@@ -93,31 +91,7 @@ export const mockNotifications: Notification[] = [
     type: 'security',
     title: 'Yeni Cihaz Girişi',
     message: 'Hesabınıza yeni bir cihazdan (iPhone 13, İstanbul) giriş yapıldı.',
-    date: new Date(Date.now() - 3600000 * 5).toISOString(), // 5 hours ago (Today)
+    date: new Date(Date.now() - 3600000 * 5).toISOString(),
     isRead: false
-  },
-  {
-    id: '3',
-    type: 'bot',
-    title: 'ModBot Güncellemesi',
-    message: 'ModBot v2.1 yayında! Yeni spam filtresi özellikleri eklendi.',
-    date: new Date(Date.now() - 86400000).toISOString(), // Yesterday
-    isRead: true
-  },
-  {
-    id: '4',
-    type: 'system',
-    title: 'Bakım Çalışması',
-    message: 'Sistemimiz bu gece 03:00 - 05:00 saatleri arasında bakıma alınacaktır.',
-    date: new Date(Date.now() - 86400000 * 2).toISOString(), // 2 days ago
-    isRead: true
-  },
-  {
-    id: '5',
-    type: 'payment',
-    title: 'Gelir Ödemesi',
-    message: 'Haftalık bot gelirleriniz (450.50₺) cüzdanınıza aktarıldı.',
-    date: new Date(Date.now() - 86400000 * 5).toISOString(), // 5 days ago
-    isRead: true
   }
 ];
