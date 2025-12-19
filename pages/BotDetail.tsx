@@ -50,8 +50,12 @@ const BotDetail = () => {
           setIsProcessing(true);
           try {
               // 1. Veritabanı Kaydı (Admin panelinden görülmesi için kritik)
-              if (user?.id) {
-                  await DatabaseService.addUserBot(user.id.toString(), bot.id);
+              const userIdString = user?.id ? user.id.toString() : null;
+              if (userIdString) {
+                  await DatabaseService.addUserBot(userIdString, bot.id);
+                  console.log("DB sync success for bot:", bot.id);
+              } else {
+                  console.warn("User ID not found, DB sync skipped.");
               }
               
               // 2. LocalStorage Sync
@@ -64,6 +68,7 @@ const BotDetail = () => {
           } catch (e) {
               console.error("Acquisition error:", e);
               notification('error');
+              alert("Bir hata oluştu. Lütfen tekrar deneyin.");
           } finally {
               setIsProcessing(false);
           }

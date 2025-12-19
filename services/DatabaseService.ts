@@ -72,15 +72,20 @@ export class DatabaseService {
 
   // --- User-Bot Library Management ---
   static async addUserBot(userId: string, botId: string, isPremium: boolean = false) {
+    console.log(`Syncing UserBot: User=${userId}, Bot=${botId}`);
     const { error } = await supabase.from('user_bots').upsert({
-        user_id: userId,
+        user_id: userId.toString(),
         bot_id: botId,
         is_active: true,
         is_ad_enabled: false,
         is_premium: isPremium,
         acquired_at: new Date().toISOString()
     }, { onConflict: 'user_id, bot_id' });
-    if (error) throw error;
+    
+    if (error) {
+        console.error("addUserBot Error:", error.message);
+        throw error;
+    }
   }
 
   static async getUserBots(userId: string): Promise<Bot[]> {
@@ -88,7 +93,7 @@ export class DatabaseService {
         const { data, error } = await supabase
             .from('user_bots')
             .select('*, bots(*)')
-            .eq('user_id', userId);
+            .eq('user_id', userId.toString());
         
         if (error) throw error;
         return (data || []).map((item: any) => item.bots).filter(Boolean);
@@ -184,7 +189,7 @@ export class DatabaseService {
   }
 
   static async updateUserStatus(userId: string, status: string) {
-      const { error } = await supabase.from('users').update({ status }).eq('id', userId);
+      const { error } = await supabase.from('users').update({ status }).eq('id', userId.toString());
       if (error) throw error;
   }
 
@@ -195,25 +200,29 @@ export class DatabaseService {
 
   // --- User Deep Dive Assets & Audit (ENRICHED DATA) ---
   static async getUserDetailedAssets(userId: string) {
+      console.log("Fetching detailed assets for user:", userId);
       try {
         const [channels, logs, userBots] = await Promise.all([
-            supabase.from('channels').select('*').eq('user_id', userId),
-            supabase.from('notifications').select('*').eq('user_id', userId).order('date', { ascending: false }),
-            supabase.from('user_bots').select('*, bots(*)').eq('user_id', userId)
+            supabase.from('channels').select('*').eq('user_id', userId.toString()),
+            supabase.from('notifications').select('*').eq('user_id', userId.toString()).order('date', { ascending: false }),
+            supabase.from('user_bots').select('*, bots(*)').eq('user_id', userId.toString())
         ]);
         
+        const mappedUserBots = (userBots.data || []).map((ub: any) => ({
+            bot: ub.bots,
+            ownership: {
+                is_active: ub.is_active,
+                is_premium: ub.is_premium,
+                acquired_at: ub.acquired_at
+            }
+        })).filter((item: any) => item.bot !== null);
+
+        console.log(`Assets loaded: Channels=${channels.data?.length}, Bots=${mappedUserBots.length}`);
+
         return {
             channels: channels.data || [],
             logs: logs.data || [],
-            // Return bot metadata ALONG with user-specific ownership data
-            userBots: (userBots.data || []).map((ub: any) => ({
-                bot: ub.bots,
-                ownership: {
-                    is_active: ub.is_active,
-                    is_premium: ub.is_premium,
-                    acquired_at: ub.acquired_at
-                }
-            })).filter((item: any) => item.bot !== null)
+            userBots: mappedUserBots
         };
       } catch (e) {
           console.error("Critical: User assets fetch failed:", e);
@@ -224,7 +233,7 @@ export class DatabaseService {
   // --- Channel Management ---
   static async getChannels(userId: string): Promise<Channel[]> {
     try {
-      const { data, error } = await supabase.from('channels').select('*').eq('user_id', userId);
+      const { data, error } = await supabase.from('channels').select('*').eq('user_id', userId.toString());
       if (error) throw error;
       return data || [];
     } catch (e) {
@@ -246,6 +255,6 @@ export class DatabaseService {
   static logoutAdmin() { localStorage.removeItem('admin_v3_session'); }
 
   static async init() {
-    console.log("Database Sync Service v4.4 - Audit Protocol Active");
+    console.log("Database Sync Service v4.5 - Audit Protocol Active");
   }
 }

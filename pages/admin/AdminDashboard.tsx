@@ -335,15 +335,23 @@ const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClos
     const [data, setData] = useState<{ channels: Channel[], logs: Notification[], userBots: any[] }>({ channels: [], logs: [], userBots: [] });
     const [isLoading, setIsLoading] = useState(true);
 
+    const loadData = async () => {
+        setIsLoading(true);
+        const res = await DatabaseService.getUserDetailedAssets(user.id);
+        setData(res as any);
+        setIsLoading(false);
+    };
+
     useEffect(() => {
-        const load = async () => {
-            setIsLoading(true);
-            const res = await DatabaseService.getUserDetailedAssets(user.id);
-            setData(res as any);
-            setIsLoading(false);
-        };
-        load();
+        loadData();
     }, [user.id]);
+
+    // Force reload when tab switches to assets to ensure sync
+    useEffect(() => {
+        if (activeTab === 'assets') {
+            loadData();
+        }
+    }, [activeTab]);
 
     const totalMemberCount = data.channels.reduce((sum, c) => sum + (c.memberCount || 0), 0);
     const totalRevenue = data.channels.reduce((sum, c) => sum + (c.revenue || 0), 0);
@@ -368,6 +376,7 @@ const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClos
                         </div>
                     </div>
                     <div className="flex gap-2">
+                        <button onClick={loadData} title="Yenile" className="p-3 bg-slate-900 text-slate-400 hover:text-white rounded-2xl border border-slate-800 transition-colors"><RefreshCw size={22} className={isLoading ? 'animate-spin' : ''}/></button>
                         <button onClick={onStatusToggle} className={`p-3 rounded-2xl transition-all ${user.status === 'Active' ? 'bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white' : 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white'}`}>
                             {user.status === 'Active' ? <Ban size={22}/> : <CheckCircle size={22}/>}
                         </button>
@@ -387,7 +396,7 @@ const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClos
                     {isLoading ? (
                         <div className="flex flex-col items-center justify-center py-20 gap-4">
                             <Loader2 className="animate-spin text-blue-500" size={32} />
-                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic animate-pulse">Kayıtlar Sorgulanıyor...</p>
+                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic animate-pulse">Veriler Getiriliyor...</p>
                         </div>
                     ) : (
                         <>
@@ -408,7 +417,6 @@ const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClos
                                                 <h4 className="text-lg font-black text-white uppercase italic tracking-tighter mb-2">Platform Karnesi</h4>
                                                 <p className="text-sm text-slate-400 leading-relaxed font-medium">
                                                     Bu kullanıcı sistemimizde <span className="text-white font-bold">{data.channels.length} kanal</span> ve <span className="text-white font-bold">{data.userBots.length} aktif bot</span> yönetmektedir. 
-                                                    Aktivite skoru <span className="text-emerald-500 font-bold uppercase italic">Mükemmel</span> olarak puanlanmıştır. 
                                                 </p>
                                             </div>
                                         </div>
@@ -447,34 +455,41 @@ const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClos
                                             <div className="w-1.5 h-6 bg-purple-600 rounded-full"></div> ENVANTER ({data.userBots.length})
                                         </h4>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                            {data.userBots.length === 0 ? <p className="col-span-full text-slate-700 italic font-bold p-16 text-center border-2 border-dashed border-slate-900 rounded-[40px] text-[10px]">Bot Envanteri Boş</p> : 
-                                            data.userBots.map((item, idx) => (
-                                                <div key={idx} className="bg-slate-900/40 border border-slate-800 p-6 rounded-[32px] flex flex-col group hover:border-purple-500/40 transition-all shadow-lg relative">
-                                                    <div className="flex gap-4 items-center mb-4">
-                                                        <img src={item.bot.icon} className="w-16 h-16 rounded-[24px] border border-slate-800 object-cover shadow-xl" />
-                                                        <div className="min-w-0 flex-1">
-                                                            <p className="font-black text-white text-sm italic truncate tracking-tight">{item.bot.name}</p>
-                                                            <p className="text-[9px] text-slate-600 font-black uppercase tracking-widest mt-1">
-                                                                {CATEGORY_NAMES[item.bot.category] || item.bot.category}
-                                                            </p>
+                                            {data.userBots.length === 0 ? (
+                                                <div className="col-span-full flex flex-col items-center justify-center p-20 border-2 border-dashed border-slate-800 rounded-[40px] bg-slate-950/20 text-center">
+                                                    <Bot size={48} className="text-slate-800 mb-4" />
+                                                    <p className="text-slate-600 font-bold uppercase tracking-widest text-[10px]">Henüz Bot Eklenmemiş</p>
+                                                    <p className="text-slate-800 text-[9px] mt-2 italic">Kullanıcı marketten bot eklediğinde burada listelenecek.</p>
+                                                </div>
+                                            ) : (
+                                                data.userBots.map((item, idx) => (
+                                                    <div key={idx} className="bg-slate-900/40 border border-slate-800 p-6 rounded-[32px] flex flex-col group hover:border-purple-500/40 transition-all shadow-lg relative">
+                                                        <div className="flex gap-4 items-center mb-4">
+                                                            <img src={item.bot.icon} className="w-16 h-16 rounded-[24px] border border-slate-800 object-cover shadow-xl bg-slate-950" />
+                                                            <div className="min-w-0 flex-1">
+                                                                <p className="font-black text-white text-sm italic truncate tracking-tight">{item.bot.name}</p>
+                                                                <p className="text-[9px] text-slate-600 font-black uppercase tracking-widest mt-1">
+                                                                    {CATEGORY_NAMES[item.bot.category] || item.bot.category}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div className="flex flex-wrap gap-1.5 mt-auto">
+                                                            <span className={`text-[8px] font-black px-2 py-1 rounded-lg uppercase tracking-widest border ${item.ownership.is_active ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-red-500/10 text-red-500 border-red-500/20'}`}>
+                                                                {item.ownership.is_active ? 'AKTİF' : 'PASİF'}
+                                                            </span>
+                                                            {item.ownership.is_premium && (
+                                                                <span className="text-[8px] font-black px-2 py-1 rounded-lg uppercase tracking-widest bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 flex items-center gap-1">
+                                                                    <Star size={8} fill="currentColor"/> PREMIUM
+                                                                </span>
+                                                            )}
+                                                            <span className="text-[8px] font-black px-2 py-1 rounded-lg uppercase bg-slate-800 text-slate-500 border border-slate-700">
+                                                                {new Date(item.ownership.acquired_at).toLocaleDateString()}
+                                                            </span>
                                                         </div>
                                                     </div>
-                                                    
-                                                    <div className="flex flex-wrap gap-1.5 mt-auto">
-                                                        <span className={`text-[8px] font-black px-2 py-1 rounded-lg uppercase tracking-widest border ${item.ownership.is_active ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-red-500/10 text-red-500 border-red-500/20'}`}>
-                                                            {item.ownership.is_active ? 'AKTİF' : 'PASİF'}
-                                                        </span>
-                                                        {item.ownership.is_premium && (
-                                                            <span className="text-[8px] font-black px-2 py-1 rounded-lg uppercase tracking-widest bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 flex items-center gap-1">
-                                                                <Star size={8} fill="currentColor"/> PREMIUM
-                                                            </span>
-                                                        )}
-                                                        <span className="text-[8px] font-black px-2 py-1 rounded-lg uppercase bg-slate-800 text-slate-500 border border-slate-700">
-                                                            {new Date(item.ownership.acquired_at).toLocaleDateString()}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            ))}
+                                                ))
+                                            )}
                                         </div>
                                     </section>
                                 </div>

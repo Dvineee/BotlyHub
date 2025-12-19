@@ -11,15 +11,15 @@ import './index.css';
  * Beklenmedik uygulama hatalarını yakalar ve kullanıcıya güvenli bir geri dönüş sunar.
  */
 interface ErrorBoundaryProps { 
-  children: ReactNode; 
+  children?: ReactNode; 
 }
 interface ErrorBoundaryState { 
   hasError: boolean; 
   error: Error | null; 
 }
 
-// Fixed: Inherit from React.Component with explicit generic types to ensure 'this.state' and 'this.props' are correctly typed and recognized by the compiler.
-class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+// Fixed: Inherit from Component with explicit generic types and optional children to ensure 'this.state', 'this.props', and JSX usage are correctly typed.
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false, error: null };
@@ -53,7 +53,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
       );
     }
     // Fixed: Properly return children from props using 'this.props.children'.
-    return this.props.children;
+    return this.props.children || null;
   }
 }
 
