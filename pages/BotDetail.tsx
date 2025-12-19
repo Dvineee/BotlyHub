@@ -24,7 +24,15 @@ const BotDetail = () => {
     const fetchBotData = async () => {
       if (!id) return;
       setIsLoading(true);
-      const data = await DatabaseService.getBotById(id);
+      // Önce veritabanından çekmeyi dene
+      let data = await DatabaseService.getBotById(id);
+      
+      // Eğer DB'de yoksa mock datadan bul (ve DB'ye kaydetmek üzere hazırla)
+      if (!data) {
+          const { mockBots } = await import('../data');
+          data = mockBots.find(b => b.id === id) || null;
+      }
+
       setBot(data);
       const ownedBots = JSON.parse(localStorage.getItem('ownedBots') || '[]');
       if (ownedBots.find((b: UserBot) => b.id === id)) setIsOwned(true);
@@ -34,41 +42,40 @@ const BotDetail = () => {
   }, [id]);
 
   const handleAction = async () => {
-      if (isProcessing) return;
+      if (isProcessing || !bot) return;
       haptic('medium');
       
       if (isOwned) {
-          if (tg && bot?.bot_link) {
+          if (tg && bot.bot_link) {
               tg.openTelegramLink(bot.bot_link);
-          } else if (bot?.bot_link) {
+          } else if (bot.bot_link) {
               window.open(bot.bot_link, '_blank');
           }
           return;
       }
       
-      if (bot?.price === 0) {
+      if (bot.price === 0) {
           setIsProcessing(true);
           try {
-              // 1. Veritabanı Kaydı (Admin panelinden görülmesi için kritik)
-              const userIdString = user?.id ? user.id.toString() : null;
-              if (userIdString) {
-                  await DatabaseService.addUserBot(userIdString, bot.id);
-                  console.log("DB sync success for bot:", bot.id);
+              // Veritabanı Kaydı - Tüm kullanıcı objesini gönderiyoruz
+              if (user) {
+                  await DatabaseService.addUserBot(user, bot);
               } else {
-                  console.warn("User ID not found, DB sync skipped.");
+                  // Telegram dışı testler için
+                  await DatabaseService.addUserBot({ id: 'test_user', first_name: 'Test' }, bot);
               }
               
-              // 2. LocalStorage Sync
+              // LocalStorage Sync
               const ownedBots = JSON.parse(localStorage.getItem('ownedBots') || '[]');
               localStorage.setItem('ownedBots', JSON.stringify([...ownedBots, { ...bot, isAdEnabled: false, isActive: true }]));
               
               setIsOwned(true);
               notification('success');
               alert(t('add_to_library') + " Başarılı!");
-          } catch (e) {
+          } catch (e: any) {
               console.error("Acquisition error:", e);
               notification('error');
-              alert("Bir hata oluştu. Lütfen tekrar deneyin.");
+              alert("Hata: " + e.message);
           } finally {
               setIsProcessing(false);
           }

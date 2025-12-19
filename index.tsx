@@ -11,15 +11,15 @@ import './index.css';
  * Beklenmedik uygulama hatalarını yakalar ve kullanıcıya güvenli bir geri dönüş sunar.
  */
 interface ErrorBoundaryProps { 
-  children: ReactNode; 
+  children?: ReactNode; 
 }
 interface ErrorBoundaryState { 
   hasError: boolean; 
   error: Error | null; 
 }
 
-// Fixed: Inherit from React.Component with explicit generic types to ensure 'this.state' and 'this.props' are correctly typed and available to the TypeScript compiler.
-class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+// Fix: Use Component directly from the import and define Props/State correctly.
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false, error: null };
@@ -34,7 +34,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   }
 
   render() {
-    // Fixed: Properly access state via 'this.state' which is now correctly inherited from React.Component.
+    // Fix: Using this.state which is now correctly recognized via inheritance from Component.
     if (this.state.hasError) {
       return (
         <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center p-8 text-center">
@@ -52,7 +52,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
         </div>
       );
     }
-    // Fixed: Properly return children from props using 'this.props.children'.
+    // Fix: Using this.props.children which is now correctly recognized.
     return this.props.children;
   }
 }
@@ -62,7 +62,7 @@ if (rootElement) {
   const manifestUrl = 'https://ton-connect.github.io/demo-dapp-with-react-ui/tonconnect-manifest.json';
   const root = createRoot(rootElement);
 
-  // Fixed: Wrapped the app tree within ErrorBoundary, which now correctly identifies its children through proper class inheritance.
+  // Fix: The usage of ErrorBoundary is correct but requires optional children in type definition to satisfy some TS configurations.
   root.render(
     <React.StrictMode>
       <ErrorBoundary>

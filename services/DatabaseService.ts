@@ -9,7 +9,6 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export class DatabaseService {
   
-  // --- Dashboard Stats ---
   static async getAdminStats() {
     try {
       const [users, bots, notifications, anns] = await Promise.all([
@@ -18,7 +17,6 @@ export class DatabaseService {
         supabase.from('notifications').select('id', { count: 'exact', head: true }),
         supabase.from('announcements').select('id', { count: 'exact', head: true })
       ]);
-
       return {
         userCount: users.count || 0,
         botCount: bots.count || 0,
@@ -26,12 +24,10 @@ export class DatabaseService {
         annCount: anns.count || 0
       };
     } catch (e) {
-      console.error("Stats Error:", e);
       return { userCount: 0, botCount: 0, notifCount: 0, annCount: 0 };
     }
   }
 
-  // --- Bot Management ---
   static async getBots(category?: string): Promise<Bot[]> {
     try {
       let query = supabase.from('bots').select('*').order('id', { ascending: false });
@@ -70,16 +66,28 @@ export class DatabaseService {
     if (error) throw error;
   }
 
-  // --- User-Bot Library Management ---
-  static async addUserBot(userId: string, botId: string, isPremium: boolean = false) {
-    console.log(`Syncing UserBot: User=${userId}, Bot=${botId}`);
+  // --- KRİTİK GÜNCELLEME: Kullanıcı Botu Ekleme ---
+  static async addUserBot(userData: any, botData: Bot, isPremium: boolean = false) {
+    const userId = userData.id.toString();
     
-    // Yabancı anahtar hatasını önlemek için önce kullanıcının varlığından emin olunur (UPSERT)
-    // Bu metot çağrıldığında App.tsx zaten sync yapmış olmalı ama güvenlik önlemi iyidir.
+    // 1. Kullanıcının var olduğundan emin ol (Race condition önleyici)
+    await this.syncUser({
+        id: userId,
+        name: `${userData.first_name || ''} ${userData.last_name || ''}`.trim() || 'User',
+        username: userData.username || 'user',
+        avatar: userData.photo_url || `https://ui-avatars.com/api/?name=User`,
+    });
 
+    // 2. Botun veritabanında olduğundan emin ol (Eğer mock datadan geliyorsa DB'de olmayabilir)
+    const { data: existingBot } = await supabase.from('bots').select('id').eq('id', botData.id).maybeSingle();
+    if (!existingBot) {
+        await this.saveBot(botData);
+    }
+
+    // 3. İlişkiyi kur
     const { error } = await supabase.from('user_bots').upsert({
-        user_id: userId.toString(),
-        bot_id: botId,
+        user_id: userId,
+        bot_id: botData.id,
         is_active: true,
         is_ad_enabled: false,
         is_premium: isPremium,
@@ -87,8 +95,8 @@ export class DatabaseService {
     }, { onConflict: 'user_id, bot_id' });
     
     if (error) {
-        console.error("addUserBot Error:", error.message);
-        throw error;
+        console.error("addUserBot Error:", error);
+        throw new Error(error.message);
     }
   }
 
@@ -98,117 +106,26 @@ export class DatabaseService {
             .from('user_bots')
             .select('*, bots(*)')
             .eq('user_id', userId.toString());
-        
         if (error) throw error;
         return (data || []).map((item: any) => item.bots).filter(Boolean);
     } catch (e) {
-        console.error("Fetch user bots error:", e);
         return [];
     }
   }
 
-  // --- Notification System & Audit Logs ---
-  static async getNotifications(userId?: string): Promise<Notification[]> {
-    try {
-      let query = supabase.from('notifications').select('*').order('date', { ascending: false });
-      if (userId) {
-          query = query.or(`user_id.eq.${userId},target_type.eq.global`);
-      }
-      const { data, error } = await query;
-      if (error) throw error;
-      return data || [];
-    } catch (e) {
-      return [];
-    }
-  }
-
-  static async sendNotification(notification: Partial<Notification>) {
-    const { error } = await supabase.from('notifications').insert({
-        ...notification,
-        id: notification.id || Math.random().toString(36).substr(2, 9),
-        date: new Date().toISOString(),
-        isRead: false
-    });
-    if (error) throw error;
-  }
-
-  static async markNotificationRead(id: string) {
-    const { error } = await supabase.from('notifications').update({ isRead: true }).eq('id', id);
-    if (error) throw error;
-  }
-
-  // --- Announcement Management ---
-  static async getAnnouncements(): Promise<Announcement[]> {
-    try {
-      const { data, error } = await supabase.from('announcements').select('*').order('id', { ascending: false });
-      if (error) throw error;
-      return data || [];
-    } catch (e) {
-      return [];
-    }
-  }
-
-  static async saveAnnouncement(ann: Partial<Announcement>) {
-    const { error } = await supabase.from('announcements').upsert({
-        ...ann,
-        id: ann.id || Math.random().toString(36).substr(2, 9),
-        is_active: ann.is_active ?? true
-    }, { onConflict: 'id' });
-    if (error) throw error;
-  }
-
-  static async deleteAnnouncement(id: string) {
-    const { error } = await supabase.from('announcements').delete().eq('id', id);
-    if (error) throw error;
-  }
-
-  // --- Settings Management ---
-  static async getSettings() {
-    try {
-        const { data, error } = await supabase.from('settings').select('*').eq('id', 1).maybeSingle();
-        if (error) return null;
-        return data;
-    } catch (e) {
-        return null;
-    }
-  }
-
-  static async saveSettings(settings: any) {
-    const { error } = await supabase.from('settings').upsert({ 
-        id: 1, 
-        ...settings 
-    }, { onConflict: 'id' });
-    if (error) throw new Error(error.message);
-  }
-
-  // --- User Management ---
-  static async getUsers(): Promise<User[]> {
-    try {
-      const { data, error } = await supabase.from('users').select('*').order('id', { ascending: false });
-      if (error) throw error;
-      return data || [];
-    } catch (e) {
-      return [];
-    }
-  }
-
-  static async updateUserStatus(userId: string, status: string) {
-      const { error } = await supabase.from('users').update({ status }).eq('id', userId.toString());
-      if (error) throw error;
-  }
-
   static async syncUser(user: Partial<User>) {
-    // onConflict id belirtildiğinde, eğer kullanıcı varsa bilgilerini günceller, yoksa oluşturur.
+    if (!user.id) return;
     const { error } = await supabase.from('users').upsert({
         ...user,
-        id: user.id?.toString()
+        id: user.id.toString(),
+        joinDate: user.joinDate || new Date().toISOString(),
+        role: user.role || 'User',
+        status: user.status || 'Active'
     }, { onConflict: 'id' });
-    if (error) throw error;
+    if (error) console.error("User Sync Error:", error);
   }
 
-  // --- User Deep Dive Assets & Audit (ENRICHED DATA) ---
   static async getUserDetailedAssets(userId: string) {
-      console.log("Fetching detailed assets for user:", userId);
       try {
         const [channels, logs, userBots] = await Promise.all([
             supabase.from('channels').select('*').eq('user_id', userId.toString()),
@@ -231,12 +148,10 @@ export class DatabaseService {
             userBots: mappedUserBots
         };
       } catch (e) {
-          console.error("Critical: User assets fetch failed:", e);
           return { channels: [], logs: [], userBots: [] };
       }
   }
 
-  // --- Channel Management ---
   static async getChannels(userId: string): Promise<Channel[]> {
     try {
       const { data, error } = await supabase.from('channels').select('*').eq('user_id', userId.toString());
@@ -255,12 +170,100 @@ export class DatabaseService {
     if (error) throw error;
   }
 
-  // --- Admin Session ---
+  // New: Implementation for missing getSettings method
+  static async getSettings() {
+    try {
+      const { data, error } = await supabase.from('settings').select('*').maybeSingle();
+      if (error) throw error;
+      return data;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // New: Implementation for missing saveSettings method
+  static async saveSettings(settings: any) {
+    const { error } = await supabase.from('settings').upsert(settings, { onConflict: 'id' });
+    if (error) throw error;
+  }
+
+  // New: Implementation for missing getAnnouncements method
+  static async getAnnouncements(): Promise<Announcement[]> {
+    try {
+      const { data, error } = await supabase.from('announcements').select('*').order('id', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  // New: Implementation for missing saveAnnouncement method
+  static async saveAnnouncement(ann: Partial<Announcement>) {
+    const { error } = await supabase.from('announcements').upsert({
+      ...ann,
+      id: ann.id || Math.random().toString(36).substr(2, 9)
+    }, { onConflict: 'id' });
+    if (error) throw error;
+  }
+
+  // New: Implementation for missing deleteAnnouncement method
+  static async deleteAnnouncement(id: string) {
+    const { error } = await supabase.from('announcements').delete().eq('id', id);
+    if (error) throw error;
+  }
+
+  // New: Implementation for missing getNotifications method
+  static async getNotifications(userId?: string): Promise<Notification[]> {
+    try {
+      let query = supabase.from('notifications').select('*').order('date', { ascending: false });
+      if (userId) {
+        query = query.or(`user_id.eq.${userId},target_type.eq.global`);
+      }
+      const { data, error } = await query;
+      if (error) throw error;
+      return data || [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  // New: Implementation for missing markNotificationRead method
+  static async markNotificationRead(id: string) {
+    const { error } = await supabase.from('notifications').update({ isRead: true }).eq('id', id);
+    if (error) throw error;
+  }
+
+  // New: Implementation for missing sendNotification method
+  static async sendNotification(notification: Partial<Notification>) {
+    const { error } = await supabase.from('notifications').insert({
+      ...notification,
+      id: notification.id || Math.random().toString(36).substr(2, 9),
+      date: new Date().toISOString(),
+      isRead: false
+    });
+    if (error) throw error;
+  }
+
+  // New: Implementation for missing getUsers method
+  static async getUsers(): Promise<User[]> {
+    try {
+      const { data, error } = await supabase.from('users').select('*').order('joinDate', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  // New: Implementation for missing updateUserStatus method
+  static async updateUserStatus(userId: string, status: string) {
+    const { error } = await supabase.from('users').update({ status }).eq('id', userId);
+    if (error) throw error;
+  }
+
   static setAdminSession(token: string) { localStorage.setItem('admin_v3_session', token); }
   static isAdminLoggedIn(): boolean { return !!localStorage.getItem('admin_v3_session'); }
   static logoutAdmin() { localStorage.removeItem('admin_v3_session'); }
-
-  static async init() {
-    console.log("Database Sync Service v4.6 - Audit Protocol Active");
-  }
+  static async init() { console.log("Service Initialized"); }
 }
