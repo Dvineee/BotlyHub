@@ -1,4 +1,5 @@
-import React, { ErrorInfo, ReactNode } from 'react';
+
+import React, { ErrorInfo, ReactNode, Component, PropsWithChildren } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import { TranslationProvider } from './TranslationContext';
@@ -10,19 +11,22 @@ import './index.css';
  * Beklenmedik uygulama hatalarını yakalar ve kullanıcıya güvenli bir geri dönüş sunar.
  */
 interface ErrorBoundaryProps { 
-  children: ReactNode; 
 }
 interface ErrorBoundaryState { 
   hasError: boolean; 
   error: Error | null; 
 }
 
-// Fix: Use React.Component explicitly to ensure that state and props are correctly inherited and recognized by the TypeScript compiler.
-class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  constructor(props: ErrorBoundaryProps) {
+// Fix: Use Component with PropsWithChildren to resolve JSX children errors and define state as a class field for better TypeScript recognition.
+class ErrorBoundary extends Component<PropsWithChildren<ErrorBoundaryProps>, ErrorBoundaryState> {
+  // Fix: Explicitly define state property to resolve "Property 'state' does not exist on type ErrorBoundary" errors.
+  public state: ErrorBoundaryState = {
+    hasError: false,
+    error: null
+  };
+
+  constructor(props: PropsWithChildren<ErrorBoundaryProps>) {
     super(props);
-    // Fix: state is now correctly recognized as a property of ErrorBoundary through inheritance.
-    this.state = { hasError: false, error: null };
   }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
@@ -34,7 +38,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   }
 
   render() {
-    // Fix: state is now correctly recognized as a property of ErrorBoundary.
+    // Fix: Accessing state safely through inherited Component properties.
     if (this.state.hasError) {
       return (
         <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center p-8 text-center">
@@ -52,7 +56,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
         </div>
       );
     }
-    // Fix: props is now correctly recognized as a property of ErrorBoundary.
+    // Fix: Accessing children correctly from props provided by PropsWithChildren.
     return this.props.children;
   }
 }
@@ -62,7 +66,7 @@ if (rootElement) {
   const manifestUrl = 'https://ton-connect.github.io/demo-dapp-with-react-ui/tonconnect-manifest.json';
   const root = createRoot(rootElement);
 
-  // Fix: Providing children inside the ErrorBoundary component satisfies the required children prop.
+  // Fix: Wrapping the application with ErrorBoundary and TranslationProvider ensuring children are correctly typed and provided.
   root.render(
     <React.StrictMode>
       <ErrorBoundary>

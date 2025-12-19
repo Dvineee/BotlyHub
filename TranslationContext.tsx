@@ -1,5 +1,5 @@
 
-import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import React, { createContext, useState, useContext, useEffect, ReactNode, PropsWithChildren } from 'react';
 import './types';
 
 // Çeviri Sözlüğü - Anahtarlar veritabanındaki "category" değerleriyle (küçük harf) eşleşmelidir.
@@ -77,7 +77,8 @@ interface TranslationContextType {
 
 const TranslationContext = createContext<TranslationContextType | undefined>(undefined);
 
-export const TranslationProvider = ({ children }: { children: ReactNode }) => {
+// Fix: Explicitly use PropsWithChildren for TranslationProvider to resolve JSX children missing errors in consumption points like index.tsx.
+export const TranslationProvider = ({ children }: PropsWithChildren<{}>) => {
   const [language, setLanguage] = useState<Language>('tr');
 
   useEffect(() => {

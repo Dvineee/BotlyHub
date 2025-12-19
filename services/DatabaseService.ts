@@ -66,44 +66,60 @@ export class DatabaseService {
     if (error) throw error;
   }
 
-  // --- KRİTİK GÜNCELLEME: Kullanıcı Botu Ekleme ---
-  // userData: Telegram user objesi veya ID
-  // botData: Full bot objesi
+  /**
+   * Kullanıcı kütüphanesine bot ekler.
+   * Önemli: Foreign Key hatalarını önlemek için önce user ve bot varlığı kontrol edilir.
+   */
   static async addUserBot(userData: any, botData: Bot, isPremium: boolean = false) {
-    // 1. User ID'yi normalize et
     const userId = (userData.id || userData).toString();
     
-    console.log("Attempting to add user-bot relationship:", userId, botData.id);
+    try {
+        // 1. Kullanıcıyı senkronize et (Yoksa oluştur)
+        const { data: userCheck } = await supabase.from('users').select('id').eq('id', userId).maybeSingle();
+        if (!userCheck) {
+            await this.syncUser({
+                id: userId,
+                name: userData.first_name ? `${userData.first_name} ${userData.last_name || ''}`.trim() : 'User',
+                username: userData.username || 'user',
+                avatar: userData.photo_url || `https://ui-avatars.com/api/?name=User`
+            });
+        }
 
-    // 2. Kullanıcının var olduğundan emin ol (Yabancı anahtar hatasını önler)
-    const { data: userExists } = await supabase.from('users').select('id').eq('id', userId).maybeSingle();
-    if (!userExists) {
-        await this.syncUser({
-            id: userId,
-            name: userData.first_name ? `${userData.first_name} ${userData.last_name || ''}`.trim() : 'User',
-            username: userData.username || 'user',
-            avatar: userData.photo_url || `https://ui-avatars.com/api/?name=User`
-        });
-    }
+        // 2. Botun markette olduğundan emin ol
+        const { data: botCheck } = await supabase.from('bots').select('id').eq('id', botData.id).maybeSingle();
+        if (!botCheck) {
+            await this.saveBot(botData);
+        }
 
-    // 3. Botun veritabanında (Market) olduğundan emin ol (Yabancı anahtar hatasını önler)
-    const { data: botExists } = await supabase.from('bots').select('id').eq('id', botData.id).maybeSingle();
-    if (!botExists) {
-        await this.saveBot(botData);
-    }
+        // 3. İlişkiyi ekle
+        const payload: any = {
+            user_id: userId,
+            bot_id: botData.id,
+            is_active: true,
+            is_premium: isPremium
+        };
 
-    // 4. Kütüphaneye ekle (user_bots tablosuna insert)
-    const { error } = await supabase.from('user_bots').upsert({
-        user_id: userId,
-        bot_id: botData.id,
-        is_active: true,
-        is_premium: isPremium,
-        acquired_at: new Date().toISOString()
-    }, { onConflict: 'user_id, bot_id' });
-    
-    if (error) {
-        console.error("Supabase user_bots insert error:", error);
-        throw new Error("Veritabanı bağlantı hatası: " + error.message);
+        // acquired_at sütunu DB'de yoksa hata almamak için opsiyonel olarak ekleyelim
+        // Ancak SQL adımını yaptıysanız bu sorunsuz çalışacaktır.
+        payload.acquired_at = new Date().toISOString();
+
+        const { error } = await supabase
+            .from('user_bots')
+            .upsert(payload, { onConflict: 'user_id, bot_id' });
+        
+        if (error) {
+            // Eğer hala sütun hatası veriyorsa, acquired_at olmadan tekrar dene (Geçici çözüm)
+            if (error.message.includes('acquired_at')) {
+                delete payload.acquired_at;
+                const { error: retryError } = await supabase.from('user_bots').upsert(payload, { onConflict: 'user_id, bot_id' });
+                if (retryError) throw retryError;
+            } else {
+                throw error;
+            }
+        }
+    } catch (e: any) {
+        console.error("Critical Database Error in addUserBot:", e);
+        throw new Error(e.message || "Veritabanına eklenirken bir hata oluştu.");
     }
   }
 
@@ -145,7 +161,7 @@ export class DatabaseService {
             ownership: {
                 is_active: ub.is_active,
                 is_premium: ub.is_premium,
-                acquired_at: ub.acquired_at
+                acquired_at: ub.acquired_at || new Date().toISOString()
             }
         })).filter((item: any) => item.bot !== null);
 
