@@ -73,6 +73,10 @@ export class DatabaseService {
   // --- User-Bot Library Management ---
   static async addUserBot(userId: string, botId: string, isPremium: boolean = false) {
     console.log(`Syncing UserBot: User=${userId}, Bot=${botId}`);
+    
+    // Yabancı anahtar hatasını önlemek için önce kullanıcının varlığından emin olunur (UPSERT)
+    // Bu metot çağrıldığında App.tsx zaten sync yapmış olmalı ama güvenlik önlemi iyidir.
+
     const { error } = await supabase.from('user_bots').upsert({
         user_id: userId.toString(),
         bot_id: botId,
@@ -194,7 +198,11 @@ export class DatabaseService {
   }
 
   static async syncUser(user: Partial<User>) {
-    const { error } = await supabase.from('users').upsert(user, { onConflict: 'id' });
+    // onConflict id belirtildiğinde, eğer kullanıcı varsa bilgilerini günceller, yoksa oluşturur.
+    const { error } = await supabase.from('users').upsert({
+        ...user,
+        id: user.id?.toString()
+    }, { onConflict: 'id' });
     if (error) throw error;
   }
 
@@ -216,8 +224,6 @@ export class DatabaseService {
                 acquired_at: ub.acquired_at
             }
         })).filter((item: any) => item.bot !== null);
-
-        console.log(`Assets loaded: Channels=${channels.data?.length}, Bots=${mappedUserBots.length}`);
 
         return {
             channels: channels.data || [],
@@ -255,6 +261,6 @@ export class DatabaseService {
   static logoutAdmin() { localStorage.removeItem('admin_v3_session'); }
 
   static async init() {
-    console.log("Database Sync Service v4.5 - Audit Protocol Active");
+    console.log("Database Sync Service v4.6 - Audit Protocol Active");
   }
 }

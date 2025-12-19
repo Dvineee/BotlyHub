@@ -1,15 +1,14 @@
 
 import React, { useEffect, Suspense, lazy, useState } from 'react';
-// Fixed: Use namespace import for react-router-dom to resolve "no exported member" errors
 import * as Router from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { DatabaseService } from './services/DatabaseService';
+import { useTelegram } from './hooks/useTelegram';
+import { User } from './types';
 import './types';
 
-// Destructure router components and hooks from the namespace
 const { HashRouter, Routes, Route, useLocation, useNavigate } = Router as any;
 
-// Lazy Load Pages
 const Home = lazy(() => import('./pages/Home'));
 const SearchPage = lazy(() => import('./pages/SearchPage'));
 const BotDetail = lazy(() => import('./pages/BotDetail'));
@@ -22,8 +21,6 @@ const Notifications = lazy(() => import('./pages/Notifications'));
 const AccountSettings = lazy(() => import('./pages/AccountSettings'));
 const Earnings = lazy(() => import('./pages/Earnings'));
 const Maintenance = lazy(() => import('./pages/Maintenance'));
-
-// Admin Pages
 const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 
@@ -37,23 +34,44 @@ const PageLoader = () => (
 const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useTelegram();
   const isAdminPath = location.pathname.startsWith('/a/');
   const [isMaintenance, setIsMaintenance] = useState(false);
 
   useEffect(() => {
     DatabaseService.init();
     
-    const checkMaintenance = async () => {
-        if (isAdminPath) return;
-        const settings = await DatabaseService.getSettings();
-        if (settings && settings.maintenanceMode) {
-            setIsMaintenance(true);
-        } else {
-            const localStatus = localStorage.getItem('maintenance_mode') === 'true';
-            setIsMaintenance(localStatus);
+    const initializeApp = async () => {
+        // 1. Bakım Modu Kontrolü
+        if (!isAdminPath) {
+            const settings = await DatabaseService.getSettings();
+            if (settings && settings.maintenanceMode) {
+                setIsMaintenance(true);
+            }
+        }
+
+        // 2. Kullanıcı Senkronizasyonu (Kütüphaneye ekleme hatasını önlemek için kritik)
+        if (user && !isAdminPath) {
+            try {
+                const userData: Partial<User> = {
+                    id: user.id.toString(),
+                    name: `${user.first_name} ${user.last_name || ''}`.trim(),
+                    username: user.username || 'user',
+                    avatar: user.photo_url || `https://ui-avatars.com/api/?name=${user.first_name}`,
+                    role: 'User',
+                    status: 'Active',
+                    badges: [],
+                    joinDate: new Date().toISOString()
+                };
+                await DatabaseService.syncUser(userData);
+                console.log("User successfully synchronized with DB.");
+            } catch (e) {
+                console.error("User sync failed:", e);
+            }
         }
     };
-    checkMaintenance();
+    
+    initializeApp();
 
     if (!isAdminPath) {
       const tg = window.Telegram?.WebApp;
@@ -73,7 +91,7 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
     }, 150);
 
     return () => clearTimeout(timer);
-  }, [isAdminPath]);
+  }, [isAdminPath, user]);
 
   useEffect(() => {
     if (isAdminPath) return;

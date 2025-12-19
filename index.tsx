@@ -11,15 +11,15 @@ import './index.css';
  * Beklenmedik uygulama hatalarını yakalar ve kullanıcıya güvenli bir geri dönüş sunar.
  */
 interface ErrorBoundaryProps { 
-  children?: ReactNode; 
+  children: ReactNode; 
 }
 interface ErrorBoundaryState { 
   hasError: boolean; 
   error: Error | null; 
 }
 
-// Fixed: Inherit from Component with explicit generic types and optional children to ensure 'this.state', 'this.props', and JSX usage are correctly typed.
-class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+// Fixed: Inherit from React.Component with explicit generic types to ensure 'this.state' and 'this.props' are correctly typed and available to the TypeScript compiler.
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false, error: null };
@@ -34,7 +34,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 
   render() {
-    // Fixed: Access state via 'this.state' as it is now correctly inherited and typed.
+    // Fixed: Properly access state via 'this.state' which is now correctly inherited from React.Component.
     if (this.state.hasError) {
       return (
         <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center p-8 text-center">
@@ -53,7 +53,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       );
     }
     // Fixed: Properly return children from props using 'this.props.children'.
-    return this.props.children || null;
+    return this.props.children;
   }
 }
 
@@ -62,7 +62,7 @@ if (rootElement) {
   const manifestUrl = 'https://ton-connect.github.io/demo-dapp-with-react-ui/tonconnect-manifest.json';
   const root = createRoot(rootElement);
 
-  // root.render expects a ReactNode. We provide a tree starting with StrictMode and ErrorBoundary.
+  // Fixed: Wrapped the app tree within ErrorBoundary, which now correctly identifies its children through proper class inheritance.
   root.render(
     <React.StrictMode>
       <ErrorBoundary>
