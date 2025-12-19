@@ -6,84 +6,59 @@ import { TranslationProvider } from './TranslationContext';
 import { TonConnectUIProvider } from '@tonconnect/ui-react';
 import './index.css';
 
-console.log("Application initializing...");
+/**
+ * Uygulama Hata Yakalayıcı (ErrorBoundary)
+ * Beklenmedik uygulama hatalarını yakalar ve kullanıcıya güvenli bir geri dönüş sunar.
+ */
+// Fixed: Marked children as optional to resolve missing children error in some TS configurations
+interface Props { children?: ReactNode; }
+interface State { hasError: boolean; error: Error | null; }
 
-// --- Error Boundary for Production Debugging ---
-interface ErrorBoundaryProps {
-  // Making children optional helps resolve JSX missing prop errors in some TypeScript environments
-  children?: ReactNode;
-}
-
-interface ErrorBoundaryState {
-  hasError: boolean;
-  error: Error | null;
-  errorInfo: ErrorInfo | null;
-}
-
-// Fixed: Explicitly using React.Component with generic parameters for props and state to ensure inherited properties are recognized
-class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  // Fixed: Initializing state as a class property to ensure it's recognized by the type checker on the instance
-  public state: ErrorBoundaryState = { 
-    hasError: false, 
-    error: null, 
-    errorInfo: null 
-  };
-
-  constructor(props: ErrorBoundaryProps) {
+// Fixed: Explicitly use React.Component and a constructor to ensure this.props and this.state are correctly recognized by TypeScript
+class ErrorBoundary extends React.Component<Props, State> {
+  constructor(props: Props) {
     super(props);
+    this.state = { hasError: false, error: null };
   }
 
-  static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
+  static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("Uncaught error:", error, errorInfo);
-    // Fixed: setState is now correctly recognized as inherited from React.Component
-    this.setState({ error, errorInfo });
+    console.error("Critical Runtime Error:", error, errorInfo);
   }
 
   render() {
-    // Fixed: state property is recognized on the class instance
     if (this.state.hasError) {
       return (
-        <div style={{ padding: 20, color: '#fff', backgroundColor: '#991b1b', height: '100vh', overflow: 'auto', fontFamily: 'monospace', zIndex: 99999, position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}>
-          <h2>⚠️ Uygulama Hatası</h2>
-          <p>Bir şeyler ters gitti.</p>
-          <br/>
-          <strong>Hata:</strong> {this.state.error?.toString()}
-          <br/><br/>
-          <details style={{ whiteSpace: 'pre-wrap' }}>
-            {this.state.errorInfo?.componentStack}
-          </details>
-          <br/>
+        <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center p-8 text-center">
+          <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mb-6 border border-red-500/20">
+            <span className="text-4xl">⚠️</span>
+          </div>
+          <h2 className="text-2xl font-black text-white mb-4 uppercase tracking-tighter italic">Uygulama Hatası</h2>
+          <p className="text-slate-500 text-sm mb-8 max-w-xs font-medium">Bir şeyler ters gitti. Uygulamayı yeniden başlatmayı deneyin.</p>
           <button 
             onClick={() => window.location.reload()} 
-            style={{ padding: '10px 20px', borderRadius: 8, border: 'none', backgroundColor: '#fff', color: '#991b1b', fontWeight: 'bold' }}
+            className="px-10 py-4 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-2xl transition-all shadow-xl shadow-blue-900/20 active:scale-95 text-xs uppercase tracking-widest"
           >
-            Sayfayı Yenile
+            Yeniden Başlat
           </button>
         </div>
       );
     }
-
-    // Fixed: props property is recognized on the class instance
+    // Fixed: Accessed children via this.props safely, property now recognized via inheritance
     return this.props.children;
   }
 }
 
 const rootElement = document.getElementById('root');
-if (!rootElement) {
-  throw new Error("Could not find root element to mount to");
-}
-
-try {
+if (rootElement) {
   const manifestUrl = 'https://ton-connect.github.io/demo-dapp-with-react-ui/tonconnect-manifest.json';
   const root = createRoot(rootElement);
 
   root.render(
     <React.StrictMode>
-      {/* Fixed: Making children optional in props and wrapping correctly resolves missing children prop errors */}
       <ErrorBoundary>
         <TonConnectUIProvider manifestUrl={manifestUrl}>
           <TranslationProvider>
@@ -93,9 +68,4 @@ try {
       </ErrorBoundary>
     </React.StrictMode>
   );
-  console.log("React mount successful");
-} catch (e) {
-  console.error("Critical mount error:", e);
-  // Fallback error display if React completely fails to mount
-  rootElement.innerHTML = `<div style="color:red; padding:20px;">CRITICAL STARTUP ERROR: ${e}</div>`;
 }
