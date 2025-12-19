@@ -73,9 +73,9 @@ const BotDetail = () => {
           <h2 className="text-3xl font-black mt-8 text-white text-center leading-tight">{bot.name}</h2>
           
           <div className="flex gap-2 mt-4">
-              {/* Kategori Türkçeleştirildi */}
+              {/* Kategori Veritabanından gelen değeri (örn: Productivity) küçültüp sözlükten buluyoruz */}
               <span className="text-[10px] font-black px-3 py-1.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 uppercase tracking-widest">
-                {t('cat_' + bot.category)}
+                {t('cat_' + (bot.category || '').toLowerCase())}
               </span>
               <span className="text-[10px] font-black px-3 py-1.5 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase tracking-widest flex items-center gap-1.5">
                 <ShieldCheck size={12}/> {t('verified')}

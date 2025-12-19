@@ -2,7 +2,7 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import './types';
 
-// Çeviri Sözlüğü
+// Çeviri Sözlüğü - Anahtarlar veritabanındaki "category" değerleriyle (küçük harf) eşleşmelidir.
 const translations = {
   tr: {
     // Navigation & Header
@@ -15,7 +15,7 @@ const translations = {
     "no_results": "Sonuç bulunamadı.",
     "search_all_cats": "Tüm Kategorilerde Ara",
     
-    // Categories (Kullanıcı Tarafı)
+    // Kategoriler (Veritabanındaki ID'ler ile tam eşleşen anahtarlar)
     "cat_all": "Hepsi",
     "cat_productivity": "Üretkenlik",
     "cat_games": "Eğlence & Oyun",
@@ -24,7 +24,7 @@ const translations = {
     "cat_music": "Müzik & Ses",
     "cat_moderation": "Grup Yönetimi",
     
-    // Bot Detail & Actions
+    // Bot Detay & Eylemler
     "open": "Aç",
     "premium": "Premium",
     "verified": "Doğrulanmış",
@@ -35,7 +35,7 @@ const translations = {
     "start_bot": "Botu Başlat",
     "share_copied": "Link kopyalandı!",
 
-    // Sections
+    // Bölümler
     "featured": "Öne Çıkanlar",
     "search_results": "Arama Sonuçları"
   },
