@@ -7,7 +7,7 @@ import {
   Megaphone, Calendar, Settings as SettingsIcon, 
   ShieldCheck, Percent, Globe, MessageSquare, AlertTriangle,
   Sparkles, Zap, Star, ChevronRight, Eye, Send, Activity, 
-  Clock, Wallet, ShieldAlert, Cpu, Ban, CheckCircle, Gift, Info, Heart, Bell, Shield, ExternalLink, TrendingUp, History, ListFilter
+  Clock, Wallet, ShieldAlert, Cpu, Ban, CheckCircle, Gift, Info, Heart, Bell, Shield, ExternalLink, TrendingUp, History, ListFilter, CreditCard
 } from 'lucide-react';
 import { DatabaseService } from '../../services/DatabaseService';
 import { User, Bot as BotType, Announcement, Notification, Channel } from '../../types';
@@ -70,6 +70,7 @@ const AdminDashboard = () => {
           </div>
           <nav className="flex-1 space-y-2">
             <NavItem to="/a/dashboard" icon={LayoutDashboard} label="Kontrol Paneli" />
+            <NavItem to="/a/dashboard/sales" icon={CreditCard} label="Satış Geçmişi" />
             <NavItem to="/a/dashboard/users" icon={Users} label="Kullanıcılar" />
             <NavItem to="/a/dashboard/bots" icon={Bot} label="Market Botları" />
             <NavItem to="/a/dashboard/notifications" icon={Send} label="Bildirim Merkezi" />
@@ -103,6 +104,7 @@ const AdminDashboard = () => {
           <div className="max-w-[1400px] mx-auto pb-10">
             <Routes>
               <Route path="/" element={<HomeView />} />
+              <Route path="/sales" element={<SalesManagement />} />
               <Route path="/users" element={<UserManagement />} />
               <Route path="/bots" element={<BotManagement />} />
               <Route path="/notifications" element={<NotificationCenter />} />
@@ -117,7 +119,7 @@ const AdminDashboard = () => {
 };
 
 const HomeView = () => {
-    const [stats, setStats] = useState({ userCount: 0, botCount: 0, notifCount: 0, annCount: 0 });
+    const [stats, setStats] = useState({ userCount: 0, botCount: 0, notifCount: 0, annCount: 0, salesCount: 0 });
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => { load(); }, []);
@@ -150,7 +152,7 @@ const HomeView = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard label="Toplam Üye" value={stats.userCount} icon={Users} color="blue" trend="+12%" />
                 <StatCard label="Aktif Bot" value={stats.botCount} icon={Bot} color="purple" trend="+4%" />
-                <StatCard label="Bildirimler" value={stats.notifCount} icon={Send} color="emerald" trend="Anlık" />
+                <StatCard label="Toplam İşlem" value={stats.salesCount} icon={CreditCard} color="emerald" trend="Canlı" />
                 <StatCard label="Aktif Duyuru" value={stats.annCount} icon={Megaphone} color="orange" trend="Live" />
             </div>
 
@@ -183,6 +185,103 @@ const HomeView = () => {
                         <LogItem time="45 dk" action="Sistem ayarları denetlendi" status="Update" />
                         <LogItem time="2 sa" action="Veritabanı senkronize edildi" status="Success" />
                     </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const SalesManagement = () => {
+    const [sales, setSales] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [search, setSearch] = useState('');
+
+    useEffect(() => { load(); }, []);
+    const load = async () => {
+        setIsLoading(true);
+        const data = await DatabaseService.getAllPurchases();
+        setSales(data);
+        setIsLoading(false);
+    };
+
+    const filteredSales = sales.filter(s => 
+        (s.users?.name || '').toLowerCase().includes(search.toLowerCase()) || 
+        (s.bots?.name || '').toLowerCase().includes(search.toLowerCase())
+    );
+
+    return (
+        <div className="animate-in fade-in space-y-10">
+            <div className="flex flex-col sm:flex-row justify-between gap-6">
+                <div>
+                    <h2 className="text-3xl font-black text-white italic tracking-tighter uppercase">İŞLEM <span className="text-emerald-500">GEÇMİŞİ</span></h2>
+                    <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mt-1">Market Satış ve Edinme Kayıtları ({sales.length})</p>
+                </div>
+                <div className="flex gap-4">
+                    <input 
+                        type="text" 
+                        value={search}
+                        onChange={e => setSearch(e.target.value)}
+                        placeholder="Kullanıcı veya bot ara..." 
+                        className="bg-[#0f172a] border border-slate-800 rounded-2xl px-6 py-4 text-xs outline-none focus:border-emerald-500 transition-all w-full sm:w-80 font-bold" 
+                    />
+                    <button onClick={load} className="p-4 bg-slate-900 border border-slate-800 rounded-2xl text-slate-400 hover:text-white transition-all"><RefreshCw size={20} className={isLoading ? 'animate-spin' : ''}/></button>
+                </div>
+            </div>
+
+            <div className="bg-[#0f172a] border border-slate-800 rounded-[32px] overflow-hidden shadow-2xl">
+                <div className="overflow-x-auto no-scrollbar">
+                    <table className="w-full text-left">
+                        <thead className="bg-slate-950/50 border-b border-slate-800 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                            <tr>
+                                <th className="px-8 py-6">Kullanıcı</th>
+                                <th className="px-8 py-6">Alınan Bot</th>
+                                <th className="px-8 py-6">İşlem Tipi</th>
+                                <th className="px-8 py-6">Tarih</th>
+                                <th className="px-8 py-6 text-right">Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-800/50">
+                            {isLoading ? <tr><td colSpan={5} className="p-20 text-center text-slate-500 font-bold animate-pulse">KAYITLAR YÜKLENİYOR...</td></tr> : 
+                             filteredSales.length === 0 ? <tr><td colSpan={5} className="p-20 text-center text-slate-600 font-bold italic">Henüz bir işlem kaydı bulunmuyor.</td></tr> : 
+                             filteredSales.map((s, idx) => (
+                                <tr key={idx} className="hover:bg-slate-800/20 transition-all group">
+                                    <td className="px-8 py-6">
+                                        <div className="flex items-center gap-4">
+                                            <img src={s.users?.avatar} className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800" />
+                                            <div>
+                                                <p className="font-black text-white text-xs">@{s.users?.username}</p>
+                                                <p className="text-[9px] text-slate-500 font-bold uppercase tracking-tighter">{s.users?.name}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-8 py-6">
+                                        <div className="flex items-center gap-4">
+                                            <img src={s.bots?.icon} className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800" />
+                                            <div>
+                                                <p className="font-black text-white text-xs italic">{s.bots?.name}</p>
+                                                <p className="text-[9px] text-slate-500 font-bold uppercase">Stars {s.bots?.price}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-8 py-6">
+                                        <span className={`text-[9px] font-black px-3 py-1.5 rounded-xl uppercase tracking-widest border ${s.is_premium ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' : 'bg-slate-800 text-slate-500 border-slate-700'}`}>
+                                            {s.is_premium ? 'Premium' : 'Ücretsiz'}
+                                        </span>
+                                    </td>
+                                    <td className="px-8 py-6">
+                                        <p className="text-xs text-slate-400 font-bold">{new Date(s.acquired_at).toLocaleDateString('tr-TR')}</p>
+                                        <p className="text-[9px] text-slate-600 uppercase font-black">{new Date(s.acquired_at).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</p>
+                                    </td>
+                                    <td className="px-8 py-6 text-right">
+                                        <div className="flex items-center justify-end gap-2">
+                                            <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                                            <span className="text-[10px] font-black text-emerald-400 uppercase">BAŞARILI</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -346,7 +445,6 @@ const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClos
         loadData();
     }, [user.id]);
 
-    // Force reload when tab switches to assets to ensure sync
     useEffect(() => {
         if (activeTab === 'assets') {
             loadData();
@@ -359,7 +457,6 @@ const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClos
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-end bg-black/90 backdrop-blur-md animate-in fade-in" onClick={onClose}>
             <div className="h-full w-full max-w-4xl bg-[#0f172a] border-l border-slate-800 shadow-2xl flex flex-col relative overflow-hidden" onClick={e => e.stopPropagation()}>
-                {/* Header */}
                 <div className="p-10 pb-6 border-b border-slate-800/50 flex justify-between items-start shrink-0">
                     <div className="flex gap-8">
                         <div className="relative">
@@ -384,14 +481,12 @@ const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClos
                     </div>
                 </div>
 
-                {/* Tabs */}
                 <div className="flex px-10 gap-8 border-b border-slate-800/50 bg-slate-950/20 shrink-0">
                     <TabBtn active={activeTab === 'info'} label="Profil Analizi" icon={TrendingUp} onClick={() => setActiveTab('info')} />
                     <TabBtn active={activeTab === 'assets'} label={`Varlıklar (${data.channels.length + data.userBots.length})`} icon={Package} onClick={() => setActiveTab('assets')} />
                     <TabBtn active={activeTab === 'logs'} label="İşlem Geçmişi" icon={History} onClick={() => setActiveTab('logs')} />
                 </div>
 
-                {/* Content */}
                 <div className="flex-1 overflow-y-auto p-10 no-scrollbar pb-32">
                     {isLoading ? (
                         <div className="flex flex-col items-center justify-center py-20 gap-4">
@@ -524,7 +619,6 @@ const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClos
                     )}
                 </div>
 
-                {/* Footer */}
                 <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-[#0f172a] via-[#0f172a] to-transparent shrink-0">
                     <button className="w-full py-6 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-[36px] text-[11px] tracking-[0.4em] uppercase shadow-2xl shadow-blue-900/40 active:scale-95 transition-all flex items-center justify-center gap-4">
                         <MessageSquare size={20}/> KULLANICIYA MESAJ İLET

@@ -1,4 +1,3 @@
-
 import React, { ErrorInfo, ReactNode, Component, PropsWithChildren } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
@@ -11,21 +10,22 @@ import './index.css';
  * Beklenmedik uygulama hatalarını yakalar ve kullanıcıya güvenli bir geri dönüş sunar.
  */
 interface ErrorBoundaryProps { 
+  children?: ReactNode;
 }
 interface ErrorBoundaryState { 
   hasError: boolean; 
   error: Error | null; 
 }
 
-// Fix: Use Component with PropsWithChildren to resolve JSX children errors and define state as a class field for better TypeScript recognition.
-class ErrorBoundary extends Component<PropsWithChildren<ErrorBoundaryProps>, ErrorBoundaryState> {
-  // Fix: Explicitly define state property to resolve "Property 'state' does not exist on type ErrorBoundary" errors.
+// Fix: Using React.Component explicitly to ensure 'props' and 'state' are correctly inherited and recognized by the TypeScript compiler.
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  // Fix: Explicitly define state property to resolve "Property 'state' does not exist on type ErrorBoundary" errors and ensure correct inheritance.
   public state: ErrorBoundaryState = {
     hasError: false,
     error: null
   };
 
-  constructor(props: PropsWithChildren<ErrorBoundaryProps>) {
+  constructor(props: ErrorBoundaryProps) {
     super(props);
   }
 
@@ -38,7 +38,7 @@ class ErrorBoundary extends Component<PropsWithChildren<ErrorBoundaryProps>, Err
   }
 
   render() {
-    // Fix: Accessing state safely through inherited Component properties.
+    // Fix: Accessing state through inherited Component properties.
     if (this.state.hasError) {
       return (
         <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center p-8 text-center">
@@ -56,7 +56,7 @@ class ErrorBoundary extends Component<PropsWithChildren<ErrorBoundaryProps>, Err
         </div>
       );
     }
-    // Fix: Accessing children correctly from props provided by PropsWithChildren.
+    // Fix: Inheriting from React.Component provides access to this.props, resolving the error where 'props' was not found on ErrorBoundary.
     return this.props.children;
   }
 }
