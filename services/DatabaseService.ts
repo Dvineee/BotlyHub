@@ -67,36 +67,43 @@ export class DatabaseService {
   }
 
   // --- KRİTİK GÜNCELLEME: Kullanıcı Botu Ekleme ---
+  // userData: Telegram user objesi veya ID
+  // botData: Full bot objesi
   static async addUserBot(userData: any, botData: Bot, isPremium: boolean = false) {
-    const userId = userData.id.toString();
+    // 1. User ID'yi normalize et
+    const userId = (userData.id || userData).toString();
     
-    // 1. Kullanıcının var olduğundan emin ol (Race condition önleyici)
-    await this.syncUser({
-        id: userId,
-        name: `${userData.first_name || ''} ${userData.last_name || ''}`.trim() || 'User',
-        username: userData.username || 'user',
-        avatar: userData.photo_url || `https://ui-avatars.com/api/?name=User`,
-    });
+    console.log("Attempting to add user-bot relationship:", userId, botData.id);
 
-    // 2. Botun veritabanında olduğundan emin ol (Eğer mock datadan geliyorsa DB'de olmayabilir)
-    const { data: existingBot } = await supabase.from('bots').select('id').eq('id', botData.id).maybeSingle();
-    if (!existingBot) {
+    // 2. Kullanıcının var olduğundan emin ol (Yabancı anahtar hatasını önler)
+    const { data: userExists } = await supabase.from('users').select('id').eq('id', userId).maybeSingle();
+    if (!userExists) {
+        await this.syncUser({
+            id: userId,
+            name: userData.first_name ? `${userData.first_name} ${userData.last_name || ''}`.trim() : 'User',
+            username: userData.username || 'user',
+            avatar: userData.photo_url || `https://ui-avatars.com/api/?name=User`
+        });
+    }
+
+    // 3. Botun veritabanında (Market) olduğundan emin ol (Yabancı anahtar hatasını önler)
+    const { data: botExists } = await supabase.from('bots').select('id').eq('id', botData.id).maybeSingle();
+    if (!botExists) {
         await this.saveBot(botData);
     }
 
-    // 3. İlişkiyi kur
+    // 4. Kütüphaneye ekle (user_bots tablosuna insert)
     const { error } = await supabase.from('user_bots').upsert({
         user_id: userId,
         bot_id: botData.id,
         is_active: true,
-        is_ad_enabled: false,
         is_premium: isPremium,
         acquired_at: new Date().toISOString()
     }, { onConflict: 'user_id, bot_id' });
     
     if (error) {
-        console.error("addUserBot Error:", error);
-        throw new Error(error.message);
+        console.error("Supabase user_bots insert error:", error);
+        throw new Error("Veritabanı bağlantı hatası: " + error.message);
     }
   }
 
@@ -170,7 +177,6 @@ export class DatabaseService {
     if (error) throw error;
   }
 
-  // New: Implementation for missing getSettings method
   static async getSettings() {
     try {
       const { data, error } = await supabase.from('settings').select('*').maybeSingle();
@@ -181,13 +187,11 @@ export class DatabaseService {
     }
   }
 
-  // New: Implementation for missing saveSettings method
   static async saveSettings(settings: any) {
     const { error } = await supabase.from('settings').upsert(settings, { onConflict: 'id' });
     if (error) throw error;
   }
 
-  // New: Implementation for missing getAnnouncements method
   static async getAnnouncements(): Promise<Announcement[]> {
     try {
       const { data, error } = await supabase.from('announcements').select('*').order('id', { ascending: false });
@@ -198,7 +202,6 @@ export class DatabaseService {
     }
   }
 
-  // New: Implementation for missing saveAnnouncement method
   static async saveAnnouncement(ann: Partial<Announcement>) {
     const { error } = await supabase.from('announcements').upsert({
       ...ann,
@@ -207,13 +210,11 @@ export class DatabaseService {
     if (error) throw error;
   }
 
-  // New: Implementation for missing deleteAnnouncement method
   static async deleteAnnouncement(id: string) {
     const { error } = await supabase.from('announcements').delete().eq('id', id);
     if (error) throw error;
   }
 
-  // New: Implementation for missing getNotifications method
   static async getNotifications(userId?: string): Promise<Notification[]> {
     try {
       let query = supabase.from('notifications').select('*').order('date', { ascending: false });
@@ -228,13 +229,11 @@ export class DatabaseService {
     }
   }
 
-  // New: Implementation for missing markNotificationRead method
   static async markNotificationRead(id: string) {
     const { error } = await supabase.from('notifications').update({ isRead: true }).eq('id', id);
     if (error) throw error;
   }
 
-  // New: Implementation for missing sendNotification method
   static async sendNotification(notification: Partial<Notification>) {
     const { error } = await supabase.from('notifications').insert({
       ...notification,
@@ -245,7 +244,6 @@ export class DatabaseService {
     if (error) throw error;
   }
 
-  // New: Implementation for missing getUsers method
   static async getUsers(): Promise<User[]> {
     try {
       const { data, error } = await supabase.from('users').select('*').order('joinDate', { ascending: false });
@@ -256,7 +254,6 @@ export class DatabaseService {
     }
   }
 
-  // New: Implementation for missing updateUserStatus method
   static async updateUserStatus(userId: string, status: string) {
     const { error } = await supabase.from('users').update({ status }).eq('id', userId);
     if (error) throw error;

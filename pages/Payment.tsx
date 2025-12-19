@@ -28,14 +28,17 @@ const Payment = () => {
   const item = targetBot || plan;
 
   const handleSuccess = async () => {
+      if (!item) return;
+      
       haptic('heavy');
       notification('success');
       
       if (targetBot) {
           // 1. Veritabanı Senkronizasyonu (Admin Görünürlüğü İçin)
-          if (user?.id) {
+          // HATA DÜZELTME: Sadece ID değil, tüm objeleri gönderiyoruz.
+          if (user) {
               try {
-                  await DatabaseService.addUserBot(user.id.toString(), targetBot.id, true);
+                  await DatabaseService.addUserBot(user, targetBot, true);
               } catch (e) {
                   console.error("Database sync error during payment:", e);
               }
