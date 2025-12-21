@@ -1,4 +1,3 @@
-
 import { createClient } from '@supabase/supabase-js';
 import { Bot, User, Channel, Announcement, Notification } from '../types';
 
@@ -232,7 +231,7 @@ export class DatabaseService {
           id: u.id,
           name: u.name,
           username: u.username,
-          avatar: u.avatar,
+          avatar: u.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(u.name || 'User')}`,
           role: u.role,
           status: u.status,
           badges: u.badges || [],
