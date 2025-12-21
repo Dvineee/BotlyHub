@@ -8,9 +8,14 @@ export default defineConfig({
     outDir: 'dist',
   },
   server: {
-    host: true, // Telefondan test ederken yerel IP ile erişim için gerekli
+    host: true,
+    port: 5173,
+    // ngrok tüneli üzerinden HMR (Hot Module Replacement) çalışması için
+    hmr: {
+        clientPort: 443
+    },
+    // ngrok gibi dış servislerin erişimine izin ver
+    allowedHosts: ['all'] 
   },
-  // Telegram Web Apps often run in a subpath or verify root access differently.
-  // './' ensures assets are loaded relative to index.html
   base: './', 
 });

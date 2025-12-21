@@ -56,12 +56,9 @@ export class DatabaseService {
     const botId = botData.id.toString();
     
     try {
-        // 1. ADIM: Kullanıcıyı senkronize et (Foreign Key hatasını önlemek için ŞART)
-        // Eğer kullanıcı veritabanında yoksa, user_bots kaydı eklenemez.
         const { data: userExists } = await supabase.from('users').select('id').eq('id', userId).maybeSingle();
         
         if (!userExists) {
-            console.log("Kullanıcı bulunamadı, yeni kayıt oluşturuluyor...");
             await this.syncUser({
                 id: userId,
                 name: userData.first_name ? `${userData.first_name} ${userData.last_name || ''}`.trim() : (userData.name || 'Bilinmeyen Kullanıcı'),
@@ -70,13 +67,11 @@ export class DatabaseService {
             });
         }
 
-        // 2. ADIM: Botun sistemde kayıtlı olduğundan emin ol
         const { data: botExists } = await supabase.from('bots').select('id').eq('id', botId).maybeSingle();
         if (!botExists) {
             await this.saveBot(botData);
         }
 
-        // 3. ADIM: user_bots tablosuna kaydet (Satın Alma Gerçekleşiyor)
         const payload = {
             user_id: userId,
             bot_id: botId,
@@ -89,23 +84,8 @@ export class DatabaseService {
             .from('user_bots')
             .upsert(payload, { onConflict: 'user_id,bot_id' });
         
-        if (upsertError) {
-            // Upsert başarısız olursa manuel kontrol ve müdahale (Constraint koruması)
-            const { data: existing } = await supabase
-                .from('user_bots')
-                .select('*')
-                .eq('user_id', userId)
-                .eq('bot_id', botId)
-                .maybeSingle();
+        if (upsertError) throw upsertError;
 
-            if (existing) {
-                await supabase.from('user_bots').update(payload).eq('user_id', userId).eq('bot_id', botId);
-            } else {
-                await supabase.from('user_bots').insert(payload);
-            }
-        }
-
-        // 4. ADIM: Bildirim ve Log
         await this.sendNotification({
             user_id: userId,
             type: isPremium ? 'payment' : 'bot',
@@ -198,12 +178,19 @@ export class DatabaseService {
   }
 
   static async saveBot(bot: Partial<Bot>) {
+    // ID yoksa veya boşsa rastgele bir ID ata (Yeni ekleme durumu)
+    const botId = bot.id || Math.random().toString(36).substring(2, 9);
+    
     const { error } = await supabase.from('bots').upsert({
       ...bot,
-      id: bot.id || Math.random().toString(36).substr(2, 9),
+      id: botId,
       screenshots: bot.screenshots || []
     }, { onConflict: 'id' });
-    if (error) throw error;
+    
+    if (error) {
+        console.error("Bot Save Error:", error.message);
+        throw error;
+    }
   }
 
   static async deleteBot(id: string) {

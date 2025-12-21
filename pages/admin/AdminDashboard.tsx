@@ -322,7 +322,6 @@ const LogItem = ({ time, action, status }: any) => {
     );
 };
 
-// --- User Management Module ---
 const UserManagement = () => {
     const [users, setUsers] = useState<User[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -444,12 +443,6 @@ const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClos
     useEffect(() => {
         loadData();
     }, [user.id]);
-
-    useEffect(() => {
-        if (activeTab === 'assets') {
-            loadData();
-        }
-    }, [activeTab]);
 
     const totalMemberCount = data.channels.reduce((sum, c) => sum + (c.memberCount || 0), 0);
     const totalRevenue = data.channels.reduce((sum, c) => sum + (c.revenue || 0), 0);
@@ -647,12 +640,12 @@ const DetailCard = ({ label, value, icon: Icon }: any) => (
     </div>
 );
 
-// --- Market Bot Management ---
 const BotManagement = () => {
     const [bots, setBots] = useState<BotType[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingBot, setEditingBot] = useState<Partial<BotType> | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => { load(); }, []);
     const load = async () => { setIsLoading(true); setBots(await DatabaseService.getBots()); setIsLoading(false); };
@@ -660,9 +653,17 @@ const BotManagement = () => {
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!editingBot) return;
-        await DatabaseService.saveBot(editingBot);
-        setIsModalOpen(false);
-        load();
+        
+        setIsSaving(true);
+        try {
+            await DatabaseService.saveBot(editingBot);
+            setIsModalOpen(false);
+            load();
+        } catch (err: any) {
+            alert("Hata: " + err.message);
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     return (
@@ -703,25 +704,25 @@ const BotManagement = () => {
             )}
 
             {isModalOpen && editingBot && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/95 backdrop-blur-md animate-in fade-in" onClick={() => setIsModalOpen(false)}>
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/95 backdrop-blur-md animate-in fade-in" onClick={() => !isSaving && setIsModalOpen(false)}>
                     <div className="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-[44px] p-10 relative shadow-2xl overflow-y-auto max-h-[90vh] no-scrollbar" onClick={e => e.stopPropagation()}>
-                        <button onClick={() => setIsModalOpen(false)} className="absolute top-8 right-8 text-slate-500 hover:text-white"><X size={22}/></button>
+                        <button onClick={() => setIsModalOpen(false)} disabled={isSaving} className="absolute top-8 right-8 text-slate-500 hover:text-white disabled:opacity-30"><X size={22}/></button>
                         <h3 className="text-2xl font-black mb-10 text-white italic tracking-tighter uppercase">{editingBot.id ? 'Bot Verisini Düzenle' : 'Yeni Bot Oluştur'}</h3>
                         <form onSubmit={handleSave} className="space-y-6">
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Bot İsmi</label>
-                                <input type="text" required value={editingBot.name} onChange={e => setEditingBot({...editingBot, name: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none transition-all shadow-inner" />
+                                <input type="text" required value={editingBot.name} onChange={e => setEditingBot({...editingBot, name: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none transition-all shadow-inner" placeholder="Botun Marketteki Adı" />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Kategori</label>
                                     <select value={editingBot.category} onChange={e => setEditingBot({...editingBot, category: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none appearance-none">
                                         <option value="productivity">Üretkenlik</option>
-                                        <option value="games">Oyun</option>
-                                        <option value="utilities">Araçlar</option>
-                                        <option value="finance">Finans</option>
-                                        <option value="music">Müzik</option>
-                                        <option value="moderation">Moderasyon</option>
+                                        <option value="games">Eğlence & Oyun</option>
+                                        <option value="utilities">Araçlar & Servisler</option>
+                                        <option value="finance">Finans & Ekonomi</option>
+                                        <option value="music">Müzik & Ses</option>
+                                        <option value="moderation">Grup Yönetimi</option>
                                     </select>
                                 </div>
                                 <div className="space-y-2">
@@ -731,17 +732,19 @@ const BotManagement = () => {
                             </div>
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Detaylı Açıklama</label>
-                                <textarea required value={editingBot.description} onChange={e => setEditingBot({...editingBot, description: (e.target as any).value})} className="w-full h-32 bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm resize-none focus:border-blue-500 outline-none font-medium leading-relaxed" />
+                                <textarea required value={editingBot.description} onChange={e => setEditingBot({...editingBot, description: (e.target as any).value})} className="w-full h-32 bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm resize-none focus:border-blue-500 outline-none font-medium leading-relaxed" placeholder="Bot ne işe yarar? Kullanıcılara ne sunar?" />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Bot Linki (@username)</label>
+                                <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Bot Linki (Telegram)</label>
                                 <input type="text" required value={editingBot.bot_link} onChange={e => setEditingBot({...editingBot, bot_link: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none" placeholder="https://t.me/example_bot" />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">İkon URL</label>
-                                <input type="text" required value={editingBot.icon} onChange={e => setEditingBot({...editingBot, icon: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none" />
+                                <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">İkon URL (Görsel Adresi)</label>
+                                <input type="text" required value={editingBot.icon} onChange={e => setEditingBot({...editingBot, icon: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none" placeholder="https://..." />
                             </div>
-                            <button type="submit" className="w-full py-6 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-3xl text-[10px] tracking-[0.3em] uppercase shadow-2xl shadow-blue-900/30 active:scale-95 transition-all mt-4">KAYITLARI YAYINLA</button>
+                            <button type="submit" disabled={isSaving} className="w-full py-6 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-3xl text-[10px] tracking-[0.3em] uppercase shadow-2xl shadow-blue-900/30 active:scale-95 transition-all mt-4 flex items-center justify-center gap-3">
+                                {isSaving ? <Loader2 className="animate-spin" /> : 'KAYITLARI YAYINLA'}
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -750,7 +753,6 @@ const BotManagement = () => {
     );
 };
 
-// --- Notification Center ---
 const NotificationCenter = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [form, setForm] = useState({ title: '', message: '', type: 'system' as any });
@@ -828,7 +830,6 @@ const NotificationCenter = () => {
     );
 };
 
-// --- Announcement Management ---
 const AnnouncementManagement = () => {
     const [anns, setAnns] = useState<Announcement[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -943,7 +944,6 @@ const AnnouncementManagement = () => {
     );
 };
 
-// --- Settings Management ---
 const SettingsManagement = () => {
     const [settings, setSettings] = useState({
         appName: 'BotlyHub V3',
