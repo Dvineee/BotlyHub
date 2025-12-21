@@ -674,26 +674,16 @@ const BotManagement = () => {
         }
 
         setIsFetchingIcon(true);
-        try {
-            const username = editingBot.bot_link.replace('@', '');
-            // Telegram'ın genel profil resmi endpoint'i
-            const iconUrl = `https://img.t.me/i/userpic/320/${username}.jpg`;
-            
-            // Görselin varlığını kontrol et
-            const img = new Image();
-            img.onload = () => {
-                setEditingBot({ ...editingBot, icon: iconUrl });
-                setIsFetchingIcon(false);
-            };
-            img.onerror = () => {
-                alert("Görsel bulunamadı. Lütfen kullanıcı adının doğruluğunu kontrol edin veya manuel yükleyin.");
-                setIsFetchingIcon(false);
-            };
-            img.src = iconUrl;
-        } catch (e) {
-            console.error(e);
+        // CORS ve ön-yükleme hatalarından kaçınmak için doğrudan URL oluşturup atıyoruz.
+        // Telegram görsel sunucusu genellikle img.t.me veya t.me üzerinden çalışır.
+        const username = editingBot.bot_link.replace('@', '').toLowerCase();
+        const iconUrl = `https://t.me/i/userpic/320/${username}.jpg`;
+        
+        // Küçük bir yapay bekleme (deneyim için)
+        setTimeout(() => {
+            setEditingBot({ ...editingBot, icon: iconUrl });
             setIsFetchingIcon(false);
-        }
+        }, 600);
     };
 
     return (
