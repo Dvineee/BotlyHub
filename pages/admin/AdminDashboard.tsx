@@ -161,7 +161,7 @@ const AdminDashboard = () => {
 
 const HomeView = () => {
     const [stats, setStats] = useState({ userCount: 0, botCount: 0, notifCount: 0, annCount: 0, salesCount: 0 });
-    const [recentLogs, setRecentLogs] = useState<any[]>([]);
+    const [combinedLogs, setCombinedLogs] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [showAllLogs, setShowAllLogs] = useState(false);
 
@@ -184,13 +184,36 @@ const HomeView = () => {
 
     const load = async () => {
         setIsLoading(true);
-        const [statData, logsData] = await Promise.all([
-            DatabaseService.getAdminStats(),
-            DatabaseService.getAllPurchases()
-        ]);
-        setStats(statData);
-        setRecentLogs(logsData);
-        setIsLoading(false);
+        try {
+            const [statData, purchases, globalNotifs] = await Promise.all([
+                DatabaseService.getAdminStats(),
+                DatabaseService.getAllPurchases(),
+                DatabaseService.getNotifications()
+            ]);
+            setStats(statData);
+
+            // Karma Log Sistemi: Bot Edinmeleri + Admin Duyuruları/Sistem Logları
+            const logs = [
+                ...purchases.map(p => ({
+                    id: p.id || Math.random(),
+                    date: p.acquired_at,
+                    action: `@${p.users?.username || 'Kullanıcı'} '${p.bots?.name || 'Bot'}' kütüphanesine ekledi.`,
+                    status: p.is_premium ? 'Update' : 'Success'
+                })),
+                ...globalNotifs.map(n => ({
+                    id: n.id,
+                    date: n.date,
+                    action: `SİSTEM: ${n.title}`,
+                    status: n.type === 'security' ? 'Update' : 'Info'
+                }))
+            ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+            setCombinedLogs(logs);
+        } catch (e) {
+            console.error("Home load error:", e);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const mockChartData = [
@@ -198,7 +221,7 @@ const HomeView = () => {
         { name: 'Per', users: 45 }, { name: 'Cum', users: 32 }, { name: 'Cmt', users: 58 }, { name: 'Paz', users: 52 }
     ];
 
-    const displayedLogs = showAllLogs ? recentLogs : recentLogs.slice(0, 5);
+    const displayedLogs = showAllLogs ? combinedLogs : combinedLogs.slice(0, 5);
 
     return (
         <div className="animate-in fade-in space-y-10">
@@ -246,7 +269,7 @@ const HomeView = () => {
                         <h3 className="text-lg font-black text-white uppercase tracking-tight italic flex items-center gap-3"><Clock size={18} className="text-blue-500"/> Son İşlemler</h3>
                         <button 
                             onClick={() => setShowAllLogs(!showAllLogs)}
-                            className="text-[9px] font-black text-blue-500 uppercase tracking-widest hover:text-white transition-colors bg-blue-500/5 px-3 py-1.5 rounded-lg border border-blue-500/20"
+                            className="text-[9px] font-black text-blue-500 uppercase tracking-widest hover:text-white transition-colors bg-blue-500/5 px-3 py-1.5 rounded-lg border border-blue-500/20 shadow-xl"
                         >
                             {showAllLogs ? 'Küçült' : 'Tümünü Gör'}
                         </button>
@@ -256,26 +279,26 @@ const HomeView = () => {
                         {isLoading ? (
                             <div className="py-20 flex flex-col items-center justify-center gap-4 animate-pulse">
                                 <Loader2 className="animate-spin text-slate-700" size={32} />
-                                <p className="text-[10px] font-black text-slate-700 uppercase tracking-widest">Veriler Okunuyor...</p>
+                                <p className="text-[10px] font-black text-slate-700 uppercase tracking-widest">Sistem Taranıyor...</p>
                             </div>
                         ) : displayedLogs.length === 0 ? (
                             <div className="py-20 text-center">
                                 <Activity className="mx-auto text-slate-800 mb-4" size={40} />
-                                <p className="text-xs text-slate-600 font-bold italic">Henüz işlem kaydı bulunmuyor.</p>
+                                <p className="text-xs text-slate-600 font-bold italic">İşlem kaydı bulunmuyor.</p>
                             </div>
                         ) : (
-                            displayedLogs.map((log, idx) => (
+                            displayedLogs.map((log) => (
                                 <LogItem 
-                                    key={log.id || idx} 
-                                    time={getTimeAgo(log.acquired_at)} 
-                                    action={`@${log.users?.username || 'Kullanıcı'} tarafından '${log.bots?.name || 'Bot'}' kütüphaneye eklendi.`} 
-                                    status={log.is_premium ? "Update" : "Success"} 
+                                    key={log.id} 
+                                    time={getTimeAgo(log.date)} 
+                                    action={log.action} 
+                                    status={log.status as any} 
                                 />
                             ))
                         )}
                     </div>
 
-                    {!showAllLogs && recentLogs.length > 5 && (
+                    {!showAllLogs && combinedLogs.length > 5 && (
                         <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-[#0f172a] to-transparent pointer-events-none group-hover:opacity-50 transition-opacity"></div>
                     )}
                 </div>
@@ -382,7 +405,6 @@ const BotManagement = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingBot, setEditingBot] = useState<Partial<BotType> | null>(null);
     const [isLoading, setIsLoading] = useState(false);
-    // Fix: Corrected variable name to avoid redeclaration of 'setIsLoading' and properly define 'setIsSaving'.
     const [isSaving, setIsSaving] = useState(false);
     const [isFetchingIcon, setIsFetchingIcon] = useState(false);
 
@@ -546,7 +568,18 @@ const UserManagement = () => {
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
     useEffect(() => { load(); }, []);
-    const load = async () => { setIsLoading(true); setUsers(await DatabaseService.getUsers()); setIsLoading(false); };
+    
+    const load = async () => { 
+        setIsLoading(true); 
+        try {
+            const data = await DatabaseService.getUsers();
+            setUsers(data); 
+        } catch (e) {
+            console.error("User management load error:", e);
+        } finally {
+            setIsLoading(false); 
+        }
+    };
 
     const toggleStatus = async (user: User) => {
         const nextStatus = user.status === 'Active' ? 'Passive' : 'Active';
@@ -567,7 +600,7 @@ const UserManagement = () => {
                     <h2 className="text-3xl font-black text-white italic tracking-tighter uppercase">ÜYE <span className="text-blue-500">EKOSİSTEMİ</span></h2>
                     <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mt-1">Sistemdeki Tüm Kayıtlar ({users.length})</p>
                 </div>
-                <div className="relative">
+                <div className="flex gap-4">
                     <input 
                         type="text" 
                         value={search}
@@ -575,6 +608,7 @@ const UserManagement = () => {
                         placeholder="İsim veya @username ara..." 
                         className="bg-[#0f172a] border border-slate-800 rounded-[28px] px-8 py-5 text-xs outline-none focus:border-blue-500 transition-all w-full sm:w-96 font-bold shadow-2xl" 
                     />
+                    <button onClick={load} className="p-5 bg-slate-900 border border-slate-800 rounded-[24px] text-slate-400 hover:text-white transition-all shadow-xl active:scale-95"><RefreshCw size={20} className={isLoading ? 'animate-spin' : ''}/></button>
                 </div>
             </div>
 

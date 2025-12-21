@@ -30,13 +30,11 @@ export class DatabaseService {
     }
   }
 
-  // Fix: Added getBotById to fetch a specific bot's details by its ID.
   static async getBotById(id: string): Promise<Bot | null> {
     const { data } = await supabase.from('bots').select('*').eq('id', id).maybeSingle();
     return data;
   }
 
-  // Fix: Added getUserBots to retrieve all bots associated with a specific user.
   static async getUserBots(userId: string): Promise<Bot[]> {
     const { data, error } = await supabase
       .from('user_bots')
@@ -116,13 +114,11 @@ export class DatabaseService {
     } catch (e) { return []; }
   }
 
-  // Fix: Added saveBot to handle creating or updating bot definitions in the marketplace.
   static async saveBot(bot: Partial<Bot>) {
     const { error } = await supabase.from('bots').upsert(bot);
     if (error) throw error;
   }
 
-  // Fix: Added deleteBot to allow removing bots from the database.
   static async deleteBot(id: string) {
     const { error } = await supabase.from('bots').delete().eq('id', id);
     if (error) throw error;
@@ -131,8 +127,15 @@ export class DatabaseService {
   static async syncUser(user: Partial<User>) {
     if (!user.id) return;
     await supabase.from('users').upsert({
-        ...user,
         id: user.id.toString(),
+        name: user.name || 'İsimsiz Kullanıcı',
+        username: user.username || 'user',
+        avatar: user.avatar || `https://ui-avatars.com/api/?name=User`,
+        role: user.role || 'User',
+        status: user.status || 'Active',
+        badges: user.badges || [],
+        email: user.email || null,
+        phone: user.phone || null,
         join_date: user.joinDate || new Date().toISOString()
     });
   }
@@ -151,7 +154,6 @@ export class DatabaseService {
     }));
   }
 
-  // Fix: Added getAllPurchases to provide administrative insights into bot acquisitions.
   static async getAllPurchases(): Promise<any[]> {
     const { data } = await supabase
       .from('user_bots')
@@ -160,7 +162,6 @@ export class DatabaseService {
     return data || [];
   }
 
-  // Fix: Added getUserDetailedAssets to aggregate a user's assets (channels, bots) and notification history for the admin view.
   static async getUserDetailedAssets(userId: string) {
     const [channels, notifications, userBotsRaw] = await Promise.all([
       this.getChannels(userId),
@@ -193,19 +194,16 @@ export class DatabaseService {
     await supabase.from('settings').upsert(settings);
   }
 
-  // Fix: Modified getAnnouncements to return all announcements, enabling full management in the admin dashboard.
   static async getAnnouncements(): Promise<Announcement[]> {
     const { data } = await supabase.from('announcements').select('*');
     return data || [];
   }
 
-  // Fix: Added saveAnnouncement for managing promotional cards.
   static async saveAnnouncement(ann: Partial<Announcement>) {
     const { error } = await supabase.from('announcements').upsert(ann);
     if (error) throw error;
   }
 
-  // Fix: Added deleteAnnouncement for removing promotional cards.
   static async deleteAnnouncement(id: string) {
     const { error } = await supabase.from('announcements').delete().eq('id', id);
     if (error) throw error;
@@ -227,8 +225,25 @@ export class DatabaseService {
   }
 
   static async getUsers(): Promise<User[]> {
-    const { data } = await supabase.from('users').select('*').order('join_date', { ascending: false });
-    return (data || []).map(u => ({ ...u, joinDate: u.join_date }));
+    try {
+      const { data, error } = await supabase.from('users').select('*').order('join_date', { ascending: false });
+      if (error) throw error;
+      return (data || []).map(u => ({
+          id: u.id,
+          name: u.name,
+          username: u.username,
+          avatar: u.avatar,
+          role: u.role,
+          status: u.status,
+          badges: u.badges || [],
+          joinDate: u.join_date,
+          email: u.email,
+          phone: u.phone
+      }));
+    } catch (e) {
+      console.error("Users fetch error:", e);
+      return [];
+    }
   }
 
   static async updateUserStatus(userId: string, status: string) {
