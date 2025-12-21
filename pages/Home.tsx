@@ -27,11 +27,18 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
     if (ann.action_type === 'popup') {
         onShowPopup(ann);
     } else {
-        const link = ann.button_link;
+        let link = ann.button_link;
         if (!link) return;
-        if (link.startsWith('http')) window.location.href = link;
-        else if (link.startsWith('/')) navigate(link);
-        else window.location.href = `https://t.me/${link.replace('@','')}`;
+        
+        if (link.startsWith('@')) {
+            window.location.href = `https://t.me/${link.substring(1)}`;
+        } else if (link.startsWith('http')) {
+            window.location.href = link;
+        } else if (link.startsWith('/')) {
+            navigate(link);
+        } else {
+            window.location.href = `https://t.me/${link.replace('@','')}`;
+        }
     }
   };
 
@@ -249,10 +256,16 @@ const Home = () => {
                     </p>
                     <button 
                         onClick={() => {
-                            const link = selectedAnn.button_link;
-                            if (link.startsWith('http')) window.location.href = link;
-                            else if (link.startsWith('/')) navigate(link);
-                            else window.location.href = `https://t.me/${link.replace('@','')}`;
+                            let link = selectedAnn.button_link;
+                            if (link.startsWith('@')) {
+                                window.location.href = `https://t.me/${link.substring(1)}`;
+                            } else if (link.startsWith('http')) {
+                                window.location.href = link;
+                            } else if (link.startsWith('/')) {
+                                navigate(link);
+                            } else {
+                                window.location.href = `https://t.me/${link.replace('@','')}`;
+                            }
                             setSelectedAnn(null);
                         }}
                         className="w-full py-5 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-2xl text-[11px] uppercase tracking-[0.3em] shadow-2xl shadow-blue-900/40 transition-all active:scale-95"

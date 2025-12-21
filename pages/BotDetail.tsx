@@ -44,10 +44,17 @@ const BotDetail = () => {
       haptic('medium');
       
       if (isOwned) {
-          if (tg && bot.bot_link) {
-              tg.openTelegramLink(bot.bot_link);
-          } else if (bot.bot_link) {
-              window.open(bot.bot_link, '_blank');
+          let finalLink = bot.bot_link;
+          
+          // @ formatını Telegram Linkine çevir
+          if (finalLink && finalLink.startsWith('@')) {
+              finalLink = `https://t.me/${finalLink.substring(1)}`;
+          }
+
+          if (tg && finalLink) {
+              tg.openTelegramLink(finalLink);
+          } else if (finalLink) {
+              window.open(finalLink, '_blank');
           }
           return;
       }
@@ -55,11 +62,9 @@ const BotDetail = () => {
       if (bot.price === 0) {
           setIsProcessing(true);
           try {
-              // Mevcut kullanıcı nesnesiyle veritabanına ekle
               const userData = user || { id: 'test_user', first_name: 'Misafir', username: 'guest' };
               await DatabaseService.addUserBot(userData, bot, false);
               
-              // LocalStorage Sync
               const ownedBots = JSON.parse(localStorage.getItem('ownedBots') || '[]');
               localStorage.setItem('ownedBots', JSON.stringify([...ownedBots, { ...bot, isAdEnabled: false, isActive: true }]));
               

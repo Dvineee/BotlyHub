@@ -735,8 +735,9 @@ const BotManagement = () => {
                                 <textarea required value={editingBot.description} onChange={e => setEditingBot({...editingBot, description: (e.target as any).value})} className="w-full h-32 bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm resize-none focus:border-blue-500 outline-none font-medium leading-relaxed" placeholder="Bot ne işe yarar? Kullanıcılara ne sunar?" />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Bot Linki (Telegram)</label>
-                                <input type="text" required value={editingBot.bot_link} onChange={e => setEditingBot({...editingBot, bot_link: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none" placeholder="https://t.me/example_bot" />
+                                <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Bot Linki (Telegram @)</label>
+                                <input type="text" required value={editingBot.bot_link} onChange={e => setEditingBot({...editingBot, bot_link: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none" placeholder="Örn: @BotlyHubBOT" />
+                                <p className="text-[9px] text-slate-600 font-bold uppercase ml-2 tracking-tighter">Sadece kullanıcı adını (Örn: @BotName) yazmanız yeterlidir.</p>
                             </div>
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">İkon URL (Görsel Adresi)</label>
