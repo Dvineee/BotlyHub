@@ -11,7 +11,6 @@ export class DatabaseService {
   
   static async getAdminStats() {
     try {
-      // Not: created_at her Supabase tablosunda varsayılan olarak bulunur.
       const [users, bots, notifications, anns, sales] = await Promise.all([
         supabase.from('users').select('id', { count: 'exact', head: true }),
         supabase.from('bots').select('id', { count: 'exact', head: true }),
@@ -27,7 +26,6 @@ export class DatabaseService {
         salesCount: sales.count || 0
       };
     } catch (e) {
-      console.error("Stats load error:", e);
       return { userCount: 0, botCount: 0, notifCount: 0, annCount: 0, salesCount: 0 };
     }
   }
@@ -53,7 +51,6 @@ export class DatabaseService {
     const botId = botData.id.toString();
     
     try {
-        // Önce kullanıcıyı kaydet/güncelle
         await this.syncUser({
             id: userId,
             name: userData.first_name ? `${userData.first_name} ${userData.last_name || ''}`.trim() : (userData.name || 'User'),
@@ -72,7 +69,7 @@ export class DatabaseService {
         if (error) throw error;
         return true;
     } catch (e) {
-        console.error("Bot kütüphaneye eklenirken hata:", e);
+        console.error(e);
         throw e;
     }
   }
@@ -110,7 +107,8 @@ export class DatabaseService {
 
   static async getBots(category?: string): Promise<Bot[]> {
     try {
-      let query = supabase.from('bots').select('*').order('created_at', { ascending: false });
+      // created_at yerine id ile sıralıyoruz (daha güvenli)
+      let query = supabase.from('bots').select('*').order('id', { ascending: false });
       if (category && category !== 'all') query = query.eq('category', category);
       const { data } = await query;
       return data || [];
@@ -130,7 +128,7 @@ export class DatabaseService {
   static async syncUser(user: Partial<User>) {
     if (!user.id) return;
     try {
-        const { error } = await supabase.from('users').upsert({
+        await supabase.from('users').upsert({
             id: user.id.toString(),
             name: user.name || 'İsimsiz Kullanıcı',
             username: user.username || 'user',
@@ -139,12 +137,12 @@ export class DatabaseService {
             status: user.status || 'Active',
             badges: user.badges || [],
             email: user.email || null,
-            phone: user.phone || null
-            // join_date hatasını önlemek için created_at'i veritabanına bırakıyoruz
+            phone: user.phone || null,
+            // Ekran görüntüsündeki sütun ismine (joindate) göre güncellendi
+            joindate: user.joinDate || new Date().toISOString()
         }, { onConflict: 'id' });
-        if (error) throw error;
     } catch (e) {
-        console.error("User Sync Error:", e);
+        console.error("Sync error:", e);
     }
   }
 
@@ -234,16 +232,13 @@ export class DatabaseService {
 
   static async getUsers(): Promise<User[]> {
     try {
-      // Hata Veren join_date yerine created_at kullanıyoruz
+      // Ekran görüntünüzdeki joindate sütununa göre sıralama yapıyoruz
       const { data, error } = await supabase
         .from('users')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('joindate', { ascending: false });
 
-      if (error) {
-          console.error("Supabase Error Details:", error.message, error.details, error.hint);
-          throw error;
-      }
+      if (error) throw error;
 
       return (data || []).map(u => ({
           id: u.id.toString(),
@@ -253,7 +248,8 @@ export class DatabaseService {
           role: u.role || 'User',
           status: u.status || 'Active',
           badges: u.badges || [],
-          joinDate: u.created_at, // join_date yoksa created_at'e mapliyoruz
+          // joindate sütununu frontend'deki joinDate'e eşliyoruz
+          joinDate: u.joindate || u.joinDate,
           email: u.email,
           phone: u.phone
       }));
@@ -270,5 +266,5 @@ export class DatabaseService {
   static setAdminSession(token: string) { localStorage.setItem('admin_v3_session', token); }
   static isAdminLoggedIn(): boolean { return !!localStorage.getItem('admin_v3_session'); }
   static logoutAdmin() { localStorage.removeItem('admin_v3_session'); }
-  static async init() { console.log("Database Connection Verified"); }
+  static async init() { console.log("DB Init"); }
 }
