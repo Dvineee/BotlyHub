@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import * as Router from 'react-router-dom';
 import { 
@@ -192,6 +191,7 @@ const HomeView = () => {
             ]);
             setStats(statData);
 
+            // Karma Log Sistemi: Bot Edinmeleri + Admin Duyuruları/Sistem Logları
             const logs = [
                 ...purchases.map(p => ({
                     id: p.id || Math.random(),
@@ -575,8 +575,8 @@ const UserManagement = () => {
         try {
             const data = await DatabaseService.getUsers();
             setUsers(data); 
-        } catch (e) {
-            console.error("User management load error:", e);
+        } catch (e: any) {
+            console.error("User management fetch crash:", e.message);
         } finally {
             setIsLoading(false); 
         }
@@ -721,6 +721,7 @@ const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClos
                         <button onClick={onStatusToggle} className={`p-4 rounded-2xl transition-all shadow-xl ${user.status === 'Active' ? 'bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white' : 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white'}`}>
                             {user.status === 'Active' ? <Ban size={24}/> : <CheckCircle size={24}/>}
                         </button>
+                        {/* Fix: Use onClick instead of non-existent onClose property on button */}
                         <button onClick={onClose} className="p-4 bg-slate-900 text-slate-500 hover:text-white rounded-2xl border border-slate-800 transition-colors shadow-xl"><X size={24}/></button>
                     </div>
                 </div>
