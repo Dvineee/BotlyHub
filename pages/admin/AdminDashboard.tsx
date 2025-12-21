@@ -7,7 +7,7 @@ import {
   Megaphone, Calendar, Settings as SettingsIcon, 
   ShieldCheck, Percent, Globe, MessageSquare, AlertTriangle,
   Sparkles, Zap, Star, ChevronRight, Eye, Send, Activity, 
-  Clock, Wallet, ShieldAlert, Cpu, Ban, CheckCircle, Gift, Info, Heart, Bell, Shield, ExternalLink, TrendingUp, History, ListFilter, CreditCard
+  Clock, Wallet, ShieldAlert, Cpu, Ban, CheckCircle, Gift, Info, Heart, Bell, Shield, ExternalLink, TrendingUp, History, ListFilter, CreditCard, Image as ImageIcon, Wand2
 } from 'lucide-react';
 import { DatabaseService } from '../../services/DatabaseService';
 import { User, Bot as BotType, Announcement, Notification, Channel } from '../../types';
@@ -646,6 +646,7 @@ const BotManagement = () => {
     const [editingBot, setEditingBot] = useState<Partial<BotType> | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const [isFetchingIcon, setIsFetchingIcon] = useState(false);
 
     useEffect(() => { load(); }, []);
     const load = async () => { setIsLoading(true); setBots(await DatabaseService.getBots()); setIsLoading(false); };
@@ -663,6 +664,35 @@ const BotManagement = () => {
             alert("Hata: " + err.message);
         } finally {
             setIsSaving(false);
+        }
+    };
+
+    const fetchBotIcon = async () => {
+        if (!editingBot?.bot_link || !editingBot.bot_link.startsWith('@')) {
+            alert("Lütfen önce geçerli bir Telegram kullanıcı adı girin (@BotName formatında)");
+            return;
+        }
+
+        setIsFetchingIcon(true);
+        try {
+            const username = editingBot.bot_link.replace('@', '');
+            // Telegram'ın genel profil resmi endpoint'i
+            const iconUrl = `https://img.t.me/i/userpic/320/${username}.jpg`;
+            
+            // Görselin varlığını kontrol et
+            const img = new Image();
+            img.onload = () => {
+                setEditingBot({ ...editingBot, icon: iconUrl });
+                setIsFetchingIcon(false);
+            };
+            img.onerror = () => {
+                alert("Görsel bulunamadı. Lütfen kullanıcı adının doğruluğunu kontrol edin veya manuel yükleyin.");
+                setIsFetchingIcon(false);
+            };
+            img.src = iconUrl;
+        } catch (e) {
+            console.error(e);
+            setIsFetchingIcon(false);
         }
     };
 
@@ -736,12 +766,31 @@ const BotManagement = () => {
                             </div>
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Bot Linki (Telegram @)</label>
-                                <input type="text" required value={editingBot.bot_link} onChange={e => setEditingBot({...editingBot, bot_link: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none" placeholder="Örn: @BotlyHubBOT" />
-                                <p className="text-[9px] text-slate-600 font-bold uppercase ml-2 tracking-tighter">Sadece kullanıcı adını (Örn: @BotName) yazmanız yeterlidir.</p>
+                                <div className="flex gap-2">
+                                    <div className="relative flex-1 group">
+                                        <Send className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-blue-500 transition-colors" size={18} />
+                                        <input type="text" required value={editingBot.bot_link} onChange={e => setEditingBot({...editingBot, bot_link: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl py-5 pl-12 pr-4 text-sm font-bold text-white focus:border-blue-500 outline-none" placeholder="Örn: @BotlyHubBOT" />
+                                    </div>
+                                    <button 
+                                        type="button" 
+                                        onClick={fetchBotIcon}
+                                        disabled={isFetchingIcon}
+                                        title="Görseli Bottan Çek"
+                                        className="px-6 bg-slate-950 border border-slate-800 rounded-2xl text-blue-500 hover:text-blue-400 hover:border-blue-500/50 transition-all flex items-center justify-center disabled:opacity-50 active:scale-95"
+                                    >
+                                        {isFetchingIcon ? <Loader2 className="animate-spin" size={20} /> : <Wand2 size={20} />}
+                                    </button>
+                                </div>
+                                <p className="text-[9px] text-slate-600 font-bold uppercase ml-2 tracking-tighter italic">Sihirbaz butonuna basarak botun profil resmini otomatik çekebilirsiniz.</p>
                             </div>
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">İkon URL (Görsel Adresi)</label>
-                                <input type="text" required value={editingBot.icon} onChange={e => setEditingBot({...editingBot, icon: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none" placeholder="https://..." />
+                                <div className="flex gap-4 items-center">
+                                    <div className="w-16 h-16 bg-slate-950 border border-slate-800 rounded-2xl flex items-center justify-center overflow-hidden shrink-0">
+                                        {editingBot.icon ? <img src={editingBot.icon} className="w-full h-full object-cover" /> : <ImageIcon className="text-slate-800" size={24}/>}
+                                    </div>
+                                    <input type="text" required value={editingBot.icon} onChange={e => setEditingBot({...editingBot, icon: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-5 text-sm font-bold text-white focus:border-blue-500 outline-none" placeholder="https://..." />
+                                </div>
                             </div>
                             <button type="submit" disabled={isSaving} className="w-full py-6 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-3xl text-[10px] tracking-[0.3em] uppercase shadow-2xl shadow-blue-900/30 active:scale-95 transition-all mt-4 flex items-center justify-center gap-3">
                                 {isSaving ? <Loader2 className="animate-spin" /> : 'KAYITLARI YAYINLA'}
