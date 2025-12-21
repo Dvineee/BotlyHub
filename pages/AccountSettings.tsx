@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, Mail, Phone, Save, Loader2, ShieldCheck, AlertCircle } from 'lucide-react';
-// Fixed: Use namespace import for react-router-dom to resolve "no exported member" errors
 import * as Router from 'react-router-dom';
 import { useTelegram } from '../hooks/useTelegram';
 import { DatabaseService } from '../services/DatabaseService';
@@ -12,17 +11,22 @@ const { useNavigate } = Router as any;
 const AccountSettings = () => {
   const navigate = useNavigate();
   const { user, haptic, notification } = useTelegram();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [userData, setUserData] = useState<User | null>(null);
   const [formData, setFormData] = useState({ email: '', phone: '+90 ' });
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     const loadUserData = async () => {
-        if (!user) return;
+        if (!user?.id) {
+            setIsLoading(false);
+            return;
+        }
+        
         try {
-            const users = await DatabaseService.getUsers();
-            const currentUser = users.find(u => u.id === user.id.toString());
+            // Sadece bu kullanıcının verilerini çekiyoruz
+            const currentUser = await DatabaseService.getUserById(user.id.toString());
             if (currentUser) {
                 setUserData(currentUser);
                 setFormData({
@@ -32,6 +36,8 @@ const AccountSettings = () => {
             }
         } catch (e) {
             console.error("Profil yükleme hatası:", e);
+        } finally {
+            setIsLoading(false);
         }
     };
     loadUserData();
@@ -42,7 +48,7 @@ const AccountSettings = () => {
     if (!val.startsWith('+90 ')) {
         val = '+90 ' + val.replace(/^\+90\s*/, '');
     }
-    const suffix = val.slice(4).replace(/[^\d]/g, '').slice(0, 10); // Max 10 hane
+    const suffix = val.slice(4).replace(/[^\d]/g, '').slice(0, 10);
     setFormData({ ...formData, phone: '+90 ' + suffix });
   };
 
@@ -53,7 +59,6 @@ const AccountSettings = () => {
         return;
     }
 
-    // Basit Validasyon
     if (!formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
         alert('Lütfen geçerli bir e-posta adresi girin.');
         return;
@@ -63,24 +68,17 @@ const AccountSettings = () => {
         return;
     }
 
-    setIsLoading(true);
+    setIsSaving(true);
     haptic('medium');
 
     try {
         const payload: Partial<User> = {
             id: user.id.toString(),
-            name: `${user.first_name} ${user.last_name || ''}`.trim(),
-            username: user.username || 'user',
-            avatar: user.photo_url || `https://ui-avatars.com/api/?name=${user.first_name}`,
             email: formData.email,
-            phone: formData.phone,
-            joinDate: userData?.joinDate || new Date().toISOString(),
-            status: userData?.status || 'Active',
-            role: userData?.role || 'User',
-            badges: userData?.badges || []
+            phone: formData.phone
         };
 
-        // Fixed: syncUser method is now implemented in DatabaseService
+        // DatabaseService.syncUser artık akıllı olduğu için email/phone'u koruyacak
         await DatabaseService.syncUser(payload);
         
         notification('success');
@@ -89,13 +87,19 @@ const AccountSettings = () => {
     } catch (e: any) {
         console.error("Kayıt Hatası:", e);
         notification('error');
-        const msg = e.message || 'Bilinmeyen bir hata oluştu.';
-        setErrorMsg(msg);
-        alert('Kaydedilemedi!\n\nDetay: ' + msg);
+        setErrorMsg(e.message || 'Bilinmeyen bir hata oluştu.');
     } finally {
-        setIsLoading(false);
+        setIsSaving(false);
     }
   };
+
+  if (isLoading) {
+      return (
+        <div className="min-h-screen bg-[#020617] flex items-center justify-center">
+            <Loader2 className="animate-spin text-blue-500" size={32} />
+        </div>
+      );
+  }
 
   return (
     <div className="min-h-screen bg-[#020617] p-6 pt-10 pb-20">
@@ -110,7 +114,7 @@ const AccountSettings = () => {
         <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-start gap-3 animate-in fade-in">
           <AlertCircle className="text-red-500 shrink-0 mt-0.5" size={18} />
           <div>
-            <p className="text-red-500 text-xs font-bold">Veritabanı Hatası</p>
+            <p className="text-red-500 text-xs font-bold">İşlem Başarısız</p>
             <p className="text-red-400/80 text-[10px] mt-1 leading-relaxed">{errorMsg}</p>
           </div>
         </div>
@@ -158,10 +162,10 @@ const AccountSettings = () => {
           <div className="pt-4">
               <button 
                 onClick={handleSave} 
-                disabled={isLoading} 
+                disabled={isSaving} 
                 className="w-full bg-blue-600 hover:bg-blue-500 py-5 rounded-[24px] font-black text-white flex items-center justify-center gap-3 shadow-lg shadow-blue-900/20 active:scale-95 transition-all disabled:opacity-50"
               >
-                  {isLoading ? <Loader2 className="animate-spin" size={20} /> : <><Save size={20}/><span>Değişiklikleri Kaydet</span></>}
+                  {isSaving ? <Loader2 className="animate-spin" size={20} /> : <><Save size={20}/><span>Değişiklikleri Kaydet</span></>}
               </button>
           </div>
       </div>

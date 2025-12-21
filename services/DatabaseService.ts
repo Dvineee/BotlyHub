@@ -35,6 +35,33 @@ export class DatabaseService {
     return data;
   }
 
+  static async getUserById(userId: string): Promise<User | null> {
+    try {
+        const { data, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', userId.toString())
+            .maybeSingle();
+        
+        if (error || !data) return null;
+
+        return {
+            id: data.id.toString(),
+            name: data.name || 'İsimsiz',
+            username: data.username || 'user',
+            avatar: data.avatar || '',
+            role: data.role || 'User',
+            status: data.status || 'Active',
+            badges: data.badges || [],
+            joinDate: data.joindate || data.joinDate,
+            email: data.email,
+            phone: data.phone
+        };
+    } catch (e) {
+        return null;
+    }
+  }
+
   static async getUserBots(userId: string): Promise<Bot[]> {
     const { data, error } = await supabase
       .from('user_bots')
@@ -107,7 +134,6 @@ export class DatabaseService {
 
   static async getBots(category?: string): Promise<Bot[]> {
     try {
-      // created_at yerine id ile sıralıyoruz (daha güvenli)
       let query = supabase.from('bots').select('*').order('id', { ascending: false });
       if (category && category !== 'all') query = query.eq('category', category);
       const { data } = await query;
@@ -125,22 +151,38 @@ export class DatabaseService {
     if (error) throw error;
   }
 
+  /**
+   * syncUser: Veritabanındaki verileri ezmemek için akıllı güncelleme yapar.
+   */
   static async syncUser(user: Partial<User>) {
     if (!user.id) return;
     try {
-        await supabase.from('users').upsert({
-            id: user.id.toString(),
-            name: user.name || 'İsimsiz Kullanıcı',
-            username: user.username || 'user',
-            avatar: user.avatar || `https://ui-avatars.com/api/?name=User`,
+        const userId = user.id.toString();
+        
+        // Önce mevcut kullanıcıyı çekelim ki email/phone verilerini kaybetmeyelim
+        const { data: existing } = await supabase
+            .from('users')
+            .select('email, phone, joindate, joinDate')
+            .eq('id', userId)
+            .maybeSingle();
+
+        const updateData: any = {
+            id: userId,
+            name: user.name,
+            username: user.username,
+            avatar: user.avatar,
             role: user.role || 'User',
             status: user.status || 'Active',
             badges: user.badges || [],
-            email: user.email || null,
-            phone: user.phone || null,
-            // Ekran görüntüsündeki sütun ismine (joindate) göre güncellendi
-            joindate: user.joinDate || new Date().toISOString()
-        }, { onConflict: 'id' });
+            // Eğer yeni pakette mail/tel yoksa ve eskiden varsa, eskileri koru
+            email: user.email || existing?.email || null,
+            phone: user.phone || existing?.phone || null,
+            joindate: user.joinDate || existing?.joindate || existing?.joinDate || new Date().toISOString(),
+            joinDate: user.joinDate || existing?.joinDate || existing?.joindate || new Date().toISOString()
+        };
+
+        const { error } = await supabase.from('users').upsert(updateData, { onConflict: 'id' });
+        if (error) throw error;
     } catch (e) {
         console.error("Sync error:", e);
     }
@@ -232,7 +274,6 @@ export class DatabaseService {
 
   static async getUsers(): Promise<User[]> {
     try {
-      // Ekran görüntünüzdeki joindate sütununa göre sıralama yapıyoruz
       const { data, error } = await supabase
         .from('users')
         .select('*')
@@ -248,7 +289,6 @@ export class DatabaseService {
           role: u.role || 'User',
           status: u.status || 'Active',
           badges: u.badges || [],
-          // joindate sütununu frontend'deki joinDate'e eşliyoruz
           joinDate: u.joindate || u.joinDate,
           email: u.email,
           phone: u.phone
@@ -266,5 +306,5 @@ export class DatabaseService {
   static setAdminSession(token: string) { localStorage.setItem('admin_v3_session', token); }
   static isAdminLoggedIn(): boolean { return !!localStorage.getItem('admin_v3_session'); }
   static logoutAdmin() { localStorage.removeItem('admin_v3_session'); }
-  static async init() { console.log("DB Init"); }
+  static async init() { console.log("DB Loaded"); }
 }
