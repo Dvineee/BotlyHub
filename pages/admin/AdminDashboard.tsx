@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import * as Router from 'react-router-dom';
 import { 
@@ -36,7 +37,6 @@ const AVAILABLE_ICONS = [
   { name: 'Shield', icon: Shield }
 ];
 
-// Fix: Added StatCard component to resolve "Cannot find name 'StatCard'" errors in HomeView.
 const StatCard = ({ label, value, icon: Icon, color, trend }: any) => {
   const colors: any = {
     blue: 'text-blue-500 bg-blue-500/10 border-blue-500/20 shadow-blue-500/5',
@@ -61,7 +61,6 @@ const StatCard = ({ label, value, icon: Icon, color, trend }: any) => {
   );
 };
 
-// Fix: Added LogItem component to resolve "Cannot find name 'LogItem'" errors in HomeView.
 const LogItem = ({ time, action, status }: { time: string, action: string, status: 'Success' | 'Info' | 'Update' }) => {
   const colors: any = {
     Success: 'bg-emerald-500',
@@ -70,14 +69,14 @@ const LogItem = ({ time, action, status }: { time: string, action: string, statu
   };
 
   return (
-    <div className="flex gap-4 group">
+    <div className="flex gap-4 group animate-in slide-in-from-left duration-300">
       <div className="flex flex-col items-center">
-        <div className={`w-3 h-3 rounded-full ${colors[status]} shadow-lg`}></div>
-        <div className="w-px flex-1 bg-slate-800 my-2"></div>
+        <div className={`w-3 h-3 rounded-full ${colors[status]} shadow-[0_0_10px_rgba(59,130,246,0.3)]`}></div>
+        <div className="w-px flex-1 bg-slate-800/50 my-2"></div>
       </div>
       <div className="pb-6">
-        <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-1">{time}</p>
-        <p className="text-sm text-slate-400 font-medium group-hover:text-white transition-colors">{action}</p>
+        <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-1 italic">{time}</p>
+        <p className="text-sm text-slate-400 font-medium group-hover:text-white transition-colors leading-relaxed">{action}</p>
       </div>
     </div>
   );
@@ -162,13 +161,35 @@ const AdminDashboard = () => {
 
 const HomeView = () => {
     const [stats, setStats] = useState({ userCount: 0, botCount: 0, notifCount: 0, annCount: 0, salesCount: 0 });
+    const [recentLogs, setRecentLogs] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [showAllLogs, setShowAllLogs] = useState(false);
 
     useEffect(() => { load(); }, []);
+
+    const getTimeAgo = (dateStr: string) => {
+        const seconds = Math.floor((new Date().getTime() - new Date(dateStr).getTime()) / 1000);
+        let interval = seconds / 31536000;
+        if (interval > 1) return Math.floor(interval) + " yıl önce";
+        interval = seconds / 2592000;
+        if (interval > 1) return Math.floor(interval) + " ay önce";
+        interval = seconds / 86400;
+        if (interval > 1) return Math.floor(interval) + " gün önce";
+        interval = seconds / 3600;
+        if (interval > 1) return Math.floor(interval) + " sa önce";
+        interval = seconds / 60;
+        if (interval > 1) return Math.floor(interval) + " dk önce";
+        return "az önce";
+    };
+
     const load = async () => {
         setIsLoading(true);
-        const data = await DatabaseService.getAdminStats();
-        setStats(data);
+        const [statData, logsData] = await Promise.all([
+            DatabaseService.getAdminStats(),
+            DatabaseService.getAllPurchases()
+        ]);
+        setStats(statData);
+        setRecentLogs(logsData);
         setIsLoading(false);
     };
 
@@ -177,6 +198,8 @@ const HomeView = () => {
         { name: 'Per', users: 45 }, { name: 'Cum', users: 32 }, { name: 'Cmt', users: 58 }, { name: 'Paz', users: 52 }
     ];
 
+    const displayedLogs = showAllLogs ? recentLogs : recentLogs.slice(0, 5);
+
     return (
         <div className="animate-in fade-in space-y-10">
             <div className="flex flex-col sm:flex-row justify-between gap-4">
@@ -184,8 +207,8 @@ const HomeView = () => {
                     <h1 className="text-4xl font-black text-white tracking-tighter uppercase italic">KOMUTA <span className="text-blue-500">MERKEZİ</span></h1>
                     <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mt-1">Gerçek Zamanlı Platform Analitiği</p>
                 </div>
-                <button onClick={load} className="px-6 py-3 bg-slate-900 border border-slate-800 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-white transition-all flex items-center gap-2">
-                    <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} /> Yenile
+                <button onClick={load} className="px-6 py-3 bg-slate-900/50 border border-slate-800 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-white transition-all flex items-center gap-2">
+                    <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} /> Verileri Senkronize Et
                 </button>
             </div>
 
@@ -217,14 +240,44 @@ const HomeView = () => {
                         </ResponsiveContainer>
                     </div>
                 </div>
-                <div className="bg-[#0f172a] border border-slate-800 rounded-[32px] p-8 flex flex-col shadow-2xl">
-                    <h3 className="text-lg font-black text-white mb-6 uppercase tracking-tight italic flex items-center gap-3"><Clock size={18} className="text-blue-500"/> Son İşlemler</h3>
-                    <div className="space-y-6 flex-1 overflow-y-auto no-scrollbar pr-2 max-h-[300px]">
-                        <LogItem time="Az önce" action="Yeni bot kütüphaneye eklendi" status="Success" />
-                        <LogItem time="5 dk" action="Admin girişi sağlandı" status="Info" />
-                        <LogItem time="12 dk" action="Sistem bakımı tamamlandı" status="Update" />
-                        <LogItem time="1 sa" action="Veritabanı optimize edildi" status="Success" />
+                
+                <div className="bg-[#0f172a] border border-slate-800 rounded-[32px] p-8 flex flex-col shadow-2xl relative overflow-hidden group">
+                    <div className="flex items-center justify-between mb-8">
+                        <h3 className="text-lg font-black text-white uppercase tracking-tight italic flex items-center gap-3"><Clock size={18} className="text-blue-500"/> Son İşlemler</h3>
+                        <button 
+                            onClick={() => setShowAllLogs(!showAllLogs)}
+                            className="text-[9px] font-black text-blue-500 uppercase tracking-widest hover:text-white transition-colors bg-blue-500/5 px-3 py-1.5 rounded-lg border border-blue-500/20"
+                        >
+                            {showAllLogs ? 'Küçült' : 'Tümünü Gör'}
+                        </button>
                     </div>
+
+                    <div className={`space-y-4 flex-1 overflow-y-auto no-scrollbar pr-2 transition-all ${showAllLogs ? 'max-h-[600px]' : 'max-h-[350px]'}`}>
+                        {isLoading ? (
+                            <div className="py-20 flex flex-col items-center justify-center gap-4 animate-pulse">
+                                <Loader2 className="animate-spin text-slate-700" size={32} />
+                                <p className="text-[10px] font-black text-slate-700 uppercase tracking-widest">Veriler Okunuyor...</p>
+                            </div>
+                        ) : displayedLogs.length === 0 ? (
+                            <div className="py-20 text-center">
+                                <Activity className="mx-auto text-slate-800 mb-4" size={40} />
+                                <p className="text-xs text-slate-600 font-bold italic">Henüz işlem kaydı bulunmuyor.</p>
+                            </div>
+                        ) : (
+                            displayedLogs.map((log, idx) => (
+                                <LogItem 
+                                    key={log.id || idx} 
+                                    time={getTimeAgo(log.acquired_at)} 
+                                    action={`@${log.users?.username || 'Kullanıcı'} tarafından '${log.bots?.name || 'Bot'}' kütüphaneye eklendi.`} 
+                                    status={log.is_premium ? "Update" : "Success"} 
+                                />
+                            ))
+                        )}
+                    </div>
+
+                    {!showAllLogs && recentLogs.length > 5 && (
+                        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-[#0f172a] to-transparent pointer-events-none group-hover:opacity-50 transition-opacity"></div>
+                    )}
                 </div>
             </div>
         </div>
@@ -329,6 +382,7 @@ const BotManagement = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingBot, setEditingBot] = useState<Partial<BotType> | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    // Fix: Corrected variable name to avoid redeclaration of 'setIsLoading' and properly define 'setIsSaving'.
     const [isSaving, setIsSaving] = useState(false);
     const [isFetchingIcon, setIsFetchingIcon] = useState(false);
 
