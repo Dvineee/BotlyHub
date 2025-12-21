@@ -30,276 +30,213 @@ export class DatabaseService {
     }
   }
 
-  static async getAllPurchases() {
-      try {
-          const { data, error } = await supabase
-              .from('user_bots')
-              .select(`
-                *,
-                users:user_id (*),
-                bots:bot_id (*)
-              `)
-              .order('acquired_at', { ascending: false });
-          
-          if (error) throw error;
-          return data || [];
-      } catch (e) {
-          console.error("Purchase Fetch Error:", e);
-          return [];
-      }
+  // Fix: Added getBotById to fetch a specific bot's details by its ID.
+  static async getBotById(id: string): Promise<Bot | null> {
+    const { data } = await supabase.from('bots').select('*').eq('id', id).maybeSingle();
+    return data;
+  }
+
+  // Fix: Added getUserBots to retrieve all bots associated with a specific user.
+  static async getUserBots(userId: string): Promise<Bot[]> {
+    const { data, error } = await supabase
+      .from('user_bots')
+      .select('bots(*)')
+      .eq('user_id', userId.toString());
+    
+    if (error || !data) return [];
+    return data.map((item: any) => item.bots).filter((b: any) => b !== null);
   }
 
   static async addUserBot(userData: any, botData: Bot, isPremium: boolean = false) {
-    if (!userData || !botData) throw new Error("Eksik veri: Kullanıcı veya Bot bilgisi yok.");
-    
+    if (!userData || !botData) throw new Error("Eksik veri.");
     const userId = (userData.id || userData).toString();
     const botId = botData.id.toString();
     
     try {
-        const { data: userExists } = await supabase.from('users').select('id').eq('id', userId).maybeSingle();
-        
-        if (!userExists) {
-            await this.syncUser({
-                id: userId,
-                name: userData.first_name ? `${userData.first_name} ${userData.last_name || ''}`.trim() : (userData.name || 'Bilinmeyen Kullanıcı'),
-                username: userData.username || 'user',
-                avatar: userData.photo_url || `https://ui-avatars.com/api/?name=User`
-            });
-        }
+        await this.syncUser({
+            id: userId,
+            name: userData.first_name ? `${userData.first_name} ${userData.last_name || ''}`.trim() : (userData.name || 'User'),
+            username: userData.username || 'user',
+            avatar: userData.photo_url || `https://ui-avatars.com/api/?name=User`
+        });
 
-        const { data: botExists } = await supabase.from('bots').select('id').eq('id', botId).maybeSingle();
-        if (!botExists) {
-            await this.saveBot(botData);
-        }
-
-        const payload = {
+        const { error } = await supabase.from('user_bots').upsert({
             user_id: userId,
             bot_id: botId,
             is_active: true,
             is_premium: isPremium,
             acquired_at: new Date().toISOString()
-        };
-
-        const { error: upsertError } = await supabase
-            .from('user_bots')
-            .upsert(payload, { onConflict: 'user_id,bot_id' });
+        }, { onConflict: 'user_id,bot_id' });
         
-        if (upsertError) throw upsertError;
-
-        await this.sendNotification({
-            user_id: userId,
-            type: isPremium ? 'payment' : 'bot',
-            title: isPremium ? 'Premium Bot Aktif Edildi' : 'Kütüphaneye Eklendi',
-            message: `${botData.name} artık sizinle! Keyifli kullanımlar.`,
-            target_type: 'user'
-        });
-
+        if (error) throw error;
         return true;
-    } catch (e: any) {
-        console.error("DATABASE_CRITICAL_ERROR (addUserBot):", e);
+    } catch (e) {
+        console.error(e);
         throw e;
     }
   }
 
-  static async getUserBots(userId: string): Promise<Bot[]> {
-    try {
-        const { data, error } = await supabase
-            .from('user_bots')
-            .select('*, bots(*)')
-            .eq('user_id', userId.toString());
-        if (error) throw error;
-        return (data || []).map((item: any) => item.bots).filter(Boolean);
-    } catch (e) {
-        return [];
-    }
-  }
-
-  static async syncUser(user: Partial<User>) {
-    if (!user.id) return;
-    const { error } = await supabase.from('users').upsert({
-        ...user,
-        id: user.id.toString(),
-        joinDate: user.joinDate || new Date().toISOString(),
-        role: user.role || 'User',
-        status: user.status || 'Active'
-    }, { onConflict: 'id' });
-    if (error) console.error("User Sync Error:", error);
-  }
-
-  static async getUserDetailedAssets(userId: string) {
+  static async syncChannelsFromBotActivity(userId: string): Promise<number> {
       try {
-        const [channels, logs, userBots] = await Promise.all([
-            supabase.from('channels').select('*').eq('user_id', userId.toString()),
-            supabase.from('notifications').select('*').eq('user_id', userId.toString()).order('date', { ascending: false }),
-            supabase.from('user_bots').select('*, bots(*)').eq('user_id', userId.toString())
-        ]);
-        
-        const mappedUserBots = (userBots.data || []).map((ub: any) => ({
-            bot: ub.bots,
-            ownership: {
-                is_active: ub.is_active ?? true,
-                is_premium: ub.is_premium ?? false,
-                acquired_at: ub.acquired_at || new Date().toISOString()
-            }
-        })).filter((item: any) => item.bot !== null);
+          const { data: logs, error: logErr } = await supabase
+              .from('bot_discovery_logs')
+              .select('*')
+              .eq('owner_id', userId.toString())
+              .eq('is_synced', false);
 
-        return {
-            channels: channels.data || [],
-            logs: logs.data || [],
-            userBots: mappedUserBots
-        };
+          if (logErr || !logs || logs.length === 0) return 0;
+
+          let synced = 0;
+          for (const log of logs) {
+              const { error: chErr } = await supabase.from('channels').insert({
+                  user_id: userId.toString(),
+                  name: log.channel_name,
+                  member_count: log.member_count || 0,
+                  icon: log.channel_icon,
+                  connected_bot_ids: [log.bot_id]
+              });
+
+              if (!chErr) {
+                  await supabase.from('bot_discovery_logs').update({ is_synced: true }).eq('id', log.id);
+                  synced++;
+              }
+          }
+          return synced;
       } catch (e) {
-          return { channels: [], logs: [], userBots: [] };
+          return 0;
       }
   }
 
   static async getBots(category?: string): Promise<Bot[]> {
     try {
       let query = supabase.from('bots').select('*').order('id', { ascending: false });
-      if (category && category !== 'all') {
-        query = query.eq('category', category);
-      }
-      const { data, error } = await query;
-      if (error) throw error;
+      if (category && category !== 'all') query = query.eq('category', category);
+      const { data } = await query;
       return data || [];
-    } catch (e) {
-      return [];
-    }
+    } catch (e) { return []; }
   }
 
-  static async getBotById(id: string): Promise<Bot | null> {
-    try {
-      const { data, error } = await supabase.from('bots').select('*').eq('id', id).maybeSingle();
-      if (error) throw error;
-      return data;
-    } catch (e) {
-      return null;
-    }
-  }
-
+  // Fix: Added saveBot to handle creating or updating bot definitions in the marketplace.
   static async saveBot(bot: Partial<Bot>) {
-    // ID yoksa veya boşsa rastgele bir ID ata (Yeni ekleme durumu)
-    const botId = bot.id || Math.random().toString(36).substring(2, 9);
-    
-    const { error } = await supabase.from('bots').upsert({
-      ...bot,
-      id: botId,
-      screenshots: bot.screenshots || []
-    }, { onConflict: 'id' });
-    
-    if (error) {
-        console.error("Bot Save Error:", error.message);
-        throw error;
-    }
+    const { error } = await supabase.from('bots').upsert(bot);
+    if (error) throw error;
   }
 
+  // Fix: Added deleteBot to allow removing bots from the database.
   static async deleteBot(id: string) {
     const { error } = await supabase.from('bots').delete().eq('id', id);
     if (error) throw error;
   }
 
-  static async getChannels(userId: string): Promise<Channel[]> {
-    try {
-      const { data, error } = await supabase.from('channels').select('*').eq('user_id', userId.toString());
-      if (error) throw error;
-      return data || [];
-    } catch (e) {
-      return [];
-    }
+  static async syncUser(user: Partial<User>) {
+    if (!user.id) return;
+    await supabase.from('users').upsert({
+        ...user,
+        id: user.id.toString(),
+        join_date: user.joinDate || new Date().toISOString()
+    });
   }
 
-  static async saveChannel(channel: Partial<Channel>) {
-    const { error } = await supabase.from('channels').upsert({
-      ...channel,
-      id: channel.id || Math.random().toString(36).substr(2, 9)
-    }, { onConflict: 'id' });
-    if (error) throw error;
+  static async getChannels(userId: string): Promise<Channel[]> {
+    const { data } = await supabase.from('channels').select('*').eq('user_id', userId.toString());
+    return (data || []).map(c => ({
+        id: c.id,
+        user_id: c.user_id,
+        name: c.name,
+        memberCount: c.member_count,
+        icon: c.icon,
+        isAdEnabled: c.is_ad_enabled,
+        connectedBotIds: c.connected_bot_ids,
+        revenue: c.revenue
+    }));
+  }
+
+  // Fix: Added getAllPurchases to provide administrative insights into bot acquisitions.
+  static async getAllPurchases(): Promise<any[]> {
+    const { data } = await supabase
+      .from('user_bots')
+      .select('*, users(*), bots(*)')
+      .order('acquired_at', { ascending: false });
+    return data || [];
+  }
+
+  // Fix: Added getUserDetailedAssets to aggregate a user's assets (channels, bots) and notification history for the admin view.
+  static async getUserDetailedAssets(userId: string) {
+    const [channels, notifications, userBotsRaw] = await Promise.all([
+      this.getChannels(userId),
+      this.getNotifications(userId),
+      supabase.from('user_bots').select('*, bots(*)').eq('user_id', userId.toString())
+    ]);
+
+    const userBots = (userBotsRaw.data || []).map((ub: any) => ({
+      ownership: {
+        is_active: ub.is_active,
+        is_premium: ub.is_premium,
+        acquired_at: ub.acquired_at
+      },
+      bot: ub.bots
+    }));
+
+    return {
+      channels: channels,
+      logs: notifications,
+      userBots: userBots
+    };
   }
 
   static async getSettings() {
-    try {
-      const { data, error } = await supabase.from('settings').select('*').maybeSingle();
-      if (error) throw error;
-      return data;
-    } catch (e) {
-      return null;
-    }
+    const { data } = await supabase.from('settings').select('*').maybeSingle();
+    return data;
   }
 
   static async saveSettings(settings: any) {
-    const { error } = await supabase.from('settings').upsert(settings, { onConflict: 'id' });
-    if (error) throw error;
+    await supabase.from('settings').upsert(settings);
   }
 
+  // Fix: Modified getAnnouncements to return all announcements, enabling full management in the admin dashboard.
   static async getAnnouncements(): Promise<Announcement[]> {
-    try {
-      const { data, error } = await supabase.from('announcements').select('*').order('id', { ascending: false });
-      if (error) throw error;
-      return data || [];
-    } catch (e) {
-      return [];
-    }
+    const { data } = await supabase.from('announcements').select('*');
+    return data || [];
   }
 
+  // Fix: Added saveAnnouncement for managing promotional cards.
   static async saveAnnouncement(ann: Partial<Announcement>) {
-    const { error } = await supabase.from('announcements').upsert({
-      ...ann,
-      id: ann.id || Math.random().toString(36).substr(2, 9)
-    }, { onConflict: 'id' });
+    const { error } = await supabase.from('announcements').upsert(ann);
     if (error) throw error;
   }
 
+  // Fix: Added deleteAnnouncement for removing promotional cards.
   static async deleteAnnouncement(id: string) {
     const { error } = await supabase.from('announcements').delete().eq('id', id);
     if (error) throw error;
   }
 
   static async getNotifications(userId?: string): Promise<Notification[]> {
-    try {
-      let query = supabase.from('notifications').select('*').order('date', { ascending: false });
-      if (userId) {
-        query = query.or(`user_id.eq.${userId},target_type.eq.global`);
-      }
-      const { data, error } = await query;
-      if (error) throw error;
-      return data || [];
-    } catch (e) {
-      return [];
-    }
+    let query = supabase.from('notifications').select('*').order('date', { ascending: false });
+    if (userId) query = query.or(`user_id.eq.${userId},target_type.eq.global`);
+    const { data } = await query;
+    return data || [];
   }
 
   static async markNotificationRead(id: string) {
-    const { error } = await supabase.from('notifications').update({ isRead: true }).eq('id', id);
-    if (error) throw error;
+    await supabase.from('notifications').update({ is_read: true }).eq('id', id);
   }
 
-  static async sendNotification(notification: Partial<Notification>) {
-    const { error } = await supabase.from('notifications').insert({
-      ...notification,
-      id: notification.id || Math.random().toString(36).substr(2, 9),
-      date: new Date().toISOString(),
-      isRead: false
-    });
-    if (error) throw error;
+  static async sendNotification(n: any) {
+    await supabase.from('notifications').insert({ ...n, date: new Date().toISOString() });
   }
 
   static async getUsers(): Promise<User[]> {
-    try {
-      const { data, error } = await supabase.from('users').select('*').order('joinDate', { ascending: false });
-      if (error) throw error;
-      return data || [];
-    } catch (e) {
-      return [];
-    }
+    const { data } = await supabase.from('users').select('*').order('join_date', { ascending: false });
+    return (data || []).map(u => ({ ...u, joinDate: u.join_date }));
   }
 
   static async updateUserStatus(userId: string, status: string) {
-    const { error } = await supabase.from('users').update({ status }).eq('id', userId);
-    if (error) throw error;
+    await supabase.from('users').update({ status }).eq('id', userId);
   }
 
   static setAdminSession(token: string) { localStorage.setItem('admin_v3_session', token); }
   static isAdminLoggedIn(): boolean { return !!localStorage.getItem('admin_v3_session'); }
   static logoutAdmin() { localStorage.removeItem('admin_v3_session'); }
-  static async init() { console.log("Service Initialized"); }
+  static async init() { console.log("DB Init"); }
 }
