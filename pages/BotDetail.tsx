@@ -24,37 +24,59 @@ const BotDetail = () => {
     const fetchBotData = async () => {
       if (!id) return;
       setIsLoading(true);
-      let data = await DatabaseService.getBotById(id);
       
+      // 1. Bot verisini çek
+      let data = await DatabaseService.getBotById(id);
       if (!data) {
           const { mockBots } = await import('../data');
           data = mockBots.find(b => b.id === id) || null;
       }
-
       setBot(data);
-      const ownedBots = JSON.parse(localStorage.getItem('ownedBots') || '[]');
-      if (ownedBots.find((b: UserBot) => b.id === id)) setIsOwned(true);
+
+      // 2. Sahiplik Kontrolü (DB + Local)
+      if (user?.id) {
+          const dbBots = await DatabaseService.getUserBots(user.id.toString());
+          const isOwnedInDb = dbBots.some(b => b.id === id);
+          
+          const localOwned = JSON.parse(localStorage.getItem('ownedBots') || '[]');
+          const isOwnedInLocal = localOwned.some((b: UserBot) => b.id === id);
+          
+          setIsOwned(isOwnedInDb || isOwnedInLocal);
+
+          // LocalStorage'ı güncelle (senkronize tut)
+          if (isOwnedInDb && !isOwnedInLocal && data) {
+              localStorage.setItem('ownedBots', JSON.stringify([...localOwned, { ...data, isAdEnabled: false, isActive: true }]));
+          }
+      } else {
+          const localOwned = JSON.parse(localStorage.getItem('ownedBots') || '[]');
+          setIsOwned(localOwned.some((b: UserBot) => b.id === id));
+      }
+
       setIsLoading(false);
     };
     fetchBotData();
-  }, [id]);
+  }, [id, user]);
 
   const handleAction = async () => {
       if (isProcessing || !bot) return;
       haptic('medium');
       
       if (isOwned) {
-          let finalLink = bot.bot_link;
+          let botLink = bot.bot_link || '';
+          let finalUrl = '';
           
-          // @ formatını Telegram Linkine çevir
-          if (finalLink && finalLink.startsWith('@')) {
-              finalLink = `https://t.me/${finalLink.substring(1)}`;
+          // Link Formatlama Mantığı
+          if (botLink.startsWith('http')) {
+              finalUrl = botLink;
+          } else {
+              const username = botLink.replace('@', '').trim();
+              finalUrl = `https://t.me/${username}`;
           }
 
-          if (tg && finalLink) {
-              tg.openTelegramLink(finalLink);
-          } else if (finalLink) {
-              window.open(finalLink, '_blank');
+          if (tg && tg.openTelegramLink) {
+              tg.openTelegramLink(finalUrl);
+          } else {
+              window.open(finalUrl, '_blank');
           }
           return;
       }
