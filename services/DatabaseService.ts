@@ -1,3 +1,4 @@
+
 import { createClient } from '@supabase/supabase-js';
 import { Bot, User, Channel, Announcement, Notification } from '../types';
 
@@ -68,7 +69,7 @@ export class DatabaseService {
         if (error) throw error;
         return true;
     } catch (e) {
-        console.error(e);
+        console.error("Bot ekleme hatası:", e);
         throw e;
     }
   }
@@ -125,18 +126,23 @@ export class DatabaseService {
 
   static async syncUser(user: Partial<User>) {
     if (!user.id) return;
-    await supabase.from('users').upsert({
-        id: user.id.toString(),
-        name: user.name || 'İsimsiz Kullanıcı',
-        username: user.username || 'user',
-        avatar: user.avatar || `https://ui-avatars.com/api/?name=User`,
-        role: user.role || 'User',
-        status: user.status || 'Active',
-        badges: user.badges || [],
-        email: user.email || null,
-        phone: user.phone || null,
-        join_date: user.joinDate || new Date().toISOString()
-    });
+    try {
+        const { error } = await supabase.from('users').upsert({
+            id: user.id.toString(),
+            name: user.name || 'İsimsiz Kullanıcı',
+            username: user.username || 'user',
+            avatar: user.avatar || `https://ui-avatars.com/api/?name=User`,
+            role: user.role || 'User',
+            status: user.status || 'Active',
+            badges: user.badges || [],
+            email: user.email || null,
+            phone: user.phone || null,
+            join_date: user.joinDate || new Date().toISOString()
+        }, { onConflict: 'id' });
+        if (error) throw error;
+    } catch (e) {
+        console.error("Kullanıcı senkronizasyon hatası:", e);
+    }
   }
 
   static async getChannels(userId: string): Promise<Channel[]> {
@@ -228,19 +234,19 @@ export class DatabaseService {
       const { data, error } = await supabase.from('users').select('*').order('join_date', { ascending: false });
       if (error) throw error;
       return (data || []).map(u => ({
-          id: u.id,
-          name: u.name,
-          username: u.username,
+          id: u.id.toString(),
+          name: u.name || 'İsimsiz',
+          username: u.username || 'user',
           avatar: u.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(u.name || 'User')}`,
-          role: u.role,
-          status: u.status,
+          role: u.role || 'User',
+          status: u.status || 'Active',
           badges: u.badges || [],
           joinDate: u.join_date,
           email: u.email,
           phone: u.phone
       }));
     } catch (e) {
-      console.error("Users fetch error:", e);
+      console.error("Kullanıcı listesi çekme hatası:", e);
       return [];
     }
   }
@@ -252,5 +258,5 @@ export class DatabaseService {
   static setAdminSession(token: string) { localStorage.setItem('admin_v3_session', token); }
   static isAdminLoggedIn(): boolean { return !!localStorage.getItem('admin_v3_session'); }
   static logoutAdmin() { localStorage.removeItem('admin_v3_session'); }
-  static async init() { console.log("DB Init"); }
+  static async init() { console.log("Database initialized"); }
 }

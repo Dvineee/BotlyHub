@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import * as Router from 'react-router-dom';
 import { 
@@ -191,12 +192,11 @@ const HomeView = () => {
             ]);
             setStats(statData);
 
-            // Karma Log Sistemi: Bot Edinmeleri + Admin Duyuruları/Sistem Logları
             const logs = [
                 ...purchases.map(p => ({
                     id: p.id || Math.random(),
                     date: p.acquired_at,
-                    action: `@${p.users?.username || 'Kullanıcı'} '${p.bots?.name || 'Bot'}' kütüphanesine ekledi.`,
+                    action: `@${p.users?.username || 'user'} '${p.bots?.name || 'Bot'}' edindi.`,
                     status: p.is_premium ? 'Update' : 'Success'
                 })),
                 ...globalNotifs.map(n => ({
@@ -566,7 +566,9 @@ const UserManagement = () => {
     const [search, setSearch] = useState('');
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
-    useEffect(() => { load(); }, []);
+    useEffect(() => { 
+        load(); 
+    }, []);
     
     const load = async () => { 
         setIsLoading(true); 
@@ -589,7 +591,8 @@ const UserManagement = () => {
 
     const filteredUsers = users.filter(u => 
         (u.name || '').toLowerCase().includes(search.toLowerCase()) || 
-        (u.username || '').toLowerCase().includes(search.toLowerCase())
+        (u.username || '').toLowerCase().includes(search.toLowerCase()) ||
+        (u.id || '').toString().includes(search)
     );
 
     return (
@@ -604,7 +607,7 @@ const UserManagement = () => {
                         type="text" 
                         value={search}
                         onChange={e => setSearch(e.target.value)}
-                        placeholder="İsim veya @username ara..." 
+                        placeholder="İsim, ID veya @username..." 
                         className="bg-[#0f172a] border border-slate-800 rounded-[28px] px-8 py-5 text-xs outline-none focus:border-blue-500 transition-all w-full sm:w-96 font-bold shadow-2xl" 
                     />
                     <button onClick={load} className="p-5 bg-slate-900 border border-slate-800 rounded-[24px] text-slate-400 hover:text-white transition-all shadow-xl active:scale-95"><RefreshCw size={20} className={isLoading ? 'animate-spin' : ''}/></button>
@@ -636,7 +639,7 @@ const UserManagement = () => {
                                             </div>
                                             <div>
                                                 <p className="font-black text-white text-base tracking-tight italic">@{u.username}</p>
-                                                <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest">{u.name}</p>
+                                                <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest">ID: {u.id}</p>
                                             </div>
                                         </div>
                                     </td>
@@ -647,8 +650,8 @@ const UserManagement = () => {
                                         </div>
                                     </td>
                                     <td className="px-10 py-8">
-                                        <p className="text-xs text-slate-500 font-bold">{new Date(u.joinDate).toLocaleDateString()}</p>
-                                        <p className="text-[9px] text-slate-700 uppercase font-black mt-1">Hoş Geldin</p>
+                                        <p className="text-xs text-slate-500 font-bold">{u.joinDate ? new Date(u.joinDate).toLocaleDateString() : 'Belirsiz'}</p>
+                                        <p className="text-[9px] text-slate-700 uppercase font-black mt-1">Platform Katılımı</p>
                                     </td>
                                     <td className="px-10 py-8">
                                         <span className={`text-[9px] font-black px-3 py-1.5 rounded-xl uppercase tracking-widest border ${u.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-red-500/10 text-red-500 border-red-500/20'}`}>
@@ -710,7 +713,7 @@ const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClos
                             <p className="text-blue-500 font-black text-base tracking-[0.2em] mt-1 uppercase">@{user.username}</p>
                             <div className="flex gap-4 mt-6">
                                 <span className="bg-slate-950 px-4 py-2 rounded-2xl border border-slate-800 text-[10px] font-black text-slate-500 uppercase tracking-widest italic shadow-inner">ID: {user.id}</span>
-                                <span className="bg-slate-950 px-4 py-2 rounded-2xl border border-slate-800 text-[10px] font-black text-slate-500 uppercase tracking-widest italic shadow-inner">KATILIM: {new Date(user.joinDate).toLocaleDateString()}</span>
+                                <span className="bg-slate-950 px-4 py-2 rounded-2xl border border-slate-800 text-[10px] font-black text-slate-500 uppercase tracking-widest italic shadow-inner">KATILIM: {user.joinDate ? new Date(user.joinDate).toLocaleDateString() : 'Belirsiz'}</span>
                             </div>
                         </div>
                     </div>
