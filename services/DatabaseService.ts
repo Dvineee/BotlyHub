@@ -11,11 +11,9 @@ export class DatabaseService {
   
   static async syncChannelsFromBotActivity(userId: string): Promise<number> {
       try {
-          // ID'yi temizle ve metne çevir
           const uIdStr = String(userId).trim();
           console.log("[SYNC] Tarama başlatıldı. Aranan Owner ID:", uIdStr);
           
-          // 1. İşlenmemiş sinyalleri çek
           const { data: logs, error: logErr } = await supabase
               .from('bot_discovery_logs')
               .select('*')
@@ -28,22 +26,14 @@ export class DatabaseService {
           }
 
           if (!logs || logs.length === 0) {
-              console.log("[SYNC] Bu kullanıcı için işlenecek yeni log bulunamadı.");
-              // Debug için: Tüm logları bir kez çekip owner_id'leri görelim
-              const { data: allLogs } = await supabase.from('bot_discovery_logs').select('owner_id').limit(5);
-              console.log("[SYNC-DEBUG] Veritabanındaki son 5 logun sahibi:", allLogs?.map(l => l.owner_id));
+              console.log("[SYNC] İşlenecek yeni log yok.");
               return 0;
           }
 
-          console.log(`[SYNC] ${logs.length} adet yeni sinyal işleniyor...`);
-
           let successCount = 0;
           for (const log of logs) {
-              // 2. Kanalı Upsert Et (Varsa güncelle, yoksa ekle)
-              // connected_bot_ids'i dizi olarak hazırla
               const botId = String(log.bot_id);
               
-              // Önce kanal var mı bakalım
               const { data: existing } = await supabase
                   .from('channels')
                   .select('*')
@@ -52,13 +42,17 @@ export class DatabaseService {
                   .maybeSingle();
 
               let syncOk = false;
+              // Fotoğraf linkini hazırla (yoksa fallback oluştur)
+              const newIcon = log.channel_icon || `https://ui-avatars.com/api/?name=${encodeURIComponent(log.channel_name)}`;
+
               if (existing) {
                   const bots = Array.from(new Set([...(existing.connected_bot_ids || []), botId]));
                   const { error: upErr } = await supabase
                       .from('channels')
                       .update({
                           member_count: log.member_count,
-                          connected_bot_ids: bots
+                          connected_bot_ids: bots,
+                          icon: log.channel_icon || existing.icon // Eğer bot yeni ikon gönderdiyse güncelle
                       })
                       .eq('id', existing.id);
                   if (!upErr) syncOk = true;
@@ -69,7 +63,7 @@ export class DatabaseService {
                           user_id: uIdStr,
                           name: log.channel_name,
                           member_count: log.member_count || 0,
-                          icon: log.channel_icon || `https://ui-avatars.com/api/?name=${encodeURIComponent(log.channel_name)}`,
+                          icon: newIcon,
                           connected_bot_ids: [botId],
                           revenue: 0
                       });
@@ -77,7 +71,6 @@ export class DatabaseService {
               }
 
               if (syncOk) {
-                  // 3. Logu işaretle
                   await supabase.from('bot_discovery_logs').update({ is_synced: true }).eq('id', log.id);
                   successCount++;
               }
@@ -92,8 +85,6 @@ export class DatabaseService {
 
   static async getChannels(userId: string): Promise<Channel[]> {
     const uIdStr = String(userId).trim();
-    console.log("[GET-CHANNELS] İstek:", uIdStr);
-
     const { data, error } = await supabase
         .from('channels')
         .select('*')
@@ -105,7 +96,6 @@ export class DatabaseService {
         return [];
     }
     
-    console.log("[GET-CHANNELS] Gelen Veri Adeti:", data?.length || 0);
     return (data || []).map(c => ({
         id: String(c.id),
         user_id: String(c.user_id),
