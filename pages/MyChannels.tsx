@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, Plus, Megaphone, Users, Loader2, RefreshCw, Search, ShieldCheck, Zap, AlertCircle } from 'lucide-react';
+import { ChevronLeft, Plus, Megaphone, Users, Loader2, RefreshCw, Search, ShieldCheck, Zap, AlertCircle, CheckCircle2 } from 'lucide-react';
 import * as Router from 'react-router-dom';
 import { Channel } from '../types';
 import { DatabaseService } from '../services/DatabaseService';
@@ -14,17 +14,50 @@ const MyChannels = () => {
   const [channels, setChannels] = useState<Channel[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [autoSyncStatus, setAutoSyncStatus] = useState<'idle' | 'syncing' | 'done'>('idle');
 
   useEffect(() => {
-    if (user?.id) loadChannels();
-    else setIsLoading(false);
+    if (user?.id) {
+        initChannels();
+    } else {
+        setIsLoading(false);
+    }
   }, [user]);
 
+  const initChannels = async () => {
+      setIsLoading(true);
+      
+      // 1. Önce veritabanındaki mevcut kanalları yükle (Hızlı açılış için)
+      const initialData = await DatabaseService.getChannels(user.id.toString());
+      setChannels(initialData);
+      
+      // 2. Arka planda sessizce bot keşiflerini senkronize et (Otomatik özellik)
+      try {
+          setAutoSyncStatus('syncing');
+          const newSyncedCount = await DatabaseService.syncChannelsFromBotActivity(user.id.toString());
+          
+          if (newSyncedCount > 0) {
+              // Eğer yeni kanal bulunduysa listeyi tazele
+              const refreshedData = await DatabaseService.getChannels(user.id.toString());
+              setChannels(refreshedData);
+              notification('success');
+              setAutoSyncStatus('done');
+              // 3 saniye sonra done durumunu temizle
+              setTimeout(() => setAutoSyncStatus('idle'), 3000);
+          } else {
+              setAutoSyncStatus('idle');
+          }
+      } catch (e) {
+          console.error("Auto sync failed:", e);
+          setAutoSyncStatus('idle');
+      } finally {
+          setIsLoading(false);
+      }
+  };
+
   const loadChannels = async () => {
-    setIsLoading(true);
     const data = await DatabaseService.getChannels(user.id.toString());
     setChannels(data);
-    setIsLoading(false);
   };
 
   const handleSync = async () => {
@@ -33,12 +66,10 @@ const MyChannels = () => {
       haptic('medium');
       
       try {
-          // Bu metod, botun bir kanalda /start komutuyla tetiklediği yeni kanalları bulur
           const newCount = await DatabaseService.syncChannelsFromBotActivity(user.id.toString());
           if (newCount > 0) {
               notification('success');
-              alert(`${newCount} yeni kanal otomatik olarak senkronize edildi!`);
-              loadChannels();
+              await loadChannels();
           } else {
               alert("Yeni kanal bulunamadı. Lütfen botu eklediğiniz kanalda /start komutunu verdiğinizden emin olun.");
           }
@@ -62,23 +93,39 @@ const MyChannels = () => {
             onClick={handleSync}
             disabled={isSyncing}
             className="p-3 bg-slate-900/60 border border-slate-800 rounded-2xl text-blue-400 active:scale-90 transition-all disabled:opacity-30"
-            title="Bot Aktivitelerini Senkronize Et"
+            title="Manuel Senkronizasyon"
         >
             <RefreshCw size={20} className={isSyncing ? 'animate-spin' : ''} />
         </button>
       </div>
 
+      {/* Auto Sync Indicator - Sessiz Bildirim */}
+      {autoSyncStatus !== 'idle' && (
+          <div className={`mb-6 p-4 rounded-2xl border flex items-center justify-center gap-3 animate-in slide-in-from-top-4 transition-all ${
+              autoSyncStatus === 'syncing' ? 'bg-blue-600/10 border-blue-500/20 text-blue-400' : 'bg-emerald-600/10 border-emerald-500/20 text-emerald-400'
+          }`}>
+              {autoSyncStatus === 'syncing' ? (
+                  <Loader2 className="animate-spin" size={16} />
+              ) : (
+                  <CheckCircle2 size={16} />
+              )}
+              <span className="text-[10px] font-black uppercase tracking-widest italic">
+                  {autoSyncStatus === 'syncing' ? 'Yeni kanallar taranıyor...' : 'Liste güncellendi!'}
+              </span>
+          </div>
+      )}
+
       <div className="bg-blue-600/5 border border-blue-500/10 p-6 rounded-[36px] mb-8 flex items-start gap-4">
           <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shrink-0 text-white shadow-xl shadow-blue-900/20"><Zap size={24}/></div>
           <div>
-              <p className="text-xs font-black text-white uppercase italic tracking-tight">Otomatik Keşif</p>
+              <p className="text-xs font-black text-white uppercase italic tracking-tight">Akıllı Takip</p>
               <p className="text-[10px] text-slate-500 font-medium leading-relaxed mt-1">
-                  Kütüphanenizdeki bir botu kanalınıza ekleyip <span className="text-blue-400 font-bold">/start</span> verdiğinizde, kanalınız otomatik olarak buraya eklenir.
+                  Botu kanalınıza ekleyip <span className="text-blue-400 font-bold">/start</span> verdiğinizde, uygulama kanalınızı <span className="text-white">otomatik</span> olarak algılar.
               </p>
           </div>
       </div>
 
-      {isLoading ? (
+      {isLoading && channels.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 gap-4">
               <Loader2 className="animate-spin text-blue-500" size={32} />
               <p className="text-[10px] font-black text-slate-700 uppercase tracking-widest animate-pulse">Kanallar taranıyor...</p>
@@ -94,7 +141,7 @@ const MyChannels = () => {
                 onClick={handleSync} 
                 className="px-8 py-4 bg-slate-900 border border-slate-800 rounded-2xl text-[10px] font-black text-blue-500 uppercase tracking-widest hover:text-white transition-all active:scale-95"
               >
-                  Şimdi Senkronize Et
+                  Manuel Tara
               </button>
           </div>
       ) : (
