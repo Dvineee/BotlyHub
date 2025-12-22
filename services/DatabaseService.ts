@@ -125,35 +125,41 @@ export class DatabaseService {
 
   static async syncChannelsFromBotActivity(userId: string): Promise<number> {
       try {
+          const uIdStr = userId.toString();
+          
+          // Python botunun yazdığı logları çek
           const { data: logs, error: logErr } = await supabase
               .from('bot_discovery_logs')
               .select('*')
-              .eq('owner_id', userId.toString())
+              .eq('owner_id', uIdStr)
               .eq('is_synced', false);
 
           if (logErr || !logs || logs.length === 0) return 0;
 
           let syncedCount = 0;
           for (const log of logs) {
-              // Aynı isimde bir kanal var mı kontrol et
+              // Aynı kullanıcıya ait aynı isimde bir kanal var mı?
               const { data: existing } = await supabase
                   .from('channels')
                   .select('*')
-                  .eq('user_id', userId.toString())
+                  .eq('user_id', uIdStr)
                   .eq('name', log.channel_name)
                   .maybeSingle();
 
               if (existing) {
-                  // Mevcut kanalı güncelle (bot_id ekle ve üye sayısını güncelle)
-                  const updatedBots = Array.from(new Set([...(existing.connected_bot_ids || []), log.bot_id]));
+                  // Kanal zaten varsa bağlı bot listesini güncelle
+                  const currentBots = existing.connected_bot_ids || [];
+                  const updatedBots = Array.from(new Set([...currentBots, log.bot_id]));
+                  
                   await supabase.from('channels').update({
                       member_count: log.member_count || existing.member_count,
-                      connected_bot_ids: updatedBots
+                      connected_bot_ids: updatedBots,
+                      icon: log.channel_icon || existing.icon
                   }).eq('id', existing.id);
               } else {
-                  // Yeni kanal oluştur
+                  // Yeni kanal kaydı
                   await supabase.from('channels').insert({
-                      user_id: userId.toString(),
+                      user_id: uIdStr,
                       name: log.channel_name,
                       member_count: log.member_count || 0,
                       icon: log.channel_icon,
@@ -163,13 +169,13 @@ export class DatabaseService {
                   });
               }
 
-              // Log'u senkronize edildi olarak işaretle
+              // Log satırını "işlendi" olarak işaretle
               await supabase.from('bot_discovery_logs').update({ is_synced: true }).eq('id', log.id);
               syncedCount++;
           }
           return syncedCount;
       } catch (e) {
-          console.error("Auto-sync error:", e);
+          console.error("Critical Sync Error:", e);
           return 0;
       }
   }
