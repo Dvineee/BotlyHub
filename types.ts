@@ -48,6 +48,7 @@ export interface UserBot extends Bot {
   isAdEnabled: boolean;
   isActive: boolean;
   expiryDate?: string;
+  ownership_id?: string;
 }
 
 export interface Channel {
@@ -94,7 +95,6 @@ export interface Notification {
   message: string;
   date: string;
   isRead: boolean;
-  // Added user_id and target_type to support per-user and global notifications used in DatabaseService
   user_id?: string;
   target_type?: 'user' | 'global';
 }

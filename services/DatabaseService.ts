@@ -1,6 +1,6 @@
 
 import { createClient } from '@supabase/supabase-js';
-import { Bot, User, Channel, Announcement, Notification } from '../types';
+import { Bot, User, Channel, Announcement, Notification, UserBot } from '../types';
 
 const SUPABASE_URL = 'https://ybnxfwqrduuinzgnbymc.supabase.co'; 
 const SUPABASE_ANON_KEY = 'sb_publishable_VeYQ304ZpUpj3ymB3ihpjw_jt49W1G-'; 
@@ -62,20 +62,32 @@ export class DatabaseService {
     }
   }
 
-  static async getUserBots(userId: string): Promise<Bot[]> {
+  static async getUserBots(userId: string): Promise<UserBot[]> {
     const { data, error } = await supabase
       .from('user_bots')
-      .select('bots(*)')
+      .select('*, bots(*)')
       .eq('user_id', userId.toString());
     
     if (error || !data) return [];
-    return data.map((item: any) => item.bots).filter((b: any) => b !== null);
+    return data.map((item: any) => ({
+        ...item.bots,
+        expiryDate: item.expiry_date || item.expiryDate,
+        ownership_id: item.id
+    })).filter((b: any) => b.id !== undefined);
   }
 
   static async addUserBot(userData: any, botData: Bot, isPremium: boolean = false) {
     if (!userData || !botData) throw new Error("Eksik veri.");
     const userId = (userData.id || userData).toString();
     const botId = botData.id.toString();
+    
+    // Ücretli bot ise 30 günlük süre tanımla
+    let expiryDate = null;
+    if (botData.price > 0) {
+        const date = new Date();
+        date.setDate(date.getDate() + 30);
+        expiryDate = date.toISOString();
+    }
     
     try {
         await this.syncUser({
@@ -90,7 +102,8 @@ export class DatabaseService {
             bot_id: botId,
             is_active: true,
             is_premium: isPremium,
-            acquired_at: new Date().toISOString()
+            acquired_at: new Date().toISOString(),
+            expiry_date: expiryDate
         }, { onConflict: 'user_id,bot_id' });
         
         if (error) throw error;
@@ -99,6 +112,16 @@ export class DatabaseService {
         console.error(e);
         throw e;
     }
+  }
+
+  static async removeUserBot(userId: string, botId: string) {
+    const { error } = await supabase
+        .from('user_bots')
+        .delete()
+        .eq('user_id', userId.toString())
+        .eq('bot_id', botId.toString());
+    
+    if (error) throw error;
   }
 
   static async syncChannelsFromBotActivity(userId: string): Promise<number> {
@@ -151,15 +174,11 @@ export class DatabaseService {
     if (error) throw error;
   }
 
-  /**
-   * syncUser: Veritabanındaki verileri ezmemek için akıllı güncelleme yapar.
-   */
   static async syncUser(user: Partial<User>) {
     if (!user.id) return;
     try {
         const userId = user.id.toString();
         
-        // Önce mevcut kullanıcıyı çekelim ki email/phone verilerini kaybetmeyelim
         const { data: existing } = await supabase
             .from('users')
             .select('email, phone, joindate, joinDate')
@@ -174,7 +193,6 @@ export class DatabaseService {
             role: user.role || 'User',
             status: user.status || 'Active',
             badges: user.badges || [],
-            // Eğer yeni pakette mail/tel yoksa ve eskiden varsa, eskileri koru
             email: user.email || existing?.email || null,
             phone: user.phone || existing?.phone || null,
             joindate: user.joinDate || existing?.joindate || existing?.joinDate || new Date().toISOString(),
@@ -221,7 +239,8 @@ export class DatabaseService {
       ownership: {
         is_active: ub.is_active,
         is_premium: ub.is_premium,
-        acquired_at: ub.acquired_at
+        acquired_at: ub.acquired_at,
+        expiry_date: ub.expiry_date
       },
       bot: ub.bots
     }));

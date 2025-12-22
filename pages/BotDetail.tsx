@@ -21,36 +21,52 @@ const BotDetail = () => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
-    const fetchBotData = async () => {
-      if (!id) return;
-      setIsLoading(true);
-      
-      let data = await DatabaseService.getBotById(id);
-      if (!data) {
-          const { mockBots } = await import('../data');
-          data = mockBots.find(b => b.id === id) || null;
-      }
-      setBot(data);
-
-      if (user?.id) {
-          const dbBots = await DatabaseService.getUserBots(user.id.toString());
-          setIsOwned(dbBots.some(b => b.id === id));
-      } else {
-          const localOwned = JSON.parse(localStorage.getItem('ownedBots') || '[]');
-          setIsOwned(localOwned.some((b: UserBot) => b.id === id));
-      }
-
-      setIsLoading(false);
-    };
     fetchBotData();
   }, [id, user]);
+
+  const fetchBotData = async () => {
+    if (!id) return;
+    setIsLoading(true);
+    
+    try {
+        // 1. Bot verisini getir
+        let data = await DatabaseService.getBotById(id);
+        if (!data) {
+            const { mockBots } = await import('../data');
+            data = mockBots.find(b => b.id === id) || null;
+        }
+        setBot(data);
+
+        // 2. Mülkiyet kontrolü (Kullanıcıda bot var mı?)
+        if (user?.id) {
+            const dbBots = await DatabaseService.getUserBots(user.id.toString());
+            const owned = dbBots.some(b => b.id === id);
+            setIsOwned(owned);
+            
+            // LocalStorage sync (opsiyonel ama tutarlılık için iyi)
+            const localOwned = JSON.parse(localStorage.getItem('ownedBots') || '[]');
+            if (owned && !localOwned.some((b: any) => b.id === id)) {
+                localStorage.setItem('ownedBots', JSON.stringify([...localOwned, data]));
+            } else if (!owned && localOwned.some((b: any) => b.id === id)) {
+                localStorage.setItem('ownedBots', JSON.stringify(localOwned.filter((b: any) => b.id !== id)));
+            }
+        } else {
+            const localOwned = JSON.parse(localStorage.getItem('ownedBots') || '[]');
+            setIsOwned(localOwned.some((b: UserBot) => b.id === id));
+        }
+    } catch (e) {
+        console.error("Bot detayı çekilemedi", e);
+    } finally {
+        setIsLoading(false);
+    }
+  };
 
   const handleAction = async () => {
       if (isProcessing || !bot) return;
       haptic('medium');
       
+      // Eğer kullanıcı botu kaldırmışsa (isOwned = false), bu butona basıldığında satın almaya veya eklemeye gider.
       if (isOwned) {
-          // Botu kütüphaneden başlatma işlemi
           const username = bot.bot_link.replace('@', '').trim();
           const finalUrl = `https://t.me/${username}`;
           
@@ -69,9 +85,6 @@ const BotDetail = () => {
               const userData = user || { id: 'test_user', first_name: 'Misafir', username: 'guest' };
               await DatabaseService.addUserBot(userData, bot, false);
               
-              const localOwned = JSON.parse(localStorage.getItem('ownedBots') || '[]');
-              localStorage.setItem('ownedBots', JSON.stringify([...localOwned, { ...bot, isAdEnabled: false, isActive: true }]));
-              
               setIsOwned(true);
               notification('success');
               haptic('heavy');
@@ -82,6 +95,7 @@ const BotDetail = () => {
               setIsProcessing(false);
           }
       } else {
+          // Ücretli bot ise ödeme sayfasına
           navigate(`/payment/${id}`);
       }
   };
@@ -100,7 +114,7 @@ const BotDetail = () => {
       <div className="px-6 flex flex-col items-center mt-12">
           <div className="relative group">
               <div className={`absolute inset-0 blur-3xl opacity-20 rounded-full transition-all ${isOwned ? 'bg-blue-500' : 'bg-purple-500'}`}></div>
-              <img src={bot.icon} className={`w-40 h-40 rounded-[48px] shadow-2xl border-4 relative z-10 object-cover transition-all ${isOwned ? 'border-blue-500/50 scale-105' : 'border-slate-800'}`} />
+              <img src={bot.icon} className={`w-40 h-40 rounded-[48px] shadow-2xl border-4 relative z-10 object-cover transition-all ${isOwned ? 'border-blue-500/50 scale-105' : 'border-slate-800 grayscale-[0.5]'}`} />
               {isOwned && (
                 <div className="absolute -bottom-2 -right-2 z-20 bg-blue-600 text-white p-2.5 rounded-2xl shadow-xl border-4 border-[#020617] animate-in zoom-in">
                     <CheckCircle2 size={24} />
@@ -123,7 +137,7 @@ const BotDetail = () => {
               <div className="mt-8 p-6 bg-slate-900/50 border border-slate-800 rounded-[32px] flex items-start gap-4 max-w-sm">
                   <div className="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center shrink-0 text-slate-500"><Lock size={20}/></div>
                   <p className="text-[11px] text-slate-400 font-medium leading-relaxed">
-                      Bu botu kullanabilmek için önce kütüphanenize eklemeli ve uygulama üzerinden aktif etmelisiniz.
+                      Bu bot kütüphanenizde bulunmuyor. Kullanmak için önce eklemeli veya satın almalısınız.
                   </p>
               </div>
           )}
@@ -146,10 +160,14 @@ const BotDetail = () => {
                       )
                   )}
               </button>
-              {isOwned && (
+              {isOwned ? (
                   <p className="text-center text-[9px] text-slate-600 font-black uppercase tracking-widest mt-4 animate-pulse italic">
-                      Botu buradan başlattıktan sonra kanalınızda start verebilirsiniz.
+                      Bot kütüphanenizde aktif. İstediğiniz zaman kaldırabilirsiniz.
                   </p>
+              ) : (
+                <p className="text-center text-[9px] text-slate-700 font-black uppercase tracking-widest mt-4 italic">
+                    Kullanmak için mülkiyet doğrulaması gereklidir.
+                </p>
               )}
           </div>
       </div>
