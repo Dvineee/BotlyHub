@@ -29,11 +29,11 @@ const MyChannels = () => {
       setIsLoading(true);
       try {
           const uId = user.id.toString();
-          // 1. Önce mevcut kanalları getir
+          // 1. Önce mevcutları çek
           const initialData = await DatabaseService.getChannels(uId);
           setChannels(initialData);
           
-          // 2. Bekleyen bot loglarını senkronize et
+          // 2. Ardından senkronizasyonu tetikle
           await triggerSync();
       } catch (e) {
           console.error("Init Channels Error:", e);
@@ -48,17 +48,17 @@ const MyChannels = () => {
       setAutoSyncStatus('syncing');
       
       try {
-          console.log("[MyChannels] Sync tetikleniyor...");
+          console.log("[MyChannels] Sync başlatılıyor...");
           const newSyncedCount = await DatabaseService.syncChannelsFromBotActivity(uId);
           
+          // Senkronizasyon başarılı olsun ya da olmasın, listeyi her zaman en güncel haliyle çek
+          const refreshedData = await DatabaseService.getChannels(uId);
+          setChannels(refreshedData);
+
           if (newSyncedCount > 0) {
-              console.log("[MyChannels] Yeni veriler bulundu, liste yenileniyor.");
-              const refreshedData = await DatabaseService.getChannels(uId);
-              setChannels(refreshedData);
               notification('success');
               setAutoSyncStatus('done');
           } else {
-              console.log("[MyChannels] Senkronize edilecek yeni veri yok.");
               setAutoSyncStatus('idle');
           }
       } catch (e) {
@@ -75,7 +75,6 @@ const MyChannels = () => {
       await triggerSync();
       setIsSyncing(false);
       
-      // Eğer hiç kanal yoksa ve veri gelmediyse rehberi göster
       if (channels.length === 0) {
           setShowGuide(true);
       }
@@ -99,7 +98,6 @@ const MyChannels = () => {
         </button>
       </div>
 
-      {/* Sync Status Banner */}
       {autoSyncStatus !== 'idle' && (
           <div className={`mb-6 p-4 rounded-2xl border flex items-center justify-center gap-3 animate-in slide-in-from-top-4 transition-all ${
               autoSyncStatus === 'syncing' ? 'bg-blue-600/10 border-blue-500/20 text-blue-400' : 
@@ -110,7 +108,7 @@ const MyChannels = () => {
                autoSyncStatus === 'done' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
               <span className="text-[10px] font-black uppercase tracking-widest italic">
                   {autoSyncStatus === 'syncing' ? 'Bot sinyalleri taranıyor...' : 
-                   autoSyncStatus === 'done' ? 'Yeni kanallar eklendi!' : 'Bağlantı hatası oluştu.'}
+                   autoSyncStatus === 'done' ? 'Senkronizasyon Tamam!' : 'Bağlantı hatası oluştu.'}
               </span>
           </div>
       )}
@@ -120,20 +118,20 @@ const MyChannels = () => {
               <button onClick={() => setShowGuide(false)} className="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors"><X size={16}/></button>
               <div className="flex items-center gap-3 mb-5 text-blue-400">
                   <BotIcon size={24} className="animate-bounce" />
-                  <p className="text-xs font-black uppercase tracking-tight italic">Nasıl Kanal Eklenir?</p>
+                  <p className="text-xs font-black uppercase tracking-tight italic">Neden Görünmüyor?</p>
               </div>
               <ul className="space-y-4">
                   <li className="flex gap-4">
                       <div className="w-6 h-6 bg-blue-600 rounded-lg flex items-center justify-center shrink-0 text-white font-black text-xs italic shadow-lg">1</div>
-                      <p className="text-[10px] text-slate-400 font-medium leading-relaxed">Botu kanalınıza/grubunuza <b>Yönetici (Admin)</b> olarak ekleyin.</p>
+                      <p className="text-[10px] text-slate-400 font-medium leading-relaxed">Botun kanalınızda <b>Yönetici</b> yetkisi olduğundan emin olun.</p>
                   </li>
                   <li className="flex gap-4">
                       <div className="w-6 h-6 bg-blue-600 rounded-lg flex items-center justify-center shrink-0 text-white font-black text-xs italic shadow-lg">2</div>
-                      <p className="text-[10px] text-slate-400 font-medium leading-relaxed">Kanal içinde <b>/start</b> yazarak botun sizi tanımasını sağlayın.</p>
+                      <p className="text-[10px] text-slate-400 font-medium leading-relaxed">Kanalda <b>/start</b> yazdıktan sonra bu sayfayı sağ üstten yenileyin.</p>
                   </li>
                   <li className="flex gap-4">
                       <div className="w-6 h-6 bg-blue-600 rounded-lg flex items-center justify-center shrink-0 text-white font-black text-xs italic shadow-lg">3</div>
-                      <p className="text-[10px] text-slate-400 font-medium leading-relaxed">Bu sayfada sağ üstteki <b>Yenile</b> butonuna basın.</p>
+                      <p className="text-[10px] text-slate-400 font-medium leading-relaxed">Halen gelmiyorsa botu kanaldan çıkarıp tekrar ekleyin.</p>
                   </li>
               </ul>
           </div>
@@ -148,14 +146,14 @@ const MyChannels = () => {
           <div className="text-center py-20 bg-slate-900/20 rounded-[44px] border-2 border-dashed border-slate-900 flex flex-col items-center gap-6">
               <div className="w-20 h-20 bg-slate-900 rounded-full flex items-center justify-center text-slate-800"><Megaphone size={40} /></div>
               <div className="px-10">
-                  <p className="text-slate-500 text-sm font-bold uppercase tracking-widest">Henüz kanal bulunamadı</p>
-                  <p className="text-[10px] text-slate-700 mt-2 italic font-medium">Botu kanalınıza ekledikten sonra yenileyin.</p>
+                  <p className="text-slate-500 text-sm font-bold uppercase tracking-widest">Kanal Bulunamadı</p>
+                  <p className="text-[10px] text-slate-700 mt-2 italic font-medium">Sinyal algılandı uyarısı aldıysanız yenileyin.</p>
               </div>
               <button 
                 onClick={handleManualRefresh} 
                 className="px-8 py-4 bg-slate-900 border border-slate-800 rounded-2xl text-[10px] font-black text-blue-500 uppercase tracking-widest hover:text-white transition-all active:scale-95"
               >
-                  Senkronize Et
+                  Yeniden Tara
               </button>
           </div>
       ) : (
@@ -164,7 +162,7 @@ const MyChannels = () => {
                   <h2 className="text-[10px] font-black text-slate-700 uppercase tracking-[0.4em]">Bağlı Kanallar ({channels.length})</h2>
               </div>
               {channels.map(c => (
-                  <div key={c.id} className="bg-[#0f172a]/60 border border-slate-800 p-5 rounded-[32px] flex items-center justify-between group hover:bg-slate-900/60 transition-all shadow-xl">
+                  <div key={c.id} className="bg-[#0f172a]/60 border border-slate-800 p-5 rounded-[32px] flex items-center justify-between group hover:bg-slate-900/60 transition-all shadow-xl animate-in slide-in-from-bottom-2">
                       <div className="flex items-center gap-5">
                           <img src={c.icon} className="w-14 h-14 rounded-2xl border border-slate-800 shadow-lg object-cover" />
                           <div>
@@ -185,7 +183,7 @@ const MyChannels = () => {
               <div className="mt-12 p-8 border border-slate-900/50 rounded-[40px] bg-slate-900/10 flex flex-col items-center gap-4 text-center">
                   <Info className="text-slate-800" size={32} />
                   <p className="text-[10px] text-slate-600 font-bold leading-relaxed uppercase tracking-widest px-4">
-                      Kanal listesi BotlyHub altyapısı ile şifreli olarak senkronize edilmektedir.
+                      Veriler anlık olarak BotlyHub Engine üzerinden güncellenmektedir.
                   </p>
               </div>
           </div>
