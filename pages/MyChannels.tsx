@@ -1,6 +1,6 @@
 
-import React, { useState, useEffect } from 'react';
-import { ChevronLeft, Megaphone, Users, Loader2, RefreshCw, AlertCircle, CheckCircle2, X, Info, Bot as BotIcon } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ChevronLeft, Megaphone, Users, Loader2, RefreshCw, AlertCircle, CheckCircle2, X, Bot as BotIcon, Info } from 'lucide-react';
 import * as Router from 'react-router-dom';
 import { Channel } from '../types';
 import { DatabaseService } from '../services/DatabaseService';
@@ -27,36 +27,46 @@ const MyChannels = () => {
 
   const initChannels = async () => {
       setIsLoading(true);
-      // Mevcutları yükle
-      const initialData = await DatabaseService.getChannels(user.id.toString());
-      setChannels(initialData);
-      
-      // Otomatik senkronizasyonu başlat
-      await triggerSync();
-      setIsLoading(false);
+      try {
+          const uId = user.id.toString();
+          // 1. Önce mevcut kanalları getir
+          const initialData = await DatabaseService.getChannels(uId);
+          setChannels(initialData);
+          
+          // 2. Bekleyen bot loglarını senkronize et
+          await triggerSync();
+      } catch (e) {
+          console.error("Init Channels Error:", e);
+      } finally {
+          setIsLoading(false);
+      }
   };
 
   const triggerSync = async () => {
       if (!user?.id) return;
+      const uId = user.id.toString();
       setAutoSyncStatus('syncing');
       
       try {
-          const newSyncedCount = await DatabaseService.syncChannelsFromBotActivity(user.id.toString());
+          console.log("[MyChannels] Sync tetikleniyor...");
+          const newSyncedCount = await DatabaseService.syncChannelsFromBotActivity(uId);
           
           if (newSyncedCount > 0) {
-              const refreshedData = await DatabaseService.getChannels(user.id.toString());
+              console.log("[MyChannels] Yeni veriler bulundu, liste yenileniyor.");
+              const refreshedData = await DatabaseService.getChannels(uId);
               setChannels(refreshedData);
               notification('success');
               setAutoSyncStatus('done');
           } else {
+              console.log("[MyChannels] Senkronize edilecek yeni veri yok.");
               setAutoSyncStatus('idle');
           }
       } catch (e) {
-          console.error("Sync error:", e);
+          console.error("[MyChannels] Sync error:", e);
           setAutoSyncStatus('error');
       }
       
-      setTimeout(() => setAutoSyncStatus('idle'), 4000);
+      setTimeout(() => setAutoSyncStatus('idle'), 3000);
   };
 
   const handleManualRefresh = async () => {
@@ -65,7 +75,7 @@ const MyChannels = () => {
       await triggerSync();
       setIsSyncing(false);
       
-      // Eğer hiç kanal yoksa rehberi göster
+      // Eğer hiç kanal yoksa ve veri gelmediyse rehberi göster
       if (channels.length === 0) {
           setShowGuide(true);
       }

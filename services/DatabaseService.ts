@@ -11,10 +11,12 @@ export class DatabaseService {
   
   static async syncChannelsFromBotActivity(userId: string): Promise<number> {
       try {
-          const uIdStr = userId.toString();
-          console.log("[SYNC] Başlatılıyor. Aranan Owner ID:", uIdStr);
+          // ID'yi temizle ve string olduğundan emin ol
+          const uIdStr = userId.toString().trim();
+          console.log("[DEBUG-SYNC] Başlatıldı. Hedef Kullanıcı ID:", uIdStr);
           
-          // 1. Logları çek
+          // 1. İşlenmemiş logları çek
+          // ÖNEMLİ: owner_id veritabanında 'text' tipinde olmalıdır.
           const { data: logs, error: logErr } = await supabase
               .from('bot_discovery_logs')
               .select('*')
@@ -22,75 +24,92 @@ export class DatabaseService {
               .eq('is_synced', false);
 
           if (logErr) {
-              console.error("[SYNC] Supabase Hatası:", logErr);
+              console.error("[DEBUG-SYNC] Supabase Log Çekme Hatası:", logErr.message, logErr.details);
               return 0;
           }
 
-          console.log("[SYNC] Bulunan ham log sayısı:", logs?.length || 0);
+          console.log("[DEBUG-SYNC] Veritabanında eşleşen log sayısı:", logs?.length || 0);
 
           if (!logs || logs.length === 0) {
-              console.warn("[SYNC] Eşleşen işlenmemiş log bulunamadı. Lütfen Bot'un owner_id'yi doğru yazdığından emin olun.");
+              console.log("[DEBUG-SYNC] İşlenecek yeni kayıt yok. (Eğer bot yazdıysa owner_id eşleşmiyor olabilir)");
               return 0;
           }
 
           let syncedCount = 0;
           for (const log of logs) {
-              console.log("[SYNC] İşleniyor:", log.channel_name);
+              console.log("[DEBUG-SYNC] İşleme alınıyor:", log.channel_name, "(Bot:", log.bot_id, ")");
               
-              // 2. Kanal daha önce eklenmiş mi?
-              const { data: existing, error: existErr } = await supabase
+              // 2. Kanal daha önce bu kullanıcıya eklenmiş mi?
+              const { data: existing, error: checkErr } = await supabase
                   .from('channels')
                   .select('*')
                   .eq('user_id', uIdStr)
                   .eq('name', log.channel_name)
                   .maybeSingle();
 
-              if (existErr) console.error("[SYNC] Kanal kontrol hatası:", existErr);
+              if (checkErr) {
+                  console.error("[DEBUG-SYNC] Kanal kontrol hatası:", checkErr.message);
+                  continue;
+              }
 
               if (existing) {
-                  console.log("[SYNC] Kanal zaten var, bot listesi güncelleniyor.");
+                  console.log("[DEBUG-SYNC] Kanal mevcut. Bot listesi güncelleniyor...");
                   const currentBots = existing.connected_bot_ids || [];
                   const updatedBots = Array.from(new Set([...currentBots, log.bot_id]));
                   
-                  await supabase.from('channels').update({
-                      member_count: log.member_count || existing.member_count,
-                      connected_bot_ids: updatedBots
-                  }).eq('id', existing.id);
+                  const { error: updErr } = await supabase
+                      .from('channels')
+                      .update({
+                          member_count: log.member_count || existing.member_count,
+                          connected_bot_ids: updatedBots
+                      })
+                      .eq('id', existing.id);
+                  
+                  if (updErr) console.error("[DEBUG-SYNC] Kanal güncelleme hatası:", updErr.message);
               } else {
-                  console.log("[SYNC] Yeni kanal oluşturuluyor.");
-                  const { error: insErr } = await supabase.from('channels').insert({
-                      user_id: uIdStr,
-                      name: log.channel_name,
-                      member_count: log.member_count || 0,
-                      icon: log.channel_icon,
-                      connected_bot_ids: [log.bot_id],
-                      is_ad_enabled: false,
-                      revenue: 0
-                  });
-                  if (insErr) console.error("[SYNC] Kanal insert hatası:", insErr);
+                  console.log("[DEBUG-SYNC] Yeni kanal kaydı oluşturuluyor...");
+                  const { error: insErr } = await supabase
+                      .from('channels')
+                      .insert({
+                          user_id: uIdStr,
+                          name: log.channel_name,
+                          member_count: log.member_count || 0,
+                          icon: log.channel_icon,
+                          connected_bot_ids: [log.bot_id],
+                          is_ad_enabled: false,
+                          revenue: 0
+                      });
+                  
+                  if (insErr) console.error("[DEBUG-SYNC] Kanal oluşturma hatası:", insErr.message);
               }
 
-              // 3. Log'u "İşlendi" olarak işaretle
-              await supabase.from('bot_discovery_logs').update({ is_synced: true }).eq('id', log.id);
-              syncedCount++;
+              // 3. Logu işlendi olarak işaretle
+              const { error: finalErr } = await supabase
+                  .from('bot_discovery_logs')
+                  .update({ is_synced: true })
+                  .eq('id', log.id);
+              
+              if (finalErr) console.error("[DEBUG-SYNC] Log işaretleme hatası:", finalErr.message);
+              else syncedCount++;
           }
-          console.log("[SYNC] Tamamlandı. Senkronize edilen:", syncedCount);
+          
+          console.log("[DEBUG-SYNC] Senkronizasyon Bitti. Toplam işlenen:", syncedCount);
           return syncedCount;
-      } catch (e) {
-          console.error("[SYNC] Kritik Hata:", e);
+      } catch (e: any) {
+          console.error("[DEBUG-SYNC] KRİTİK HATA:", e.message);
           return 0;
       }
   }
 
   static async getChannels(userId: string): Promise<Channel[]> {
+    const uIdStr = userId.toString().trim();
     const { data, error } = await supabase
         .from('channels')
         .select('*')
-        .eq('user_id', userId.toString())
+        .eq('user_id', uIdStr)
         .order('id', { ascending: false });
     
     if (error) console.error("Get Channels Error:", error);
-        
     return (data || []).map(c => ({
         id: c.id,
         user_id: c.user_id,
