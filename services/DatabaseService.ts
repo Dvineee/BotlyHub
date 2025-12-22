@@ -1,6 +1,6 @@
 
 import { createClient } from '@supabase/supabase-js';
-import { Bot, User, Channel, Announcement, Notification, UserBot } from '../types';
+import { Bot, User, Channel, Announcement, Notification, UserBot, ActivityLog } from '../types';
 
 const SUPABASE_URL = 'https://ybnxfwqrduuinzgnbymc.supabase.co'; 
 const SUPABASE_ANON_KEY = 'sb_publishable_VeYQ304ZpUpj3ymB3ihpjw_jt49W1G-'; 
@@ -9,11 +9,37 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export class DatabaseService {
   
+  /**
+   * World-Class Logging Engine
+   * Kullanıcının her adımını izler ve activity_logs tablosuna kaydeder.
+   */
+  static async logActivity(
+      userId: string, 
+      type: ActivityLog['type'], 
+      actionKey: string, 
+      title: string, 
+      description: string,
+      metadata: any = {}
+  ) {
+      try {
+          const uIdStr = String(userId).trim();
+          await supabase.from('activity_logs').insert({
+              user_id: uIdStr,
+              type,
+              action_key: actionKey,
+              title,
+              description,
+              metadata,
+              created_at: new Date().toISOString()
+          });
+      } catch (e) {
+          console.error("[AUDIT-LOG-FAIL]", e);
+      }
+  }
+
   static async syncChannelsFromBotActivity(userId: string): Promise<number> {
       try {
           const uIdStr = String(userId).trim();
-          
-          // İşlenmemiş sinyalleri çek
           const { data: logs, error: logErr } = await supabase
               .from('bot_discovery_logs')
               .select('*')
@@ -25,8 +51,6 @@ export class DatabaseService {
           let successCount = 0;
           for (const log of logs) {
               const botId = String(log.bot_id);
-              
-              // Kanalı bul veya oluştur
               const { data: existing } = await supabase
                   .from('channels')
                   .select('*')
@@ -34,9 +58,6 @@ export class DatabaseService {
                   .eq('name', log.channel_name)
                   .maybeSingle();
 
-              // Botun gönderdiği fotoğraf URL'sini al, yoksa eskini koru, o da yoksa avatar oluştur
-              const logIcon = log.channel_icon;
-              
               let syncOk = false;
               if (existing) {
                   const bots = Array.from(new Set([...(existing.connected_bot_ids || []), botId]));
@@ -45,8 +66,7 @@ export class DatabaseService {
                       .update({
                           member_count: log.member_count,
                           connected_bot_ids: bots,
-                          // KRİTİK: Bot her sinyal verdiğinde fotoğrafı güncelle
-                          icon: logIcon || existing.icon 
+                          icon: log.channel_icon || existing.icon 
                       })
                       .eq('id', existing.id);
                   if (!upErr) syncOk = true;
@@ -57,7 +77,7 @@ export class DatabaseService {
                           user_id: uIdStr,
                           name: log.channel_name,
                           member_count: log.member_count || 0,
-                          icon: logIcon || `https://ui-avatars.com/api/?name=${encodeURIComponent(log.channel_name)}`,
+                          icon: log.channel_icon || `https://ui-avatars.com/api/?name=${encodeURIComponent(log.channel_name)}`,
                           connected_bot_ids: [botId],
                           revenue: 0
                       });
@@ -70,6 +90,10 @@ export class DatabaseService {
               }
           }
           
+          if (successCount > 0) {
+              await this.logActivity(uIdStr, 'channel_sync', 'channels_updated', 'Kanal Verileri Senkronize Edildi', `${successCount} kanal bot sinyalleriyle güncellendi.`, { count: successCount });
+          }
+          
           return successCount;
       } catch (e) {
           console.error("[SYNC] Error:", e);
@@ -79,14 +103,7 @@ export class DatabaseService {
 
   static async getChannels(userId: string): Promise<Channel[]> {
     const uIdStr = String(userId).trim();
-    const { data, error } = await supabase
-        .from('channels')
-        .select('*')
-        .eq('user_id', uIdStr)
-        .order('created_at', { ascending: false });
-    
-    if (error) return [];
-    
+    const { data, error } = await supabase.from('channels').select('*').eq('user_id', uIdStr).order('created_at', { ascending: false });
     return (data || []).map(c => ({
         id: String(c.id),
         user_id: String(c.user_id),
@@ -121,23 +138,43 @@ export class DatabaseService {
     const userId = (userData.id || userData).toString();
     await this.syncUser({ id: userId, name: userData.first_name || 'User', username: userData.username || 'user' });
     const { error } = await supabase.from('user_bots').upsert({ user_id: userId, bot_id: botData.id, is_active: true, is_premium: isPremium, acquired_at: new Date().toISOString() });
+    
     if (error) throw error;
+
+    await this.logActivity(userId, 'bot_manage', 'bot_acquired', 'Bot Kütüphaneye Eklendi', `'${botData.name}' botu başarıyla edinildi.`, { bot_id: botData.id, is_premium: isPremium });
     return true;
   }
 
   static async removeUserBot(userId: string, botId: string) {
-    await supabase.from('user_bots').delete().eq('user_id', userId.toString()).eq('bot_id', botId.toString());
+    const uIdStr = userId.toString();
+    const { data: botInfo } = await supabase.from('bots').select('name').eq('id', botId).maybeSingle();
+    
+    // İlişkiyi tamamen sil
+    const { error } = await supabase.from('user_bots').delete().eq('user_id', uIdStr).eq('bot_id', botId.toString());
+    
+    if (!error) {
+        await this.logActivity(uIdStr, 'bot_manage', 'bot_removed', 'Bot İlişkisi Kesildi', `'${botInfo?.name || botId}' botu ve kullanıcı arasındaki tüm veriler silindi.`, { bot_id: botId });
+    }
   }
 
   static async syncUser(user: Partial<User>) {
     if (!user.id) return;
-    await supabase.from('users').upsert({ id: user.id.toString(), name: user.name, username: user.username, avatar: user.avatar, joindate: new Date().toISOString() }, { onConflict: 'id' });
+    const { error } = await supabase.from('users').upsert({ id: user.id.toString(), name: user.name, username: user.username, avatar: user.avatar, email: user.email, phone: user.phone, joindate: new Date().toISOString() }, { onConflict: 'id' });
+    
+    if (!error && (user.email || user.phone)) {
+        await this.logActivity(user.id.toString(), 'security', 'profile_updated', 'Profil Güvenlik Bilgileri Güncellendi', 'E-posta veya telefon verisi sisteme işlendi.');
+    }
   }
 
   static async getUserById(userId: string): Promise<User | null> {
     const { data } = await supabase.from('users').select('*').eq('id', userId.toString()).maybeSingle();
     if (!data) return null;
-    return { id: data.id, name: data.name, username: data.username, avatar: data.avatar, role: data.role || 'User', status: data.status || 'Active', badges: [], joinDate: data.joindate };
+    return { id: data.id, name: data.name, username: data.username, avatar: data.avatar, role: data.role || 'User', status: data.status || 'Active', badges: [], joinDate: data.joindate, email: data.email, phone: data.phone };
+  }
+
+  static async getUserActivityLogs(userId: string): Promise<ActivityLog[]> {
+      const { data } = await supabase.from('activity_logs').select('*').eq('user_id', userId.toString()).order('created_at', { ascending: false });
+      return data || [];
   }
 
   static async getNotifications(userId?: string): Promise<Notification[]> {
@@ -162,65 +199,59 @@ export class DatabaseService {
   }
 
   static async getUserDetailedAssets(userId: string) {
-    const [channels, notifications, userBotsRaw] = await Promise.all([
+    const [channels, logs, userBotsRaw] = await Promise.all([
       this.getChannels(userId),
-      this.getNotifications(userId),
+      this.getUserActivityLogs(userId),
       supabase.from('user_bots').select('*, bots(*)').eq('user_id', userId.toString())
     ]);
-    return { channels, logs: notifications, userBots: (userBotsRaw.data || []).map((ub: any) => ({ ownership: ub, bot: ub.bots })) };
+    return { channels, logs, userBots: (userBotsRaw.data || []).map((ub: any) => ({ ownership: ub, bot: ub.bots })) };
   }
 
   static async getUsers(): Promise<User[]> {
     const { data } = await supabase.from('users').select('*').order('joindate', { ascending: false });
-    return (data || []).map(u => ({ id: u.id, name: u.name, username: u.username, avatar: u.avatar, role: u.role || 'User', status: u.status || 'Active', badges: [], joinDate: u.joindate }));
+    return (data || []).map(u => ({ id: u.id, name: u.name, username: u.username, avatar: u.avatar, role: u.role || 'User', status: u.status || 'Active', badges: [], joinDate: u.joindate, email: u.email, phone: u.phone }));
   }
 
   static async updateUserStatus(userId: string, status: string) {
     await supabase.from('users').update({ status }).eq('id', userId);
+    await this.logActivity(userId, 'security', 'account_status_changed', 'Hesap Durumu Değiştirildi', `Admin hesabı '${status}' moduna aldı.`);
   }
 
   static async getAdminStats() {
     const { count: userCount } = await supabase.from('users').select('*', { count: 'exact', head: true });
     const { count: botCount } = await supabase.from('bots').select('*', { count: 'exact', head: true });
-    const { count: notifCount } = await supabase.from('notifications').select('*', { count: 'exact', head: true });
-    const { count: annCount } = await supabase.from('announcements').select('*', { count: 'exact', head: true });
+    const { count: logCount } = await supabase.from('activity_logs').select('*', { count: 'exact', head: true });
     const { count: salesCount } = await supabase.from('user_bots').select('*', { count: 'exact', head: true });
-    return { userCount: userCount || 0, botCount: botCount || 0, notifCount: notifCount || 0, annCount: annCount || 0, salesCount: salesCount || 0 };
+    return { userCount: userCount || 0, botCount: botCount || 0, logCount: logCount || 0, salesCount: salesCount || 0 };
   }
 
   static async getAllPurchases() {
-    const { data, error } = await supabase.from('user_bots').select('*, users(*), bots(*)').order('acquired_at', { ascending: false });
+    const { data } = await supabase.from('user_bots').select('*, users(*), bots(*)').order('acquired_at', { ascending: false });
     return data || [];
   }
 
   static async saveBot(bot: Partial<Bot>) {
-    const { error } = await supabase.from('bots').upsert(bot);
-    if (error) throw error;
+    await supabase.from('bots').upsert(bot);
   }
 
   static async deleteBot(id: string) {
-    const { error } = await supabase.from('bots').delete().eq('id', id);
-    if (error) throw error;
+    await supabase.from('bots').delete().eq('id', id);
   }
 
   static async sendNotification(notification: any) {
-    const { error } = await supabase.from('notifications').insert({ title: notification.title, message: notification.message, type: notification.type || 'system', target_type: notification.target_type || 'global', user_id: notification.user_id || null, date: new Date().toISOString(), is_read: false });
-    if (error) throw error;
+    await supabase.from('notifications').insert({ title: notification.title, message: notification.message, type: notification.type || 'system', target_type: notification.target_type || 'global', user_id: notification.user_id || null, date: new Date().toISOString(), is_read: false });
   }
 
   static async saveAnnouncement(ann: Partial<Announcement>) {
-    const { error } = await supabase.from('announcements').upsert(ann);
-    if (error) throw error;
+    await supabase.from('announcements').upsert(ann);
   }
 
   static async deleteAnnouncement(id: string) {
-    const { error } = await supabase.from('announcements').delete().eq('id', id);
-    if (error) throw error;
+    await supabase.from('announcements').delete().eq('id', id);
   }
 
   static async saveSettings(settings: any) {
-    const { error } = await supabase.from('settings').upsert({ id: 1, ...settings });
-    if (error) throw error;
+    await supabase.from('settings').upsert({ id: 1, ...settings });
   }
 
   static setAdminSession(token: string) { localStorage.setItem('admin_v3_session', token); }

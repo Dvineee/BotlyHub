@@ -7,10 +7,11 @@ import {
   Megaphone, Calendar, Settings as SettingsIcon, 
   ShieldCheck, Percent, Globe, MessageSquare, AlertTriangle,
   Sparkles, Zap, Star, ChevronRight, Eye, Send, Activity, 
-  Clock, Wallet, ShieldAlert, Cpu, Ban, CheckCircle, Gift, Info, Heart, Bell, Shield, ExternalLink, TrendingUp, History, ListFilter, CreditCard, Image as ImageIcon, Wand2, Hash
+  Clock, Wallet, ShieldAlert, Cpu, Ban, CheckCircle, Gift, Info, Heart, Bell, Shield, ExternalLink, TrendingUp, History, ListFilter, CreditCard, Image as ImageIcon, Wand2, Hash, Fingerprint, Key, Search
 } from 'lucide-react';
-import { DatabaseService } from '../../services/DatabaseService';
-import { User, Bot as BotType, Announcement, Notification, Channel } from '../../types';
+// Fix: Added 'supabase' to the import from DatabaseService.
+import { DatabaseService, supabase } from '../../services/DatabaseService';
+import { User, Bot as BotType, Announcement, Notification, Channel, ActivityLog } from '../../types';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const { useNavigate, Routes, Route, Link, useLocation } = Router as any;
@@ -61,22 +62,43 @@ const StatCard = ({ label, value, icon: Icon, color, trend }: any) => {
   );
 };
 
-const LogItem = ({ time, action, status }: { time: string, action: string, status: 'Success' | 'Info' | 'Update' }) => {
-  const colors: any = {
-    Success: 'bg-emerald-500',
-    Info: 'bg-blue-500',
-    Update: 'bg-purple-500'
+const LogItem = ({ log }: { log: ActivityLog }) => {
+  const getLogStyle = (type: string) => {
+    switch(type) {
+        case 'auth': return { icon: Key, color: 'text-blue-400', bg: 'bg-blue-400/10' };
+        case 'bot_manage': return { icon: Bot, color: 'text-purple-400', bg: 'bg-purple-400/10' };
+        case 'channel_sync': return { icon: RefreshCw, color: 'text-emerald-400', bg: 'bg-emerald-400/10' };
+        case 'payment': return { icon: Wallet, color: 'text-yellow-400', bg: 'bg-yellow-400/10' };
+        case 'security': return { icon: ShieldAlert, color: 'text-red-400', bg: 'bg-red-400/10' };
+        default: return { icon: Activity, color: 'text-slate-400', bg: 'bg-slate-400/10' };
+    }
   };
 
+  const style = getLogStyle(log.type);
+  const Icon = style.icon;
+
   return (
-    <div className="flex gap-4 group animate-in slide-in-from-left duration-300">
-      <div className="flex flex-col items-center">
-        <div className={`w-3 h-3 rounded-full ${colors[status]} shadow-[0_0_10px_rgba(59,130,246,0.3)]`}></div>
-        <div className="w-px flex-1 bg-slate-800/50 my-2"></div>
+    <div className="flex gap-5 group animate-in slide-in-from-left duration-300 bg-slate-900/20 p-4 rounded-2xl border border-transparent hover:border-slate-800 transition-all">
+      <div className={`w-12 h-12 rounded-xl ${style.bg} ${style.color} flex items-center justify-center shrink-0 shadow-inner group-hover:scale-110 transition-transform`}>
+        <Icon size={20} />
       </div>
-      <div className="pb-6">
-        <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-1 italic">{time}</p>
-        <p className="text-sm text-slate-400 font-medium group-hover:text-white transition-colors leading-relaxed">{action}</p>
+      <div className="flex-1 min-w-0">
+        <div className="flex justify-between items-start mb-1">
+            <p className="text-sm font-black text-white italic tracking-tight">{log.title}</p>
+            <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest italic">
+                {new Date(log.created_at).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+            </p>
+        </div>
+        <p className="text-xs text-slate-500 font-medium group-hover:text-slate-400 transition-colors leading-relaxed">{log.description}</p>
+        {log.metadata && Object.keys(log.metadata).length > 0 && (
+            <div className="mt-2 flex gap-2">
+                {Object.entries(log.metadata).map(([key, val]: any) => (
+                    <span key={key} className="text-[8px] font-black text-slate-700 bg-slate-950 px-2 py-0.5 rounded border border-slate-900 uppercase">
+                        {key}: {val}
+                    </span>
+                ))}
+            </div>
+        )}
       </div>
     </div>
   );
@@ -160,54 +182,22 @@ const AdminDashboard = () => {
 };
 
 const HomeView = () => {
-    const [stats, setStats] = useState({ userCount: 0, botCount: 0, notifCount: 0, annCount: 0, salesCount: 0 });
+    const [stats, setStats] = useState({ userCount: 0, botCount: 0, logCount: 0, salesCount: 0 });
     const [combinedLogs, setCombinedLogs] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [showAllLogs, setShowAllLogs] = useState(false);
 
     useEffect(() => { load(); }, []);
-
-    const getTimeAgo = (dateStr: string) => {
-        const seconds = Math.floor((new Date().getTime() - new Date(dateStr).getTime()) / 1000);
-        let interval = seconds / 31536000;
-        if (interval > 1) return Math.floor(interval) + " yıl önce";
-        interval = seconds / 2592000;
-        if (interval > 1) return Math.floor(interval) + " ay önce";
-        interval = seconds / 86400;
-        if (interval > 1) return Math.floor(interval) + " gün önce";
-        interval = seconds / 3600;
-        if (interval > 1) return Math.floor(interval) + " sa önce";
-        interval = seconds / 60;
-        if (interval > 1) return Math.floor(interval) + " dk önce";
-        return "az önce";
-    };
 
     const load = async () => {
         setIsLoading(true);
         try {
-            const [statData, purchases, globalNotifs] = await Promise.all([
-                DatabaseService.getAdminStats(),
-                DatabaseService.getAllPurchases(),
-                DatabaseService.getNotifications()
-            ]);
+            const statData = await DatabaseService.getAdminStats();
             setStats(statData);
-
-            const logs = [
-                ...purchases.map(p => ({
-                    id: p.id || Math.random(),
-                    date: p.acquired_at,
-                    action: `@${p.users?.username || 'user'} '${p.bots?.name || 'Bot'}' edindi.`,
-                    status: p.is_premium ? 'Update' : 'Success'
-                })),
-                ...globalNotifs.map(n => ({
-                    id: n.id,
-                    date: n.date,
-                    action: `SİSTEM: ${n.title}`,
-                    status: n.type === 'security' ? 'Update' : 'Info'
-                }))
-            ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
-            setCombinedLogs(logs);
+            
+            // Son 10 logu getir
+            // Fix: Replaced 'supabase' reference which was missing an import.
+            const { data: logs } = await supabase.from('activity_logs').select('*, users(username, avatar)').order('created_at', { ascending: false }).limit(10);
+            setCombinedLogs(logs || []);
         } catch (e) {
             console.error("Home load error:", e);
         } finally {
@@ -219,8 +209,6 @@ const HomeView = () => {
         { name: 'Pzt', users: 12 }, { name: 'Sal', users: 25 }, { name: 'Çar', users: 18 },
         { name: 'Per', users: 45 }, { name: 'Cum', users: 32 }, { name: 'Cmt', users: 58 }, { name: 'Paz', users: 52 }
     ];
-
-    const displayedLogs = showAllLogs ? combinedLogs : combinedLogs.slice(0, 5);
 
     return (
         <div className="animate-in fade-in space-y-10">
@@ -238,7 +226,7 @@ const HomeView = () => {
                 <StatCard label="Üye Sayısı" value={stats.userCount} icon={Users} color="blue" trend="+12%" />
                 <StatCard label="Pazar Botları" value={stats.botCount} icon={Bot} color="purple" trend="+4%" />
                 <StatCard label="Toplam Edinme" value={stats.salesCount} icon={CreditCard} color="emerald" trend="Canlı" />
-                <StatCard label="Bildirimler" value={stats.notifCount} icon={Send} color="orange" trend="Live" />
+                <StatCard label="Sistem Logu" value={stats.logCount} icon={Fingerprint} color="orange" trend="Audit" />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -265,41 +253,34 @@ const HomeView = () => {
                 
                 <div className="bg-[#0f172a] border border-slate-800 rounded-[32px] p-8 flex flex-col shadow-2xl relative overflow-hidden group">
                     <div className="flex items-center justify-between mb-8">
-                        <h3 className="text-lg font-black text-white uppercase tracking-tight italic flex items-center gap-3"><Clock size={18} className="text-blue-500"/> Son İşlemler</h3>
-                        <button 
-                            onClick={() => setShowAllLogs(!showAllLogs)}
-                            className="text-[9px] font-black text-blue-500 uppercase tracking-widest hover:text-white transition-colors bg-blue-500/5 px-3 py-1.5 rounded-lg border border-blue-500/20 shadow-xl"
-                        >
-                            {showAllLogs ? 'Küçült' : 'Tümünü Gör'}
-                        </button>
+                        <h3 className="text-lg font-black text-white uppercase tracking-tight italic flex items-center gap-3"><Clock size={18} className="text-blue-500"/> Son Aktiviteler</h3>
                     </div>
 
-                    <div className={`space-y-4 flex-1 overflow-y-auto no-scrollbar pr-2 transition-all ${showAllLogs ? 'max-h-[600px]' : 'max-h-[350px]'}`}>
+                    <div className="space-y-4 flex-1 overflow-y-auto no-scrollbar">
                         {isLoading ? (
                             <div className="py-20 flex flex-col items-center justify-center gap-4 animate-pulse">
                                 <Loader2 className="animate-spin text-slate-700" size={32} />
                                 <p className="text-[10px] font-black text-slate-700 uppercase tracking-widest">Sistem Taranıyor...</p>
                             </div>
-                        ) : displayedLogs.length === 0 ? (
+                        ) : combinedLogs.length === 0 ? (
                             <div className="py-20 text-center">
                                 <Activity className="mx-auto text-slate-800 mb-4" size={40} />
                                 <p className="text-xs text-slate-600 font-bold italic">İşlem kaydı bulunmuyor.</p>
                             </div>
                         ) : (
-                            displayedLogs.map((log) => (
-                                <LogItem 
-                                    key={log.id} 
-                                    time={getTimeAgo(log.date)} 
-                                    action={log.action} 
-                                    status={log.status as any} 
-                                />
+                            combinedLogs.map((log) => (
+                                <div key={log.id} className="flex items-center gap-4 p-3 bg-slate-950/50 border border-slate-900 rounded-2xl group/item hover:border-blue-500/20 transition-all">
+                                    <img src={log.users?.avatar} className="w-10 h-10 rounded-xl object-cover shrink-0" />
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-[10px] font-black text-white truncate italic uppercase tracking-tighter">@{log.users?.username || 'user'}</p>
+                                        <p className="text-[9px] text-slate-500 truncate font-medium">{log.title}</p>
+                                    </div>
+                                    <p className="text-[8px] font-black text-slate-700 uppercase">{new Date(log.created_at).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</p>
+                                </div>
                             ))
                         )}
                     </div>
-
-                    {!showAllLogs && combinedLogs.length > 5 && (
-                        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-[#0f172a] to-transparent pointer-events-none group-hover:opacity-50 transition-opacity"></div>
-                    )}
+                    <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#0f172a] to-transparent pointer-events-none"></div>
                 </div>
             </div>
         </div>
@@ -480,7 +461,6 @@ const BotManagement = () => {
                         <button onClick={() => setIsModalOpen(false)} disabled={isSaving} className="absolute top-10 right-10 text-slate-500 hover:text-white disabled:opacity-30"><X size={26}/></button>
                         <h3 className="text-3xl font-black mb-12 text-white italic tracking-tighter uppercase">{editingBot.id ? 'Bot Verisini Revize Et' : 'Sisteme Yeni Bot Ekle'}</h3>
                         <form onSubmit={handleSave} className="space-y-8">
-                            
                             <div className="bg-blue-600/5 border border-blue-500/10 p-6 rounded-[32px] mb-4 flex items-start gap-4">
                                 <AlertTriangle size={24} className="text-blue-500 shrink-0 mt-0.5" />
                                 <div>
@@ -528,12 +508,7 @@ const BotManagement = () => {
                                         <Send className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-700 group-focus-within:text-blue-500 transition-colors" size={18} />
                                         <input type="text" required value={editingBot.bot_link} onChange={e => setEditingBot({...editingBot, bot_link: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl py-5 pl-12 pr-4 text-xs font-black text-white focus:border-blue-500 outline-none" placeholder="@BotlyHubBOT" />
                                     </div>
-                                    <button 
-                                        type="button" 
-                                        onClick={fetchBotIcon}
-                                        disabled={isFetchingIcon}
-                                        className="px-6 bg-slate-950 border border-slate-800 rounded-2xl text-blue-500 hover:text-white hover:bg-blue-600/20 transition-all flex items-center justify-center disabled:opacity-50 active:scale-95 shadow-xl"
-                                    >
+                                    <button type="button" onClick={fetchBotIcon} disabled={isFetchingIcon} className="px-6 bg-slate-950 border border-slate-800 rounded-2xl text-blue-500 hover:text-white hover:bg-blue-600/20 transition-all flex items-center justify-center disabled:opacity-50 active:scale-95 shadow-xl">
                                         {isFetchingIcon ? <Loader2 className="animate-spin" size={20} /> : <Wand2 size={20} />}
                                     </button>
                                 </div>
@@ -566,9 +541,7 @@ const UserManagement = () => {
     const [search, setSearch] = useState('');
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
-    useEffect(() => { 
-        load(); 
-    }, []);
+    useEffect(() => { load(); }, []);
     
     const load = async () => { 
         setIsLoading(true); 
@@ -603,13 +576,7 @@ const UserManagement = () => {
                     <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mt-1">Sistemdeki Tüm Kayıtlar ({users.length})</p>
                 </div>
                 <div className="flex gap-4">
-                    <input 
-                        type="text" 
-                        value={search}
-                        onChange={e => setSearch(e.target.value)}
-                        placeholder="İsim, ID veya @username..." 
-                        className="bg-[#0f172a] border border-slate-800 rounded-[28px] px-8 py-5 text-xs outline-none focus:border-blue-500 transition-all w-full sm:w-96 font-bold shadow-2xl" 
-                    />
+                    <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="İsim, ID veya @username..." className="bg-[#0f172a] border border-slate-800 rounded-[28px] px-8 py-5 text-xs outline-none focus:border-blue-500 transition-all w-full sm:w-96 font-bold shadow-2xl" />
                     <button onClick={load} className="p-5 bg-slate-900 border border-slate-800 rounded-[24px] text-slate-400 hover:text-white transition-all shadow-xl active:scale-95"><RefreshCw size={20} className={isLoading ? 'animate-spin' : ''}/></button>
                 </div>
             </div>
@@ -684,7 +651,7 @@ const UserManagement = () => {
 
 const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClose: () => void, onStatusToggle: () => void }) => {
     const [activeTab, setActiveTab] = useState<'info' | 'assets' | 'logs'>('info');
-    const [data, setData] = useState<{ channels: Channel[], logs: Notification[], userBots: any[] }>({ channels: [], logs: [], userBots: [] });
+    const [data, setData] = useState<{ channels: Channel[], logs: ActivityLog[], userBots: any[] }>({ channels: [], logs: [], userBots: [] });
     const [isLoading, setIsLoading] = useState(true);
 
     const loadData = async () => {
@@ -749,18 +716,6 @@ const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClos
                                         <DetailCard label="BAĞLI KANAL" value={data.channels.length} icon={Megaphone} />
                                         <DetailCard label="KÜTÜPHANE" value={data.userBots.length} icon={Bot} />
                                     </div>
-                                    <div className="p-12 bg-gradient-to-br from-blue-600/10 to-purple-600/10 border border-blue-500/20 rounded-[48px] shadow-2xl">
-                                        <div className="flex gap-8 items-center">
-                                            <div className="w-20 h-20 bg-blue-600 rounded-[32px] flex items-center justify-center text-white shadow-2xl shadow-blue-900/50 rotate-3"><Sparkles size={40}/></div>
-                                            <div className="flex-1">
-                                                <h4 className="text-xl font-black text-white uppercase italic tracking-tighter mb-2">Kullanıcı Karnesi</h4>
-                                                <p className="text-sm text-slate-400 leading-relaxed font-medium">
-                                                    Bu kullanıcı toplam <span className="text-white font-bold">{data.channels.length} kanal</span> üzerinden botlarımızı aktif etmiştir. 
-                                                    Platformdaki genel güven puanı <span className="text-emerald-500 font-black">YÜKSEK</span> olarak işaretlenmiştir.
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                             )}
 
@@ -816,16 +771,10 @@ const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClos
                                                                 <p className="text-[10px] text-slate-600 font-black uppercase tracking-widest italic">{CATEGORY_NAMES[item.bot.category] || item.bot.category}</p>
                                                             </div>
                                                         </div>
-                                                        
                                                         <div className="flex flex-wrap gap-2 mt-auto">
                                                             <span className={`text-[9px] font-black px-3 py-1.5 rounded-xl uppercase tracking-widest border ${item.ownership.is_active ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-red-500/10 text-red-500 border-red-500/20'}`}>
                                                                 {item.ownership.is_active ? 'Kullanımda' : 'Durduruldu'}
                                                             </span>
-                                                            {item.ownership.is_premium && (
-                                                                <span className="text-[9px] font-black px-3 py-1.5 rounded-xl uppercase tracking-widest bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 flex items-center gap-1.5">
-                                                                    <Star size={10} fill="currentColor"/> Premium
-                                                                </span>
-                                                            )}
                                                             <span className="text-[9px] font-black px-3 py-1.5 rounded-xl uppercase bg-slate-800 text-slate-500 border border-slate-700 shadow-inner">
                                                                 {new Date(item.ownership.acquired_at).toLocaleDateString()}
                                                             </span>
@@ -839,28 +788,12 @@ const UserDetailsView = ({ user, onClose, onStatusToggle }: { user: User, onClos
                             )}
 
                             {activeTab === 'logs' && (
-                                <div className="space-y-6 animate-in fade-in">
+                                <div className="space-y-4 animate-in fade-in">
                                     <h4 className="text-[11px] font-black text-slate-600 uppercase tracking-[0.4em] mb-10 flex items-center gap-4 italic">
-                                        <div className="w-2 h-8 bg-emerald-600 rounded-full"></div> SON AKTİVİTELER
+                                        <div className="w-2 h-8 bg-emerald-600 rounded-full"></div> TÜM AKTİVİTE KAYITLARI
                                     </h4>
                                     {data.logs.length === 0 ? <p className="text-slate-800 italic font-black p-24 text-center border-2 border-dashed border-slate-900 rounded-[48px] text-[10px] uppercase tracking-widest">Kayıt Bulunmuyor</p> : 
-                                     data.logs.map(log => (
-                                        <div key={log.id} className="bg-slate-900/30 border border-slate-800 p-8 rounded-[36px] flex gap-8 group hover:bg-slate-800/10 transition-all border-l-8 border-l-slate-800 hover:border-l-blue-600">
-                                            <div className="w-14 h-14 rounded-2xl bg-slate-950 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-110 transition-transform">
-                                                {log.type === 'payment' ? <Wallet size={24} className="text-emerald-500"/> : 
-                                                 log.type === 'security' ? <ShieldAlert size={24} className="text-red-500"/> : 
-                                                 log.type === 'bot' ? <Cpu size={24} className="text-purple-500"/> :
-                                                 <Bell size={24} className="text-blue-500"/>}
-                                            </div>
-                                            <div className="min-w-0 flex-1">
-                                                <div className="flex justify-between items-start gap-4 mb-3">
-                                                    <p className="text-base font-black text-white italic truncate tracking-tight">{log.title}</p>
-                                                    <p className="text-[10px] text-slate-600 font-black uppercase tracking-widest whitespace-nowrap mt-1 bg-slate-950 px-3 py-1.5 rounded-xl shadow-inner">{new Date(log.date).toLocaleString('tr-TR')}</p>
-                                                </div>
-                                                <p className="text-sm text-slate-500 leading-relaxed font-medium">{log.message}</p>
-                                            </div>
-                                        </div>
-                                     ))}
+                                     data.logs.map(log => <LogItem key={log.id} log={log} />)}
                                 </div>
                             )}
                         </>
@@ -943,7 +876,6 @@ const NotificationCenter = () => {
                         </button>
                     </form>
                 </div>
-
                 <div className="flex-1 flex flex-col">
                     <h3 className="text-2xl font-black text-white italic tracking-tighter uppercase mb-10 flex items-center gap-4"><Clock className="text-purple-500"/> YAYIN GEÇMİŞİ</h3>
                     <div className="space-y-5 flex-1 overflow-y-auto no-scrollbar pr-2 max-h-[700px]">
@@ -996,7 +928,6 @@ const AnnouncementManagement = () => {
                     <Plus size={18}/> Yeni Kart Oluştur
                 </button>
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {anns.length === 0 ? <div className="col-span-full py-40 text-center text-slate-800 font-black uppercase tracking-[0.4em] border-2 border-dashed border-slate-900 rounded-[56px] text-[11px] italic">Aktif kampanya bulunmuyor</div> : 
                  anns.map(a => (
@@ -1017,73 +948,6 @@ const AnnouncementManagement = () => {
                     </div>
                 ))}
             </div>
-
-            {isModalOpen && editingAnn && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/95 backdrop-blur-md animate-in fade-in" onClick={() => setIsModalOpen(false)}>
-                    <div className="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-[56px] p-12 relative shadow-2xl overflow-y-auto max-h-[90vh] no-scrollbar" onClick={e => e.stopPropagation()}>
-                        <button onClick={() => setIsModalOpen(false)} className="absolute top-10 right-10 text-slate-500 hover:text-white"><X size={26}/></button>
-                        <h3 className="text-3xl font-black mb-12 text-white italic tracking-tighter uppercase">{editingAnn.id ? 'Kart Verilerini Düzenle' : 'Yeni Duyuru Kartı'}</h3>
-                        <form onSubmit={handleSave} className="space-y-8">
-                            <div className="space-y-3">
-                                <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">KART BAŞLIĞI</label>
-                                <input type="text" required value={editingAnn.title} onChange={e => setEditingAnn({...editingAnn, title: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-6 text-sm font-bold text-white focus:border-blue-500 outline-none shadow-inner" placeholder="örn: Yeni Premium Bot!" />
-                            </div>
-                            <div className="space-y-3">
-                                <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">PROMO METNİ</label>
-                                <textarea required value={editingAnn.description} onChange={e => setEditingAnn({...editingAnn, description: (e.target as any).value})} className="w-full h-28 bg-slate-950 border border-slate-800 rounded-3xl p-6 text-sm resize-none focus:border-blue-500 outline-none font-medium leading-relaxed" placeholder="Ana sayfada görünecek açıklama..." />
-                            </div>
-
-                            <div className="space-y-4">
-                                <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">İCON BELİRLE</label>
-                                <div className="grid grid-cols-5 gap-4 bg-slate-950 p-6 rounded-3xl border border-slate-800 shadow-inner">
-                                    {AVAILABLE_ICONS.map(i => (
-                                        <button 
-                                            key={i.name} 
-                                            type="button"
-                                            onClick={() => setEditingAnn({...editingAnn, icon_name: i.name})}
-                                            className={`p-4 rounded-2xl flex items-center justify-center transition-all shadow-xl ${editingAnn.icon_name === i.name ? 'bg-blue-600 text-white' : 'bg-slate-900 text-slate-700 hover:text-slate-400'}`}
-                                        >
-                                            <i.icon size={24} />
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-8">
-                                <div className="space-y-3">
-                                    <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">BUTON METNİ</label>
-                                    <input type="text" required value={editingAnn.button_text} onChange={e => setEditingAnn({...editingAnn, button_text: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-6 text-sm font-bold focus:border-blue-500 outline-none shadow-inner" placeholder="Hemen Başla" />
-                                </div>
-                                <div className="space-y-3">
-                                    <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">RENK ŞEMASI</label>
-                                    <select value={editingAnn.color_scheme} onChange={e => setEditingAnn({...editingAnn, color_scheme: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-6 text-sm font-bold focus:border-blue-500 outline-none appearance-none italic">
-                                        <option value="purple">Modern Mor</option>
-                                        <option value="blue">Deniz Mavisi</option>
-                                        <option value="emerald">Zümrüt Yeşil</option>
-                                        <option value="orange">Neon Turuncu</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div className="space-y-3">
-                                <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">HEDEF LİNK / @USER</label>
-                                <input type="text" value={editingAnn.button_link} onChange={e => setEditingAnn({...editingAnn, button_link: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-6 text-sm font-bold focus:border-blue-500 outline-none shadow-inner" placeholder="@username, /sayfa veya link..." />
-                            </div>
-                            <div className="flex items-center justify-between p-8 bg-slate-950 border border-slate-800 rounded-[32px] shadow-inner">
-                                <div>
-                                    <p className="text-sm font-black text-white uppercase tracking-tight">AKTİF DURUMU</p>
-                                    <p className="text-[10px] text-slate-600 font-bold uppercase mt-1">Sistemde gösterilsin mi?</p>
-                                </div>
-                                <button type="button" onClick={() => setEditingAnn({...editingAnn, is_active: !editingAnn.is_active})} className={`w-16 h-8 rounded-full relative transition-all shadow-xl ${editingAnn.is_active ? 'bg-emerald-600' : 'bg-slate-800'}`}>
-                                    <div className={`absolute top-1.5 w-5 h-5 bg-white rounded-full transition-all shadow-2xl ${editingAnn.is_active ? 'left-9' : 'left-2'}`} />
-                                </button>
-                            </div>
-                            <button type="submit" className="w-full py-7 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-[36px] text-[12px] tracking-[0.4em] uppercase shadow-2xl shadow-blue-900/50 active:scale-95 transition-all mt-6 flex items-center justify-center gap-4">
-                                <ShieldCheck size={22} /> KARTI SİSTEME YÜKLE
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            )}
         </div>
     );
 };
@@ -1121,7 +985,6 @@ const SettingsManagement = () => {
                 <h2 className="text-3xl font-black text-white italic tracking-tighter uppercase">SİSTEM <span className="text-blue-500">PARAMETRELERİ</span></h2>
                 <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mt-1">Platform Çekirdek Ayarları</p>
             </div>
-            
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                 <div className="bg-[#0f172a] border border-slate-800 p-12 rounded-[56px] space-y-10 shadow-2xl relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-2 h-full bg-blue-600"></div>
@@ -1131,34 +994,9 @@ const SettingsManagement = () => {
                             <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Platform Başlığı</label> 
                             <input type="text" value={settings.appName} onChange={e => setSettings({...settings, appName: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-6 text-sm font-bold text-white focus:border-blue-500 outline-none transition-all shadow-inner" /> 
                         </div>
-                        <div className="space-y-3"> 
-                            <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Destek Kanal Linki</label> 
-                            <input type="text" value={settings.supportLink} onChange={e => setSettings({...settings, supportLink: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-6 text-sm font-bold text-white focus:border-blue-500 outline-none shadow-inner" /> 
-                        </div>
-                    </div>
-                </div>
-
-                <div className="bg-[#0f172a] border border-slate-800 p-12 rounded-[56px] space-y-10 shadow-2xl relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-2 h-full bg-emerald-600"></div>
-                    <h3 className="font-black text-xl text-white mb-8 uppercase italic flex items-center gap-4"><Percent size={28} className="text-emerald-500"/> Operasyonel Ayarlar</h3>
-                    <div className="space-y-10">
-                        <div className="flex items-center justify-between p-8 bg-slate-950 border border-slate-800 rounded-[36px] shadow-inner">
-                            <div> 
-                                <p className="text-base font-black text-white italic tracking-tight uppercase">BAKIM MODU</p> 
-                                <p className="text-[10px] text-slate-600 font-bold uppercase mt-1 italic tracking-widest">Platformu erişime kapat</p> 
-                            </div>
-                            <button onClick={() => setSettings({...settings, maintenanceMode: !settings.maintenanceMode})} className={`w-16 h-8 rounded-full relative transition-all shadow-2xl ${settings.maintenanceMode ? 'bg-red-600' : 'bg-slate-800'}`}> 
-                                <div className={`absolute top-1.5 w-5 h-5 bg-white rounded-full transition-all shadow-inner ${settings.maintenanceMode ? 'left-9' : 'left-2'}`} /> 
-                            </button>
-                        </div>
-                        <div className="space-y-3"> 
-                            <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Komisyon Oranı (%)</label> 
-                            <input type="number" value={settings.commissionRate} onChange={e => setSettings({...settings, commissionRate: Number((e.target as any).value)})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-6 text-sm font-bold text-white focus:border-emerald-500 outline-none shadow-inner" /> 
-                        </div>
                     </div>
                 </div>
             </div>
-
             <button onClick={handleSave} disabled={isSaving} className="w-full py-8 bg-blue-600 hover:bg-blue-500 text-white font-black text-[12px] uppercase tracking-[0.6em] rounded-[40px] shadow-2xl shadow-blue-900/50 active:scale-95 transition-all flex items-center justify-center gap-4 disabled:opacity-50 mt-12"> 
                 {isSaving ? <Loader2 className="animate-spin" /> : <ShieldCheck size={26} />} TÜM SİSTEMİ GÜNCELLE
             </button>

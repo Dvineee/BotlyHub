@@ -14,6 +14,17 @@ export interface User {
   canPublishAds?: boolean;
 }
 
+export interface ActivityLog {
+  id: string;
+  user_id: string;
+  type: 'auth' | 'bot_manage' | 'channel_sync' | 'payment' | 'security' | 'system';
+  action_key: string;
+  title: string;
+  description: string;
+  metadata: any;
+  created_at: string;
+}
+
 export interface Bot {
   id: string;
   name: string;

@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronLeft, ShoppingBag, TrendingUp, Bot, Send, Activity, Trash2, AlertTriangle, X, Loader2, Lock, Clock, Info } from 'lucide-react';
 import * as Router from 'react-router-dom';
 import { UserBot } from '../types';
@@ -29,14 +29,11 @@ const MyBots = () => {
     if (user?.id) {
         try {
             const dbBots = await DatabaseService.getUserBots(user.id.toString());
-            
-            // Otomatik temizleme kontrolü (Expired Check)
             const now = new Date();
             const validBots: UserBot[] = [];
             const expiredNames: string[] = [];
 
             for (const b of dbBots) {
-                // Eğer expiryDate varsa ve geçmişse sil
                 if (b.expiryDate && new Date(b.expiryDate) < now) {
                     await DatabaseService.removeUserBot(user.id.toString(), b.id);
                     expiredNames.push(b.name);
@@ -66,20 +63,36 @@ const MyBots = () => {
     setIsLoading(false);
   };
 
-  const toggleAdRevenue = (botId: string) => {
-      const updatedBots = bots.map(bot => 
-        bot.id === botId ? { ...bot, isAdEnabled: !bot.isAdEnabled } : bot
+  const toggleAdRevenue = async (botId: string) => {
+      const bot = bots.find(b => b.id === botId);
+      if (!bot) return;
+
+      const updatedBots = bots.map(b => 
+        b.id === botId ? { ...b, isAdEnabled: !b.isAdEnabled } : b
       );
       setBots(updatedBots);
       localStorage.setItem('ownedBots', JSON.stringify(updatedBots));
+
+      if (user?.id) {
+          // Fix: Added missing title argument and corrected type to 'bot_manage'
+          await DatabaseService.logActivity(user.id.toString(), 'bot_manage', 'Ayar Değişti', 'Gelir Ayarı Güncellendi', `'${bot.name}' botu için gelir modu ${!bot.isAdEnabled ? 'AÇILDI' : 'KAPATILDI'}.`);
+      }
   };
 
-  const toggleActiveStatus = (botId: string) => {
-    const updatedBots = bots.map(bot => 
-        bot.id === botId ? { ...bot, isActive: !bot.isActive } : bot
+  const toggleActiveStatus = async (botId: string) => {
+    const bot = bots.find(b => b.id === botId);
+    if (!bot) return;
+
+    const updatedBots = bots.map(b => 
+        b.id === botId ? { ...b, isActive: !b.isActive } : b
     );
     setBots(updatedBots);
     localStorage.setItem('ownedBots', JSON.stringify(updatedBots));
+
+    if (user?.id) {
+        // Fix: Added missing title argument and corrected type to 'bot_manage'
+        await DatabaseService.logActivity(user.id.toString(), 'bot_manage', 'Statü Değişti', 'Bot Durumu Güncellendi', `'${bot.name}' bot durumu ${!bot.isActive ? 'AKTİF' : 'PASİF'} yapıldı.`);
+    }
   };
 
   const handleDeleteClick = (bot: UserBot) => {
@@ -115,8 +128,12 @@ const MyBots = () => {
       }
   };
 
-  const handleStartBot = (bot: UserBot) => {
+  const handleStartBot = async (bot: UserBot) => {
       haptic('medium');
+      if (user?.id) {
+          // Fix: Added missing title argument and corrected type to 'bot_manage'
+          await DatabaseService.logActivity(user.id.toString(), 'bot_manage', 'Bot Başlatıldı', 'Bot Tetiklendi', `'${bot.name}' botu Telegram üzerinden tetiklendi.`);
+      }
       let botLink = bot.bot_link || '';
       let finalUrl = botLink.startsWith('http') ? botLink : `https://t.me/${botLink.replace('@', '').trim()}`;
       if (tg?.openTelegramLink) tg.openTelegramLink(finalUrl);
