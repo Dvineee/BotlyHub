@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { ChevronLeft, Megaphone, Users, Loader2, RefreshCw, AlertCircle, CheckCircle2, X, Bot as BotIcon, Info } from 'lucide-react';
+import { ChevronLeft, Megaphone, Users, Loader2, RefreshCw, AlertCircle, CheckCircle2, X, Bot as BotIcon, Info, Fingerprint } from 'lucide-react';
 import * as Router from 'react-router-dom';
 import { Channel } from '../types';
 import { DatabaseService } from '../services/DatabaseService';
@@ -28,12 +28,9 @@ const MyChannels = () => {
   const initChannels = async () => {
       setIsLoading(true);
       try {
-          const uId = user.id.toString();
-          // 1. Önce mevcutları çek
+          const uId = String(user.id);
           const initialData = await DatabaseService.getChannels(uId);
           setChannels(initialData);
-          
-          // 2. Ardından senkronizasyonu tetikle
           await triggerSync();
       } catch (e) {
           console.error("Init Channels Error:", e);
@@ -44,28 +41,23 @@ const MyChannels = () => {
 
   const triggerSync = async () => {
       if (!user?.id) return;
-      const uId = user.id.toString();
+      const uId = String(user.id);
       setAutoSyncStatus('syncing');
       
       try {
-          console.log("[MyChannels] Sync başlatılıyor...");
-          const newSyncedCount = await DatabaseService.syncChannelsFromBotActivity(uId);
-          
-          // Senkronizasyon başarılı olsun ya da olmasın, listeyi her zaman en güncel haliyle çek
+          const count = await DatabaseService.syncChannelsFromBotActivity(uId);
           const refreshedData = await DatabaseService.getChannels(uId);
           setChannels(refreshedData);
 
-          if (newSyncedCount > 0) {
+          if (count > 0) {
               notification('success');
               setAutoSyncStatus('done');
           } else {
               setAutoSyncStatus('idle');
           }
       } catch (e) {
-          console.error("[MyChannels] Sync error:", e);
           setAutoSyncStatus('error');
       }
-      
       setTimeout(() => setAutoSyncStatus('idle'), 3000);
   };
 
@@ -74,10 +66,7 @@ const MyChannels = () => {
       haptic('medium');
       await triggerSync();
       setIsSyncing(false);
-      
-      if (channels.length === 0) {
-          setShowGuide(true);
-      }
+      if (channels.length === 0) setShowGuide(true);
   };
 
   return (
@@ -96,6 +85,15 @@ const MyChannels = () => {
         >
             <RefreshCw size={20} className={isSyncing ? 'animate-spin' : ''} />
         </button>
+      </div>
+
+      {/* Debug Info: Bu kısım sorunu çözmenize yardımcı olur */}
+      <div className="mb-6 p-3 bg-slate-900/40 rounded-xl border border-slate-800 flex items-center justify-between opacity-50">
+          <div className="flex items-center gap-2">
+            <Fingerprint size={12} className="text-slate-500" />
+            <span className="text-[9px] font-black text-slate-500 uppercase">Kimliğiniz:</span>
+          </div>
+          <span className="text-[10px] font-mono text-blue-400">{user?.id || 'Yükleniyor...'}</span>
       </div>
 
       {autoSyncStatus !== 'idle' && (
@@ -129,10 +127,6 @@ const MyChannels = () => {
                       <div className="w-6 h-6 bg-blue-600 rounded-lg flex items-center justify-center shrink-0 text-white font-black text-xs italic shadow-lg">2</div>
                       <p className="text-[10px] text-slate-400 font-medium leading-relaxed">Kanalda <b>/start</b> yazdıktan sonra bu sayfayı sağ üstten yenileyin.</p>
                   </li>
-                  <li className="flex gap-4">
-                      <div className="w-6 h-6 bg-blue-600 rounded-lg flex items-center justify-center shrink-0 text-white font-black text-xs italic shadow-lg">3</div>
-                      <p className="text-[10px] text-slate-400 font-medium leading-relaxed">Halen gelmiyorsa botu kanaldan çıkarıp tekrar ekleyin.</p>
-                  </li>
               </ul>
           </div>
       )}
@@ -147,7 +141,7 @@ const MyChannels = () => {
               <div className="w-20 h-20 bg-slate-900 rounded-full flex items-center justify-center text-slate-800"><Megaphone size={40} /></div>
               <div className="px-10">
                   <p className="text-slate-500 text-sm font-bold uppercase tracking-widest">Kanal Bulunamadı</p>
-                  <p className="text-[10px] text-slate-700 mt-2 italic font-medium">Sinyal algılandı uyarısı aldıysanız yenileyin.</p>
+                  <p className="text-[10px] text-slate-700 mt-2 italic font-medium">Lütfen botun çalıştığından emin olun.</p>
               </div>
               <button 
                 onClick={handleManualRefresh} 
@@ -179,13 +173,6 @@ const MyChannels = () => {
                       </div>
                   </div>
               ))}
-              
-              <div className="mt-12 p-8 border border-slate-900/50 rounded-[40px] bg-slate-900/10 flex flex-col items-center gap-4 text-center">
-                  <Info className="text-slate-800" size={32} />
-                  <p className="text-[10px] text-slate-600 font-bold leading-relaxed uppercase tracking-widest px-4">
-                      Veriler anlık olarak BotlyHub Engine üzerinden güncellenmektedir.
-                  </p>
-              </div>
           </div>
       )}
     </div>
