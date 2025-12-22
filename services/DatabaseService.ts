@@ -10,7 +10,7 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 export class DatabaseService {
   
   /**
-   * Merkezi Loglama Sistemi
+   * Merkezi Loglama Sistemi - Detaylandırılmış Metadata Desteği
    */
   static async logActivity(
       userId: string, 
@@ -28,7 +28,11 @@ export class DatabaseService {
               action_key: actionKey,
               title,
               description,
-              metadata,
+              metadata: {
+                  ...metadata,
+                  client_time: new Date().toISOString(),
+                  platform: 'Telegram_Web'
+              },
               created_at: new Date().toISOString()
           });
       } catch (e) {
@@ -50,6 +54,8 @@ export class DatabaseService {
           let successCount = 0;
           for (const log of logs) {
               const botId = String(log.bot_id);
+              const { data: botInfo } = await supabase.from('bots').select('name').eq('id', botId).maybeSingle();
+              
               const { data: existing } = await supabase
                   .from('channels')
                   .select('*')
@@ -58,7 +64,10 @@ export class DatabaseService {
                   .maybeSingle();
 
               let syncOk = false;
+              let action = '';
+
               if (existing) {
+                  action = 'UPDATE';
                   const bots = Array.from(new Set([...(existing.connected_bot_ids || []), botId]));
                   const { error: upErr } = await supabase
                       .from('channels')
@@ -70,6 +79,7 @@ export class DatabaseService {
                       .eq('id', existing.id);
                   if (!upErr) syncOk = true;
               } else {
+                  action = 'INSERT';
                   const { error: insErr } = await supabase
                       .from('channels')
                       .insert({
@@ -86,11 +96,23 @@ export class DatabaseService {
               if (syncOk) {
                   await supabase.from('bot_discovery_logs').update({ is_synced: true }).eq('id', log.id);
                   successCount++;
+                  
+                  // Her bir kanal için detaylı log
+                  await this.logActivity(
+                      uIdStr, 
+                      'channel_sync', 
+                      'channel_discovered', 
+                      action === 'INSERT' ? 'Yeni Kanal Bağlandı' : 'Kanal Verisi Güncellendi', 
+                      `'${log.channel_name}' kanalı '${botInfo?.name || botId}' botu üzerinden gelen /start komutuyla senkronize edildi.`,
+                      { 
+                        channel_name: log.channel_name, 
+                        bot_name: botInfo?.name, 
+                        bot_id: botId,
+                        member_count: log.member_count,
+                        sync_type: action
+                      }
+                  );
               }
-          }
-          
-          if (successCount > 0) {
-              await this.logActivity(uIdStr, 'channel_sync', 'channels_updated', 'Kanal Verileri Senkronize Edildi', `${successCount} kanal bot sinyalleriyle güncellendi.`, { count: successCount });
           }
           
           return successCount;
@@ -102,7 +124,7 @@ export class DatabaseService {
 
   static async getChannels(userId: string): Promise<Channel[]> {
     const uIdStr = String(userId).trim();
-    const { data, error } = await supabase.from('channels').select('*').eq('user_id', uIdStr).order('created_at', { ascending: false });
+    const { data } = await supabase.from('channels').select('*').eq('user_id', uIdStr).order('created_at', { ascending: false });
     return (data || []).map(c => ({
         id: String(c.id),
         user_id: String(c.user_id),
@@ -115,16 +137,46 @@ export class DatabaseService {
     }));
   }
 
-  static async getBots(category?: string): Promise<Bot[]> {
-    let query = supabase.from('bots').select('*').order('id', { ascending: false });
-    if (category && category !== 'all') query = query.eq('category', category);
-    const { data } = await query;
-    return data || [];
+  static async removeUserBot(userId: string, botId: string) {
+    const uIdStr = userId.toString();
+    const bIdStr = botId.toString();
+    
+    const { data: botInfo } = await supabase.from('bots').select('name').eq('id', bIdStr).maybeSingle();
+    const { data: userChannels } = await supabase.from('channels').select('*').eq('user_id', uIdStr);
+
+    if (userChannels && userChannels.length > 0) {
+        for (const channel of userChannels) {
+            const botIds = channel.connected_bot_ids || [];
+            if (botIds.includes(bIdStr)) {
+                const updatedBotIds = botIds.filter((id: string) => id !== bIdStr);
+                
+                if (updatedBotIds.length === 0) {
+                    await supabase.from('channels').delete().eq('id', channel.id);
+                    await this.logActivity(uIdStr, 'channel_sync', 'channel_cascade_deleted', 'Kanal Otomatik Silindi', `'${channel.name}' kanalı, bağlı olduğu son bot (${botInfo?.name || bIdStr}) kütüphaneden kaldırıldığı için silindi.`, { channel_id: channel.id, bot_id: bIdStr, bot_name: botInfo?.name });
+                } else {
+                    await supabase.from('channels').update({ connected_bot_ids: updatedBotIds }).eq('id', channel.id);
+                    await this.logActivity(uIdStr, 'channel_sync', 'channel_bot_unlinked', 'Kanal Bot İlişkisi Kesildi', `'${channel.name}' kanalının '${botInfo?.name || bIdStr}' botu ile bağı koparıldı (Diğer botlar aktif).`, { channel_id: channel.id, bot_id: bIdStr, remaining_bots: updatedBotIds });
+                }
+            }
+        }
+    }
+    
+    const { error } = await supabase.from('user_bots').delete().eq('user_id', uIdStr).eq('bot_id', bIdStr);
+    if (!error) {
+        await this.logActivity(uIdStr, 'bot_manage', 'bot_removed', 'Bot Kütüphaneden Kaldırıldı', `'${botInfo?.name || bIdStr}' botu kütüphaneden çıkarıldı ve ilişkili yetkiler sonlandırıldı.`, { bot_id: bIdStr, bot_name: botInfo?.name });
+    }
   }
 
   static async getBotById(id: string): Promise<Bot | null> {
     const { data } = await supabase.from('bots').select('*').eq('id', id).maybeSingle();
     return data;
+  }
+
+  static async getBots(category?: string): Promise<Bot[]> {
+    let query = supabase.from('bots').select('*').order('id', { ascending: false });
+    if (category && category !== 'all') query = query.eq('category', category);
+    const { data } = await query;
+    return data || [];
   }
 
   static async getUserBots(userId: string): Promise<UserBot[]> {
@@ -137,63 +189,16 @@ export class DatabaseService {
     const userId = (userData.id || userData).toString();
     await this.syncUser({ id: userId, name: userData.first_name || 'User', username: userData.username || 'user' });
     const { error } = await supabase.from('user_bots').upsert({ user_id: userId, bot_id: botData.id, is_active: true, is_premium: isPremium, acquired_at: new Date().toISOString() });
-    
     if (error) throw error;
-
-    await this.logActivity(userId, 'bot_manage', 'bot_acquired', 'Bot Kütüphaneye Eklendi', `'${botData.name}' botu başarıyla edinildi.`, { bot_id: botData.id, is_premium: isPremium });
+    await this.logActivity(userId, 'bot_manage', 'bot_acquired', 'Bot Kütüphaneye Eklendi', `'${botData.name}' botu kullanıcı kütüphanesine kaydedildi.`, { bot_id: botData.id, bot_name: botData.name, is_premium: isPremium });
     return true;
-  }
-
-  /**
-   * Bot Silme ve İlişkili Kanalları Temizleme
-   */
-  static async removeUserBot(userId: string, botId: string) {
-    const uIdStr = userId.toString();
-    const bIdStr = botId.toString();
-    
-    // 1. Bot bilgisini al (Log için)
-    const { data: botInfo } = await supabase.from('bots').select('name').eq('id', bIdStr).maybeSingle();
-    
-    // 2. Bu botla ilişkili kanalları bul
-    const { data: userChannels } = await supabase
-        .from('channels')
-        .select('*')
-        .eq('user_id', uIdStr);
-
-    if (userChannels && userChannels.length > 0) {
-        for (const channel of userChannels) {
-            const botIds = channel.connected_bot_ids || [];
-            
-            if (botIds.includes(bIdStr)) {
-                const updatedBotIds = botIds.filter((id: string) => id !== bIdStr);
-                
-                if (updatedBotIds.length === 0) {
-                    // Kanalın başka bot bağı kalmadıysa KANALI SİL
-                    await supabase.from('channels').delete().eq('id', channel.id);
-                    await this.logActivity(uIdStr, 'channel_sync', 'channel_auto_deleted', 'Kanal Otomatik Silindi', `'${channel.name}' kanalı, bağlı olduğu son bot (${botInfo?.name || bIdStr}) silindiği için kaldırıldı.`, { channel_id: channel.id, bot_id: bIdStr });
-                } else {
-                    // Sadece bot bağını kopar
-                    await supabase.from('channels').update({ connected_bot_ids: updatedBotIds }).eq('id', channel.id);
-                    await this.logActivity(uIdStr, 'channel_sync', 'channel_bot_unlinked', 'Kanal Bot Bağı Kesildi', `'${channel.name}' kanalının '${botInfo?.name || bIdStr}' botu ile ilişkisi kesildi.`, { channel_id: channel.id, bot_id: bIdStr });
-                }
-            }
-        }
-    }
-    
-    // 3. Bot mülkiyetini sil
-    const { error } = await supabase.from('user_bots').delete().eq('user_id', uIdStr).eq('bot_id', bIdStr);
-    
-    if (!error) {
-        await this.logActivity(uIdStr, 'bot_manage', 'bot_removed', 'Bot Kütüphaneden Kaldırıldı', `'${botInfo?.name || bIdStr}' botu ve tüm kullanım hakları iptal edildi.`, { bot_id: bIdStr });
-    }
   }
 
   static async syncUser(user: Partial<User>) {
     if (!user.id) return;
     const { error } = await supabase.from('users').upsert({ id: user.id.toString(), name: user.name, username: user.username, avatar: user.avatar, email: user.email, phone: user.phone, joindate: new Date().toISOString() }, { onConflict: 'id' });
-    
     if (!error && (user.email || user.phone)) {
-        await this.logActivity(user.id.toString(), 'security', 'profile_updated', 'Profil Güvenlik Bilgileri Güncellendi', 'E-posta veya telefon verisi sisteme işlendi.');
+        await this.logActivity(user.id.toString(), 'security', 'profile_updated', 'Profil Bilgileri Güncellendi', 'Kullanıcı iletişim/güvenlik verilerini güncelledi.', { email: user.email, phone: user.phone });
     }
   }
 
@@ -245,7 +250,7 @@ export class DatabaseService {
 
   static async updateUserStatus(userId: string, status: string) {
     await supabase.from('users').update({ status }).eq('id', userId);
-    await this.logActivity(userId, 'security', 'account_status_changed', 'Hesap Durumu Değiştirildi', `Admin hesabı '${status}' moduna aldı.`);
+    await this.logActivity(userId, 'security', 'account_status_changed', 'Hesap Durumu Değiştirildi', `Admin hesabı '${status}' moduna aldı.`, { new_status: status });
   }
 
   static async getAdminStats() {
