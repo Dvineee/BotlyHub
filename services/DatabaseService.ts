@@ -11,11 +11,10 @@ export class DatabaseService {
   
   static async syncChannelsFromBotActivity(userId: string): Promise<number> {
       try {
-          // ID'yi temizle ve string'e zorla
           const uIdStr = String(userId).trim();
-          console.log("[SYNC] İşlem Başladı. UserID:", uIdStr);
+          console.log("[SYNC-ENGINE] Tarama başladı. Kullanıcı:", uIdStr);
           
-          // 1. İşlenmemiş logları al
+          // 1. Logları çek
           const { data: logs, error: logErr } = await supabase
               .from('bot_discovery_logs')
               .select('*')
@@ -23,30 +22,34 @@ export class DatabaseService {
               .eq('is_synced', false);
 
           if (logErr) {
-              console.error("[SYNC] Log çekme hatası:", logErr.message);
+              console.error("[SYNC-ENGINE] Log çekme hatası:", logErr.message);
               return 0;
           }
 
           if (!logs || logs.length === 0) {
-              console.log("[SYNC] Bekleyen log bulunamadı.");
+              console.log("[SYNC-ENGINE] İşlenecek yeni sinyal yok.");
               return 0;
           }
 
           let syncedCount = 0;
           for (const log of logs) {
-              console.log(`[SYNC] İşleniyor: ${log.channel_name}`);
-              
-              // 2. Mevcut kanal kontrolü (user_id ve name ile)
-              const { data: existing } = await supabase
+              // 2. Mevcut kanal var mı?
+              const { data: existing, error: checkErr } = await supabase
                   .from('channels')
                   .select('*')
                   .eq('user_id', uIdStr)
                   .eq('name', log.channel_name)
                   .maybeSingle();
 
+              if (checkErr) {
+                  console.error(`[SYNC-ENGINE] '${log.channel_name}' kontrol hatası:`, checkErr.message);
+                  continue;
+              }
+
               let dbSuccess = false;
 
               if (existing) {
+                  // Güncelleme: connected_bot_ids sütununun varlığından emin olmalıyız
                   const currentBots = existing.connected_bot_ids || [];
                   const updatedBots = Array.from(new Set([...currentBots, log.bot_id]));
                   
@@ -59,8 +62,9 @@ export class DatabaseService {
                       .eq('id', existing.id);
                   
                   if (!updErr) dbSuccess = true;
-                  else console.error("[SYNC] Update Hatası:", updErr.message);
+                  else console.error("[SYNC-ENGINE] Update başarısız (Sütun eksik olabilir):", updErr.message);
               } else {
+                  // Yeni Ekleme
                   const { error: insErr } = await supabase
                       .from('channels')
                       .insert({
@@ -73,36 +77,33 @@ export class DatabaseService {
                           revenue: 0
                       });
                   
-                  if (!insErr) dbSuccess = true;
-                  else console.error("[SYNC] Insert Hatası:", insErr.message);
+                  if (!insErr) {
+                      dbSuccess = true;
+                      console.log("[SYNC-ENGINE] Yeni kanal başarıyla eklendi.");
+                  } else {
+                      console.error("[SYNC-ENGINE] Kayıt başarısız (Muhtemelen tablo yapısı hatalı):", insErr.message);
+                      // Eğer sütun hatası varsa kullanıcıyı uyaracak bir log bırakıyoruz
+                      if (insErr.message.includes('connected_bot_ids')) {
+                          console.error("KRİTİK: 'connected_bot_ids' sütunu veritabanında bulunamadı!");
+                      }
+                  }
               }
 
               if (dbSuccess) {
-                  const { error: finalErr } = await supabase
-                      .from('bot_discovery_logs')
-                      .update({ is_synced: true })
-                      .eq('id', log.id);
-                  
-                  if (!finalErr) syncedCount++;
+                  await supabase.from('bot_discovery_logs').update({ is_synced: true }).eq('id', log.id);
+                  syncedCount++;
               }
           }
           
-          // Supabase'in veriyi indekslemesi için çok kısa bir bekleme
-          if (syncedCount > 0) {
-              await new Promise(r => setTimeout(r, 800));
-          }
-
           return syncedCount;
-      } catch (e: any) {
-          console.error("[SYNC] Kritik Hata:", e);
+      } catch (e) {
+          console.error("[SYNC-ENGINE] Beklenmedik hata:", e);
           return 0;
       }
   }
 
   static async getChannels(userId: string): Promise<Channel[]> {
     const uIdStr = String(userId).trim();
-    console.log("[DB-GET] Kanallar isteniyor. ID:", uIdStr);
-
     const { data, error } = await supabase
         .from('channels')
         .select('*')
@@ -110,12 +111,10 @@ export class DatabaseService {
         .order('id', { ascending: false });
     
     if (error) {
-        console.error("[DB-GET] Hata:", error.message);
+        console.error("[DB-GET] Veri çekme hatası:", error.message);
         return [];
     }
     
-    console.log("[DB-GET] Bulunan kanal sayısı:", data?.length || 0);
-
     return (data || []).map(c => ({
         id: c.id,
         user_id: String(c.user_id),
@@ -123,7 +122,7 @@ export class DatabaseService {
         memberCount: c.member_count,
         icon: c.icon,
         isAdEnabled: c.is_ad_enabled,
-        connectedBotIds: c.connected_bot_ids,
+        connectedBotIds: c.connected_bot_ids || [],
         revenue: c.revenue
     }));
   }
