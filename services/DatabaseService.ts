@@ -10,8 +10,7 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 export class DatabaseService {
   
   /**
-   * World-Class Logging Engine
-   * Kullanıcının her adımını izler ve activity_logs tablosuna kaydeder.
+   * Merkezi Loglama Sistemi
    */
   static async logActivity(
       userId: string, 
@@ -145,15 +144,47 @@ export class DatabaseService {
     return true;
   }
 
+  /**
+   * Bot Silme ve İlişkili Kanalları Temizleme
+   */
   static async removeUserBot(userId: string, botId: string) {
     const uIdStr = userId.toString();
-    const { data: botInfo } = await supabase.from('bots').select('name').eq('id', botId).maybeSingle();
+    const bIdStr = botId.toString();
     
-    // İlişkiyi tamamen sil
-    const { error } = await supabase.from('user_bots').delete().eq('user_id', uIdStr).eq('bot_id', botId.toString());
+    // 1. Bot bilgisini al (Log için)
+    const { data: botInfo } = await supabase.from('bots').select('name').eq('id', bIdStr).maybeSingle();
+    
+    // 2. Bu botla ilişkili kanalları bul
+    const { data: userChannels } = await supabase
+        .from('channels')
+        .select('*')
+        .eq('user_id', uIdStr);
+
+    if (userChannels && userChannels.length > 0) {
+        for (const channel of userChannels) {
+            const botIds = channel.connected_bot_ids || [];
+            
+            if (botIds.includes(bIdStr)) {
+                const updatedBotIds = botIds.filter((id: string) => id !== bIdStr);
+                
+                if (updatedBotIds.length === 0) {
+                    // Kanalın başka bot bağı kalmadıysa KANALI SİL
+                    await supabase.from('channels').delete().eq('id', channel.id);
+                    await this.logActivity(uIdStr, 'channel_sync', 'channel_auto_deleted', 'Kanal Otomatik Silindi', `'${channel.name}' kanalı, bağlı olduğu son bot (${botInfo?.name || bIdStr}) silindiği için kaldırıldı.`, { channel_id: channel.id, bot_id: bIdStr });
+                } else {
+                    // Sadece bot bağını kopar
+                    await supabase.from('channels').update({ connected_bot_ids: updatedBotIds }).eq('id', channel.id);
+                    await this.logActivity(uIdStr, 'channel_sync', 'channel_bot_unlinked', 'Kanal Bot Bağı Kesildi', `'${channel.name}' kanalının '${botInfo?.name || bIdStr}' botu ile ilişkisi kesildi.`, { channel_id: channel.id, bot_id: bIdStr });
+                }
+            }
+        }
+    }
+    
+    // 3. Bot mülkiyetini sil
+    const { error } = await supabase.from('user_bots').delete().eq('user_id', uIdStr).eq('bot_id', bIdStr);
     
     if (!error) {
-        await this.logActivity(uIdStr, 'bot_manage', 'bot_removed', 'Bot İlişkisi Kesildi', `'${botInfo?.name || botId}' botu ve kullanıcı arasındaki tüm veriler silindi.`, { bot_id: botId });
+        await this.logActivity(uIdStr, 'bot_manage', 'bot_removed', 'Bot Kütüphaneden Kaldırıldı', `'${botInfo?.name || bIdStr}' botu ve tüm kullanım hakları iptal edildi.`, { bot_id: bIdStr });
     }
   }
 
