@@ -1,9 +1,9 @@
 
-import { useState, useEffect } from 'react';
-import { ChevronLeft, Megaphone, Users, Loader2, RefreshCw, AlertCircle, CheckCircle2, X, Bot as BotIcon, Info, Fingerprint } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { ChevronLeft, Megaphone, Users, Loader2, RefreshCw, AlertCircle, CheckCircle2, X, Bot as BotIcon, Info, Fingerprint, Zap } from 'lucide-react';
 import * as Router from 'react-router-dom';
 import { Channel } from '../types';
-import { DatabaseService } from '../services/DatabaseService';
+import { DatabaseService, supabase } from '../services/DatabaseService';
 import { useTelegram } from '../hooks/useTelegram';
 
 const { useNavigate } = Router as any;
@@ -16,14 +16,40 @@ const MyChannels = () => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [autoSyncStatus, setAutoSyncStatus] = useState<'idle' | 'syncing' | 'done' | 'error'>('idle');
   const [showGuide, setShowGuide] = useState(false);
+  const realtimeSubscription = useRef<any>(null);
 
   useEffect(() => {
     if (user?.id) {
         initChannels();
+        setupRealtime();
     } else {
         setIsLoading(false);
     }
+
+    return () => {
+        if (realtimeSubscription.current) {
+            supabase.removeChannel(realtimeSubscription.current);
+        }
+    };
   }, [user]);
+
+  const setupRealtime = () => {
+      const uId = String(user.id);
+      
+      // bot_discovery_logs tablosundaki değişiklikleri dinle
+      realtimeSubscription.current = supabase
+          .channel('any')
+          .on('postgres_changes', { 
+              event: 'INSERT', 
+              schema: 'public', 
+              table: 'bot_discovery_logs',
+              filter: `owner_id=eq.${uId}` 
+          }, (payload) => {
+              console.log("[REALTIME] Yeni sinyal yakalandı!", payload);
+              triggerSync();
+          })
+          .subscribe();
+  };
 
   const initChannels = async () => {
       setIsLoading(true);
@@ -33,7 +59,7 @@ const MyChannels = () => {
           setChannels(initialData);
           await triggerSync();
       } catch (e) {
-          console.error("Init Channels Error:", e);
+          console.error("Init Error:", e);
       } finally {
           setIsLoading(false);
       }
@@ -78,22 +104,19 @@ const MyChannels = () => {
             </button>
             <h1 className="text-xl font-black text-white italic tracking-tighter uppercase">Kanallarım</h1>
         </div>
-        <button 
-            onClick={handleManualRefresh} 
-            disabled={isSyncing}
-            className="p-3 bg-slate-900/60 border border-slate-800 rounded-2xl text-blue-400 active:scale-90 transition-all disabled:opacity-30"
-        >
-            <RefreshCw size={20} className={isSyncing ? 'animate-spin' : ''} />
-        </button>
-      </div>
-
-      {/* Debug Info: Bu kısım sorunu çözmenize yardımcı olur */}
-      <div className="mb-6 p-3 bg-slate-900/40 rounded-xl border border-slate-800 flex items-center justify-between opacity-50">
-          <div className="flex items-center gap-2">
-            <Fingerprint size={12} className="text-slate-500" />
-            <span className="text-[9px] font-black text-slate-500 uppercase">Kimliğiniz:</span>
-          </div>
-          <span className="text-[10px] font-mono text-blue-400">{user?.id || 'Yükleniyor...'}</span>
+        <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600/10 border border-blue-500/20 rounded-xl">
+                <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.8)]"></div>
+                <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest">Canlı</span>
+            </div>
+            <button 
+                onClick={handleManualRefresh} 
+                disabled={isSyncing}
+                className="p-3 bg-slate-900/60 border border-slate-800 rounded-2xl text-slate-400 active:scale-90 transition-all disabled:opacity-30"
+            >
+                <RefreshCw size={20} className={isSyncing ? 'animate-spin text-blue-500' : ''} />
+            </button>
+        </div>
       </div>
 
       {autoSyncStatus !== 'idle' && (
@@ -105,29 +128,9 @@ const MyChannels = () => {
               {autoSyncStatus === 'syncing' ? <Loader2 className="animate-spin" size={16} /> : 
                autoSyncStatus === 'done' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
               <span className="text-[10px] font-black uppercase tracking-widest italic">
-                  {autoSyncStatus === 'syncing' ? 'Bot sinyalleri taranıyor...' : 
-                   autoSyncStatus === 'done' ? 'Senkronizasyon Tamam!' : 'Bağlantı hatası oluştu.'}
+                  {autoSyncStatus === 'syncing' ? 'Yeni veriler aktarılıyor...' : 
+                   autoSyncStatus === 'done' ? 'Kanal Listesi Güncellendi!' : 'Bağlantı hatası oluştu.'}
               </span>
-          </div>
-      )}
-
-      {showGuide && (
-          <div className="mb-8 p-6 bg-blue-600/5 border border-blue-500/20 rounded-[32px] animate-in zoom-in relative">
-              <button onClick={() => setShowGuide(false)} className="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors"><X size={16}/></button>
-              <div className="flex items-center gap-3 mb-5 text-blue-400">
-                  <BotIcon size={24} className="animate-bounce" />
-                  <p className="text-xs font-black uppercase tracking-tight italic">Neden Görünmüyor?</p>
-              </div>
-              <ul className="space-y-4">
-                  <li className="flex gap-4">
-                      <div className="w-6 h-6 bg-blue-600 rounded-lg flex items-center justify-center shrink-0 text-white font-black text-xs italic shadow-lg">1</div>
-                      <p className="text-[10px] text-slate-400 font-medium leading-relaxed">Botun kanalınızda <b>Yönetici</b> yetkisi olduğundan emin olun.</p>
-                  </li>
-                  <li className="flex gap-4">
-                      <div className="w-6 h-6 bg-blue-600 rounded-lg flex items-center justify-center shrink-0 text-white font-black text-xs italic shadow-lg">2</div>
-                      <p className="text-[10px] text-slate-400 font-medium leading-relaxed">Kanalda <b>/start</b> yazdıktan sonra bu sayfayı sağ üstten yenileyin.</p>
-                  </li>
-              </ul>
           </div>
       )}
 
@@ -141,13 +144,13 @@ const MyChannels = () => {
               <div className="w-20 h-20 bg-slate-900 rounded-full flex items-center justify-center text-slate-800"><Megaphone size={40} /></div>
               <div className="px-10">
                   <p className="text-slate-500 text-sm font-bold uppercase tracking-widest">Kanal Bulunamadı</p>
-                  <p className="text-[10px] text-slate-700 mt-2 italic font-medium">Lütfen botun çalıştığından emin olun.</p>
+                  <p className="text-[10px] text-slate-700 mt-2 italic font-medium">Botu kanalınıza ekleyip sinyal gönderin.</p>
               </div>
               <button 
                 onClick={handleManualRefresh} 
                 className="px-8 py-4 bg-slate-900 border border-slate-800 rounded-2xl text-[10px] font-black text-blue-500 uppercase tracking-widest hover:text-white transition-all active:scale-95"
               >
-                  Yeniden Tara
+                  Şimdi Tara
               </button>
           </div>
       ) : (
@@ -156,9 +159,22 @@ const MyChannels = () => {
                   <h2 className="text-[10px] font-black text-slate-700 uppercase tracking-[0.4em]">Bağlı Kanallar ({channels.length})</h2>
               </div>
               {channels.map(c => (
-                  <div key={c.id} className="bg-[#0f172a]/60 border border-slate-800 p-5 rounded-[32px] flex items-center justify-between group hover:bg-slate-900/60 transition-all shadow-xl animate-in slide-in-from-bottom-2">
+                  <div key={c.id} className="bg-[#0f172a]/60 border border-slate-800 p-5 rounded-[32px] flex items-center justify-between group hover:bg-slate-900/60 transition-all shadow-xl animate-in slide-in-from-bottom-2 relative overflow-hidden">
                       <div className="flex items-center gap-5">
-                          <img src={c.icon} className="w-14 h-14 rounded-2xl border border-slate-800 shadow-lg object-cover" />
+                          <div className="relative">
+                            <img 
+                                src={c.icon} 
+                                className="w-14 h-14 rounded-2xl border border-slate-800 shadow-lg object-cover bg-slate-900" 
+                                onError={(e) => {
+                                    (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(c.name)}&background=1e293b&color=fff`;
+                                }}
+                            />
+                            {autoSyncStatus === 'syncing' && (
+                                <div className="absolute inset-0 bg-blue-600/20 rounded-2xl animate-pulse flex items-center justify-center">
+                                    <Zap size={16} className="text-white fill-white" />
+                                </div>
+                            )}
+                          </div>
                           <div>
                               <p className="font-black text-white text-sm italic tracking-tight">{c.name}</p>
                               <div className="flex items-center gap-2 mt-1">

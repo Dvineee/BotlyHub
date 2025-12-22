@@ -12,28 +12,21 @@ export class DatabaseService {
   static async syncChannelsFromBotActivity(userId: string): Promise<number> {
       try {
           const uIdStr = String(userId).trim();
-          console.log("[SYNC] Tarama başlatıldı. Aranan Owner ID:", uIdStr);
           
+          // İşlenmemiş sinyalleri çek
           const { data: logs, error: logErr } = await supabase
               .from('bot_discovery_logs')
               .select('*')
               .eq('owner_id', uIdStr)
               .eq('is_synced', false);
 
-          if (logErr) {
-              console.error("[SYNC] Log çekme hatası:", logErr.message);
-              return 0;
-          }
-
-          if (!logs || logs.length === 0) {
-              console.log("[SYNC] İşlenecek yeni log yok.");
-              return 0;
-          }
+          if (logErr || !logs || logs.length === 0) return 0;
 
           let successCount = 0;
           for (const log of logs) {
               const botId = String(log.bot_id);
               
+              // Kanalı bul veya oluştur
               const { data: existing } = await supabase
                   .from('channels')
                   .select('*')
@@ -41,10 +34,10 @@ export class DatabaseService {
                   .eq('name', log.channel_name)
                   .maybeSingle();
 
+              // Botun gönderdiği fotoğraf URL'sini al, yoksa eskini koru, o da yoksa avatar oluştur
+              const logIcon = log.channel_icon;
+              
               let syncOk = false;
-              // Fotoğraf linkini hazırla (yoksa fallback oluştur)
-              const newIcon = log.channel_icon || `https://ui-avatars.com/api/?name=${encodeURIComponent(log.channel_name)}`;
-
               if (existing) {
                   const bots = Array.from(new Set([...(existing.connected_bot_ids || []), botId]));
                   const { error: upErr } = await supabase
@@ -52,7 +45,8 @@ export class DatabaseService {
                       .update({
                           member_count: log.member_count,
                           connected_bot_ids: bots,
-                          icon: log.channel_icon || existing.icon // Eğer bot yeni ikon gönderdiyse güncelle
+                          // KRİTİK: Bot her sinyal verdiğinde fotoğrafı güncelle
+                          icon: logIcon || existing.icon 
                       })
                       .eq('id', existing.id);
                   if (!upErr) syncOk = true;
@@ -63,7 +57,7 @@ export class DatabaseService {
                           user_id: uIdStr,
                           name: log.channel_name,
                           member_count: log.member_count || 0,
-                          icon: newIcon,
+                          icon: logIcon || `https://ui-avatars.com/api/?name=${encodeURIComponent(log.channel_name)}`,
                           connected_bot_ids: [botId],
                           revenue: 0
                       });
@@ -78,7 +72,7 @@ export class DatabaseService {
           
           return successCount;
       } catch (e) {
-          console.error("[SYNC] Kritik hata:", e);
+          console.error("[SYNC] Error:", e);
           return 0;
       }
   }
@@ -91,10 +85,7 @@ export class DatabaseService {
         .eq('user_id', uIdStr)
         .order('created_at', { ascending: false });
     
-    if (error) {
-        console.error("[GET-CHANNELS] Hata:", error.message);
-        return [];
-    }
+    if (error) return [];
     
     return (data || []).map(c => ({
         id: String(c.id),
