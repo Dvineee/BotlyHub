@@ -171,7 +171,18 @@ export class DatabaseService {
   }
 
   static async saveBot(bot: any) {
-    const dbPayload = { id: String(bot.id), name: String(bot.name), description: String(bot.description), price: Number(bot.price), category: String(bot.category), bot_link: String(bot.bot_link), screenshots: bot.screenshots || [], icon: String(bot.icon || '') };
+    const dbPayload = { 
+        id: String(bot.id), 
+        name: String(bot.name), 
+        description: String(bot.description), 
+        short_desc: String(bot.short_desc || ''),
+        price: Number(bot.price), 
+        category: String(bot.category), 
+        bot_link: String(bot.bot_link), 
+        is_premium: Boolean(bot.is_premium),
+        screenshots: bot.screenshots || [], 
+        icon: String(bot.icon || '') 
+    };
     const { error } = await supabase.from('bots').upsert(dbPayload, { onConflict: 'id' });
     if (error) throw error;
   }
@@ -181,15 +192,17 @@ export class DatabaseService {
     if (error) throw error;
   }
 
-  static async sendNotification(notification: any) {
-    const uniqueId = Math.random().toString(36).substring(2, 15);
-    const payload = { id: uniqueId, title: notification.title, message: notification.message, type: notification.type || 'system', target_type: 'global', user_id: null, date: new Date().toISOString(), isRead: false };
-    const { error } = await supabase.from('notifications').insert(payload);
-    if (error) throw error;
-  }
-
   static async saveSettings(settings: any) {
-    await supabase.from('settings').upsert({ id: 1, appName: settings.appName, MaintenanceMode: settings.maintenanceMode });
+    await supabase.from('settings').upsert({ 
+        id: 1, 
+        appName: settings.appName, 
+        MaintenanceMode: settings.maintenanceMode,
+        commissionRate: Number(settings.commissionRate),
+        supportLink: String(settings.supportLink),
+        termsUrl: String(settings.termsUrl),
+        instagramUrl: String(settings.instagramUrl),
+        telegramChannelUrl: String(settings.telegramChannelUrl)
+    });
   }
 
   static setAdminSession(token: string) { localStorage.setItem('admin_v3_session', token); }
