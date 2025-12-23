@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, Mail, Phone, Save, Loader2, CheckCircle2, Lock, ShieldCheck, AlertCircle, ArrowRight, Shield, BadgeCheck } from 'lucide-react';
+import { ChevronLeft, Mail, Save, Loader2, CheckCircle2, Lock, ShieldCheck, AlertCircle, ArrowRight, Shield, BadgeCheck } from 'lucide-react';
 import * as Router from 'react-router-dom';
 import { useTelegram } from '../hooks/useTelegram';
 import { DatabaseService } from '../services/DatabaseService';
@@ -14,7 +14,7 @@ const AccountSettings = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
-  const [formData, setFormData] = useState({ email: '', phone: '' });
+  const [formData, setFormData] = useState({ email: '' });
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
@@ -27,12 +27,10 @@ const AccountSettings = () => {
         try {
             const currentUser = await DatabaseService.getUserById(user.id.toString());
             if (currentUser) {
-                // Email veya telefon girilmişse sistemi kilitli/doğrulanmış kabul et
-                const verified = !!(currentUser.email || (currentUser.phone && currentUser.phone !== '+90 '));
+                const verified = !!currentUser.email;
                 setIsVerified(verified);
                 setFormData({
-                    email: currentUser.email || '',
-                    phone: currentUser.phone || '+90 '
+                    email: currentUser.email || ''
                 });
             }
         } catch (e) {
@@ -43,16 +41,6 @@ const AccountSettings = () => {
     };
     loadUserData();
   }, [user]);
-
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (isVerified) return;
-    let val = e.target.value;
-    if (!val.startsWith('+90 ')) {
-        val = '+90 ' + val.replace(/^\+90\s*/, '');
-    }
-    const suffix = val.slice(4).replace(/[^\d]/g, '').slice(0, 10);
-    setFormData({ ...formData, phone: '+90 ' + suffix });
-  };
 
   const handleSave = async () => {
     if (isVerified) return;
@@ -68,20 +56,13 @@ const AccountSettings = () => {
         return;
     }
 
-    const phoneDigits = formData.phone.replace(/\D/g, '');
-    if (phoneDigits.length > 2 && phoneDigits.length < 12) {
-        alert('Lütfen telefon numaranızı eksiksiz girin.');
-        return;
-    }
-
     setIsSaving(true);
     haptic('medium');
 
     try {
         const payload: Partial<User> = {
             id: user.id.toString(),
-            email: formData.email,
-            phone: phoneDigits.length <= 2 ? null : formData.phone
+            email: formData.email
         };
 
         await DatabaseService.syncUser(payload);
@@ -107,7 +88,6 @@ const AccountSettings = () => {
 
   return (
     <div className="min-h-screen bg-[#020617] flex flex-col animate-in fade-in">
-      {/* SaaS Header - Minimalist */}
       <div className="p-6 pt-12 flex items-center justify-between">
         <button onClick={() => navigate('/settings')} className="p-2.5 bg-slate-900/40 border border-slate-800 rounded-xl text-slate-500 hover:text-white transition-all">
           <ChevronLeft size={20} />
@@ -129,16 +109,14 @@ const AccountSettings = () => {
       </div>
 
       <div className="px-6 flex-1 max-w-lg mx-auto w-full mt-4">
-          {/* Intro Section */}
           <div className="mb-10">
               <h2 className="text-xl font-bold text-white mb-2 tracking-tight">Hesap Doğrulama</h2>
               <p className="text-xs text-slate-500 leading-relaxed font-medium">
-                  Kazanç yönetimi ve güvenli işlemler için kimlik bilgilerinizi bir kereliğine doğrulamalısınız.
+                  Kazanç yönetimi ve güvenli işlemler için e-posta adresinizi bir kereliğine doğrulamalısınız.
               </p>
           </div>
 
           <div className="space-y-8">
-              {/* Email Section */}
               <div className="space-y-3">
                   <div className="flex justify-between items-center px-1">
                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">E-Posta Adresi</label>
@@ -163,36 +141,11 @@ const AccountSettings = () => {
                   </div>
                   {!isVerified && (
                       <p className="text-[9px] text-slate-600 font-medium px-1">
-                        * Gelecek güncellemede bu adrese bir doğrulama kodu (OTP) gönderilecektir.
+                        * İletişim bilgileriniz güvenlik protokolü ile kilitlenecektir.
                       </p>
                   )}
               </div>
 
-              {/* Phone Section */}
-              <div className="space-y-3">
-                  <div className="flex justify-between items-center px-1">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Telefon Numarası (Opsiyonel)</label>
-                  </div>
-                  <div className="relative group">
-                      <div className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${isVerified ? 'text-slate-700' : 'text-slate-600 group-focus-within:text-blue-500'}`}>
-                        {isVerified ? <Lock size={16} /> : <Phone size={18} />}
-                      </div>
-                      <input 
-                        type="tel" 
-                        value={formData.phone} 
-                        disabled={isVerified}
-                        onChange={handlePhoneChange}
-                        className={`w-full py-4 pl-12 pr-6 text-sm font-semibold rounded-2xl border transition-all ${
-                            isVerified 
-                            ? 'bg-slate-900/20 border-slate-900/50 text-slate-500 cursor-not-allowed' 
-                            : 'bg-slate-900/40 border-slate-800 text-white focus:border-blue-500/50 outline-none'
-                        }`} 
-                        placeholder="+90 5XX XXX XX XX" 
-                      />
-                  </div>
-              </div>
-
-              {/* Status Message */}
               {errorMsg && (
                   <div className="p-4 bg-red-500/5 border border-red-500/10 rounded-xl flex items-center gap-3 animate-in shake">
                       <AlertCircle className="text-red-500" size={16} />
@@ -200,7 +153,6 @@ const AccountSettings = () => {
                   </div>
               )}
 
-              {/* Action Area */}
               <div className="pt-8">
                   {isVerified ? (
                       <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-6 text-center">
@@ -208,7 +160,7 @@ const AccountSettings = () => {
                               <ShieldCheck className="text-emerald-500" size={24} />
                           </div>
                           <h4 className="text-white font-bold text-sm mb-1">Hesap Doğrulandı</h4>
-                          <p className="text-[10px] text-slate-600 font-medium mb-6">İletişim bilgileriniz güvenlik protokolü ile kilitlenmiştir.</p>
+                          <p className="text-[10px] text-slate-600 font-medium mb-6">Profil bilgileriniz başarıyla güncellendi.</p>
                           <button 
                             onClick={() => navigate('/settings')}
                             className="w-full py-4 bg-slate-800 hover:bg-slate-750 text-white font-bold rounded-2xl text-[11px] uppercase tracking-widest transition-all flex items-center justify-center gap-2 active:scale-95"
@@ -229,7 +181,6 @@ const AccountSettings = () => {
           </div>
       </div>
 
-      {/* Footer Branding - Subtle */}
       <div className="p-10 flex flex-col items-center opacity-20 mt-auto">
           <div className="h-px w-8 bg-slate-700 mb-4"></div>
           <p className="text-[8px] font-black text-slate-500 uppercase tracking-[0.4em] italic">SECURE DATA PROTOCOL V3.2</p>

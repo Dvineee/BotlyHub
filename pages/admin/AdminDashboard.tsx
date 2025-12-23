@@ -64,7 +64,7 @@ const LogItem = ({ log }: { log: any }) => {
 
   const style = getLogStyle(log.type);
   const Icon = style.icon;
-  const logUser = log.users; // Joinden gelen kullanıcı verisi
+  const logUser = log.users;
 
   return (
     <div className="p-4 bg-slate-900/50 border border-slate-800 rounded-xl mb-3 hover:border-slate-700 transition-all group relative overflow-hidden">
@@ -76,7 +76,6 @@ const LogItem = ({ log }: { log: any }) => {
             <div>
                 <div className="flex items-center gap-2">
                     <p className="text-sm font-bold text-white leading-none">{log.title}</p>
-                    {/* KULLANICI BİLGİSİ BURAYA EKLENDİ */}
                     {logUser && (
                         <div className="flex items-center gap-1.5 px-2 py-0.5 bg-slate-950 border border-slate-800 rounded-md">
                             <img src={logUser.avatar} className="w-3.5 h-3.5 rounded-full object-cover" />
@@ -99,7 +98,6 @@ const LogItem = ({ log }: { log: any }) => {
       
       <p className="text-xs text-slate-400 mb-3 ml-11 leading-relaxed border-l-2 border-slate-800 pl-3 py-0.5">{log.description}</p>
       
-      {/* DETAYLI METADATA GÖSTERİMİ */}
       {log.metadata && Object.keys(log.metadata).length > 0 && (
           <div className="flex flex-wrap gap-2 ml-11 pt-2 border-t border-slate-800/50">
               {Object.entries(log.metadata).map(([key, val]: any) => (
@@ -143,7 +141,6 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-[#020617] flex text-slate-200 font-sans overflow-hidden">
-      {/* Sidebar */}
       <aside className={`fixed inset-y-0 left-0 z-[70] w-64 bg-slate-900 border-r border-slate-800 transition-transform lg:relative lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="h-full flex flex-col p-6">
           <div className="flex items-center gap-3 mb-10 px-2">
@@ -164,7 +161,6 @@ const AdminDashboard = () => {
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="flex-1 flex flex-col overflow-hidden">
         <header className="h-16 border-b border-slate-800 flex items-center justify-between px-8 bg-slate-950/50 backdrop-blur-md shrink-0 z-50">
            <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 bg-slate-900 rounded-lg text-slate-400"><Menu size={20}/></button>
@@ -212,7 +208,6 @@ const HomeView = () => {
             const statData = await DatabaseService.getAdminStats();
             setStats(statData);
             
-            // Kullanıcı Joinli sorgu yapılıyor
             const { data: logs } = await supabase
                 .from('activity_logs')
                 .select('*, users(username, avatar)')
@@ -387,14 +382,19 @@ const SalesManagement = () => {
 };
 
 const BotManagement = () => {
-    const [bots, setBots] = useState<BotType[]>([]);
+    const [bots, setBots] = useState<any[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingBot, setEditingBot] = useState<Partial<BotType> | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [isFetchingIcon, setIsFetchingIcon] = useState(false);
 
     useEffect(() => { load(); }, []);
-    const load = async () => { setIsLoading(true); setBots(await DatabaseService.getBots()); setIsLoading(false); };
+    const load = async () => { 
+        setIsLoading(true); 
+        const botData = await DatabaseService.getBotsWithStats();
+        setBots(botData); 
+        setIsLoading(false); 
+    };
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -439,7 +439,14 @@ const BotManagement = () => {
                                     <span className="text-[9px] font-bold text-slate-500 uppercase bg-slate-950 px-2 py-0.5 rounded border border-slate-800 tracking-tighter italic">ID: {b.id}</span>
                                     <span className="text-[9px] font-bold text-blue-500 uppercase italic tracking-widest">{CATEGORY_NAMES[b.category] || b.category}</span>
                                 </div>
-                                <p className="text-xs font-black text-white italic flex items-center gap-1.5"><Star size={12} className="text-yellow-500" fill="currentColor"/> {b.price} Yıldız</p>
+                                <div className="flex items-center justify-between">
+                                    <p className="text-xs font-black text-white italic flex items-center gap-1.5"><Star size={12} className="text-yellow-500" fill="currentColor"/> {b.price} Yıldız</p>
+                                    {/* Toplam kullanıcı sayısı buraya eklendi */}
+                                    <div className="flex items-center gap-1 px-2 py-1 bg-blue-500/10 border border-blue-500/20 rounded text-[9px] font-bold text-blue-400 italic">
+                                        <Users size={10} />
+                                        <span>{b.ownerCount} SAHİP</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <p className="text-xs text-slate-500 line-clamp-3 mb-6 font-medium leading-relaxed italic">{b.description}</p>
@@ -546,7 +553,7 @@ const UserManagement = () => {
                         <thead className="bg-slate-950/50 border-b border-slate-800 text-[10px] font-bold text-slate-600 uppercase tracking-widest">
                             <tr>
                                 <th className="px-6 py-5">Üye Profili</th>
-                                <th className="px-6 py-5">İletişim Detayları</th>
+                                <th className="px-6 py-5">E-Posta</th>
                                 <th className="px-6 py-5">Platform Katılımı</th>
                                 <th className="px-6 py-5">Durum</th>
                                 <th className="px-6 py-5 text-right">Aksiyonlar</th>
@@ -570,10 +577,7 @@ const UserManagement = () => {
                                         </div>
                                     </td>
                                     <td className="px-6 py-5 text-[10px] text-slate-400 font-bold">
-                                        {/* Fix: Mail icon is now defined */}
                                         <p className="flex items-center gap-2"><Mail size={12} className="text-slate-600"/> {u.email || 'Mail Tanımlanmadı'}</p>
-                                        {/* Fix: Phone icon is now defined */}
-                                        <p className="flex items-center gap-2 mt-1.5"><Phone size={12} className="text-slate-600"/> {u.phone || 'Telefon Tanımlanmadı'}</p>
                                     </td>
                                     <td className="px-6 py-5 text-[10px] text-slate-500 font-bold uppercase italic tracking-tighter">
                                         {u.joinDate ? new Date(u.joinDate).toLocaleDateString('tr-TR', { day: '2-digit', month: 'long', year: 'numeric' }) : 'Kayıt Tarihi Yok'}
@@ -602,41 +606,67 @@ const UserManagement = () => {
 
 const NotificationCenter = () => {
     const [isLoading, setIsLoading] = useState(false);
-    const [form, setForm] = useState({ title: '', message: '', type: 'system' as any });
+    const [form, setForm] = useState({ title: '', message: '', type: 'system' as any, target_type: 'global', user_id: '' });
 
     const handleSend = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (form.target_type === 'user' && !form.user_id) {
+            alert("Lütfen bir kullanıcı ID girin.");
+            return;
+        }
         setIsLoading(true);
-        await DatabaseService.sendNotification({ ...form, target_type: 'global' });
-        setIsLoading(false);
-        setForm({ title: '', message: '', type: 'system' });
-        alert("Global duyuru tüm kullanıcılara ulaştırıldı.");
+        try {
+            await DatabaseService.sendNotification(form);
+            alert(form.target_type === 'global' ? "Global duyuru ulaştırıldı." : "Bireysel bildirim gönderildi.");
+            setForm({ title: '', message: '', type: 'system', target_type: 'global', user_id: '' });
+        } catch (e: any) {
+            alert("Hata: " + e.message);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
         <div className="animate-in fade-in space-y-6">
-            <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Global Duyuru Yönetimi</h2>
+            <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Duyuru & Bildirim Yönetimi</h2>
             <div className="bg-slate-900 border border-slate-800 p-8 rounded-2xl max-w-xl shadow-2xl relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/5 blur-[50px] pointer-events-none"></div>
                 <form onSubmit={handleSend} className="space-y-6 relative z-10">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Hedef Kitle</label>
+                            <select value={form.target_type} onChange={e => setForm({...form, target_type: e.target.value as any})} className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-xs font-bold text-white outline-none focus:border-blue-500 appearance-none italic shadow-inner">
+                                <option value="global">Tüm Kullanıcılar</option>
+                                <option value="user">Tekil Kullanıcı (ID)</option>
+                            </select>
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Kategori</label>
+                            <select value={form.type} onChange={e => setForm({...form, type: e.target.value as any})} className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-xs font-bold text-white outline-none focus:border-blue-500 appearance-none italic shadow-inner">
+                                <option value="system">Duyuru</option>
+                                <option value="payment">Ödeme</option>
+                                <option value="security">Güvenlik</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    {form.target_type === 'user' && (
+                        <div className="space-y-1.5 animate-in slide-in-from-top-2">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Kullanıcı ID</label>
+                            <input required type="text" value={form.user_id} onChange={e => setForm({...form, user_id: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-xs font-bold text-white outline-none focus:border-blue-500 shadow-inner" placeholder="örn: 123456789" />
+                        </div>
+                    )}
+
                     <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Yayın Kategorisi</label>
-                        <select value={form.type} onChange={e => setForm({...form, type: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-xs font-bold text-white outline-none focus:border-blue-500 appearance-none italic shadow-inner">
-                            <option value="system">Duyuru / Tanıtım</option>
-                            <option value="payment">Ödeme / Finansal Uyarı</option>
-                            <option value="security">Güvenlik / Teknik Bakım</option>
-                        </select>
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Başlık</label>
+                        <input required type="text" value={form.title} onChange={e => setForm({...form, title: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-xs font-bold text-white outline-none focus:border-blue-500 shadow-inner" placeholder="Mesaj başlığı..." />
                     </div>
                     <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Yayın Başlığı</label>
-                        <input required type="text" value={form.title} onChange={e => setForm({...form, title: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-xs font-bold text-white outline-none focus:border-blue-500 shadow-inner" placeholder="örn: Premium Botlarda İndirim!" />
-                    </div>
-                    <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Duyuru Detayı</label>
-                        <textarea required value={form.message} onChange={e => setForm({...form, message: (e.target as any).value})} className="w-full h-36 bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-xs font-medium text-slate-300 outline-none focus:border-blue-500 resize-none shadow-inner leading-relaxed" placeholder="Tüm üyelere iletilecek global mesaj içeriği..." />
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">İçerik</label>
+                        <textarea required value={form.message} onChange={e => setForm({...form, message: e.target.value})} className="w-full h-36 bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-xs font-medium text-slate-300 outline-none focus:border-blue-500 resize-none shadow-inner leading-relaxed" placeholder="Gönderilecek mesaj içeriği..." />
                     </div>
                     <button type="submit" disabled={isLoading} className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-xl text-xs uppercase tracking-[0.4em] shadow-xl shadow-blue-900/20 active:scale-95 transition-all flex items-center justify-center gap-3">
-                        {isLoading ? <Loader2 className="animate-spin" size={20}/> : <><Send size={18} /> YAYINI BAŞLAT</>}
+                        {isLoading ? <Loader2 className="animate-spin" size={20}/> : <><Send size={18} /> BİLDİRİMİ GÖNDER</>}
                     </button>
                 </form>
             </div>

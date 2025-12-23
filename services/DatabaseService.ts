@@ -9,9 +9,6 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export class DatabaseService {
   
-  /**
-   * Merkezi Loglama Sistemi - Detaylandırılmış Metadata Desteği
-   */
   static async logActivity(
       userId: string, 
       type: ActivityLog['type'], 
@@ -97,7 +94,6 @@ export class DatabaseService {
                   await supabase.from('bot_discovery_logs').update({ is_synced: true }).eq('id', log.id);
                   successCount++;
                   
-                  // Her bir kanal için detaylı log
                   await this.logActivity(
                       uIdStr, 
                       'channel_sync', 
@@ -179,6 +175,16 @@ export class DatabaseService {
     return data || [];
   }
 
+  static async getBotsWithStats(): Promise<any[]> {
+      const { data: bots } = await supabase.from('bots').select('*').order('id', { ascending: false });
+      const { data: owners } = await supabase.from('user_bots').select('bot_id');
+      
+      return (bots || []).map(bot => ({
+          ...bot,
+          ownerCount: (owners || []).filter(o => o.bot_id === bot.id).length
+      }));
+  }
+
   static async getUserBots(userId: string): Promise<UserBot[]> {
     const { data } = await supabase.from('user_bots').select('*, bots(*)').eq('user_id', userId.toString());
     if (!data) return [];
@@ -197,8 +203,8 @@ export class DatabaseService {
   static async syncUser(user: Partial<User>) {
     if (!user.id) return;
     const { error } = await supabase.from('users').upsert({ id: user.id.toString(), name: user.name, username: user.username, avatar: user.avatar, email: user.email, phone: user.phone, joindate: new Date().toISOString() }, { onConflict: 'id' });
-    if (!error && (user.email || user.phone)) {
-        await this.logActivity(user.id.toString(), 'security', 'profile_updated', 'Profil Bilgileri Güncellendi', 'Kullanıcı iletişim/güvenlik verilerini güncelledi.', { email: user.email, phone: user.phone });
+    if (!error && user.email) {
+        await this.logActivity(user.id.toString(), 'security', 'profile_updated', 'Profil Bilgileri Güncellendi', 'Kullanıcı iletişim/güvenlik verilerini güncelledi.', { email: user.email });
     }
   }
 
@@ -215,7 +221,10 @@ export class DatabaseService {
 
   static async getNotifications(userId?: string): Promise<Notification[]> {
     let query = supabase.from('notifications').select('*').order('date', { ascending: false });
-    if (userId) query = query.or(`user_id.eq.${userId},target_type.eq.global`);
+    if (userId) {
+        // Fix: Ensure OR logic works correctly for global or targeted notifications
+        query = query.or(`user_id.eq.${userId},target_type.eq.global`);
+    }
     const { data } = await query;
     return data || [];
   }
@@ -232,15 +241,6 @@ export class DatabaseService {
   static async getAnnouncements(): Promise<Announcement[]> {
     const { data } = await supabase.from('announcements').select('*').order('id', { ascending: false });
     return data || [];
-  }
-
-  static async getUserDetailedAssets(userId: string) {
-    const [channels, logs, userBotsRaw] = await Promise.all([
-      this.getChannels(userId),
-      this.getUserActivityLogs(userId),
-      supabase.from('user_bots').select('*, bots(*)').eq('user_id', userId.toString())
-    ]);
-    return { channels, logs, userBots: (userBotsRaw.data || []).map((ub: any) => ({ ownership: ub, bot: ub.bots })) };
   }
 
   static async getUsers(): Promise<User[]> {
@@ -275,7 +275,18 @@ export class DatabaseService {
   }
 
   static async sendNotification(notification: any) {
-    await supabase.from('notifications').insert({ title: notification.title, message: notification.message, type: notification.type || 'system', target_type: notification.target_type || 'global', user_id: notification.user_id || null, date: new Date().toISOString(), is_read: false });
+    // Fix: Explicitly handle user_id for non-global notifications to ensure delivery
+    const payload = {
+        title: notification.title,
+        message: notification.message,
+        type: notification.type || 'system',
+        target_type: notification.target_type || 'global',
+        user_id: notification.target_type === 'user' ? notification.user_id : null,
+        date: new Date().toISOString(),
+        is_read: false
+    };
+    const { error } = await supabase.from('notifications').insert(payload);
+    if (error) throw error;
   }
 
   static async saveAnnouncement(ann: Partial<Announcement>) {
