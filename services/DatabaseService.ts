@@ -259,7 +259,6 @@ export class DatabaseService {
   }
 
   static async markNotificationRead(id: string) {
-    // Hem isRead hem is_read sütunlarını güncellemeyi dene (hangisi varsa o çalışır)
     await supabase.from('notifications').update({ isRead: true, is_read: true }).eq('id', id);
   }
 
@@ -305,7 +304,6 @@ export class DatabaseService {
   }
 
   static async sendNotification(notification: any) {
-    // Column 'id' violates not-null constraint hatasını önlemek için benzersiz bir ID üret
     const uniqueId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     
     const payload = {
@@ -313,8 +311,8 @@ export class DatabaseService {
         title: notification.title,
         message: notification.message,
         type: notification.type || 'system',
-        target_type: notification.target_type || 'global',
-        user_id: notification.user_id || null, 
+        target_type: 'global', // Her zaman global yapıldı
+        user_id: null, 
         date: new Date().toISOString(),
         isRead: false,
         is_read: false 
