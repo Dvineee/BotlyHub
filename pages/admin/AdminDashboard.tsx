@@ -156,12 +156,15 @@ const HomeView = () => {
                 <StatCard label="Platform Üyesi" value={stats.userCount} icon={Users} color="blue" />
                 <StatCard label="Aktif Botlar" value={stats.botCount} icon={Bot} color="purple" />
                 <StatCard label="Kütüphane Kaydı" value={stats.salesCount} icon={Wallet} color="emerald" />
-                <StatCard label="Denetim Kaydı" value={stats.logCount} icon={Activity} color="orange" />
+                <StatCard label="Denetim Kaydı" value={stats.logCount} icon={Activity} color="orange" trend="5" />
             </div>
-            <div className="bg-slate-900 border border-white/5 rounded-[32px] p-8 shadow-xl relative overflow-hidden">
-                <h3 className="text-xs font-bold text-white uppercase tracking-widest mb-8 flex items-center gap-2 relative z-10"><ShieldCheck size={16} className="text-blue-500" /> Audit Log (Sistem Denetimi)</h3>
+            <div className="bg-slate-900/40 border border-white/5 rounded-[48px] p-10 shadow-2xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/5 blur-[100px] rounded-full"></div>
+                <h3 className="text-xs font-bold text-white uppercase tracking-widest mb-10 flex items-center gap-3 relative z-10">
+                    <ShieldCheck size={18} className="text-blue-500" /> Audit Log (İşlem Geçmişi)
+                </h3>
                 <div className="space-y-1 relative z-10">
-                    {isLoading ? <div className="py-20 text-center text-slate-800 animate-pulse font-bold uppercase text-[10px]">İşlemler taranıyor...</div> : 
+                    {isLoading ? <div className="py-20 text-center text-slate-800 animate-pulse font-bold uppercase text-[10px] italic tracking-widest">Sinyaller Taranıyor...</div> : 
                     combinedLogs.map(log => <LogItem key={log.id} log={log} />)}
                 </div>
             </div>
@@ -192,7 +195,7 @@ const AdsManagement = () => {
             setFormData({ title: '', content: '', image_url: '' });
             setIsModalOpen(false);
             loadAds();
-            alert("Reklam sıraya alındı!");
+            alert("Reklam yayına hazır!");
         } catch (e) { console.error(e); } finally { setIsLoading(false); }
     };
 
@@ -201,46 +204,57 @@ const AdsManagement = () => {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Reklam Yayıncılığı</h2>
-                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Kanallara anlık reklam servis edin ve etkileşimi ölçün.</p>
+                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Botlar üzerinden kanallara reklam servis edin.</p>
                 </div>
-                <button onClick={() => setIsModalOpen(true)} className="w-full sm:w-auto px-8 py-4 bg-white text-slate-950 hover:bg-blue-500 hover:text-white rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl active:scale-95 transition-all">
-                    <PlusCircle size={18}/> REKLAM OLUŞTUR
+                <button onClick={() => setIsModalOpen(true)} className="w-full sm:w-auto px-8 py-4 bg-white text-slate-950 hover:bg-blue-600 hover:text-white rounded-3xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl active:scale-95">
+                    <PlusCircle size={18} className="inline mr-2"/> YENİ REKLAM
                 </button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <StatCard label="Toplam Gönderim" value={ads.length} icon={Radio} color="blue" />
-                <StatCard label="Bekleyen Yayın" value={ads.filter(a => a.status === 'pending').length} icon={RefreshCw} color="purple" />
-                <StatCard label="Toplam Erişim" value={ads.reduce((acc, curr) => acc + curr.total_reach, 0).toLocaleString()} icon={Eye} color="emerald" trend="12" />
-                <StatCard label="Kanal Sayısı" value={ads.reduce((acc, curr) => acc + curr.channel_count, 0)} icon={Target} color="orange" />
-            </div>
-            <div className="bg-slate-900 border border-white/5 rounded-[32px] overflow-hidden">
+            
+            <div className="bg-slate-900 border border-white/5 rounded-[48px] overflow-hidden shadow-2xl">
                 <table className="w-full text-left text-xs">
                     <thead className="bg-slate-950/50 border-b border-white/5 text-slate-500 font-bold uppercase">
-                        <tr><th className="px-6 py-5">Reklam</th><th className="px-6 py-5">Durum</th><th className="px-6 py-5">Performans</th><th className="px-6 py-5 text-right">İşlem</th></tr>
+                        <tr>
+                            <th className="px-8 py-6">Reklam Kampanyası</th>
+                            <th className="px-8 py-6">Durum</th>
+                            <th className="px-8 py-6 text-right">Erişim</th>
+                            <th className="px-8 py-6 text-right">İşlem</th>
+                        </tr>
                     </thead>
                     <tbody className="divide-y divide-white/5">
                         {ads.map(ad => (
-                            <tr key={ad.id} className="hover:bg-white/5 transition-colors">
-                                <td className="px-6 py-5"><p className="font-bold text-white">{ad.title}</p></td>
-                                <td className="px-6 py-5"><span className="text-blue-400 font-black text-[9px] uppercase">{ad.status}</span></td>
-                                <td className="px-6 py-5"><div className="flex items-center gap-2 text-emerald-500 font-black"><TrendingUp size={14}/><span>{ad.total_reach}</span></div></td>
-                                <td className="px-6 py-5 text-right"><button onClick={async () => { if(confirm("Sil?")) { await DatabaseService.deleteAd(ad.id); loadAds(); } }} className="p-2 bg-slate-800 rounded-xl"><Trash2 size={16}/></button></td>
+                            <tr key={ad.id} className="hover:bg-white/2 transition-colors">
+                                <td className="px-8 py-6"><p className="font-bold text-white uppercase italic tracking-tight">{ad.title}</p></td>
+                                <td className="px-8 py-6">
+                                    <span className="px-2 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded font-black text-[9px] uppercase tracking-tighter">
+                                        {ad.status}
+                                    </span>
+                                </td>
+                                <td className="px-8 py-6 text-right font-black text-emerald-500">
+                                    <TrendingUp size={14} className="inline mr-1"/> {ad.total_reach}
+                                </td>
+                                <td className="px-8 py-6 text-right">
+                                    <button onClick={async () => { if(confirm("Silmek istiyor musunuz?")) { await DatabaseService.deleteAd(ad.id); loadAds(); } }} className="p-3 bg-slate-800 hover:bg-red-600 rounded-2xl text-slate-400 hover:text-white transition-all">
+                                        <Trash2 size={16}/>
+                                    </button>
+                                </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
             </div>
+
             {isModalOpen && (
                  <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/95 backdrop-blur-xl animate-in fade-in">
-                    <div className="bg-[#020617] w-full max-w-2xl rounded-[48px] border border-white/10 p-10 shadow-2xl relative">
-                        <div className="flex justify-between items-center mb-8">
-                            <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter">Yayın Hazırla</h3>
+                    <div className="bg-[#020617] w-full max-w-2xl rounded-[48px] border border-white/10 p-12 shadow-2xl relative">
+                        <div className="flex justify-between items-center mb-10">
+                            <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter">Kampanya Hazırla</h3>
                             <button onClick={() => setIsModalOpen(false)} className="p-3 bg-slate-900 rounded-2xl text-slate-500 hover:text-white transition-colors"><X size={20}/></button>
                         </div>
                         <form onSubmit={handleCreate} className="space-y-6">
-                            <input required type="text" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="w-full bg-slate-950 border border-white/5 rounded-2xl p-5 text-xs font-bold text-white outline-none" placeholder="Reklam Başlığı" />
-                            <textarea required value={formData.content} onChange={e => setFormData({...formData, content: e.target.value})} className="w-full h-40 bg-slate-950 border border-white/5 rounded-2xl p-5 text-xs font-medium text-slate-300 outline-none" placeholder="Reklam Metni" />
-                            <button type="submit" disabled={isLoading} className="w-full py-6 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-2xl text-[11px] uppercase tracking-[0.4em] shadow-xl transition-all">
+                            <input required type="text" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="w-full bg-slate-950 border border-white/5 rounded-3xl p-6 text-xs font-bold text-white outline-none focus:border-blue-500" placeholder="Reklam Başlığı" />
+                            <textarea required value={formData.content} onChange={e => setFormData({...formData, content: e.target.value})} className="w-full h-40 bg-slate-950 border border-white/5 rounded-3xl p-6 text-xs font-medium text-slate-300 outline-none focus:border-blue-500 resize-none" placeholder="Reklam Metni" />
+                            <button type="submit" disabled={isLoading} className="w-full py-6 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-[32px] text-[11px] uppercase tracking-[0.4em] shadow-xl">
                                 {isLoading ? <Loader2 className="animate-spin" size={20}/> : 'YAYINI BAŞLAT'}
                             </button>
                         </form>
@@ -268,62 +282,88 @@ const BotManagement = () => {
             await DatabaseService.saveBot(editingBot!);
             setIsModalOpen(false);
             load();
-            alert("Katalog güncellendi!");
-        } catch (err: any) { alert("Hata oluştu."); } finally { setIsLoading(false); }
+            alert("Ürün katalog verileri güncellendi.");
+        } catch (err: any) { alert("Güncelleme başarısız."); } finally { setIsLoading(false); }
     };
 
     return (
-        <div className="animate-in fade-in space-y-8">
+        <div className="animate-in fade-in space-y-10">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Market Kataloğu</h2>
-                <button onClick={() => { setEditingBot({ id: 'bot_' + Math.random().toString(36).substr(2, 5), name: '', description: '', price: 0, category: 'productivity', bot_link: '', screenshots: [] }); setIsModalOpen(true); }} className="px-8 py-4 bg-blue-600 hover:bg-blue-500 rounded-2xl text-[10px] font-black text-white flex items-center gap-3 transition-all active:scale-95">
+                <div>
+                    <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Katalog Yönetimi</h2>
+                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Platformdaki ürünleri ve market vitrinini yönetin.</p>
+                </div>
+                <button onClick={() => { setEditingBot({ id: 'bot_' + Math.random().toString(36).substr(2, 5), name: '', description: '', price: 0, category: 'productivity', bot_link: '', screenshots: [] }); setIsModalOpen(true); }} className="px-8 py-4 bg-blue-600 hover:bg-blue-500 rounded-3xl text-[10px] font-black text-white flex items-center gap-3 transition-all active:scale-95 shadow-xl">
                     <Plus size={18}/> YENİ ÜRÜN EKLE
                 </button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {bots.map(b => (
-                    <div key={b.id} className="bg-slate-900 border border-white/5 p-6 rounded-[32px] hover:border-blue-500/30 transition-all shadow-xl group">
-                        <div className="flex gap-5 mb-6">
-                            <img src={b.bot_link ? `https://t.me/i/userpic/320/${b.bot_link.replace('@','')}.jpg` : ''} className="w-16 h-16 rounded-[22px] object-cover bg-slate-800 border-2 border-slate-800" />
-                            <div className="min-w-0 flex-1">
-                                <h4 className="font-black text-white text-base truncate italic uppercase tracking-tighter">{b.name}</h4>
-                                <p className="text-[10px] text-blue-500 font-black mt-1 uppercase tracking-widest">{b.price} STARS</p>
+                    <div key={b.id} className="bg-slate-900 border border-white/5 p-8 rounded-[48px] hover:border-blue-500/30 transition-all shadow-2xl group relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                            <Bot size={80} />
+                        </div>
+                        <div className="flex gap-6 mb-8 relative z-10">
+                            <img src={b.bot_link ? `https://t.me/i/userpic/320/${b.bot_link.replace('@','')}.jpg` : ''} className="w-20 h-20 rounded-[32px] object-cover bg-slate-800 border-2 border-slate-800 shadow-xl" />
+                            <div className="min-w-0 flex-1 flex flex-col justify-center">
+                                <h4 className="font-black text-white text-lg truncate italic uppercase tracking-tighter">{b.name}</h4>
+                                <p className="text-[10px] text-blue-500 font-black mt-2 uppercase tracking-[0.2em]">{b.price} STARS</p>
                             </div>
                         </div>
-                        <div className="flex gap-2">
-                            <button onClick={() => { setEditingBot(b); setIsModalOpen(true); }} className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-white font-black text-[10px] rounded-xl uppercase tracking-widest transition-all">YAPILANDIR</button>
-                            <button onClick={async () => { if(confirm("Botu sil?")) { await DatabaseService.deleteBot(b.id); load(); } }} className="p-3 bg-slate-800 hover:bg-red-600 text-slate-400 hover:text-white rounded-xl transition-all"><Trash2 size={16}/></button>
+                        <div className="flex gap-3 relative z-10">
+                            <button onClick={() => { setEditingBot(b); setIsModalOpen(true); }} className="flex-1 py-4 bg-slate-850 hover:bg-slate-800 text-white font-black text-[10px] rounded-[20px] uppercase tracking-widest transition-all">YAPILANDIR</button>
+                            <button onClick={async () => { if(confirm("Ürünü silmek istediğinize emin misiniz?")) { await DatabaseService.deleteBot(b.id); load(); } }} className="p-4 bg-slate-850 hover:bg-red-600/20 text-slate-500 hover:text-red-500 rounded-[20px] transition-all"><Trash2 size={18}/></button>
                         </div>
                     </div>
                 ))}
             </div>
+
             {isModalOpen && editingBot && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/95 backdrop-blur-xl animate-in fade-in overflow-y-auto">
-                    <div className="bg-[#020617] w-full max-w-4xl my-auto rounded-[48px] border border-white/10 p-10 shadow-2xl relative">
-                        <div className="flex justify-between items-center mb-10">
-                            <h3 className="text-xl font-black text-white uppercase italic tracking-tighter">Bot Ürün Bilgisi</h3>
-                            <button onClick={() => setIsModalOpen(false)} className="p-3 bg-slate-800 text-slate-400 rounded-2xl"><X size={24}/></button>
-                        </div>
-                        <form onSubmit={handleSave} className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div className="space-y-6">
-                                <input required type="text" value={editingBot.id} onChange={e => setEditingBot({...editingBot, id: e.target.value})} className="w-full bg-slate-950 border border-white/5 rounded-2xl p-5 text-xs font-bold text-white outline-none" placeholder="Bot ID" />
-                                <input required type="text" value={editingBot.name} onChange={e => setEditingBot({...editingBot, name: e.target.value})} className="w-full bg-slate-950 border border-white/5 rounded-2xl p-5 text-xs font-bold text-white outline-none" placeholder="Bot İsmi" />
-                                <input required type="text" value={editingBot.bot_link?.replace('@','')} onChange={e => setEditingBot({...editingBot, bot_link: '@' + e.target.value})} className="w-full bg-slate-950 border border-white/5 rounded-2xl p-5 text-xs font-bold text-white outline-none" placeholder="Telegram Username" />
-                                <input type="number" value={editingBot.price} onChange={e => setEditingBot({...editingBot, price: Number(e.target.value)})} className="w-full bg-slate-950 border border-white/5 rounded-2xl p-5 text-xs font-bold text-white outline-none" placeholder="Fiyat (Stars)" />
+                    <div className="bg-[#020617] w-full max-w-4xl my-auto rounded-[64px] border border-white/10 p-12 shadow-2xl relative">
+                        <div className="flex justify-between items-center mb-12">
+                            <div>
+                                <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter">Bot Ürün Yapılandırması</h3>
+                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Bot teknik detaylarını ve fiyatlandırmasını girin.</p>
                             </div>
+                            <button onClick={() => setIsModalOpen(false)} className="p-4 bg-slate-900 rounded-[24px] text-slate-500 hover:text-white transition-colors"><X size={28}/></button>
+                        </div>
+                        <form onSubmit={handleSave} className="grid grid-cols-1 md:grid-cols-2 gap-10">
                             <div className="space-y-6">
-                                <textarea value={editingBot.description} onChange={e => setEditingBot({...editingBot, description: e.target.value})} className="w-full h-32 bg-slate-950 border border-white/5 rounded-2xl p-5 text-xs font-medium text-slate-300 outline-none" placeholder="Ürün Açıklaması" />
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Kategori</label>
-                                    <select value={editingBot.category} onChange={e => setEditingBot({...editingBot, category: e.target.value})} className="w-full bg-slate-950 border border-white/5 rounded-2xl p-5 text-xs font-bold text-white outline-none">
-                                        <option value="productivity">Üretkenlik</option>
-                                        <option value="games">Oyun</option>
-                                        <option value="utilities">Araçlar</option>
-                                        <option value="moderation">Yönetim</option>
+                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Bot Benzersiz Kimlik (ID)</label>
+                                    <input required type="text" value={editingBot.id} onChange={e => setEditingBot({...editingBot, id: e.target.value})} className="w-full bg-slate-950 border border-white/5 rounded-[24px] p-6 text-xs font-bold text-white outline-none focus:border-blue-500" placeholder="Örn: task_master" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Ürün İsmi</label>
+                                    <input required type="text" value={editingBot.name} onChange={e => setEditingBot({...editingBot, name: e.target.value})} className="w-full bg-slate-950 border border-white/5 rounded-[24px] p-6 text-xs font-bold text-white outline-none focus:border-blue-500" placeholder="Bot İsmi" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Telegram Kullanıcı Adı</label>
+                                    <input required type="text" value={editingBot.bot_link?.replace('@','')} onChange={e => setEditingBot({...editingBot, bot_link: '@' + e.target.value})} className="w-full bg-slate-950 border border-white/5 rounded-[24px] p-6 text-xs font-bold text-white outline-none focus:border-blue-500" placeholder="@username" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Satış Fiyatı (Stars)</label>
+                                    <input type="number" value={editingBot.price} onChange={e => setEditingBot({...editingBot, price: Number(e.target.value)})} className="w-full bg-slate-950 border border-white/5 rounded-[24px] p-6 text-xs font-bold text-white outline-none focus:border-blue-500" placeholder="Fiyat" />
+                                </div>
+                            </div>
+                            <div className="space-y-6 flex flex-col">
+                                <div className="space-y-2 flex-1">
+                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Detaylı Açıklama</label>
+                                    <textarea value={editingBot.description} onChange={e => setEditingBot({...editingBot, description: e.target.value})} className="w-full h-full min-h-[160px] bg-slate-950 border border-white/5 rounded-[32px] p-6 text-xs font-medium text-slate-300 outline-none focus:border-blue-500 resize-none" placeholder="Ürün özelliklerini buraya yazın..." />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Vitrindeki Kategorisi</label>
+                                    <select value={editingBot.category} onChange={e => setEditingBot({...editingBot, category: e.target.value})} className="w-full bg-slate-950 border border-white/5 rounded-[24px] p-6 text-xs font-bold text-white outline-none focus:border-blue-500 appearance-none">
+                                        <option value="productivity">Üretkenlik & İş</option>
+                                        <option value="games">Eğlence & Oyun</option>
+                                        <option value="utilities">Servisler & Araçlar</option>
+                                        <option value="moderation">Moderasyon & Yönetim</option>
                                     </select>
                                 </div>
-                                <button type="submit" disabled={isLoading} className="w-full py-6 bg-blue-600 text-white font-black rounded-3xl text-[10px] uppercase tracking-[0.4em] shadow-xl">
-                                    {isLoading ? <Loader2 className="animate-spin mx-auto" size={20}/> : 'DEĞİŞİKLİKLERİ KAYDET'}
+                                <button type="submit" disabled={isLoading} className="w-full py-6 bg-blue-600 text-white font-black rounded-[32px] text-[11px] uppercase tracking-[0.4em] shadow-xl mt-4">
+                                    {isLoading ? <Loader2 className="animate-spin mx-auto" size={24}/> : 'SİSTEM VERİLERİNİ GÜNCELLE'}
                                 </button>
                             </div>
                         </form>
@@ -341,7 +381,7 @@ const NotificationCenter = () => {
 
     useEffect(() => { load(); }, []);
     const load = async () => {
-        const { data } = await supabase.from('notifications').select('*').eq('target_type', 'global').order('date', { ascending: false }).limit(5);
+        const { data } = await supabase.from('notifications').select('*').eq('target_type', 'global').order('date', { ascending: false }).limit(6);
         setRecentNotes(data || []);
     };
 
@@ -352,46 +392,59 @@ const NotificationCenter = () => {
             await DatabaseService.sendNotification({ ...form, target_type: 'global' });
             setForm({ title: '', message: '', type: 'system' });
             load();
-            alert("Global duyuru başarıyla yayınlandı!");
-        } catch (err) { alert("Hata oluştu."); } finally { setIsLoading(false); }
+            alert("Global yayın tüm üyelere başarıyla aktarıldı!");
+        } catch (err) { alert("Yayın hatası."); } finally { setIsLoading(false); }
     };
 
     return (
-        <div className="animate-in fade-in space-y-8">
-            <div className="flex justify-between items-center">
-                <div>
-                    <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Yayın Merkezi</h2>
-                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Platform geneline anlık bildirim ve duyuru servis edin.</p>
-                </div>
+        <div className="animate-in fade-in space-y-12">
+            <div>
+                <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Bildirim Yayın Merkezi</h2>
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Platform genelindeki kullanıcılara anlık duyurular servis edin.</p>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                <form onSubmit={handleSend} className="bg-slate-900 border border-white/5 p-10 rounded-[48px] space-y-6">
-                    <input required type="text" value={form.title} onChange={e => setForm({...form, title: e.target.value})} className="w-full bg-slate-950 border border-white/5 rounded-2xl p-5 text-xs font-bold text-white outline-none" placeholder="Duyuru Başlığı" />
-                    <textarea required value={form.message} onChange={e => setForm({...form, message: e.target.value})} className="w-full h-40 bg-slate-950 border border-white/5 rounded-2xl p-5 text-xs font-medium text-slate-300 outline-none" placeholder="Duyuru içeriği..." />
-                    <select value={form.type} onChange={e => setForm({...form, type: e.target.value as any})} className="w-full bg-slate-950 border border-white/5 rounded-2xl p-5 text-xs font-bold text-white outline-none">
-                        <option value="system">Sistem Güncellemesi</option>
-                        <option value="payment">Ödeme Duyurusu</option>
-                        <option value="security">Güvenlik Uyarısı</option>
-                    </select>
-                    <button type="submit" disabled={isLoading} className="w-full py-6 bg-blue-600 text-white font-black rounded-3xl text-[10px] uppercase tracking-[0.4em] shadow-xl">
-                        {isLoading ? <Loader2 className="animate-spin" size={20}/> : <><Send size={18} className="inline mr-2"/> YAYINI BAŞLAT</>}
+            
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-16">
+                <form onSubmit={handleSend} className="bg-slate-900 border border-white/5 p-12 rounded-[56px] space-y-8 shadow-2xl">
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Yayın Başlığı</label>
+                        <input required type="text" value={form.title} onChange={e => setForm({...form, title: e.target.value})} className="w-full bg-slate-950 border border-white/5 rounded-3xl p-6 text-xs font-bold text-white outline-none focus:border-blue-500" placeholder="Örn: Yeni Özellik Yayında!" />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Mesaj İçeriği</label>
+                        <textarea required value={form.message} onChange={e => setForm({...form, message: e.target.value})} className="w-full h-44 bg-slate-950 border border-white/5 rounded-[32px] p-6 text-xs font-medium text-slate-300 outline-none focus:border-blue-500 resize-none" placeholder="Kullanıcıların göreceği detaylı duyuru..." />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Yayın Kategorisi</label>
+                        <select value={form.type} onChange={e => setForm({...form, type: e.target.value as any})} className="w-full bg-slate-950 border border-white/5 rounded-3xl p-6 text-xs font-bold text-white outline-none focus:border-blue-500">
+                            <option value="system">Sistem Duyurusu</option>
+                            <option value="payment">Ödeme & Finans</option>
+                            <option value="security">Güvenlik Uyarısı</option>
+                        </select>
+                    </div>
+                    <button type="submit" disabled={isLoading} className="w-full py-6 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-[32px] text-[11px] uppercase tracking-[0.4em] shadow-xl">
+                        {isLoading ? <Loader2 className="animate-spin" size={24}/> : <><Send size={18} className="inline mr-3"/> YAYINI PLATFORMA SERVİS ET</>}
                     </button>
                 </form>
-                <div className="space-y-6">
-                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2"><History size={16}/> Son Gönderilenler</h3>
-                    <div className="space-y-3">
+
+                <div className="space-y-8">
+                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-3">
+                        <History size={18} className="text-blue-500"/> Yayın Kayıtları (Log)
+                    </h3>
+                    <div className="space-y-4">
                         {recentNotes.map(note => (
-                            <div key={note.id} className="p-5 bg-slate-900/40 border border-white/5 rounded-[28px] flex items-center justify-between group">
-                                <div className="flex items-center gap-4 min-w-0">
-                                    <div className="w-10 h-10 rounded-xl bg-slate-950 flex items-center justify-center text-blue-400 border border-white/5 group-hover:scale-110 transition-transform">
-                                        <Bell size={18}/>
+                            <div key={note.id} className="p-6 bg-slate-900/40 border border-white/5 rounded-[32px] flex items-center justify-between group hover:border-blue-500/20 transition-all">
+                                <div className="flex items-center gap-5 min-w-0">
+                                    <div className="w-12 h-12 rounded-2xl bg-slate-950 flex items-center justify-center text-blue-400 border border-white/5 group-hover:scale-110 transition-transform">
+                                        <BellRing size={20}/>
                                     </div>
                                     <div className="min-w-0">
-                                        <p className="text-xs font-black text-white truncate uppercase italic">{note.title}</p>
-                                        <p className="text-[10px] text-slate-500 font-bold uppercase mt-1">{new Date(note.date).toLocaleDateString()}</p>
+                                        <p className="text-sm font-black text-white truncate uppercase italic tracking-tight">{note.title}</p>
+                                        <p className="text-[10px] text-slate-600 font-bold uppercase mt-1.5">{new Date(note.date).toLocaleDateString('tr-TR')} • {note.type}</p>
                                     </div>
                                 </div>
-                                <div className="text-emerald-500"><CheckCircle2 size={16}/></div>
+                                <div className="text-emerald-500/50 group-hover:text-emerald-500 transition-colors">
+                                    <CheckCircle2 size={20}/>
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -411,31 +464,40 @@ const SettingsManagement = () => {
         setIsLoading(true);
         await DatabaseService.saveSettings(settings);
         setIsLoading(false);
-        alert("Sistem ayarları güncellendi.");
+        alert("Platform yapılandırma ayarları kilitlendi.");
     };
 
     return (
-        <div className="animate-in fade-in space-y-8">
-            <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Sistem Konfigürasyonu</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                <div className="bg-slate-900 border border-white/5 p-10 rounded-[48px] space-y-8">
-                    <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Platform İsmi</label>
-                        <input type="text" value={settings.appName} onChange={e => setSettings({...settings, appName: e.target.value})} className="w-full bg-slate-950 border border-white/5 rounded-2xl p-5 text-xs font-bold text-white outline-none focus:border-blue-500" />
+        <div className="animate-in fade-in space-y-12">
+            <div>
+                <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Global Yapılandırma</h2>
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Sistemin temel parametrelerini ve güvenlik modlarını yönetin.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+                <div className="bg-slate-900 border border-white/5 p-12 rounded-[56px] space-y-10 shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-40 h-40 bg-blue-600/5 blur-[80px] rounded-full"></div>
+                    <div className="space-y-4 relative z-10">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Platform Marka İsmi</label>
+                        <input type="text" value={settings.appName} onChange={e => setSettings({...settings, appName: e.target.value})} className="w-full bg-slate-950 border border-white/5 rounded-3xl p-6 text-xs font-bold text-white outline-none focus:border-blue-500" />
                     </div>
-                    <div className="space-y-4">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Bakım Modu</label>
-                        <button onClick={() => setSettings({...settings, maintenanceMode: !settings.maintenanceMode})} className={`w-full py-5 rounded-3xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl ${settings.maintenanceMode ? 'bg-red-600 text-white shadow-red-600/20' : 'bg-slate-800 text-slate-400'}`}>
-                            {settings.maintenanceMode ? <><ShieldAlert size={18} className="inline mr-2"/> BAKIM MODU AKTİF</> : 'PLATFORM ÇEVRİMİÇİ'}
+                    <div className="space-y-4 relative z-10">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Altyapı Durumu</label>
+                        <button onClick={() => setSettings({...settings, maintenanceMode: !settings.maintenanceMode})} className={`w-full py-6 rounded-[32px] text-[11px] font-black uppercase tracking-widest transition-all shadow-xl flex items-center justify-center gap-3 ${settings.maintenanceMode ? 'bg-red-600 text-white' : 'bg-slate-800 text-slate-400'}`}>
+                            {settings.maintenanceMode ? <><ShieldAlert size={20}/> BAKIM MODU AKTİF</> : <><Globe size={20}/> PLATFORM ÇEVRİMİÇİ</>}
                         </button>
                     </div>
-                    <button onClick={handleSave} disabled={isLoading} className="w-full py-6 bg-blue-600 text-white font-black rounded-3xl text-[10px] uppercase tracking-[0.4em] shadow-xl shadow-blue-600/20 transition-all">
-                        {isLoading ? <Loader2 className="animate-spin mx-auto" size={20}/> : 'AYARLARI KAYDET'}
+                    <button onClick={handleSave} disabled={isLoading} className="w-full py-7 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-[32px] text-[12px] uppercase tracking-[0.5em] shadow-xl relative z-10">
+                        {isLoading ? <Loader2 className="animate-spin mx-auto" size={24}/> : 'KONFİGÜRASYONU KAYDET'}
                     </button>
                 </div>
-                <div className="p-10 border border-dashed border-slate-800 rounded-[48px] flex flex-col items-center justify-center text-center">
-                    <Cpu size={64} className="text-slate-800 mb-6"/>
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-widest leading-relaxed">Sistem yapılandırması üzerinde yapılan değişiklikler anlık olarak tüm kullanıcıları etkiler.</p>
+                
+                <div className="flex flex-col items-center justify-center text-center p-12 border border-dashed border-slate-800 rounded-[56px] opacity-40">
+                    <Cpu size={80} className="text-slate-700 mb-8" />
+                    <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 italic">Infrastructure V3.5</h4>
+                    <p className="text-[11px] text-slate-600 font-bold uppercase leading-relaxed max-w-xs">
+                        Bu alandaki değişiklikler anlık olarak veritabanına işlenir ve tüm istemcileri etkiler. Güvenliğiniz için dikkatli işlem yapın.
+                    </p>
                 </div>
             </div>
         </div>
@@ -447,19 +509,27 @@ const SalesManagement = () => {
     useEffect(() => { load(); }, []);
     const load = async () => { setSales(await DatabaseService.getAllPurchases()); };
     return (
-        <div className="animate-in fade-in space-y-6">
-            <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Envanter Hareketleri</h2>
-            <div className="bg-slate-900 border border-white/5 rounded-[32px] overflow-hidden shadow-2xl">
+        <div className="animate-in fade-in space-y-8">
+            <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Envanter & Satış Takibi</h2>
+            <div className="bg-slate-900 border border-white/5 rounded-[48px] overflow-hidden shadow-2xl">
                 <table className="w-full text-left text-xs">
                     <thead className="bg-slate-950/50 border-b border-white/5 text-slate-500 font-bold uppercase">
-                        <tr><th className="px-6 py-5">Üye</th><th className="px-6 py-5">Bot</th><th className="px-6 py-5 text-right">Tarih</th></tr>
+                        <tr><th className="px-8 py-6">Üye</th><th className="px-8 py-6">Ürün / Bot</th><th className="px-8 py-6 text-right">Acquisition Tarihi</th></tr>
                     </thead>
                     <tbody className="divide-y divide-white/5">
                         {sales.map((s, idx) => (
-                            <tr key={idx} className="hover:bg-white/5 transition-colors"><td className="px-6 py-5">@{s.users?.username}</td><td className="px-6 py-5 font-bold">{s.bots?.name}</td><td className="px-6 py-5 text-right">{new Date(s.acquired_at).toLocaleDateString()}</td></tr>
+                            <tr key={idx} className="hover:bg-white/2 transition-colors">
+                                <td className="px-8 py-6 flex items-center gap-3">
+                                    <img src={s.users?.avatar} className="w-8 h-8 rounded-lg border border-white/5" />
+                                    <span className="font-bold text-white">@{s.users?.username}</span>
+                                </td>
+                                <td className="px-8 py-6 font-black text-blue-400 uppercase tracking-tighter italic">{s.bots?.name}</td>
+                                <td className="px-8 py-6 text-right font-medium text-slate-500">{new Date(s.acquired_at).toLocaleDateString('tr-TR')}</td>
+                            </tr>
                         ))}
                     </tbody>
                 </table>
+                {sales.length === 0 && <div className="p-32 text-center text-slate-800 font-bold uppercase text-[10px] italic tracking-widest">Henüz bir satış kaydı bulunmuyor.</div>}
             </div>
         </div>
     );
@@ -470,19 +540,30 @@ const UserManagement = () => {
     useEffect(() => { load(); }, []);
     const load = async () => { setUsers(await DatabaseService.getUsers()); };
     return (
-        <div className="animate-in fade-in space-y-6">
-            <h2 className="text-xl font-black text-white uppercase italic">Platform Üyeleri</h2>
-            <div className="bg-slate-900 border border-white/5 rounded-[32px] overflow-hidden shadow-2xl overflow-x-auto">
-                <table className="w-full text-left text-xs min-w-[600px]">
+        <div className="animate-in fade-in space-y-8">
+            <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Üye Veri Tabanı</h2>
+            <div className="bg-slate-900 border border-white/5 rounded-[48px] overflow-hidden shadow-2xl overflow-x-auto">
+                <table className="w-full text-left text-xs min-w-[700px]">
                     <thead className="bg-slate-950/50 border-b border-white/5 text-slate-500 font-bold uppercase">
-                        <tr><th className="px-6 py-5">Üye</th><th className="px-6 py-5">Durum</th><th className="px-6 py-5 text-right">Aksiyon</th></tr>
+                        <tr><th className="px-8 py-6">Kullanıcı Bilgisi</th><th className="px-8 py-6">Hesap Statüsü</th><th className="px-8 py-6 text-right">Eylem</th></tr>
                     </thead>
                     <tbody className="divide-y divide-white/5">
                         {users.map(u => (
                             <tr key={u.id} className="hover:bg-white/2 transition-all">
-                                <td className="px-6 py-5 flex items-center gap-3"><img src={u.avatar} className="w-10 h-10 rounded-xl border border-white/5" /> <div><p className="font-bold text-white">@{u.username}</p><p className="text-[9px] text-slate-600 uppercase mt-0.5">{u.name}</p></div></td>
-                                <td className="px-6 py-5"><span className={`px-2 py-1 rounded-md font-black text-[9px] uppercase border ${u.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20'}`}>{u.status}</span></td>
-                                <td className="px-6 py-5 text-right"><button onClick={async () => { await DatabaseService.updateUserStatus(u.id, u.status === 'Active' ? 'Passive' : 'Active'); load(); }} className="p-3 bg-slate-800 rounded-xl hover:bg-red-500/20 hover:text-red-500 transition-all"><Ban size={16}/></button></td>
+                                <td className="px-8 py-6 flex items-center gap-4">
+                                    <img src={u.avatar} className="w-12 h-12 rounded-[20px] border border-white/5 shadow-lg" /> 
+                                    <div><p className="font-black text-white italic tracking-tight uppercase">@{u.username}</p><p className="text-[9px] text-slate-600 uppercase mt-0.5 font-bold">{u.name}</p></div>
+                                </td>
+                                <td className="px-8 py-6">
+                                    <span className={`px-3 py-1.5 rounded-lg font-black text-[9px] uppercase border ${u.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20'}`}>
+                                        {u.status}
+                                    </span>
+                                </td>
+                                <td className="px-8 py-6 text-right">
+                                    <button onClick={async () => { await DatabaseService.updateUserStatus(u.id, u.status === 'Active' ? 'Passive' : 'Active'); load(); }} className={`p-4 rounded-2xl transition-all ${u.status === 'Active' ? 'bg-slate-800 text-slate-500 hover:bg-red-600 hover:text-white' : 'bg-emerald-600 text-white'}`}>
+                                        {u.status === 'Active' ? <Ban size={18}/> : <CheckCircle size={18}/>}
+                                    </button>
+                                </td>
                             </tr>
                         ))}
                     </tbody>
