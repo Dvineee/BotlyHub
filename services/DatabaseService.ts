@@ -235,7 +235,6 @@ export class DatabaseService {
   static async getNotifications(userId?: string): Promise<Notification[]> {
     if (!userId) return [];
     
-    // is_read sütun adını isRead olarak şemaya uyumlu şekilde güncelliyoruz
     const { data, error } = await supabase
         .from('notifications')
         .select('*')
@@ -248,20 +247,20 @@ export class DatabaseService {
     }
 
     return (data || []).map(n => ({
-        id: n.id,
+        id: String(n.id),
         type: n.type,
         title: n.title,
         message: n.message,
         date: n.date,
-        isRead: n.isRead || n.is_read || false, // Hem camel hem snake case desteği
+        isRead: n.isRead !== undefined ? n.isRead : (n.is_read !== undefined ? n.is_read : false), 
         user_id: n.user_id,
         target_type: n.target_type
     }));
   }
 
   static async markNotificationRead(id: string) {
-    // Veritabanındaki gerçek sütun adının isRead olduğunu varsayarak güncelliyoruz
-    await supabase.from('notifications').update({ isRead: true }).eq('id', id);
+    // Hem isRead hem is_read sütunlarını güncellemeyi dene (hangisi varsa o çalışır)
+    await supabase.from('notifications').update({ isRead: true, is_read: true }).eq('id', id);
   }
 
   static async getSettings() {
@@ -306,14 +305,19 @@ export class DatabaseService {
   }
 
   static async sendNotification(notification: any) {
+    // Column 'id' violates not-null constraint hatasını önlemek için benzersiz bir ID üret
+    const uniqueId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    
     const payload = {
+        id: uniqueId, 
         title: notification.title,
         message: notification.message,
         type: notification.type || 'system',
         target_type: notification.target_type || 'global',
         user_id: notification.user_id || null, 
         date: new Date().toISOString(),
-        isRead: false // Hata aldığınız is_read alanı isRead olarak revize edildi
+        isRead: false,
+        is_read: false 
     };
 
     const { error } = await supabase.from('notifications').insert(payload);
