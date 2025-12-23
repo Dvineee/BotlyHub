@@ -222,15 +222,20 @@ export class DatabaseService {
     return { id: data.id, name: data.name, username: data.username, avatar: data.avatar, role: data.role || 'User', status: data.status || 'Active', badges: [], joinDate: data.joindate, email: data.email };
   }
 
-  static async getUserActivityLogs(userId: string): Promise<ActivityLog[]> {
-      const { data } = await supabase.from('activity_logs').select('*').eq('user_id', userId.toString()).order('created_at', { ascending: false });
-      return data || [];
+  static async searchUsers(query: string): Promise<User[]> {
+    if (!query || query.length < 2) return [];
+    const { data } = await supabase
+        .from('users')
+        .select('*')
+        .ilike('username', `%${query.replace('@', '')}%`)
+        .limit(5);
+    return (data || []).map(u => ({ id: u.id, name: u.name, username: u.username, avatar: u.avatar, role: u.role || 'User', status: u.status || 'Active', badges: [], joinDate: u.joindate, email: u.email }));
   }
 
   static async getNotifications(userId?: string): Promise<Notification[]> {
     if (!userId) return [];
     
-    // Supabase OR syntax for finding notifications that are EITHER global OR specific to this user
+    // Hem global hem kullanıcıya özel bildirimleri çek
     const { data, error } = await supabase
         .from('notifications')
         .select('*')
@@ -300,29 +305,12 @@ export class DatabaseService {
   }
 
   static async sendNotification(notification: any) {
-    let targetUserId = null;
-
-    if (notification.target_type === 'user') {
-        // Eğer username ile hedefleme yapılıyorsa kullanıcıyı bul
-        const username = notification.username.replace('@', '').trim();
-        const { data: userData, error: userError } = await supabase
-            .from('users')
-            .select('id')
-            .eq('username', username)
-            .maybeSingle();
-            
-        if (userError || !userData) {
-            throw new Error(`@${username} kullanıcısı veritabanında bulunamadı.`);
-        }
-        targetUserId = userData.id;
-    }
-
     const payload = {
         title: notification.title,
         message: notification.message,
         type: notification.type || 'system',
         target_type: notification.target_type || 'global',
-        user_id: targetUserId,
+        user_id: notification.user_id || null, // Artık ID doğrudan UI'dan geliyor
         date: new Date().toISOString(),
         is_read: false
     };

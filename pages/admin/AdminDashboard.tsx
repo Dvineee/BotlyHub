@@ -605,24 +605,49 @@ const UserManagement = () => {
 
 const NotificationCenter = () => {
     const [isLoading, setIsLoading] = useState(false);
-    const [form, setForm] = useState({ title: '', message: '', type: 'system' as any, target_type: 'global', username: '' });
+    const [form, setForm] = useState({ title: '', message: '', type: 'system' as any, target_type: 'global', user_id: '', username: '' });
+    const [userSearch, setUserSearch] = useState('');
+    const [searchResults, setSearchResults] = useState<User[]>([]);
+    const [isSearching, setIsSearching] = useState(false);
+
+    // Kullanıcı adı arama debounced
+    useEffect(() => {
+        const timer = setTimeout(async () => {
+            if (userSearch.length >= 2) {
+                setIsSearching(true);
+                const results = await DatabaseService.searchUsers(userSearch);
+                setSearchResults(results);
+                setIsSearching(false);
+            } else {
+                setSearchResults([]);
+            }
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [userSearch]);
 
     const handleSend = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (form.target_type === 'user' && !form.username) {
-            alert("Lütfen hedef kullanıcının Telegram @KullanıcıAdını girin.");
+        if (form.target_type === 'user' && !form.user_id) {
+            alert("Lütfen bir kullanıcı seçin.");
             return;
         }
         setIsLoading(true);
         try {
             await DatabaseService.sendNotification(form);
-            alert(form.target_type === 'global' ? "Global duyuru ulaştırıldı." : `Bildirim @${form.username.replace('@', '')} kullanıcısına gönderildi.`);
-            setForm({ title: '', message: '', type: 'system', target_type: 'global', username: '' });
+            alert(form.target_type === 'global' ? "Global duyuru ulaştırıldı." : `Bildirim @${form.username} kullanıcısına gönderildi.`);
+            setForm({ title: '', message: '', type: 'system', target_type: 'global', user_id: '', username: '' });
+            setUserSearch('');
         } catch (e: any) {
             alert("Hata: " + e.message);
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const selectUser = (user: User) => {
+        setForm({ ...form, user_id: user.id, username: user.username });
+        setUserSearch(`@${user.username}`);
+        setSearchResults([]);
     };
 
     return (
@@ -634,9 +659,13 @@ const NotificationCenter = () => {
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1.5">
                             <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Hedef Kitle</label>
-                            <select value={form.target_type} onChange={e => setForm({...form, target_type: e.target.value as any})} className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-xs font-bold text-white outline-none focus:border-blue-500 appearance-none italic shadow-inner">
+                            <select value={form.target_type} onChange={e => {
+                                const val = e.target.value as any;
+                                setForm({...form, target_type: val, user_id: '', username: ''});
+                                setUserSearch('');
+                            }} className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-xs font-bold text-white outline-none focus:border-blue-500 appearance-none italic shadow-inner">
                                 <option value="global">Tüm Kullanıcılar</option>
-                                <option value="user">Tekil Kullanıcı (@)</option>
+                                <option value="user">Tekil Kullanıcı</option>
                             </select>
                         </div>
                         <div className="space-y-1.5">
@@ -650,12 +679,47 @@ const NotificationCenter = () => {
                     </div>
 
                     {form.target_type === 'user' && (
-                        <div className="space-y-1.5 animate-in slide-in-from-top-2">
-                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Telegram @Username</label>
+                        <div className="space-y-1.5 relative animate-in slide-in-from-top-2">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Kullanıcı Arama (@username)</label>
                             <div className="relative">
-                                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-blue-500 font-black text-xs">@</span>
-                                <input required type="text" value={form.username} onChange={e => setForm({...form, username: e.target.value.replace('@', '')})} className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 pl-8 text-xs font-bold text-white outline-none focus:border-blue-500 shadow-inner" placeholder="kullaniciadi" />
+                                <input 
+                                    required 
+                                    type="text" 
+                                    value={userSearch} 
+                                    onChange={e => {
+                                        setUserSearch(e.target.value);
+                                        if (form.user_id) setForm({...form, user_id: '', username: ''});
+                                    }} 
+                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-xs font-bold text-white outline-none focus:border-blue-500 shadow-inner" 
+                                    placeholder="Kullanıcı adı yazın..." 
+                                />
+                                {isSearching && <Loader2 className="absolute right-3 top-3.5 animate-spin text-blue-500" size={16} />}
                             </div>
+                            
+                            {searchResults.length > 0 && (
+                                <div className="absolute top-full left-0 right-0 mt-2 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl z-[100] overflow-hidden divide-y divide-slate-800 animate-in fade-in">
+                                    {searchResults.map(u => (
+                                        <button 
+                                            key={u.id} 
+                                            type="button"
+                                            onClick={() => selectUser(u)}
+                                            className="w-full p-3 flex items-center gap-3 hover:bg-slate-850 transition-colors text-left"
+                                        >
+                                            <img src={u.avatar} className="w-8 h-8 rounded-lg object-cover border border-slate-800" />
+                                            <div>
+                                                <p className="text-[10px] font-black text-white italic leading-none">@{u.username}</p>
+                                                <p className="text-[8px] text-slate-500 font-bold uppercase mt-1 tracking-tighter">{u.name}</p>
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                            {form.user_id && (
+                                <div className="mt-2 p-2 bg-blue-600/10 border border-blue-500/20 rounded-lg flex items-center gap-2">
+                                    <CheckCircle size={12} className="text-blue-500" />
+                                    <span className="text-[9px] font-bold text-blue-400 uppercase tracking-widest">Alıcı Onaylandı: @{form.username}</span>
+                                </div>
+                            )}
                         </div>
                     )}
 
