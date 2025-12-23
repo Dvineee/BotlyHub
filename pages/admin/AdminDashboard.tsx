@@ -37,6 +37,52 @@ const StatCard = ({ label, value, icon: Icon, color }: any) => {
   );
 };
 
+/**
+ * Telegram Reklam Önizleme Bileşeni
+ */
+const TelegramAdPreview = ({ content, imageUrl, buttonText }: { content: string, imageUrl?: string, buttonText?: string }) => {
+    return (
+        <div className="bg-[#17212b] rounded-2xl overflow-hidden w-full max-w-[340px] shadow-2xl border border-white/5 font-sans mx-auto">
+            <div className="bg-[#242f3d] p-3 flex items-center justify-between border-b border-black/10">
+                <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-xs">B</div>
+                    <div className="flex flex-col">
+                        <span className="text-xs font-bold text-white leading-none">BotlyHub Advert</span>
+                        <span className="text-[10px] text-slate-400 mt-0.5">bot</span>
+                    </div>
+                </div>
+                <MoreVertical size={16} className="text-slate-400" />
+            </div>
+            
+            <div className="p-0.5 bg-[#0e1621] min-h-[100px] flex flex-col gap-1 pb-3">
+                <div className="bg-[#242f3d] rounded-2xl m-2 p-0 shadow-sm border border-black/10 overflow-hidden self-start max-w-[90%]">
+                    {imageUrl && (
+                        <div className="w-full h-44 bg-slate-800 relative">
+                            <img 
+                                src={imageUrl} 
+                                className="w-full h-full object-cover" 
+                                onError={(e) => (e.target as any).style.display = 'none'}
+                            />
+                        </div>
+                    )}
+                    <div className="p-3 text-[13px] leading-relaxed text-white whitespace-pre-wrap">
+                        {content || "Reklam içeriği burada görüntülenecek..."}
+                        <div className="text-[10px] text-slate-400 mt-1 flex justify-end">12:45</div>
+                    </div>
+                </div>
+                
+                {buttonText && (
+                    <div className="px-3 flex justify-start">
+                        <div className="bg-blue-500 text-white py-2.5 px-8 rounded-xl text-xs font-bold text-center shadow-lg active:scale-95 transition-all w-full max-w-[200px]">
+                            {buttonText}
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -133,56 +179,6 @@ const HomeView = () => {
                 <StatCard label="Satış Hacmi" value={stats.salesCount} icon={Wallet} color="emerald" />
                 <StatCard label="Aktivite Logu" value={stats.logCount} icon={Activity} color="orange" />
             </div>
-            <div className="p-12 border border-dashed border-white/5 rounded-[48px] flex flex-col items-center justify-center text-center opacity-40">
-                <Cpu size={64} className="mb-6 text-slate-800" />
-                <p className="text-xs font-bold text-slate-600 uppercase tracking-widest">Sistem Analitiği Hazırlanıyor...</p>
-            </div>
-        </div>
-    );
-};
-
-/**
- * Telegram Reklam Önizleme Bileşeni
- */
-const TelegramAdPreview = ({ content, imageUrl, buttonText }: { content: string, imageUrl?: string, buttonText?: string }) => {
-    return (
-        <div className="bg-[#17212b] rounded-2xl overflow-hidden w-full max-w-[340px] shadow-2xl border border-white/5 font-sans mx-auto">
-            <div className="bg-[#242f3d] p-3 flex items-center justify-between border-b border-black/10">
-                <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-xs">B</div>
-                    <div className="flex flex-col">
-                        <span className="text-xs font-bold text-white leading-none">BotlyHub Advert</span>
-                        <span className="text-[10px] text-slate-400 mt-0.5">bot</span>
-                    </div>
-                </div>
-                <MoreVertical size={16} className="text-slate-400" />
-            </div>
-            
-            <div className="p-0.5 bg-[#0e1621] min-h-[100px] flex flex-col gap-1 pb-3">
-                <div className="bg-[#242f3d] rounded-2xl m-2 p-0 shadow-sm border border-black/10 overflow-hidden self-start max-w-[90%]">
-                    {imageUrl && (
-                        <div className="w-full h-44 bg-slate-800 relative">
-                            <img 
-                                src={imageUrl} 
-                                className="w-full h-full object-cover" 
-                                onError={(e) => (e.target as any).style.display = 'none'}
-                            />
-                        </div>
-                    )}
-                    <div className="p-3 text-[13px] leading-relaxed text-white whitespace-pre-wrap">
-                        {content || "Reklam içeriği burada görüntülenecek..."}
-                        <div className="text-[10px] text-slate-400 mt-1 flex justify-end">12:45</div>
-                    </div>
-                </div>
-                
-                {buttonText && (
-                    <div className="px-3 flex justify-start">
-                        <div className="bg-[#242f3d]/80 backdrop-blur-md border border-white/10 text-blue-400 py-2.5 px-8 rounded-xl text-xs font-bold text-center shadow-lg active:scale-95 transition-all">
-                            {buttonText}
-                        </div>
-                    </div>
-                )}
-            </div>
         </div>
     );
 };
@@ -266,8 +262,8 @@ const AdsManagement = () => {
                                 </td>
                                 <td className="px-8 py-6">
                                     <div className="flex flex-col">
-                                        <span className="font-black text-blue-400 text-sm">{ad.total_reach.toLocaleString()}</span>
-                                        <span className="text-[9px] text-slate-600 font-bold uppercase">{ad.channel_count} Kanal</span>
+                                        <span className="font-black text-blue-400 text-sm">{ad.total_reach?.toLocaleString() || 0}</span>
+                                        <span className="text-[9px] text-slate-600 font-bold uppercase">{ad.channel_count || 0} Kanal</span>
                                     </div>
                                 </td>
                                 <td className="px-8 py-6 text-slate-500 font-bold uppercase tracking-tighter">
@@ -290,7 +286,6 @@ const AdsManagement = () => {
                         <button onClick={() => setIsModalOpen(false)} className="absolute top-8 right-8 p-3 bg-slate-900 rounded-2xl text-slate-500 hover:text-white transition-all"><X size={20}/></button>
                         
                         <div className="flex flex-col lg:flex-row gap-12">
-                            {/* Form Alanı */}
                             <div className="flex-1 space-y-8">
                                 <div>
                                     <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter mb-2">Reklam Yayınlama</h3>
@@ -300,7 +295,7 @@ const AdsManagement = () => {
                                 <form onSubmit={handleCreate} className="space-y-6">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Kampanya Başlığı (İç Takip İçin)</label>
+                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Kampanya Başlığı</label>
                                             <input required type="text" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="w-full bg-slate-950 border border-white/5 rounded-3xl p-6 text-xs font-bold text-white outline-none focus:border-blue-500/30" placeholder="Örn: Black Friday 2024" />
                                         </div>
                                         <div className="space-y-2">
@@ -334,29 +329,13 @@ const AdsManagement = () => {
                                 </form>
                             </div>
 
-                            {/* Önizleme Alanı */}
                             <div className="w-full lg:w-[380px] shrink-0">
                                 <div className="bg-slate-900/40 border border-white/5 rounded-[44px] p-8 flex flex-col items-center">
                                     <div className="flex items-center gap-3 mb-8">
                                         <Smartphone size={18} className="text-slate-600" />
                                         <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Canlı Önizleme</span>
                                     </div>
-                                    
-                                    <TelegramAdPreview 
-                                        content={formData.content}
-                                        imageUrl={formData.image_url}
-                                        buttonText={formData.button_text}
-                                    />
-
-                                    <div className="mt-8 p-6 bg-blue-500/5 border border-blue-500/10 rounded-3xl w-full">
-                                        <div className="flex items-center gap-2 mb-2 text-blue-500">
-                                            <Sparkles size={14} />
-                                            <span className="text-[10px] font-black uppercase tracking-widest">Sistem Notu</span>
-                                        </div>
-                                        <p className="text-[10px] text-slate-500 font-bold leading-relaxed italic uppercase">
-                                            Reklam onaylandığı an kütüphanenizdeki tüm botlara bağlı kanallara anlık olarak gönderilir.
-                                        </p>
-                                    </div>
+                                    <TelegramAdPreview content={formData.content} imageUrl={formData.image_url} buttonText={formData.button_text} />
                                 </div>
                             </div>
                         </div>
@@ -367,6 +346,7 @@ const AdsManagement = () => {
     );
 };
 
+// ... Diğer bileşenler (SalesManagement, UserManagement, BotManagement, AnnouncementCenter, SettingsManagement) aynı kalacak.
 const SalesManagement = () => {
     const [sales, setSales] = useState<any[]>([]);
     useEffect(() => { load(); }, []);
