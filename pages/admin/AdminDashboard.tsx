@@ -52,11 +52,7 @@ const TelegramAdPreview = ({ title, content, imageUrl, buttonText }: { title: st
                         <span className="text-[9px] text-blue-400 mt-0.5 font-medium uppercase tracking-widest">bot</span>
                     </div>
                 </div>
-                <div className="flex gap-1.5">
-                   <div className="w-1 h-1 bg-slate-500 rounded-full"></div>
-                   <div className="w-1 h-1 bg-slate-500 rounded-full"></div>
-                   <div className="w-1 h-1 bg-slate-500 rounded-full"></div>
-                </div>
+                <MoreVertical size={16} className="text-slate-400" />
             </div>
             
             <div className="p-0.5 bg-[#0e1621] min-h-[120px] flex flex-col gap-1 pb-4">
@@ -71,7 +67,7 @@ const TelegramAdPreview = ({ title, content, imageUrl, buttonText }: { title: st
                         </div>
                     )}
                     <div className="p-3.5 text-[14px] leading-relaxed text-white whitespace-pre-wrap">
-                        {/* BAŞLIK MESAJ İÇİNDE KALIN (BOLD) YAZILIR */}
+                        {/* BAŞLIK MESAJ İÇİNDE KALIN (BOLD) YAZILIR (Botun HTML Modunu Simüle Eder) */}
                         <div className="font-black mb-3 text-white border-b border-white/10 pb-2 flex items-center gap-2 tracking-tight">
                            <Zap size={14} className="text-blue-500 fill-blue-500" />
                            {title || "Kampanya Başlığı"}
