@@ -39,26 +39,30 @@ const StatCard = ({ label, value, icon: Icon, color }: any) => {
 
 /**
  * Telegram Reklam Önizleme Bileşeni
- * Botun HTML parse_mode="HTML" ile göndereceği başlığı kalın simüle eder.
+ * Botun HTML parse_mode="HTML" ile göndereceği BAŞLIĞI KALIN simüle eder.
  */
 const TelegramAdPreview = ({ title, content, imageUrl, buttonText }: { title: string, content: string, imageUrl?: string, buttonText?: string }) => {
     return (
-        <div className="bg-[#17212b] rounded-2xl overflow-hidden w-full max-w-[340px] shadow-2xl border border-white/5 font-sans mx-auto">
+        <div className="bg-[#17212b] rounded-2xl overflow-hidden w-full max-w-[340px] shadow-2xl border border-white/5 font-sans mx-auto transition-all animate-in zoom-in-95">
             <div className="bg-[#242f3d] p-3 flex items-center justify-between border-b border-black/10">
                 <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-xs">B</div>
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-blue-400 flex items-center justify-center text-white font-bold text-[10px] shadow-lg">B</div>
                     <div className="flex flex-col">
-                        <span className="text-xs font-bold text-white leading-none">BotlyHub Advert</span>
-                        <span className="text-[10px] text-slate-400 mt-0.5">bot</span>
+                        <span className="text-xs font-bold text-white leading-none tracking-tight">BotlyHub Advert</span>
+                        <span className="text-[9px] text-blue-400 mt-0.5 font-medium uppercase tracking-widest">bot</span>
                     </div>
                 </div>
-                <MoreVertical size={16} className="text-slate-400" />
+                <div className="flex gap-1.5">
+                   <div className="w-1 h-1 bg-slate-500 rounded-full"></div>
+                   <div className="w-1 h-1 bg-slate-500 rounded-full"></div>
+                   <div className="w-1 h-1 bg-slate-500 rounded-full"></div>
+                </div>
             </div>
             
-            <div className="p-0.5 bg-[#0e1621] min-h-[100px] flex flex-col gap-1 pb-3">
-                <div className="bg-[#242f3d] rounded-2xl m-2 p-0 shadow-sm border border-black/10 overflow-hidden self-start max-w-[90%]">
+            <div className="p-0.5 bg-[#0e1621] min-h-[120px] flex flex-col gap-1 pb-4">
+                <div className="bg-[#242f3d] rounded-2xl m-2 p-0 shadow-sm border border-black/20 overflow-hidden self-start max-w-[92%] relative">
                     {imageUrl && (
-                        <div className="w-full h-44 bg-slate-800 relative">
+                        <div className="w-full h-48 bg-slate-800 relative">
                             <img 
                                 src={imageUrl} 
                                 className="w-full h-full object-cover" 
@@ -66,17 +70,23 @@ const TelegramAdPreview = ({ title, content, imageUrl, buttonText }: { title: st
                             />
                         </div>
                     )}
-                    <div className="p-3 text-[13px] leading-relaxed text-white whitespace-pre-wrap">
-                        {/* BAŞLIK KALIN YAZILIR (Botun göndereceği HTML formatı) */}
-                        <div className="font-bold mb-2 text-white text-sm tracking-tight">{title || "Kampanya Başlığı"}</div>
-                        <div className="text-slate-200">{content || "Reklam içeriği burada görüntülenecek..."}</div>
-                        <div className="text-[10px] text-slate-400 mt-2 flex justify-end italic">12:45</div>
+                    <div className="p-3.5 text-[14px] leading-relaxed text-white whitespace-pre-wrap">
+                        {/* BAŞLIK MESAJ İÇİNDE KALIN (BOLD) YAZILIR */}
+                        <div className="font-black mb-3 text-white border-b border-white/10 pb-2 flex items-center gap-2 tracking-tight">
+                           <Zap size={14} className="text-blue-500 fill-blue-500" />
+                           {title || "Kampanya Başlığı"}
+                        </div>
+                        <div className="text-[#e0e0e0] font-medium leading-[1.6]">{content || "Reklam içeriği burada görüntülenecek..."}</div>
+                        <div className="text-[10px] text-slate-400 mt-3 flex justify-end items-center gap-1">
+                           <span>12:45</span>
+                           <CheckCircle2 size={10} className="text-blue-500" />
+                        </div>
                     </div>
                 </div>
                 
                 {buttonText && (
-                    <div className="px-3 flex justify-start">
-                        <div className="bg-blue-600 text-white py-2.5 px-8 rounded-xl text-xs font-bold text-center shadow-lg active:scale-95 transition-all w-full max-w-[200px] uppercase tracking-wider">
+                    <div className="px-3 flex justify-start animate-in slide-in-from-left-4">
+                        <div className="bg-blue-600 hover:bg-blue-500 text-white py-3 px-10 rounded-xl text-xs font-black text-center shadow-xl active:scale-95 transition-all w-full max-w-[220px] uppercase tracking-widest">
                             {buttonText}
                         </div>
                     </div>
@@ -298,7 +308,7 @@ const AdsManagement = () => {
                                 <form onSubmit={handleCreate} className="space-y-6">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Kampanya Başlığı (Kalın Yazılır)</label>
+                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Kampanya Başlığı (KALIN YAZILIR)</label>
                                             <input required type="text" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="w-full bg-slate-950 border border-white/5 rounded-3xl p-6 text-xs font-bold text-white outline-none focus:border-blue-500/30" placeholder="Örn: %50 İndirim Fırsatı!" />
                                         </div>
                                         <div className="space-y-2">
@@ -339,6 +349,7 @@ const AdsManagement = () => {
                                         <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Bot Çıktı Önizlemesi</span>
                                     </div>
                                     <TelegramAdPreview title={formData.title} content={formData.content} imageUrl={formData.image_url} buttonText={formData.button_text} />
+                                    <p className="text-[9px] text-slate-500 mt-6 font-bold uppercase tracking-tighter text-center px-4 leading-relaxed">Başlık metin içinde <span className="text-white">KALIN</span> (HTML) olarak gönderilecek.</p>
                                 </div>
                             </div>
                         </div>

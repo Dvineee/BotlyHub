@@ -16,7 +16,6 @@ export class DatabaseService {
   }
 
   static async createAd(ad: Partial<Ad>) {
-      // Reklam oluşturulurken durum her zaman 'pending' (beklemede) olmalıdır.
       const { error } = await supabase.from('ads').insert({
           title: ad.title,
           content: ad.content,
@@ -54,43 +53,63 @@ export class DatabaseService {
   static async syncChannelsFromBotActivity(userId: string): Promise<number> {
       try {
           const uIdStr = String(userId).trim();
+          // bot_discovery_logs tablosundaki senkronize edilmemiş logları çek
           const { data: logs, error: logErr } = await supabase.from('bot_discovery_logs').select('*').eq('owner_id', uIdStr).eq('is_synced', false);
+          
           if (logErr || !logs || logs.length === 0) return 0;
+          
           let successCount = 0;
           for (const log of logs) {
               const botId = String(log.bot_id);
-              const telegramId = String(log.chat_id || '');
+              // KRİTİK: Hem chat_id hem telegram_id kontrolü
+              const telegramId = String(log.chat_id || log.telegram_id || '');
 
-              const { data: existing } = await supabase.from('channels').select('*').eq('user_id', uIdStr).eq('name', log.channel_name).maybeSingle();
+              if (!telegramId) {
+                  console.warn("Log kaydında Telegram ID bulunamadı, atlanıyor:", log.channel_name);
+                  continue;
+              }
+
+              // Kanal zaten var mı kontrol et (Ad veya Telegram ID ile)
+              const { data: existing } = await supabase.from('channels').select('*').eq('user_id', uIdStr).eq('telegram_id', telegramId).maybeSingle();
+              
               let syncOk = false;
               if (existing) {
+                  // Mevcut kanalı güncelle
                   const bots = Array.from(new Set([...(existing.connected_bot_ids || []), botId]));
                   const { error: upErr } = await supabase.from('channels').update({ 
-                      member_count: log.member_count, 
+                      member_count: log.member_count || existing.member_count, 
                       connected_bot_ids: bots, 
                       icon: log.channel_icon || existing.icon,
-                      telegram_id: telegramId || existing.telegram_id 
+                      telegram_id: telegramId,
+                      is_ad_enabled: true // Senkronize olanları aktif et
                   }).eq('id', existing.id);
                   if (!upErr) syncOk = true;
               } else {
+                  // Yeni kanal oluştur
                   const { error: insErr } = await supabase.from('channels').insert({ 
                       user_id: uIdStr, 
                       telegram_id: telegramId, 
-                      name: log.channel_name, 
+                      name: log.channel_name || 'İsimsiz Kanal', 
                       member_count: log.member_count || 0, 
-                      icon: log.channel_icon || `https://ui-avatars.com/api/?name=${encodeURIComponent(log.channel_name)}`, 
+                      icon: log.channel_icon || `https://ui-avatars.com/api/?name=${encodeURIComponent(log.channel_name || 'CH')}`, 
                       connected_bot_ids: [botId], 
-                      revenue: 0 
+                      revenue: 0,
+                      is_ad_enabled: true
                   });
                   if (!insErr) syncOk = true;
               }
+              
               if (syncOk) {
+                  // Logu senkronize edildi olarak işaretle
                   await supabase.from('bot_discovery_logs').update({ is_synced: true }).eq('id', log.id);
                   successCount++;
               }
           }
           return successCount;
-      } catch (e) { return 0; }
+      } catch (e) { 
+          console.error("SyncChannels Error:", e);
+          return 0; 
+      }
   }
 
   static async getChannels(userId: string): Promise<Channel[]> {

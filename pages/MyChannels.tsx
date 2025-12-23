@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, Megaphone, Users, Loader2, RefreshCw, AlertCircle, CheckCircle2, X, Bot as BotIcon, Info, Fingerprint, Zap } from 'lucide-react';
+import { ChevronLeft, Megaphone, Users, Loader2, RefreshCw, AlertCircle, CheckCircle2, X, Bot as BotIcon, Info, Fingerprint, Zap, AlertTriangle } from 'lucide-react';
 import * as Router from 'react-router-dom';
 import { Channel } from '../types';
 import { DatabaseService, supabase } from '../services/DatabaseService';
@@ -15,7 +15,6 @@ const MyChannels = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
   const [autoSyncStatus, setAutoSyncStatus] = useState<'idle' | 'syncing' | 'done' | 'error'>('idle');
-  const [showGuide, setShowGuide] = useState(false);
   const realtimeSubscription = useRef<any>(null);
 
   useEffect(() => {
@@ -34,18 +33,17 @@ const MyChannels = () => {
   }, [user]);
 
   const setupRealtime = () => {
+      if (!user?.id) return;
       const uId = String(user.id);
       
-      // bot_discovery_logs tablosundaki değişiklikleri dinle
       realtimeSubscription.current = supabase
-          .channel('any')
+          .channel('discovery_updates')
           .on('postgres_changes', { 
               event: 'INSERT', 
               schema: 'public', 
               table: 'bot_discovery_logs',
               filter: `owner_id=eq.${uId}` 
-          }, (payload) => {
-              console.log("[REALTIME] Yeni sinyal yakalandı!", payload);
+          }, () => {
               triggerSync();
           })
           .subscribe();
@@ -92,7 +90,6 @@ const MyChannels = () => {
       haptic('medium');
       await triggerSync();
       setIsSyncing(false);
-      if (channels.length === 0) setShowGuide(true);
   };
 
   return (
@@ -169,9 +166,9 @@ const MyChannels = () => {
                                     (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(c.name)}&background=1e293b&color=fff`;
                                 }}
                             />
-                            {autoSyncStatus === 'syncing' && (
-                                <div className="absolute inset-0 bg-blue-600/20 rounded-2xl animate-pulse flex items-center justify-center">
-                                    <Zap size={16} className="text-white fill-white" />
+                            {!c.telegram_id && (
+                                <div className="absolute -top-2 -right-2 bg-red-600 p-1.5 rounded-lg border-2 border-[#020617] shadow-xl animate-bounce">
+                                    <AlertTriangle size={12} className="text-white" />
                                 </div>
                             )}
                           </div>
@@ -181,6 +178,7 @@ const MyChannels = () => {
                                   <Users size={12} className="text-slate-600" />
                                   <p className="text-[10px] text-slate-500 font-bold uppercase">{c.memberCount.toLocaleString()} Üye</p>
                               </div>
+                              {!c.telegram_id && <p className="text-[8px] text-red-500 font-black uppercase tracking-tighter mt-1">ID Eksik: Reklam Alamaz!</p>}
                           </div>
                       </div>
                       <div className="text-right bg-slate-950 px-4 py-3 rounded-2xl border border-slate-900">
@@ -191,6 +189,16 @@ const MyChannels = () => {
               ))}
           </div>
       )}
+      
+      <div className="mt-10 p-6 bg-blue-600/5 border border-blue-600/10 rounded-[32px]">
+          <div className="flex items-center gap-3 mb-3 text-blue-500">
+              <Info size={18} />
+              <h4 className="text-[10px] font-black uppercase tracking-widest">Kanal Görünmüyor mu?</h4>
+          </div>
+          <p className="text-[10px] text-slate-500 leading-relaxed font-medium">
+              Eğer kanalınız listede yoksa, botun kanalda yönetici olduğundan ve en az bir mesaj paylaşıldığından emin olun. Sistem yeni sinyalleri otomatik yakalar.
+          </p>
+      </div>
     </div>
   );
 };
