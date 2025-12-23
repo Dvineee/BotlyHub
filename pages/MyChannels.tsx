@@ -178,7 +178,12 @@ const MyChannels = () => {
                                   <Users size={12} className="text-slate-600" />
                                   <p className="text-[10px] text-slate-500 font-bold uppercase">{c.memberCount.toLocaleString()} Üye</p>
                               </div>
-                              {!c.telegram_id && <p className="text-[8px] text-red-500 font-black uppercase tracking-tighter mt-1">ID Eksik: Reklam Alamaz!</p>}
+                              {!c.telegram_id && (
+                                  <div className="flex items-center gap-1 mt-1 text-red-500">
+                                      <AlertTriangle size={10} />
+                                      <p className="text-[8px] font-black uppercase tracking-tighter">ID Eksik: Reklam Alamaz!</p>
+                                  </div>
+                              )}
                           </div>
                       </div>
                       <div className="text-right bg-slate-950 px-4 py-3 rounded-2xl border border-slate-900">
@@ -196,7 +201,7 @@ const MyChannels = () => {
               <h4 className="text-[10px] font-black uppercase tracking-widest">Kanal Görünmüyor mu?</h4>
           </div>
           <p className="text-[10px] text-slate-500 leading-relaxed font-medium">
-              Eğer kanalınız listede yoksa, botun kanalda yönetici olduğundan ve en az bir mesaj paylaşıldığından emin olun. Sistem yeni sinyalleri otomatik yakalar.
+              Eğer kanalınız listede yoksa, botun kanalda yönetici olduğundan ve en az bir mesaj paylaşıldığından emin olun. Sistem yeni sinyalleri otomatik yakalar ve ID eşleştirmesi yapar.
           </p>
       </div>
     </div>
