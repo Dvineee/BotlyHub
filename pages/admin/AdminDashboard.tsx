@@ -9,7 +9,7 @@ import {
   Zap, Star, Eye, Send, Activity, 
   Clock, Wallet, ShieldAlert, Cpu, Ban, CheckCircle, 
   Search, Database, Hash, Wand2, Image as ImageIcon, History, TrendingUp,
-  Mail, Phone
+  Mail, Phone, User as UserIcon
 } from 'lucide-react';
 import { DatabaseService, supabase } from '../../services/DatabaseService';
 import { User, Bot as BotType, Announcement, Notification, Channel, ActivityLog } from '../../types';
@@ -24,14 +24,6 @@ const CATEGORY_NAMES: Record<string, string> = {
     'music': 'Müzik & Ses',
     'moderation': 'Grup Yönetimi'
 };
-
-const AVAILABLE_ICONS = [
-  { name: 'Megaphone', icon: Megaphone },
-  { name: 'Zap', icon: Zap },
-  { name: 'Star', icon: Star },
-  { name: 'BotIcon', icon: Bot },
-  { name: 'Shield', icon: ShieldCheck }
-];
 
 // --- ALT BİLEŞENLER ---
 
@@ -58,7 +50,7 @@ const StatCard = ({ label, value, icon: Icon, color }: any) => {
   );
 };
 
-const LogItem = ({ log }: { log: ActivityLog }) => {
+const LogItem = ({ log }: { log: any }) => {
   const getLogStyle = (type: string) => {
     switch(type) {
         case 'auth': return { icon: Hash, color: 'text-blue-400', bg: 'bg-blue-400/10' };
@@ -72,26 +64,42 @@ const LogItem = ({ log }: { log: ActivityLog }) => {
 
   const style = getLogStyle(log.type);
   const Icon = style.icon;
+  const logUser = log.users; // Joinden gelen kullanıcı verisi
 
   return (
-    <div className="p-4 bg-slate-900/50 border border-slate-800 rounded-xl mb-3 hover:border-slate-700 transition-all group">
-      <div className="flex justify-between items-start mb-2">
+    <div className="p-4 bg-slate-900/50 border border-slate-800 rounded-xl mb-3 hover:border-slate-700 transition-all group relative overflow-hidden">
+      <div className="flex justify-between items-start mb-2 relative z-10">
         <div className="flex items-center gap-3">
             <div className={`p-2 rounded-lg ${style.bg} ${style.color} group-hover:scale-110 transition-transform`}>
                 <Icon size={16} />
             </div>
             <div>
-                <p className="text-sm font-bold text-white">{log.title}</p>
-                <p className="text-[10px] text-slate-500 font-medium uppercase tracking-tight">{log.type}</p>
+                <div className="flex items-center gap-2">
+                    <p className="text-sm font-bold text-white leading-none">{log.title}</p>
+                    {/* KULLANICI BİLGİSİ BURAYA EKLENDİ */}
+                    {logUser && (
+                        <div className="flex items-center gap-1.5 px-2 py-0.5 bg-slate-950 border border-slate-800 rounded-md">
+                            <img src={logUser.avatar} className="w-3.5 h-3.5 rounded-full object-cover" />
+                            <span className="text-[9px] font-black text-blue-400 italic">@{logUser.username}</span>
+                        </div>
+                    )}
+                </div>
+                <p className="text-[10px] text-slate-500 font-medium uppercase tracking-tight mt-1">{log.type}</p>
             </div>
         </div>
-        <p className="text-[10px] text-slate-600 font-bold italic">
-            {new Date(log.created_at).toLocaleString('tr-TR')}
-        </p>
+        <div className="text-right">
+            <p className="text-[10px] text-slate-600 font-bold italic leading-none">
+                {new Date(log.created_at).toLocaleTimeString('tr-TR')}
+            </p>
+            <p className="text-[8px] text-slate-700 font-bold uppercase tracking-tighter mt-1">
+                {new Date(log.created_at).toLocaleDateString('tr-TR')}
+            </p>
+        </div>
       </div>
-      <p className="text-xs text-slate-400 mb-3 ml-11 leading-relaxed">{log.description}</p>
       
-      {/* DETAYLI METADATA GÖSTERİMİ - Kullanıcının istediği detaylar burada korunuyor */}
+      <p className="text-xs text-slate-400 mb-3 ml-11 leading-relaxed border-l-2 border-slate-800 pl-3 py-0.5">{log.description}</p>
+      
+      {/* DETAYLI METADATA GÖSTERİMİ */}
       {log.metadata && Object.keys(log.metadata).length > 0 && (
           <div className="flex flex-wrap gap-2 ml-11 pt-2 border-t border-slate-800/50">
               {Object.entries(log.metadata).map(([key, val]: any) => (
@@ -135,7 +143,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-[#020617] flex text-slate-200 font-sans overflow-hidden">
-      {/* Sidebar - Geri getirilen klasik menü */}
+      {/* Sidebar */}
       <aside className={`fixed inset-y-0 left-0 z-[70] w-64 bg-slate-900 border-r border-slate-800 transition-transform lg:relative lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="h-full flex flex-col p-6">
           <div className="flex items-center gap-3 mb-10 px-2">
@@ -204,6 +212,7 @@ const HomeView = () => {
             const statData = await DatabaseService.getAdminStats();
             setStats(statData);
             
+            // Kullanıcı Joinli sorgu yapılıyor
             const { data: logs } = await supabase
                 .from('activity_logs')
                 .select('*, users(username, avatar)')
@@ -238,11 +247,12 @@ const HomeView = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2 space-y-6">
-                    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
-                         <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-6 flex items-center gap-2">
-                             <History size={16} className="text-blue-500" /> Operasyonel Akış (Metadata Detaylı)
+                    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+                         <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none"><History size={80} /></div>
+                         <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-6 flex items-center gap-2 relative z-10">
+                             <ShieldCheck size={16} className="text-blue-500" /> Audit Log (İşlem Yapan Kullanıcılar)
                          </h3>
-                         <div className="space-y-1">
+                         <div className="space-y-1 relative z-10">
                              {isLoading ? (
                                 <div className="py-20 text-center text-slate-700 animate-pulse font-bold uppercase text-xs">Veritabanı Senkronize Ediliyor...</div>
                              ) : combinedLogs.length === 0 ? (
@@ -269,8 +279,8 @@ const HomeView = () => {
                     
                     <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl text-center">
                         <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-4">Hızlı Erişim</h3>
-                        <button onClick={() => navigate('/a/dashboard/users')} className="w-full py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:border-blue-500/50 transition-all mb-3">Tüm Üyeleri Gör</button>
-                        <button onClick={() => navigate('/a/dashboard/bots')} className="w-full py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:border-purple-500/50 transition-all">Yeni Bot Ekle</button>
+                        <button onClick={() => navigate('/a/dashboard/users')} className="w-full py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:border-blue-500/50 transition-all mb-3 shadow-inner">Tüm Üyeleri Gör</button>
+                        <button onClick={() => navigate('/a/dashboard/bots')} className="w-full py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:border-purple-500/50 transition-all shadow-inner">Yeni Bot Ekle</button>
                     </div>
                 </div>
             </div>
