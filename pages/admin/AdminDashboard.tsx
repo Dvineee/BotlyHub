@@ -9,7 +9,7 @@ import {
   Zap, Star, Eye, Send, Activity, 
   Clock, Wallet, ShieldAlert, Cpu, Ban, CheckCircle, 
   Search, Database, Hash, Wand2, Image as ImageIcon, History, TrendingUp,
-  Mail, Phone, User as UserIcon
+  Mail, User as UserIcon
 } from 'lucide-react';
 import { DatabaseService, supabase } from '../../services/DatabaseService';
 import { User, Bot as BotType, Announcement, Notification, Channel, ActivityLog } from '../../types';
@@ -441,7 +441,6 @@ const BotManagement = () => {
                                 </div>
                                 <div className="flex items-center justify-between">
                                     <p className="text-xs font-black text-white italic flex items-center gap-1.5"><Star size={12} className="text-yellow-500" fill="currentColor"/> {b.price} Yıldız</p>
-                                    {/* Toplam kullanıcı sayısı buraya eklendi */}
                                     <div className="flex items-center gap-1 px-2 py-1 bg-blue-500/10 border border-blue-500/20 rounded text-[9px] font-bold text-blue-400 italic">
                                         <Users size={10} />
                                         <span>{b.ownerCount} SAHİP</span>
@@ -606,19 +605,19 @@ const UserManagement = () => {
 
 const NotificationCenter = () => {
     const [isLoading, setIsLoading] = useState(false);
-    const [form, setForm] = useState({ title: '', message: '', type: 'system' as any, target_type: 'global', user_id: '' });
+    const [form, setForm] = useState({ title: '', message: '', type: 'system' as any, target_type: 'global', username: '' });
 
     const handleSend = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (form.target_type === 'user' && !form.user_id) {
-            alert("Lütfen bir kullanıcı ID girin.");
+        if (form.target_type === 'user' && !form.username) {
+            alert("Lütfen hedef kullanıcının Telegram @KullanıcıAdını girin.");
             return;
         }
         setIsLoading(true);
         try {
             await DatabaseService.sendNotification(form);
-            alert(form.target_type === 'global' ? "Global duyuru ulaştırıldı." : "Bireysel bildirim gönderildi.");
-            setForm({ title: '', message: '', type: 'system', target_type: 'global', user_id: '' });
+            alert(form.target_type === 'global' ? "Global duyuru ulaştırıldı." : `Bildirim @${form.username.replace('@', '')} kullanıcısına gönderildi.`);
+            setForm({ title: '', message: '', type: 'system', target_type: 'global', username: '' });
         } catch (e: any) {
             alert("Hata: " + e.message);
         } finally {
@@ -637,7 +636,7 @@ const NotificationCenter = () => {
                             <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Hedef Kitle</label>
                             <select value={form.target_type} onChange={e => setForm({...form, target_type: e.target.value as any})} className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-xs font-bold text-white outline-none focus:border-blue-500 appearance-none italic shadow-inner">
                                 <option value="global">Tüm Kullanıcılar</option>
-                                <option value="user">Tekil Kullanıcı (ID)</option>
+                                <option value="user">Tekil Kullanıcı (@)</option>
                             </select>
                         </div>
                         <div className="space-y-1.5">
@@ -652,8 +651,11 @@ const NotificationCenter = () => {
 
                     {form.target_type === 'user' && (
                         <div className="space-y-1.5 animate-in slide-in-from-top-2">
-                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Kullanıcı ID</label>
-                            <input required type="text" value={form.user_id} onChange={e => setForm({...form, user_id: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-xs font-bold text-white outline-none focus:border-blue-500 shadow-inner" placeholder="örn: 123456789" />
+                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Telegram @Username</label>
+                            <div className="relative">
+                                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-blue-500 font-black text-xs">@</span>
+                                <input required type="text" value={form.username} onChange={e => setForm({...form, username: e.target.value.replace('@', '')})} className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 pl-8 text-xs font-bold text-white outline-none focus:border-blue-500 shadow-inner" placeholder="kullaniciadi" />
+                            </div>
                         </div>
                     )}
 

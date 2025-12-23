@@ -202,7 +202,15 @@ export class DatabaseService {
 
   static async syncUser(user: Partial<User>) {
     if (!user.id) return;
-    const { error } = await supabase.from('users').upsert({ id: user.id.toString(), name: user.name, username: user.username, avatar: user.avatar, email: user.email, phone: user.phone, joindate: new Date().toISOString() }, { onConflict: 'id' });
+    const { error } = await supabase.from('users').upsert({ 
+        id: user.id.toString(), 
+        name: user.name, 
+        username: user.username, 
+        avatar: user.avatar, 
+        email: user.email, 
+        joindate: new Date().toISOString() 
+    }, { onConflict: 'id' });
+    
     if (!error && user.email) {
         await this.logActivity(user.id.toString(), 'security', 'profile_updated', 'Profil Bilgileri Güncellendi', 'Kullanıcı iletişim/güvenlik verilerini güncelledi.', { email: user.email });
     }
@@ -211,7 +219,7 @@ export class DatabaseService {
   static async getUserById(userId: string): Promise<User | null> {
     const { data } = await supabase.from('users').select('*').eq('id', userId.toString()).maybeSingle();
     if (!data) return null;
-    return { id: data.id, name: data.name, username: data.username, avatar: data.avatar, role: data.role || 'User', status: data.status || 'Active', badges: [], joinDate: data.joindate, email: data.email, phone: data.phone };
+    return { id: data.id, name: data.name, username: data.username, avatar: data.avatar, role: data.role || 'User', status: data.status || 'Active', badges: [], joinDate: data.joindate, email: data.email };
   }
 
   static async getUserActivityLogs(userId: string): Promise<ActivityLog[]> {
@@ -220,13 +228,30 @@ export class DatabaseService {
   }
 
   static async getNotifications(userId?: string): Promise<Notification[]> {
-    let query = supabase.from('notifications').select('*').order('date', { ascending: false });
-    if (userId) {
-        // Fix: Ensure OR logic works correctly for global or targeted notifications
-        query = query.or(`user_id.eq.${userId},target_type.eq.global`);
+    if (!userId) return [];
+    
+    // Supabase OR syntax for finding notifications that are EITHER global OR specific to this user
+    const { data, error } = await supabase
+        .from('notifications')
+        .select('*')
+        .or(`user_id.eq.${userId},target_type.eq.global`)
+        .order('date', { ascending: false });
+        
+    if (error) {
+        console.error("Fetch notifications error:", error);
+        return [];
     }
-    const { data } = await query;
-    return data || [];
+
+    return (data || []).map(n => ({
+        id: n.id,
+        type: n.type,
+        title: n.title,
+        message: n.message,
+        date: n.date,
+        isRead: n.is_read,
+        user_id: n.user_id,
+        target_type: n.target_type
+    }));
   }
 
   static async markNotificationRead(id: string) {
@@ -245,7 +270,7 @@ export class DatabaseService {
 
   static async getUsers(): Promise<User[]> {
     const { data } = await supabase.from('users').select('*').order('joindate', { ascending: false });
-    return (data || []).map(u => ({ id: u.id, name: u.name, username: u.username, avatar: u.avatar, role: u.role || 'User', status: u.status || 'Active', badges: [], joinDate: u.joindate, email: u.email, phone: u.phone }));
+    return (data || []).map(u => ({ id: u.id, name: u.name, username: u.username, avatar: u.avatar, role: u.role || 'User', status: u.status || 'Active', badges: [], joinDate: u.joindate, email: u.email }));
   }
 
   static async updateUserStatus(userId: string, status: string) {
@@ -275,16 +300,33 @@ export class DatabaseService {
   }
 
   static async sendNotification(notification: any) {
-    // Fix: Explicitly handle user_id for non-global notifications to ensure delivery
+    let targetUserId = null;
+
+    if (notification.target_type === 'user') {
+        // Eğer username ile hedefleme yapılıyorsa kullanıcıyı bul
+        const username = notification.username.replace('@', '').trim();
+        const { data: userData, error: userError } = await supabase
+            .from('users')
+            .select('id')
+            .eq('username', username)
+            .maybeSingle();
+            
+        if (userError || !userData) {
+            throw new Error(`@${username} kullanıcısı veritabanında bulunamadı.`);
+        }
+        targetUserId = userData.id;
+    }
+
     const payload = {
         title: notification.title,
         message: notification.message,
         type: notification.type || 'system',
         target_type: notification.target_type || 'global',
-        user_id: notification.target_type === 'user' ? notification.user_id : null,
+        user_id: targetUserId,
         date: new Date().toISOString(),
         is_read: false
     };
+
     const { error } = await supabase.from('notifications').insert(payload);
     if (error) throw error;
   }
