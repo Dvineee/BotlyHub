@@ -8,7 +8,7 @@ import {
   ShieldCheck, Globe, Send, Activity, 
   Wallet, ShieldAlert, Cpu, Ban, CheckCircle, 
   Search, Database, Hash, Wand2, Image as ImageIcon, History,
-  Mail, BellRing, Sparkles, Eye, Zap, RefreshCcw, Star
+  Mail, BellRing, Sparkles, Eye, Zap, RefreshCcw, Star, Calendar, MessageSquare
 } from 'lucide-react';
 import { DatabaseService, supabase } from '../../services/DatabaseService';
 import { User, Bot as BotType, Announcement, Notification, Channel, ActivityLog } from '../../types';
@@ -293,105 +293,136 @@ const UserManagement = () => {
 const NotificationCenter = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [form, setForm] = useState({ title: '', message: '', type: 'system' as any });
+    const [recentNotes, setRecentNotes] = useState<Notification[]>([]);
+
+    useEffect(() => {
+        loadRecentNotes();
+    }, []);
+
+    const loadRecentNotes = async () => {
+        const { data } = await supabase
+            .from('notifications')
+            .select('*')
+            .eq('target_type', 'global')
+            .order('date', { ascending: false })
+            .limit(5);
+        setRecentNotes(data || []);
+    };
 
     const handleSend = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
         try {
-            // DatabaseService.sendNotification metodunu şemadaki 'isRead' sütunuyla uyumlu hale getirdik
             await DatabaseService.sendNotification({
                 ...form,
                 target_type: 'global'
             });
-            alert("Duyuru başarıyla yayınlandı! Tüm kullanıcılar için 'isRead: false' olarak kaydedildi.");
             setForm({ title: '', message: '', type: 'system' });
+            loadRecentNotes();
         } catch (e: any) {
             console.error("Gönderim Hatası:", e);
-            alert("Gönderim Hatası: Veritabanında 'isRead' sütunu bulunamadı veya bir şema hatası oluştu. Lütfen DatabaseService.ts dosyasındaki isimlendirmeleri kontrol edin.");
         } finally {
             setIsLoading(false);
         }
     };
 
     const categories = [
-        { id: 'system', label: 'Genel Duyuru', icon: BellRing, color: 'text-blue-400' },
+        { id: 'system', label: 'Duyuru', icon: BellRing, color: 'text-blue-400' },
         { id: 'payment', label: 'Kampanya', icon: Zap, color: 'text-yellow-400' },
-        { id: 'security', label: 'Önemli Uyarı', icon: ShieldAlert, color: 'text-red-400' },
+        { id: 'security', label: 'Güvenlik', icon: ShieldAlert, color: 'text-red-400' },
         { id: 'bot', label: 'Güncelleme', icon: RefreshCcw, color: 'text-emerald-400' }
     ];
+
+    const getIcon = (type: string) => {
+        return categories.find(c => c.id === type)?.icon || BellRing;
+    };
 
     return (
         <div className="animate-in fade-in space-y-8">
             <div className="flex justify-between items-center">
-                <div>
-                    <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Yayın Merkezi</h2>
-                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Tüm üyelere anlık bildirim (isRead: false) gönderir.</p>
-                </div>
+                <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Yayın Merkezi</h2>
                 <div className="px-4 py-2 bg-blue-600/10 border border-blue-500/20 rounded-xl flex items-center gap-2">
                     <Globe size={14} className="text-blue-500" />
-                    <span className="text-[9px] font-black text-blue-400 uppercase">HEDEF: %100 GLOBAL</span>
+                    <span className="text-[9px] font-black text-blue-400 uppercase">MOD: GLOBAL YAYIN</span>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                {/* SOL: FORM */}
                 <div className="bg-slate-900 border border-slate-800 p-8 rounded-[32px] shadow-2xl">
                     <form onSubmit={handleSend} className="space-y-6">
-                        <div className="space-y-3">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Kategori Seçin</label>
-                            <div className="grid grid-cols-2 gap-3">
-                                {categories.map(cat => (
-                                    <button key={cat.id} type="button" onClick={() => setForm({...form, type: cat.id as any})}
-                                        className={`p-4 rounded-2xl border transition-all flex items-center gap-3 text-left ${
-                                            form.type === cat.id ? 'bg-blue-600/10 border-blue-600/50 text-white shadow-lg' : 'bg-slate-950 border-slate-800 text-slate-500 hover:border-slate-700'
-                                        }`}>
-                                        <cat.icon size={18} className={form.type === cat.id ? cat.color : ''} />
-                                        <span className="text-[10px] font-black uppercase tracking-tight">{cat.label}</span>
-                                    </button>
-                                ))}
-                            </div>
+                        <div className="grid grid-cols-2 gap-3">
+                            {categories.map(cat => (
+                                <button key={cat.id} type="button" onClick={() => setForm({...form, type: cat.id as any})}
+                                    className={`p-4 rounded-2xl border transition-all flex items-center gap-3 text-left ${
+                                        form.type === cat.id ? 'bg-blue-600/10 border-blue-600/50 text-white shadow-lg' : 'bg-slate-950 border-slate-800 text-slate-500 hover:border-slate-700'
+                                    }`}>
+                                    <cat.icon size={18} className={form.type === cat.id ? cat.color : ''} />
+                                    <span className="text-[10px] font-black uppercase tracking-tight">{cat.label}</span>
+                                </button>
+                            ))}
                         </div>
 
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Duyuru Başlığı</label>
-                            <input required type="text" value={form.title} onChange={e => setForm({...form, title: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-xs font-bold text-white outline-none focus:border-blue-500 shadow-inner" placeholder="örn: Bayram Kampanyası Başladı!" />
+                            <input required type="text" value={form.title} onChange={e => setForm({...form, title: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-xs font-bold text-white outline-none focus:border-blue-500" placeholder="Yayın Başlığı" />
                         </div>
 
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Mesaj Detayı</label>
-                            <textarea required value={form.message} onChange={e => setForm({...form, message: e.target.value})} className="w-full h-40 bg-slate-950 border border-slate-800 rounded-2xl p-4 text-xs font-medium text-slate-300 outline-none focus:border-blue-500 resize-none shadow-inner leading-relaxed" placeholder="Kullanıcılara ulaştırılacak ana mesaj metni..." />
+                            <textarea required value={form.message} onChange={e => setForm({...form, message: e.target.value})} className="w-full h-40 bg-slate-950 border border-slate-800 rounded-2xl p-4 text-xs font-medium text-slate-300 outline-none focus:border-blue-500 resize-none leading-relaxed" placeholder="Yayın içeriğini buraya yazın..." />
                         </div>
 
                         <button type="submit" disabled={isLoading} className="w-full py-5 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-2xl text-[10px] uppercase tracking-[0.4em] shadow-xl shadow-blue-900/20 active:scale-95 transition-all flex items-center justify-center gap-3">
-                            {isLoading ? <Loader2 className="animate-spin" size={20}/> : <><Send size={18} /> YAYINI BAŞLAT</>}
+                            {isLoading ? <Loader2 className="animate-spin" size={20}/> : <><Send size={18} /> YAYINI GÖNDER</>}
                         </button>
                     </form>
                 </div>
 
-                <div className="space-y-6">
-                    <div className="bg-slate-900 border border-slate-800 p-8 rounded-[32px] shadow-xl">
-                        <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-6 flex items-center gap-2"><Eye size={16} className="text-blue-400" /> Mobil Görünüm Önizlemesi</h3>
-                        <div className="bg-[#020617] w-full aspect-[9/10] max-w-[280px] mx-auto rounded-[36px] border-[6px] border-slate-800 shadow-2xl relative overflow-hidden flex flex-col p-4">
-                            <div className="w-16 h-4 bg-slate-800 rounded-b-xl absolute top-0 left-1/2 -translate-x-1/2"></div>
-                            <div className="mt-6 flex-1">
-                                <p className="text-[9px] font-black text-slate-700 uppercase mb-3 px-1">Bildirimler</p>
-                                <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 shadow-lg relative overflow-hidden">
-                                    <div className="absolute top-0 left-0 w-1 h-full bg-blue-600"></div>
-                                    <div className="flex gap-3">
-                                        <div className="w-8 h-8 rounded-lg bg-slate-950 flex items-center justify-center shrink-0">
-                                            {React.createElement(categories.find(c => c.id === form.type)?.icon || BellRing, { size: 14, className: 'text-blue-400' })}
-                                        </div>
-                                        <div className="min-w-0 flex-1">
-                                            <p className="text-[10px] font-black text-white truncate">{form.title || 'Duyuru Başlığı'}</p>
-                                            <p className="text-[8px] text-slate-500 font-medium line-clamp-2 mt-0.5">{form.message || 'Mesaj içeriği burada bu şekilde görünecektir...'}</p>
+                {/* SAĞ: SON GÖNDERİLENLER */}
+                <div className="bg-slate-900 border border-slate-800 p-8 rounded-[32px] shadow-xl flex flex-col">
+                    <h3 className="text-[11px] font-black text-slate-500 uppercase tracking-[0.3em] mb-6 flex items-center gap-3"><History size={16} className="text-blue-400" /> Son Yayınlanan Duyurular</h3>
+                    
+                    <div className="space-y-4 overflow-y-auto max-h-[500px] no-scrollbar pr-2">
+                        {recentNotes.length === 0 ? (
+                            <div className="py-20 text-center opacity-20">
+                                <BellRing size={40} className="mx-auto mb-4" />
+                                <p className="text-xs font-bold uppercase tracking-widest">Kayıt Bulunamadı</p>
+                            </div>
+                        ) : (
+                            recentNotes.map((note) => {
+                                const Icon = getIcon(note.type);
+                                return (
+                                    <div key={note.id} className="bg-slate-950/80 border border-slate-800/50 rounded-2xl p-4 hover:border-slate-700 transition-all group">
+                                        <div className="flex items-start gap-4">
+                                            <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center border border-slate-800 group-hover:bg-blue-600/10 transition-colors">
+                                                <Icon size={18} className="text-blue-400" />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex justify-between items-center mb-1">
+                                                    <h4 className="text-[11px] font-black text-white truncate uppercase tracking-tight">{note.title}</h4>
+                                                    <span className="text-[9px] text-slate-600 font-bold whitespace-nowrap">{new Date(note.date).toLocaleDateString()}</span>
+                                                </div>
+                                                <p className="text-[10px] text-slate-500 font-medium line-clamp-2 leading-relaxed">{note.message}</p>
+                                                <div className="flex items-center gap-3 mt-3">
+                                                    <div className="flex items-center gap-1">
+                                                        <Globe size={10} className="text-emerald-500" />
+                                                        <span className="text-[8px] font-black text-emerald-500 uppercase">Global</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
+                                                        <CheckCircle size={10} className="text-blue-500" />
+                                                        <span className="text-[8px] font-black text-blue-500 uppercase tracking-tighter">Yayında</span>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="mt-8 p-4 bg-blue-600/5 border border-blue-500/10 rounded-2xl flex items-start gap-4">
-                            <Sparkles size={18} className="text-blue-400 shrink-0" />
-                            <p className="text-[10px] text-slate-500 font-medium leading-relaxed italic">Okunma durumu (isRead) veritabanınızdaki isimlendirmeyle tam uyumlu olarak 'false' atanarak kaydedilir.</p>
-                        </div>
+                                );
+                            })
+                        )}
+                    </div>
+
+                    <div className="mt-auto pt-8 border-t border-slate-800 flex items-center gap-3 opacity-40">
+                        <Sparkles size={16} className="text-blue-500" />
+                        <p className="text-[10px] text-slate-400 font-bold italic">Duyurular anlık olarak kullanıcıların ekranına düşer.</p>
                     </div>
                 </div>
             </div>
@@ -413,7 +444,7 @@ const SettingsManagement = () => {
 
     const handleSave = async () => {
         await DatabaseService.saveSettings(settings);
-        alert("Sistem ayarları güncellendi (MaintenanceMode: " + settings.maintenanceMode + ")");
+        alert("Sistem ayarları güncellendi.");
     };
 
     return (
