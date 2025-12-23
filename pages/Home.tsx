@@ -13,6 +13,17 @@ const iconMap: Record<string, any> = {
   Sparkles, Megaphone, Zap, Gift, Star, Info, BotIcon, Heart, Bell, Shield
 };
 
+/**
+ * Telegram üzerinden güncel profil resmini çeken yardımcı fonksiyon
+ */
+const getLiveBotIcon = (bot: Bot) => {
+    if (bot.bot_link) {
+        const username = bot.bot_link.replace('@', '').replace('https://t.me/', '').trim();
+        if (username) return `https://t.me/i/userpic/320/${username}.jpg`;
+    }
+    return bot.icon || `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=random&color=fff`;
+};
+
 const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) => void }> = ({ ann, onShowPopup }) => {
   const navigate = useNavigate();
   const colors: Record<string, string> = {
@@ -77,7 +88,12 @@ const BotCard: React.FC<{ bot: Bot }> = ({ bot }) => {
   return (
     <div onClick={handleClick} className="flex items-center p-4 cursor-pointer group hover:bg-slate-900/60 rounded-[28px] transition-all border border-transparent hover:border-slate-800/50 mb-2 active:bg-slate-900">
         <div className="relative shrink-0">
-            <img src={bot.icon} alt={bot.name} className="w-20 h-20 rounded-[28px] object-cover bg-slate-900 shadow-2xl border border-slate-800 group-hover:scale-105 transition-transform" />
+            <img 
+                src={getLiveBotIcon(bot)} 
+                alt={bot.name} 
+                className="w-20 h-20 rounded-[28px] object-cover bg-slate-900 shadow-2xl border border-slate-800 group-hover:scale-105 transition-transform" 
+                onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
+            />
             {bot.price > 0 && (
                 <div className="absolute -top-1.5 -right-1.5 w-6 h-6 bg-yellow-500 rounded-lg flex items-center justify-center shadow-lg border-2 border-slate-950">
                     <Star size={12} fill="currentColor" className="text-slate-950" />

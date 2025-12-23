@@ -13,6 +13,17 @@ import { useTranslation } from '../TranslationContext';
 
 const { useNavigate, useParams } = Router as any;
 
+/**
+ * Telegram üzerinden güncel profil resmini çeken yardımcı fonksiyon
+ */
+const getLiveBotIcon = (bot: Bot) => {
+    if (bot.bot_link) {
+        const username = bot.bot_link.replace('@', '').replace('https://t.me/', '').trim();
+        if (username) return `https://t.me/i/userpic/320/${username}.jpg`;
+    }
+    return bot.icon || `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`;
+};
+
 const BotDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -76,7 +87,6 @@ const BotDetail = () => {
   const loadBotChannels = async () => {
       if (!user?.id || !id) return;
       const allChannels = await DatabaseService.getChannels(user.id.toString());
-      // Sadece bu bota bağlı kanalları filtrele
       setBotChannels(allChannels.filter(c => c.connectedBotIds.includes(id)));
   };
 
@@ -93,7 +103,7 @@ const BotDetail = () => {
       haptic('medium');
       
       if (isOwned) {
-          const username = bot.bot_link.replace('@', '').trim();
+          const username = bot.bot_link.replace('@', '').replace('https://t.me/', '').trim();
           const finalUrl = `https://t.me/${username}`;
           if (tg?.openTelegramLink) tg.openTelegramLink(finalUrl);
           else window.open(finalUrl, '_blank');
@@ -134,7 +144,11 @@ const BotDetail = () => {
           <div className="bg-[#0f172a] border border-slate-800 rounded-[44px] p-8 relative overflow-hidden shadow-2xl mb-10">
               <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/10 blur-[60px] rounded-full"></div>
               <div className="flex flex-col items-center text-center relative z-10">
-                  <img src={bot.icon} className={`w-32 h-32 rounded-[40px] shadow-2xl border-4 transition-all mb-6 ${isOwned ? 'border-blue-500/50' : 'border-slate-800'}`} />
+                  <img 
+                    src={getLiveBotIcon(bot)} 
+                    className={`w-32 h-32 rounded-[40px] shadow-2xl border-4 transition-all mb-6 ${isOwned ? 'border-blue-500/50' : 'border-slate-800'}`} 
+                    onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
+                  />
                   <h2 className="text-3xl font-black text-white italic tracking-tighter uppercase">{bot.name}</h2>
                   <div className="flex gap-2 mt-4">
                       <span className="text-[8px] font-black px-3 py-1.5 rounded-lg bg-slate-950 text-slate-500 border border-slate-800 uppercase tracking-widest">{bot.category}</span>
@@ -144,10 +158,7 @@ const BotDetail = () => {
           </div>
 
           {isOwned ? (
-              /* PANEL MODU: Kullanıcı botun sahibi ise */
               <div className="space-y-10 animate-in slide-in-from-bottom-4">
-                  
-                  {/* BAĞLANTI DURUMU / KURULUM REHBERİ */}
                   <section>
                       <div className="flex justify-between items-center mb-6 px-2">
                           <h3 className="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em] flex items-center gap-3">
@@ -169,7 +180,6 @@ const BotDetail = () => {
                       </div>
                   </section>
 
-                  {/* BU BOTA BAĞLI KANALLAR */}
                   <section>
                       <div className="flex justify-between items-center mb-6 px-2">
                           <h3 className="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em] flex items-center gap-3">
@@ -204,7 +214,6 @@ const BotDetail = () => {
                   </section>
               </div>
           ) : (
-              /* TANITIM MODU: Kullanıcı botun sahibi değilse */
               <div className="space-y-10 animate-in fade-in">
                   <section>
                       <h3 className="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em] mb-4 px-2 italic">Açıklama</h3>
@@ -224,7 +233,6 @@ const BotDetail = () => {
           )}
       </div>
 
-      {/* FIXED ACTION BUTTON */}
       <div className="fixed bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-[#020617] via-[#020617] to-transparent z-30">
           <div className="max-w-md mx-auto">
               <button 

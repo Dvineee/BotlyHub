@@ -2,11 +2,22 @@
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ShoppingBag, TrendingUp, Bot, Send, Activity, Trash2, AlertTriangle, X, Loader2, Lock, Clock, Info } from 'lucide-react';
 import * as Router from 'react-router-dom';
-import { UserBot } from '../types';
+import { UserBot, Bot as BotType } from '../types';
 import { DatabaseService } from '../services/DatabaseService';
 import { useTelegram } from '../hooks/useTelegram';
 
 const { useNavigate } = Router as any;
+
+/**
+ * Telegram üzerinden güncel profil resmini çeken yardımcı fonksiyon
+ */
+const getLiveBotIcon = (bot: BotType) => {
+    if (bot.bot_link) {
+        const username = bot.bot_link.replace('@', '').replace('https://t.me/', '').trim();
+        if (username) return `https://t.me/i/userpic/320/${username}.jpg`;
+    }
+    return bot.icon || `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`;
+};
 
 const MyBots = () => {
   const navigate = useNavigate();
@@ -74,7 +85,6 @@ const MyBots = () => {
       localStorage.setItem('ownedBots', JSON.stringify(updatedBots));
 
       if (user?.id) {
-          // Fix: Added missing title argument and corrected type to 'bot_manage'
           await DatabaseService.logActivity(user.id.toString(), 'bot_manage', 'Ayar Değişti', 'Gelir Ayarı Güncellendi', `'${bot.name}' botu için gelir modu ${!bot.isAdEnabled ? 'AÇILDI' : 'KAPATILDI'}.`);
       }
   };
@@ -90,7 +100,6 @@ const MyBots = () => {
     localStorage.setItem('ownedBots', JSON.stringify(updatedBots));
 
     if (user?.id) {
-        // Fix: Added missing title argument and corrected type to 'bot_manage'
         await DatabaseService.logActivity(user.id.toString(), 'bot_manage', 'Statü Değişti', 'Bot Durumu Güncellendi', `'${bot.name}' bot durumu ${!bot.isActive ? 'AKTİF' : 'PASİF'} yapıldı.`);
     }
   };
@@ -131,7 +140,6 @@ const MyBots = () => {
   const handleStartBot = async (bot: UserBot) => {
       haptic('medium');
       if (user?.id) {
-          // Fix: Added missing title argument and corrected type to 'bot_manage'
           await DatabaseService.logActivity(user.id.toString(), 'bot_manage', 'Bot Başlatıldı', 'Bot Tetiklendi', `'${bot.name}' botu Telegram üzerinden tetiklendi.`);
       }
       let botLink = bot.bot_link || '';
@@ -185,7 +193,12 @@ const MyBots = () => {
                 <div key={bot.id} className="group relative bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden h-[145px] transition-all hover:border-slate-700">
                     <div className="p-3 flex items-center h-full pr-14 relative z-10">
                          <div className="relative flex-shrink-0">
-                             <img src={bot.icon} alt={bot.name} className="w-24 h-24 rounded-2xl object-cover bg-slate-800 border border-slate-700" />
+                             <img 
+                                src={getLiveBotIcon(bot)} 
+                                alt={bot.name} 
+                                className="w-24 h-24 rounded-2xl object-cover bg-slate-800 border border-slate-700" 
+                                onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
+                             />
                              {bot.price > 0 && (
                                  <div className="absolute -top-2 -left-2 bg-blue-600 text-white p-1.5 rounded-lg border-2 border-slate-950 shadow-xl">
                                      <Lock size={12} />
