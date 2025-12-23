@@ -243,22 +243,22 @@ export class DatabaseService {
   }
 
   static async saveBot(bot: any) {
-    // Sadece veritabanı şemasında bulunan kolonları gönder (Strict Pick)
-    // ownerCount, isNew, features gibi UI-only alanları temizler
+    // KESİN ÇÖZÜM: Sadece veritabanı şemasında var olan kolonları seçiyoruz.
+    // ownerCount gibi sonradan eklenen sanal alanlar veritabanına gönderilmez.
     const dbPayload = {
-        id: bot.id,
-        name: bot.name,
-        description: bot.description,
-        icon: bot.icon,
-        price: bot.price,
-        category: bot.category,
-        bot_link: bot.bot_link,
-        screenshots: bot.screenshots
+        id: String(bot.id),
+        name: String(bot.name),
+        description: String(bot.description),
+        price: Number(bot.price),
+        category: String(bot.category),
+        bot_link: String(bot.bot_link),
+        screenshots: bot.screenshots || [],
+        icon: String(bot.icon || '') // Fallback olarak durabilir ama render'da kullanılmayacak
     };
 
-    const { error } = await supabase.from('bots').upsert(dbPayload);
+    const { error } = await supabase.from('bots').upsert(dbPayload, { onConflict: 'id' });
     if (error) {
-        console.error("Supabase Save Bot Detail Error:", error);
+        console.error("Supabase Bot Upsert Fail:", error);
         throw error;
     }
   }
