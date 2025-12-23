@@ -243,11 +243,22 @@ export class DatabaseService {
   }
 
   static async saveBot(bot: any) {
-    // Veritabanı tablosunda olmayanjoined alanları (ownerCount gibi) temizle
-    const { ownerCount, ...cleanBot } = bot;
-    const { error } = await supabase.from('bots').upsert(cleanBot);
+    // Sadece veritabanı şemasında bulunan kolonları gönder (Strict Pick)
+    // ownerCount, isNew, features gibi UI-only alanları temizler
+    const dbPayload = {
+        id: bot.id,
+        name: bot.name,
+        description: bot.description,
+        icon: bot.icon,
+        price: bot.price,
+        category: bot.category,
+        bot_link: bot.bot_link,
+        screenshots: bot.screenshots
+    };
+
+    const { error } = await supabase.from('bots').upsert(dbPayload);
     if (error) {
-        console.error("Supabase Save Bot Error:", error);
+        console.error("Supabase Save Bot Detail Error:", error);
         throw error;
     }
   }
