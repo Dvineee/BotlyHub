@@ -142,7 +142,7 @@ export class DatabaseService {
     if (!data) return [];
     return data.map((item: any) => ({ 
         ...item.bots, 
-        expiryDate: item.expiryDate, // Şemada CamelCase: expiryDate
+        expiryDate: item.expiryDate, 
         ownership_id: item.id,
         is_premium: item.is_premium,
         is_active: item.is_active
@@ -171,7 +171,7 @@ export class DatabaseService {
         avatar: user.avatar, 
         email: user.email, 
         joindate: new Date().toISOString(),
-        joinDate: new Date().toISOString() // Şemada her ikisi de görünüyor
+        joinDate: new Date().toISOString() 
     }, { onConflict: 'id' });
   }
 
@@ -196,15 +196,12 @@ export class DatabaseService {
         title: n.title,
         message: n.message,
         date: n.date,
-        isRead: n.isRead, // Şemadaki tam isim
+        isRead: n.isRead, 
         user_id: n.user_id,
         target_type: n.target_type
     }));
   }
 
-  /**
-   * Bildirim Okundu İşaretle - Şemadaki tam isimlendirmeyi (isRead) kullanır.
-   */
   static async markNotificationRead(id: string) {
     const { error } = await supabase
         .from('notifications')
@@ -245,17 +242,21 @@ export class DatabaseService {
     return data || [];
   }
 
-  static async saveBot(bot: Partial<Bot>) {
-    await supabase.from('bots').upsert(bot);
+  static async saveBot(bot: any) {
+    // Veritabanı tablosunda olmayanjoined alanları (ownerCount gibi) temizle
+    const { ownerCount, ...cleanBot } = bot;
+    const { error } = await supabase.from('bots').upsert(cleanBot);
+    if (error) {
+        console.error("Supabase Save Bot Error:", error);
+        throw error;
+    }
   }
 
   static async deleteBot(id: string) {
-    await supabase.from('bots').delete().eq('id', id);
+    const { error } = await supabase.from('bots').delete().eq('id', id);
+    if (error) throw error;
   }
 
-  /**
-   * Bildirim Gönder - Şemaya (isRead) tam uyumlu payload kullanır.
-   */
   static async sendNotification(notification: any) {
     const uniqueId = Math.random().toString(36).substring(2, 15);
     const payload = {
@@ -266,7 +267,7 @@ export class DatabaseService {
         target_type: 'global', 
         user_id: null, 
         date: new Date().toISOString(),
-        isRead: false // Şemadaki tam CamelCase isimlendirme
+        isRead: false 
     };
 
     const { error } = await supabase.from('notifications').insert(payload);
@@ -280,7 +281,7 @@ export class DatabaseService {
     await supabase.from('settings').upsert({ 
         id: 1, 
         appName: settings.appName,
-        MaintenanceMode: settings.maintenanceMode // Şemadaki tam isim
+        MaintenanceMode: settings.maintenanceMode 
     });
   }
 

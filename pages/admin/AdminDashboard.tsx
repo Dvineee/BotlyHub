@@ -1,7 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
 import * as Router from 'react-router-dom';
-// Added missing Fingerprint import to resolve "Cannot find name 'Fingerprint'" error on line 361
 import { 
   LayoutDashboard, Users, Bot, LogOut, Menu, X, 
   Loader2, RefreshCw, Plus, Trash2, 
@@ -10,7 +9,7 @@ import {
   Wallet, ShieldAlert, Cpu, Ban, CheckCircle, 
   Search, Database, Hash, Wand2, Image as ImageIcon, History,
   Mail, BellRing, Sparkles, Eye, Zap, RefreshCcw, Star, Calendar, MessageSquare, ExternalLink, Layers, PlusCircle, Link2,
-  Fingerprint
+  Fingerprint, Info
 } from 'lucide-react';
 import { DatabaseService, supabase } from '../../services/DatabaseService';
 import { User, Bot as BotType, Announcement, Notification, Channel, ActivityLog } from '../../types';
@@ -226,7 +225,7 @@ const SalesManagement = () => {
     );
 };
 
-// --- YENİLENEN MARKET YÖNETİMİ ---
+// --- MARKET YÖNETİMİ ---
 
 const BotManagement = () => {
     const [bots, setBots] = useState<any[]>([]);
@@ -246,39 +245,29 @@ const BotManagement = () => {
             load();
         } catch (err) {
             console.error("Bot kaydetme hatası:", err);
-            alert("Bot kaydedilemedi. Lütfen verileri kontrol edin.");
+            alert("Bot kaydedilemedi. Veritabanı bağlantısını kontrol edin.");
         } finally {
             setIsLoading(false);
         }
     };
 
     /**
-     * Telegram Kullanıcı Adından Otomatik Görsel Çekme
+     * Telegram Kullanıcı Adından Otomatik ve GÜNCEL Görsel Çekme
      */
-    const handleTelegramUserChange = (val: string) => {
+    const handleTelegramUsernameChange = (val: string) => {
         const username = val.replace('@', '').trim();
         const tgLink = username ? `@${username}` : '';
         
-        // Eğer kullanıcı adı girilmişse Telegram'dan profil resmini çekmeye çalış
+        // Eğer kullanıcı adı girilmişse Telegram'ın profil resmi API'sini kullan (En güncel hali çeker)
         if (username) {
-            const tgIconUrl = `https://t.me/i/userpic/160/${username}.jpg`;
+            const tgIconUrl = `https://t.me/i/userpic/320/${username}.jpg`;
             setEditingBot(prev => ({ 
                 ...prev, 
                 bot_link: tgLink, 
-                icon: tgIconUrl // Otomatik olarak profil resmini ata
+                icon: tgIconUrl 
             }));
         } else {
             setEditingBot(prev => ({ ...prev, bot_link: tgLink }));
-        }
-    };
-
-    const handleAutoNameChange = (name: string) => {
-        // Eğer ikon alanı hala boşsa fallback avatar oluştur
-        if (!editingBot?.icon || editingBot.icon.includes('ui-avatars.com')) {
-            const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff&size=512&bold=true`;
-            setEditingBot(prev => ({ ...prev, name, icon: fallback }));
-        } else {
-            setEditingBot(prev => ({ ...prev, name }));
         }
     };
 
@@ -303,8 +292,8 @@ const BotManagement = () => {
         <div className="animate-in fade-in space-y-8">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Market Envanteri</h2>
-                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1 italic">Bot mülkiyetlerini ve kimliklerini yönetin.</p>
+                    <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Market Yönetimi</h2>
+                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1 italic">Bot kimliklerini ve vitrin görünümlerini buradan yönetin.</p>
                 </div>
                 <button onClick={() => { setEditingBot({ id: Math.random().toString(36).substr(2, 9), name: '', description: '', price: 0, category: 'productivity', bot_link: '', icon: '', screenshots: [] }); setIsModalOpen(true); }} className="w-full sm:w-auto px-6 py-3.5 bg-blue-600 hover:bg-blue-500 rounded-2xl text-xs font-black text-white flex items-center justify-center gap-3 shadow-xl shadow-blue-900/20 active:scale-95 transition-all">
                     <Plus size={18}/> YENİ BOT OLUŞTUR
@@ -327,13 +316,13 @@ const BotManagement = () => {
                                 <p className="text-[10px] text-blue-500 font-black mt-1 uppercase tracking-widest">{b.price} STARS</p>
                                 <div className="flex items-center gap-2 mt-2">
                                     <Users size={12} className="text-slate-600" />
-                                    <span className="text-[10px] text-slate-500 font-bold">{b.ownerCount} Aktif Sahip</span>
+                                    <span className="text-[10px] text-slate-500 font-bold">{b.ownerCount} Sahip</span>
                                 </div>
                             </div>
                         </div>
                         <div className="flex gap-2">
-                            <button onClick={() => { setEditingBot(b); setIsModalOpen(true); }} className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-white font-black text-[10px] rounded-xl uppercase tracking-widest transition-all">YÖNET</button>
-                            <button onClick={async () => { if(confirm("Bu botu sistemden kalıcı olarak silmek istediğine emin misin?")) { await DatabaseService.deleteBot(b.id); load(); } }} className="p-3 bg-slate-800 hover:bg-red-600 text-slate-400 hover:text-white rounded-xl transition-all"><Trash2 size={16}/></button>
+                            <button onClick={() => { setEditingBot(b); setIsModalOpen(true); }} className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-white font-black text-[10px] rounded-xl uppercase tracking-widest transition-all">DÜZENLE</button>
+                            <button onClick={async () => { if(confirm("Bu botu sistemden silmek istediğine emin misin?")) { await DatabaseService.deleteBot(b.id); load(); } }} className="p-3 bg-slate-800 hover:bg-red-600 text-slate-400 hover:text-white rounded-xl transition-all"><Trash2 size={16}/></button>
                         </div>
                     </div>
                 ))}
@@ -341,68 +330,75 @@ const BotManagement = () => {
 
             {/* BOT DÜZENLEME MODAL */}
             {isModalOpen && editingBot && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 lg:p-6 bg-black/90 backdrop-blur-md animate-in fade-in overflow-y-auto">
-                    <div className="bg-[#020617] w-full max-w-5xl my-auto rounded-[32px] lg:rounded-[40px] border border-slate-800 overflow-hidden flex flex-col shadow-2xl max-h-[90vh]">
-                        <div className="p-6 lg:p-8 border-b border-slate-800 flex justify-between items-center bg-slate-900/30 shrink-0">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 lg:p-6 bg-black/95 backdrop-blur-md animate-in fade-in overflow-y-auto">
+                    <div className="bg-[#020617] w-full max-w-6xl my-auto rounded-[32px] lg:rounded-[48px] border border-slate-800 overflow-hidden flex flex-col shadow-2xl max-h-[95vh] relative">
+                        
+                        {/* Modal Header */}
+                        <div className="p-6 lg:p-10 border-b border-slate-800 flex justify-between items-center bg-slate-900/30 shrink-0">
                             <div className="flex items-center gap-4">
-                                <div className="p-3 bg-blue-600 rounded-2xl"><Bot className="text-white" size={24}/></div>
+                                <div className="p-3 bg-blue-600 rounded-2xl shadow-lg shadow-blue-500/20"><Bot className="text-white" size={28}/></div>
                                 <div>
-                                    <h3 className="text-xl font-black text-white uppercase italic tracking-tighter">Bot Yapılandırma</h3>
-                                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Market vitrinini ve kimlik bilgilerini düzenleyin.</p>
+                                    <h3 className="text-xl lg:text-2xl font-black text-white uppercase italic tracking-tighter">Bot Yapılandırma</h3>
+                                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest hidden sm:block">ID bazlı veritabanı kayıtlarını yönetin.</p>
                                 </div>
                             </div>
                             <button onClick={() => setIsModalOpen(false)} className="p-3 bg-slate-800 text-slate-400 hover:text-white rounded-2xl transition-all"><X size={24}/></button>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto p-6 lg:p-10 no-scrollbar">
-                            <form id="bot-form" onSubmit={handleSave} className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-                                {/* SOL KOLON: TEMEL BİLGİLER */}
-                                <div className="lg:col-span-7 space-y-8">
-                                    <div className="space-y-1.5">
-                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
-                                            <Fingerprint size={12}/> Bot Benzersiz ID (Mülkiyet Kimliği)
-                                        </label>
-                                        <input required type="text" value={editingBot.id} onChange={e => setEditingBot({...editingBot, id: e.target.value})} className="w-full bg-slate-900 border border-slate-800 rounded-2xl p-4 text-xs font-mono font-bold text-blue-500 outline-none focus:border-blue-500 bg-blue-500/5" placeholder="bot_unique_id" />
-                                    </div>
-
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                        <div className="space-y-1.5">
-                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Bot Görünen Adı</label>
-                                            <input required type="text" value={editingBot.name} onChange={e => handleAutoNameChange(e.target.value)} className="w-full bg-slate-900 border border-slate-800 rounded-2xl p-4 text-sm font-bold text-white outline-none focus:border-blue-500" placeholder="örn: Task Master Pro" />
-                                        </div>
-                                        <div className="space-y-1.5">
-                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex justify-between">
-                                                <span>Telegram Kullanıcı Adı</span>
-                                                <span className="text-blue-500 animate-pulse">Auto-Sync Görsel</span>
+                        {/* Modal Body */}
+                        <div className="flex-1 overflow-y-auto p-6 lg:p-12 no-scrollbar">
+                            <form id="bot-form" onSubmit={handleSave} className="flex flex-col lg:grid lg:grid-cols-12 gap-10 lg:gap-16">
+                                
+                                {/* SOL KOLON: FORM VERİLERİ */}
+                                <div className="lg:col-span-7 space-y-10">
+                                    
+                                    <div className="p-6 bg-slate-900/40 border border-slate-800 rounded-[32px] space-y-8">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
+                                                <Fingerprint size={12} className="text-blue-500"/> Bot Benzersiz ID (Zorunlu)
                                             </label>
-                                            <div className="relative">
-                                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 font-black text-sm">@</span>
-                                                <input required type="text" value={editingBot.bot_link?.replace('@','')} onChange={e => handleTelegramUserChange(e.target.value)} className="w-full bg-slate-900 border border-slate-800 rounded-2xl p-4 pl-10 text-sm font-bold text-white outline-none focus:border-blue-500" placeholder="bot_username" />
+                                            <input required type="text" value={editingBot.id} onChange={e => setEditingBot({...editingBot, id: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-xs font-mono font-bold text-blue-500 outline-none focus:border-blue-500 bg-blue-500/5 transition-all" placeholder="bot_id_unique" />
+                                        </div>
+
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Bot Görünen Adı</label>
+                                                <input required type="text" value={editingBot.name} onChange={e => setEditingBot({...editingBot, name: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm font-bold text-white outline-none focus:border-blue-500 transition-all" placeholder="örn: Task Master Pro" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex justify-between">
+                                                    <span>Telegram Kullanıcı Adı</span>
+                                                    <span className="text-emerald-500 text-[8px] animate-pulse">OTO-SİNK GÖRSEL</span>
+                                                </label>
+                                                <div className="relative">
+                                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 font-black text-sm">@</span>
+                                                    <input required type="text" value={editingBot.bot_link?.replace('@','')} onChange={e => handleTelegramUsernameChange(e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 pl-10 text-sm font-bold text-white outline-none focus:border-blue-500 transition-all" placeholder="bot_username" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Kategori</label>
+                                                <select value={editingBot.category} onChange={e => setEditingBot({...editingBot, category: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm font-bold text-white outline-none focus:border-blue-500 transition-all appearance-none cursor-pointer">
+                                                    {Object.entries(CATEGORY_NAMES).map(([id, label]) => <option key={id} value={id}>{label}</option>)}
+                                                </select>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Fiyat (Stars)</label>
+                                                <input required type="number" value={editingBot.price} onChange={e => setEditingBot({...editingBot, price: Number(e.target.value)})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm font-bold text-white outline-none focus:border-blue-500 transition-all" placeholder="0 = Ücretsiz" />
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                        <div className="space-y-1.5">
-                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Kategori</label>
-                                            <select value={editingBot.category} onChange={e => setEditingBot({...editingBot, category: e.target.value})} className="w-full bg-slate-900 border border-slate-800 rounded-2xl p-4 text-sm font-bold text-white outline-none focus:border-blue-500">
-                                                {Object.entries(CATEGORY_NAMES).map(([id, label]) => <option key={id} value={id}>{label}</option>)}
-                                            </select>
-                                        </div>
-                                        <div className="space-y-1.5">
-                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Fiyat (Stars)</label>
-                                            <input required type="number" value={editingBot.price} onChange={e => setEditingBot({...editingBot, price: Number(e.target.value)})} className="w-full bg-slate-900 border border-slate-800 rounded-2xl p-4 text-sm font-bold text-white outline-none focus:border-blue-500" placeholder="0 = Ücretsiz" />
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-1.5">
-                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Bot Detay Açıklaması</label>
-                                        <textarea required value={editingBot.description} onChange={e => setEditingBot({...editingBot, description: e.target.value})} className="w-full h-32 bg-slate-900 border border-slate-800 rounded-2xl p-4 text-sm font-medium text-slate-300 outline-none focus:border-blue-500 resize-none leading-relaxed" placeholder="Kullanıcıların göreceği tanıtım metni..." />
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Tanıtım Metni</label>
+                                        <textarea required value={editingBot.description} onChange={e => setEditingBot({...editingBot, description: e.target.value})} className="w-full h-40 bg-slate-900/40 border border-slate-800 rounded-[32px] p-6 text-sm font-medium text-slate-300 outline-none focus:border-blue-500 resize-none leading-relaxed transition-all" placeholder="Market vitrininde görünecek açıklama..." />
                                     </div>
 
                                     <div className="space-y-4">
-                                        <div className="flex justify-between items-center">
-                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Görsel Vitrini (Screenshots)</label>
+                                        <div className="flex justify-between items-center px-1">
+                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Ekran Görüntüleri</label>
                                             <button type="button" onClick={addScreenshot} className="text-[10px] font-black text-blue-500 uppercase flex items-center gap-1 hover:text-blue-400 transition-colors">
                                                 <PlusCircle size={14}/> URL EKLE
                                             </button>
@@ -410,9 +406,9 @@ const BotManagement = () => {
                                         <div className="space-y-3">
                                             {(editingBot.screenshots || []).map((s, idx) => (
                                                 <div key={idx} className="flex gap-3 animate-in slide-in-from-left-2">
-                                                    <div className="p-3 bg-slate-800 rounded-xl text-slate-500 font-black text-[10px] hidden sm:flex">{idx+1}</div>
-                                                    <input type="text" value={s} onChange={e => updateScreenshot(idx, e.target.value)} className="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-4 text-xs font-medium text-white outline-none focus:border-blue-500" placeholder="Görsel URL'si (https://...)" />
-                                                    <button type="button" onClick={() => removeScreenshot(idx)} className="p-3 bg-red-600/10 text-red-500 rounded-xl hover:bg-red-600 hover:text-white transition-all"><Trash2 size={16}/></button>
+                                                    <div className="p-3 bg-slate-800 rounded-xl text-slate-500 font-black text-[10px] hidden sm:flex items-center">{idx+1}</div>
+                                                    <input type="text" value={s} onChange={e => updateScreenshot(idx, e.target.value)} className="flex-1 bg-slate-900 border border-slate-800 rounded-2xl px-5 text-xs font-medium text-white outline-none focus:border-blue-500" placeholder="https://..." />
+                                                    <button type="button" onClick={() => removeScreenshot(idx)} className="p-4 bg-red-600/10 text-red-500 rounded-2xl hover:bg-red-600 hover:text-white transition-all"><Trash2 size={18}/></button>
                                                 </div>
                                             ))}
                                         </div>
@@ -421,48 +417,44 @@ const BotManagement = () => {
 
                                 {/* SAĞ KOLON: ÖNİZLEME */}
                                 <div className="lg:col-span-5 space-y-8">
-                                    <div className="bg-slate-900 border border-slate-800 p-8 rounded-[40px] shadow-xl space-y-6 lg:sticky lg:top-0">
+                                    <div className="bg-slate-900/60 border border-slate-800 p-8 rounded-[48px] shadow-2xl space-y-8 lg:sticky lg:top-10">
                                         <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-4 flex items-center gap-2">
-                                            <Eye size={16} className="text-blue-400" /> CANLI ÖNİZLEME
+                                            <Eye size={18} className="text-blue-500" /> MARKET ÖNİZLEME
                                         </h3>
                                         
-                                        <div className="space-y-6">
+                                        <div className="space-y-8">
                                             <div className="flex flex-col items-center text-center">
                                                 <div className="relative group">
-                                                    <img src={editingBot.icon} className="w-28 h-28 rounded-[32px] border-4 border-slate-800 shadow-2xl object-cover bg-slate-950 mb-4" onError={(e) => { (e.target as any).src = 'https://ui-avatars.com/api/?name=Bot&background=334155'; }} />
-                                                    <div className="absolute inset-0 bg-black/60 rounded-[32px] opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-all cursor-pointer">
+                                                    <div className="absolute inset-0 bg-blue-500/10 blur-[40px] rounded-full opacity-50"></div>
+                                                    <img src={editingBot.icon} className="w-32 h-32 rounded-[40px] border-4 border-slate-800 shadow-2xl object-cover bg-slate-950 mb-6 relative z-10" onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${editingBot.name || 'Bot'}&background=1e293b&color=fff&bold=true`; }} />
+                                                    <div className="absolute inset-0 bg-black/60 rounded-[40px] opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-all cursor-pointer z-20">
                                                         <RefreshCw size={24} className="text-white mb-2" />
-                                                        <span className="text-[8px] text-white font-bold uppercase">Manuel Değiştir</span>
                                                         <input type="text" value={editingBot.icon} onChange={e => setEditingBot({...editingBot, icon: e.target.value})} className="absolute inset-0 opacity-0 cursor-pointer" />
                                                     </div>
                                                 </div>
-                                                <h4 className="text-2xl font-black text-white italic tracking-tighter uppercase">{editingBot.name || 'BİLGİ BEKLENİYOR'}</h4>
-                                                <div className="flex gap-2 mt-2">
-                                                    <span className="text-[8px] font-black px-2 py-1 rounded bg-slate-950 text-slate-500 border border-slate-800 uppercase tracking-widest">{editingBot.category}</span>
-                                                    <span className="text-[8px] font-black px-2 py-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase tracking-widest italic">BOT_ID: {editingBot.id}</span>
+                                                <h4 className="text-3xl font-black text-white italic tracking-tighter uppercase mb-2">{editingBot.name || 'Bot Adı'}</h4>
+                                                <div className="flex gap-2">
+                                                    <span className="text-[8px] font-black px-3 py-1.5 rounded-lg bg-slate-950 text-slate-500 border border-slate-800 uppercase tracking-widest">{editingBot.category}</span>
+                                                    <span className="text-[8px] font-black px-3 py-1.5 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase tracking-widest italic tracking-tighter">ID: {editingBot.id}</span>
                                                 </div>
                                             </div>
 
-                                            <div className="border-t border-slate-800 pt-6">
-                                                <div className="flex justify-between items-center mb-4 px-1">
-                                                    <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Ekran Görüntüleri</p>
-                                                    <Layers size={14} className="text-slate-700" />
+                                            <div className="border-t border-slate-800 pt-8">
+                                                <div className="flex justify-between items-center mb-5 px-1">
+                                                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Ekran Görüntüleri</p>
+                                                    <Layers size={16} className="text-slate-700" />
                                                 </div>
-                                                <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+                                                <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2 px-1">
                                                     {(editingBot.screenshots || []).map((s, i) => (
-                                                        s && <img key={i} src={s} className="w-20 h-32 rounded-xl object-cover border border-slate-800 bg-slate-950 shrink-0 shadow-lg" onError={(e) => { (e.target as any).style.display = 'none'; }} />
+                                                        s && <img key={i} src={s} className="w-24 h-40 rounded-2xl object-cover border border-slate-800 bg-slate-950 shrink-0 shadow-2xl transition-all" onError={(e) => { (e.target as any).style.display = 'none'; }} />
                                                     ))}
                                                 </div>
                                             </div>
 
-                                            <div className="pt-4 flex flex-col gap-3">
-                                                <button disabled type="button" className="w-full py-5 bg-blue-600/10 border border-blue-500/20 text-blue-500 font-black rounded-2xl text-[10px] uppercase tracking-widest opacity-50 flex items-center justify-center gap-2">
-                                                    <Star size={14} fill="currentColor" /> {editingBot.price === 0 ? 'Kütüphaneye Ücretsiz Ekle' : `Stars ${editingBot.price} - Satın Al`}
+                                            <div className="pt-6 flex flex-col gap-4">
+                                                <button disabled type="button" className="w-full py-6 bg-blue-600/10 border border-blue-500/20 text-blue-500 font-black rounded-[24px] text-[11px] uppercase tracking-widest opacity-40 flex items-center justify-center gap-3">
+                                                    <Star size={16} fill="currentColor" /> {editingBot.price === 0 ? 'Kütüphaneye Ücretsiz Ekle' : `Stars ${editingBot.price} - Satın Al`}
                                                 </button>
-                                                <div className="flex items-center justify-center gap-2 opacity-30">
-                                                    <ShieldCheck size={12} />
-                                                    <span className="text-[8px] font-black uppercase tracking-[0.2em]">Secure Sync Preview</span>
-                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -470,10 +462,11 @@ const BotManagement = () => {
                             </form>
                         </div>
 
-                        <div className="p-6 lg:p-8 border-t border-slate-800 bg-slate-900/30 flex justify-end gap-4 shrink-0">
-                            <button onClick={() => setIsModalOpen(false)} className="px-6 lg:px-8 py-4 text-slate-500 font-black text-[10px] uppercase tracking-widest hover:bg-slate-800 rounded-2xl transition-all">Vazgeç</button>
-                            <button form="bot-form" type="submit" disabled={isLoading} className="flex-1 lg:flex-none px-10 py-4 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-2xl text-[10px] uppercase tracking-[0.3em] shadow-xl shadow-blue-900/20 active:scale-95 transition-all flex items-center justify-center gap-3">
-                                {isLoading ? <Loader2 className="animate-spin" size={18}/> : <><ShieldCheck size={18} /> KAYIT ET VE YAYINLA</>}
+                        {/* Modal Footer */}
+                        <div className="p-8 lg:p-10 border-t border-slate-800 bg-slate-900/50 backdrop-blur-xl flex flex-col sm:flex-row justify-end gap-4 shrink-0">
+                            <button onClick={() => setIsModalOpen(false)} className="w-full sm:w-auto px-10 py-5 text-slate-500 font-black text-[11px] uppercase tracking-widest hover:bg-slate-800 rounded-[20px] transition-all">İptal</button>
+                            <button form="bot-form" type="submit" disabled={isLoading} className="w-full sm:flex-1 lg:flex-none px-12 py-5 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-[20px] text-[11px] uppercase tracking-[0.4em] shadow-2xl shadow-blue-900/30 active:scale-[0.98] transition-all flex items-center justify-center gap-4">
+                                {isLoading ? <Loader2 className="animate-spin" size={20}/> : <><ShieldCheck size={20} /> Kayıt Et ve Yayınla</>}
                             </button>
                         </div>
                     </div>
@@ -510,7 +503,7 @@ const UserManagement = () => {
     );
 };
 
-// --- YENİLENEN DUYURU MERKEZİ ---
+// --- DUYURU MERKEZİ ---
 
 const NotificationCenter = () => {
     const [isLoading, setIsLoading] = useState(false);
