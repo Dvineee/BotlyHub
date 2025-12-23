@@ -11,7 +11,7 @@ import {
   Mail, BellRing, Sparkles, Eye, Zap, RefreshCcw, Star, Calendar, MessageSquare, ExternalLink, Layers, PlusCircle, Link2,
   Fingerprint, Info, TrendingUp, BarChart3, Radio,
   Layout, MousePointer2, Target, Bell, CheckCircle2, ChevronRight,
-  GripVertical, DollarSign, LifeBuoy, FileText, Instagram
+  GripVertical, DollarSign, LifeBuoy, FileText, Instagram, Clock, Smartphone, MoreVertical
 } from 'lucide-react';
 import { DatabaseService, supabase } from '../../services/DatabaseService';
 import { User, Bot as BotType, Announcement, Notification, Channel, ActivityLog, Ad } from '../../types';
@@ -136,6 +136,300 @@ const HomeView = () => {
             <div className="p-12 border border-dashed border-white/5 rounded-[48px] flex flex-col items-center justify-center text-center opacity-40">
                 <Cpu size={64} className="mb-6 text-slate-800" />
                 <p className="text-xs font-bold text-slate-600 uppercase tracking-widest">Sistem Analitiği Hazırlanıyor...</p>
+            </div>
+        </div>
+    );
+};
+
+/**
+ * Telegram Reklam Önizleme Bileşeni
+ */
+const TelegramAdPreview = ({ content, imageUrl, buttonText }: { content: string, imageUrl?: string, buttonText?: string }) => {
+    return (
+        <div className="bg-[#17212b] rounded-2xl overflow-hidden w-full max-w-[340px] shadow-2xl border border-white/5 font-sans mx-auto">
+            <div className="bg-[#242f3d] p-3 flex items-center justify-between border-b border-black/10">
+                <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-xs">B</div>
+                    <div className="flex flex-col">
+                        <span className="text-xs font-bold text-white leading-none">BotlyHub Advert</span>
+                        <span className="text-[10px] text-slate-400 mt-0.5">bot</span>
+                    </div>
+                </div>
+                <MoreVertical size={16} className="text-slate-400" />
+            </div>
+            
+            <div className="p-0.5 bg-[#0e1621] min-h-[100px] flex flex-col gap-1 pb-3">
+                <div className="bg-[#242f3d] rounded-2xl m-2 p-0 shadow-sm border border-black/10 overflow-hidden self-start max-w-[90%]">
+                    {imageUrl && (
+                        <div className="w-full h-44 bg-slate-800 relative">
+                            <img 
+                                src={imageUrl} 
+                                className="w-full h-full object-cover" 
+                                onError={(e) => (e.target as any).style.display = 'none'}
+                            />
+                        </div>
+                    )}
+                    <div className="p-3 text-[13px] leading-relaxed text-white whitespace-pre-wrap">
+                        {content || "Reklam içeriği burada görüntülenecek..."}
+                        <div className="text-[10px] text-slate-400 mt-1 flex justify-end">12:45</div>
+                    </div>
+                </div>
+                
+                {buttonText && (
+                    <div className="px-3 flex justify-start">
+                        <div className="bg-[#242f3d]/80 backdrop-blur-md border border-white/10 text-blue-400 py-2.5 px-8 rounded-xl text-xs font-bold text-center shadow-lg active:scale-95 transition-all">
+                            {buttonText}
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+const AdsManagement = () => {
+    const [ads, setAds] = useState<Ad[]>([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [formData, setFormData] = useState({ title: '', content: '', image_url: '', button_text: '', button_link: '' });
+
+    useEffect(() => { loadAds(); }, []);
+    const loadAds = async () => { setAds(await DatabaseService.getAds()); };
+
+    const handleCreate = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsLoading(true);
+        try {
+            await DatabaseService.createAd(formData);
+            setFormData({ title: '', content: '', image_url: '', button_text: '', button_link: '' });
+            setIsModalOpen(false);
+            loadAds();
+            alert("Reklam başarıyla sıraya eklendi!");
+        } catch (e) { console.error(e); } finally { setIsLoading(false); }
+    };
+
+    const getStatusColor = (status: string) => {
+        switch(status) {
+            case 'sent': return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+            case 'sending': return 'bg-orange-500/10 text-orange-400 border-orange-500/20';
+            case 'pending': return 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+            case 'failed': return 'bg-red-500/10 text-red-400 border-red-500/20';
+            default: return 'bg-slate-500/10 text-slate-400 border-slate-500/20';
+        }
+    };
+
+    return (
+        <div className="animate-in fade-in space-y-8 pb-20">
+            <div className="flex justify-between items-center">
+                <div className="flex items-center gap-4">
+                    <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Kampanya Merkezi</h2>
+                    <button onClick={loadAds} className="p-2 bg-slate-900 rounded-xl text-slate-500 hover:text-white transition-all"><RefreshCcw size={16} /></button>
+                </div>
+                <button onClick={() => setIsModalOpen(true)} className="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all">
+                    <PlusCircle size={18} className="inline mr-2"/> YENİ REKLAM OLUŞTUR
+                </button>
+            </div>
+
+            <div className="bg-[#0f172a] border border-white/5 rounded-[48px] overflow-hidden shadow-2xl">
+                <table className="w-full text-left text-xs">
+                    <thead className="bg-slate-950/50 border-b border-white/5 text-slate-500 font-bold uppercase">
+                        <tr>
+                            <th className="px-8 py-6">Kampanya / İçerik</th>
+                            <th className="px-8 py-6">Durum</th>
+                            <th className="px-8 py-6">Erişim</th>
+                            <th className="px-8 py-6">Tarih</th>
+                            <th className="px-8 py-6 text-right">Eylem</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                        {ads.length === 0 ? (
+                            <tr><td colSpan={5} className="p-12 text-center text-slate-600 font-bold uppercase tracking-widest italic">Henüz reklam kampanyası bulunmuyor.</td></tr>
+                        ) : ads.map(ad => (
+                            <tr key={ad.id} className="hover:bg-white/2 transition-colors">
+                                <td className="px-8 py-6">
+                                    <div className="flex items-center gap-4">
+                                        {ad.image_url ? (
+                                            <img src={ad.image_url} className="w-12 h-12 rounded-xl object-cover border border-white/5" />
+                                        ) : (
+                                            <div className="w-12 h-12 rounded-xl bg-slate-900 flex items-center justify-center text-slate-700"><ImageIcon size={20}/></div>
+                                        )}
+                                        <div>
+                                            <p className="font-bold text-white uppercase italic mb-1 truncate max-w-[200px]">{ad.title}</p>
+                                            <p className="text-[9px] text-slate-500 truncate max-w-[200px]">{ad.content}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td className="px-8 py-6">
+                                    <span className={`px-3 py-1.5 rounded-lg font-black text-[9px] uppercase tracking-tighter border ${getStatusColor(ad.status)}`}>
+                                        {ad.status.toUpperCase()}
+                                    </span>
+                                </td>
+                                <td className="px-8 py-6">
+                                    <div className="flex flex-col">
+                                        <span className="font-black text-blue-400 text-sm">{ad.total_reach.toLocaleString()}</span>
+                                        <span className="text-[9px] text-slate-600 font-bold uppercase">{ad.channel_count} Kanal</span>
+                                    </div>
+                                </td>
+                                <td className="px-8 py-6 text-slate-500 font-bold uppercase tracking-tighter">
+                                    {new Date(ad.created_at).toLocaleDateString('tr-TR')}
+                                </td>
+                                <td className="px-8 py-6 text-right">
+                                    <button onClick={async () => { if(confirm("Silmek istediğinize emin misiniz?")) { await DatabaseService.deleteAd(ad.id); loadAds(); } }} className="p-3 bg-slate-800 rounded-2xl text-slate-400 hover:text-red-500 transition-all active:scale-90">
+                                        <Trash2 size={16}/>
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
+            {isModalOpen && (
+                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/95 backdrop-blur-xl animate-in fade-in overflow-y-auto">
+                    <div className="bg-[#020617] w-full max-w-6xl rounded-[56px] border border-white/10 p-8 lg:p-14 shadow-2xl relative my-auto">
+                        <button onClick={() => setIsModalOpen(false)} className="absolute top-8 right-8 p-3 bg-slate-900 rounded-2xl text-slate-500 hover:text-white transition-all"><X size={20}/></button>
+                        
+                        <div className="flex flex-col lg:flex-row gap-12">
+                            {/* Form Alanı */}
+                            <div className="flex-1 space-y-8">
+                                <div>
+                                    <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter mb-2">Reklam Yayınlama</h3>
+                                    <p className="text-[10px] text-slate-500 font-black uppercase tracking-[0.2em]">Kampanya detaylarını girin ve canlı önizlemeyi izleyin</p>
+                                </div>
+
+                                <form onSubmit={handleCreate} className="space-y-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Kampanya Başlığı (İç Takip İçin)</label>
+                                            <input required type="text" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="w-full bg-slate-950 border border-white/5 rounded-3xl p-6 text-xs font-bold text-white outline-none focus:border-blue-500/30" placeholder="Örn: Black Friday 2024" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Görsel URL</label>
+                                            <div className="relative">
+                                                <ImageIcon className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-600" size={18} />
+                                                <input type="text" value={formData.image_url} onChange={e => setFormData({...formData, image_url: e.target.value})} className="w-full bg-slate-950 border border-white/5 rounded-3xl p-6 pl-14 text-xs font-bold text-white outline-none focus:border-blue-500/30" placeholder="https://..." />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Reklam Açıklaması</label>
+                                        <textarea required value={formData.content} onChange={e => setFormData({...formData, content: e.target.value})} className="w-full h-40 bg-slate-950 border border-white/5 rounded-[32px] p-6 text-sm font-medium text-slate-300 outline-none focus:border-blue-500/30 resize-none" placeholder="Reklam mesajını buraya yazın..." />
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Buton Metni</label>
+                                            <input type="text" value={formData.button_text} onChange={e => setFormData({...formData, button_text: e.target.value})} className="w-full bg-slate-950 border border-white/5 rounded-3xl p-6 text-xs font-bold text-white outline-none focus:border-blue-500/30" placeholder="Örn: Hemen İncele" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Buton Linki</label>
+                                            <input type="text" value={formData.button_link} onChange={e => setFormData({...formData, button_link: e.target.value})} className="w-full bg-slate-950 border border-white/5 rounded-3xl p-6 text-xs font-bold text-white outline-none focus:border-blue-500/30" placeholder="Örn: https://t.me/..." />
+                                        </div>
+                                    </div>
+
+                                    <button type="submit" disabled={isLoading} className="w-full py-6 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-[32px] text-[10px] uppercase tracking-[0.4em] shadow-xl shadow-blue-600/20 transition-all flex items-center justify-center gap-3">
+                                        {isLoading ? <Loader2 className="animate-spin" size={20}/> : <><Send size={18}/> KAMPANYAYI BAŞLAT</>}
+                                    </button>
+                                </form>
+                            </div>
+
+                            {/* Önizleme Alanı */}
+                            <div className="w-full lg:w-[380px] shrink-0">
+                                <div className="bg-slate-900/40 border border-white/5 rounded-[44px] p-8 flex flex-col items-center">
+                                    <div className="flex items-center gap-3 mb-8">
+                                        <Smartphone size={18} className="text-slate-600" />
+                                        <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Canlı Önizleme</span>
+                                    </div>
+                                    
+                                    <TelegramAdPreview 
+                                        content={formData.content}
+                                        imageUrl={formData.image_url}
+                                        buttonText={formData.button_text}
+                                    />
+
+                                    <div className="mt-8 p-6 bg-blue-500/5 border border-blue-500/10 rounded-3xl w-full">
+                                        <div className="flex items-center gap-2 mb-2 text-blue-500">
+                                            <Sparkles size={14} />
+                                            <span className="text-[10px] font-black uppercase tracking-widest">Sistem Notu</span>
+                                        </div>
+                                        <p className="text-[10px] text-slate-500 font-bold leading-relaxed italic uppercase">
+                                            Reklam onaylandığı an kütüphanenizdeki tüm botlara bağlı kanallara anlık olarak gönderilir.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+const SalesManagement = () => {
+    const [sales, setSales] = useState<any[]>([]);
+    useEffect(() => { load(); }, []);
+    const load = async () => { setSales(await DatabaseService.getAllPurchases()); };
+    return (
+        <div className="animate-in fade-in space-y-8">
+            <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Kütüphane Hareketleri</h2>
+            <div className="bg-[#0f172a] border border-white/5 rounded-[48px] overflow-hidden shadow-2xl">
+                <table className="w-full text-left text-xs">
+                    <thead className="bg-slate-950/50 border-b border-white/5 text-slate-500 font-bold uppercase">
+                        <tr><th className="px-8 py-6">Üye</th><th className="px-8 py-6">Ürün</th><th className="px-8 py-6 text-right">Tarih</th></tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                        {sales.map((s, idx) => (
+                            <tr key={idx} className="hover:bg-white/2 transition-colors">
+                                <td className="px-8 py-6 flex items-center gap-3">
+                                    <img src={s.users?.avatar} className="w-8 h-8 rounded-lg border border-white/5" />
+                                    <span className="font-bold text-white">@{s.users?.username}</span>
+                                </td>
+                                <td className="px-8 py-6 font-black text-blue-400 uppercase tracking-tighter italic">{s.bots?.name}</td>
+                                <td className="px-8 py-6 text-right font-medium text-slate-500">{new Date(s.acquired_at).toLocaleDateString('tr-TR')}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
+};
+
+const UserManagement = () => {
+    const [users, setUsers] = useState<User[]>([]);
+    useEffect(() => { load(); }, []);
+    const load = async () => { setUsers(await DatabaseService.getUsers()); };
+    return (
+        <div className="animate-in fade-in space-y-8">
+            <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Üye Veritabanı</h2>
+            <div className="bg-[#0f172a] border border-white/5 rounded-[48px] overflow-hidden shadow-2xl">
+                <table className="w-full text-left text-xs">
+                    <thead className="bg-slate-950/50 border-b border-white/5 text-slate-500 font-bold uppercase">
+                        <tr><th className="px-8 py-6">Kullanıcı</th><th className="px-8 py-6">Durum</th><th className="px-8 py-6 text-right">İşlem</th></tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                        {users.map(u => (
+                            <tr key={u.id} className="hover:bg-white/2 transition-all">
+                                <td className="px-8 py-6 flex items-center gap-4">
+                                    <img src={u.avatar} className="w-12 h-12 rounded-[20px] border border-white/5 shadow-lg" /> 
+                                    <div><p className="font-black text-white italic tracking-tight uppercase">@{u.username}</p><p className="text-[9px] text-slate-600 uppercase mt-0.5 font-bold">{u.name}</p></div>
+                                </td>
+                                <td className="px-8 py-6">
+                                    <span className={`px-3 py-1.5 rounded-lg font-black text-[9px] uppercase border ${u.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20'}`}>
+                                        {u.status}
+                                    </span>
+                                </td>
+                                <td className="px-8 py-6 text-right">
+                                    <button onClick={async () => { await DatabaseService.updateUserStatus(u.id, u.status === 'Active' ? 'Passive' : 'Active'); load(); }} className={`p-4 rounded-2xl transition-all ${u.status === 'Active' ? 'bg-slate-800 text-slate-500 hover:bg-red-600 hover:text-white' : 'bg-emerald-600 text-white'}`}>
+                                        {u.status === 'Active' ? <Ban size={18}/> : <CheckCircle size={18}/>}
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             </div>
         </div>
     );
@@ -380,138 +674,6 @@ const SettingsManagement = () => {
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    );
-};
-
-const AdsManagement = () => {
-    const [ads, setAds] = useState<Ad[]>([]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const [formData, setFormData] = useState({ title: '', content: '', image_url: '' });
-
-    useEffect(() => { loadAds(); }, []);
-    const loadAds = async () => { setAds(await DatabaseService.getAds()); };
-
-    const handleCreate = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsLoading(true);
-        try {
-            await DatabaseService.createAd(formData);
-            setFormData({ title: '', content: '', image_url: '' });
-            setIsModalOpen(false);
-            loadAds();
-            alert("Reklam yayın sırasına eklendi.");
-        } catch (e) { console.error(e); } finally { setIsLoading(false); }
-    };
-
-    return (
-        <div className="animate-in fade-in space-y-8 pb-20">
-            <div className="flex justify-between items-center">
-                <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Reklam Yayıncılığı</h2>
-                <button onClick={() => setIsModalOpen(true)} className="px-8 py-4 bg-white text-slate-950 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl">
-                    <PlusCircle size={18} className="inline mr-2"/> KAMPANYA BAŞLAT
-                </button>
-            </div>
-            <div className="bg-[#0f172a] border border-white/5 rounded-[48px] overflow-hidden shadow-2xl">
-                <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-950/50 border-b border-white/5 text-slate-500 font-bold uppercase">
-                        <tr><th className="px-8 py-6">Kampanya</th><th className="px-8 py-6">Statü</th><th className="px-8 py-6">Performans</th><th className="px-8 py-6 text-right">Eylem</th></tr>
-                    </thead>
-                    <tbody className="divide-y divide-white/5">
-                        {ads.map(ad => (
-                            <tr key={ad.id} className="hover:bg-white/2 transition-colors">
-                                <td className="px-8 py-6"><p className="font-bold text-white uppercase italic">{ad.title}</p></td>
-                                <td className="px-8 py-6"><span className="px-2 py-1 bg-blue-500/10 text-blue-400 rounded font-black text-[9px] uppercase tracking-tighter border border-blue-500/20">{ad.status}</span></td>
-                                <td className="px-8 py-6 font-black text-emerald-500"><TrendingUp size={14} className="inline mr-1"/> {ad.total_reach}</td>
-                                <td className="px-8 py-6 text-right"><button onClick={async () => { if(confirm("Sil?")) { await DatabaseService.deleteAd(ad.id); loadAds(); } }} className="p-3 bg-slate-800 rounded-2xl text-slate-400 hover:text-white transition-all"><Trash2 size={16}/></button></td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-            {isModalOpen && (
-                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/95 backdrop-blur-xl animate-in fade-in">
-                    <div className="bg-[#020617] w-full max-w-2xl rounded-[48px] border border-white/10 p-12 shadow-2xl relative">
-                        <h3 className="text-xl font-black text-white uppercase italic tracking-tighter mb-10">Yeni Kampanya</h3>
-                        <form onSubmit={handleCreate} className="space-y-6">
-                            <input required type="text" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="w-full bg-slate-950 border border-white/5 rounded-3xl p-6 text-xs font-bold text-white outline-none" placeholder="Kampanya Başlığı" />
-                            <textarea required value={formData.content} onChange={e => setFormData({...formData, content: e.target.value})} className="w-full h-40 bg-slate-950 border border-white/5 rounded-3xl p-6 text-xs font-medium text-slate-300 outline-none" placeholder="Reklam İçeriği" />
-                            <button type="submit" disabled={isLoading} className="w-full py-6 bg-blue-600 text-white font-black rounded-[32px] text-[10px] uppercase tracking-[0.4em] shadow-xl">
-                                {isLoading ? <Loader2 className="animate-spin" size={20}/> : 'YAYINI TETİKLE'}
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            )}
-        </div>
-    );
-};
-
-const SalesManagement = () => {
-    const [sales, setSales] = useState<any[]>([]);
-    useEffect(() => { load(); }, []);
-    const load = async () => { setSales(await DatabaseService.getAllPurchases()); };
-    return (
-        <div className="animate-in fade-in space-y-8">
-            <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Kütüphane Hareketleri</h2>
-            <div className="bg-[#0f172a] border border-white/5 rounded-[48px] overflow-hidden shadow-2xl">
-                <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-950/50 border-b border-white/5 text-slate-500 font-bold uppercase">
-                        <tr><th className="px-8 py-6">Üye</th><th className="px-8 py-6">Ürün</th><th className="px-8 py-6 text-right">Tarih</th></tr>
-                    </thead>
-                    <tbody className="divide-y divide-white/5">
-                        {sales.map((s, idx) => (
-                            <tr key={idx} className="hover:bg-white/2 transition-colors">
-                                <td className="px-8 py-6 flex items-center gap-3">
-                                    <img src={s.users?.avatar} className="w-8 h-8 rounded-lg border border-white/5" />
-                                    <span className="font-bold text-white">@{s.users?.username}</span>
-                                </td>
-                                <td className="px-8 py-6 font-black text-blue-400 uppercase tracking-tighter italic">{s.bots?.name}</td>
-                                <td className="px-8 py-6 text-right font-medium text-slate-500">{new Date(s.acquired_at).toLocaleDateString('tr-TR')}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    );
-};
-
-const UserManagement = () => {
-    const [users, setUsers] = useState<User[]>([]);
-    useEffect(() => { load(); }, []);
-    const load = async () => { setUsers(await DatabaseService.getUsers()); };
-    return (
-        <div className="animate-in fade-in space-y-8">
-            <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Üye Veritabanı</h2>
-            <div className="bg-[#0f172a] border border-white/5 rounded-[48px] overflow-hidden shadow-2xl">
-                <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-950/50 border-b border-white/5 text-slate-500 font-bold uppercase">
-                        <tr><th className="px-8 py-6">Kullanıcı</th><th className="px-8 py-6">Durum</th><th className="px-8 py-6 text-right">İşlem</th></tr>
-                    </thead>
-                    <tbody className="divide-y divide-white/5">
-                        {users.map(u => (
-                            <tr key={u.id} className="hover:bg-white/2 transition-all">
-                                <td className="px-8 py-6 flex items-center gap-4">
-                                    <img src={u.avatar} className="w-12 h-12 rounded-[20px] border border-white/5 shadow-lg" /> 
-                                    <div><p className="font-black text-white italic tracking-tight uppercase">@{u.username}</p><p className="text-[9px] text-slate-600 uppercase mt-0.5 font-bold">{u.name}</p></div>
-                                </td>
-                                <td className="px-8 py-6">
-                                    <span className={`px-3 py-1.5 rounded-lg font-black text-[9px] uppercase border ${u.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20'}`}>
-                                        {u.status}
-                                    </span>
-                                </td>
-                                <td className="px-8 py-6 text-right">
-                                    <button onClick={async () => { await DatabaseService.updateUserStatus(u.id, u.status === 'Active' ? 'Passive' : 'Active'); load(); }} className={`p-4 rounded-2xl transition-all ${u.status === 'Active' ? 'bg-slate-800 text-slate-500 hover:bg-red-600 hover:text-white' : 'bg-emerald-600 text-white'}`}>
-                                        {u.status === 'Active' ? <Ban size={18}/> : <CheckCircle size={18}/>}
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
             </div>
         </div>
     );

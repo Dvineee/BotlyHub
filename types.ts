@@ -43,7 +43,9 @@ export interface Ad {
   title: string;
   content: string;
   image_url?: string;
-  status: 'pending' | 'sent' | 'failed';
+  button_text?: string;
+  button_link?: string;
+  status: 'pending' | 'sending' | 'sent' | 'failed';
   total_reach: number;
   channel_count: number;
   created_at: string;
@@ -77,7 +79,7 @@ export interface UserBot extends Bot {
 export interface Channel {
   id: string;
   user_id: string;
-  telegram_id: string; // Telegram chat_id (Python botundan gelen veri)
+  telegram_id: string; 
   name: string;
   memberCount: number;
   icon: string;

@@ -16,10 +16,13 @@ export class DatabaseService {
   }
 
   static async createAd(ad: Partial<Ad>) {
+      // Reklam oluşturulurken durum her zaman 'pending' (beklemede) olmalıdır.
       const { error } = await supabase.from('ads').insert({
           title: ad.title,
           content: ad.content,
           image_url: ad.image_url,
+          button_text: ad.button_text,
+          button_link: ad.button_link,
           status: 'pending',
           total_reach: 0,
           channel_count: 0,
@@ -51,13 +54,12 @@ export class DatabaseService {
   static async syncChannelsFromBotActivity(userId: string): Promise<number> {
       try {
           const uIdStr = String(userId).trim();
-          // bot_discovery_logs tablosundan chat_id'yi de çekiyoruz
           const { data: logs, error: logErr } = await supabase.from('bot_discovery_logs').select('*').eq('owner_id', uIdStr).eq('is_synced', false);
           if (logErr || !logs || logs.length === 0) return 0;
           let successCount = 0;
           for (const log of logs) {
               const botId = String(log.bot_id);
-              const telegramId = String(log.chat_id || ''); // Python botundan gelen chat_id
+              const telegramId = String(log.chat_id || '');
 
               const { data: existing } = await supabase.from('channels').select('*').eq('user_id', uIdStr).eq('name', log.channel_name).maybeSingle();
               let syncOk = false;
@@ -67,7 +69,7 @@ export class DatabaseService {
                       member_count: log.member_count, 
                       connected_bot_ids: bots, 
                       icon: log.channel_icon || existing.icon,
-                      telegram_id: telegramId || existing.telegram_id // telegram_id'yi güncelle
+                      telegram_id: telegramId || existing.telegram_id 
                   }).eq('id', existing.id);
                   if (!upErr) syncOk = true;
               } else {
