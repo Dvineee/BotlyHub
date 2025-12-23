@@ -3,13 +3,14 @@ import React, { useEffect, useState } from 'react';
 import * as Router from 'react-router-dom';
 import { 
   LayoutDashboard, Users, Bot, LogOut, Menu, X, 
-  Package, Loader2, RefreshCw, Plus, Edit2, Trash2, 
-  Megaphone, Calendar, Settings as SettingsIcon, 
-  ShieldCheck, Globe, MessageSquare, AlertTriangle,
-  Zap, Star, Eye, Send, Activity, 
-  Clock, Wallet, ShieldAlert, Cpu, Ban, CheckCircle, 
-  Search, Database, Hash, Wand2, Image as ImageIcon, History, TrendingUp,
-  Mail, User as UserIcon, CheckCircle2, Sparkles, BellRing
+  Loader2, RefreshCw, Plus, Trash2, 
+  Megaphone, Settings as SettingsIcon, 
+  ShieldCheck, Globe, Send, Activity, 
+  Wallet, ShieldAlert, Cpu, Ban, CheckCircle, 
+  Search, Database, Hash, Wand2, Image as ImageIcon, History,
+  Mail, BellRing, Sparkles, Eye, Zap, RefreshCcw,
+  // Added Star icon to resolve 'Cannot find name Star' error in BotManagement component.
+  Star
 } from 'lucide-react';
 import { DatabaseService, supabase } from '../../services/DatabaseService';
 import { User, Bot as BotType, Announcement, Notification, Channel, ActivityLog } from '../../types';
@@ -55,7 +56,7 @@ const LogItem = ({ log }: { log: any }) => {
     switch(type) {
         case 'auth': return { icon: Hash, color: 'text-blue-400', bg: 'bg-blue-400/10' };
         case 'bot_manage': return { icon: Bot, color: 'text-purple-400', bg: 'bg-purple-400/10' };
-        case 'channel_sync': return { icon: RefreshCw, color: 'text-emerald-400', bg: 'bg-emerald-400/10' };
+        case 'channel_sync': return { icon: RefreshCcw, color: 'text-emerald-400', bg: 'bg-emerald-400/10' };
         case 'payment': return { icon: Wallet, color: 'text-yellow-400', bg: 'bg-yellow-400/10' };
         case 'security': return { icon: ShieldAlert, color: 'text-red-400', bg: 'bg-red-400/10' };
         default: return { icon: Activity, color: 'text-slate-400', bg: 'bg-slate-400/10' };
@@ -95,21 +96,7 @@ const LogItem = ({ log }: { log: any }) => {
             </p>
         </div>
       </div>
-      
       <p className="text-xs text-slate-400 mb-3 ml-11 leading-relaxed border-l-2 border-slate-800 pl-3 py-0.5">{log.description}</p>
-      
-      {log.metadata && Object.keys(log.metadata).length > 0 && (
-          <div className="flex flex-wrap gap-2 ml-11 pt-2 border-t border-slate-800/50">
-              {Object.entries(log.metadata).map(([key, val]: any) => (
-                  key !== 'client_time' && key !== 'platform' && (
-                      <div key={key} className="bg-slate-950 px-2 py-1 rounded border border-slate-800 flex items-center gap-2">
-                          <span className="text-[8px] font-bold text-slate-600 uppercase tracking-tighter">{key.replace('_', ' ')}:</span>
-                          <span className="text-[9px] font-black text-blue-400 italic">{String(val)}</span>
-                      </div>
-                  )
-              ))}
-          </div>
-      )}
     </div>
   );
 };
@@ -165,7 +152,7 @@ const AdminDashboard = () => {
         <header className="h-16 border-b border-slate-800 flex items-center justify-between px-8 bg-slate-950/50 backdrop-blur-md shrink-0 z-50">
            <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 bg-slate-900 rounded-lg text-slate-400"><Menu size={20}/></button>
            <div className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-4">
-              <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+              <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]"></div>
               Sistem Durumu: Stabil
            </div>
            <div className="flex items-center gap-4">
@@ -212,7 +199,7 @@ const HomeView = () => {
                 .from('activity_logs')
                 .select('*, users(username, avatar)')
                 .order('created_at', { ascending: false })
-                .limit(20);
+                .limit(10);
             setCombinedLogs(logs || []);
         } catch (e) {
             console.error("Home load error:", e);
@@ -245,7 +232,7 @@ const HomeView = () => {
                     <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
                          <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none"><History size={80} /></div>
                          <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-6 flex items-center gap-2 relative z-10">
-                             <ShieldCheck size={16} className="text-blue-500" /> Audit Log (İşlem Yapan Kullanıcılar)
+                             <ShieldCheck size={16} className="text-blue-500" /> Audit Log
                          </h3>
                          <div className="space-y-1 relative z-10">
                              {isLoading ? (
@@ -271,12 +258,6 @@ const HomeView = () => {
                             <ServerMetric label="Aktif WebSocket" value="Online" />
                         </div>
                     </div>
-                    
-                    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl text-center">
-                        <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-4">Hızlı Erişim</h3>
-                        <button onClick={() => navigate('/a/dashboard/users')} className="w-full py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:border-blue-500/50 transition-all mb-3 shadow-inner">Tüm Üyeleri Gör</button>
-                        <button onClick={() => navigate('/a/dashboard/bots')} className="w-full py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:border-purple-500/50 transition-all shadow-inner">Yeni Bot Ekle</button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -289,8 +270,6 @@ const ServerMetric = ({ label, value }: any) => (
         <span className="text-xs font-black text-white italic">{value}</span>
     </div>
 );
-
-// --- YÖNETİM SAYFALARI ---
 
 const SalesManagement = () => {
     const [sales, setSales] = useState<any[]>([]);
@@ -312,23 +291,7 @@ const SalesManagement = () => {
 
     return (
         <div className="animate-in fade-in space-y-6">
-            <div className="flex justify-between items-center">
-                <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Envanter Hareketleri</h2>
-                <div className="flex gap-3">
-                    <div className="relative">
-                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600" />
-                        <input 
-                            type="text" 
-                            value={search}
-                            onChange={e => setSearch(e.target.value)}
-                            placeholder="Üye veya Bot ara..." 
-                            className="bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-xs outline-none focus:border-blue-500 w-64 text-white font-medium" 
-                        />
-                    </div>
-                    <button onClick={load} className="p-2.5 bg-slate-900 border border-slate-800 rounded-xl text-slate-400 hover:text-white shadow-lg active:scale-95"><RefreshCw size={16} className={isLoading ? 'animate-spin' : ''}/></button>
-                </div>
-            </div>
-
+            <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Envanter Hareketleri</h2>
             <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
@@ -337,17 +300,16 @@ const SalesManagement = () => {
                                 <th className="px-6 py-5">Kullanıcı</th>
                                 <th className="px-6 py-5">İlişkili Bot</th>
                                 <th className="px-6 py-5">İşlem Tarihi</th>
-                                <th className="px-6 py-5 text-right">Durum</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-800/50">
-                            {isLoading ? <tr><td colSpan={4} className="p-24 text-center text-slate-700 italic font-bold text-xs uppercase animate-pulse">Veriler Okunuyor...</td></tr> : 
-                             filteredSales.length === 0 ? <tr><td colSpan={4} className="p-24 text-center text-slate-800 italic text-xs uppercase">Kayıt bulunamadı.</td></tr> :
+                            {isLoading ? <tr><td colSpan={3} className="p-24 text-center text-slate-700 italic font-bold text-xs uppercase animate-pulse">Veriler Okunuyor...</td></tr> : 
+                             filteredSales.length === 0 ? <tr><td colSpan={3} className="p-24 text-center text-slate-800 italic text-xs uppercase">Kayıt bulunamadı.</td></tr> :
                              filteredSales.map((s, idx) => (
                                 <tr key={idx} className="hover:bg-slate-800/20 transition-colors group">
                                     <td className="px-6 py-5">
                                         <div className="flex items-center gap-3">
-                                            <img src={s.users?.avatar} className="w-10 h-10 rounded-xl border border-slate-800 shadow-lg group-hover:scale-110 transition-transform" />
+                                            <img src={s.users?.avatar} className="w-10 h-10 rounded-xl border border-slate-800 shadow-lg object-cover" />
                                             <div>
                                                 <p className="font-bold text-white text-xs italic tracking-tight">@{s.users?.username}</p>
                                                 <p className="text-[10px] text-slate-500 font-medium uppercase tracking-tighter">{s.users?.name}</p>
@@ -361,15 +323,11 @@ const SalesManagement = () => {
                                             </div>
                                             <div>
                                                 <p className="font-bold text-white text-xs italic">{s.bots?.name}</p>
-                                                <p className="text-[10px] text-emerald-500 uppercase font-black italic tracking-tighter">{s.bots?.price} STARS</p>
                                             </div>
                                         </div>
                                     </td>
                                     <td className="px-6 py-5 text-[10px] text-slate-500 font-bold uppercase italic">
-                                        {new Date(s.acquired_at).toLocaleString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                                    </td>
-                                    <td className="px-6 py-5 text-right">
-                                        <span className="text-[9px] font-black text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-lg italic uppercase tracking-widest shadow-emerald-500/5">Aktif</span>
+                                        {new Date(s.acquired_at).toLocaleString('tr-TR')}
                                     </td>
                                 </tr>
                             ))}
@@ -422,7 +380,7 @@ const BotManagement = () => {
         <div className="animate-in fade-in space-y-6">
             <div className="flex justify-between items-center">
                 <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Market Yönetimi</h2>
-                <button onClick={() => { setEditingBot({ name: '', description: '', price: 0, category: 'productivity', bot_link: '', icon: '', screenshots: [] }); setIsModalOpen(true); }} className="px-5 py-3 bg-blue-600 hover:bg-blue-500 rounded-xl text-xs font-bold text-white flex items-center gap-3 shadow-xl active:scale-95 transition-all">
+                <button onClick={() => { setEditingBot({ name: '', description: '', price: 0, category: 'productivity', bot_link: '', icon: '', screenshots: [] }); setIsModalOpen(true); }} className="px-5 py-3 bg-blue-600 hover:bg-blue-500 rounded-xl text-xs font-bold text-white flex items-center gap-3 shadow-xl transition-all">
                     <Plus size={18}/> Yeni Bot Ekle
                 </button>
             </div>
@@ -432,23 +390,15 @@ const BotManagement = () => {
                  bots.map(b => (
                     <div key={b.id} className="bg-slate-900 border border-slate-800 p-6 rounded-2xl hover:border-slate-700 transition-all flex flex-col group shadow-xl">
                         <div className="flex gap-4 mb-5">
-                            <img src={b.icon} className="w-16 h-16 rounded-xl object-cover bg-slate-950 border border-slate-800 shadow-md group-hover:scale-110 transition-transform" />
+                            <img src={b.icon} className="w-16 h-16 rounded-xl object-cover bg-slate-950 border border-slate-800 shadow-md transition-transform" />
                             <div className="min-w-0 flex-1">
                                 <h4 className="font-bold text-white text-sm truncate mb-1 italic tracking-tight">{b.name}</h4>
                                 <div className="flex gap-2 items-center mb-2">
-                                    <span className="text-[9px] font-bold text-slate-500 uppercase bg-slate-950 px-2 py-0.5 rounded border border-slate-800 tracking-tighter italic">ID: {b.id}</span>
                                     <span className="text-[9px] font-bold text-blue-500 uppercase italic tracking-widest">{CATEGORY_NAMES[b.category] || b.category}</span>
                                 </div>
-                                <div className="flex items-center justify-between">
-                                    <p className="text-xs font-black text-white italic flex items-center gap-1.5"><Star size={12} className="text-yellow-500" fill="currentColor"/> {b.price} Yıldız</p>
-                                    <div className="flex items-center gap-1 px-2 py-1 bg-blue-500/10 border border-blue-500/20 rounded text-[9px] font-bold text-blue-400 italic">
-                                        <Users size={10} />
-                                        <span>{b.ownerCount} SAHİP</span>
-                                    </div>
-                                </div>
+                                <p className="text-xs font-black text-white italic flex items-center gap-1.5"><Star size={12} className="text-yellow-500" fill="currentColor"/> {b.price} Yıldız</p>
                             </div>
                         </div>
-                        <p className="text-xs text-slate-500 line-clamp-3 mb-6 font-medium leading-relaxed italic">{b.description}</p>
                         <div className="flex gap-2 mt-auto">
                             <button onClick={() => { setEditingBot(b); setIsModalOpen(true); }} className="flex-1 py-2.5 bg-slate-800 hover:bg-blue-600 text-white text-[10px] font-bold uppercase rounded-lg transition-all shadow-md">Düzenle</button>
                             <button onClick={async () => { if(confirm("Bu botu marketten silmek istediğinize emin misiniz?")) { await DatabaseService.deleteBot(b.id); load(); } }} className="p-2.5 bg-slate-800 hover:bg-red-500 text-slate-500 hover:text-white rounded-lg transition-all shadow-md active:scale-90"><Trash2 size={18}/></button>
@@ -463,10 +413,6 @@ const BotManagement = () => {
                         <button onClick={() => setIsModalOpen(false)} className="absolute top-6 right-6 text-slate-500 hover:text-white transition-colors"><X size={24}/></button>
                         <h3 className="text-xl font-black mb-8 text-white uppercase italic tracking-tighter">{editingBot.id ? 'Ürün Detaylarını Revize Et' : 'Yeni Ürün Tanımla'}</h3>
                         <form onSubmit={handleSave} className="space-y-5">
-                            <div className="space-y-1.5">
-                                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Sistem ID (Koda Bağımlı)</label>
-                                <input type="text" required value={editingBot.id} onChange={e => setEditingBot({...editingBot, id: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-xs font-bold text-white focus:border-blue-500 outline-none shadow-inner" placeholder="örn: premium_bot_01" />
-                            </div>
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Bot Görünür Adı</label>
                                 <input type="text" required value={editingBot.name} onChange={e => setEditingBot({...editingBot, name: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-xs font-bold text-white focus:border-blue-500 outline-none shadow-inner" placeholder="Market Adı" />
@@ -484,25 +430,15 @@ const BotManagement = () => {
                                 </div>
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Market Açıklaması</label>
-                                <textarea required value={editingBot.description} onChange={e => setEditingBot({...editingBot, description: (e.target as any).value})} className="w-full h-28 bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-xs font-medium text-slate-300 focus:border-blue-500 outline-none resize-none shadow-inner leading-relaxed" placeholder="Kullanıcıya yönelik açıklama..." />
-                            </div>
-                            <div className="space-y-1.5">
-                                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Telegram @Username & İkon</label>
+                                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Telegram @Username</label>
                                 <div className="flex gap-3">
                                     <input type="text" required value={editingBot.bot_link} onChange={e => setEditingBot({...editingBot, bot_link: (e.target as any).value})} className="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-xs font-bold text-white focus:border-blue-500 outline-none shadow-inner" placeholder="@BotlyHubBot" />
                                     <button type="button" onClick={fetchBotIcon} className="p-3 bg-slate-800 hover:bg-blue-600 rounded-xl text-white transition-all active:scale-90 shadow-md">
                                         <Wand2 size={20} />
                                     </button>
                                 </div>
-                                <div className="mt-4 p-4 bg-slate-950 border border-slate-800 rounded-xl flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-slate-900 rounded-lg flex items-center justify-center overflow-hidden shrink-0 border border-slate-800">
-                                        {editingBot.icon ? <img src={editingBot.icon} className="w-full h-full object-cover" /> : <ImageIcon size={20} className="text-slate-800"/>}
-                                    </div>
-                                    <input type="text" required value={editingBot.icon} onChange={e => setEditingBot({...editingBot, icon: (e.target as any).value})} className="flex-1 bg-transparent border-b border-slate-800 p-1 text-[10px] font-bold text-slate-400 outline-none focus:border-blue-500" placeholder="İkon URL" />
-                                </div>
                             </div>
-                            <button type="submit" className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-xl text-xs uppercase tracking-[0.2em] shadow-xl shadow-blue-900/20 active:scale-95 transition-all mt-4 flex items-center justify-center gap-3">
+                            <button type="submit" className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-xl text-xs uppercase tracking-[0.2em] transition-all mt-4 flex items-center justify-center gap-3">
                                 <ShieldCheck size={18} /> MARKET VERİSİNİ YAYINLA
                             </button>
                         </form>
@@ -529,57 +465,34 @@ const UserManagement = () => {
 
     const filteredUsers = users.filter(u => 
         (u.name || '').toLowerCase().includes(search.toLowerCase()) || 
-        (u.username || '').toLowerCase().includes(search.toLowerCase()) ||
-        (u.id || '').toString().includes(search)
+        (u.username || '').toLowerCase().includes(search.toLowerCase())
     );
 
     return (
         <div className="animate-in fade-in space-y-6">
-            <div className="flex justify-between items-center">
-                <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Sistem Üyeleri</h2>
-                <div className="flex gap-3">
-                    <div className="relative">
-                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600" />
-                        <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="İsim, ID veya @user..." className="bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-xs outline-none focus:border-blue-500 w-64 text-white font-medium shadow-md" />
-                    </div>
-                    <button onClick={load} className="p-2.5 bg-slate-900 border border-slate-800 rounded-xl text-slate-400 hover:text-white shadow-lg active:scale-95"><RefreshCw size={16} className={isLoading ? 'animate-spin' : ''}/></button>
-                </div>
-            </div>
-
+            <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Sistem Üyeleri</h2>
             <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
                         <thead className="bg-slate-950/50 border-b border-slate-800 text-[10px] font-bold text-slate-600 uppercase tracking-widest">
                             <tr>
                                 <th className="px-6 py-5">Üye Profili</th>
-                                <th className="px-6 py-5">E-Posta</th>
-                                <th className="px-6 py-5">Platform Katılımı</th>
                                 <th className="px-6 py-5">Durum</th>
-                                <th className="px-6 py-5 text-right">Aksiyonlar</th>
+                                <th className="px-6 py-5 text-right">Aksiyon</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-800/50">
-                            {isLoading ? <tr><td colSpan={5} className="p-24 text-center text-slate-700 italic font-bold text-xs uppercase animate-pulse">Kullanıcı Veritabanı Taranıyor...</td></tr> : 
-                             filteredUsers.length === 0 ? <tr><td colSpan={5} className="p-24 text-center text-slate-800 italic text-xs uppercase">Üye kaydı bulunamadı.</td></tr> :
+                            {isLoading ? <tr><td colSpan={3} className="p-24 text-center text-slate-700 italic font-bold text-xs uppercase animate-pulse">Tarama Yapılıyor...</td></tr> : 
                              filteredUsers.map(u => (
-                                <tr key={u.id} className="hover:bg-slate-800/20 transition-all group">
+                                <tr key={u.id} className="hover:bg-slate-800/20 transition-all">
                                     <td className="px-6 py-5">
                                         <div className="flex items-center gap-3">
-                                            <div className="relative">
-                                                <img src={u.avatar} className="w-11 h-11 rounded-xl border border-slate-800 shadow-md group-hover:scale-110 transition-transform object-cover" />
-                                                <div className={`absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-4 border-[#020617] ${u.status === 'Active' ? 'bg-emerald-500' : 'bg-red-500'}`}></div>
-                                            </div>
+                                            <img src={u.avatar} className="w-10 h-10 rounded-xl border border-slate-800 object-cover" />
                                             <div>
-                                                <p className="font-bold text-white text-xs italic tracking-tight">@{u.username}</p>
-                                                <p className="text-[9px] text-slate-600 font-black uppercase tracking-widest">ID: {u.id}</p>
+                                                <p className="font-bold text-white text-xs italic">@{u.username}</p>
+                                                <p className="text-[9px] text-slate-600 font-black uppercase">ID: {u.id}</p>
                                             </div>
                                         </div>
-                                    </td>
-                                    <td className="px-6 py-5 text-[10px] text-slate-400 font-bold">
-                                        <p className="flex items-center gap-2"><Mail size={12} className="text-slate-600"/> {u.email || 'Mail Tanımlanmadı'}</p>
-                                    </td>
-                                    <td className="px-6 py-5 text-[10px] text-slate-500 font-bold uppercase italic tracking-tighter">
-                                        {u.joinDate ? new Date(u.joinDate).toLocaleDateString('tr-TR', { day: '2-digit', month: 'long', year: 'numeric' }) : 'Kayıt Tarihi Yok'}
                                     </td>
                                     <td className="px-6 py-5">
                                         <span className={`text-[9px] font-black px-3 py-1.5 rounded-lg uppercase tracking-widest border italic ${u.status === 'Active' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' : 'text-red-400 bg-red-500/10 border-red-500/20'}`}>
@@ -587,11 +500,9 @@ const UserManagement = () => {
                                         </span>
                                     </td>
                                     <td className="px-6 py-5 text-right">
-                                        <div className="flex justify-end gap-2.5">
-                                            <button onClick={() => toggleStatus(u)} title={u.status === 'Active' ? 'Hesabı Askıya Al' : 'Kısıtlamayı Kaldır'} className={`p-2.5 rounded-xl transition-all shadow-md ${u.status === 'Active' ? 'bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white' : 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white'}`}>
-                                                {u.status === 'Active' ? <Ban size={18}/> : <CheckCircle size={18}/>}
-                                            </button>
-                                        </div>
+                                        <button onClick={() => toggleStatus(u)} className={`p-2.5 rounded-xl transition-all shadow-md ${u.status === 'Active' ? 'bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white' : 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white'}`}>
+                                            {u.status === 'Active' ? <Ban size={18}/> : <CheckCircle size={18}/>}
+                                        </button>
                                     </td>
                                 </tr>
                             ))}
@@ -602,6 +513,8 @@ const UserManagement = () => {
         </div>
     );
 };
+
+// --- YENİLENEN DUYURU MERKEZİ ---
 
 const NotificationCenter = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -618,62 +531,66 @@ const NotificationCenter = () => {
             alert("Global duyuru başarıyla yayınlandı. Tüm kullanıcılara anlık olarak ulaştırılacak.");
             setForm({ title: '', message: '', type: 'system' });
         } catch (e: any) {
-            alert("Gönderim Hatası: " + e.message);
+            console.error("Gönderim Hatası:", e);
+            alert("Gönderim Hatası: " + (e.message || "Bilinmeyen veritabanı hatası"));
         } finally {
             setIsLoading(false);
         }
     };
 
+    const categories = [
+        { id: 'system', label: 'Sistem Duyurusu', icon: BellRing, color: 'text-blue-400' },
+        { id: 'payment', label: 'Kampanya / Fırsat', icon: Zap, color: 'text-yellow-400' },
+        { id: 'security', label: 'Güvenlik Uyarısı', icon: ShieldAlert, color: 'text-red-400' },
+        { id: 'bot', label: 'Bot Güncellemesi', icon: RefreshCcw, color: 'text-emerald-400' }
+    ];
+
     return (
         <div className="animate-in fade-in space-y-6">
             <div className="flex justify-between items-center">
                 <div>
-                    <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Global Yayın Merkezi</h2>
-                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Platformdaki tüm aktif üyelere bildirim gönderin.</p>
+                    <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Duyuru Yayın Merkezi</h2>
+                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Platformdaki tüm kullanıcılara anlık mesaj gönderin.</p>
                 </div>
                 <div className="px-4 py-2 bg-blue-600/10 border border-blue-500/20 rounded-xl flex items-center gap-2">
                     <Globe size={14} className="text-blue-500" />
-                    <span className="text-[9px] font-black text-blue-400 uppercase tracking-widest">Hedef: Tüm Kullanıcılar</span>
+                    <span className="text-[9px] font-black text-blue-400 uppercase tracking-widest">Hedef: %100 Global</span>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                {/* FORM ALANI */}
                 <div className="bg-slate-900 border border-slate-800 p-8 rounded-[32px] shadow-2xl relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-48 h-48 bg-blue-600/5 blur-[80px] pointer-events-none"></div>
                     <form onSubmit={handleSend} className="space-y-6 relative z-10">
-                        <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Yayın Kategorisi</label>
+                        <div className="space-y-3">
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Kategori Seçimi</label>
                             <div className="grid grid-cols-2 gap-3">
-                                {[
-                                    { id: 'system', label: 'Duyuru', icon: Megaphone },
-                                    { id: 'payment', label: 'Kampanya', icon: Zap },
-                                    { id: 'security', label: 'Güvenlik', icon: ShieldCheck },
-                                    { id: 'bot', label: 'Güncelleme', icon: RefreshCw }
-                                ].map(cat => (
+                                {categories.map(cat => (
                                     <button
                                         key={cat.id}
                                         type="button"
                                         onClick={() => setForm({...form, type: cat.id as any})}
-                                        className={`p-4 rounded-2xl border transition-all flex items-center gap-3 ${
+                                        className={`p-4 rounded-2xl border transition-all flex items-center gap-3 text-left ${
                                             form.type === cat.id 
-                                            ? 'bg-blue-600/10 border-blue-600 text-white shadow-lg' 
+                                            ? 'bg-blue-600/10 border-blue-600/50 text-white shadow-lg' 
                                             : 'bg-slate-950 border-slate-800 text-slate-500 hover:border-slate-700'
                                         }`}
                                     >
-                                        <cat.icon size={16} className={form.type === cat.id ? 'text-blue-400' : ''} />
-                                        <span className="text-[10px] font-black uppercase tracking-tight">{cat.label}</span>
+                                        <cat.icon size={18} className={form.type === cat.id ? cat.color : ''} />
+                                        <span className="text-[10px] font-black uppercase tracking-tight leading-none">{cat.label}</span>
                                     </button>
                                 ))}
                             </div>
                         </div>
 
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Duyuru Başlığı</label>
-                            <input required type="text" value={form.title} onChange={e => setForm({...form, title: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-xs font-bold text-white outline-none focus:border-blue-500 shadow-inner" placeholder="örn: Yeni Versiyon Yayınlandı!" />
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Duyuru Başlığı</label>
+                            <input required type="text" value={form.title} onChange={e => setForm({...form, title: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-xs font-bold text-white outline-none focus:border-blue-500 shadow-inner" placeholder="örn: Bayram Kampanyası Başladı!" />
                         </div>
 
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Mesaj Detayı</label>
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Mesaj İçeriği</label>
                             <textarea required value={form.message} onChange={e => setForm({...form, message: e.target.value})} className="w-full h-44 bg-slate-950 border border-slate-800 rounded-2xl p-4 text-xs font-medium text-slate-300 outline-none focus:border-blue-500 resize-none shadow-inner leading-relaxed" placeholder="Kullanıcılara ulaştırılacak ana mesaj metni..." />
                         </div>
 
@@ -683,32 +600,40 @@ const NotificationCenter = () => {
                     </form>
                 </div>
 
+                {/* ÖNİZLEME ALANI */}
                 <div className="space-y-6">
                     <div className="bg-slate-900 border border-slate-800 p-8 rounded-[32px] shadow-xl">
                         <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-6 flex items-center gap-2">
-                            <Eye size={16} className="text-blue-400" /> Önizleme (Preview)
+                            <Eye size={16} className="text-blue-400" /> Mobil Uygulama Önizlemesi
                         </h3>
-                        <div className="bg-slate-950 border border-slate-800 rounded-[28px] p-6 shadow-inner relative overflow-hidden group">
-                            <div className="absolute top-0 left-0 w-1 h-full bg-blue-600"></div>
-                            <div className="flex gap-4">
-                                <div className="w-12 h-12 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center shrink-0">
-                                    <BellRing size={20} className="text-blue-400" />
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                    <div className="flex justify-between items-start mb-1">
-                                        <h4 className="text-sm font-black text-white truncate italic">{form.title || 'Duyuru Başlığı'}</h4>
-                                        <span className="text-[8px] font-black text-slate-700 uppercase">ŞİMDİ</span>
+                        
+                        <div className="bg-[#020617] w-full aspect-[9/10] max-w-[300px] mx-auto rounded-[40px] border-[6px] border-slate-800 shadow-2xl relative overflow-hidden flex flex-col p-4">
+                            <div className="w-20 h-5 bg-slate-800 rounded-b-2xl absolute top-0 left-1/2 -translate-x-1/2 z-10"></div>
+                            
+                            <div className="mt-8 flex-1">
+                                <p className="text-[10px] font-black text-slate-700 uppercase tracking-widest mb-4">Bildirimler</p>
+                                
+                                <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-3 shadow-lg relative overflow-hidden animate-pulse">
+                                    <div className="absolute top-0 left-0 w-1 h-full bg-blue-600"></div>
+                                    <div className="flex gap-3">
+                                        <div className="w-8 h-8 rounded-lg bg-slate-950 flex items-center justify-center shrink-0">
+                                            {React.createElement(categories.find(c => c.id === form.type)?.icon || BellRing, { size: 14, className: 'text-blue-400' })}
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <p className="text-[10px] font-black text-white truncate">{form.title || 'Duyuru Başlığı'}</p>
+                                            <p className="text-[8px] text-slate-500 font-medium line-clamp-2 mt-0.5">{form.message || 'Mesaj içeriği burada bu şekilde görünecektir...'}</p>
+                                        </div>
                                     </div>
-                                    <p className="text-[11px] text-slate-500 font-medium leading-relaxed line-clamp-3">
-                                        {form.message || 'Göndereceğiniz mesajın kullanıcı ekranında nasıl görüneceği burada simüle edilir.'}
-                                    </p>
                                 </div>
                             </div>
+                            
+                            <div className="h-1 w-1/3 bg-slate-800 rounded-full mx-auto mt-auto mb-2"></div>
                         </div>
+
                         <div className="mt-8 p-4 bg-blue-600/5 border border-blue-500/10 rounded-2xl flex items-start gap-4">
                             <Sparkles size={18} className="text-blue-400 mt-1 shrink-0" />
                             <p className="text-[10px] text-slate-500 font-medium leading-relaxed italic">
-                                "Yayını Başlat" butonuna bastığınızda, sistem otomatik olarak tüm aktif oturumlara anlık (Push) bildirim gönderecektir. Bu işlem geri alınamaz.
+                                Duyuru gönderildiğinde tüm kullanıcılar için "Okunmadı" statüsünde yeni bir bildirim kaydı oluşturulur. Büyük duyurular için sistem günlüğü otomatik kayıt tutar.
                             </p>
                         </div>
                     </div>
@@ -739,31 +664,24 @@ const SettingsManagement = () => {
 
     return (
         <div className="animate-in fade-in space-y-6">
-            <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Genel Sistem Yapılandırması</h2>
+            <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Sistem Yapılandırması</h2>
             <div className="bg-slate-900 border border-slate-800 p-8 rounded-2xl max-w-xl shadow-2xl space-y-7 relative overflow-hidden">
-                <div className="absolute bottom-0 right-0 w-32 h-32 bg-blue-600/5 blur-[50px] pointer-events-none"></div>
-                <div className="space-y-1.5 relative z-10">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Uygulama Görüntüleme Adı</label>
+                <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Uygulama Adı</label>
                     <input type="text" value={settings.appName} onChange={e => setSettings({...settings, appName: (e.target as any).value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-xs font-bold text-white outline-none focus:border-blue-500 shadow-inner" />
                 </div>
                 
-                <div className="flex items-center justify-between p-4 bg-slate-950 rounded-xl border border-slate-800 shadow-inner relative z-10">
+                <div className="flex items-center justify-between p-4 bg-slate-950 rounded-xl border border-slate-800 shadow-inner">
                     <div>
                         <p className="text-xs font-bold text-white uppercase tracking-tight italic">Acil Bakım Modu</p>
-                        <p className="text-[9px] text-slate-600 font-bold uppercase tracking-tighter mt-1">Sistemi son kullanıcılara kilitler.</p>
                     </div>
                     <button onClick={() => setSettings({...settings, maintenanceMode: !settings.maintenanceMode})} className={`w-12 h-6 rounded-full relative transition-all shadow-lg ${settings.maintenanceMode ? 'bg-red-600' : 'bg-slate-800'}`}>
                         <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all shadow-md ${settings.maintenanceMode ? 'left-7' : 'left-1'}`}></div>
                     </button>
                 </div>
 
-                <div className="space-y-1.5 relative z-10">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Global Komisyon Oranı (%)</label>
-                    <input type="number" value={settings.commissionRate} onChange={e => setSettings({...settings, commissionRate: Number((e.target as any).value)})} className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-xs font-bold text-white outline-none focus:border-blue-500 shadow-inner" />
-                </div>
-
-                <button onClick={handleSave} disabled={isSaving} className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-xl text-xs uppercase tracking-[0.4em] shadow-xl shadow-blue-900/20 transition-all flex items-center justify-center gap-3 active:scale-95">
-                    {isSaving ? <Loader2 className="animate-spin" size={20}/> : <><ShieldCheck size={18} /> AYARLARI GLOBAL KAYDET</>}
+                <button onClick={handleSave} disabled={isSaving} className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-xl text-xs uppercase tracking-[0.4em] transition-all flex items-center justify-center gap-3 active:scale-95">
+                    {isSaving ? <Loader2 className="animate-spin" size={20}/> : <><ShieldCheck size={18} /> AYARLARI KAYDET</>}
                 </button>
             </div>
         </div>

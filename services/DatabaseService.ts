@@ -252,14 +252,17 @@ export class DatabaseService {
         title: n.title,
         message: n.message,
         date: n.date,
-        isRead: n.isRead !== undefined ? n.isRead : (n.is_read !== undefined ? n.is_read : false), 
+        // is_read sütun adındaki belirsizliği çözmek için her iki anahtarı da kontrol et
+        isRead: n.isRead !== undefined ? n.isRead : (n.is_read !== undefined ? n.is_read : (n.isread !== undefined ? n.isread : false)), 
         user_id: n.user_id,
         target_type: n.target_type
     }));
   }
 
   static async markNotificationRead(id: string) {
-    await supabase.from('notifications').update({ isRead: true, is_read: true }).eq('id', id);
+    // Sütun adı uyumsuzluklarını önlemek için tüm ihtimalleri güncellemeye çalış
+    const updatePayload: any = { isRead: true, is_read: true, isread: true };
+    await supabase.from('notifications').update(updatePayload).eq('id', id);
   }
 
   static async getSettings() {
@@ -304,22 +307,34 @@ export class DatabaseService {
   }
 
   static async sendNotification(notification: any) {
+    // id violates not-null hatasını önlemek için benzersiz bir id üret
     const uniqueId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     
-    const payload = {
+    // Veritabanı sütun isimlerindeki farklılıkları (is_read, isRead, isread) minimize etmek için payload'ı zenginleştir
+    const payload: any = {
         id: uniqueId, 
         title: notification.title,
         message: notification.message,
         type: notification.type || 'system',
-        target_type: 'global', // Her zaman global yapıldı
+        target_type: 'global', 
         user_id: null, 
         date: new Date().toISOString(),
         isRead: false,
-        is_read: false 
+        is_read: false,
+        isread: false
     };
 
     const { error } = await supabase.from('notifications').insert(payload);
-    if (error) throw error;
+    if (error) {
+        // Eğer hala is_read hatası veriyorsa, o sütunu payload'dan çıkarıp tekrar dene
+        if (error.message.includes('is_read')) {
+            delete payload.is_read;
+            const { error: retryError } = await supabase.from('notifications').insert(payload);
+            if (retryError) throw retryError;
+        } else {
+            throw error;
+        }
+    }
   }
 
   static async saveAnnouncement(ann: Partial<Announcement>) {
