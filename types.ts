@@ -1,4 +1,5 @@
 
+
 export interface User {
   id: string;
   name: string;
@@ -36,6 +37,18 @@ export interface Bot {
   screenshots: string[];
   isNew?: boolean;
   features?: string[];
+}
+
+export interface Ad {
+  id: string;
+  title: string;
+  content: string;
+  image_url?: string;
+  status: 'pending' | 'sent' | 'failed';
+  total_reach: number;
+  channel_count: number;
+  created_at: string;
+  sent_at?: string;
 }
 
 export interface Announcement {
@@ -87,18 +100,6 @@ export interface CryptoTransaction {
   hash: string;
 }
 
-export interface SubscriptionPlan {
-  id: string;
-  name: string;
-  price: number;
-  billingPeriod: 'Aylık' | 'Yıllık';
-  description: string;
-  features: string[];
-  color: string;
-  icon: any;
-  isPopular?: boolean;
-}
-
 export interface Notification {
   id: string;
   type: 'system' | 'payment' | 'security' | 'bot';
@@ -108,6 +109,19 @@ export interface Notification {
   isRead: boolean;
   user_id?: string;
   target_type?: 'user' | 'global';
+}
+
+// Fix: Added SubscriptionPlan interface to resolve "Module './types' has no exported member 'SubscriptionPlan'" errors.
+export interface SubscriptionPlan {
+  id: string;
+  name: string;
+  price: number;
+  billingPeriod: string;
+  description: string;
+  color: string;
+  icon: any;
+  isPopular?: boolean;
+  features: string[];
 }
 
 declare global {
