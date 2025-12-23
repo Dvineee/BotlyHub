@@ -51,7 +51,6 @@ export class DatabaseService {
           let successCount = 0;
           for (const log of logs) {
               const botId = String(log.bot_id);
-              const { data: botInfo } = await supabase.from('bots').select('name').eq('id', botId).maybeSingle();
               
               const { data: existing } = await supabase
                   .from('channels')
@@ -61,10 +60,7 @@ export class DatabaseService {
                   .maybeSingle();
 
               let syncOk = false;
-              let action = '';
-
               if (existing) {
-                  action = 'UPDATE';
                   const bots = Array.from(new Set([...(existing.connected_bot_ids || []), botId]));
                   const { error: upErr } = await supabase
                       .from('channels')
@@ -76,7 +72,6 @@ export class DatabaseService {
                       .eq('id', existing.id);
                   if (!upErr) syncOk = true;
               } else {
-                  action = 'INSERT';
                   const { error: insErr } = await supabase
                       .from('channels')
                       .insert({
@@ -93,24 +88,8 @@ export class DatabaseService {
               if (syncOk) {
                   await supabase.from('bot_discovery_logs').update({ is_synced: true }).eq('id', log.id);
                   successCount++;
-                  
-                  await this.logActivity(
-                      uIdStr, 
-                      'channel_sync', 
-                      'channel_discovered', 
-                      action === 'INSERT' ? 'Yeni Kanal Bağlandı' : 'Kanal Verisi Güncellendi', 
-                      `'${log.channel_name}' kanalı '${botInfo?.name || botId}' botu üzerinden gelen /start komutuyla senkronize edildi.`,
-                      { 
-                        channel_name: log.channel_name, 
-                        bot_name: botInfo?.name, 
-                        bot_id: botId,
-                        member_count: log.member_count,
-                        sync_type: action
-                      }
-                  );
               }
           }
-          
           return successCount;
       } catch (e) {
           console.error("[SYNC] Error:", e);
@@ -134,33 +113,7 @@ export class DatabaseService {
   }
 
   static async removeUserBot(userId: string, botId: string) {
-    const uIdStr = userId.toString();
-    const bIdStr = botId.toString();
-    
-    const { data: botInfo } = await supabase.from('bots').select('name').eq('id', bIdStr).maybeSingle();
-    const { data: userChannels } = await supabase.from('channels').select('*').eq('user_id', uIdStr);
-
-    if (userChannels && userChannels.length > 0) {
-        for (const channel of userChannels) {
-            const botIds = channel.connected_bot_ids || [];
-            if (botIds.includes(bIdStr)) {
-                const updatedBotIds = botIds.filter((id: string) => id !== bIdStr);
-                
-                if (updatedBotIds.length === 0) {
-                    await supabase.from('channels').delete().eq('id', channel.id);
-                    await this.logActivity(uIdStr, 'channel_sync', 'channel_cascade_deleted', 'Kanal Otomatik Silindi', `'${channel.name}' kanalı, bağlı olduğu son bot (${botInfo?.name || bIdStr}) kütüphaneden kaldırıldığı için silindi.`, { channel_id: channel.id, bot_id: bIdStr, bot_name: botInfo?.name });
-                } else {
-                    await supabase.from('channels').update({ connected_bot_ids: updatedBotIds }).eq('id', channel.id);
-                    await this.logActivity(uIdStr, 'channel_sync', 'channel_bot_unlinked', 'Kanal Bot İlişkisi Kesildi', `'${channel.name}' kanalının '${botInfo?.name || bIdStr}' botu ile bağı koparıldı (Diğer botlar aktif).`, { channel_id: channel.id, bot_id: bIdStr, remaining_bots: updatedBotIds });
-                }
-            }
-        }
-    }
-    
-    const { error } = await supabase.from('user_bots').delete().eq('user_id', uIdStr).eq('bot_id', bIdStr);
-    if (!error) {
-        await this.logActivity(uIdStr, 'bot_manage', 'bot_removed', 'Bot Kütüphaneden Kaldırıldı', `'${botInfo?.name || bIdStr}' botu kütüphaneden çıkarıldı ve ilişkili yetkiler sonlandırıldı.`, { bot_id: bIdStr, bot_name: botInfo?.name });
-    }
+    await supabase.from('user_bots').delete().eq('user_id', userId.toString()).eq('bot_id', botId.toString());
   }
 
   static async getBotById(id: string): Promise<Bot | null> {
@@ -178,7 +131,6 @@ export class DatabaseService {
   static async getBotsWithStats(): Promise<any[]> {
       const { data: bots } = await supabase.from('bots').select('*').order('id', { ascending: false });
       const { data: owners } = await supabase.from('user_bots').select('bot_id');
-      
       return (bots || []).map(bot => ({
           ...bot,
           ownerCount: (owners || []).filter(o => o.bot_id === bot.id).length
@@ -188,81 +140,77 @@ export class DatabaseService {
   static async getUserBots(userId: string): Promise<UserBot[]> {
     const { data } = await supabase.from('user_bots').select('*, bots(*)').eq('user_id', userId.toString());
     if (!data) return [];
-    return data.map((item: any) => ({ ...item.bots, expiryDate: item.expiry_date, ownership_id: item.id })).filter(b => b.id);
+    return data.map((item: any) => ({ 
+        ...item.bots, 
+        expiryDate: item.expiryDate, // Şemada CamelCase: expiryDate
+        ownership_id: item.id,
+        is_premium: item.is_premium,
+        is_active: item.is_active
+    })).filter(b => b.id);
   }
 
   static async addUserBot(userData: any, botData: Bot, isPremium: boolean = false) {
     const userId = (userData.id || userData).toString();
-    await this.syncUser({ id: userId, name: userData.first_name || 'User', username: userData.username || 'user' });
-    const { error } = await supabase.from('user_bots').upsert({ user_id: userId, bot_id: botData.id, is_active: true, is_premium: isPremium, acquired_at: new Date().toISOString() });
+    const { error } = await supabase.from('user_bots').upsert({ 
+        user_id: userId, 
+        bot_id: botData.id, 
+        is_active: true, 
+        is_premium: isPremium, 
+        acquired_at: new Date().toISOString() 
+    });
     if (error) throw error;
-    await this.logActivity(userId, 'bot_manage', 'bot_acquired', 'Bot Kütüphaneye Eklendi', `'${botData.name}' botu kullanıcı kütüphanesine kaydedildi.`, { bot_id: botData.id, bot_name: botData.name, is_premium: isPremium });
     return true;
   }
 
   static async syncUser(user: Partial<User>) {
     if (!user.id) return;
-    const { error } = await supabase.from('users').upsert({ 
+    await supabase.from('users').upsert({ 
         id: user.id.toString(), 
         name: user.name, 
         username: user.username, 
         avatar: user.avatar, 
         email: user.email, 
-        joindate: new Date().toISOString() 
+        joindate: new Date().toISOString(),
+        joinDate: new Date().toISOString() // Şemada her ikisi de görünüyor
     }, { onConflict: 'id' });
-    
-    if (!error && user.email) {
-        await this.logActivity(user.id.toString(), 'security', 'profile_updated', 'Profil Bilgileri Güncellendi', 'Kullanıcı iletişim/güvenlik verilerini güncelledi.', { email: user.email });
-    }
   }
 
   static async getUserById(userId: string): Promise<User | null> {
     const { data } = await supabase.from('users').select('*').eq('id', userId.toString()).maybeSingle();
     if (!data) return null;
-    return { id: data.id, name: data.name, username: data.username, avatar: data.avatar, role: data.role || 'User', status: data.status || 'Active', badges: [], joinDate: data.joindate, email: data.email };
-  }
-
-  static async searchUsers(query: string): Promise<User[]> {
-    if (!query || query.length < 2) return [];
-    const { data } = await supabase
-        .from('users')
-        .select('*')
-        .ilike('username', `%${query.replace('@', '')}%`)
-        .limit(5);
-    return (data || []).map(u => ({ id: u.id, name: u.name, username: u.username, avatar: u.avatar, role: u.role || 'User', status: u.status || 'Active', badges: [], joinDate: u.joindate, email: u.email }));
+    return { id: data.id, name: data.name, username: data.username, avatar: data.avatar, role: data.role || 'User', status: data.status || 'Active', badges: data.badges || [], joinDate: data.joindate, email: data.email };
   }
 
   static async getNotifications(userId?: string): Promise<Notification[]> {
     if (!userId) return [];
-    
     const { data, error } = await supabase
         .from('notifications')
         .select('*')
         .or(`user_id.eq.${userId},target_type.eq.global`)
         .order('date', { ascending: false });
         
-    if (error) {
-        console.error("Fetch notifications error:", error);
-        return [];
-    }
-
+    if (error) return [];
     return (data || []).map(n => ({
         id: String(n.id),
         type: n.type,
         title: n.title,
         message: n.message,
         date: n.date,
-        // is_read sütun adındaki belirsizliği çözmek için her iki anahtarı da kontrol et
-        isRead: n.isRead !== undefined ? n.isRead : (n.is_read !== undefined ? n.is_read : (n.isread !== undefined ? n.isread : false)), 
+        isRead: n.isRead, // Şemadaki tam isim
         user_id: n.user_id,
         target_type: n.target_type
     }));
   }
 
+  /**
+   * Bildirim Okundu İşaretle - Şemadaki tam isimlendirmeyi (isRead) kullanır.
+   */
   static async markNotificationRead(id: string) {
-    // Sütun adı uyumsuzluklarını önlemek için tüm ihtimalleri güncellemeye çalış
-    const updatePayload: any = { isRead: true, is_read: true, isread: true };
-    await supabase.from('notifications').update(updatePayload).eq('id', id);
+    const { error } = await supabase
+        .from('notifications')
+        .update({ isRead: true })
+        .eq('id', id);
+    if (error) throw error;
   }
 
   static async getSettings() {
@@ -277,12 +225,11 @@ export class DatabaseService {
 
   static async getUsers(): Promise<User[]> {
     const { data } = await supabase.from('users').select('*').order('joindate', { ascending: false });
-    return (data || []).map(u => ({ id: u.id, name: u.name, username: u.username, avatar: u.avatar, role: u.role || 'User', status: u.status || 'Active', badges: [], joinDate: u.joindate, email: u.email }));
+    return (data || []).map(u => ({ id: u.id, name: u.name, username: u.username, avatar: u.avatar, role: u.role || 'User', status: u.status || 'Active', badges: u.badges || [], joinDate: u.joindate, email: u.email }));
   }
 
   static async updateUserStatus(userId: string, status: string) {
     await supabase.from('users').update({ status }).eq('id', userId);
-    await this.logActivity(userId, 'security', 'account_status_changed', 'Hesap Durumu Değiştirildi', `Admin hesabı '${status}' moduna aldı.`, { new_status: status });
   }
 
   static async getAdminStats() {
@@ -306,12 +253,12 @@ export class DatabaseService {
     await supabase.from('bots').delete().eq('id', id);
   }
 
+  /**
+   * Bildirim Gönder - Şemaya (isRead) tam uyumlu payload kullanır.
+   */
   static async sendNotification(notification: any) {
-    // id violates not-null hatasını önlemek için benzersiz bir id üret
-    const uniqueId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    
-    // Veritabanı sütun isimlerindeki farklılıkları (is_read, isRead, isread) minimize etmek için payload'ı zenginleştir
-    const payload: any = {
+    const uniqueId = Math.random().toString(36).substring(2, 15);
+    const payload = {
         id: uniqueId, 
         title: notification.title,
         message: notification.message,
@@ -319,34 +266,22 @@ export class DatabaseService {
         target_type: 'global', 
         user_id: null, 
         date: new Date().toISOString(),
-        isRead: false,
-        is_read: false,
-        isread: false
+        isRead: false // Şemadaki tam CamelCase isimlendirme
     };
 
     const { error } = await supabase.from('notifications').insert(payload);
     if (error) {
-        // Eğer hala is_read hatası veriyorsa, o sütunu payload'dan çıkarıp tekrar dene
-        if (error.message.includes('is_read')) {
-            delete payload.is_read;
-            const { error: retryError } = await supabase.from('notifications').insert(payload);
-            if (retryError) throw retryError;
-        } else {
-            throw error;
-        }
+        console.error("DB Notification Insert Error:", error);
+        throw error;
     }
   }
 
-  static async saveAnnouncement(ann: Partial<Announcement>) {
-    await supabase.from('announcements').upsert(ann);
-  }
-
-  static async deleteAnnouncement(id: string) {
-    await supabase.from('announcements').delete().eq('id', id);
-  }
-
   static async saveSettings(settings: any) {
-    await supabase.from('settings').upsert({ id: 1, ...settings });
+    await supabase.from('settings').upsert({ 
+        id: 1, 
+        appName: settings.appName,
+        MaintenanceMode: settings.maintenanceMode // Şemadaki tam isim
+    });
   }
 
   static setAdminSession(token: string) { localStorage.setItem('admin_v3_session', token); }
