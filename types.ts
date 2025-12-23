@@ -1,5 +1,4 @@
 
-
 export interface User {
   id: string;
   name: string;
@@ -78,6 +77,7 @@ export interface UserBot extends Bot {
 export interface Channel {
   id: string;
   user_id: string;
+  telegram_id: string; // Telegram chat_id (Python botundan gelen veri)
   name: string;
   memberCount: number;
   icon: string;
@@ -111,7 +111,6 @@ export interface Notification {
   target_type?: 'user' | 'global';
 }
 
-// Fix: Added SubscriptionPlan interface to resolve "Module './types' has no exported member 'SubscriptionPlan'" errors.
 export interface SubscriptionPlan {
   id: string;
   name: string;

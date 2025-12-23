@@ -32,7 +32,7 @@ export class DatabaseService {
       await supabase.from('ads').delete().eq('id', id);
   }
 
-  // --- MEVCUT METODLAR ---
+  // --- KANAL VE LOG YÖNETİMİ ---
   static async logActivity(userId: string, type: ActivityLog['type'], actionKey: string, title: string, description: string, metadata: any = {}) {
       try {
           const uIdStr = String(userId).trim();
@@ -51,19 +51,35 @@ export class DatabaseService {
   static async syncChannelsFromBotActivity(userId: string): Promise<number> {
       try {
           const uIdStr = String(userId).trim();
+          // bot_discovery_logs tablosundan chat_id'yi de çekiyoruz
           const { data: logs, error: logErr } = await supabase.from('bot_discovery_logs').select('*').eq('owner_id', uIdStr).eq('is_synced', false);
           if (logErr || !logs || logs.length === 0) return 0;
           let successCount = 0;
           for (const log of logs) {
               const botId = String(log.bot_id);
+              const telegramId = String(log.chat_id || ''); // Python botundan gelen chat_id
+
               const { data: existing } = await supabase.from('channels').select('*').eq('user_id', uIdStr).eq('name', log.channel_name).maybeSingle();
               let syncOk = false;
               if (existing) {
                   const bots = Array.from(new Set([...(existing.connected_bot_ids || []), botId]));
-                  const { error: upErr } = await supabase.from('channels').update({ member_count: log.member_count, connected_bot_ids: bots, icon: log.channel_icon || existing.icon }).eq('id', existing.id);
+                  const { error: upErr } = await supabase.from('channels').update({ 
+                      member_count: log.member_count, 
+                      connected_bot_ids: bots, 
+                      icon: log.channel_icon || existing.icon,
+                      telegram_id: telegramId || existing.telegram_id // telegram_id'yi güncelle
+                  }).eq('id', existing.id);
                   if (!upErr) syncOk = true;
               } else {
-                  const { error: insErr } = await supabase.from('channels').insert({ user_id: uIdStr, name: log.channel_name, member_count: log.member_count || 0, icon: log.channel_icon || `https://ui-avatars.com/api/?name=${encodeURIComponent(log.channel_name)}`, connected_bot_ids: [botId], revenue: 0 });
+                  const { error: insErr } = await supabase.from('channels').insert({ 
+                      user_id: uIdStr, 
+                      telegram_id: telegramId, 
+                      name: log.channel_name, 
+                      member_count: log.member_count || 0, 
+                      icon: log.channel_icon || `https://ui-avatars.com/api/?name=${encodeURIComponent(log.channel_name)}`, 
+                      connected_bot_ids: [botId], 
+                      revenue: 0 
+                  });
                   if (!insErr) syncOk = true;
               }
               if (syncOk) {
@@ -78,7 +94,17 @@ export class DatabaseService {
   static async getChannels(userId: string): Promise<Channel[]> {
     const uIdStr = String(userId).trim();
     const { data } = await supabase.from('channels').select('*').eq('user_id', uIdStr).order('created_at', { ascending: false });
-    return (data || []).map(c => ({ id: String(c.id), user_id: String(c.user_id), name: c.name, memberCount: c.member_count || 0, icon: c.icon || '', isAdEnabled: c.is_ad_enabled || false, connectedBotIds: c.connected_bot_ids || [], revenue: Number(c.revenue || 0) }));
+    return (data || []).map(c => ({ 
+        id: String(c.id), 
+        user_id: String(c.user_id), 
+        telegram_id: String(c.telegram_id || ''),
+        name: c.name, 
+        memberCount: c.member_count || 0, 
+        icon: c.icon || '', 
+        isAdEnabled: c.is_ad_enabled || false, 
+        connectedBotIds: c.connected_bot_ids || [], 
+        revenue: Number(c.revenue || 0) 
+    }));
   }
 
   static async removeUserBot(userId: string, botId: string) {
