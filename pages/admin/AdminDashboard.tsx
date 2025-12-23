@@ -11,7 +11,8 @@ import {
   Mail, BellRing, Sparkles, Eye, Zap, RefreshCcw, Star, Calendar, MessageSquare, ExternalLink, Layers, PlusCircle, Link2,
   Fingerprint, Info, TrendingUp, BarChart3, Radio,
   Layout, MousePointer2, Target, Bell, CheckCircle2, ChevronRight,
-  GripVertical, DollarSign, LifeBuoy, FileText, Instagram, Clock, Smartphone, MoreVertical
+  GripVertical, DollarSign, LifeBuoy, FileText, Instagram, Clock, Smartphone, MoreVertical,
+  ChevronLeft
 } from 'lucide-react';
 import { DatabaseService, supabase } from '../../services/DatabaseService';
 import { User, Bot as BotType, Announcement, Notification, Channel, ActivityLog, Ad } from '../../types';
@@ -38,27 +39,33 @@ const StatCard = ({ label, value, icon: Icon, color }: any) => {
 };
 
 /**
- * Telegram Reklam Önizleme Bileşeni
- * Botun HTML parse_mode="HTML" ile göndereceği BAŞLIĞI KALIN simüle eder.
+ * Authentic Telegram Advertisement Preview
+ * Simulates Dark Mode with bold title and inline button styles.
  */
 const TelegramAdPreview = ({ title, content, imageUrl, buttonText }: { title: string, content: string, imageUrl?: string, buttonText?: string }) => {
     return (
-        <div className="bg-[#17212b] rounded-2xl overflow-hidden w-full max-w-[340px] shadow-2xl border border-white/5 font-sans mx-auto transition-all animate-in zoom-in-95">
-            <div className="bg-[#242f3d] p-3 flex items-center justify-between border-b border-black/10">
-                <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-blue-400 flex items-center justify-center text-white font-bold text-[10px] shadow-lg">B</div>
+        <div className="bg-[#0e1621] rounded-2xl overflow-hidden w-full max-w-[320px] shadow-2xl font-sans mx-auto flex flex-col h-[480px] animate-in zoom-in-95">
+            {/* Header */}
+            <div className="bg-[#242f3d] p-3 flex items-center justify-between border-b border-black/20 shrink-0">
+                <div className="flex items-center gap-2">
+                    <ChevronLeft size={20} className="text-[#6c7883]" />
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#3b82f6] to-[#60a5fa] flex items-center justify-center text-white font-bold text-xs shadow-lg">B</div>
                     <div className="flex flex-col">
-                        <span className="text-xs font-bold text-white leading-none tracking-tight">BotlyHub Advert</span>
-                        <span className="text-[9px] text-blue-400 mt-0.5 font-medium uppercase tracking-widest">bot</span>
+                        <span className="text-[13px] font-bold text-white leading-none">BotlyHub Advert</span>
+                        <span className="text-[10px] text-[#6c7883] mt-0.5">bot</span>
                     </div>
                 </div>
-                <MoreVertical size={16} className="text-slate-400" />
+                <div className="flex items-center gap-4">
+                    <Search size={18} className="text-[#6c7883]" />
+                    <MoreVertical size={18} className="text-[#6c7883]" />
+                </div>
             </div>
             
-            <div className="p-0.5 bg-[#0e1621] min-h-[120px] flex flex-col gap-1 pb-4">
-                <div className="bg-[#242f3d] rounded-2xl m-2 p-0 shadow-sm border border-black/20 overflow-hidden self-start max-w-[92%] relative">
+            {/* Messages Area */}
+            <div className="flex-1 p-2 bg-[#0e1621] overflow-hidden flex flex-col gap-2 relative">
+                <div className="bg-[#182533] rounded-xl rounded-tl-none m-1 shadow-sm border border-black/10 overflow-hidden self-start max-w-[85%] relative">
                     {imageUrl && (
-                        <div className="w-full h-48 bg-slate-800 relative">
+                        <div className="w-full h-40 bg-slate-800 relative">
                             <img 
                                 src={imageUrl} 
                                 className="w-full h-full object-cover" 
@@ -66,23 +73,21 @@ const TelegramAdPreview = ({ title, content, imageUrl, buttonText }: { title: st
                             />
                         </div>
                     )}
-                    <div className="p-3.5 text-[14px] leading-relaxed text-white whitespace-pre-wrap">
-                        {/* BAŞLIK MESAJ İÇİNDE KALIN (BOLD) YAZILIR (Botun HTML Modunu Simüle Eder) */}
-                        <div className="font-black mb-3 text-white border-b border-white/10 pb-2 flex items-center gap-2 tracking-tight">
-                           <Zap size={14} className="text-blue-500 fill-blue-500" />
-                           {title || "Kampanya Başlığı"}
-                        </div>
-                        <div className="text-[#e0e0e0] font-medium leading-[1.6]">{content || "Reklam içeriği burada görüntülenecek..."}</div>
-                        <div className="text-[10px] text-slate-400 mt-3 flex justify-end items-center gap-1">
+                    <div className="p-2.5 text-[14px] leading-snug text-white">
+                        {/* TITLE IS BOLD AS PER TELEGRAM HTML PARSE MODE */}
+                        <span className="font-bold block mb-1 text-white">{title || "Kampanya Başlığı"}</span>
+                        <span className="text-[#f1f1f1] whitespace-pre-wrap">{content || "Reklam içeriği burada görüntülenecek..."}</span>
+                        <div className="text-[10px] text-[#6c7883] mt-1 flex justify-end items-center gap-1">
                            <span>12:45</span>
-                           <CheckCircle2 size={10} className="text-blue-500" />
+                           <CheckCircle2 size={10} className="text-[#3b82f6]" />
                         </div>
                     </div>
                 </div>
                 
+                {/* Inline Keyboard Button Style */}
                 {buttonText && (
-                    <div className="px-3 flex justify-start animate-in slide-in-from-left-4">
-                        <div className="bg-blue-600 hover:bg-blue-500 text-white py-3 px-10 rounded-xl text-xs font-black text-center shadow-xl active:scale-95 transition-all w-full max-w-[220px] uppercase tracking-widest">
+                    <div className="px-2 self-start w-[85%]">
+                        <div className="bg-[#182533]/80 hover:bg-[#182533] border border-white/5 text-[#4ea4f5] py-2.5 rounded-lg text-[13px] font-bold text-center shadow-lg active:scale-95 transition-all cursor-pointer">
                             {buttonText}
                         </div>
                     </div>
@@ -304,7 +309,7 @@ const AdsManagement = () => {
                                 <form onSubmit={handleCreate} className="space-y-6">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Kampanya Başlığı (KALIN YAZILIR)</label>
+                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Kampanya Başlığı (MESAJ İÇİNDE KALIN)</label>
                                             <input required type="text" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="w-full bg-slate-950 border border-white/5 rounded-3xl p-6 text-xs font-bold text-white outline-none focus:border-blue-500/30" placeholder="Örn: %50 İndirim Fırsatı!" />
                                         </div>
                                         <div className="space-y-2">
@@ -342,10 +347,12 @@ const AdsManagement = () => {
                                 <div className="bg-slate-900/40 border border-white/5 rounded-[44px] p-8 flex flex-col items-center sticky top-0">
                                     <div className="flex items-center gap-3 mb-8">
                                         <Smartphone size={18} className="text-slate-600" />
-                                        <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Bot Çıktı Önizlemesi</span>
+                                        <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Telegram Mobil Önizleme</span>
                                     </div>
                                     <TelegramAdPreview title={formData.title} content={formData.content} imageUrl={formData.image_url} buttonText={formData.button_text} />
-                                    <p className="text-[9px] text-slate-500 mt-6 font-bold uppercase tracking-tighter text-center px-4 leading-relaxed">Başlık metin içinde <span className="text-white">KALIN</span> (HTML) olarak gönderilecek.</p>
+                                    <p className="text-[9px] text-slate-500 mt-6 font-bold uppercase tracking-tighter text-center px-4 leading-relaxed italic">
+                                        Gerçek Telegram görünümüdür. <br/> Başlık <span className="text-white">BOLDPARSE</span> ile kalın gönderilir.
+                                    </p>
                                 </div>
                             </div>
                         </div>

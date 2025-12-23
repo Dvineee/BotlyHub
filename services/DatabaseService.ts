@@ -9,7 +9,7 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export class DatabaseService {
   
-  // --- REKLAM YÖNETİMİ ---
+  // --- AD MANAGEMENT ---
   static async getAds(): Promise<Ad[]> {
       const { data } = await supabase.from('ads').select('*').order('created_at', { ascending: false });
       return data || [];
@@ -34,7 +34,7 @@ export class DatabaseService {
       await supabase.from('ads').delete().eq('id', id);
   }
 
-  // --- KANAL VE LOG YÖNETİMİ ---
+  // --- CHANNEL & LOG MANAGEMENT ---
   static async logActivity(userId: string, type: ActivityLog['type'], actionKey: string, title: string, description: string, metadata: any = {}) {
       try {
           const uIdStr = String(userId).trim();
@@ -53,7 +53,6 @@ export class DatabaseService {
   static async syncChannelsFromBotActivity(userId: string): Promise<number> {
       try {
           const uIdStr = String(userId).trim();
-          // bot_discovery_logs tablosundaki senkronize edilmemiş logları çek
           const { data: logs, error: logErr } = await supabase.from('bot_discovery_logs').select('*').eq('owner_id', uIdStr).eq('is_synced', false);
           
           if (logErr || !logs || logs.length === 0) return 0;
@@ -61,31 +60,25 @@ export class DatabaseService {
           let successCount = 0;
           for (const log of logs) {
               const botId = String(log.bot_id);
-              // KRİTİK: Hem chat_id hem telegram_id kontrolü
-              const telegramId = String(log.chat_id || log.telegram_id || '');
+              // CRITICAL: Prioritize chat_id as the primary source for telegram_id
+              const telegramId = String(log.chat_id || log.telegram_id || '').trim();
 
-              if (!telegramId) {
-                  console.warn("Log kaydında Telegram ID bulunamadı, atlanıyor:", log.channel_name);
-                  continue;
-              }
+              if (!telegramId) continue;
 
-              // Kanal zaten var mı kontrol et (Ad veya Telegram ID ile)
               const { data: existing } = await supabase.from('channels').select('*').eq('user_id', uIdStr).eq('telegram_id', telegramId).maybeSingle();
               
               let syncOk = false;
               if (existing) {
-                  // Mevcut kanalı güncelle
                   const bots = Array.from(new Set([...(existing.connected_bot_ids || []), botId]));
                   const { error: upErr } = await supabase.from('channels').update({ 
                       member_count: log.member_count || existing.member_count, 
                       connected_bot_ids: bots, 
                       icon: log.channel_icon || existing.icon,
                       telegram_id: telegramId,
-                      is_ad_enabled: true // Senkronize olanları aktif et
+                      is_ad_enabled: true 
                   }).eq('id', existing.id);
                   if (!upErr) syncOk = true;
               } else {
-                  // Yeni kanal oluştur
                   const { error: insErr } = await supabase.from('channels').insert({ 
                       user_id: uIdStr, 
                       telegram_id: telegramId, 
@@ -100,7 +93,6 @@ export class DatabaseService {
               }
               
               if (syncOk) {
-                  // Logu senkronize edildi olarak işaretle
                   await supabase.from('bot_discovery_logs').update({ is_synced: true }).eq('id', log.id);
                   successCount++;
               }
