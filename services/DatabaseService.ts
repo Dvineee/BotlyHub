@@ -235,7 +235,7 @@ export class DatabaseService {
   static async getNotifications(userId?: string): Promise<Notification[]> {
     if (!userId) return [];
     
-    // Hem global hem kullanıcıya özel bildirimleri çek
+    // is_read sütun adını isRead olarak şemaya uyumlu şekilde güncelliyoruz
     const { data, error } = await supabase
         .from('notifications')
         .select('*')
@@ -253,14 +253,15 @@ export class DatabaseService {
         title: n.title,
         message: n.message,
         date: n.date,
-        isRead: n.is_read,
+        isRead: n.isRead || n.is_read || false, // Hem camel hem snake case desteği
         user_id: n.user_id,
         target_type: n.target_type
     }));
   }
 
   static async markNotificationRead(id: string) {
-    await supabase.from('notifications').update({ is_read: true }).eq('id', id);
+    // Veritabanındaki gerçek sütun adının isRead olduğunu varsayarak güncelliyoruz
+    await supabase.from('notifications').update({ isRead: true }).eq('id', id);
   }
 
   static async getSettings() {
@@ -310,9 +311,9 @@ export class DatabaseService {
         message: notification.message,
         type: notification.type || 'system',
         target_type: notification.target_type || 'global',
-        user_id: notification.user_id || null, // Artık ID doğrudan UI'dan geliyor
+        user_id: notification.user_id || null, 
         date: new Date().toISOString(),
-        is_read: false
+        isRead: false // Hata aldığınız is_read alanı isRead olarak revize edildi
     };
 
     const { error } = await supabase.from('notifications').insert(payload);
