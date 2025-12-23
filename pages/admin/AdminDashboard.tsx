@@ -39,7 +39,7 @@ const StatCard = ({ label, value, icon: Icon, color }: any) => {
 
 /**
  * Telegram Reklam Önizleme Bileşeni
- * Başlığı kalın (bold) olarak en üste ekler.
+ * Botun HTML parse_mode="HTML" ile göndereceği başlığı kalın simüle eder.
  */
 const TelegramAdPreview = ({ title, content, imageUrl, buttonText }: { title: string, content: string, imageUrl?: string, buttonText?: string }) => {
     return (
@@ -67,16 +67,16 @@ const TelegramAdPreview = ({ title, content, imageUrl, buttonText }: { title: st
                         </div>
                     )}
                     <div className="p-3 text-[13px] leading-relaxed text-white whitespace-pre-wrap">
-                        {/* Başlık Kalın */}
-                        <div className="font-bold mb-2">{title || "Kampanya Başlığı"}</div>
-                        {content || "Reklam içeriği burada görüntülenecek..."}
-                        <div className="text-[10px] text-slate-400 mt-1 flex justify-end">12:45</div>
+                        {/* BAŞLIK KALIN YAZILIR (Botun göndereceği HTML formatı) */}
+                        <div className="font-bold mb-2 text-white text-sm tracking-tight">{title || "Kampanya Başlığı"}</div>
+                        <div className="text-slate-200">{content || "Reklam içeriği burada görüntülenecek..."}</div>
+                        <div className="text-[10px] text-slate-400 mt-2 flex justify-end italic">12:45</div>
                     </div>
                 </div>
                 
                 {buttonText && (
                     <div className="px-3 flex justify-start">
-                        <div className="bg-blue-500 text-white py-2.5 px-8 rounded-xl text-xs font-bold text-center shadow-lg active:scale-95 transition-all w-full max-w-[200px]">
+                        <div className="bg-blue-600 text-white py-2.5 px-8 rounded-xl text-xs font-bold text-center shadow-lg active:scale-95 transition-all w-full max-w-[200px] uppercase tracking-wider">
                             {buttonText}
                         </div>
                     </div>
@@ -298,8 +298,8 @@ const AdsManagement = () => {
                                 <form onSubmit={handleCreate} className="space-y-6">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Kampanya Başlığı (Mesajda Kalın Yazılır)</label>
-                                            <input required type="text" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="w-full bg-slate-950 border border-white/5 rounded-3xl p-6 text-xs font-bold text-white outline-none focus:border-blue-500/30" placeholder="Örn: Black Friday 2024" />
+                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Kampanya Başlığı (Kalın Yazılır)</label>
+                                            <input required type="text" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="w-full bg-slate-950 border border-white/5 rounded-3xl p-6 text-xs font-bold text-white outline-none focus:border-blue-500/30" placeholder="Örn: %50 İndirim Fırsatı!" />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Görsel URL</label>
@@ -318,7 +318,7 @@ const AdsManagement = () => {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Buton Metni</label>
-                                            <input type="text" value={formData.button_text} onChange={e => setFormData({...formData, button_text: e.target.value})} className="w-full bg-slate-950 border border-white/5 rounded-3xl p-6 text-xs font-bold text-white outline-none focus:border-blue-500/30" placeholder="Örn: Hemen İncele" />
+                                            <input type="text" value={formData.button_text} onChange={e => setFormData({...formData, button_text: e.target.value})} className="w-full bg-slate-950 border border-white/5 rounded-3xl p-6 text-xs font-bold text-white outline-none focus:border-blue-500/30" placeholder="Örn: Hemen Katıl" />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Buton Linki</label>
@@ -327,16 +327,16 @@ const AdsManagement = () => {
                                     </div>
 
                                     <button type="submit" disabled={isLoading} className="w-full py-6 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-[32px] text-[10px] uppercase tracking-[0.4em] shadow-xl shadow-blue-600/20 transition-all flex items-center justify-center gap-3">
-                                        {isLoading ? <Loader2 className="animate-spin" size={20}/> : <><Send size={18}/> KAMPANYAYI BAŞLAT</>}
+                                        {isLoading ? <Loader2 className="animate-spin" size={20}/> : <><Send size={18}/> YAYINI BAŞLAT</>}
                                     </button>
                                 </form>
                             </div>
 
                             <div className="w-full lg:w-[380px] shrink-0">
-                                <div className="bg-slate-900/40 border border-white/5 rounded-[44px] p-8 flex flex-col items-center">
+                                <div className="bg-slate-900/40 border border-white/5 rounded-[44px] p-8 flex flex-col items-center sticky top-0">
                                     <div className="flex items-center gap-3 mb-8">
                                         <Smartphone size={18} className="text-slate-600" />
-                                        <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Canlı Önizleme</span>
+                                        <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Bot Çıktı Önizlemesi</span>
                                     </div>
                                     <TelegramAdPreview title={formData.title} content={formData.content} imageUrl={formData.image_url} buttonText={formData.button_text} />
                                 </div>
