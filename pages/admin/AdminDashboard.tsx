@@ -39,8 +39,9 @@ const StatCard = ({ label, value, icon: Icon, color }: any) => {
 
 /**
  * Telegram Reklam Önizleme Bileşeni
+ * Başlığı kalın (bold) olarak en üste ekler.
  */
-const TelegramAdPreview = ({ content, imageUrl, buttonText }: { content: string, imageUrl?: string, buttonText?: string }) => {
+const TelegramAdPreview = ({ title, content, imageUrl, buttonText }: { title: string, content: string, imageUrl?: string, buttonText?: string }) => {
     return (
         <div className="bg-[#17212b] rounded-2xl overflow-hidden w-full max-w-[340px] shadow-2xl border border-white/5 font-sans mx-auto">
             <div className="bg-[#242f3d] p-3 flex items-center justify-between border-b border-black/10">
@@ -66,6 +67,8 @@ const TelegramAdPreview = ({ content, imageUrl, buttonText }: { content: string,
                         </div>
                     )}
                     <div className="p-3 text-[13px] leading-relaxed text-white whitespace-pre-wrap">
+                        {/* Başlık Kalın */}
+                        <div className="font-bold mb-2">{title || "Kampanya Başlığı"}</div>
                         {content || "Reklam içeriği burada görüntülenecek..."}
                         <div className="text-[10px] text-slate-400 mt-1 flex justify-end">12:45</div>
                     </div>
@@ -295,7 +298,7 @@ const AdsManagement = () => {
                                 <form onSubmit={handleCreate} className="space-y-6">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Kampanya Başlığı</label>
+                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Kampanya Başlığı (Mesajda Kalın Yazılır)</label>
                                             <input required type="text" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="w-full bg-slate-950 border border-white/5 rounded-3xl p-6 text-xs font-bold text-white outline-none focus:border-blue-500/30" placeholder="Örn: Black Friday 2024" />
                                         </div>
                                         <div className="space-y-2">
@@ -335,7 +338,7 @@ const AdsManagement = () => {
                                         <Smartphone size={18} className="text-slate-600" />
                                         <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Canlı Önizleme</span>
                                     </div>
-                                    <TelegramAdPreview content={formData.content} imageUrl={formData.image_url} buttonText={formData.button_text} />
+                                    <TelegramAdPreview title={formData.title} content={formData.content} imageUrl={formData.image_url} buttonText={formData.button_text} />
                                 </div>
                             </div>
                         </div>
@@ -346,7 +349,6 @@ const AdsManagement = () => {
     );
 };
 
-// ... Diğer bileşenler (SalesManagement, UserManagement, BotManagement, AnnouncementCenter, SettingsManagement) aynı kalacak.
 const SalesManagement = () => {
     const [sales, setSales] = useState<any[]>([]);
     useEffect(() => { load(); }, []);
