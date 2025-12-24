@@ -35,16 +35,13 @@ class PriceService {
     }
 
     /**
-     * TL tutarını TON ve Telegram Stars birimine dönüştürür.
+     * TL tutarını sadece TON birimine dönüştürür.
+     * Stars (Yıldız) sistemi kaldırılmıştır.
      */
     static convert(tl: number, tonRate: number) {
         const amount = Number(tl) || 0;
-        // Fix: Added 'stars' property to the return object to satisfy component requirements and resolve type mismatch errors in AdminDashboard.
-        // Telegram Stars are approximately $0.02 USD. Using a conversion of ~0.7 TRY per Star.
-        const starRateInTry = 0.7;
         return {
-            ton: parseFloat((amount / tonRate).toFixed(3)),
-            stars: Math.floor(amount / starRateInTry)
+            ton: parseFloat((amount / tonRate).toFixed(3))
         };
     }
 }
