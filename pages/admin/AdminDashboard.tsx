@@ -12,7 +12,7 @@ import {
   Fingerprint, Info, TrendingUp, BarChart3, Radio,
   Layout, MousePointer2, Target, Bell, CheckCircle2, ChevronRight,
   GripVertical, DollarSign, LifeBuoy, FileText, Instagram, Clock, Smartphone, MoreVertical,
-  ChevronLeft, Edit3, Save, AlertTriangle, Images
+  ChevronLeft, Edit3, Save, AlertTriangle, Image
 } from 'lucide-react';
 import { DatabaseService, supabase } from '../../services/DatabaseService';
 import { User, Bot as BotType, Announcement, Notification, Channel, ActivityLog, Ad } from '../../types';
@@ -24,7 +24,7 @@ const { useNavigate, Routes, Route, Link, useLocation } = Router as any;
  */
 const getLiveBotIcon = (bot: Partial<BotType>) => {
     if (bot.bot_link) {
-        const username = bot.bot_link.replace('@', '').replace('https://t.me/', '').trim();
+        const username = bot.bot_link.replace('@', '').replace('https://t.me/', '').split('/').pop()?.trim();
         if (username) return `https://t.me/i/userpic/320/${username}.jpg`;
     }
     return bot.icon || `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name || 'Bot')}&background=1e293b&color=fff&bold=true`;
@@ -614,7 +614,7 @@ const BotManagement = () => {
                                     </div>
                                 </div>
                                 <div className="space-y-3">
-                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 italic flex items-center gap-2"><Images size={14}/> Ekran Görüntüleri (Virgül ile ayırın)</label>
+                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 italic flex items-center gap-2"><Image size={14}/> Ekran Görüntüleri (Virgül ile ayırın)</label>
                                     <input type="text" value={editingBot.screenshots} onChange={e => setEditingBot({...editingBot, screenshots: e.target.value})} className="w-full bg-slate-900/40 border border-white/5 rounded-[28px] p-7 text-xs font-bold text-white outline-none focus:border-blue-500/40 shadow-inner" placeholder="https://resim1.com, https://resim2.com" />
                                 </div>
                                 <div className="flex items-center gap-6 p-7 bg-slate-900/40 border border-white/5 rounded-[28px] shadow-inner">
@@ -750,7 +750,10 @@ const SettingsManagement = () => {
         try {
             await DatabaseService.saveSettings(settings);
             alert("Sistem ayarları başarıyla güncellendi.");
-        } catch (e) { alert("Hata!"); } finally { setIsLoading(false); }
+        } catch (e) { 
+            console.error(e);
+            alert("Ayarlar kaydedilemedi!"); 
+        } finally { setIsLoading(false); }
     };
 
     return (

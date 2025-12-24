@@ -179,10 +179,10 @@ export class DatabaseService {
   static async getSettings() {
     const { data } = await supabase.from('settings').select('*').maybeSingle();
     if (data) {
-        // App.tsx'teki kontrol için normalize et
+        // Normalization for consistency across the app
         return {
             ...data,
-            maintenanceMode: data.MaintenanceMode
+            maintenanceMode: Boolean(data.MaintenanceMode)
         };
     }
     return data;
@@ -216,6 +216,10 @@ export class DatabaseService {
   }
 
   static async saveBot(bot: any) {
+    const screenshots = Array.isArray(bot.screenshots) 
+      ? bot.screenshots 
+      : String(bot.screenshots || '').split(',').map((s: string) => s.trim()).filter(Boolean);
+
     const dbPayload = { 
         id: String(bot.id), 
         name: String(bot.name), 
@@ -225,7 +229,7 @@ export class DatabaseService {
         category: String(bot.category), 
         bot_link: String(bot.bot_link), 
         is_premium: Boolean(bot.is_premium),
-        screenshots: Array.isArray(bot.screenshots) ? bot.screenshots : (String(bot.screenshots || '').split(',').map((s: string) => s.trim()).filter(Boolean)), 
+        screenshots: screenshots, 
         icon: String(bot.icon || '') 
     };
     const { error } = await supabase.from('bots').upsert(dbPayload, { onConflict: 'id' });
@@ -238,7 +242,7 @@ export class DatabaseService {
   }
 
   static async saveSettings(settings: any) {
-    await supabase.from('settings').upsert({ 
+    const { error } = await supabase.from('settings').upsert({ 
         id: 1, 
         appName: settings.appName, 
         MaintenanceMode: Boolean(settings.maintenanceMode),
@@ -248,6 +252,7 @@ export class DatabaseService {
         instagramUrl: String(settings.instagramUrl),
         telegramChannelUrl: String(settings.telegramChannelUrl)
     });
+    if (error) throw error;
   }
 
   static setAdminSession(token: string) { localStorage.setItem('admin_v3_session', token); }
