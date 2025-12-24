@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, Star, Wallet, CheckCircle2, Loader2, ShieldCheck, Zap, AlertTriangle, ShieldAlert } from 'lucide-react';
+import { ChevronLeft, Wallet, CheckCircle2, Loader2, ShieldCheck, Zap, AlertTriangle, ShieldAlert } from 'lucide-react';
 import * as Router from 'react-router-dom';
 import { subscriptionPlans } from '../data';
 import { Bot } from '../types';
@@ -27,7 +27,6 @@ const Payment = () => {
         PriceService.getTonPrice().then(p => setTonPrice(p.tonTry));
     }
     
-    // Telegram Header Rengi Production Modu
     if (tg) {
         tg.setHeaderColor('#020617');
     }
@@ -36,7 +35,7 @@ const Payment = () => {
   const plan = subscriptionPlans.find(p => p.id === id);
   const item = targetBot || plan;
 
-  const handleSuccess = async (method: 'stars' | 'ton') => {
+  const handleSuccess = async () => {
       if (!item) return;
       
       haptic('heavy');
@@ -45,90 +44,30 @@ const Payment = () => {
       try {
           const userData = user || { id: 'guest', first_name: 'User' };
           
-          // Veritabanı Aktivasyonu
           if (targetBot) {
               await DatabaseService.addUserBot(userData, targetBot, true);
           } else if (plan) {
               localStorage.setItem('userPlan', plan.id);
           }
           
-          // Gerçek İşlem Kaydı (Audit Log)
           await DatabaseService.logActivity(
               userData.id.toString(), 
               'payment', 
               'PAYMENT_COMPLETE', 
-              'İşlem Başarılı', 
-              `${item.name} için ${method.toUpperCase()} ödemesi onaylandı ve aktivasyon tamamlandı.`
+              'TON İşlemi Başarılı', 
+              `${item.name} için TON ödemesi onaylandı.`
           );
 
-          // Kullanıcıyı yönlendir
           navigate(targetBot ? '/my-bots' : '/settings');
       } catch (e) {
-          console.error("Post-Payment Activation Error:", e);
-          alert("Ödeme onaylandı ancak aktivasyon sırasında bir ağ hatası oluştu. Lütfen bot üzerinden destek ile iletişime geçin.");
+          console.error("Post-Payment Error:", e);
+          alert("Ödeme onaylandı ancak aktivasyon hatası oluştu.");
       }
   };
 
-  const prices = item ? PriceService.convert(item.price, tonPrice) : { stars: 0, ton: 0 };
+  // Fix: Updated fallback to include 'stars: 0' to ensure type compatibility with the updated PriceService.convert return type.
+  const prices = item ? PriceService.convert(item.price, tonPrice) : { ton: 0, stars: 0 };
 
-  /**
-   * Telegram Stars (XTR) Gerçek Ödeme Akışı
-   */
-  const payWithStars = async () => {
-      if (!tg) {
-          alert("Telegram WebApp ortamı bulunamadı.");
-          return;
-      }
-      
-      setIsLoading(true);
-      haptic('medium');
-
-      try {
-          /**
-           * PRODUCTION NOTU:
-           * Telegram Stars ödemesi için bir 'invoice_url' gereklidir.
-           * Bu URL bot backend'iniz tarafından 'createInvoiceLink' API'si ile oluşturulur.
-           * provider_token boş (Stars için), currency 'XTR' olmalıdır.
-           */
-          
-          // Örnek Slug: Kullanıcı planı veya bot ID'sine göre backend'den URL istenir
-          const invoiceSlug = targetBot ? `bot_${targetBot.id}` : `plan_${plan?.id}`;
-          
-          // Backend'den gerçek invoice linki alındığı varsayılıyor
-          // const response = await fetch('/api/get-stars-link', { body: JSON.stringify({ slug: invoiceSlug }) });
-          // const { url } = await response.json();
-
-          // Şimdilik Telegram Native openInvoice çağrısını yapıyoruz
-          // Gerçek URL backend'den gelmelidir, burada protokolü aktif ediyoruz
-          tg.openInvoice('', (status: string) => {
-              if (status === 'paid') {
-                  handleSuccess('stars');
-              } else if (status === 'failed') {
-                  notification('error');
-                  setIsLoading(false);
-              } else {
-                  // status === 'cancelled' vb.
-                  setIsLoading(false);
-              }
-          });
-
-          // Not: invoiceUrl boş olduğunda Telegram hata verebilir. 
-          // Backend entegrasyonu tamamlanana kadar kullanıcıyı bilgilendiriyoruz:
-          if (!tg.initData) {
-              alert("Bu özellik yalnızca gerçek Telegram uygulaması içinde çalışır.");
-              setIsLoading(false);
-          }
-          
-      } catch (e) {
-          notification('error');
-          setIsLoading(false);
-          console.error("Stars Payment Error:", e);
-      }
-  };
-
-  /**
-   * TON Connect Gerçek Transfer Akışı
-   */
   const payWithTON = async () => {
       if (!tonConnectUI.connected) {
           notification('warning');
@@ -141,18 +80,13 @@ const Payment = () => {
       
       try {
           const transactionPayload = WalletService.createTonTransaction(prices.ton);
-          
-          // Bu metod gerçek cüzdanda (Tonkeeper vb.) popup açar ve onay bekler
           const result = await tonConnectUI.sendTransaction(transactionPayload);
           
           if (result) {
-              // Cüzdan işlemi onayladı ve ağa yayınladı
-              await handleSuccess('ton');
+              await handleSuccess();
           }
       } catch (e: any) {
           notification('error');
-          console.error("TON Connect Transaction Error:", e);
-          // Hata durumunda (kullanıcı reddetti vb.) loading kapat
           setIsLoading(false);
       }
   };
@@ -167,7 +101,7 @@ const Payment = () => {
             </button>
             <div className="flex items-center gap-2 px-4 py-2 bg-blue-600/10 border border-blue-500/20 rounded-full">
                 <ShieldCheck size={14} className="text-blue-500" />
-                <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">Güvenli Ödeme</span>
+                <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">Güvenli TON Ödemesi</span>
             </div>
         </div>
 
@@ -183,52 +117,34 @@ const Payment = () => {
             </div>
 
             <h2 className="text-4xl font-black text-white mb-3 italic tracking-tighter uppercase">{item.name}</h2>
-            <p className="text-slate-500 text-[10px] mb-10 font-black uppercase tracking-[0.3em]">Ödeme Protokolü Seçiniz</p>
+            <p className="text-slate-500 text-[10px] mb-10 font-black uppercase tracking-[0.3em]">Satın Alma Onayı</p>
             
-            <div className="grid grid-cols-2 gap-5">
-                <div className="bg-slate-950/80 p-7 rounded-[36px] border border-white/5 shadow-inner group">
-                    <span className="text-[9px] text-slate-600 font-black uppercase tracking-widest block mb-3 group-hover:text-yellow-500 transition-colors">Stars</span>
-                    <div className="text-2xl font-black text-white flex items-center justify-center gap-2 italic">
-                        <Star size={20} className="text-yellow-500" fill="currentColor" />
-                        <span>{prices.stars}</span>
-                    </div>
-                </div>
-                <div className="bg-slate-950/80 p-7 rounded-[36px] border border-white/5 shadow-inner group">
-                    <span className="text-[9px] text-slate-600 font-black uppercase tracking-widest block mb-3 group-hover:text-blue-500 transition-colors">TON</span>
-                    <div className="text-2xl font-black text-white flex items-center justify-center gap-2 italic">
-                        <Zap size={20} className="text-blue-500" />
-                        <span>{prices.ton}</span>
-                    </div>
+            <div className="bg-slate-950/80 p-8 rounded-[36px] border border-white/5 shadow-inner">
+                <div className="flex flex-col items-center">
+                    <Zap size={32} className="text-blue-500 mb-3" />
+                    <span className="text-[11px] text-slate-600 font-black uppercase tracking-widest mb-1">Toplam Tutar</span>
+                    <p className="text-3xl font-black text-white italic tracking-tighter">{prices.ton} TON</p>
+                    <p className="text-[9px] text-slate-700 font-bold uppercase mt-2">≈ {item.price} TL</p>
                 </div>
             </div>
         </div>
 
         <div className="space-y-5">
             <button 
-                onClick={payWithStars}
-                disabled={isLoading}
-                className="w-full bg-yellow-500 hover:bg-yellow-400 py-7 rounded-[32px] text-slate-950 font-black shadow-2xl shadow-yellow-500/20 flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 uppercase tracking-[0.2em] text-xs border-b-4 border-yellow-700"
-            >
-                {isLoading ? <Loader2 className="animate-spin" size={24} /> : <Star size={24} fill="currentColor" />}
-                Telegram Stars ile Öde
-            </button>
-            
-            <button 
                 onClick={payWithTON}
                 disabled={isLoading}
                 className="w-full bg-blue-600 hover:bg-blue-500 py-7 rounded-[32px] text-white font-black shadow-2xl shadow-blue-600/20 flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 uppercase tracking-[0.2em] text-xs border-b-4 border-blue-800"
             >
                 {isLoading ? <Loader2 className="animate-spin" size={24} /> : <Wallet size={24} />}
-                TON Wallet ile Öde
+                Cüzdanı Bağla ve Öde
             </button>
         </div>
         
         <div className="mt-16 flex flex-col items-center gap-6 opacity-40">
             <div className="flex items-center gap-3">
                 <ShieldAlert size={18} className="text-slate-500" />
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] italic text-slate-500">End-to-End Secure Transaction</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] italic text-slate-500">Blokzincir Güvenceli İşlem</span>
             </div>
-            <p className="text-[8px] text-slate-700 font-black uppercase tracking-[0.2em]">Transaction Protocol V3.4.1</p>
         </div>
     </div>
   );

@@ -82,7 +82,7 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = ({ bot, tonRate }) => {
             />
             {bot.price > 0 && (
                 <div className="absolute -top-1.5 -right-1.5 w-7 h-7 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg border-4 border-[#020617]">
-                    <Star size={12} fill="currentColor" className="text-white" />
+                    <Zap size={12} fill="currentColor" className="text-white" />
                 </div>
             )}
         </div>
@@ -94,9 +94,8 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = ({ bot, tonRate }) => {
                     <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-500/10 px-2 py-1 rounded-md">Ücretsiz</span>
                 ) : (
                     <div className="flex items-center gap-2">
-                        <span className="text-[9px] font-black text-blue-400 uppercase tracking-tighter">{prices.stars} Stars</span>
-                        <div className="w-1 h-1 bg-slate-700 rounded-full"></div>
-                        <span className="text-[9px] font-black text-indigo-400 uppercase tracking-tighter">{prices.ton} TON</span>
+                        <Zap size={10} className="text-blue-500" />
+                        <span className="text-[9px] font-black text-blue-400 uppercase tracking-tighter">{prices.ton} TON</span>
                     </div>
                 )}
             </div>

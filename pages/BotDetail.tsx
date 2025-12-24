@@ -289,13 +289,8 @@ const BotDetail = () => {
                           bot.price === 0 ? <><PlusCircle size={18} /> Ücretsiz Edin</> : (
                               <div className="flex items-center gap-4">
                                   <div className="flex flex-col items-center">
-                                      <span className="text-[8px] opacity-60">Stars</span>
-                                      <span className="text-sm">{prices.stars}</span>
-                                  </div>
-                                  <div className="w-px h-6 bg-slate-200/20"></div>
-                                  <div className="flex flex-col items-center">
-                                      <span className="text-[8px] opacity-60">TON</span>
-                                      <span className="text-sm">{prices.ton}</span>
+                                      <span className="text-[10px] font-black uppercase tracking-widest text-blue-600">TON Wallet</span>
+                                      <span className="text-sm font-black italic">{prices.ton} TON</span>
                                   </div>
                               </div>
                           )
