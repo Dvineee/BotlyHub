@@ -30,6 +30,13 @@ const getLiveBotIcon = (bot: Partial<BotType>) => {
     return bot.icon || `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name || 'Bot')}&background=1e293b&color=fff&bold=true`;
 };
 
+const convertPrice = (tl: number) => {
+    return {
+        stars: Math.round(tl * 1.4),
+        ton: parseFloat((tl / 250).toFixed(2))
+    };
+};
+
 const StatCard = ({ label, value, icon: Icon, color }: any) => {
   const colors: Record<string, string> = {
     blue: 'text-blue-500 bg-blue-500/10 border-blue-500/20',
@@ -528,7 +535,10 @@ const BotManagement = () => {
             setIsModalOpen(false);
             load();
             alert("Bot verileri başarıyla senkronize edildi.");
-        } catch (err: any) { alert("Hata oluştu!"); } finally { setIsLoading(false); }
+        } catch (err: any) { 
+            console.error(err);
+            alert("Hata oluştu!"); 
+        } finally { setIsLoading(false); }
     };
 
     return (
@@ -583,10 +593,10 @@ const BotManagement = () => {
                                 <div className="flex flex-col items-center gap-4 p-8 bg-slate-900/40 border border-white/5 rounded-[40px] shadow-inner mb-2 text-center">
                                     <img 
                                         src={getLiveBotIcon(editingBot)} 
-                                        className="w-24 h-24 rounded-[32px] border-4 border-slate-800 shadow-2xl object-cover" 
+                                        className="w-24 h-24 rounded-[32px] border-4 border-slate-800 shadow-2xl object-cover bg-slate-900" 
                                         onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=B&background=334155&color=fff`; }}
                                     />
-                                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Telegram Profil Önizlemesi</p>
+                                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Canlı Telegram Profil Resmi</p>
                                 </div>
                                 <div className="space-y-3">
                                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 italic">Benzersiz Kimlik (ID)</label>
@@ -598,7 +608,7 @@ const BotManagement = () => {
                                 </div>
                                 <div className="space-y-3">
                                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 italic">Telegram @Username</label>
-                                    <input required type="text" value={editingBot.bot_link?.replace('@','')} onChange={e => setEditingBot({...editingBot, bot_link: '@' + e.target.value})} className="w-full bg-slate-900/40 border border-white/5 rounded-[28px] p-7 text-xs font-bold text-white outline-none focus:border-blue-500/40 shadow-inner" />
+                                    <input required type="text" value={editingBot.bot_link?.replace('@','')} onChange={e => setEditingBot({...editingBot, bot_link: '@' + e.target.value})} className="w-full bg-slate-900/40 border border-white/5 rounded-[28px] p-7 text-xs font-bold text-white outline-none focus:border-blue-500/40 shadow-inner" placeholder="bot_username" />
                                 </div>
                             </div>
                             <div className="space-y-8">
@@ -611,6 +621,16 @@ const BotManagement = () => {
                                     <div className="relative">
                                         <DollarSign className="absolute left-7 top-1/2 -translate-y-1/2 text-emerald-500" size={18} />
                                         <input type="number" value={editingBot.price} onChange={e => setEditingBot({...editingBot, price: Number(e.target.value)})} className="w-full bg-slate-900/40 border border-white/5 rounded-[28px] p-7 pl-16 text-xs font-bold text-white outline-none focus:border-blue-500/40 shadow-inner" />
+                                    </div>
+                                    <div className="flex gap-4 mt-2 px-2">
+                                        <div className="flex-1 p-3 bg-slate-950 rounded-xl border border-white/5 flex flex-col items-center">
+                                            <span className="text-[8px] text-slate-600 font-black uppercase">Stars</span>
+                                            <span className="text-[10px] font-bold text-blue-500">{convertPrice(editingBot.price).stars}</span>
+                                        </div>
+                                        <div className="flex-1 p-3 bg-slate-950 rounded-xl border border-white/5 flex flex-col items-center">
+                                            <span className="text-[8px] text-slate-600 font-black uppercase">TON</span>
+                                            <span className="text-[10px] font-bold text-indigo-500">{convertPrice(editingBot.price).ton}</span>
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="space-y-3">

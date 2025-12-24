@@ -47,10 +47,12 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
             const settings = await DatabaseService.getSettings();
             if (settings && settings.maintenanceMode) {
                 setIsMaintenance(true);
+            } else {
+                setIsMaintenance(false);
             }
         }
 
-        // 2. Kullanıcı Senkronizasyonu (Kütüphaneye ekleme hatasını önlemek için kritik)
+        // 2. Kullanıcı Senkronizasyonu
         if (user && !isAdminPath) {
             try {
                 const userData: Partial<User> = {
@@ -64,7 +66,6 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
                     joinDate: new Date().toISOString()
                 };
                 await DatabaseService.syncUser(userData);
-                console.log("User successfully synchronized with DB.");
             } catch (e) {
                 console.error("User sync failed:", e);
             }
@@ -91,7 +92,7 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
     }, 150);
 
     return () => clearTimeout(timer);
-  }, [isAdminPath, user]);
+  }, [isAdminPath, user, location.pathname]);
 
   useEffect(() => {
     if (isAdminPath) return;

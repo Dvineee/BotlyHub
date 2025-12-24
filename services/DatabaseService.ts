@@ -179,7 +179,6 @@ export class DatabaseService {
   static async getSettings() {
     const { data } = await supabase.from('settings').select('*').maybeSingle();
     if (data) {
-        // Normalization for consistency across the app
         return {
             ...data,
             maintenanceMode: Boolean(data.MaintenanceMode)
