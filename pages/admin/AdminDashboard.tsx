@@ -278,10 +278,13 @@ const BotManagement = () => {
             await DatabaseService.saveBot(editingBot);
             setIsModalOpen(false);
             load();
-            alert("Bot protokol altına alındı.");
+            alert("Bot başarıyla protokol altına alındı.");
         } catch (err: any) { alert("Sistem Hatası!"); } finally { setIsLoading(false); }
     };
 
+    /**
+     * EKRAN GÖRÜNTÜSÜ KUTUCUKLARI MANTIĞI
+     */
     const addScreenshotBox = () => {
         const current = Array.isArray(editingBot.screenshots) ? editingBot.screenshots : [];
         setEditingBot({ ...editingBot, screenshots: [...current, ''] });
@@ -306,7 +309,7 @@ const BotManagement = () => {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
                 <div className="flex flex-col gap-2">
                     <h2 className="text-2xl font-black text-white uppercase italic tracking-tighter">Market <span className="text-blue-500">Envanteri</span></h2>
-                    <p className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.3em]">Merkezi bot dağıtım kontrolü</p>
+                    <p className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.3em]">Market botlarını yönetin</p>
                 </div>
                 <button onClick={() => { setEditingBot({ id: '', name: '', description: '', short_desc: '', price: 0, category: 'productivity', bot_link: '', is_premium: false, screenshots: [] }); setIsModalOpen(true); }} className="px-10 py-5 bg-blue-600 hover:bg-blue-500 rounded-[28px] text-[10px] font-black text-white uppercase tracking-[0.2em] shadow-2xl active:scale-95 transition-all">
                     <Plus size={20} className="inline mr-2"/> YENİ BOT TANIMLA
@@ -347,12 +350,13 @@ const BotManagement = () => {
                         <div className="flex justify-between items-center mb-10 px-4">
                             <div className="flex items-center gap-4">
                                 <div className="p-3 bg-blue-600/10 rounded-2xl text-blue-500"><Wand2 size={24}/></div>
-                                <h3 className="text-3xl font-black text-white uppercase italic tracking-tighter">Bot <span className="text-blue-500">Editörü</span></h3>
+                                <h3 className="text-3xl font-black text-white uppercase italic tracking-tighter">Bot <span className="text-blue-500">Protokolü</span></h3>
                             </div>
                             <button onClick={() => setIsModalOpen(false)} className="p-4 bg-slate-900 border border-white/5 rounded-2xl text-slate-500 hover:text-white transition-all shadow-xl"><X size={28}/></button>
                         </div>
                         
                         <form onSubmit={handleSave} className="grid grid-cols-1 lg:grid-cols-2 gap-16 p-4">
+                            {/* Sol Bölüm: Kimlik ve Görsel */}
                             <div className="space-y-10">
                                 <div className="flex flex-col items-center gap-6 p-10 bg-slate-900/40 border border-white/5 rounded-[48px] shadow-inner text-center">
                                     <div className="relative">
@@ -365,48 +369,44 @@ const BotManagement = () => {
                                     </div>
                                     <div>
                                         <p className="text-[11px] font-black text-white uppercase tracking-[0.3em] italic">TELEGRAM AVATAR SENKRONİZASYONU</p>
-                                        <p className="text-[9px] text-slate-600 font-bold uppercase mt-1">Username girildiğinde Telegram'dan çekilir</p>
+                                        <p className="text-[9px] text-slate-600 font-bold uppercase mt-1">Username değiştikçe anlık güncellenir</p>
                                     </div>
                                 </div>
 
                                 <div className="space-y-6">
                                     <div className="space-y-3">
-                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 italic">Telegram Adresi (@username)</label>
+                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 italic">Telegram @Username</label>
                                         <div className="relative">
                                             <div className="absolute left-6 top-1/2 -translate-y-1/2 text-blue-500 font-black text-xs">@</div>
-                                            <input required type="text" value={editingBot.bot_link?.replace('@','')} onChange={e => setEditingBot({...editingBot, bot_link: '@' + e.target.value.trim()})} className="w-full bg-slate-900/40 border border-white/5 rounded-[28px] p-7 pl-12 text-xs font-bold text-white outline-none focus:border-blue-500/40 shadow-inner" placeholder="bot_id" />
+                                            <input required type="text" value={editingBot.bot_link?.replace('@','')} onChange={e => setEditingBot({...editingBot, bot_link: '@' + e.target.value.trim()})} className="w-full bg-slate-900/40 border border-white/5 rounded-[28px] p-7 pl-12 text-xs font-bold text-white outline-none focus:border-blue-500/40 shadow-inner" placeholder="bot_id_buraya" />
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-8">
                                         <div className="space-y-3">
-                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 italic">Benzersiz Market ID</label>
-                                            <input required type="text" value={editingBot.id} onChange={e => setEditingBot({...editingBot, id: e.target.value.toLowerCase().trim()})} className="w-full bg-slate-900/40 border border-white/5 rounded-[28px] p-7 text-xs font-bold text-white outline-none focus:border-blue-500/40 shadow-inner" placeholder="örn: gpt4_bot" />
+                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 italic">Veritabanı Kimliği</label>
+                                            <input required type="text" value={editingBot.id} onChange={e => setEditingBot({...editingBot, id: e.target.value.toLowerCase().trim()})} className="w-full bg-slate-900/40 border border-white/5 rounded-[28px] p-7 text-xs font-bold text-white outline-none focus:border-blue-500/40 shadow-inner" placeholder="örn: premium_gpt" />
                                         </div>
                                         <div className="space-y-3">
-                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 italic">Bot İsmi</label>
+                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 italic">Pazar İsmi</label>
                                             <input required type="text" value={editingBot.name} onChange={e => setEditingBot({...editingBot, name: e.target.value})} className="w-full bg-slate-900/40 border border-white/5 rounded-[28px] p-7 text-xs font-bold text-white outline-none focus:border-blue-500/40 shadow-inner" />
                                         </div>
-                                    </div>
-                                    <div className="space-y-3">
-                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 italic">Bir Kategori Seçin</label>
-                                        <select value={editingBot.category} onChange={e => setEditingBot({...editingBot, category: e.target.value})} className="w-full bg-slate-900/40 border border-white/5 rounded-[28px] p-7 text-xs font-bold text-white outline-none appearance-none cursor-pointer">
-                                            <option value="productivity">Üretkenlik</option>
-                                            <option value="games">Oyun & Eğlence</option>
-                                            <option value="finance">Finans & Borsa</option>
-                                            <option value="moderation">Moderasyon</option>
-                                            <option value="utilities">Servisler</option>
-                                        </select>
                                     </div>
                                 </div>
                             </div>
 
+                            {/* Sağ Bölüm: Fiyat ve Detay */}
                             <div className="space-y-10">
+                                <div className="space-y-3">
+                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 italic">Açıklama & Fonksiyonlar</label>
+                                    <textarea required value={editingBot.description} onChange={e => setEditingBot({...editingBot, description: e.target.value})} className="w-full h-32 bg-slate-900/40 border border-white/5 rounded-[32px] p-8 text-xs font-medium text-slate-300 outline-none focus:border-blue-500/40 shadow-inner resize-none leading-relaxed" placeholder="Botun temel özelliklerini girin..." />
+                                </div>
+
                                 <div className="space-y-6">
                                     <div className="flex items-center justify-between px-2">
-                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Taban Fiyat (₺ TL)</label>
+                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Fiyatlandırma (₺ TL)</label>
                                         <div className="flex items-center gap-2">
                                             <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></div>
-                                            <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest italic">1 TON = {tonPrice} TL</span>
+                                            <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest italic">Canlı Borsa: 1 TON = {tonPrice} TL</span>
                                         </div>
                                     </div>
                                     <div className="relative">
@@ -430,37 +430,38 @@ const BotManagement = () => {
                                             <p className="text-xl font-black text-indigo-500 italic tracking-tighter">{currentConversions.ton}</p>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div className="space-y-4">
-                                    <div className="flex items-center justify-between px-2">
-                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Ekran Görüntüleri</label>
-                                        <button type="button" onClick={addScreenshotBox} className="text-[10px] font-black text-blue-500 hover:text-white transition-colors uppercase flex items-center gap-1.5"><Plus size={14}/> Yeni Ekle</button>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4 max-h-[160px] overflow-y-auto no-scrollbar pr-2">
-                                        {editingBot.screenshots.map((s: string, idx: number) => (
-                                            <div key={idx} className="relative group">
-                                                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-700"><ImageIcon size={14}/></div>
-                                                <input 
-                                                    type="text" 
-                                                    value={s} 
-                                                    onChange={e => updateScreenshot(idx, e.target.value)} 
-                                                    className="w-full bg-slate-900/60 border border-white/5 rounded-2xl p-4 pl-10 pr-10 text-[9px] font-bold text-slate-400 outline-none focus:border-blue-500/40" 
-                                                    placeholder="Görsel URL..." 
-                                                />
-                                                <button type="button" onClick={() => removeScreenshot(idx)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-600 hover:text-red-500 transition-colors"><X size={14}/></button>
-                                            </div>
-                                        ))}
-                                        {editingBot.screenshots.length === 0 && (
-                                            <div className="col-span-2 py-8 border border-dashed border-slate-800 rounded-2xl text-center text-[9px] font-black text-slate-700 uppercase italic">Henüz görsel eklenmedi</div>
-                                        )}
+                                    {/* EKRAN GÖRÜNTÜSÜ KUTUCUKLARI */}
+                                    <div className="space-y-4">
+                                        <div className="flex items-center justify-between px-2">
+                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic flex items-center gap-2"><Image size={14}/> Ekran Görüntüleri</label>
+                                            <button type="button" onClick={addScreenshotBox} className="text-[10px] font-black text-blue-500 hover:text-white transition-colors uppercase flex items-center gap-1.5"><Plus size={14}/> Yeni Ekle</button>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4 max-h-[160px] overflow-y-auto no-scrollbar pr-2">
+                                            {editingBot.screenshots && editingBot.screenshots.map((s: string, idx: number) => (
+                                                <div key={idx} className="relative group animate-in zoom-in-95 duration-200">
+                                                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-700"><ImageIcon size={14}/></div>
+                                                    <input 
+                                                        type="text" 
+                                                        value={s} 
+                                                        onChange={e => updateScreenshot(idx, e.target.value)} 
+                                                        className="w-full bg-slate-900/60 border border-white/5 rounded-2xl p-4 pl-10 pr-10 text-[9px] font-bold text-slate-400 outline-none focus:border-blue-500/40" 
+                                                        placeholder="Görsel URL..." 
+                                                    />
+                                                    <button type="button" onClick={() => removeScreenshot(idx)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-600 hover:text-red-500 transition-colors"><X size={14}/></button>
+                                                </div>
+                                            ))}
+                                            {(!editingBot.screenshots || editingBot.screenshots.length === 0) && (
+                                                <div className="col-span-2 py-8 border border-dashed border-slate-800 rounded-2xl text-center text-[9px] font-black text-slate-700 uppercase italic">Henüz görsel eklenmedi</div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
 
                                 <div className="flex items-center gap-6 p-7 bg-slate-900/40 border border-white/5 rounded-[32px] shadow-inner">
                                     <div className="flex-1">
                                         <label className="text-[11px] font-black text-white uppercase tracking-widest italic">Premium Protokolü</label>
-                                        <p className="text-[9px] text-slate-600 font-bold uppercase mt-1">Özel paket sahiplerine ücretsiz erişim</p>
+                                        <p className="text-[9px] text-slate-600 font-bold uppercase mt-1">Özel paket üyelerine ücretsiz</p>
                                     </div>
                                     <button type="button" onClick={() => setEditingBot({...editingBot, is_premium: !editingBot.is_premium})} className={`w-16 h-8 rounded-full relative transition-all duration-500 ${editingBot.is_premium ? 'bg-blue-600 shadow-[0_0_20px_rgba(59,130,246,0.5)]' : 'bg-slate-800'}`}>
                                         <div className={`absolute top-1 w-6 h-6 bg-white rounded-full shadow-lg transition-all duration-300 ${editingBot.is_premium ? 'right-1' : 'left-1'}`}></div>

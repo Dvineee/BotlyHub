@@ -17,12 +17,15 @@ class PriceService {
         }
 
         try {
-            const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=toncoin&vs_currencies=try,usd');
+            // Kullanıcının önerdiği 'the-open-network' ID'si ile güncellendi
+            const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=the-open-network&vs_currencies=try,usd');
             const data = await response.json();
             
+            const tonData = data['the-open-network'];
+            
             this.cache = {
-                tonTry: data.toncoin.try,
-                tonUsd: data.toncoin.usd,
+                tonTry: tonData.try,
+                tonUsd: tonData.usd,
                 lastUpdate: now
             };
             return this.cache;
@@ -35,8 +38,6 @@ class PriceService {
 
     /**
      * TL tutarını Stars ve TON birimlerine dönüştürür.
-     * Stars: 1 TL ~ 1.4 Stars (Sabit kur)
-     * TON: Güncel borsa fiyatı üzerinden
      */
     static convert(tl: number, tonRate: number) {
         const amount = Number(tl) || 0;
