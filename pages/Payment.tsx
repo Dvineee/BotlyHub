@@ -11,6 +11,13 @@ import { WalletService } from '../services/WalletService';
 
 const { useNavigate, useParams } = Router as any;
 
+const convertPrice = (tl: number) => {
+    return {
+        stars: Math.round(tl * 1.4),
+        ton: parseFloat((tl / 250).toFixed(2))
+    };
+};
+
 const Payment = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -34,11 +41,8 @@ const Payment = () => {
       
       try {
           if (targetBot) {
-              // 1. Veritabanı Senkronizasyonu (Admin'de Görünsün)
               const userData = user || { id: 'test_user', first_name: 'Ödeme Kullanıcısı' };
               await DatabaseService.addUserBot(userData, targetBot, true);
-
-              // 2. LocalStorage Sync
               const ownedBots = JSON.parse(localStorage.getItem('ownedBots') || '[]');
               localStorage.setItem('ownedBots', JSON.stringify([...ownedBots, { ...targetBot, isAdEnabled: false, isActive: true, isPremium: true }]));
           } else if (plan) {
@@ -51,20 +55,21 @@ const Payment = () => {
       navigate(targetBot ? '/my-bots' : '/settings');
   };
 
+  const prices = item ? convertPrice(item.price) : { stars: 0, ton: 0 };
+
   const payWithStars = async () => {
       setIsLoading(true);
       haptic('medium');
       if (tg) {
           tg.showPopup({
               title: 'Telegram Stars Ödemesi',
-              message: `${item?.price} Yıldız (Stars) karşılığında bu işlem yapılsın mı?`,
+              message: `${prices.stars} Yıldız (Stars) karşılığında bu işlem yapılsın mı?`,
               buttons: [{id: 'pay', type: 'default', text: 'Onayla'}, {id: 'cancel', type: 'cancel', text: 'Vazgeç'}]
           }, (id: string) => {
               if (id === 'pay') handleSuccess();
               else setIsLoading(false);
           });
       } else {
-          // Demo için başarı simülasyonu
           setTimeout(handleSuccess, 1500);
       }
   };
@@ -76,8 +81,7 @@ const Payment = () => {
       }
       setIsLoading(true);
       try {
-          const priceInTON = parseFloat(((item?.price || 0) / 100).toFixed(2));
-          const transaction = WalletService.createTonTransaction(priceInTON);
+          const transaction = WalletService.createTonTransaction(prices.ton);
           await tonConnectUI.sendTransaction(transaction);
           await handleSuccess();
       } catch (e) {
@@ -99,13 +103,23 @@ const Payment = () => {
             <img src={item.icon} className="w-28 h-28 rounded-[32px] mx-auto mb-8 border-4 border-slate-800 shadow-2xl object-cover" />
             <h2 className="text-3xl font-black text-white mb-2">{item.name}</h2>
             <p className="text-slate-500 text-sm mb-8 font-medium">Güvenli Ödeme Seçenekleri</p>
-            <div className="flex flex-col items-center">
-                <span className="text-[10px] text-slate-600 font-black uppercase tracking-[0.3em] mb-1">Toplam Tutar</span>
-                <div className="text-4xl font-black text-white flex items-center gap-2">
-                    <Star size={30} className="text-yellow-500" fill="currentColor" />
-                    <span>{item.price}</span>
+            <div className="grid grid-cols-2 gap-4">
+                <div className="bg-slate-900/60 p-5 rounded-[24px] border border-white/5">
+                    <span className="text-[8px] text-slate-500 font-black uppercase tracking-widest block mb-1">Stars</span>
+                    <div className="text-xl font-black text-white flex items-center justify-center gap-1.5">
+                        <Star size={16} className="text-yellow-500" fill="currentColor" />
+                        <span>{prices.stars}</span>
+                    </div>
+                </div>
+                <div className="bg-slate-900/60 p-5 rounded-[24px] border border-white/5">
+                    <span className="text-[8px] text-slate-500 font-black uppercase tracking-widest block mb-1">TON</span>
+                    <div className="text-xl font-black text-white flex items-center justify-center gap-1.5">
+                        <Wallet size={16} className="text-blue-500" />
+                        <span>{prices.ton}</span>
+                    </div>
                 </div>
             </div>
+            <div className="mt-8 text-[10px] text-slate-600 font-bold uppercase">Toplam Tutar: {item.price} TL</div>
         </div>
 
         <div className="space-y-5">

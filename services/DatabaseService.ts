@@ -53,7 +53,6 @@ export class DatabaseService {
   static async syncChannelsFromBotActivity(userId: string): Promise<number> {
       try {
           const uIdStr = String(userId).trim();
-          // Senkronize edilmemiş logları çek
           const { data: logs, error: logErr } = await supabase.from('bot_discovery_logs').select('*').eq('owner_id', uIdStr).eq('is_synced', false);
           
           if (logErr || !logs || logs.length === 0) return 0;
@@ -61,17 +60,14 @@ export class DatabaseService {
           let successCount = 0;
           for (const log of logs) {
               const botId = String(log.bot_id);
-              // KRİTİK: chat_id veya telegram_id'yi mutlaka al
               const telegramId = String(log.chat_id || log.telegram_id || '').trim();
 
               if (!telegramId) continue;
 
-              // Kanalı ID ile ara
               const { data: existing } = await supabase.from('channels').select('*').eq('user_id', uIdStr).eq('telegram_id', telegramId).maybeSingle();
               
               let syncOk = false;
               if (existing) {
-                  // Varsa güncelle
                   const bots = Array.from(new Set([...(existing.connected_bot_ids || []), botId]));
                   const { error: upErr } = await supabase.from('channels').update({ 
                       member_count: log.member_count || existing.member_count, 
@@ -82,7 +78,6 @@ export class DatabaseService {
                   }).eq('id', existing.id);
                   if (!upErr) syncOk = true;
               } else {
-                  // Yoksa yeni oluştur
                   const { error: insErr } = await supabase.from('channels').insert({ 
                       user_id: uIdStr, 
                       telegram_id: telegramId, 
@@ -183,6 +178,13 @@ export class DatabaseService {
 
   static async getSettings() {
     const { data } = await supabase.from('settings').select('*').maybeSingle();
+    if (data) {
+        // App.tsx'teki kontrol için normalize et
+        return {
+            ...data,
+            maintenanceMode: data.MaintenanceMode
+        };
+    }
     return data;
   }
 
@@ -223,7 +225,7 @@ export class DatabaseService {
         category: String(bot.category), 
         bot_link: String(bot.bot_link), 
         is_premium: Boolean(bot.is_premium),
-        screenshots: bot.screenshots || [], 
+        screenshots: Array.isArray(bot.screenshots) ? bot.screenshots : (String(bot.screenshots || '').split(',').map((s: string) => s.trim()).filter(Boolean)), 
         icon: String(bot.icon || '') 
     };
     const { error } = await supabase.from('bots').upsert(dbPayload, { onConflict: 'id' });
@@ -239,7 +241,7 @@ export class DatabaseService {
     await supabase.from('settings').upsert({ 
         id: 1, 
         appName: settings.appName, 
-        MaintenanceMode: settings.maintenanceMode,
+        MaintenanceMode: Boolean(settings.maintenanceMode),
         commissionRate: Number(settings.commissionRate),
         supportLink: String(settings.supportLink),
         termsUrl: String(settings.termsUrl),

@@ -13,6 +13,16 @@ const iconMap: Record<string, any> = {
   Sparkles, Megaphone, Zap, Gift, Star, Info, BotIcon, Heart, Bell, Shield
 };
 
+/**
+ * TL fiyatını Stars ve TON'a çeviren yardımcı
+ */
+const convertPrice = (tl: number) => {
+    return {
+        stars: Math.round(tl * 1.4),
+        ton: parseFloat((tl / 250).toFixed(2))
+    };
+};
+
 const getLiveBotIcon = (bot: Bot) => {
     if (bot.bot_link) {
         const username = bot.bot_link.replace('@', '').replace('https://t.me/', '').trim();
@@ -68,6 +78,7 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
 const BotCard: React.FC<{ bot: Bot }> = ({ bot }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const prices = convertPrice(bot.price);
   
   const handleClick = () => {
       navigate(`/bot/${bot.id}`);
@@ -92,12 +103,17 @@ const BotCard: React.FC<{ bot: Bot }> = ({ bot }) => {
             <div className="flex items-center gap-2 mb-1.5">
                 <h3 className="font-black text-lg text-slate-100 truncate italic tracking-tighter uppercase">{bot.name}</h3>
             </div>
-            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest truncate">{bot.description}</p>
-            <div className="flex items-center gap-2 mt-2">
-                 <span className="text-[8px] font-black text-blue-500 uppercase tracking-widest bg-blue-500/10 px-2 py-1 rounded-md border border-blue-500/10">
-                    {t('cat_' + (bot.category || '').toLowerCase())}
-                </span>
-                {bot.price === 0 && <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-500/10 px-2 py-1 rounded-md border border-emerald-500/10">Ücretsiz</span>}
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest truncate mb-2">{bot.description}</p>
+            <div className="flex items-center gap-3">
+                {bot.price === 0 ? (
+                    <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-500/10 px-2 py-1 rounded-md border border-emerald-500/10">Ücretsiz</span>
+                ) : (
+                    <div className="flex items-center gap-2">
+                        <span className="text-[9px] font-black text-blue-400 uppercase tracking-tighter">{prices.stars} Stars</span>
+                        <div className="w-1 h-1 bg-slate-700 rounded-full"></div>
+                        <span className="text-[9px] font-black text-indigo-400 uppercase tracking-tighter">{prices.ton} TON</span>
+                    </div>
+                )}
             </div>
         </div>
         <div className="bg-slate-800/60 p-2.5 rounded-2xl border border-slate-700/50 text-slate-400 group-hover:text-white group-hover:bg-blue-600 group-hover:border-blue-500 transition-all">

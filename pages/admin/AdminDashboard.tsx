@@ -12,7 +12,7 @@ import {
   Fingerprint, Info, TrendingUp, BarChart3, Radio,
   Layout, MousePointer2, Target, Bell, CheckCircle2, ChevronRight,
   GripVertical, DollarSign, LifeBuoy, FileText, Instagram, Clock, Smartphone, MoreVertical,
-  ChevronLeft, Edit3, Save, AlertTriangle
+  ChevronLeft, Edit3, Save, AlertTriangle, Images
 } from 'lucide-react';
 import { DatabaseService, supabase } from '../../services/DatabaseService';
 import { User, Bot as BotType, Announcement, Notification, Channel, ActivityLog, Ad } from '../../types';
@@ -20,8 +20,16 @@ import { User, Bot as BotType, Announcement, Notification, Channel, ActivityLog,
 const { useNavigate, Routes, Route, Link, useLocation } = Router as any;
 
 /**
- * Premium Stat Kartı
+ * Telegram üzerinden güncel profil resmini çeken yardımcı fonksiyon
  */
+const getLiveBotIcon = (bot: Partial<BotType>) => {
+    if (bot.bot_link) {
+        const username = bot.bot_link.replace('@', '').replace('https://t.me/', '').trim();
+        if (username) return `https://t.me/i/userpic/320/${username}.jpg`;
+    }
+    return bot.icon || `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name || 'Bot')}&background=1e293b&color=fff&bold=true`;
+};
+
 const StatCard = ({ label, value, icon: Icon, color }: any) => {
   const colors: Record<string, string> = {
     blue: 'text-blue-500 bg-blue-500/10 border-blue-500/20',
@@ -44,9 +52,6 @@ const StatCard = ({ label, value, icon: Icon, color }: any) => {
   );
 };
 
-/**
- * Pixel-Perfect Telegram Advertisement Preview (Dark Mode)
- */
 const TelegramAdPreview = ({ title, content, imageUrl, buttonText }: { title: string, content: string, imageUrl?: string, buttonText?: string }) => {
     return (
         <div className="bg-[#0e1621] rounded-2xl overflow-hidden w-full max-w-[300px] shadow-2xl font-sans mx-auto flex flex-col h-[480px] border border-white/5 animate-in zoom-in-95">
@@ -533,7 +538,7 @@ const BotManagement = () => {
                     <h2 className="text-2xl font-black text-white uppercase italic tracking-tighter">Market <span className="text-blue-500">Envanteri</span></h2>
                     <p className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.3em]">Mağaza vitrinindeki tüm botların yönetimi</p>
                 </div>
-                <button onClick={() => { setEditingBot({ id: '', name: '', description: '', short_desc: '', price: 0, category: 'productivity', bot_link: '', is_premium: false }); setIsModalOpen(true); }} className="px-10 py-5 bg-blue-600 hover:bg-blue-500 rounded-[28px] text-[10px] font-black text-white uppercase tracking-[0.2em] shadow-2xl shadow-blue-600/30 active:scale-95 transition-all">
+                <button onClick={() => { setEditingBot({ id: '', name: '', description: '', short_desc: '', price: 0, category: 'productivity', bot_link: '', is_premium: false, screenshots: [] }); setIsModalOpen(true); }} className="px-10 py-5 bg-blue-600 hover:bg-blue-500 rounded-[28px] text-[10px] font-black text-white uppercase tracking-[0.2em] shadow-2xl shadow-blue-600/30 active:scale-95 transition-all">
                     <Plus size={20} className="inline mr-2"/> YENİ BOT TANIMLA
                 </button>
             </div>
@@ -543,17 +548,20 @@ const BotManagement = () => {
                     <div key={b.id} className="bg-[#0f172a]/40 border border-white/5 p-10 rounded-[56px] hover:border-blue-500/30 transition-all shadow-2xl relative overflow-hidden group">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/5 blur-[80px] rounded-full group-hover:bg-blue-600/10 transition-all"></div>
                         <div className="flex items-center gap-8 mb-10 relative z-10">
-                            <img src={b.bot_link ? `https://t.me/i/userpic/320/${b.bot_link.replace('@','')}.jpg` : b.icon} className="w-24 h-24 rounded-[36px] object-cover bg-slate-950 border-2 border-white/10 shadow-2xl group-hover:rotate-3 transition-transform" />
+                            <img 
+                                src={getLiveBotIcon(b)} 
+                                className="w-24 h-24 rounded-[36px] object-cover bg-slate-950 border-2 border-white/10 shadow-2xl group-hover:rotate-3 transition-transform" 
+                                onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(b.name)}&background=334155&color=fff&bold=true`; }}
+                            />
                             <div className="min-w-0 flex-1">
                                 <h4 className="font-black text-white text-xl truncate italic uppercase tracking-tighter mb-1">{b.name}</h4>
                                 <div className="flex items-center gap-2">
-                                    <Star size={14} className="text-yellow-500" fill="currentColor"/>
-                                    <p className="text-[10px] text-blue-500 font-black uppercase tracking-widest">{b.price} STARS</p>
+                                    <p className="text-[10px] text-blue-500 font-black uppercase tracking-widest">{b.price} TL</p>
                                 </div>
                             </div>
                         </div>
                         <div className="flex gap-4 relative z-10">
-                            <button onClick={() => { setEditingBot(b); setIsModalOpen(true); }} className="flex-1 py-4.5 bg-slate-800 hover:bg-slate-700 text-white font-black text-[10px] rounded-2xl uppercase tracking-widest transition-all border border-white/5">DÜZENLE</button>
+                            <button onClick={() => { setEditingBot({...b, screenshots: Array.isArray(b.screenshots) ? b.screenshots.join(', ') : b.screenshots}); setIsModalOpen(true); }} className="flex-1 py-4.5 bg-slate-800 hover:bg-slate-700 text-white font-black text-[10px] rounded-2xl uppercase tracking-widest transition-all border border-white/5">DÜZENLE</button>
                             <button onClick={async () => { if(confirm("Sil?")) { await DatabaseService.deleteBot(b.id); load(); } }} className="p-4.5 bg-slate-800 hover:bg-red-600 text-slate-500 hover:text-white rounded-2xl transition-all border border-white/5"><Trash2 size={20}/></button>
                         </div>
                     </div>
@@ -562,7 +570,7 @@ const BotManagement = () => {
 
             {isModalOpen && editingBot && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/98 backdrop-blur-3xl animate-in fade-in overflow-y-auto no-scrollbar">
-                    <div className="bg-[#020617] w-full max-w-4xl my-auto rounded-[72px] border border-white/10 p-12 shadow-2xl relative">
+                    <div className="bg-[#020617] w-full max-w-5xl my-auto rounded-[72px] border border-white/10 p-12 shadow-2xl relative">
                         <div className="flex justify-between items-center mb-14">
                             <div className="flex items-center gap-4">
                                 <div className="p-3 bg-blue-600/10 rounded-2xl text-blue-500"><Wand2 size={24}/></div>
@@ -572,6 +580,14 @@ const BotManagement = () => {
                         </div>
                         <form onSubmit={handleSave} className="grid grid-cols-1 md:grid-cols-2 gap-12">
                             <div className="space-y-8">
+                                <div className="flex flex-col items-center gap-4 p-8 bg-slate-900/40 border border-white/5 rounded-[40px] shadow-inner mb-2 text-center">
+                                    <img 
+                                        src={getLiveBotIcon(editingBot)} 
+                                        className="w-24 h-24 rounded-[32px] border-4 border-slate-800 shadow-2xl object-cover" 
+                                        onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=B&background=334155&color=fff`; }}
+                                    />
+                                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Telegram Profil Önizlemesi</p>
+                                </div>
                                 <div className="space-y-3">
                                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 italic">Benzersiz Kimlik (ID)</label>
                                     <input required type="text" value={editingBot.id} onChange={e => setEditingBot({...editingBot, id: e.target.value})} className="w-full bg-slate-900/40 border border-white/5 rounded-[28px] p-7 text-xs font-bold text-white outline-none focus:border-blue-500/40 shadow-inner" placeholder="örn: helper_bot" />
@@ -587,15 +603,19 @@ const BotManagement = () => {
                             </div>
                             <div className="space-y-8">
                                 <div className="space-y-3">
-                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 italic">Açıklama (Landing)</label>
-                                    <input type="text" value={editingBot.short_desc} onChange={e => setEditingBot({...editingBot, short_desc: e.target.value})} className="w-full bg-slate-900/40 border border-white/5 rounded-[28px] p-7 text-xs font-bold text-white outline-none focus:border-blue-500/40 shadow-inner" />
+                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 italic">Açıklama</label>
+                                    <textarea required value={editingBot.description} onChange={e => setEditingBot({...editingBot, description: e.target.value})} className="w-full h-32 bg-slate-900/40 border border-white/5 rounded-[28px] p-7 text-xs font-bold text-white outline-none focus:border-blue-500/40 shadow-inner resize-none" />
                                 </div>
                                 <div className="space-y-3">
-                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 italic">Fiyat (Stars)</label>
+                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 italic">Fiyat (₺ TL)</label>
                                     <div className="relative">
-                                        <Star className="absolute left-7 top-1/2 -translate-y-1/2 text-yellow-500" size={18} fill="currentColor"/>
+                                        <DollarSign className="absolute left-7 top-1/2 -translate-y-1/2 text-emerald-500" size={18} />
                                         <input type="number" value={editingBot.price} onChange={e => setEditingBot({...editingBot, price: Number(e.target.value)})} className="w-full bg-slate-900/40 border border-white/5 rounded-[28px] p-7 pl-16 text-xs font-bold text-white outline-none focus:border-blue-500/40 shadow-inner" />
                                     </div>
+                                </div>
+                                <div className="space-y-3">
+                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 italic flex items-center gap-2"><Images size={14}/> Ekran Görüntüleri (Virgül ile ayırın)</label>
+                                    <input type="text" value={editingBot.screenshots} onChange={e => setEditingBot({...editingBot, screenshots: e.target.value})} className="w-full bg-slate-900/40 border border-white/5 rounded-[28px] p-7 text-xs font-bold text-white outline-none focus:border-blue-500/40 shadow-inner" placeholder="https://resim1.com, https://resim2.com" />
                                 </div>
                                 <div className="flex items-center gap-6 p-7 bg-slate-900/40 border border-white/5 rounded-[28px] shadow-inner">
                                     <div className="flex-1">
@@ -722,7 +742,7 @@ const SettingsManagement = () => {
     useEffect(() => { load(); }, []);
     const load = async () => {
         const data = await DatabaseService.getSettings();
-        if (data) setSettings({ ...data, maintenanceMode: data.MaintenanceMode });
+        if (data) setSettings({ ...data });
     };
 
     const handleSave = async () => {

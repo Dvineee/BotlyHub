@@ -15,9 +15,13 @@ import { useTranslation } from '../TranslationContext';
 
 const { useNavigate, useParams } = Router as any;
 
-/**
- * Canlı Telegram Görseli
- */
+const convertPrice = (tl: number) => {
+    return {
+        stars: Math.round(tl * 1.4),
+        ton: parseFloat((tl / 250).toFixed(2))
+    };
+};
+
 const getLiveBotIcon = (bot: Bot) => {
     if (bot.bot_link) {
         const username = bot.bot_link.replace('@', '').replace('https://t.me/', '').trim();
@@ -144,9 +148,10 @@ const BotDetail = () => {
     </div>
   );
 
+  const prices = convertPrice(bot.price);
+
   return (
     <div className="min-h-screen bg-[#020617] text-slate-200 pb-32 animate-in fade-in selection:bg-blue-500/30">
-      {/* Header */}
       <nav className="fixed top-0 inset-x-0 h-16 z-[60] flex items-center justify-between px-6 bg-[#020617]/60 backdrop-blur-xl border-b border-white/5">
         <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-slate-400 hover:text-white transition-colors">
             <ChevronLeft size={24} />
@@ -157,7 +162,6 @@ const BotDetail = () => {
         </button>
       </nav>
 
-      {/* Hero Section */}
       <div className="pt-24 px-6 mb-12 flex flex-col items-center text-center">
         <div className="relative mb-8 group">
             <div className="absolute inset-0 bg-blue-600/20 blur-[40px] rounded-full group-hover:bg-blue-600/30 transition-all"></div>
@@ -186,7 +190,6 @@ const BotDetail = () => {
         </p>
       </div>
 
-      {/* Büyük Galeri Bölümü */}
       {bot.screenshots && bot.screenshots.length > 0 && (
           <section className="mb-16">
               <div className="px-8 flex items-center gap-3 mb-6">
@@ -208,11 +211,9 @@ const BotDetail = () => {
           </section>
       )}
 
-      {/* İçerik Alanı */}
       <div className="px-8">
           {isOwned ? (
               <div className="space-y-12 animate-in slide-in-from-bottom-4">
-                  {/* Kurulum */}
                   <div className="space-y-6">
                       <div className="flex items-center gap-3 mb-2">
                           <Terminal size={18} className="text-blue-500" />
@@ -221,16 +222,9 @@ const BotDetail = () => {
                       <div className="space-y-4">
                           <InstructionItem num="01" title="Yönetici Yapın" desc="Botu kanalınıza ekleyip tam yetki verin." />
                           <InstructionItem num="02" title="Tetikleyin" desc="Kanalınızda /start komutunu gönderin." />
-                          <div className="p-6 bg-blue-600/5 border border-blue-600/10 rounded-3xl flex items-start gap-4">
-                              <Zap size={20} className="text-blue-500 mt-0.5" />
-                              <p className="text-xs text-slate-400 leading-relaxed font-medium">
-                                İlk mesajdan sonra sistem kanalı otomatik olarak tanıyacaktır.
-                              </p>
-                          </div>
                       </div>
                   </div>
 
-                  {/* Kanallar */}
                   <div className="space-y-6">
                       <div className="flex justify-between items-center">
                         <div className="flex items-center gap-3">
@@ -266,7 +260,6 @@ const BotDetail = () => {
               </div>
           ) : (
               <div className="space-y-12 animate-in fade-in">
-                  {/* Özellikler Grid */}
                   <div className="grid grid-cols-2 gap-4">
                       <SaasFeature icon={Zap} title="Yüksek Hız" />
                       <SaasFeature icon={Shield} title="Güvenli Altyapı" />
@@ -284,7 +277,6 @@ const BotDetail = () => {
           )}
       </div>
 
-      {/* Fixed Action Area */}
       <div className="fixed bottom-0 inset-x-0 p-6 z-[70] bg-gradient-to-t from-[#020617] via-[#020617]/90 to-transparent">
           <div className="max-w-md mx-auto">
               <button 
@@ -298,7 +290,19 @@ const BotDetail = () => {
               >
                   {isProcessing ? <Loader2 className="animate-spin" /> : (
                       isOwned ? <><Send size={18} /> Botu Başlat</> : (
-                          bot.price === 0 ? <><PlusCircle size={18} /> Ücretsiz Edin</> : <><Star size={18} fill="currentColor" /> {bot.price} Stars - Satın Al</>
+                          bot.price === 0 ? <><PlusCircle size={18} /> Ücretsiz Edin</> : (
+                              <div className="flex items-center gap-4">
+                                  <div className="flex flex-col items-center">
+                                      <span className="text-[8px] opacity-60">Stars</span>
+                                      <span className="text-sm">{prices.stars}</span>
+                                  </div>
+                                  <div className="w-px h-6 bg-slate-200/20"></div>
+                                  <div className="flex flex-col items-center">
+                                      <span className="text-[8px] opacity-60">TON</span>
+                                      <span className="text-sm">{prices.ton}</span>
+                                  </div>
+                              </div>
+                          )
                       )
                   )}
               </button>
