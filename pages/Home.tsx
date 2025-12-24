@@ -6,6 +6,7 @@ import { Bot, Announcement } from '../types';
 import { categories } from '../data';
 import { useTranslation } from '../TranslationContext';
 import { DatabaseService } from '../services/DatabaseService';
+import PriceService from '../services/PriceService';
 
 const { useNavigate } = Router as any;
 
@@ -13,19 +14,9 @@ const iconMap: Record<string, any> = {
   Sparkles, Megaphone, Zap, Gift, Star, Info, BotIcon, Heart, Bell, Shield
 };
 
-/**
- * TL fiyatını Stars ve TON'a çeviren yardımcı
- */
-const convertPrice = (tl: number) => {
-    return {
-        stars: Math.round(tl * 1.4),
-        ton: parseFloat((tl / 250).toFixed(2))
-    };
-};
-
 const getLiveBotIcon = (bot: Bot) => {
     if (bot.bot_link) {
-        const username = bot.bot_link.replace('@', '').replace('https://t.me/', '').trim();
+        const username = bot.bot_link.replace('@', '').replace('https://t.me/', '').split('/').pop()?.trim();
         if (username) return `https://t.me/i/userpic/320/${username}.jpg`;
     }
     return bot.icon || `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=random&color=fff`;
@@ -75,17 +66,13 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
   );
 };
 
-const BotCard: React.FC<{ bot: Bot }> = ({ bot }) => {
+const BotCard: React.FC<{ bot: Bot, tonRate: number }> = ({ bot, tonRate }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const prices = convertPrice(bot.price);
+  const prices = PriceService.convert(bot.price, tonRate);
   
-  const handleClick = () => {
-      navigate(`/bot/${bot.id}`);
-  };
-
   return (
-    <div onClick={handleClick} className="flex items-center p-5 cursor-pointer group hover:bg-slate-900/60 rounded-[32px] transition-all border border-transparent hover:border-slate-800/50 mb-3 active:bg-slate-900 shadow-xl shadow-black/5">
+    <div onClick={() => navigate(`/bot/${bot.id}`)} className="flex items-center p-5 cursor-pointer group hover:bg-slate-900/60 rounded-[32px] transition-all border border-transparent hover:border-slate-800/50 mb-3 active:bg-slate-900 shadow-xl shadow-black/5">
         <div className="relative shrink-0">
             <img 
                 src={getLiveBotIcon(bot)} 
@@ -100,13 +87,11 @@ const BotCard: React.FC<{ bot: Bot }> = ({ bot }) => {
             )}
         </div>
         <div className="flex-1 ml-5 min-w-0 mr-3">
-            <div className="flex items-center gap-2 mb-1.5">
-                <h3 className="font-black text-lg text-slate-100 truncate italic tracking-tighter uppercase">{bot.name}</h3>
-            </div>
+            <h3 className="font-black text-lg text-slate-100 truncate italic tracking-tighter uppercase mb-1.5">{bot.name}</h3>
             <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest truncate mb-2">{bot.description}</p>
             <div className="flex items-center gap-3">
                 {bot.price === 0 ? (
-                    <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-500/10 px-2 py-1 rounded-md border border-emerald-500/10">Ücretsiz</span>
+                    <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-500/10 px-2 py-1 rounded-md">Ücretsiz</span>
                 ) : (
                     <div className="flex items-center gap-2">
                         <span className="text-[9px] font-black text-blue-400 uppercase tracking-tighter">{prices.stars} Stars</span>
@@ -132,16 +117,19 @@ const Home = () => {
   const [bots, setBots] = useState<Bot[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [tonRate, setTonRate] = useState(250);
   const [selectedAnn, setSelectedAnn] = useState<Announcement | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const loadData = async (catId: string = 'all') => {
     setIsLoading(true);
-    const [botData, annData] = await Promise.all([
+    const [botData, annData, pData] = await Promise.all([
         DatabaseService.getBots(catId),
-        DatabaseService.getAnnouncements()
+        DatabaseService.getAnnouncements(),
+        PriceService.getTonPrice()
     ]);
     setBots(botData);
+    setTonRate(pData.tonTry);
     if (annData.length > 0) setAnnouncements(annData.filter(a => a.is_active));
     setIsLoading(false);
   };
@@ -161,8 +149,8 @@ const Home = () => {
     <div className="p-4 pt-10 min-h-screen bg-[#020617] pb-32 font-sans text-slate-200">
       <div className="flex justify-between items-center mb-10 px-1 relative">
         <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-blue-600 rounded-[20px] flex items-center justify-center shadow-2xl rotate-3 group">
-                <BotIcon size={24} className="text-white group-hover:scale-110 transition-transform" />
+            <div className="w-12 h-12 bg-blue-600 rounded-[20px] flex items-center justify-center shadow-2xl rotate-3">
+                <BotIcon size={24} className="text-white" />
             </div>
             <div>
                 <h1 className="text-2xl font-black text-white tracking-tighter uppercase italic leading-none">Botly<span className="text-blue-500">Hub</span></h1>
@@ -220,7 +208,7 @@ const Home = () => {
 
             <div className="space-y-1">
                 <h2 className="text-[10px] font-black text-slate-700 uppercase tracking-[0.4em] mb-8">{searchQuery ? t('search_results') : 'Mağaza Vitrini'}</h2>
-                {filteredBots.length > 0 ? filteredBots.map(bot => <BotCard key={bot.id} bot={bot} />) : <div className="py-24 text-center text-slate-700 font-bold uppercase text-xs tracking-widest">Sonuç yok.</div>}
+                {filteredBots.length > 0 ? filteredBots.map(bot => <BotCard key={bot.id} bot={bot} tonRate={tonRate} />) : <div className="py-24 text-center text-slate-700 font-bold uppercase text-xs tracking-widest">Sonuç yok.</div>}
             </div>
           </>
       )}

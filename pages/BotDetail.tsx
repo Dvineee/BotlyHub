@@ -11,20 +11,14 @@ import * as Router from 'react-router-dom';
 import { Bot, UserBot, Channel } from '../types';
 import { useTelegram } from '../hooks/useTelegram';
 import { DatabaseService, supabase } from '../services/DatabaseService';
+import PriceService from '../services/PriceService';
 import { useTranslation } from '../TranslationContext';
 
 const { useNavigate, useParams } = Router as any;
 
-const convertPrice = (tl: number) => {
-    return {
-        stars: Math.round(tl * 1.4),
-        ton: parseFloat((tl / 250).toFixed(2))
-    };
-};
-
 const getLiveBotIcon = (bot: Bot) => {
     if (bot.bot_link) {
-        const username = bot.bot_link.replace('@', '').replace('https://t.me/', '').trim();
+        const username = bot.bot_link.replace('@', '').replace('https://t.me/', '').split('/').pop()?.trim();
         if (username) return `https://t.me/i/userpic/320/${username}.jpg`;
     }
     return bot.icon || `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=1e293b&color=fff&bold=true`;
@@ -41,12 +35,14 @@ const BotDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
   const [botChannels, setBotChannels] = useState<Channel[]>([]);
+  const [tonRate, setTonRate] = useState(250);
   const [isSyncing, setIsSyncing] = useState(false);
   
   const realtimeSubscription = useRef<any>(null);
 
   useEffect(() => {
     fetchBotData();
+    PriceService.getTonPrice().then(p => setTonRate(p.tonTry));
     if (isOwned && user?.id) {
         loadBotChannels();
         setupRealtime();
@@ -110,7 +106,7 @@ const BotDetail = () => {
       haptic('medium');
       
       if (isOwned) {
-          const username = bot.bot_link.replace('@', '').replace('https://t.me/', '').trim();
+          const username = bot.bot_link.replace('@', '').replace('https://t.me/', '').split('/').pop()?.trim();
           const finalUrl = `https://t.me/${username}`;
           if (tg?.openTelegramLink) tg.openTelegramLink(finalUrl);
           else window.open(finalUrl, '_blank');
@@ -148,7 +144,7 @@ const BotDetail = () => {
     </div>
   );
 
-  const prices = convertPrice(bot.price);
+  const prices = PriceService.convert(bot.price, tonRate);
 
   return (
     <div className="min-h-screen bg-[#020617] text-slate-200 pb-32 animate-in fade-in selection:bg-blue-500/30">
