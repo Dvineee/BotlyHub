@@ -11,22 +11,45 @@ export class DatabaseService {
   
   // --- BİLDİRİM YÖNETİMİ ---
   static async sendGlobalNotification(title: string, message: string, type: Notification['type'] = 'system') {
-      const { error } = await supabase.from('notifications').insert({
-          title,
-          message,
-          type,
+      // Not: ID'yi Supabase otomatik oluşturur. Date formatını ISO String olarak gönderiyoruz.
+      const { data, error } = await supabase.from('notifications').insert([
+        {
+          title: title.trim(),
+          message: message.trim(),
+          type: type,
           date: new Date().toISOString(),
           isRead: false,
           target_type: 'global'
-      });
-      if (error) throw error;
+        }
+      ]).select();
+      
+      if (error) {
+          console.error("Supabase Notification Error:", error);
+          throw error;
+      }
+      return data;
   }
 
   static async getNotifications(userId?: string): Promise<Notification[]> {
     if (!userId) return [];
-    const { data, error } = await supabase.from('notifications').select('*').or(`user_id.eq.${userId},target_type.eq.global`).order('date', { ascending: false });
+    // Kullanıcıya özel veya global olanları çek
+    const { data, error } = await supabase
+        .from('notifications')
+        .select('*')
+        .or(`user_id.eq.${userId},target_type.eq.global`)
+        .order('date', { ascending: false });
+        
     if (error) return [];
-    return (data || []).map(n => ({ id: String(n.id), type: n.type, title: n.title, message: n.message, date: n.date, isRead: n.isRead, user_id: n.user_id, target_type: n.target_type }));
+    return (data || []).map(n => ({ 
+        id: String(n.id), 
+        type: n.type, 
+        title: n.title, 
+        message: n.message, 
+        date: n.date, 
+        isRead: n.isRead, 
+        user_id: n.user_id, 
+        target_type: n.target_type 
+    }));
   }
 
   static async markNotificationRead(id: string) {

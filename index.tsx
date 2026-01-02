@@ -1,4 +1,5 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+
+import React, { ErrorInfo, ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import { TranslationProvider } from './TranslationContext';
@@ -17,9 +18,9 @@ interface ErrorBoundaryState {
   error: Error | null; 
 }
 
-// Fix: Extending from the imported Component class to ensure props and state are correctly inherited and recognized by the TypeScript compiler.
-class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  // Fix: Initializing state directly in the class body as a property of type ErrorBoundaryState.
+// Fix: Extending from React.Component to ensure props and state are correctly inherited and recognized by the TypeScript compiler.
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  // Fix: Initializing state directly in the class body.
   public state: ErrorBoundaryState = {
     hasError: false,
     error: null
@@ -52,7 +53,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
         </div>
       );
     }
-    // Fix: Accessing 'props' inherited from Component class to satisfy TypeScript requirements and ensure compatibility.
+    // Fix: Correctly returning children from inherited props from React.Component.
     return this.props.children;
   }
 }
