@@ -9,6 +9,30 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export class DatabaseService {
   
+  // --- BİLDİRİM YÖNETİMİ ---
+  static async sendGlobalNotification(title: string, message: string, type: Notification['type'] = 'system') {
+      const { error } = await supabase.from('notifications').insert({
+          title,
+          message,
+          type,
+          date: new Date().toISOString(),
+          isRead: false,
+          target_type: 'global'
+      });
+      if (error) throw error;
+  }
+
+  static async getNotifications(userId?: string): Promise<Notification[]> {
+    if (!userId) return [];
+    const { data, error } = await supabase.from('notifications').select('*').or(`user_id.eq.${userId},target_type.eq.global`).order('date', { ascending: false });
+    if (error) return [];
+    return (data || []).map(n => ({ id: String(n.id), type: n.type, title: n.title, message: n.message, date: n.date, isRead: n.isRead, user_id: n.user_id, target_type: n.target_type }));
+  }
+
+  static async markNotificationRead(id: string) {
+    await supabase.from('notifications').update({ isRead: true }).eq('id', id);
+  }
+
   // --- REKLAM YÖNETİMİ ---
   static async getAds(): Promise<Ad[]> {
       const { data } = await supabase.from('ads').select('*').order('created_at', { ascending: false });
@@ -168,17 +192,6 @@ export class DatabaseService {
     const { data } = await supabase.from('users').select('*').eq('id', userId.toString()).maybeSingle();
     if (!data) return null;
     return { id: data.id, name: data.name, username: data.username, avatar: data.avatar, role: data.role || 'User', status: data.status || 'Active', badges: data.badges || [], joinDate: data.joindate, email: data.email };
-  }
-
-  static async getNotifications(userId?: string): Promise<Notification[]> {
-    if (!userId) return [];
-    const { data, error } = await supabase.from('notifications').select('*').or(`user_id.eq.${userId},target_type.eq.global`).order('date', { ascending: false });
-    if (error) return [];
-    return (data || []).map(n => ({ id: String(n.id), type: n.type, title: n.title, message: n.message, date: n.date, isRead: n.isRead, user_id: n.user_id, target_type: n.target_type }));
-  }
-
-  static async markNotificationRead(id: string) {
-    await supabase.from('notifications').update({ isRead: true }).eq('id', id);
   }
 
   static async getSettings() {

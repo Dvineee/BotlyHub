@@ -101,7 +101,6 @@ const BotDetail = () => {
 
   return (
     <div className="min-h-screen bg-[#020617] text-slate-200 pb-40 animate-in fade-in selection:bg-blue-500/30">
-      {/* Navigation */}
       <nav className="fixed top-0 inset-x-0 h-16 z-[60] flex items-center justify-between px-6 bg-[#020617]/60 backdrop-blur-xl border-b border-white/5">
         <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-slate-400 hover:text-white transition-colors">
             <ChevronLeft size={24} />
@@ -112,7 +111,6 @@ const BotDetail = () => {
         </button>
       </nav>
 
-      {/* Hero Section */}
       <div className="pt-24 px-6 mb-12 flex flex-col items-center text-center">
         <div className="relative mb-8 group">
             <div className="absolute inset-0 bg-blue-600/20 blur-[40px] rounded-full"></div>
@@ -123,19 +121,16 @@ const BotDetail = () => {
             />
         </div>
         
-        <h1 className="text-3xl font-black text-white tracking-tight mb-2 italic uppercase">{bot.name}</h1>
-        <div className="flex items-center gap-2 mb-6">
-            <span className="text-[9px] font-black px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 uppercase tracking-widest flex items-center gap-1.5 shadow-lg">
-                <ShieldCheck size={14} /> DOĞRULANMIŞ BOT
-            </span>
-        </div>
+        <h1 className="text-3xl font-black text-white tracking-tight mb-6 italic uppercase">{bot.name}</h1>
         
-        <p className="max-w-xs text-sm text-slate-400 leading-relaxed font-bold uppercase italic opacity-70">
-            {bot.description}
-        </p>
+        <div className="max-w-xs p-6 bg-slate-900/40 rounded-[32px] border border-white/5 relative overflow-hidden group">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600/50 to-transparent"></div>
+            <p className="text-sm text-slate-300 leading-relaxed font-bold uppercase italic opacity-90 text-center">
+                {bot.description}
+            </p>
+        </div>
       </div>
 
-      {/* Features Grid */}
       <div className="px-6 mb-12">
           <div className="grid grid-cols-2 gap-4">
               <SaasFeature icon={Zap} title="Yüksek Hız" />
@@ -143,7 +138,6 @@ const BotDetail = () => {
           </div>
       </div>
 
-      {/* Screenshots Gallery Section */}
       {screenshots.length > 0 && (
         <div className="mb-12">
             <div className="px-6 flex items-center justify-between mb-6">
@@ -161,18 +155,12 @@ const BotDetail = () => {
                         className="min-w-[240px] max-w-[280px] aspect-[9/16] bg-slate-900 rounded-[32px] border border-white/5 overflow-hidden shadow-2xl snap-center shrink-0 active:scale-95 transition-all group relative cursor-pointer"
                     >
                         <img src={url} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="Preview" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-6">
-                            <div className="bg-white/10 backdrop-blur-md p-3 rounded-full border border-white/20">
-                                <Maximize2 size={18} className="text-white" />
-                            </div>
-                        </div>
                     </div>
                 ))}
             </div>
         </div>
       )}
 
-      {/* Bottom Sticky Action */}
       <div className="fixed bottom-0 inset-x-0 p-6 z-[70] bg-gradient-to-t from-[#020617] via-[#020617]/95 to-transparent pb-10">
           <div className="max-w-md mx-auto">
               <button 
@@ -204,22 +192,6 @@ const BotDetail = () => {
               </button>
           </div>
       </div>
-
-      {/* Fullscreen Preview Modal */}
-      {fullscreenImage && (
-          <div 
-            className="fixed inset-0 z-[200] bg-black/98 backdrop-blur-2xl flex flex-col items-center justify-center p-4 animate-in fade-in"
-            onClick={() => setFullscreenImage(null)}
-          >
-              <button className="absolute top-10 right-6 p-4 bg-white/5 rounded-2xl text-white z-[210]">
-                  <X size={24} />
-              </button>
-              <div className="w-full max-w-sm h-[80vh] rounded-[48px] overflow-hidden border border-white/10 shadow-2xl" onClick={e => e.stopPropagation()}>
-                  <img src={fullscreenImage} className="w-full h-full object-contain bg-slate-950" alt="Full Preview" />
-              </div>
-              <p className="mt-8 text-[10px] font-black text-slate-600 uppercase tracking-widest italic">Kapatmak için dokunun</p>
-          </div>
-      )}
     </div>
   );
 };

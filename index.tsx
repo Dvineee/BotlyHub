@@ -17,7 +17,7 @@ interface ErrorBoundaryState {
   error: Error | null; 
 }
 
-// Fix: Extending from Component directly instead of React.Component to ensure props and state are correctly inherited and recognized by the TypeScript compiler.
+// Fix: Extending from the imported Component class to ensure props and state are correctly inherited and recognized by the TypeScript compiler.
 class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   // Fix: Initializing state directly in the class body as a property of type ErrorBoundaryState.
   public state: ErrorBoundaryState = {
