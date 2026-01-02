@@ -91,10 +91,10 @@ const AccountSettings = () => {
     <div className="min-h-screen bg-[#020617] flex flex-col text-slate-200 animate-in fade-in pb-20">
       {/* Custom Minimal Header */}
       <nav className="h-20 px-6 flex items-center justify-between border-b border-white/5 bg-[#020617]/50 backdrop-blur-xl sticky top-0 z-50">
-        <button onClick={() => navigate('/settings')} className="p-2 -ml-2 text-slate-400 hover:text-white transition-colors">
-          <ChevronLeft size={24} />
+        <button onClick={() => navigate('/settings')} className="p-3 bg-slate-900/40 rounded-2xl border border-white/5 text-slate-400 active:scale-90 transition-transform">
+          <ChevronLeft size={20} />
         </button>
-        <span className="text-[10px] font-black tracking-[0.3em] text-white/40 uppercase italic">Güvenlik Paneli</span>
+        <span className="text-[10px] font-black tracking-[0.3em] text-white/40 uppercase italic">Hesap Bilgileri</span>
         <div className="w-10"></div>
       </nav>
 
@@ -105,21 +105,19 @@ const AccountSettings = () => {
                   {isVerified ? (
                       <><BadgeCheck size={14} className="text-emerald-500" /><span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">DOĞRULANMIŞ HESAP</span></>
                   ) : (
-                      <><Fingerprint size={14} className="text-blue-500" /><span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">DOĞRULAMA BEKLİYOR</span></>
+                      <><Fingerprint size={14} className="text-blue-500" /><span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">DOĞRULAMA GEREKLİ</span></>
                   )}
               </div>
-              <h1 className="text-3xl font-black text-white italic uppercase tracking-tighter mb-4">Hesap <span className="text-blue-600">Kimliği</span></h1>
+              <h1 className="text-3xl font-black text-white italic uppercase tracking-tighter mb-4">Güvenlik <span className="text-blue-600">Ayarları</span></h1>
               <p className="text-xs text-slate-500 leading-relaxed font-bold uppercase italic opacity-60 px-4">
-                  Ödemeleriniz ve bot yönetiminiz için kimlik doğrulaması zorunludur.
+                  Sistem güvenliğiniz ve ödemeleriniz için e-posta doğrulaması zorunludur.
               </p>
           </div>
 
-          {/* Form Card */}
-          <div className="space-y-10">
+          {/* Minimal Form Card */}
+          <div className="space-y-8">
               <div className="space-y-4">
-                  <div className="flex justify-between items-center px-4">
-                    <label className="text-[9px] font-black text-slate-600 uppercase tracking-[0.2em]">E-POSTA ADRESİ</label>
-                  </div>
+                  <label className="text-[9px] font-black text-slate-600 uppercase tracking-[0.2em] ml-2">E-POSTA ADRESİ</label>
                   <div className="relative group">
                       <div className={`absolute left-5 top-1/2 -translate-y-1/2 transition-colors ${isVerified ? 'text-emerald-500' : 'text-slate-600 group-focus-within:text-blue-500'}`}>
                         {isVerified ? <ShieldCheck size={18} /> : <Mail size={18} />}
@@ -129,12 +127,12 @@ const AccountSettings = () => {
                         value={formData.email} 
                         readOnly={isVerified}
                         onChange={e => setFormData({...formData, email: e.target.value})} 
-                        className={`w-full h-18 pl-14 pr-6 text-xs font-black rounded-[28px] border transition-all uppercase italic tracking-widest ${
+                        className={`w-full h-18 pl-14 pr-6 text-xs font-black rounded-3xl border transition-all uppercase italic tracking-widest ${
                             isVerified 
                             ? 'bg-slate-950 border-emerald-500/20 text-emerald-500/60' 
                             : 'bg-slate-900/40 border-white/5 text-white focus:border-blue-500/50 outline-none shadow-2xl'
                         }`} 
-                        placeholder="EMAIL@DOMAIN.COM" 
+                        placeholder="E-POSTA ADRESİNİZ" 
                       />
                   </div>
               </div>
@@ -152,8 +150,8 @@ const AccountSettings = () => {
                           <div className="w-16 h-16 bg-emerald-500/10 border border-emerald-500/20 rounded-[24px] flex items-center justify-center mx-auto mb-6">
                               <ShieldCheck className="text-emerald-500" size={32} />
                           </div>
-                          <h4 className="text-white font-black text-sm mb-2 uppercase italic tracking-tight">KİMLİK ONAYLANDI</h4>
-                          <p className="text-[10px] text-slate-600 font-bold uppercase italic mb-8">Tüm platform özellikleri aktif edildi.</p>
+                          <h4 className="text-white font-black text-sm mb-2 uppercase italic tracking-tight">KİMLİK DOĞRULANDI</h4>
+                          <p className="text-[10px] text-slate-600 font-bold uppercase italic mb-8">Profiliniz tüm platform işlemlerine açık.</p>
                           <button 
                             onClick={() => navigate('/settings')}
                             className="w-full h-16 bg-slate-900 hover:bg-slate-850 text-white font-black rounded-3xl text-[10px] uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-3 active:scale-95 border border-white/5"
@@ -169,8 +167,8 @@ const AccountSettings = () => {
                       >
                         {isSaving ? <Loader2 className="animate-spin" size={24} /> : (
                             <>
-                                <span className="text-[11px] uppercase tracking-[0.3em] italic">VERİLERİ KİLİTLE</span>
-                                <span className="text-[8px] opacity-60 uppercase tracking-widest font-black">GÜVENLİ ONAY</span>
+                                <span className="text-[11px] uppercase tracking-[0.3em] italic">BİLGİLERİ KAYDET</span>
+                                <span className="text-[8px] opacity-60 uppercase tracking-widest font-black">GÜVENLİ İŞLEM</span>
                             </>
                         )}
                       </button>
@@ -179,11 +177,11 @@ const AccountSettings = () => {
           </div>
       </div>
 
-      <div className="mt-auto pt-20 flex flex-col items-center gap-4 opacity-30">
+      <div className="mt-auto pt-20 flex flex-col items-center gap-4 opacity-20">
           <div className="h-px w-12 bg-slate-800"></div>
           <div className="flex items-center gap-3">
               <Shield size={14} className="text-slate-500" />
-              <p className="text-[8px] font-black text-slate-500 uppercase tracking-[0.4em] italic">BOTLYHUB SECURITY ARCHITECTURE</p>
+              <p className="text-[8px] font-black text-slate-500 uppercase tracking-[0.4em] italic">BOTLYHUB V3 SECURITY ARCHITECTURE</p>
           </div>
       </div>
     </div>

@@ -174,7 +174,7 @@ const AdminNotifications = () => {
             setTitle('');
             setMessage('');
         } catch (e) {
-            alert("Gönderim hatası!");
+            alert("Gönderim hatası! Lütfen console üzerinden detayı inceleyin.");
         } finally {
             setIsSending(false);
         }
@@ -236,47 +236,135 @@ const AdminInput = ({ label, value, onChange, type = "text" }: any) => (
     </div>
 );
 
-// --- DİĞER MODÜLLER (BASİTLEŞTİRİLMİŞ) ---
+// --- RESTORED MODULES ---
 const UserManagement = () => {
     const [users, setUsers] = useState<User[]>([]);
-    useEffect(() => { DatabaseService.getUsers().then(setUsers); }, []);
-    return <div className="p-4">Kullanıcı Listesi ({users.length})</div>;
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => { 
+        DatabaseService.getUsers().then(data => {
+            setUsers(data);
+            setIsLoading(false);
+        }); 
+    }, []);
+
+    if (isLoading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin" /></div>;
+
+    return (
+        <div className="space-y-6">
+            <h2 className="text-xl font-black">ÜYE YÖNETİMİ</h2>
+            <div className="bg-slate-900/50 border border-white/5 rounded-3xl overflow-hidden">
+                <table className="w-full text-left text-xs">
+                    <thead className="bg-white/5 text-[10px] uppercase tracking-widest text-slate-500">
+                        <tr>
+                            <th className="px-6 py-4">Kullanıcı</th>
+                            <th className="px-6 py-4">Role</th>
+                            <th className="px-6 py-4">Durum</th>
+                            <th className="px-6 py-4">Tarih</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                        {users.map(u => (
+                            <tr key={u.id} className="hover:bg-white/5 transition-colors">
+                                <td className="px-6 py-4 flex items-center gap-3">
+                                    <img src={u.avatar} className="w-8 h-8 rounded-full border border-white/10" />
+                                    <div>
+                                        <p className="font-bold text-white">{u.name}</p>
+                                        <p className="text-[10px] text-slate-500">@{u.username}</p>
+                                    </div>
+                                </td>
+                                <td className="px-6 py-4"><span className="px-2 py-1 bg-blue-500/10 text-blue-500 rounded-lg">{u.role}</span></td>
+                                <td className="px-6 py-4"><span className={`px-2 py-1 rounded-lg ${u.status === 'Active' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>{u.status}</span></td>
+                                <td className="px-6 py-4 text-slate-500">{new Date(u.joinDate).toLocaleDateString()}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
 };
 
 const BotManagement = () => {
     const [bots, setBots] = useState<any[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingBot, setEditingBot] = useState<any>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
     useEffect(() => { load(); }, []);
-    const load = async () => setBots(await DatabaseService.getBotsWithStats());
+    
+    const load = async () => {
+        setIsLoading(true);
+        const data = await DatabaseService.getBotsWithStats();
+        setBots(data);
+        setIsLoading(false);
+    };
+
+    if (isLoading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin" /></div>;
+
     return (
         <div className="space-y-6">
-            <div className="flex justify-between">
-                <h2 className="text-xl font-black">BOT ENVANTERİ</h2>
-                <button onClick={() => { setEditingBot({ id: '', name: '', description: '', price: 0, category: 'productivity', bot_link: '', screenshots: [] }); setIsModalOpen(true); }} className="bg-blue-600 px-4 py-2 rounded-xl text-xs font-bold">YENİ BOT</button>
+            <div className="flex justify-between items-center">
+                <h2 className="text-xl font-black italic tracking-tighter">BOT ENVANTERİ</h2>
+                <button 
+                  onClick={() => { setEditingBot({ id: '', name: '', description: '', price: 0, category: 'productivity', bot_link: '', screenshots: [], icon: '' }); setIsModalOpen(true); }} 
+                  className="bg-blue-600 hover:bg-blue-500 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center gap-2"
+                >
+                    <Plus size={16}/> YENİ BOT EKLE
+                </button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {bots.map(b => (
-                    <div key={b.id} className="bg-slate-900/50 p-6 rounded-3xl border border-white/5 flex flex-col gap-4">
-                        <h4 className="font-bold">{b.name}</h4>
-                        <p className="text-xs text-slate-500 line-clamp-2">{b.description}</p>
-                        <button onClick={() => {setEditingBot(b); setIsModalOpen(true);}} className="bg-white/5 py-2 rounded-lg text-[10px] font-bold">DÜZENLE</button>
+                    <div key={b.id} className="bg-slate-900/50 p-8 rounded-[32px] border border-white/5 flex flex-col gap-5 hover:border-blue-500/30 transition-all group">
+                        <div className="flex items-center gap-4">
+                            <img src={b.icon || `https://ui-avatars.com/api/?name=${encodeURIComponent(b.name)}`} className="w-12 h-12 rounded-2xl border border-white/10" />
+                            <div>
+                                <h4 className="font-bold text-white text-sm group-hover:text-blue-400 transition-colors">{b.name}</h4>
+                                <p className="text-[10px] text-slate-500 uppercase font-black">{b.category}</p>
+                            </div>
+                        </div>
+                        <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">{b.description}</p>
+                        <div className="flex items-center justify-between pt-2 border-t border-white/5">
+                            <span className="text-sm font-black text-emerald-500">{b.price} TL</span>
+                            <div className="flex gap-2">
+                                <button onClick={() => {setEditingBot(b); setIsModalOpen(true);}} className="p-2 bg-white/5 hover:bg-blue-600 rounded-xl transition-all"><Edit3 size={16}/></button>
+                                <button onClick={async () => { if(confirm('Emin misiniz?')) { await DatabaseService.deleteBot(b.id); load(); } }} className="p-2 bg-white/5 hover:bg-red-600 rounded-xl transition-all text-red-500 hover:text-white"><Trash2 size={16}/></button>
+                            </div>
+                        </div>
                     </div>
                 ))}
             </div>
+
             {isModalOpen && (
-                <div className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-6">
-                    <div className="bg-[#020617] p-8 rounded-3xl w-full max-w-2xl border border-white/10 overflow-y-auto max-h-[90vh]">
-                        <button onClick={() => setIsModalOpen(false)} className="float-right"><X/></button>
-                        <h3 className="text-lg font-bold mb-6 italic">BOT DÜZENLE</h3>
-                        <form onSubmit={async (e) => { e.preventDefault(); await DatabaseService.saveBot(editingBot); setIsModalOpen(false); load(); }} className="space-y-4">
-                            <AdminInput label="BOT ID" value={editingBot.id} onChange={v => setEditingBot({...editingBot, id: v})} />
-                            <AdminInput label="BOT İSMİ" value={editingBot.name} onChange={v => setEditingBot({...editingBot, name: v})} />
-                            <AdminInput label="TELEGRAM LİNK" value={editingBot.bot_link} onChange={v => setEditingBot({...editingBot, bot_link: v})} />
-                            <AdminInput label="FİYAT" value={editingBot.price} type="number" onChange={v => setEditingBot({...editingBot, price: v})} />
-                            <AdminInput label="GÖRSELLER (CSV)" value={(editingBot.screenshots || []).join(',')} onChange={v => setEditingBot({...editingBot, screenshots: v.split(',')})} />
-                            <textarea value={editingBot.description} onChange={e => setEditingBot({...editingBot, description: e.target.value})} className="w-full bg-slate-950 border border-white/5 p-4 rounded-xl text-xs h-32" />
-                            <button type="submit" className="w-full bg-blue-600 py-4 rounded-xl font-bold">KAYDET</button>
+                <div className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-6 backdrop-blur-md">
+                    <div className="bg-[#020617] p-10 rounded-[48px] w-full max-w-2xl border border-white/10 overflow-y-auto max-h-[90vh] shadow-2xl relative">
+                        <button onClick={() => setIsModalOpen(false)} className="absolute top-8 right-8 p-3 bg-white/5 rounded-2xl hover:bg-red-600 transition-all"><X size={20}/></button>
+                        <h3 className="text-xl font-black mb-10 italic uppercase tracking-tighter text-blue-500">Bot Bilgilerini Düzenle</h3>
+                        
+                        <form onSubmit={async (e) => { e.preventDefault(); await DatabaseService.saveBot(editingBot); setIsModalOpen(false); load(); }} className="space-y-6">
+                            <div className="grid grid-cols-2 gap-6">
+                                <AdminInput label="BOT ID" value={editingBot.id} onChange={(v: string) => setEditingBot({...editingBot, id: v})} />
+                                <AdminInput label="BOT İSMİ" value={editingBot.name} onChange={(v: string) => setEditingBot({...editingBot, name: v})} />
+                            </div>
+                            <div className="grid grid-cols-2 gap-6">
+                                <AdminInput label="KATEGORİ" value={editingBot.category} onChange={(v: string) => setEditingBot({...editingBot, category: v})} />
+                                <AdminInput label="FİYAT (TL)" value={editingBot.price} type="number" onChange={(v: string) => setEditingBot({...editingBot, price: v})} />
+                            </div>
+                            <AdminInput label="TELEGRAM LİNK" value={editingBot.bot_link} onChange={(v: string) => setEditingBot({...editingBot, bot_link: v})} />
+                            <AdminInput label="ICON URL" value={editingBot.icon} onChange={(v: string) => setEditingBot({...editingBot, icon: v})} />
+                            <AdminInput label="GÖRSELLER (CSV)" value={(editingBot.screenshots || []).join(',')} onChange={(v: string) => setEditingBot({...editingBot, screenshots: v.split(',')})} />
+                            
+                            <div className="space-y-2">
+                                <label className="text-[9px] font-black text-slate-600 uppercase tracking-widest ml-4">Bot Açıklaması</label>
+                                <textarea 
+                                  value={editingBot.description} 
+                                  onChange={e => setEditingBot({...editingBot, description: e.target.value})} 
+                                  className="w-full bg-slate-950 border border-white/5 p-6 rounded-3xl text-xs font-medium text-slate-400 h-32 focus:border-blue-500/50 outline-none" 
+                                />
+                            </div>
+                            
+                            <button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 py-5 rounded-3xl font-black text-[11px] uppercase tracking-widest shadow-2xl shadow-blue-600/30">DEĞİŞİKLİKLERİ KAYDET</button>
                         </form>
                     </div>
                 </div>
@@ -285,10 +373,41 @@ const BotManagement = () => {
     );
 };
 
-const SalesManagement = () => <div className="p-4">Satış Geçmişi</div>;
-const AdsManagement = () => <div className="p-4">Reklam Merkezi</div>;
-const AnnouncementCenter = () => <div className="p-4">Duyuru Yönetimi</div>;
-const SystemLogs = () => <div className="p-4">Sistem Logları</div>;
-const SettingsManagement = () => <div className="p-4">Platform Ayarları</div>;
+const SalesManagement = () => {
+    const [sales, setSales] = useState<any[]>([]);
+    useEffect(() => { DatabaseService.getAllPurchases().then(setSales); }, []);
+    return (
+        <div className="space-y-6">
+            <h2 className="text-xl font-black italic tracking-tighter uppercase">Satış Geçmişi</h2>
+            <div className="bg-slate-900/50 border border-white/5 rounded-3xl overflow-hidden shadow-2xl">
+                <table className="w-full text-left text-xs">
+                    <thead className="bg-white/5 text-[10px] uppercase tracking-widest text-slate-500 font-black">
+                        <tr>
+                            <th className="px-6 py-4 italic">Kullanıcı</th>
+                            <th className="px-6 py-4 italic">Alınan Bot</th>
+                            <th className="px-6 py-4 italic">Tarih</th>
+                            <th className="px-6 py-4 italic text-right">Tutar</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5 font-medium">
+                        {sales.map((s, idx) => (
+                            <tr key={idx} className="hover:bg-white/5 transition-colors">
+                                <td className="px-6 py-4 text-slate-300">@{s.users?.username || 'Anonim'}</td>
+                                <td className="px-6 py-4 text-white font-bold">{s.bots?.name || 'Bilinmiyor'}</td>
+                                <td className="px-6 py-4 text-slate-500">{new Date(s.acquired_at).toLocaleString()}</td>
+                                <td className="px-6 py-4 text-right text-emerald-500 font-black italic">{s.bots?.price || 0} TL</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
+};
+
+const AdsManagement = () => <div className="p-12 text-center text-slate-500 font-bold uppercase tracking-widest italic opacity-40">Reklam Merkezi Çok Yakında</div>;
+const AnnouncementCenter = () => <div className="p-12 text-center text-slate-500 font-bold uppercase tracking-widest italic opacity-40">Duyuru Yönetimi Çok Yakında</div>;
+const SystemLogs = () => <div className="p-12 text-center text-slate-500 font-bold uppercase tracking-widest italic opacity-40">Sistem Kayıtları Arşivi</div>;
+const SettingsManagement = () => <div className="p-12 text-center text-slate-500 font-bold uppercase tracking-widest italic opacity-40">Sistem Konfigürasyonu</div>;
 
 export default AdminDashboard;

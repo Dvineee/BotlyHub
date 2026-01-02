@@ -1,5 +1,5 @@
 
-import React, { ErrorInfo, ReactNode } from 'react';
+import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import { TranslationProvider } from './TranslationContext';
@@ -18,8 +18,8 @@ interface ErrorBoundaryState {
   error: Error | null; 
 }
 
-// Fix: Extending from React.Component to ensure props and state are correctly inherited and recognized by the TypeScript compiler.
-class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+// Fix: Extending from Component to ensure props and state are correctly inherited and recognized by the TypeScript compiler.
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   // Fix: Initializing state directly in the class body.
   public state: ErrorBoundaryState = {
     hasError: false,
@@ -53,7 +53,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
         </div>
       );
     }
-    // Fix: Correctly returning children from inherited props from React.Component.
+    // Fix: Correctly returning children from inherited props from Component.
     return this.props.children;
   }
 }

@@ -11,7 +11,6 @@ export class DatabaseService {
   
   // --- BİLDİRİM YÖNETİMİ ---
   static async sendGlobalNotification(title: string, message: string, type: Notification['type'] = 'system') {
-      // Not: ID'yi Supabase otomatik oluşturur. Date formatını ISO String olarak gönderiyoruz.
       const { data, error } = await supabase.from('notifications').insert([
         {
           title: title.trim(),
@@ -32,7 +31,6 @@ export class DatabaseService {
 
   static async getNotifications(userId?: string): Promise<Notification[]> {
     if (!userId) return [];
-    // Kullanıcıya özel veya global olanları çek
     const { data, error } = await supabase
         .from('notifications')
         .select('*')
