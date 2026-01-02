@@ -13,16 +13,9 @@ export const categories = [
 ];
 
 export const mockBots: ExtendedBot[] = [
-  { id: '1', name: 'Task Master', description: 'Günlük görevlerinizi ve iş akışınızı yönetin.', price: 29.99, icon: 'https://picsum.photos/seed/task/200', category: 'productivity', isNew: true, isPremium: true, bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
+  { id: '1', name: 'Task Master', description: 'Günlük görevlerinizi ve iş akışınızı yönetin.', price: 29.99, icon: 'https://picsum.photos/seed/task/200', category: 'productivity', isNew: true, bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
   { id: '2', name: 'GameBot Pro', description: 'Topluluk içi oyun sunucusu yönetimi.', price: 0, icon: 'https://picsum.photos/seed/game/200', category: 'games', bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
-  { id: '3', name: 'CryptoAlert', description: 'Kripto varlıklar için anlık fiyat ve sinyal takibi.', price: 99.99, icon: 'https://picsum.photos/seed/crypto/200', category: 'utilities', isPremium: true, bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
-  { id: '4', name: 'ModBot', description: 'Gelişmiş otomatik grup moderasyon sistemi.', price: 49.50, icon: 'https://picsum.photos/seed/mod/200', category: 'moderation', isPremium: true, bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
-  { id: '5', name: 'MusicFy', description: 'Kanallarda yüksek kaliteli müzik yayını.', price: 19.99, icon: 'https://picsum.photos/seed/music/200', category: 'music', bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
-  { id: '6', name: 'NotionSync', description: 'Telegram verilerini Notion ile senkronize edin.', price: 35.00, icon: 'https://picsum.photos/seed/notion/200', category: 'productivity', isPremium: true, bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
-  { id: '7', name: 'FocusFlow', description: 'Pomodoro tekniği ile odaklanma sayacı.', price: 0, icon: 'https://picsum.photos/seed/focus/200', category: 'productivity', bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
-  { id: '8', name: 'RPG Master', description: 'Sohbet tabanlı devasa rol yapma oyunu.', price: 15.00, icon: 'https://picsum.photos/seed/rpg/200', category: 'games', bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
-  { id: '9', name: 'QuizKing', description: 'Arkadaşlarınızla yarışabileceğiniz bilgi yarışması.', price: 0, icon: 'https://picsum.photos/seed/quiz/200', category: 'games', bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
-  { id: '10', name: 'StockBot', description: 'Borsa ve hisse senedi teknik analizi.', price: 120.00, icon: 'https://picsum.photos/seed/stock/200', category: 'finance', isPremium: true, bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
+  { id: '10', name: 'StockBot', description: 'Borsa ve hisse senedi teknik analizi.', price: 120.00, icon: 'https://picsum.photos/seed/stock/200', category: 'finance', bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
 ];
 
 export const subscriptionPlans: SubscriptionPlan[] = [
@@ -37,8 +30,7 @@ export const subscriptionPlans: SubscriptionPlan[] = [
     features: [
       '5 Kanala Kadar Bağlantı',
       'Standart Destek',
-      '%20 Reklam Komisyonu',
-      'Temel Botlara Erişim'
+      '%20 Reklam Komisyonu'
     ]
   },
   {
@@ -46,7 +38,7 @@ export const subscriptionPlans: SubscriptionPlan[] = [
     name: 'Pro Üyelik',
     price: 149.90,
     billingPeriod: 'Aylık',
-    description: 'Büyüyen topluluklar ve bot sahipleri için.',
+    description: 'Büyüyen topluluklar için.',
     color: 'blue',
     icon: Zap,
     isPopular: true,
@@ -54,7 +46,6 @@ export const subscriptionPlans: SubscriptionPlan[] = [
       '20 Kanala Kadar Bağlantı',
       'Öncelikli Destek',
       '%10 Reklam Komisyonu',
-      'Premium Botlara Erişim',
       'Detaylı İstatistikler'
     ]
   },
@@ -70,9 +61,7 @@ export const subscriptionPlans: SubscriptionPlan[] = [
       'Sınırsız Kanal Bağlantısı',
       '7/24 Canlı Destek',
       '%2 Reklam Komisyonu',
-      'Tüm Botlar Ücretsiz',
-      'Erken Erişim Özellikleri',
-      'Onaylanmış Profil Rozeti'
+      'Özel Profil Rozeti'
     ]
   }
 ];
@@ -82,16 +71,8 @@ export const mockNotifications: Notification[] = [
     id: '1',
     type: 'payment',
     title: 'Ödeme Başarılı',
-    message: 'Task Master botu için 29.99₺ ödemeniz başarıyla alındı.',
+    message: 'TON ödemeniz başarıyla alındı.',
     date: new Date().toISOString(),
-    isRead: false
-  },
-  {
-    id: '2',
-    type: 'security',
-    title: 'Yeni Cihaz Girişi',
-    message: 'Hesabınıza yeni bir cihazdan (iPhone 13, İstanbul) giriş yapıldı.',
-    date: new Date(Date.now() - 3600000 * 5).toISOString(),
     isRead: false
   }
 ];

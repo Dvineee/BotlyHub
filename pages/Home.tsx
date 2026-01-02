@@ -68,7 +68,6 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
 
 const BotCard: React.FC<{ bot: Bot, tonRate: number }> = ({ bot, tonRate }) => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
   const prices = PriceService.convert(bot.price, tonRate);
   
   return (
@@ -111,8 +110,6 @@ const Home = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeCategory, setActiveCategory] = useState('all');
   const [bots, setBots] = useState<Bot[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -120,10 +117,10 @@ const Home = () => {
   const [selectedAnn, setSelectedAnn] = useState<Announcement | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const loadData = async (catId: string = 'all') => {
+  const loadData = async () => {
     setIsLoading(true);
     const [botData, annData, pData] = await Promise.all([
-        DatabaseService.getBots(catId),
+        DatabaseService.getBots(),
         DatabaseService.getAnnouncements(),
         PriceService.getTonPrice()
     ]);
@@ -134,15 +131,13 @@ const Home = () => {
   };
 
   useEffect(() => {
-    loadData(activeCategory);
+    loadData();
     const handleClickOutside = (event: MouseEvent) => {
         if (menuRef.current && !menuRef.current.contains(event.target as Node)) setIsMenuOpen(false);
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [activeCategory]);
-
-  const filteredBots = bots.filter(b => b.name.toLowerCase().includes(searchQuery.toLowerCase()) || b.description.toLowerCase().includes(searchQuery.toLowerCase()));
+  }, []);
 
   return (
     <div className="p-4 pt-10 min-h-screen bg-[#020617] pb-32 font-sans text-slate-200">
@@ -172,10 +167,10 @@ const Home = () => {
         </div>
       </div>
 
-      <div className="relative mb-10">
-        <div className="relative flex items-center bg-slate-900/40 backdrop-blur-xl border border-white/5 rounded-[28px] p-1 shadow-2xl">
+      <div className="relative mb-10 cursor-pointer" onClick={() => navigate('/search')}>
+        <div className="relative flex items-center bg-slate-900/40 backdrop-blur-xl border border-white/5 rounded-[28px] p-1 shadow-2xl transition-all active:scale-95">
             <Search className="ml-5 text-slate-600 w-5 h-5" />
-            <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t('search_placeholder')} className="w-full bg-transparent py-4 px-4 text-xs text-white outline-none placeholder:text-slate-600 font-bold uppercase tracking-widest" />
+            <div className="w-full py-4 px-4 text-xs text-slate-600 font-bold uppercase tracking-widest">{t('search_placeholder')}</div>
         </div>
       </div>
 
@@ -183,7 +178,7 @@ const Home = () => {
           <div className="flex flex-col items-center justify-center py-24 gap-4"><Loader2 className="animate-spin text-blue-500" size={32} /></div>
       ) : (
           <>
-            {!searchQuery && activeCategory === 'all' && announcements.length > 0 && (
+            {announcements.length > 0 && (
                 <div className="mb-12">
                     <h2 className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em] mb-6 flex items-center gap-3"><TrendingUp size={14} className="text-blue-500" /> {t('featured')}</h2>
                     <div className="flex gap-6 overflow-x-auto no-scrollbar -mx-4 px-4 pb-4 snap-x">
@@ -196,18 +191,18 @@ const Home = () => {
                 {categories.map((cat) => (
                     <button 
                         key={cat.id} 
-                        onClick={() => setActiveCategory(cat.id)}
-                        className={`flex flex-col items-center justify-center gap-3 py-6 rounded-[28px] border transition-all active:scale-95 shadow-xl ${activeCategory === cat.id ? 'bg-blue-600/10 border-blue-500/40 text-blue-400' : 'bg-slate-900/40 border-white/5 text-slate-600 hover:border-slate-800'}`}
+                        onClick={() => navigate(`/search?category=${cat.id}`)}
+                        className="flex flex-col items-center justify-center gap-3 py-6 rounded-[28px] border bg-slate-900/40 border-white/5 text-slate-600 hover:border-slate-800 transition-all active:scale-95 shadow-xl"
                     >
-                        <cat.icon size={22} className={activeCategory === cat.id ? 'text-blue-400' : 'text-slate-500'} />
+                        <cat.icon size={22} className="text-slate-500" />
                         <span className="text-[8px] font-black tracking-widest text-center uppercase">{t(cat.label)}</span>
                     </button>
                 ))}
             </div>
 
             <div className="space-y-1">
-                <h2 className="text-[10px] font-black text-slate-700 uppercase tracking-[0.4em] mb-8">{searchQuery ? t('search_results') : 'Mağaza Vitrini'}</h2>
-                {filteredBots.length > 0 ? filteredBots.map(bot => <BotCard key={bot.id} bot={bot} tonRate={tonRate} />) : <div className="py-24 text-center text-slate-700 font-bold uppercase text-xs tracking-widest">Sonuç yok.</div>}
+                <h2 className="text-[10px] font-black text-slate-700 uppercase tracking-[0.4em] mb-8">Mağaza Vitrini</h2>
+                {bots.length > 0 ? bots.map(bot => <BotCard key={bot.id} bot={bot} tonRate={tonRate} />) : <div className="py-24 text-center text-slate-700 font-bold uppercase text-xs tracking-widest">Sonuç yok.</div>}
             </div>
           </>
       )}

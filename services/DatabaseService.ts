@@ -50,6 +50,11 @@ export class DatabaseService {
       } catch (e) { console.error(e); }
   }
 
+  static async updateChannelAdStatus(channelId: string, status: boolean) {
+      const { error } = await supabase.from('channels').update({ is_ad_enabled: status }).eq('id', channelId);
+      if (error) throw error;
+  }
+
   static async syncChannelsFromBotActivity(userId: string): Promise<number> {
       try {
           const uIdStr = String(userId).trim();

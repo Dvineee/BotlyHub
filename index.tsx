@@ -1,4 +1,5 @@
-import React, { ErrorInfo, ReactNode, Component, PropsWithChildren } from 'react';
+
+import React, { ErrorInfo, ReactNode, Component } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import { TranslationProvider } from './TranslationContext';
@@ -17,17 +18,13 @@ interface ErrorBoundaryState {
   error: Error | null; 
 }
 
-// Fix: Using React.Component explicitly to ensure 'props' and 'state' are correctly inherited and recognized by the TypeScript compiler.
-class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  // Fix: Explicitly define state property to resolve "Property 'state' does not exist on type ErrorBoundary" errors and ensure correct inheritance.
+// Fix: Extending 'Component' from 'react' directly to ensure that 'this.props' and 'this.state' are correctly inherited.
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  // Fix: Initializing state directly in the class body as a property of type ErrorBoundaryState.
   public state: ErrorBoundaryState = {
     hasError: false,
     error: null
   };
-
-  constructor(props: ErrorBoundaryProps) {
-    super(props);
-  }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error };
@@ -38,7 +35,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   }
 
   render() {
-    // Fix: Accessing state through inherited Component properties.
+    // Fix: Checking the current error state.
     if (this.state.hasError) {
       return (
         <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center p-8 text-center">
@@ -56,7 +53,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
         </div>
       );
     }
-    // Fix: Inheriting from React.Component provides access to this.props, resolving the error where 'props' was not found on ErrorBoundary.
+    // Fix: Accessing 'props' inherited from the Component class.
     return this.props.children;
   }
 }
@@ -66,7 +63,7 @@ if (rootElement) {
   const manifestUrl = 'https://ton-connect.github.io/demo-dapp-with-react-ui/tonconnect-manifest.json';
   const root = createRoot(rootElement);
 
-  // Fix: Wrapping the application with ErrorBoundary and TranslationProvider ensuring children are correctly typed and provided.
+  // Fix: Rendering the app wrapped in the fixed ErrorBoundary and global providers.
   root.render(
     <React.StrictMode>
       <ErrorBoundary>

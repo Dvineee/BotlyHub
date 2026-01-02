@@ -45,7 +45,7 @@ const Payment = () => {
           const userData = user || { id: 'guest', first_name: 'User' };
           
           if (targetBot) {
-              await DatabaseService.addUserBot(userData, targetBot, true);
+              await DatabaseService.addUserBot(userData, targetBot, false);
           } else if (plan) {
               localStorage.setItem('userPlan', plan.id);
           }
@@ -65,8 +65,7 @@ const Payment = () => {
       }
   };
 
-  // Fix: Updated fallback to include 'stars: 0' to ensure type compatibility with the updated PriceService.convert return type.
-  const prices = item ? PriceService.convert(item.price, tonPrice) : { ton: 0, stars: 0 };
+  const prices = item ? PriceService.convert(item.price, tonPrice) : { ton: 0 };
 
   const payWithTON = async () => {
       if (!tonConnectUI.connected) {
@@ -131,7 +130,7 @@ const Payment = () => {
 
         <div className="space-y-5">
             <button 
-                onClick={payWithTON}
+                onClick={payWithTON} 
                 disabled={isLoading}
                 className="w-full bg-blue-600 hover:bg-blue-500 py-7 rounded-[32px] text-white font-black shadow-2xl shadow-blue-600/20 flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 uppercase tracking-[0.2em] text-xs border-b-4 border-blue-800"
             >

@@ -1,172 +1,154 @@
 
-import React, { useState, useEffect, useRef } from 'react';
-import { Search, ChevronLeft, X } from 'lucide-react';
-// Fixed: Use namespace import for react-router-dom to resolve "no exported member" errors
+import React, { useState, useEffect } from 'react';
+import { Search as SearchIcon, ChevronLeft, X, Zap, Loader2 } from 'lucide-react';
 import * as Router from 'react-router-dom';
-import { mockBots, categories } from '../data';
+import { Bot } from '../types';
+import { categories } from '../data';
 import { useTranslation } from '../TranslationContext';
+import { DatabaseService } from '../services/DatabaseService';
+import PriceService from '../services/PriceService';
 
 const { useNavigate, useSearchParams } = Router as any;
+
+const getLiveBotIcon = (bot: Bot) => {
+    if (bot.bot_link) {
+        const username = bot.bot_link.replace('@', '').replace('https://t.me/', '').split('/').pop()?.trim();
+        if (username) return `https://t.me/i/userpic/320/${username}.jpg`;
+    }
+    return bot.icon || `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=random&color=fff`;
+};
+
+const BotCard: React.FC<{ bot: Bot, tonRate: number }> = ({ bot, tonRate }) => {
+  const navigate = useNavigate();
+  const prices = PriceService.convert(bot.price, tonRate);
+  
+  return (
+    <div onClick={() => navigate(`/bot/${bot.id}`)} className="flex items-center p-5 cursor-pointer group hover:bg-slate-900/60 rounded-[32px] transition-all border border-transparent hover:border-slate-800/50 mb-3 active:bg-slate-900 shadow-xl shadow-black/5">
+        <div className="relative shrink-0">
+            <img 
+                src={getLiveBotIcon(bot)} 
+                alt={bot.name} 
+                className="w-20 h-20 rounded-[28px] object-cover bg-slate-900 shadow-2xl border border-slate-800 group-hover:scale-105 transition-transform" 
+                onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
+            />
+            {bot.price > 0 && (
+                <div className="absolute -top-1.5 -right-1.5 w-7 h-7 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg border-4 border-[#020617]">
+                    <Zap size={12} fill="currentColor" className="text-white" />
+                </div>
+            )}
+        </div>
+        <div className="flex-1 ml-5 min-w-0 mr-3">
+            <h3 className="font-black text-lg text-slate-100 truncate italic tracking-tighter uppercase mb-1.5">{bot.name}</h3>
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest truncate mb-2">{bot.description}</p>
+            <div className="flex items-center gap-3">
+                {bot.price === 0 ? (
+                    <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-500/10 px-2 py-1 rounded-md">Ücretsiz</span>
+                ) : (
+                    <div className="flex items-center gap-2">
+                        <Zap size={10} className="text-blue-500" />
+                        <span className="text-[9px] font-black text-blue-400 uppercase tracking-tighter">{prices.ton} TON</span>
+                    </div>
+                )}
+            </div>
+        </div>
+    </div>
+  );
+};
 
 const SearchPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const inputRef = useRef<HTMLInputElement>(null);
   const { t } = useTranslation();
+  const [query, setQuery] = useState(searchParams.get('q') || '');
+  const [activeCategory, setActiveCategory] = useState(searchParams.get('category') || 'all');
+  const [bots, setBots] = useState<Bot[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [tonRate, setTonRate] = useState(250);
 
-  // Initialize state from URL params
-  const initialQuery = searchParams.get('q') || '';
-  const initialCategory = searchParams.get('category') || 'all';
-
-  const [query, setQuery] = useState(initialQuery);
-  const [activeCategory, setActiveCategory] = useState(initialCategory);
-
-  // Sync state if URL changes (e.g. back button)
   useEffect(() => {
-      setQuery(searchParams.get('q') || '');
-      setActiveCategory(searchParams.get('category') || 'all');
-  }, [searchParams]);
+    const fetchData = async () => {
+        setIsLoading(true);
+        const [botData, pData] = await Promise.all([
+            DatabaseService.getBots(),
+            PriceService.getTonPrice()
+        ]);
+        setBots(botData);
+        setTonRate(pData.tonTry);
+        setIsLoading(false);
+    };
+    fetchData();
+  }, []);
 
-  const handleSearchChange = (val: string) => {
-    setQuery(val);
-  };
-
-  const handleCategorySelect = (catId: string) => {
-      setActiveCategory(catId);
-  };
-
-  // Filter bots based on name/desc AND category
-  const filteredBots = mockBots.filter(bot => {
-    const matchesText = bot.name.toLowerCase().includes(query.toLowerCase()) || 
-                        bot.description.toLowerCase().includes(query.toLowerCase());
-    
+  const filteredBots = bots.filter(bot => {
+    const matchesQuery = bot.name.toLowerCase().includes(query.toLowerCase()) || 
+                         bot.description.toLowerCase().includes(query.toLowerCase());
     const matchesCategory = activeCategory === 'all' || bot.category === activeCategory;
-
-    return matchesText && matchesCategory;
+    return matchesQuery && matchesCategory;
   });
 
-  // Get localized label
-  const currentCategoryRaw = categories.find(c => c.id === activeCategory)?.label || 'cat_all';
-  const currentCategoryLabel = t(currentCategoryRaw);
-
   return (
-    <div className="min-h-screen bg-slate-950 p-4 pt-8">
-      {/* Header with Search Input */}
-      <div className="flex items-center gap-3 mb-4">
-        <button onClick={() => navigate('/')} className="p-2 hover:bg-slate-900 rounded-full text-slate-400 hover:text-white transition-colors">
-          <ChevronLeft className="w-6 h-6" />
+    <div className="min-h-screen bg-[#020617] p-4 pt-10 pb-32 animate-in fade-in">
+      {/* Header & Search Box */}
+      <div className="flex items-center gap-4 mb-8">
+        <button onClick={() => navigate('/')} className="p-3 bg-slate-900/60 border border-slate-800 rounded-2xl text-slate-400 active:scale-90 transition-transform">
+          <ChevronLeft size={20} />
         </button>
-        
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-          <input 
-            ref={inputRef}
-            type="text" 
-            value={query}
-            onChange={(e) => handleSearchChange(e.target.value)}
-            placeholder={t('search_placeholder')}
-            className="w-full bg-slate-900 border border-slate-800 rounded-xl py-3 pl-10 pr-10 text-sm focus:outline-none focus:border-blue-500 transition-colors text-white"
-          />
-          {query && (
-            <button 
-                onClick={() => setQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white"
-            >
-                <X size={16} />
-            </button>
-          )}
+          <div className="relative flex items-center bg-slate-900/40 backdrop-blur-xl border border-white/5 rounded-[28px] p-1 shadow-2xl ring-2 ring-transparent focus-within:ring-blue-500/30 transition-all">
+            <SearchIcon className="ml-5 text-slate-600 w-5 h-5" />
+            <input 
+              type="text" 
+              value={query} 
+              autoFocus
+              onChange={(e) => setQuery(e.target.value)} 
+              placeholder={t('search_placeholder')} 
+              className="w-full bg-transparent py-4 px-4 text-xs text-white outline-none placeholder:text-slate-600 font-bold uppercase tracking-widest" 
+            />
+            {query && (
+              <button onClick={() => setQuery('')} className="mr-5 text-slate-600 hover:text-white">
+                <X size={18} />
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Categories Slider */}
-      <div className="mb-6">
-           <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
-                <button
-                    onClick={() => handleCategorySelect('all')}
-                    className={`whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold border transition-colors ${
-                        activeCategory === 'all'
-                        ? 'bg-blue-600 border-blue-600 text-white'
-                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
-                    }`}
-                >
-                    {t('cat_all')}
-                </button>
-               {categories.filter(c => c.id !== 'all').map((cat) => (
-                   <button
-                       key={cat.id}
-                       onClick={() => handleCategorySelect(cat.id)}
-                       className={`whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold border transition-colors flex items-center gap-2 ${
-                           activeCategory === cat.id
-                           ? 'bg-blue-600 border-blue-600 text-white'
-                           : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
-                       }`}
-                   >
-                       <cat.icon size={14} />
-                       {t(cat.label)}
-                   </button>
-               ))}
-           </div>
+      {/* Categories Grid (Directly below search box) */}
+      <div className="mb-10">
+        <p className="text-[10px] font-black text-slate-700 uppercase tracking-[0.4em] mb-6 px-2">Kategoriler</p>
+        <div className="grid grid-cols-4 gap-3">
+          {categories.map((cat) => (
+            <button 
+              key={cat.id} 
+              onClick={() => setActiveCategory(cat.id)}
+              className={`flex flex-col items-center justify-center gap-3 py-6 rounded-[28px] border transition-all active:scale-95 shadow-xl ${
+                activeCategory === cat.id 
+                ? 'bg-blue-600/10 border-blue-500/40 text-blue-400 ring-1 ring-blue-500/20' 
+                : 'bg-slate-900/40 border-white/5 text-slate-600'
+              }`}
+            >
+              <cat.icon size={22} className={activeCategory === cat.id ? 'text-blue-400' : 'text-slate-500'} />
+              <span className="text-[8px] font-black tracking-widest text-center uppercase">{t(cat.label)}</span>
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Results Count & Active Filter Label */}
-      <div className="mb-4 px-1 flex justify-between items-center">
-          <h2 className="text-sm font-medium text-slate-400">
-              {filteredBots.length} {t('results_found')}
-          </h2>
-          {activeCategory !== 'all' && (
-              <span className="text-xs font-bold text-blue-400 bg-blue-400/10 px-2 py-1 rounded">
-                  {currentCategoryLabel}
-              </span>
-          )}
-      </div>
+      {/* Results */}
+      <div className="space-y-1">
+        <div className="flex justify-between items-center mb-6 px-2">
+            <h2 className="text-[10px] font-black text-slate-700 uppercase tracking-[0.4em]">Sonuçlar ({filteredBots.length})</h2>
+        </div>
 
-      {/* Bot List */}
-      <div className="flex flex-col gap-2">
-        {filteredBots.length > 0 ? (
-            filteredBots.map((bot) => (
-                <div 
-                    key={bot.id}
-                    onClick={() => navigate(`/bot/${bot.id}`)}
-                    className="flex items-center py-3 px-2 cursor-pointer group relative hover:bg-slate-900/50 rounded-xl transition-colors"
-                >
-                    {/* Left: Icon */}
-                    <div className="relative flex-shrink-0">
-                        <img src={bot.icon} alt={bot.name} className="w-20 h-20 rounded-xl object-cover bg-slate-900" />
-                    </div>
-
-                    {/* Middle: Info */}
-                    <div className="flex-1 ml-4 min-w-0 mr-2">
-                        <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-bold text-lg truncate text-slate-200">
-                                {bot.name}
-                            </h3>
-                            {bot.isPremium && (
-                                <span className="bg-indigo-500/10 text-indigo-400 text-[10px] font-bold px-1.5 py-0.5 rounded border border-indigo-500/20">
-                                    {t('premium')}
-                                </span>
-                            )}
-                        </div>
-                        <p className="text-sm text-slate-500 truncate">{bot.description}</p>
-                    </div>
-
-                    {/* Right: Action */}
-                    <button className="bg-slate-900 border border-slate-800 text-slate-200 text-xs font-bold py-2 px-4 rounded-full min-w-[60px] transition-colors hover:border-slate-600 hover:text-white">
-                        {t('open')}
-                    </button>
-                </div>
-            ))
+        {isLoading ? (
+            <div className="flex justify-center py-24"><Loader2 className="animate-spin text-blue-500" /></div>
+        ) : filteredBots.length > 0 ? (
+            <div className="animate-in slide-in-from-bottom-4">
+                {filteredBots.map(bot => <BotCard key={bot.id} bot={bot} tonRate={tonRate} />)}
+            </div>
         ) : (
-            <div className="flex flex-col items-center justify-center py-12 text-slate-500">
-                <Search size={48} className="mb-4 opacity-20" />
-                <p>{t('no_results')}</p>
-                {activeCategory !== 'all' && (
-                    <button 
-                        onClick={() => setActiveCategory('all')}
-                        className="mt-4 text-blue-500 hover:text-blue-400 text-sm font-bold"
-                    >
-                        {t('search_all_cats')}
-                    </button>
-                )}
+            <div className="py-24 text-center">
+                <p className="text-slate-500 font-bold uppercase text-xs tracking-widest">Kriterlere uygun bot bulunamadı.</p>
             </div>
         )}
       </div>
