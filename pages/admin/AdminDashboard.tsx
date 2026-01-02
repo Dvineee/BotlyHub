@@ -11,7 +11,7 @@ import {
   Mail, BellRing, Sparkles, Eye, Zap, RefreshCcw, Star, Calendar, MessageSquare, ExternalLink, Layers, PlusCircle, Link2,
   Fingerprint, Info, TrendingUp, BarChart3, Radio,
   Layout, MousePointer2, Target, Bell, CheckCircle2, ChevronRight,
-  DollarSign, Edit3, Save, AlertTriangle, Image as ImageIconLucide
+  DollarSign, Edit3, Save, AlertTriangle, Image as ImageIconLucide, PlusSquare
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { DatabaseService, supabase } from '../../services/DatabaseService';
@@ -20,7 +20,7 @@ import { User, Bot as BotType, Announcement, Notification, Channel, ActivityLog,
 
 const { useNavigate, Routes, Route, Link, useLocation } = Router as any;
 
-// --- MOCK DATA FOR CHARTS (Real data would be aggregated from DB) ---
+// --- MOCK DATA FOR CHARTS ---
 const chartData = [
   { name: 'Pzt', users: 400, sales: 240 },
   { name: 'Sal', users: 300, sales: 139 },
@@ -315,6 +315,7 @@ const BotManagement = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingBot, setEditingBot] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [newScreenshotUrl, setNewScreenshotUrl] = useState('');
 
     useEffect(() => { load(); }, []);
     const load = async () => {
@@ -330,12 +331,25 @@ const BotManagement = () => {
         load();
     };
 
+    const addScreenshot = () => {
+        if (!newScreenshotUrl) return;
+        const currentScreens = editingBot.screenshots || [];
+        setEditingBot({ ...editingBot, screenshots: [...currentScreens, newScreenshotUrl] });
+        setNewScreenshotUrl('');
+    };
+
+    const removeScreenshot = (index: number) => {
+        const currentScreens = [...(editingBot.screenshots || [])];
+        currentScreens.splice(index, 1);
+        setEditingBot({ ...editingBot, screenshots: currentScreens });
+    };
+
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-10">
             <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-black text-white uppercase italic tracking-tighter">Bot <span className="text-blue-500">Envanteri</span></h2>
                 <button 
-                    onClick={() => { setEditingBot({ id: '', name: '', description: '', price: 0, category: 'productivity', bot_link: '' }); setIsModalOpen(true); }}
+                    onClick={() => { setEditingBot({ id: '', name: '', description: '', price: 0, category: 'productivity', bot_link: '', screenshots: [] }); setIsModalOpen(true); }}
                     className="px-6 py-4 bg-blue-600 hover:bg-blue-500 rounded-2xl text-[10px] font-black text-white uppercase tracking-widest shadow-xl shadow-blue-600/20 active:scale-95 transition-all"
                 >
                     <Plus size={18} className="inline mr-2" /> YENİ BOT EKLE
@@ -366,7 +380,7 @@ const BotManagement = () => {
                             </div>
                         </div>
                         <div className="flex gap-3">
-                            <button onClick={() => { setEditingBot({...bot}); setIsModalOpen(true); }} className="flex-1 py-3.5 bg-slate-950 hover:bg-blue-600 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all">DÜZENLE</button>
+                            <button onClick={() => { setEditingBot({...bot, screenshots: bot.screenshots || []}); setIsModalOpen(true); }} className="flex-1 py-3.5 bg-slate-950 hover:bg-blue-600 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all">DÜZENLE</button>
                             <button onClick={async () => { if(confirm("Bot silinecek?")) { await DatabaseService.deleteBot(bot.id); load(); } }} className="p-3.5 bg-slate-950 hover:bg-red-600 text-slate-700 hover:text-white rounded-xl transition-all"><Trash2 size={18}/></button>
                         </div>
                     </div>
@@ -375,28 +389,74 @@ const BotManagement = () => {
 
             {isModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/95 backdrop-blur-xl">
-                    <div className="bg-[#020617] w-full max-w-2xl rounded-[48px] border border-white/10 p-10 shadow-2xl relative overflow-y-auto max-h-[90vh] no-scrollbar">
+                    <div className="bg-[#020617] w-full max-w-4xl rounded-[48px] border border-white/10 p-10 shadow-2xl relative overflow-y-auto max-h-[90vh] no-scrollbar">
                         <button onClick={() => setIsModalOpen(false)} className="absolute top-8 right-8 p-3 bg-slate-900 border border-white/5 rounded-xl text-slate-500 hover:text-white transition-all"><X size={20}/></button>
                         <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter mb-10">Bot <span className="text-blue-500">Yapılandırması</span></h3>
                         
-                        <form onSubmit={handleSave} className="space-y-6">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                <AdminInput label="BOT ID" value={editingBot.id} onChange={v => setEditingBot({...editingBot, id: v})} />
-                                <AdminInput label="BOT İSMİ" value={editingBot.name} onChange={v => setEditingBot({...editingBot, name: v})} />
-                                <AdminInput label="TELEGRAM LİNK" value={editingBot.bot_link} onChange={v => setEditingBot({...editingBot, bot_link: v})} />
-                                <AdminInput label="FİYAT (TL)" type="number" value={editingBot.price} onChange={v => setEditingBot({...editingBot, price: Number(v)})} />
+                        <form onSubmit={handleSave} className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                            <div className="space-y-6">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                    <AdminInput label="BOT ID" value={editingBot.id} onChange={v => setEditingBot({...editingBot, id: v})} />
+                                    <AdminInput label="BOT İSMİ" value={editingBot.name} onChange={v => setEditingBot({...editingBot, name: v})} />
+                                    <AdminInput label="TELEGRAM LİNK" value={editingBot.bot_link} onChange={v => setEditingBot({...editingBot, bot_link: v})} />
+                                    <AdminInput label="FİYAT (TL)" type="number" value={editingBot.price} onChange={v => setEditingBot({...editingBot, price: Number(v)})} />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[9px] font-black text-slate-600 uppercase tracking-widest ml-4">Bot Açıklaması</label>
+                                    <textarea 
+                                        value={editingBot.description} 
+                                        onChange={e => setEditingBot({...editingBot, description: e.target.value})} 
+                                        className="w-full bg-slate-950 border border-white/5 rounded-3xl p-6 text-[11px] font-medium text-slate-400 h-32 resize-none outline-none focus:border-blue-600/50" 
+                                    />
+                                </div>
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-[9px] font-black text-slate-600 uppercase tracking-widest ml-4">Bot Açıklaması</label>
-                                <textarea 
-                                    value={editingBot.description} 
-                                    onChange={e => setEditingBot({...editingBot, description: e.target.value})} 
-                                    className="w-full bg-slate-950 border border-white/5 rounded-3xl p-6 text-[11px] font-medium text-slate-400 h-32 resize-none outline-none focus:border-blue-600/50" 
-                                />
+
+                            <div className="space-y-6">
+                                <div className="space-y-4">
+                                    <label className="text-[9px] font-black text-slate-600 uppercase tracking-widest ml-4">Ekran Görüntüleri (Screenshot)</label>
+                                    <div className="flex gap-3">
+                                        <input 
+                                            type="text" 
+                                            value={newScreenshotUrl} 
+                                            onChange={e => setNewScreenshotUrl(e.target.value)}
+                                            placeholder="Görsel URL (https://...)"
+                                            className="flex-1 bg-slate-950 border border-white/5 rounded-2xl p-4 text-[11px] font-black text-white outline-none focus:border-blue-600/50" 
+                                        />
+                                        <button 
+                                            type="button" 
+                                            onClick={addScreenshot}
+                                            className="p-4 bg-blue-600 hover:bg-blue-500 rounded-2xl text-white transition-all active:scale-95"
+                                        >
+                                            <PlusSquare size={20} />
+                                        </button>
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-3 gap-3 max-h-48 overflow-y-auto pr-2 no-scrollbar">
+                                        {(editingBot.screenshots || []).map((url: string, index: number) => (
+                                            <div key={index} className="relative group aspect-video rounded-xl overflow-hidden border border-white/5 bg-slate-950">
+                                                <img src={url} className="w-full h-full object-cover" />
+                                                <button 
+                                                    type="button"
+                                                    onClick={() => removeScreenshot(index)}
+                                                    className="absolute inset-0 bg-red-600/80 text-white opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </div>
+                                        ))}
+                                        {(!editingBot.screenshots || editingBot.screenshots.length === 0) && (
+                                            <div className="col-span-3 py-10 text-center border-2 border-dashed border-white/5 rounded-3xl">
+                                                <ImageIconLucide size={24} className="mx-auto text-slate-800 mb-2" />
+                                                <p className="text-[8px] font-black text-slate-800 uppercase tracking-widest">Görsel Eklenmedi</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <button type="submit" className="w-full py-5 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-3xl text-[11px] uppercase tracking-widest shadow-xl transition-all border-b-4 border-blue-800 active:translate-y-1 active:border-b-0 mt-auto">
+                                    BOTU SİSTEME KAYDET
+                                </button>
                             </div>
-                            <button type="submit" className="w-full py-5 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-3xl text-[11px] uppercase tracking-widest shadow-xl transition-all border-b-4 border-blue-800 active:translate-y-1 active:border-b-0">
-                                DEĞİŞİKLİKLERİ KAYDET
-                            </button>
                         </form>
                     </div>
                 </div>
@@ -629,7 +689,7 @@ const SettingsManagement = () => {
     );
 };
 
-// --- ANNOUNCEMENT CENTER (Simplified for logic) ---
+// --- ANNOUNCEMENT CENTER ---
 const AnnouncementCenter = () => {
     const [announcements, setAnnouncements] = useState<Announcement[]>([]);
     useEffect(() => { DatabaseService.getAnnouncements().then(setAnnouncements); }, []);
