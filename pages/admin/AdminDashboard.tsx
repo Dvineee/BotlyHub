@@ -20,6 +20,18 @@ import { User, Bot as BotType, Announcement, Notification, Channel, ActivityLog,
 
 const { useNavigate, Routes, Route, Link, useLocation } = Router as any;
 
+/**
+ * Telegram üzerinden güncel profil resmini çeken yardımcı fonksiyon
+ */
+const getLiveBotIcon = (bot: Partial<BotType>) => {
+    if (bot.icon && bot.icon.startsWith('http')) return bot.icon;
+    if (bot.bot_link) {
+        const username = bot.bot_link.replace('@', '').replace('https://t.me/', '').split('/').pop()?.trim();
+        if (username) return `https://t.me/i/userpic/320/${username}.jpg`;
+    }
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name || 'Bot')}&background=1e293b&color=fff&bold=true`;
+};
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -147,7 +159,6 @@ const HomeView = () => {
     );
 };
 
-// --- ANNOUNCEMENT CENTER MODULE ---
 const AnnouncementCenter = () => {
     const [announcements, setAnnouncements] = useState<Announcement[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -291,7 +302,6 @@ const AnnouncementCenter = () => {
     );
 };
 
-// --- BOT MANAGEMENT MODULE (REWRITTEN) ---
 const BotManagement = () => {
     const [bots, setBots] = useState<any[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -354,8 +364,9 @@ const BotManagement = () => {
                         <div className="flex items-start justify-between relative z-10">
                             <div className="relative">
                                 <img 
-                                    src={b.icon || `https://ui-avatars.com/api/?name=${encodeURIComponent(b.name)}&background=1e293b&color=fff&bold=true`} 
+                                    src={getLiveBotIcon(b)} 
                                     className="w-20 h-20 rounded-[32px] border-2 border-white/10 shadow-2xl object-cover bg-slate-950 group-hover:scale-105 transition-transform" 
+                                    onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(b.name)}&background=1e293b&color=fff&bold=true`; }}
                                 />
                                 {b.is_premium && (
                                     <div className="absolute -top-2 -left-2 bg-yellow-500 p-1.5 rounded-xl border-4 border-[#020617] shadow-lg">
@@ -455,11 +466,13 @@ const BotManagement = () => {
                                 <div className="space-y-8">
                                     <div className="flex items-center gap-6 p-6 bg-slate-900/30 rounded-[32px] border border-white/5 shadow-inner">
                                         <img 
-                                            src={editingBot.icon || `https://ui-avatars.com/api/?name=P&background=1e293b&color=fff`} 
+                                            src={getLiveBotIcon(editingBot)} 
                                             className="w-20 h-20 rounded-[28px] border-2 border-white/10 shadow-xl object-cover bg-slate-950" 
+                                            onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(editingBot.name || 'P')}&background=1e293b&color=fff`; }}
                                         />
                                         <div className="flex-1">
-                                            <AdminInput label="İKON URL" value={editingBot.icon} onChange={(v: string) => setEditingBot({...editingBot, icon: v})} />
+                                            <AdminInput label="ÖZEL İKON URL (OPSİYONEL)" value={editingBot.icon} onChange={(v: string) => setEditingBot({...editingBot, icon: v})} />
+                                            <p className="text-[8px] font-bold text-slate-600 uppercase mt-2">Boş bırakılırsa Telegram'dan çekilir.</p>
                                         </div>
                                     </div>
 
@@ -646,7 +659,6 @@ const AdminInput = ({ label, value, onChange, type = "text" }: any) => (
     </div>
 );
 
-// --- RESTORED MODULES ---
 const UserManagement = () => {
     const [users, setUsers] = useState<User[]>([]);
     const [isLoading, setIsLoading] = useState(true);
