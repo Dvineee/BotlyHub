@@ -30,6 +30,24 @@ export class DatabaseService {
       return data;
   }
 
+  static async sendUserNotification(userId: string, title: string, message: string, type: Notification['type'] = 'system') {
+      const { data, error } = await supabase.from('notifications').insert([
+        {
+          id: Math.floor(Math.random() * 999999999).toString(),
+          title: title.trim(),
+          message: message.trim(),
+          type: type,
+          date: new Date().toISOString(),
+          isRead: false,
+          user_id: userId,
+          target_type: 'user'
+        }
+      ]).select();
+      
+      if (error) throw error;
+      return data;
+  }
+
   static async getNotifications(userId?: string): Promise<Notification[]> {
     if (!userId) return [];
     const { data, error } = await supabase

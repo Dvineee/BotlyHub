@@ -170,6 +170,12 @@ const UserManagement = () => {
     const [userChannels, setUserChannels] = useState<Channel[]>([]);
     const [userLogs, setUserLogs] = useState<ActivityLog[]>([]);
     const [isUpdating, setIsUpdating] = useState(false);
+    
+    // Private Notification States
+    const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
+    const [noteTitle, setNoteTitle] = useState('');
+    const [noteMessage, setNoteMessage] = useState('');
+    const [isSendingNote, setIsSendingNote] = useState(false);
 
     useEffect(() => { load(); }, []);
 
@@ -195,6 +201,22 @@ const UserManagement = () => {
         setUserBots(bots);
         setUserLogs(logs.data || []);
         setUserChannels(channels);
+    };
+
+    const handleSendPrivateNote = async () => {
+        if (!selectedUser || !noteTitle || !noteMessage) return;
+        setIsSendingNote(true);
+        try {
+            await DatabaseService.sendUserNotification(selectedUser.id, noteTitle, noteMessage, 'system');
+            alert(`Bildirim @${selectedUser.username} kullanıcısına iletildi.`);
+            setNoteTitle('');
+            setNoteMessage('');
+            setIsNoteModalOpen(false);
+        } catch (e) {
+            alert("Bildirim gönderilemedi!");
+        } finally {
+            setIsSendingNote(false);
+        }
     };
 
     const updateUserStatus = async (status: 'Active' | 'Passive') => {
@@ -346,7 +368,10 @@ const UserManagement = () => {
                                 </div>
                             </div>
 
-                            <button className="w-full bg-blue-600 hover:bg-blue-500 py-5 rounded-[24px] text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center justify-center gap-3 transition-all active:scale-95">
+                            <button 
+                                onClick={() => setIsNoteModalOpen(true)}
+                                className="w-full bg-blue-600 hover:bg-blue-500 py-5 rounded-[24px] text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center justify-center gap-3 transition-all active:scale-95"
+                            >
                                 <Send size={18} /> ÖZEL BİLDİRİM GÖNDER
                             </button>
                         </div>
@@ -426,7 +451,7 @@ const UserManagement = () => {
                                 </div>
                             </div>
 
-                            {/* Owned Channels Grid (AS REQUESTED) */}
+                            {/* Owned Channels Grid */}
                             <div className="space-y-6">
                                 <h4 className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em] px-2 italic">ÜYENİN SAHİP OLDUĞU KANALLAR</h4>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -497,6 +522,45 @@ const UserManagement = () => {
                                 </div>
                                 <button onClick={() => setSelectedUser(null)} className="px-12 py-5 rounded-[24px] bg-slate-900 text-slate-500 font-black text-[10px] uppercase tracking-[0.2em] hover:text-white hover:bg-slate-800 transition-all active:scale-95 border border-white/5">KOMUTA PANELİNİ KAPAT</button>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Targeted Private Notification Modal */}
+            {isNoteModalOpen && selectedUser && (
+                <div className="fixed inset-0 z-[130] bg-black/98 flex items-center justify-center p-6 backdrop-blur-xl animate-in zoom-in-95">
+                    <div className="bg-[#020617] p-12 rounded-[56px] w-full max-w-xl border border-white/10 shadow-2xl relative">
+                        <button onClick={() => setIsNoteModalOpen(false)} className="absolute top-10 right-10 p-4 bg-white/5 rounded-2xl hover:bg-red-600 transition-all"><X size={20}/></button>
+                        
+                        <div className="text-center mb-10">
+                            <div className="w-16 h-16 bg-blue-600/10 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-blue-500/20">
+                                <Bell size={32} className="text-blue-500" />
+                            </div>
+                            <h3 className="text-2xl font-black text-white italic uppercase tracking-tighter mb-2">Özel <span className="text-blue-500">Bildirim</span></h3>
+                            <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">Alıcı: @{selectedUser.username}</p>
+                        </div>
+
+                        <div className="space-y-8">
+                            <AdminInput label="BİLDİRİM BAŞLIĞI" value={noteTitle} onChange={setNoteTitle} />
+                            <div className="space-y-2">
+                                <label className="text-[9px] font-black text-slate-600 uppercase tracking-widest ml-4">MESAJ İÇERİĞİ</label>
+                                <textarea 
+                                    value={noteMessage} 
+                                    onChange={e => setNoteMessage(e.target.value)}
+                                    className="w-full bg-slate-950 border border-white/5 rounded-3xl p-6 text-[11px] font-medium text-slate-400 h-40 outline-none focus:border-blue-500/40 resize-none shadow-inner"
+                                    placeholder="Kullanıcıya özel mesajınızı yazın..."
+                                />
+                            </div>
+                            
+                            <button 
+                                onClick={handleSendPrivateNote}
+                                disabled={isSendingNote || !noteTitle || !noteMessage}
+                                className="w-full bg-blue-600 hover:bg-blue-500 py-6 rounded-[32px] text-white font-black text-[10px] uppercase tracking-[0.3em] shadow-2xl shadow-blue-600/30 disabled:opacity-50 transition-all flex items-center justify-center gap-3"
+                            >
+                                {isSendingNote ? <Loader2 className="animate-spin" /> : <Send size={18} />}
+                                BİLDİRİMİ GÖNDER
+                            </button>
                         </div>
                     </div>
                 </div>
