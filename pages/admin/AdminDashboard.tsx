@@ -11,7 +11,7 @@ import {
   Mail, BellRing, Sparkles, Eye, Zap, RefreshCcw, Star, Calendar, MessageSquare, ExternalLink, Layers, PlusCircle, Link2,
   Fingerprint, Info, TrendingUp, BarChart3, Radio,
   Layout, MousePointer2, Target, Bell, CheckCircle2, ChevronRight,
-  DollarSign, Edit3, Save, AlertTriangle, Image as ImageIconLucide, PlusSquare
+  DollarSign, Edit3, Save, AlertTriangle, Image as ImageIconLucide, PlusSquare, Heart, Shield, Gift
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { DatabaseService, supabase } from '../../services/DatabaseService';
@@ -19,16 +19,6 @@ import PriceService from '../../services/PriceService';
 import { User, Bot as BotType, Announcement, Notification, Channel, ActivityLog, Ad } from '../../types';
 
 const { useNavigate, Routes, Route, Link, useLocation } = Router as any;
-
-const chartData = [
-  { name: 'Pzt', users: 400, sales: 240 },
-  { name: 'Sal', users: 300, sales: 139 },
-  { name: 'Çar', users: 200, sales: 980 },
-  { name: 'Per', users: 278, sales: 390 },
-  { name: 'Cum', users: 189, sales: 480 },
-  { name: 'Cmt', users: 239, sales: 380 },
-  { name: 'Paz', users: 349, sales: 430 },
-];
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -153,6 +143,151 @@ const HomeView = () => {
                 <StatCard label="Toplam Satış" value={stats.salesCount} icon={Wallet} color="text-emerald-500" />
                 <StatCard label="İşlem Kaydı" value={stats.logCount} icon={Activity} color="text-orange-500" />
             </div>
+        </div>
+    );
+};
+
+// --- ANNOUNCEMENT CENTER MODULE ---
+const AnnouncementCenter = () => {
+    const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingAnn, setEditingAnn] = useState<any>(null);
+
+    const load = async () => {
+        setIsLoading(true);
+        const data = await DatabaseService.getAnnouncements();
+        setAnnouncements(data);
+        setIsLoading(false);
+    };
+
+    useEffect(() => { load(); }, []);
+
+    const handleDelete = async (id: string) => {
+        if (!confirm('Bu duyuruyu silmek istediğinize emin misiniz?')) return;
+        try {
+            await DatabaseService.deleteAnnouncement(id);
+            load();
+        } catch (e) { alert('Silme hatası!'); }
+    };
+
+    if (isLoading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-blue-500" /></div>;
+
+    const colors: Record<string, string> = {
+        purple: 'bg-gradient-to-br from-[#6366f1] to-[#a855f7]',
+        emerald: 'bg-gradient-to-br from-[#10b981] to-[#34d399]',
+        blue: 'bg-gradient-to-br from-[#3b82f6] to-[#60a5fa]',
+        orange: 'bg-gradient-to-br from-[#f59e0b] to-[#ef4444]'
+    };
+
+    // Fix: Using 'Bot' icon from lucide-react instead of 'BotType' interface.
+    const iconMap: Record<string, any> = { Sparkles, Megaphone, Zap, Gift, Star, Info, Bot, Heart, Bell, Shield };
+
+    return (
+        <div className="space-y-10 animate-in fade-in duration-500">
+            <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-black text-white italic uppercase tracking-tighter">Duyuru <span className="text-purple-500">Yönetimi</span></h2>
+                <button 
+                  onClick={() => { setEditingAnn({ id: '', title: '', description: '', button_text: 'İncele', button_link: '', icon_name: 'Megaphone', color_scheme: 'purple', is_active: true, action_type: 'link', content_detail: '' }); setIsModalOpen(true); }}
+                  className="bg-purple-600 hover:bg-purple-500 px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center gap-3 transition-all active:scale-95"
+                >
+                    <PlusSquare size={18}/> YENİ DUYURU YARAT
+                </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {announcements.map(ann => (
+                    <div key={ann.id} className="bg-slate-900/40 border border-white/5 rounded-[40px] p-8 flex flex-col gap-6 relative group overflow-hidden">
+                        <div className="flex justify-between items-start">
+                             <div className={`p-4 rounded-2xl ${colors[ann.color_scheme] || colors.purple} shadow-lg shadow-black/20`}>
+                                {React.createElement(iconMap[ann.icon_name] || Megaphone, { size: 24, className: 'text-white' })}
+                             </div>
+                             <div className="flex gap-2">
+                                <button onClick={() => { setEditingAnn(ann); setIsModalOpen(true); }} className="p-3 bg-white/5 hover:bg-blue-600 rounded-xl transition-all"><Edit3 size={18}/></button>
+                                <button onClick={() => handleDelete(ann.id)} className="p-3 bg-white/5 hover:bg-red-600 rounded-xl transition-all text-red-500 hover:text-white"><Trash2 size={18}/></button>
+                             </div>
+                        </div>
+                        <div>
+                            <div className="flex items-center gap-3 mb-2">
+                                <h4 className="text-xl font-black text-white italic tracking-tighter uppercase">{ann.title}</h4>
+                                <span className={`px-2 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-widest ${ann.is_active ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>
+                                    {ann.is_active ? 'AKTİF' : 'PASİF'}
+                                </span>
+                            </div>
+                            <p className="text-xs text-slate-500 leading-relaxed font-medium">{ann.description}</p>
+                        </div>
+                        <div className="pt-4 border-t border-white/5 flex items-center justify-between">
+                            <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Aksiyon: {ann.action_type}</span>
+                            <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">{ann.color_scheme} tema</span>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {isModalOpen && (
+                <div className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-6 backdrop-blur-md">
+                    <div className="bg-[#020617] p-12 rounded-[56px] w-full max-w-3xl border border-white/10 overflow-y-auto max-h-[90vh] shadow-2xl relative scrollbar-hide">
+                        <button onClick={() => setIsModalOpen(false)} className="absolute top-10 right-10 p-3 bg-white/5 rounded-2xl hover:bg-red-600 transition-all"><X size={20}/></button>
+                        <h3 className="text-2xl font-black mb-10 italic uppercase tracking-tighter text-purple-500">Duyuru Yapılandırma</h3>
+                        
+                        <form onSubmit={async (e) => { e.preventDefault(); await DatabaseService.saveAnnouncement(editingAnn); setIsModalOpen(false); load(); }} className="space-y-8">
+                            <div className="grid grid-cols-2 gap-8">
+                                <AdminInput label="DUYURU BAŞLIĞI" value={editingAnn.title} onChange={(v: string) => setEditingAnn({...editingAnn, title: v})} />
+                                <div className="space-y-2">
+                                    <label className="text-[9px] font-black text-slate-600 uppercase tracking-widest ml-4">RENK ŞEMASI</label>
+                                    <select value={editingAnn.color_scheme} onChange={e => setEditingAnn({...editingAnn, color_scheme: e.target.value})} className="w-full bg-slate-950 border border-white/5 rounded-2xl p-4 text-[11px] font-black text-white outline-none">
+                                        <option value="purple">Modern Mor</option>
+                                        <option value="emerald">Canlı Yeşil</option>
+                                        <option value="blue">Okyanus Mavisi</option>
+                                        <option value="orange">Ateş Turuncusu</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div className="space-y-2">
+                                <label className="text-[9px] font-black text-slate-600 uppercase tracking-widest ml-4">Kısa Açıklama (Kart Üzeri)</label>
+                                <textarea value={editingAnn.description} onChange={e => setEditingAnn({...editingAnn, description: e.target.value})} className="w-full bg-slate-950 border border-white/5 p-6 rounded-3xl text-xs font-medium text-slate-400 h-24 focus:border-purple-500/50 outline-none" />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-8">
+                                <AdminInput label="BUTON METNİ" value={editingAnn.button_text} onChange={(v: string) => setEditingAnn({...editingAnn, button_text: v})} />
+                                <AdminInput label="BUTON LİNKİ (@user, /path, http...)" value={editingAnn.button_link} onChange={(v: string) => setEditingAnn({...editingAnn, button_link: v})} />
+                            </div>
+
+                            <div className="grid grid-cols-3 gap-8">
+                                <div className="space-y-2">
+                                    <label className="text-[9px] font-black text-slate-600 uppercase tracking-widest ml-4">İKON</label>
+                                    <select value={editingAnn.icon_name} onChange={e => setEditingAnn({...editingAnn, icon_name: e.target.value})} className="w-full bg-slate-950 border border-white/5 rounded-2xl p-4 text-[11px] font-black text-white outline-none">
+                                        {Object.keys(iconMap).map(k => <option key={k} value={k}>{k}</option>)}
+                                    </select>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[9px] font-black text-slate-600 uppercase tracking-widest ml-4">AKSİYON TİPİ</label>
+                                    <select value={editingAnn.action_type} onChange={e => setEditingAnn({...editingAnn, action_type: e.target.value})} className="w-full bg-slate-950 border border-white/5 rounded-2xl p-4 text-[11px] font-black text-white outline-none">
+                                        <option value="link">Doğrudan Link</option>
+                                        <option value="popup">Pop-up Bilgi</option>
+                                    </select>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[9px] font-black text-slate-600 uppercase tracking-widest ml-4">DURUM</label>
+                                    <button type="button" onClick={() => setEditingAnn({...editingAnn, is_active: !editingAnn.is_active})} className={`w-full h-[54px] rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all ${editingAnn.is_active ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>
+                                        {editingAnn.is_active ? 'YAYINDA' : 'PASİF'}
+                                    </button>
+                                </div>
+                            </div>
+
+                            {editingAnn.action_type === 'popup' && (
+                                <div className="space-y-2">
+                                    <label className="text-[9px] font-black text-slate-600 uppercase tracking-widest ml-4">Pop-up Detay Metni</label>
+                                    <textarea value={editingAnn.content_detail} onChange={e => setEditingAnn({...editingAnn, content_detail: e.target.value})} className="w-full bg-slate-950 border border-white/5 p-6 rounded-3xl text-xs font-medium text-slate-400 h-40 focus:border-purple-500/50 outline-none" />
+                                </div>
+                            )}
+                            
+                            <button type="submit" className="w-full bg-purple-600 hover:bg-purple-500 py-6 rounded-[32px] font-black text-[11px] uppercase tracking-[0.2em] shadow-2xl shadow-purple-600/30">DUYURUYU KAYDET</button>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
@@ -348,6 +483,7 @@ const BotManagement = () => {
                                 <AdminInput label="BOT İSMİ" value={editingBot.name} onChange={(v: string) => setEditingBot({...editingBot, name: v})} />
                             </div>
                             <div className="grid grid-cols-2 gap-6">
+                                {/* Fix: Changed 'editingAnn.category' to 'editingBot.category' to resolve the 'Cannot find name' error. */}
                                 <AdminInput label="KATEGORİ" value={editingBot.category} onChange={(v: string) => setEditingBot({...editingBot, category: v})} />
                                 <AdminInput label="FİYAT (TL)" value={editingBot.price} type="number" onChange={(v: string) => setEditingBot({...editingBot, price: v})} />
                             </div>
@@ -406,7 +542,6 @@ const SalesManagement = () => {
 };
 
 const AdsManagement = () => <div className="p-12 text-center text-slate-500 font-bold uppercase tracking-widest italic opacity-40">Reklam Merkezi Çok Yakında</div>;
-const AnnouncementCenter = () => <div className="p-12 text-center text-slate-500 font-bold uppercase tracking-widest italic opacity-40">Duyuru Yönetimi Çok Yakında</div>;
 const SystemLogs = () => <div className="p-12 text-center text-slate-500 font-bold uppercase tracking-widest italic opacity-40">Sistem Kayıtları Arşivi</div>;
 const SettingsManagement = () => <div className="p-12 text-center text-slate-500 font-bold uppercase tracking-widest italic opacity-40">Sistem Konfigürasyonu</div>;
 

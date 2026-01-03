@@ -11,11 +11,9 @@ export class DatabaseService {
   
   // --- BİLDİRİM YÖNETİMİ ---
   static async sendGlobalNotification(title: string, message: string, type: Notification['type'] = 'system') {
-      // Not: Supabase tablosu 'id' için auto-increment bekleyebilir ancak hata alınıyorsa 
-      // manuel bir ID veya UUID göndermek sorunu çözer.
       const { data, error } = await supabase.from('notifications').insert([
         {
-          id: Math.floor(Math.random() * 999999999).toString(), // Hata gidermek için manuel ID
+          id: Math.floor(Math.random() * 999999999).toString(),
           title: title.trim(),
           message: message.trim(),
           type: type,
@@ -55,6 +53,34 @@ export class DatabaseService {
 
   static async markNotificationRead(id: string) {
     await supabase.from('notifications').update({ isRead: true }).eq('id', id);
+  }
+
+  // --- DUYURU YÖNETİMİ ---
+  static async getAnnouncements(): Promise<Announcement[]> {
+    const { data } = await supabase.from('announcements').select('*').order('id', { ascending: false });
+    return data || [];
+  }
+
+  static async saveAnnouncement(ann: any) {
+    const dbPayload = {
+        id: ann.id || Math.floor(Math.random() * 999999).toString(),
+        title: String(ann.title),
+        description: String(ann.description),
+        button_text: String(ann.button_text),
+        button_link: String(ann.button_link),
+        icon_name: String(ann.icon_name),
+        color_scheme: String(ann.color_scheme),
+        is_active: Boolean(ann.is_active),
+        action_type: String(ann.action_type),
+        content_detail: String(ann.content_detail || '')
+    };
+    const { error } = await supabase.from('announcements').upsert(dbPayload, { onConflict: 'id' });
+    if (error) throw error;
+  }
+
+  static async deleteAnnouncement(id: string) {
+    const { error } = await supabase.from('announcements').delete().eq('id', id);
+    if (error) throw error;
   }
 
   // --- REKLAM YÖNETİMİ ---
@@ -227,11 +253,6 @@ export class DatabaseService {
         };
     }
     return data;
-  }
-
-  static async getAnnouncements(): Promise<Announcement[]> {
-    const { data } = await supabase.from('announcements').select('*').order('id', { ascending: false });
-    return data || [];
   }
 
   static async getUsers(): Promise<User[]> {
