@@ -11,8 +11,11 @@ export class DatabaseService {
   
   // --- BİLDİRİM YÖNETİMİ ---
   static async sendGlobalNotification(title: string, message: string, type: Notification['type'] = 'system') {
+      // Not: Supabase tablosu 'id' için auto-increment bekleyebilir ancak hata alınıyorsa 
+      // manuel bir ID veya UUID göndermek sorunu çözer.
       const { data, error } = await supabase.from('notifications').insert([
         {
+          id: Math.floor(Math.random() * 999999999).toString(), // Hata gidermek için manuel ID
           title: title.trim(),
           message: message.trim(),
           type: type,
