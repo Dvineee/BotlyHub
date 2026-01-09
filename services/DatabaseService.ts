@@ -101,29 +101,23 @@ export class DatabaseService {
     if (error) throw error;
   }
 
-  // --- REKLAM YÖNETİMİ ---
-  static async getAds(): Promise<Ad[]> {
-      const { data } = await supabase.from('ads').select('*').order('created_at', { ascending: false });
-      return data || [];
-  }
-
-  static async createAd(ad: Partial<Ad>) {
-      const { error } = await supabase.from('ads').insert({
-          title: ad.title,
-          content: ad.content,
-          image_url: ad.image_url,
-          button_text: ad.button_text,
-          button_link: ad.button_link,
-          status: 'pending',
-          total_reach: 0,
-          channel_count: 0,
-          created_at: new Date().toISOString()
-      });
-      if (error) throw error;
-  }
-
-  static async deleteAd(id: string) {
-      await supabase.from('ads').delete().eq('id', id);
+  // --- SAHİPLİK VE LİSANS KONTROLÜ (YENİ) ---
+  static async isBotOwnedByUser(userId: string, botId: string): Promise<boolean> {
+      const { data, error } = await supabase
+          .from('user_bots')
+          .select('id, is_active, expiryDate')
+          .eq('user_id', userId.toString())
+          .eq('bot_id', botId.toString())
+          .maybeSingle();
+      
+      if (error || !data) return false;
+      
+      // Süre kontrolü
+      if (data.expiryDate && new Date(data.expiryDate) < new Date()) {
+          return false;
+      }
+      
+      return data.is_active;
   }
 
   // --- KANAL VE LOG YÖNETİMİ ---
@@ -232,10 +226,40 @@ export class DatabaseService {
     return data || [];
   }
 
+  // Fix: Added getBotsWithStats method for AdminDashboard
   static async getBotsWithStats(): Promise<any[]> {
-      const { data: bots } = await supabase.from('bots').select('*').order('id', { ascending: false });
-      const { data: owners } = await supabase.from('user_bots').select('bot_id');
-      return (bots || []).map(bot => ({ ...bot, ownerCount: (owners || []).filter(o => o.bot_id === bot.id).length }));
+    const { data: bots, error: botsError } = await supabase.from('bots').select('*').order('id', { ascending: false });
+    if (botsError) throw botsError;
+
+    const { data: userBots, error: userBotsError } = await supabase.from('user_bots').select('bot_id');
+    if (userBotsError) throw userBotsError;
+
+    return (bots || []).map(bot => ({
+      ...bot,
+      ownerCount: (userBots || []).filter((ub: any) => ub.bot_id === bot.id).length
+    }));
+  }
+
+  // Fix: Added deleteBot method for AdminDashboard
+  static async deleteBot(id: string) {
+    const { error } = await supabase.from('bots').delete().eq('id', id);
+    if (error) throw error;
+  }
+
+  // Fix: Added saveBot method for AdminDashboard
+  static async saveBot(bot: any) {
+    const { error } = await supabase.from('bots').upsert({
+      id: bot.id,
+      name: bot.name,
+      description: bot.description,
+      price: Number(bot.price),
+      category: bot.category,
+      bot_link: bot.bot_link,
+      screenshots: bot.screenshots || [],
+      icon: bot.icon,
+      is_premium: Boolean(bot.is_premium)
+    }, { onConflict: 'id' });
+    if (error) throw error;
   }
 
   static async getUserBots(userId: string): Promise<UserBot[]> {
@@ -262,6 +286,12 @@ export class DatabaseService {
     return { id: data.id, name: data.name, username: data.username, avatar: data.avatar, role: data.role || 'User', status: data.status || 'Active', badges: data.badges || [], joinDate: data.joindate, email: data.email };
   }
 
+  // Fix: Added updateUserStatus method for AdminDashboard
+  static async updateUserStatus(userId: string, status: 'Active' | 'Passive') {
+    const { error } = await supabase.from('users').update({ status }).eq('id', userId.toString());
+    if (error) throw error;
+  }
+
   static async getSettings() {
     const { data } = await supabase.from('settings').select('*').maybeSingle();
     if (data) {
@@ -278,10 +308,6 @@ export class DatabaseService {
     return (data || []).map(u => ({ id: u.id, name: u.name, username: u.username, avatar: u.avatar, role: u.role || 'User', status: u.status || 'Active', badges: u.badges || [], joinDate: u.joindate, email: u.email }));
   }
 
-  static async updateUserStatus(userId: string, status: string) {
-    await supabase.from('users').update({ status }).eq('id', userId);
-  }
-
   static async getAdminStats() {
     const { count: userCount } = await supabase.from('users').select('*', { count: 'exact', head: true });
     const { count: botCount } = await supabase.from('bots').select('*', { count: 'exact', head: true });
@@ -293,46 +319,6 @@ export class DatabaseService {
   static async getAllPurchases() {
     const { data } = await supabase.from('user_bots').select('*, users(*), bots(*)').order('acquired_at', { ascending: false });
     return data || [];
-  }
-
-  static async saveBot(bot: any) {
-    const screenshots = Array.isArray(bot.screenshots) 
-      ? bot.screenshots 
-      : String(bot.screenshots || '').split(',').map((s: string) => s.trim()).filter(Boolean);
-
-    const dbPayload = { 
-        id: String(bot.id), 
-        name: String(bot.name), 
-        description: String(bot.description), 
-        short_desc: String(bot.short_desc || ''),
-        price: Number(bot.price), 
-        category: String(bot.category), 
-        bot_link: String(bot.bot_link), 
-        is_premium: Boolean(bot.is_premium),
-        screenshots: screenshots, 
-        icon: String(bot.icon || '') 
-    };
-    const { error } = await supabase.from('bots').upsert(dbPayload, { onConflict: 'id' });
-    if (error) throw error;
-  }
-
-  static async deleteBot(id: string) {
-    const { error } = await supabase.from('bots').delete().eq('id', id);
-    if (error) throw error;
-  }
-
-  static async saveSettings(settings: any) {
-    const { error } = await supabase.from('settings').upsert({ 
-        id: 1, 
-        appName: settings.appName, 
-        MaintenanceMode: Boolean(settings.maintenanceMode),
-        commissionRate: Number(settings.commissionRate),
-        supportLink: String(settings.supportLink),
-        termsUrl: String(settings.termsUrl),
-        instagramUrl: String(settings.instagramUrl),
-        telegramChannelUrl: String(settings.telegramChannelUrl)
-    });
-    if (error) throw error;
   }
 
   static setAdminSession(token: string) { localStorage.setItem('admin_v3_session', token); }
