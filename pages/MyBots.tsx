@@ -51,7 +51,7 @@ const MyBots = () => {
                 } else {
                     validBots.push({
                         ...b,
-                        isAdEnabled: false,
+                        revenueEnabled: false,
                         isActive: true
                     } as UserBot);
                 }
@@ -79,13 +79,13 @@ const MyBots = () => {
       if (!bot) return;
 
       const updatedBots = bots.map(b => 
-        b.id === botId ? { ...b, isAdEnabled: !b.isAdEnabled } : b
+        b.id === botId ? { ...b, revenueEnabled: !b.revenueEnabled } : b
       );
       setBots(updatedBots);
       localStorage.setItem('ownedBots', JSON.stringify(updatedBots));
 
       if (user?.id) {
-          await DatabaseService.logActivity(user.id.toString(), 'bot_manage', 'Ayar Değişti', 'Gelir Ayarı Güncellendi', `'${bot.name}' botu için gelir modu ${!bot.isAdEnabled ? 'AÇILDI' : 'KAPATILDI'}.`);
+          await DatabaseService.logActivity(user.id.toString(), 'bot_manage', 'Ayar Değişti', 'Gelir Ayarı Güncellendi', `'${bot.name}' botu için gelir modu ${!bot.revenueEnabled ? 'AÇILDI' : 'KAPATILDI'}.`);
       }
   };
 
@@ -250,11 +250,11 @@ const MyBots = () => {
                                 <div 
                                     onClick={(e) => { e.stopPropagation(); toggleAdRevenue(bot.id); }}
                                     className={`cursor-pointer rounded-2xl px-3 h-full max-h-[60px] flex items-center gap-3 border transition-all active:scale-95 ${
-                                        bot.isAdEnabled ? 'bg-emerald-500/10 border-emerald-500/50' : 'bg-slate-800 border-slate-700'
+                                        bot.revenueEnabled ? 'bg-emerald-500/10 border-emerald-500/50' : 'bg-slate-800 border-slate-700'
                                     }`}
                                 >
-                                    <TrendingUp size={18} className={bot.isAdEnabled ? 'text-emerald-400' : 'text-slate-500'} />
-                                    <span className={`text-[10px] font-black uppercase tracking-tight ${bot.isAdEnabled ? 'text-emerald-400' : 'text-slate-400'}`}>Gelir Modu</span>
+                                    <TrendingUp size={18} className={bot.revenueEnabled ? 'text-emerald-400' : 'text-slate-500'} />
+                                    <span className={`text-[10px] font-black uppercase tracking-tight ${bot.revenueEnabled ? 'text-emerald-400' : 'text-slate-400'}`}>Gelir Modu</span>
                                 </div>
 
                                 <div 

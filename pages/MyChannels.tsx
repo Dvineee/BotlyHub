@@ -97,12 +97,12 @@ const MyChannels = () => {
       const channel = channels.find(c => c.id === channelId);
       if (!channel) return;
 
-      const newStatus = !channel.isAdEnabled;
+      const newStatus = !channel.revenueEnabled;
       haptic('medium');
       
       // UI Update
       setChannels(channels.map(c => 
-        c.id === channelId ? { ...c, isAdEnabled: newStatus } : c
+        c.id === channelId ? { ...c, revenueEnabled: newStatus } : c
       ));
 
       try {
@@ -111,15 +111,15 @@ const MyChannels = () => {
               await DatabaseService.logActivity(
                   user.id.toString(), 
                   'channel_sync', 
-                  'Reklam Ayarı', 
-                  'Kanal Reklam Modu Değişti', 
-                  `'${channel.name}' kanalı için reklam modu ${newStatus ? 'AÇILDI' : 'KAPATILDI'}.`
+                  'Yayın Ayarı', 
+                  'Kanal Yayın Modu Değişti', 
+                  `'${channel.name}' kanalı için yayın modu ${newStatus ? 'AÇILDI' : 'KAPATILDI'}.`
               );
           }
       } catch (e) {
           // Rollback on error
           setChannels(channels.map(c => 
-            c.id === channelId ? { ...c, isAdEnabled: !newStatus } : c
+            c.id === channelId ? { ...c, revenueEnabled: !newStatus } : c
           ));
           notification('error');
           alert("Ayar kaydedilemedi.");
@@ -215,9 +215,9 @@ const MyChannels = () => {
                                       <p className="text-[9px] text-slate-500 font-bold uppercase">{c.memberCount.toLocaleString()}</p>
                                   </div>
                                   <div className="flex items-center gap-1.5">
-                                      <div className={`w-1.5 h-1.5 rounded-full ${c.isAdEnabled ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-slate-600'}`}></div>
-                                      <span className={`text-[9px] font-black uppercase tracking-tight ${c.isAdEnabled ? 'text-emerald-400' : 'text-slate-600'}`}>
-                                          {c.isAdEnabled ? 'REKLAM AÇIK' : 'REKLAM KAPALI'}
+                                      <div className={`w-1.5 h-1.5 rounded-full ${c.revenueEnabled ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-slate-600'}`}></div>
+                                      <span className={`text-[9px] font-black uppercase tracking-tight ${c.revenueEnabled ? 'text-emerald-400' : 'text-slate-600'}`}>
+                                          {c.revenueEnabled ? 'YAYIN AÇIK' : 'YAYIN KAPALI'}
                                       </span>
                                   </div>
                               </div>
@@ -225,7 +225,6 @@ const MyChannels = () => {
                           </div>
                       </div>
 
-                      {/* Botlarım sayfasındaki 'Yönet' butonuyla aynı yapı */}
                       <button 
                           onClick={(e) => { e.stopPropagation(); setOpenSettingsId(c.id); }}
                           className="absolute right-0 top-0 bottom-0 w-8 bg-slate-800 hover:bg-slate-750 border-l border-slate-700 flex flex-col items-center justify-center transition-all cursor-pointer z-20 group/btn"
@@ -233,18 +232,17 @@ const MyChannels = () => {
                           <span className="text-[9px] font-black text-slate-500 group-hover/btn:text-slate-300 -rotate-90 whitespace-nowrap tracking-widest uppercase italic">Yönet</span>
                       </button>
 
-                      {/* Settings Overlay - Botlarım sayfasıyla aynı tasarım */}
                       <div className={`absolute inset-0 z-30 transition-transform duration-300 ease-out flex items-center justify-center p-2 ${openSettingsId === c.id ? 'translate-x-0' : 'translate-x-full'}`}>
                            <div className="absolute inset-0 bg-slate-900/98 backdrop-blur-sm"></div>
                            <div className="w-full h-full flex items-center justify-center gap-4 relative z-40">
                                 <div 
                                     onClick={(e) => { e.stopPropagation(); toggleAdMode(c.id); }}
                                     className={`cursor-pointer rounded-2xl px-6 py-4 flex items-center gap-4 border transition-all active:scale-95 ${
-                                        c.isAdEnabled ? 'bg-emerald-500/10 border-emerald-500/50' : 'bg-slate-800 border-slate-700'
+                                        c.revenueEnabled ? 'bg-emerald-500/10 border-emerald-500/50' : 'bg-slate-800 border-slate-700'
                                     }`}
                                 >
-                                    <TrendingUp size={20} className={c.isAdEnabled ? 'text-emerald-400' : 'text-slate-500'} />
-                                    <span className={`text-[11px] font-black uppercase tracking-widest ${c.isAdEnabled ? 'text-emerald-400' : 'text-slate-400'}`}>Reklam Modu</span>
+                                    <TrendingUp size={20} className={c.revenueEnabled ? 'text-emerald-400' : 'text-slate-500'} />
+                                    <span className={`text-[11px] font-black uppercase tracking-widest ${c.revenueEnabled ? 'text-emerald-400' : 'text-slate-400'}`}>Yayın Modu</span>
                                 </div>
                                 <div className="p-4 bg-slate-800 rounded-2xl text-slate-500 hover:text-white transition-colors cursor-pointer border border-slate-700" onClick={(e) => { e.stopPropagation(); setOpenSettingsId(null); }}>
                                     <X size={20} />
@@ -259,10 +257,10 @@ const MyChannels = () => {
       <div className="mt-10 p-6 bg-blue-600/5 border border-blue-600/10 rounded-[32px]">
           <div className="flex items-center gap-3 mb-3 text-blue-500">
               <Info size={18} />
-              <h4 className="text-[10px] font-black uppercase tracking-widest">Akıllı Reklam Dağıtımı</h4>
+              <h4 className="text-[10px] font-black uppercase tracking-widest">Akıllı Tanıtım Dağıtımı</h4>
           </div>
           <p className="text-[10px] text-slate-500 leading-relaxed font-medium">
-              Kanalınızda birden fazla bot bağlıysa, reklamlar otomatik olarak optimize edilir. Her reklam sadece bir bot tarafından paylaşılır, böylece kanalınız spamden korunur. Reklam Modu kapalıysa o kanal için hiçbir bot reklam yayınlamaz.
+              Kanalınızda birden fazla bot bağlıysa, yayınlar otomatik olarak optimize edilir. Her içerik sadece bir bot tarafından paylaşılır. Yayın Modu kapalıysa o kanal için hiçbir bot paylaşım yapmaz.
           </p>
       </div>
     </div>

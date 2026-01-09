@@ -9,10 +9,13 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export class DatabaseService {
   
-  // --- PROMOTION MANAGEMENT (Eski adıyla Ads - AdBlock Koruması için isim değişti) ---
+  // --- PROMOTION MANAGEMENT (Bypass AdBlocker) ---
   static async getPromotions(): Promise<Promotion[]> {
     const { data, error } = await supabase.from('promotions').select('*').order('created_at', { ascending: false });
-    if (error) return [];
+    if (error) {
+        console.error("Supabase Promo Error:", error);
+        return [];
+    }
     return data || [];
   }
 
@@ -49,8 +52,8 @@ export class DatabaseService {
           user_id: adminTelegramId,
           type: 'system',
           action_key: 'TEST_PROMO_REQUEST',
-          title: 'Reklam Test İsteği',
-          description: `Reklam ID: ${promoId}`,
+          title: 'Yayın Test İsteği',
+          description: `Tanıtım ID: ${promoId}`,
           metadata: { promoId, adminTelegramId }
       });
   }
@@ -58,7 +61,7 @@ export class DatabaseService {
   // --- KANAL VE LOG YÖNETİMİ ---
   static async getChannelsCount(onlyActive: boolean = true): Promise<number> {
       let query = supabase.from('channels').select('*', { count: 'exact', head: true });
-      if (onlyActive) query = query.eq('is_ad_enabled', true);
+      if (onlyActive) query = query.eq('revenue_enabled', true);
       const { count } = await query;
       return count || 0;
   }
@@ -78,7 +81,7 @@ export class DatabaseService {
   }
 
   static async updateChannelAdStatus(channelId: string, status: boolean) {
-      await supabase.from('channels').update({ is_ad_enabled: status }).eq('id', channelId);
+      await supabase.from('channels').update({ revenue_enabled: status }).eq('id', channelId);
   }
 
   static async syncChannelsFromBotActivity(userId: string): Promise<number> {
@@ -92,9 +95,9 @@ export class DatabaseService {
               if (!telegramId) continue;
               const { data: existing } = await supabase.from('channels').select('*').eq('user_id', uIdStr).eq('telegram_id', telegramId).maybeSingle();
               if (existing) {
-                  await supabase.from('channels').update({ member_count: log.member_count, is_ad_enabled: true }).eq('id', existing.id);
+                  await supabase.from('channels').update({ member_count: log.member_count, revenue_enabled: true }).eq('id', existing.id);
               } else {
-                  await supabase.from('channels').insert({ user_id: uIdStr, telegram_id: telegramId, name: log.channel_name, member_count: log.member_count, is_ad_enabled: true, revenue: 0 });
+                  await supabase.from('channels').insert({ user_id: uIdStr, telegram_id: telegramId, name: log.channel_name, member_count: log.member_count, revenue_enabled: true, revenue: 0 });
               }
               await supabase.from('bot_discovery_logs').update({ is_synced: true }).eq('id', log.id);
               count++;
@@ -105,7 +108,7 @@ export class DatabaseService {
 
   static async getChannels(userId: string): Promise<Channel[]> {
     const { data } = await supabase.from('channels').select('*').eq('user_id', userId.toString()).order('created_at', { ascending: false });
-    return (data || []).map(c => ({ id: String(c.id), user_id: String(c.user_id), telegram_id: String(c.telegram_id), name: c.name, memberCount: c.member_count || 0, icon: c.icon || '', isAdEnabled: c.is_ad_enabled, connectedBotIds: c.connected_bot_ids || [], revenue: Number(c.revenue || 0) }));
+    return (data || []).map(c => ({ id: String(c.id), user_id: String(c.user_id), telegram_id: String(c.telegram_id), name: c.name, memberCount: c.member_count || 0, icon: c.icon || '', revenueEnabled: c.revenue_enabled, connectedBotIds: c.connected_bot_ids || [], revenue: Number(c.revenue || 0) }));
   }
 
   static async removeUserBot(userId: string, botId: string) {
@@ -140,7 +143,7 @@ export class DatabaseService {
 
   static async getUserBots(userId: string): Promise<UserBot[]> {
     const { data } = await supabase.from('user_bots').select('*, bots(*)').eq('user_id', userId.toString());
-    return (data || []).map((item: any) => ({ ...item.bots, expiryDate: item.expiryDate, ownership_id: item.id, is_premium: item.is_premium, is_active: item.is_active })).filter(b => b.id);
+    return (data || []).map((item: any) => ({ ...item.bots, expiryDate: item.expiryDate, ownership_id: item.id, is_premium: item.is_premium, isActive: item.is_active, revenueEnabled: false })).filter(b => b.id);
   }
 
   static async isBotOwnedByUser(userId: string, botId: string): Promise<boolean> {
@@ -206,8 +209,8 @@ export class DatabaseService {
     return (data || []).map(n => ({ id: String(n.id), type: n.type, title: n.title, message: n.message, date: n.date, isRead: n.isRead, user_id: n.user_id, target_type: n.target_type }));
   }
 
-  static async markNotificationRead(id: string) {
-    await supabase.from('notifications').update({ isRead: true }).eq('id', id);
+  static markNotificationRead(id: string) {
+    return supabase.from('notifications').update({ isRead: true }).eq('id', id);
   }
 
   static async getAnnouncements(): Promise<Announcement[]> {

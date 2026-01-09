@@ -11,7 +11,7 @@ export interface User {
   email?: string;
   phone?: string;
   isRestricted?: boolean;
-  canPublishAds?: boolean;
+  canPublishPromos?: boolean; // canPublishAds yerine
 }
 
 export interface ActivityLog {
@@ -71,7 +71,7 @@ export interface ExtendedBot extends Bot {
 }
 
 export interface UserBot extends Bot {
-  isAdEnabled: boolean;
+  revenueEnabled: boolean; // isAdEnabled yerine
   isActive: boolean;
   expiryDate?: string;
   ownership_id?: string;
@@ -84,7 +84,7 @@ export interface Channel {
   name: string;
   memberCount: number;
   icon: string;
-  isAdEnabled: boolean;
+  revenueEnabled: boolean; // isAdEnabled yerine
   connectedBotIds: string[];
   revenue: number;
 }

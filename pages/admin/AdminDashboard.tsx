@@ -14,9 +14,7 @@ import {
   DollarSign, Edit3, Save, AlertTriangle, Image as ImageIconLucide, PlusSquare, Heart, Shield, Gift, ImageIcon,
   UserPlus, UserX, Crown, ShieldQuestion, Clock, MapPin, Tablet
 } from 'lucide-react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { DatabaseService, supabase } from '../../services/DatabaseService';
-import PriceService from '../../services/PriceService';
 import { User, Bot as BotType, Announcement, Notification, Channel, ActivityLog, Promotion, UserBot } from '../../types';
 
 const { useNavigate, Routes, Route, Link, useLocation } = Router as any;
@@ -112,14 +110,14 @@ const AdminDashboard = () => {
           <div className="max-w-6xl mx-auto space-y-10">
             <Routes>
               <Route path="/" element={<HomeView />} />
-              <Route path="/users" element={<UserManagement />} />
-              <Route path="/bots" element={<BotManagement />} />
-              <Route path="/sales" element={<SalesManagement />} />
-              <Route path="/promotions" element={<PromotionManagement />} />
-              <Route path="/announcements" element={<AnnouncementCenter />} />
-              <Route path="/notifications" element={<AdminNotifications />} />
-              <Route path="/logs" element={<SystemLogs />} />
-              <Route path="/settings" element={<SettingsManagement />} />
+              <Route path="users" element={<UserManagement />} />
+              <Route path="bots" element={<BotManagement />} />
+              <Route path="sales" element={<SalesManagement />} />
+              <Route path="promotions" element={<PromotionManagement />} />
+              <Route path="announcements" element={<AnnouncementCenter />} />
+              <Route path="notifications" element={<AdminNotifications />} />
+              <Route path="logs" element={<SystemLogs />} />
+              <Route path="settings" element={<SettingsManagement />} />
             </Routes>
           </div>
         </div>
@@ -160,7 +158,7 @@ const HomeView = () => {
     );
 };
 
-// --- PROMOTION MANAGEMENT MODULE (Yeni Adıyla - AdBlocker Dostu) ---
+// --- PROMOTION MANAGEMENT MODULE (Bypass AdBlocker) ---
 const PromotionManagement = () => {
     const [promos, setPromos] = useState<Promotion[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -188,16 +186,16 @@ const PromotionManagement = () => {
         load(); 
         const interval = setInterval(() => {
             if (promos.some(p => p.status === 'sending')) load();
-        }, 5000);
+        }, 8000);
         return () => clearInterval(interval);
     }, [promos]);
 
     const handleDelete = async (id: string) => {
-        if (!confirm('Bu tanıtımı silmek istediğinize emin misiniz?')) return;
+        if (!confirm('Bu içeriği silmek istediğinize emin misiniz?')) return;
         try {
             await DatabaseService.deletePromotion(id);
             load();
-        } catch (e) { alert('Silme hatası! Veritabanında promotions tablosu mevcut mu kontrol edin.'); }
+        } catch (e) { alert('Silme hatası! Veritabanında promotions tablosu olduğundan emin olun.'); }
     };
 
     const handleToggleStatus = async (promo: Promotion) => {
@@ -205,16 +203,7 @@ const PromotionManagement = () => {
         try {
             await DatabaseService.updatePromotionStatus(promo.id, nextStatus);
             load();
-        } catch (e) { alert('Durum güncellenemedi! AdBlocker kapalı olduğundan ve promotions tablosu olduğundan emin olun.'); }
-    };
-
-    const handleTestSend = async (promoId: string) => {
-        const adminId = prompt("Test gönderimi için Telegram User ID'nizi girin:");
-        if (!adminId) return;
-        try {
-            await DatabaseService.requestTestPromotion(promoId, adminId);
-            alert("Test isteği gönderildi.");
-        } catch (e) { alert("Hata oluştu."); }
+        } catch (e) { alert('Durum güncellenemedi! promotions tablosunu kontrol edin.'); }
     };
 
     if (isLoading && promos.length === 0) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-blue-500" /></div>;
@@ -226,14 +215,14 @@ const PromotionManagement = () => {
                     <h2 className="text-3xl font-black text-white italic uppercase tracking-tighter mb-1">Tanıtım <span className="text-blue-500">Merkezi</span></h2>
                     <div className="flex items-center gap-4">
                         <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                            <Radio size={12} className="text-emerald-500 animate-pulse" /> {activeChannelsCount} Aktif Kanal Yayına Hazır
+                            <Radio size={12} className="text-emerald-500 animate-pulse" /> {activeChannelsCount} Kanal Yayına Hazır
                         </p>
                     </div>
                 </div>
                 <div className="flex gap-4">
                     <button onClick={load} className="p-5 bg-slate-900/60 border border-white/5 rounded-3xl text-slate-400 hover:text-white transition-all"><RefreshCcw size={20}/></button>
                     <button 
-                      onClick={() => { setEditingPromo({ title: '', content: '', status: 'pending', button_text: 'Şimdi İncele', button_link: '', total_reach: 0, channel_count: 0, processed_channels: [] }); setIsModalOpen(true); }}
+                      onClick={() => { setEditingPromo({ title: '', content: '', status: 'pending', button_text: 'İncele', button_link: '', total_reach: 0, channel_count: 0, processed_channels: [] }); setIsModalOpen(true); }}
                       className="bg-blue-600 hover:bg-blue-500 px-8 py-5 rounded-[28px] text-[10px] font-black uppercase tracking-widest shadow-2xl flex items-center gap-3 transition-all active:scale-95 border-b-4 border-blue-800"
                     >
                         <PlusSquare size={18}/> YENİ TANITIM OLUŞTUR
@@ -244,14 +233,15 @@ const PromotionManagement = () => {
             <div className="grid grid-cols-1 gap-6">
                 {promos.length === 0 ? (
                     <div className="py-24 text-center bg-slate-900/20 rounded-[48px] border-2 border-dashed border-slate-900 flex flex-col items-center opacity-40">
-                        <Radio size={48} className="mb-4" />
-                        <p className="font-black uppercase tracking-[0.2em]">Henüz bir kampanya tanımlanmadı.</p>
+                        <Radio size={48} className="mb-4 text-slate-800" />
+                        <p className="font-black uppercase tracking-[0.2em] text-slate-700">Veritabanında 'promotions' tablosu bulunamadı veya boş.</p>
+                        <p className="text-[9px] font-bold uppercase mt-4 text-blue-500">Lütfen Supabase panelinde 'ads' tablosunun adını 'promotions' yapın.</p>
                     </div>
                 ) : (
                     promos.map(promo => {
                         const progress = promo.status === 'sent' ? 100 : Math.min(100, (promo.channel_count / (activeChannelsCount || 1)) * 100);
                         return (
-                            <div key={promo.id} className={`bg-slate-900/40 border rounded-[44px] p-8 flex flex-col gap-6 transition-all group relative overflow-hidden ${promo.status === 'sending' ? 'border-emerald-500/30' : 'border-white/5 hover:border-blue-500/30'}`}>
+                            <div key={promo.id} className={`bg-slate-900/40 border rounded-[44px] p-8 flex flex-col gap-6 transition-all group relative overflow-hidden ${promo.status === 'sending' ? 'border-emerald-500/30 shadow-[0_0_40px_rgba(16,185,129,0.05)]' : 'border-white/5 hover:border-blue-500/30'}`}>
                                 <div className="flex flex-col lg:flex-row gap-8 items-center relative z-10">
                                     <div className="w-32 h-32 rounded-[32px] bg-slate-950 border border-white/5 overflow-hidden shrink-0 shadow-2xl">
                                         {promo.image_url ? (
@@ -269,15 +259,15 @@ const PromotionManagement = () => {
                                                 promo.status === 'sent' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' : 
                                                 'bg-slate-800 text-slate-500 border-white/5'
                                             }`}>
-                                                {promo.status === 'sending' ? 'GÖNDERİLİYOR...' : 
-                                                 promo.status === 'sent' ? 'TAMAMLANDI' : 'DURDURULDU'}
+                                                {promo.status === 'sending' ? 'YAYINLANIYOR...' : 
+                                                 promo.status === 'sent' ? 'TAMAMLANDI' : 'BEKLEMEDE'}
                                             </span>
                                         </div>
                                         <p className="text-xs text-slate-500 leading-relaxed line-clamp-2 font-medium">{promo.content}</p>
                                         
                                         <div className="space-y-2">
                                             <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-slate-600">
-                                                <span>İlerleme Durumu</span>
+                                                <span>Yayılma İlerlemesi</span>
                                                 <span>{promo.channel_count} / {activeChannelsCount} KANAL</span>
                                             </div>
                                             <div className="h-2 w-full bg-slate-950 rounded-full overflow-hidden border border-white/5">
@@ -305,12 +295,9 @@ const PromotionManagement = () => {
                                                 promo.status === 'sending' ? 'bg-orange-600/10 text-orange-500 border border-orange-500/20' : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-xl shadow-emerald-900/20'
                                             }`}
                                         >
-                                            {promo.status === 'sending' ? 'YAYINI DURDUR' : 'YAYINI BAŞLAT'}
+                                            {promo.status === 'sending' ? 'DURAKLAT' : 'YAYINI BAŞLAT'}
                                         </button>
                                         <div className="flex gap-3">
-                                            <button onClick={() => handleTestSend(promo.id)} className="flex-1 p-4 bg-white/5 hover:bg-blue-600/10 rounded-2xl text-blue-500 transition-all border border-blue-500/20 flex items-center justify-center gap-2">
-                                                <Send size={16}/> <span className="text-[8px] font-black">TEST</span>
-                                            </button>
                                             <button onClick={() => { setEditingPromo(promo); setIsModalOpen(true); }} className="p-4 bg-white/5 hover:bg-white/10 rounded-2xl transition-all border border-white/5"><Edit3 size={18}/></button>
                                             <button onClick={() => handleDelete(promo.id)} className="p-4 bg-white/5 hover:bg-red-600 rounded-2xl text-red-500 hover:text-white transition-all border border-white/5"><Trash2 size={18}/></button>
                                         </div>
@@ -328,44 +315,44 @@ const PromotionManagement = () => {
                         <button onClick={() => setIsModalOpen(false)} className="absolute top-10 right-10 p-4 bg-white/5 rounded-3xl hover:bg-red-600 transition-all active:scale-90"><X size={24}/></button>
                         
                         <div className="flex items-center gap-6 mb-12">
-                            <div className="w-16 h-16 bg-blue-600 rounded-[28px] flex items-center justify-center shadow-2xl shadow-blue-600/20"><Radio size={32} className="text-white"/></div>
+                            <div className="w-16 h-16 bg-blue-600 rounded-[28px] flex items-center justify-center shadow-2xl shadow-blue-600/20"><Bot size={32} className="text-white"/></div>
                             <div>
-                                <h3 className="text-3xl font-black italic uppercase tracking-tighter text-white">Tanıtım <span className="text-blue-500">Editörü</span></h3>
-                                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.2em] mt-1">İçerik ve Görsel Optimizasyonu</p>
+                                <h3 className="text-3xl font-black italic uppercase tracking-tighter text-white">İçerik <span className="text-blue-500">Yapılandırıcı</span></h3>
+                                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.2em] mt-1">Yayın Ayarları ve Linkler</p>
                             </div>
                         </div>
 
                         <form onSubmit={async (e) => { e.preventDefault(); await DatabaseService.savePromotion(editingPromo); setIsModalOpen(false); load(); }} className="space-y-10">
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                                 <div className="space-y-8">
-                                    <AdminInput label="KAMPANYA BAŞLIĞI" value={editingPromo.title} onChange={(v: string) => setEditingPromo({...editingPromo, title: v})} />
+                                    <AdminInput label="BAŞLIK" value={editingPromo.title} onChange={(v: string) => setEditingPromo({...editingPromo, title: v})} />
                                     <div className="space-y-2">
-                                        <label className="text-[9px] font-black text-slate-600 uppercase tracking-widest ml-4">MESAJ METNİ (HTML)</label>
+                                        <label className="text-[9px] font-black text-slate-600 uppercase tracking-widest ml-4">MESAJ İÇERİĞİ (HTML)</label>
                                         <textarea 
                                             value={editingPromo.content} 
                                             onChange={e => setEditingPromo({...editingPromo, content: e.target.value})}
                                             className="w-full bg-slate-950 border border-white/5 rounded-3xl p-6 text-[11px] font-medium text-slate-300 h-48 focus:border-blue-500/50 outline-none resize-none shadow-inner" 
-                                            placeholder="Reklam metni..."
+                                            placeholder="Gövde metni..."
                                         />
                                     </div>
                                 </div>
                                 <div className="space-y-8">
-                                    <AdminInput label="GÖRSEL URL (OPSİYONEL)" value={editingPromo.image_url} onChange={(v: string) => setEditingPromo({...editingPromo, image_url: v})} />
+                                    <AdminInput label="MEDYA URL (RESİM)" value={editingPromo.image_url} onChange={(v: string) => setEditingPromo({...editingPromo, image_url: v})} />
                                     <div className="grid grid-cols-2 gap-6">
-                                        <AdminInput label="BUTON METNİ" value={editingPromo.button_text} onChange={(v: string) => setEditingPromo({...editingPromo, button_text: v})} />
-                                        <AdminInput label="BUTON LİNKİ" value={editingPromo.button_link} onChange={(v: string) => setEditingPromo({...editingPromo, button_link: v})} />
+                                        <AdminInput label="BUTON ETİKETİ" value={editingPromo.button_text} onChange={(v: string) => setEditingPromo({...editingPromo, button_text: v})} />
+                                        <AdminInput label="HEDEF LİNK" value={editingPromo.button_link} onChange={(v: string) => setEditingPromo({...editingPromo, button_link: v})} />
                                     </div>
                                     <div className="p-8 bg-slate-900/30 border border-white/5 rounded-[40px] flex items-start gap-4">
-                                        <div className="p-3 bg-blue-600/10 rounded-2xl text-blue-500"><Info size={20}/></div>
+                                        <div className="p-3 bg-blue-600/10 rounded-2xl text-blue-500"><Shield size={20}/></div>
                                         <p className="text-[10px] text-slate-600 leading-relaxed font-bold uppercase italic">
-                                            Tanıtımı kaydettikten sonra 'YAYINI BAŞLAT' butonuna basmanız gerekir. AdBlocker eklentiniz açıksa bazı butonlar veya veriler yüklenemeyebilir.
+                                            Sistem 'promotions' tablosunu kullanarak AdBlocker filtrelerini aşar. Herhangi bir ağ hatası alıyorsanız Supabase ayarlarını kontrol edin.
                                         </p>
                                     </div>
                                 </div>
                             </div>
 
                             <button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 py-8 rounded-[32px] font-black text-xs uppercase tracking-[0.4em] shadow-2xl shadow-blue-600/30 transition-all active:scale-95 border-b-8 border-blue-800 flex items-center justify-center gap-4">
-                                <Save size={24} /> KAMPANYAYI VERİTABANINA KAYDET
+                                <Save size={24} /> SİSTEME KAYDET VE KAPAT
                             </button>
                         </form>
                     </div>
@@ -457,10 +444,10 @@ const UserManagement = () => {
     const toggleAdRights = async () => {
         if (!selectedUser) return;
         setIsUpdating(true);
-        const newVal = !selectedUser.canPublishAds;
+        const newVal = !selectedUser.canPublishPromos;
         try {
-            await supabase.from('users').update({ canPublishAds: newVal }).eq('id', selectedUser.id);
-            setSelectedUser({ ...selectedUser, canPublishAds: newVal });
+            await supabase.from('users').update({ canPublishPromos: newVal }).eq('id', selectedUser.id);
+            setSelectedUser({ ...selectedUser, canPublishPromos: newVal });
             load();
         } finally { setIsUpdating(false); }
     };
@@ -523,7 +510,7 @@ const UserManagement = () => {
                                         }`}>
                                             {u.role}
                                         </span>
-                                        {u.canPublishAds && <span className="p-1 bg-emerald-500/10 text-emerald-500 rounded-lg" title="Reklam Yetkisi"><Megaphone size={12}/></span>}
+                                        {u.canPublishPromos && <span className="p-1 bg-emerald-500/10 text-emerald-500 rounded-lg" title="Yayın Yetkisi"><Megaphone size={12}/></span>}
                                     </div>
                                 </td>
                                 <td className="px-8 py-5">
@@ -618,15 +605,15 @@ const UserManagement = () => {
                                             <div className="flex items-center gap-4">
                                                 <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500 border border-blue-500/20"><Megaphone size={20}/></div>
                                                 <div>
-                                                    <p className="text-[11px] font-black text-white uppercase italic">Reklam Yetkisi</p>
-                                                    <p className="text-[9px] text-slate-500 font-bold uppercase">Reklam yayınlama izni</p>
+                                                    <p className="text-[11px] font-black text-white uppercase italic">Tanıtım Yetkisi</p>
+                                                    <p className="text-[9px] text-slate-500 font-bold uppercase">Tanıtım yayınlama izni</p>
                                                 </div>
                                             </div>
                                             <button 
                                                 onClick={toggleAdRights}
-                                                className={`w-14 h-7 rounded-full relative transition-all duration-500 ${selectedUser.canPublishAds ? 'bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.4)]' : 'bg-slate-800'}`}
+                                                className={`w-14 h-7 rounded-full relative transition-all duration-500 ${selectedUser.canPublishPromos ? 'bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.4)]' : 'bg-slate-800'}`}
                                             >
-                                                <div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-all duration-500 ${selectedUser.canPublishAds ? 'left-8' : 'left-1'}`}></div>
+                                                <div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-all duration-500 ${selectedUser.canPublishPromos ? 'left-8' : 'left-1'}`}></div>
                                             </button>
                                         </div>
 
@@ -684,8 +671,8 @@ const UserManagement = () => {
                                             </div>
                                             <div className="text-right">
                                                 <p className="text-emerald-500 text-[10px] font-black">₺{channel.revenue}</p>
-                                                <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-md ${channel.isAdEnabled ? 'bg-blue-600/10 text-blue-500' : 'bg-slate-800 text-slate-600'}`}>
-                                                    {channel.isAdEnabled ? 'REKLAM AKTİF' : 'PASİF'}
+                                                <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-md ${channel.revenueEnabled ? 'bg-blue-600/10 text-blue-500' : 'bg-slate-800 text-slate-600'}`}>
+                                                    {channel.revenueEnabled ? 'YAYIN AKTİF' : 'PASİF'}
                                                 </span>
                                             </div>
                                         </div>
