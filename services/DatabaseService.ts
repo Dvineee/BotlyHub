@@ -9,6 +9,35 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export class DatabaseService {
   
+  // --- AD MANAGEMENT ---
+  static async getAds(): Promise<Ad[]> {
+    const { data, error } = await supabase.from('ads').select('*').order('created_at', { ascending: false });
+    if (error) return [];
+    return data || [];
+  }
+
+  static async saveAd(ad: Partial<Ad>) {
+    const payload = {
+        id: ad.id || Math.floor(Math.random() * 999999).toString(),
+        title: ad.title,
+        content: ad.content,
+        image_url: ad.image_url,
+        button_text: ad.button_text,
+        button_link: ad.button_link,
+        status: ad.status || 'pending',
+        total_reach: ad.total_reach || 0,
+        channel_count: ad.channel_count || 0,
+        created_at: ad.created_at || new Date().toISOString()
+    };
+    const { error } = await supabase.from('ads').upsert(payload, { onConflict: 'id' });
+    if (error) throw error;
+  }
+
+  static async deleteAd(id: string) {
+    const { error } = await supabase.from('ads').delete().eq('id', id);
+    if (error) throw error;
+  }
+
   // --- BİLDİRİM YÖNETİMİ ---
   static async sendGlobalNotification(title: string, message: string, type: Notification['type'] = 'system') {
       const { data, error } = await supabase.from('notifications').insert([
@@ -226,7 +255,6 @@ export class DatabaseService {
     return data || [];
   }
 
-  // Fix: Added getBotsWithStats method for AdminDashboard
   static async getBotsWithStats(): Promise<any[]> {
     const { data: bots, error: botsError } = await supabase.from('bots').select('*').order('id', { ascending: false });
     if (botsError) throw botsError;
@@ -240,13 +268,11 @@ export class DatabaseService {
     }));
   }
 
-  // Fix: Added deleteBot method for AdminDashboard
   static async deleteBot(id: string) {
     const { error } = await supabase.from('bots').delete().eq('id', id);
     if (error) throw error;
   }
 
-  // Fix: Added saveBot method for AdminDashboard
   static async saveBot(bot: any) {
     const { error } = await supabase.from('bots').upsert({
       id: bot.id,
@@ -286,7 +312,6 @@ export class DatabaseService {
     return { id: data.id, name: data.name, username: data.username, avatar: data.avatar, role: data.role || 'User', status: data.status || 'Active', badges: data.badges || [], joinDate: data.joindate, email: data.email };
   }
 
-  // Fix: Added updateUserStatus method for AdminDashboard
   static async updateUserStatus(userId: string, status: 'Active' | 'Passive') {
     const { error } = await supabase.from('users').update({ status }).eq('id', userId.toString());
     if (error) throw error;

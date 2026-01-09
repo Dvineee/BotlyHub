@@ -160,6 +160,170 @@ const HomeView = () => {
     );
 };
 
+// --- ADS MANAGEMENT MODULE ---
+const AdsManagement = () => {
+    const [ads, setAds] = useState<Ad[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingAd, setEditingAd] = useState<Partial<Ad> | null>(null);
+
+    const load = async () => {
+        setIsLoading(true);
+        const data = await DatabaseService.getAds();
+        setAds(data);
+        setIsLoading(false);
+    };
+
+    useEffect(() => { load(); }, []);
+
+    const handleDelete = async (id: string) => {
+        if (!confirm('Bu reklamı silmek istediğinize emin misiniz?')) return;
+        try {
+            await DatabaseService.deleteAd(id);
+            load();
+        } catch (e) { alert('Silme hatası!'); }
+    };
+
+    const toggleStatus = async (ad: Ad) => {
+        const nextStatus = ad.status === 'pending' ? 'sending' : 'pending';
+        try {
+            await DatabaseService.saveAd({ ...ad, status: nextStatus });
+            load();
+        } catch (e) { alert('Durum değiştirilemedi!'); }
+    };
+
+    if (isLoading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-blue-500" /></div>;
+
+    return (
+        <div className="space-y-10 animate-in fade-in duration-500">
+            <div className="flex justify-between items-center">
+                <div>
+                    <h2 className="text-3xl font-black text-white italic uppercase tracking-tighter mb-1">Reklam <span className="text-blue-500">Merkezi</span></h2>
+                    <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Kanal ağına otomatik reklam yayınlayın.</p>
+                </div>
+                <button 
+                  onClick={() => { setEditingAd({ title: '', content: '', status: 'pending', button_text: 'Hemen İncele', button_link: '' }); setIsModalOpen(true); }}
+                  className="bg-blue-600 hover:bg-blue-500 px-8 py-5 rounded-[24px] text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center gap-3 transition-all active:scale-95 border-b-4 border-blue-800"
+                >
+                    <PlusSquare size={18}/> YENİ KAMPANYA BAŞLAT
+                </button>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6">
+                {ads.length === 0 ? (
+                    <div className="py-24 text-center bg-slate-900/20 rounded-[48px] border-2 border-dashed border-white/5 opacity-40">
+                        <Radio size={48} className="mx-auto mb-4" />
+                        <p className="font-black uppercase tracking-[0.2em]">Henüz oluşturulmuş kampanya yok.</p>
+                    </div>
+                ) : (
+                    ads.map(ad => (
+                        <div key={ad.id} className="bg-slate-900/40 border border-white/5 rounded-[44px] p-8 flex flex-col lg:flex-row gap-8 items-center hover:border-blue-500/30 transition-all group">
+                            <div className="w-32 h-32 rounded-[32px] bg-slate-950 border border-white/5 overflow-hidden shrink-0 shadow-2xl">
+                                {ad.image_url ? (
+                                    <img src={ad.image_url} className="w-full h-full object-cover" />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-slate-800"><ImageIcon size={40}/></div>
+                                )}
+                            </div>
+
+                            <div className="flex-1 min-w-0 space-y-2">
+                                <div className="flex items-center gap-3">
+                                    <h4 className="text-2xl font-black text-white italic uppercase tracking-tighter truncate">{ad.title}</h4>
+                                    <span className={`px-3 py-1 rounded-xl text-[9px] font-black uppercase tracking-widest border ${
+                                        ad.status === 'sending' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 animate-pulse' : 
+                                        ad.status === 'sent' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' : 
+                                        'bg-slate-800 text-slate-500 border-white/5'
+                                    }`}>
+                                        {ad.status === 'sending' ? 'YAYINLANIYOR' : ad.status.toUpperCase()}
+                                    </span>
+                                </div>
+                                <p className="text-xs text-slate-500 leading-relaxed line-clamp-2 font-medium">{ad.content}</p>
+                                <div className="flex gap-4 pt-2">
+                                    <div className="flex items-center gap-2 text-[9px] font-black text-slate-600 uppercase tracking-widest">
+                                        <Users size={14} className="text-blue-500" /> {ad.total_reach} ERİŞİM
+                                    </div>
+                                    <div className="flex items-center gap-2 text-[9px] font-black text-slate-600 uppercase tracking-widest">
+                                        <Megaphone size={14} className="text-purple-500" /> {ad.channel_count} KANAL
+                                    </div>
+                                    <div className="flex items-center gap-2 text-[9px] font-black text-slate-600 uppercase tracking-widest">
+                                        <Calendar size={14} className="text-orange-500" /> {new Date(ad.created_at).toLocaleDateString()}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-3 shrink-0">
+                                <button 
+                                    onClick={() => toggleStatus(ad)}
+                                    className={`px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                                        ad.status === 'sending' ? 'bg-orange-500/10 text-orange-500 border border-orange-500/20' : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/20'
+                                    }`}
+                                >
+                                    {ad.status === 'sending' ? 'DURAKLAT' : 'YAYINA AL'}
+                                </button>
+                                <button onClick={() => { setEditingAd(ad); setIsModalOpen(true); }} className="p-4 bg-white/5 hover:bg-white/10 rounded-2xl transition-all"><Edit3 size={20}/></button>
+                                <button onClick={() => handleDelete(ad.id)} className="p-4 bg-white/5 hover:bg-red-600 rounded-2xl text-red-500 hover:text-white transition-all"><Trash2 size={20}/></button>
+                            </div>
+                        </div>
+                    ))
+                )}
+            </div>
+
+            {isModalOpen && editingAd && (
+                <div className="fixed inset-0 z-[110] bg-black/98 flex items-center justify-center p-6 backdrop-blur-xl animate-in zoom-in-95">
+                    <div className="bg-[#020617] p-12 rounded-[64px] w-full max-w-4xl border border-white/10 overflow-y-auto max-h-[90vh] shadow-2xl relative scrollbar-hide">
+                        <button onClick={() => setIsModalOpen(false)} className="absolute top-10 right-10 p-4 bg-white/5 rounded-3xl hover:bg-red-600 transition-all active:scale-90"><X size={24}/></button>
+                        
+                        <div className="flex items-center gap-6 mb-12">
+                            <div className="w-16 h-16 bg-blue-600 rounded-[28px] flex items-center justify-center shadow-2xl shadow-blue-600/20"><Radio size={32} className="text-white"/></div>
+                            <div>
+                                <h3 className="text-3xl font-black italic uppercase tracking-tighter text-white">Reklam <span className="text-blue-500">Editörü</span></h3>
+                                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.2em] mt-1">Görsel ve Metin Optimizasyonu</p>
+                            </div>
+                        </div>
+
+                        <form onSubmit={async (e) => { e.preventDefault(); await DatabaseService.saveAd(editingAd); setIsModalOpen(false); load(); }} className="space-y-10">
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                                <div className="space-y-8">
+                                    <AdminInput label="REKLAM BAŞLIĞI" value={editingAd.title} onChange={(v: string) => setEditingAd({...editingAd, title: v})} />
+                                    <div className="space-y-2">
+                                        <label className="text-[9px] font-black text-slate-600 uppercase tracking-widest ml-4">MESAJ İÇERİĞİ (HTML DESTEKLER)</label>
+                                        <textarea 
+                                            value={editingAd.content} 
+                                            onChange={e => setEditingAd({...editingAd, content: e.target.value})}
+                                            className="w-full bg-slate-950 border border-white/5 rounded-3xl p-6 text-[11px] font-medium text-slate-400 h-48 focus:border-blue-500/50 outline-none resize-none shadow-inner" 
+                                            placeholder="Reklam metnini buraya yazın..."
+                                        />
+                                    </div>
+                                </div>
+                                <div className="space-y-8">
+                                    <AdminInput label="GÖRSEL URL (TELEGRAM'DA FOTOĞRAF OLARAK GİDER)" value={editingAd.image_url} onChange={(v: string) => setEditingAd({...editingAd, image_url: v})} />
+                                    <div className="grid grid-cols-2 gap-6">
+                                        <AdminInput label="BUTON METNİ" value={editingAd.button_text} onChange={(v: string) => setEditingAd({...editingAd, button_text: v})} />
+                                        <AdminInput label="BUTON LİNKİ" value={editingAd.button_link} onChange={(v: string) => setEditingAd({...editingAd, button_link: v})} />
+                                    </div>
+                                    <div className="p-8 bg-slate-900/30 border border-white/5 rounded-[40px]">
+                                        <div className="flex items-center gap-3 text-blue-500 mb-4">
+                                            <Info size={18} />
+                                            <h4 className="text-[10px] font-black uppercase tracking-widest">Önizleme İpucu</h4>
+                                        </div>
+                                        <p className="text-[10px] text-slate-600 leading-relaxed font-bold uppercase italic">
+                                            Bu reklam, kanal ağındaki tüm bağlı botlar üzerinden eşzamanlı olarak paylaşılır. Görsel URL'si eklendiğinde mesaj "Fotoğraf" formatında, eklenmediğinde "Metin" formatında gönderilir.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 py-8 rounded-[32px] font-black text-xs uppercase tracking-[0.4em] shadow-2xl shadow-blue-600/30 transition-all active:scale-95 border-b-8 border-blue-800 flex items-center justify-center gap-4">
+                                <Save size={24} /> KAMPANYAYI VERİTABANINA KAYDET
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
 // --- USER MANAGEMENT CENTER ---
 const UserManagement = () => {
     const [users, setUsers] = useState<User[]>([]);
@@ -820,7 +984,7 @@ const BotManagement = () => {
                 ))}
             </div>
 
-            {isModalOpen && (
+            {isModalOpen && editingBot && (
                 <div className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-6 backdrop-blur-xl">
                     <div className="bg-[#020617] p-12 rounded-[64px] w-full max-w-4xl border border-white/10 overflow-y-auto max-h-[90vh] shadow-2xl relative scrollbar-hide">
                         <button onClick={() => setIsModalOpen(false)} className="absolute top-10 right-10 p-4 bg-white/5 rounded-3xl hover:bg-red-600 transition-all active:scale-90"><X size={24}/></button>
@@ -991,7 +1155,6 @@ const AdminInput = ({ label, value, onChange, type = "text" }: any) => (
     </div>
 );
 
-const AdsManagement = () => <div className="p-12 text-center text-slate-500 font-bold uppercase tracking-widest italic opacity-40">Reklam Merkezi Çok Yakında</div>;
 const SystemLogs = () => <div className="p-12 text-center text-slate-500 font-bold uppercase tracking-widest italic opacity-40">Sistem Kayıtları Arşivi</div>;
 const SettingsManagement = () => <div className="p-12 text-center text-slate-500 font-bold uppercase tracking-widest italic opacity-40">Sistem Konfigürasyonu</div>;
 
