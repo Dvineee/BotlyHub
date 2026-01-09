@@ -27,6 +27,7 @@ export class DatabaseService {
         status: ad.status || 'pending',
         total_reach: ad.total_reach || 0,
         channel_count: ad.channel_count || 0,
+        processed_channels: ad.processed_channels || [],
         created_at: ad.created_at || new Date().toISOString()
     };
     const { error } = await supabase.from('ads').upsert(payload, { onConflict: 'id' });
@@ -39,10 +40,11 @@ export class DatabaseService {
   }
 
   static async updateAdStatus(id: string, status: Ad['status']) {
-      await supabase.from('ads').update({ status }).eq('id', id);
+      // Eğer statü 'sending'e çekiliyorsa, işlemleri sıfırlamak yerine kaldığı yerden devam etmesi için payload'u koruyoruz.
+      const { error } = await supabase.from('ads').update({ status }).eq('id', id);
+      if (error) throw error;
   }
 
-  // Reklamı test olarak adminin kendisine gönderilmesi için bir log oluşturur
   static async requestTestAd(adId: string, adminTelegramId: string) {
       await supabase.from('activity_logs').insert({
           user_id: adminTelegramId,
@@ -142,7 +144,6 @@ export class DatabaseService {
     return (data || []).map((item: any) => ({ ...item.bots, expiryDate: item.expiryDate, ownership_id: item.id, is_premium: item.is_premium, is_active: item.is_active })).filter(b => b.id);
   }
 
-  // Fix: Added isBotOwnedByUser to resolve errors in BotDetail.tsx regarding missing method on DatabaseService.
   static async isBotOwnedByUser(userId: string, botId: string): Promise<boolean> {
     const { data } = await supabase.from('user_bots').select('id').eq('user_id', userId.toString()).eq('bot_id', botId.toString()).maybeSingle();
     return !!data;

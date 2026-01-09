@@ -48,6 +48,7 @@ export interface Ad {
   status: 'pending' | 'sending' | 'sent' | 'failed';
   total_reach: number;
   channel_count: number;
+  processed_channels?: string[]; // Hangi kanallara başarıyla gittiği
   created_at: string;
   sent_at?: string;
 }

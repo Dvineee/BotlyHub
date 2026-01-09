@@ -179,7 +179,16 @@ const AdsManagement = () => {
         setIsLoading(false);
     };
 
-    useEffect(() => { load(); }, []);
+    useEffect(() => { 
+        load(); 
+        // Canlı izleme için otomatik yenileme (Sadece yayınlanan reklam varsa)
+        const interval = setInterval(() => {
+            if (ads.some(a => a.status === 'sending')) {
+                load();
+            }
+        }, 5000);
+        return () => clearInterval(interval);
+    }, [ads]);
 
     const handleDelete = async (id: string) => {
         if (!confirm('Bu reklamı silmek istediğinize emin misiniz?')) return;
@@ -190,7 +199,8 @@ const AdsManagement = () => {
     };
 
     const handleToggleStatus = async (ad: Ad) => {
-        const nextStatus = ad.status === 'pending' || ad.status === 'failed' ? 'sending' : 'pending';
+        // Eğer statü 'pending' ise 'sending' yap, 'sending' ise 'pending' yap (duraklat)
+        const nextStatus = ad.status === 'sending' ? 'pending' : 'sending';
         try {
             await DatabaseService.updateAdStatus(ad.id, nextStatus);
             load();
@@ -202,25 +212,27 @@ const AdsManagement = () => {
         if (!adminId) return;
         try {
             await DatabaseService.requestTestAd(adId, adminId);
-            alert("Test isteği gönderildi. Birkaç dakika içinde Telegram'dan size ulaşacaktır.");
+            alert("Test isteği gönderildi. Birkaç saniye içinde Telegram'dan size ulaşacaktır.");
         } catch (e) { alert("Test isteği başarısız."); }
     };
 
-    if (isLoading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-blue-500" /></div>;
+    if (isLoading && ads.length === 0) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-blue-500" /></div>;
 
     return (
         <div className="space-y-10 animate-in fade-in duration-500">
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
                 <div>
                     <h2 className="text-3xl font-black text-white italic uppercase tracking-tighter mb-1">Reklam <span className="text-blue-500">Merkezi</span></h2>
-                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                        <Radio size={12} className="text-emerald-500 animate-pulse" /> {activeChannelsCount} Aktif Kanal Yayın Bekliyor
-                    </p>
+                    <div className="flex items-center gap-4">
+                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                            <Radio size={12} className="text-emerald-500 animate-pulse" /> {activeChannelsCount} Aktif Kanal Yayına Hazır
+                        </p>
+                    </div>
                 </div>
                 <div className="flex gap-4">
                     <button onClick={load} className="p-5 bg-slate-900/60 border border-white/5 rounded-3xl text-slate-400 hover:text-white transition-all"><RefreshCcw size={20}/></button>
                     <button 
-                      onClick={() => { setEditingAd({ title: '', content: '', status: 'pending', button_text: 'Şimdi İncele', button_link: '', total_reach: 0, channel_count: 0 }); setIsModalOpen(true); }}
+                      onClick={() => { setEditingAd({ title: '', content: '', status: 'pending', button_text: 'Şimdi İncele', button_link: '', total_reach: 0, channel_count: 0, processed_channels: [] }); setIsModalOpen(true); }}
                       className="bg-blue-600 hover:bg-blue-500 px-8 py-5 rounded-[28px] text-[10px] font-black uppercase tracking-widest shadow-2xl flex items-center gap-3 transition-all active:scale-95 border-b-4 border-blue-800"
                     >
                         <PlusSquare size={18}/> YENİ REKLAM OLUŞTUR
@@ -238,7 +250,7 @@ const AdsManagement = () => {
                     ads.map(ad => {
                         const progress = ad.status === 'sent' ? 100 : Math.min(100, (ad.channel_count / (activeChannelsCount || 1)) * 100);
                         return (
-                            <div key={ad.id} className="bg-slate-900/40 border border-white/5 rounded-[44px] p-8 flex flex-col gap-6 hover:border-blue-500/30 transition-all group relative overflow-hidden">
+                            <div key={ad.id} className={`bg-slate-900/40 border rounded-[44px] p-8 flex flex-col gap-6 transition-all group relative overflow-hidden ${ad.status === 'sending' ? 'border-emerald-500/30' : 'border-white/5 hover:border-blue-500/30'}`}>
                                 <div className="flex flex-col lg:flex-row gap-8 items-center relative z-10">
                                     <div className="w-32 h-32 rounded-[32px] bg-slate-950 border border-white/5 overflow-hidden shrink-0 shadow-2xl">
                                         {ad.image_url ? (
@@ -257,21 +269,21 @@ const AdsManagement = () => {
                                                 ad.status === 'failed' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
                                                 'bg-slate-800 text-slate-500 border-white/5'
                                             }`}>
-                                                {ad.status === 'sending' ? 'GÖNDERİLİYOR...' : 
-                                                 ad.status === 'sent' ? 'TAMAMLANDI' : 
-                                                 ad.status === 'failed' ? 'HATA OLUŞTU' : 'BEKLEMEDE'}
+                                                {ad.status === 'sending' ? 'CANLI YAYINDA...' : 
+                                                 ad.status === 'sent' ? 'YAYINLANDI' : 
+                                                 ad.status === 'failed' ? 'HATA' : 'DURAKLATILDI'}
                                             </span>
                                         </div>
                                         <p className="text-xs text-slate-500 leading-relaxed line-clamp-2 font-medium">{ad.content}</p>
                                         
                                         <div className="space-y-2">
                                             <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-slate-600">
-                                                <span>Yayın İlerlemesi</span>
+                                                <span>Yayılım İlerlemesi</span>
                                                 <span>{ad.channel_count} / {activeChannelsCount} KANAL</span>
                                             </div>
                                             <div className="h-2 w-full bg-slate-950 rounded-full overflow-hidden border border-white/5">
                                                 <div 
-                                                    className={`h-full transition-all duration-1000 ${ad.status === 'sending' ? 'bg-emerald-500 animate-pulse' : 'bg-blue-600'}`} 
+                                                    className={`h-full transition-all duration-1000 ${ad.status === 'sending' ? 'bg-emerald-500' : 'bg-blue-600'}`} 
                                                     style={{ width: `${progress}%` }}
                                                 ></div>
                                             </div>
@@ -279,28 +291,27 @@ const AdsManagement = () => {
 
                                         <div className="flex flex-wrap gap-4 pt-2">
                                             <div className="flex items-center gap-2 text-[9px] font-black text-slate-600 uppercase tracking-widest bg-slate-950/50 px-3 py-1.5 rounded-xl">
-                                                <Activity size={12} className="text-blue-500" /> {ad.total_reach || 0} ERİŞİM
+                                                <Activity size={12} className="text-blue-500" /> {ad.total_reach?.toLocaleString() || 0} POTANSİYEL ERİŞİM
                                             </div>
                                             <div className="flex items-center gap-2 text-[9px] font-black text-slate-600 uppercase tracking-widest bg-slate-950/50 px-3 py-1.5 rounded-xl">
                                                 <Calendar size={12} className="text-orange-500" /> {new Date(ad.created_at).toLocaleDateString()}
                                             </div>
-                                            <div className="flex items-center gap-2 text-[9px] font-black text-slate-600 uppercase tracking-widest bg-slate-950/50 px-3 py-1.5 rounded-xl">
-                                                <Link2 size={12} className="text-purple-500" /> {ad.button_text || 'Buton Yok'}
-                                            </div>
                                         </div>
                                     </div>
 
-                                    <div className="flex flex-col gap-3 shrink-0">
+                                    <div className="flex flex-col gap-3 shrink-0 w-full lg:w-auto">
                                         <button 
                                             onClick={() => handleToggleStatus(ad)}
                                             className={`w-full px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
                                                 ad.status === 'sending' ? 'bg-orange-600/10 text-orange-500 border border-orange-500/20' : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-xl shadow-emerald-900/20'
                                             }`}
                                         >
-                                            {ad.status === 'sending' ? 'YAYINI DURAKLAT' : 'ŞİMDİ YAYINLA'}
+                                            {ad.status === 'sending' ? 'YAYINI DURDUR' : 'YAYINI BAŞLAT'}
                                         </button>
                                         <div className="flex gap-3">
-                                            <button onClick={() => handleTestSend(ad.id)} className="flex-1 p-4 bg-white/5 hover:bg-blue-600/10 rounded-2xl text-blue-500 transition-all border border-blue-500/20 flex items-center justify-center" title="Test Gönderimi"><Send size={18}/></button>
+                                            <button onClick={() => handleTestSend(ad.id)} className="flex-1 p-4 bg-white/5 hover:bg-blue-600/10 rounded-2xl text-blue-500 transition-all border border-blue-500/20 flex items-center justify-center gap-2" title="Test Gönderimi">
+                                                <Send size={16}/> <span className="text-[8px] font-black">TEST</span>
+                                            </button>
                                             <button onClick={() => { setEditingAd(ad); setIsModalOpen(true); }} className="p-4 bg-white/5 hover:bg-white/10 rounded-2xl transition-all border border-white/5"><Edit3 size={18}/></button>
                                             <button onClick={() => handleDelete(ad.id)} className="p-4 bg-white/5 hover:bg-red-600 rounded-2xl text-red-500 hover:text-white transition-all border border-white/5"><Trash2 size={18}/></button>
                                         </div>
@@ -320,8 +331,8 @@ const AdsManagement = () => {
                         <div className="flex items-center gap-6 mb-12">
                             <div className="w-16 h-16 bg-blue-600 rounded-[28px] flex items-center justify-center shadow-2xl shadow-blue-600/20"><Radio size={32} className="text-white"/></div>
                             <div>
-                                <h3 className="text-3xl font-black italic uppercase tracking-tighter text-white">Reklam <span className="text-blue-500">Yapılandırma</span></h3>
-                                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.2em] mt-1">Görsel ve Buton Optimizasyonu</p>
+                                <h3 className="text-3xl font-black italic uppercase tracking-tighter text-white">Reklam <span className="text-blue-500">Editörü</span></h3>
+                                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.2em] mt-1">İçerik ve Gönderim Ayarları</p>
                             </div>
                         </div>
 
@@ -330,12 +341,12 @@ const AdsManagement = () => {
                                 <div className="space-y-8">
                                     <AdminInput label="KAMPANYA BAŞLIĞI" value={editingAd.title} onChange={(v: string) => setEditingAd({...editingAd, title: v})} />
                                     <div className="space-y-2">
-                                        <label className="text-[9px] font-black text-slate-600 uppercase tracking-widest ml-4">REKLAM METNİ (HTML DESTEKLER)</label>
+                                        <label className="text-[9px] font-black text-slate-600 uppercase tracking-widest ml-4">MESAJ METNİ (HTML)</label>
                                         <textarea 
                                             value={editingAd.content} 
                                             onChange={e => setEditingAd({...editingAd, content: e.target.value})}
                                             className="w-full bg-slate-950 border border-white/5 rounded-3xl p-6 text-[11px] font-medium text-slate-300 h-48 focus:border-blue-500/50 outline-none resize-none shadow-inner" 
-                                            placeholder="Reklam içeriğini buraya yazın..."
+                                            placeholder="Reklam içeriği..."
                                         />
                                     </div>
                                 </div>
@@ -345,20 +356,20 @@ const AdsManagement = () => {
                                         <AdminInput label="BUTON METNİ" value={editingAd.button_text} onChange={(v: string) => setEditingAd({...editingAd, button_text: v})} />
                                         <AdminInput label="BUTON LİNKİ" value={editingAd.button_link} onChange={(v: string) => setEditingAd({...editingAd, button_link: v})} />
                                     </div>
-                                    <div className="p-8 bg-slate-900/30 border border-white/5 rounded-[40px] flex items-start gap-4">
-                                        <div className="p-3 bg-blue-500/10 rounded-2xl text-blue-500"><Info size={20} /></div>
-                                        <div>
-                                            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] mb-2 text-white italic">Yayınlama Notu</h4>
-                                            <p className="text-[10px] text-slate-600 leading-relaxed font-bold uppercase italic">
-                                                Görsel URL eklendiğinde mesaj "Fotoğraf" olarak, eklenmediğinde "Düz Metin" olarak kanallarda paylaşılır. Buton linki boş bırakılırsa reklam sadece metin olarak gönderilir.
-                                            </p>
+                                    <div className="p-8 bg-slate-900/30 border border-white/5 rounded-[40px]">
+                                        <div className="flex items-center gap-3 text-blue-500 mb-4">
+                                            <Info size={18} />
+                                            <h4 className="text-[10px] font-black uppercase tracking-widest">Önemli Bilgi</h4>
                                         </div>
+                                        <p className="text-[10px] text-slate-600 leading-relaxed font-bold uppercase italic">
+                                            Reklamı başlattığınızda sistem, reklam modunu açmış olan tüm kanallara sırayla gönderim yapacaktır. Görsel eklendiğinde "Fotoğraflı Mesaj" olarak iletilir.
+                                        </p>
                                     </div>
                                 </div>
                             </div>
 
                             <button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 py-8 rounded-[32px] font-black text-xs uppercase tracking-[0.4em] shadow-2xl shadow-blue-600/30 transition-all active:scale-95 border-b-8 border-blue-800 flex items-center justify-center gap-4">
-                                <Save size={24} /> KAMPANYAYI VERİTABANINA KAYDET
+                                <Save size={24} /> REKLAMI KAYDET
                             </button>
                         </form>
                     </div>
