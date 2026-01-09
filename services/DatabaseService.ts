@@ -9,10 +9,10 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export class DatabaseService {
   
-  // --- TANITIM (PROMOTION) YÖNETİMİ ---
+  // --- PROMOTIONS (REKLAM) ---
   static async getPromotions(): Promise<Promotion[]> {
     const { data, error } = await supabase.from('promotions').select('*').order('created_at', { ascending: false });
-    if (error) { console.error("Promotion Fetch Error:", error); return []; }
+    if (error) return [];
     return data || [];
   }
 
@@ -35,19 +35,17 @@ export class DatabaseService {
   }
 
   static async deletePromotion(id: string) {
-    const { error } = await supabase.from('promotions').delete().eq('id', id);
-    if (error) throw error;
+    await supabase.from('promotions').delete().eq('id', id);
   }
 
   static async updatePromotionStatus(id: string, status: Promotion['status']) {
-      const { error } = await supabase.from('promotions').update({ status }).eq('id', id);
-      if (error) throw error;
+      await supabase.from('promotions').update({ status }).eq('id', id);
   }
 
-  // --- KULLANICI YÖNETİMİ ---
+  // --- KULLANICILAR ---
   static async getUsers(): Promise<User[]> {
     const { data, error } = await supabase.from('users').select('*').order('joindate', { ascending: false });
-    if (error) { console.error("Users Fetch Error:", error); return []; }
+    if (error) return [];
     return (data || []).map(u => ({ 
         id: u.id, 
         name: u.name, 
@@ -63,8 +61,7 @@ export class DatabaseService {
   }
 
   static async updateUserStatus(userId: string, status: 'Active' | 'Passive') {
-    const { error } = await supabase.from('users').update({ status }).eq('id', userId.toString());
-    if (error) throw error;
+    await supabase.from('users').update({ status }).eq('id', userId.toString());
   }
 
   static async getUserById(userId: string): Promise<User | null> {
@@ -84,7 +81,7 @@ export class DatabaseService {
     };
   }
 
-  // --- BOT YÖNETİMİ ---
+  // --- BOTLAR ---
   static async getBots(): Promise<Bot[]> {
     const { data } = await supabase.from('bots').select('*').order('id', { ascending: false });
     return data || [];
@@ -97,11 +94,6 @@ export class DatabaseService {
         ...bot, 
         ownerCount: (userBots || []).filter((ub: any) => ub.bot_id === bot.id).length 
     }));
-  }
-
-  static async getBotById(id: string): Promise<Bot | null> {
-    const { data } = await supabase.from('bots').select('*').eq('id', id).maybeSingle();
-    return data;
   }
 
   static async saveBot(bot: any) {
@@ -120,11 +112,15 @@ export class DatabaseService {
   }
 
   static async deleteBot(id: string) {
-    const { error } = await supabase.from('bots').delete().eq('id', id);
-    if (error) throw error;
+    await supabase.from('bots').delete().eq('id', id);
   }
 
-  // --- SATIŞ VE KAZANÇLAR ---
+  static async getBotById(id: string): Promise<Bot | null> {
+    const { data } = await supabase.from('bots').select('*').eq('id', id).maybeSingle();
+    return data;
+  }
+
+  // --- SATIŞLAR & KÜTÜPHANE ---
   static async getAllPurchases() {
     const { data } = await supabase.from('user_bots').select('*, users(*), bots(*)').order('acquired_at', { ascending: false });
     return data || [];
@@ -212,7 +208,7 @@ export class DatabaseService {
       } catch (e) { return 0; }
   }
 
-  // --- DUYURU VE BİLDİRİMLER ---
+  // --- DUYURULAR & BİLDİRİMLER ---
   static async getAnnouncements(): Promise<Announcement[]> {
     const { data } = await supabase.from('announcements').select('*').order('id', { ascending: false });
     return data || [];
@@ -235,8 +231,7 @@ export class DatabaseService {
   }
 
   static async deleteAnnouncement(id: string) {
-    const { error } = await supabase.from('announcements').delete().eq('id', id);
-    if (error) throw error;
+    await supabase.from('announcements').delete().eq('id', id);
   }
 
   static async sendGlobalNotification(title: string, message: string, type: Notification['type'] = 'system') {
@@ -259,7 +254,27 @@ export class DatabaseService {
 
   static markNotificationRead(id: string) { return supabase.from('notifications').update({ isRead: true }).eq('id', id); }
 
-  // --- SİSTEM ---
+  // --- İSTATİSTİKLER ---
+  static async getAdminStats() {
+    const [u, b, l, s] = await Promise.all([
+        supabase.from('users').select('*', { count: 'exact', head: true }),
+        supabase.from('bots').select('*', { count: 'exact', head: true }),
+        supabase.from('activity_logs').select('*', { count: 'exact', head: true }),
+        supabase.from('user_bots').select('*', { count: 'exact', head: true })
+    ]);
+    return { 
+        userCount: u.count || 0, 
+        botCount: b.count || 0, 
+        logCount: l.count || 0, 
+        salesCount: s.count || 0 
+    };
+  }
+
+  static async getSettings() {
+    const { data } = await supabase.from('settings').select('*').maybeSingle();
+    return data ? { ...data, maintenanceMode: Boolean(data.MaintenanceMode) } : null;
+  }
+
   static async syncUser(user: Partial<User>) {
     if (!user.id) return;
     await supabase.from('users').upsert({ 
@@ -278,19 +293,6 @@ export class DatabaseService {
       try {
           await supabase.from('activity_logs').insert({ user_id: String(userId), type, action_key: actionKey, title, description, metadata, created_at: new Date().toISOString() });
       } catch (e) {}
-  }
-
-  static async getAdminStats() {
-    const { count: u } = await supabase.from('users').select('*', { count: 'exact', head: true });
-    const { count: b } = await supabase.from('bots').select('*', { count: 'exact', head: true });
-    const { count: l } = await supabase.from('activity_logs').select('*', { count: 'exact', head: true });
-    const { count: s } = await supabase.from('user_bots').select('*', { count: 'exact', head: true });
-    return { userCount: u || 0, botCount: b || 0, logCount: l || 0, salesCount: s || 0 };
-  }
-
-  static async getSettings() {
-    const { data } = await supabase.from('settings').select('*').maybeSingle();
-    return data ? { ...data, maintenanceMode: Boolean(data.MaintenanceMode) } : null;
   }
 
   static setAdminSession(token: string) { localStorage.setItem('admin_v3_session', token); }
