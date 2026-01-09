@@ -38,7 +38,7 @@ export interface Bot {
   features?: string[];
 }
 
-export interface Ad {
+export interface Promotion {
   id: string;
   title: string;
   content: string;
@@ -48,7 +48,7 @@ export interface Ad {
   status: 'pending' | 'sending' | 'sent' | 'failed';
   total_reach: number;
   channel_count: number;
-  processed_channels?: string[]; // Hangi kanallara başarıyla gittiği
+  processed_channels?: string[]; 
   created_at: string;
   sent_at?: string;
 }

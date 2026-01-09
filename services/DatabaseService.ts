@@ -1,6 +1,6 @@
 
 import { createClient } from '@supabase/supabase-js';
-import { Bot, User, Channel, Announcement, Notification, UserBot, ActivityLog, Ad } from '../types';
+import { Bot, User, Channel, Announcement, Notification, UserBot, ActivityLog, Promotion } from '../types';
 
 const SUPABASE_URL = 'https://ybnxfwqrduuinzgnbymc.supabase.co'; 
 const SUPABASE_ANON_KEY = 'sb_publishable_VeYQ304ZpUpj3ymB3ihpjw_jt49W1G-'; 
@@ -9,50 +9,49 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export class DatabaseService {
   
-  // --- AD MANAGEMENT (REKLAM MERKEZİ) ---
-  static async getAds(): Promise<Ad[]> {
-    const { data, error } = await supabase.from('ads').select('*').order('created_at', { ascending: false });
+  // --- PROMOTION MANAGEMENT (Eski adıyla Ads - AdBlock Koruması için isim değişti) ---
+  static async getPromotions(): Promise<Promotion[]> {
+    const { data, error } = await supabase.from('promotions').select('*').order('created_at', { ascending: false });
     if (error) return [];
     return data || [];
   }
 
-  static async saveAd(ad: Partial<Ad>) {
+  static async savePromotion(promo: Partial<Promotion>) {
     const payload = {
-        id: ad.id || Math.floor(Math.random() * 999999).toString(),
-        title: ad.title,
-        content: ad.content,
-        image_url: ad.image_url,
-        button_text: ad.button_text,
-        button_link: ad.button_link,
-        status: ad.status || 'pending',
-        total_reach: ad.total_reach || 0,
-        channel_count: ad.channel_count || 0,
-        processed_channels: ad.processed_channels || [],
-        created_at: ad.created_at || new Date().toISOString()
+        id: promo.id || Math.floor(Math.random() * 999999).toString(),
+        title: promo.title,
+        content: promo.content,
+        image_url: promo.image_url,
+        button_text: promo.button_text,
+        button_link: promo.button_link,
+        status: promo.status || 'pending',
+        total_reach: promo.total_reach || 0,
+        channel_count: promo.channel_count || 0,
+        processed_channels: promo.processed_channels || [],
+        created_at: promo.created_at || new Date().toISOString()
     };
-    const { error } = await supabase.from('ads').upsert(payload, { onConflict: 'id' });
+    const { error } = await supabase.from('promotions').upsert(payload, { onConflict: 'id' });
     if (error) throw error;
   }
 
-  static async deleteAd(id: string) {
-    const { error } = await supabase.from('ads').delete().eq('id', id);
+  static async deletePromotion(id: string) {
+    const { error } = await supabase.from('promotions').delete().eq('id', id);
     if (error) throw error;
   }
 
-  static async updateAdStatus(id: string, status: Ad['status']) {
-      // Eğer statü 'sending'e çekiliyorsa, işlemleri sıfırlamak yerine kaldığı yerden devam etmesi için payload'u koruyoruz.
-      const { error } = await supabase.from('ads').update({ status }).eq('id', id);
+  static async updatePromotionStatus(id: string, status: Promotion['status']) {
+      const { error } = await supabase.from('promotions').update({ status }).eq('id', id);
       if (error) throw error;
   }
 
-  static async requestTestAd(adId: string, adminTelegramId: string) {
+  static async requestTestPromotion(promoId: string, adminTelegramId: string) {
       await supabase.from('activity_logs').insert({
           user_id: adminTelegramId,
           type: 'system',
-          action_key: 'TEST_AD_REQUEST',
+          action_key: 'TEST_PROMO_REQUEST',
           title: 'Reklam Test İsteği',
-          description: `Reklam ID: ${adId}`,
-          metadata: { adId, adminTelegramId }
+          description: `Reklam ID: ${promoId}`,
+          metadata: { promoId, adminTelegramId }
       });
   }
 
