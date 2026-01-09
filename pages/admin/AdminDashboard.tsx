@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import * as Router from 'react-router-dom';
 import { 
   LayoutDashboard, Users, Bot, LogOut, Menu, X, 
@@ -128,7 +128,6 @@ const HomeView = () => {
     );
 };
 
-// --- PROMOTION MANAGEMENT (RE-FIXED TO AVOID LOOP) ---
 const PromotionManagement = () => {
     const [promos, setPromos] = useState<Promotion[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -145,13 +144,7 @@ const PromotionManagement = () => {
         finally { setIsLoading(false); }
     }, []);
 
-    useEffect(() => { 
-        loadData(); 
-        const itv = setInterval(() => {
-             DatabaseService.getPromotions().then(setPromos);
-        }, 15000);
-        return () => clearInterval(itv);
-    }, [loadData]);
+    useEffect(() => { loadData(); }, [loadData]);
 
     const handleToggle = async (promo: Promotion) => {
         const next = promo.status === 'sending' ? 'pending' : 'sending';
@@ -159,7 +152,7 @@ const PromotionManagement = () => {
         loadData();
     };
 
-    if (isLoading && promos.length === 0) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-blue-500" /></div>;
+    if (isLoading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-blue-500" /></div>;
 
     return (
         <div className="space-y-10 animate-in fade-in">
@@ -228,17 +221,25 @@ const UserManagement = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
 
-    useEffect(() => { DatabaseService.getUsers().then(setUsers).finally(() => setIsLoading(false)); }, []);
+    const load = useCallback(async () => {
+        setIsLoading(true);
+        const data = await DatabaseService.getUsers();
+        setUsers(data);
+        setIsLoading(false);
+    }, []);
 
-    // Fix: Explicitly type nextStatus and next use strictly typed updated array to resolve User[] status assignment error.
+    useEffect(() => { load(); }, [load]);
+
     const toggleStatus = async (user: User) => {
         const nextStatus: 'Active' | 'Passive' = user.status === 'Active' ? 'Passive' : 'Active';
         await DatabaseService.updateUserStatus(user.id, nextStatus);
-        const updated: User[] = users.map(u => u.id === user.id ? { ...u, status: nextStatus } : u);
-        setUsers(updated);
+        load();
     };
 
-    const filtered = users.filter(u => u.name.toLowerCase().includes(searchTerm.toLowerCase()) || u.username.toLowerCase().includes(searchTerm.toLowerCase()));
+    const filtered = users.filter(u => 
+        u.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+        u.username.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     if (isLoading) return <div className="flex justify-center py-24"><Loader2 className="animate-spin text-blue-500" /></div>;
 
@@ -289,8 +290,13 @@ const BotManagement = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingBot, setEditingBot] = useState<any>(null);
 
-    const load = async () => { setBots(await DatabaseService.getBotsWithStats()); setIsLoading(false); };
-    useEffect(() => { load(); }, []);
+    const load = useCallback(async () => {
+        setIsLoading(true);
+        setBots(await DatabaseService.getBotsWithStats());
+        setIsLoading(false);
+    }, []);
+
+    useEffect(() => { load(); }, [load]);
 
     if (isLoading) return <div className="flex justify-center py-24"><Loader2 className="animate-spin text-blue-500" /></div>;
 
@@ -384,8 +390,8 @@ const AnnouncementCenter = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingAnn, setEditingAnn] = useState<any>(null);
 
-    const load = async () => setAnns(await DatabaseService.getAnnouncements());
-    useEffect(() => { load(); }, []);
+    const load = useCallback(async () => setAnns(await DatabaseService.getAnnouncements()), []);
+    useEffect(() => { load(); }, [load]);
 
     const colors: Record<string, string> = { purple: 'bg-purple-600', emerald: 'bg-emerald-600', blue: 'bg-blue-600', orange: 'bg-orange-600' };
 
@@ -447,8 +453,11 @@ const AdminNotifications = () => {
     const handleSend = async () => {
         if (!title || !msg) return;
         setIsSending(true);
-        await DatabaseService.sendGlobalNotification(title, msg, 'system');
-        setIsSending(false); setTitle(''); setMsg(''); alert('Gönderildi!');
+        try {
+            await DatabaseService.sendGlobalNotification(title, msg, 'system');
+            setTitle(''); setMsg(''); alert('Gönderildi!');
+        } catch(e) { alert('Hata oluştu.'); }
+        finally { setIsSending(false); }
     };
     return (
         <div className="animate-in fade-in space-y-10">
