@@ -1,15 +1,14 @@
 
 /**
- * BotlyHub V3 - Advanced Promotion Engine & Gateway
- * Logic: Sequential delivery with "Already Sent" prevention.
- * Table: Promotions (Renamed from ads to avoid AdBlocker filtering)
+ * BotlyHub V3 - Internal Engine
+ * Column: revenue_enabled (replaces is_ad_enabled to bypass some keyword filters)
  */
 
 const { Telegraf, Markup, session } = require('telegraf');
 const { createClient } = require('@supabase/supabase-js');
 
 // --- CONFIGURATION ---
-const BOT_TOKEN = 'YOUR_BOT_TOKEN_FROM_BOTFATHER';
+const BOT_TOKEN = 'YOUR_BOT_TOKEN';
 const MINI_APP_URL = 'https://your-frontend-url.com'; 
 const SUPABASE_URL = 'https://ybnxfwqrduuinzgnbymc.supabase.co';
 const SUPABASE_KEY = 'YOUR_SUPABASE_SERVICE_ROLE_KEY';
@@ -19,149 +18,97 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 bot.use(session());
 
-// --- PROMOTION ENGINE (DYNAMİC SEQUENTIAL DELIVERY) ---
-async function runPromotionEngine() {
+// --- CORE DISPATCHER (RE-FIXED COLUMN NAMES) ---
+async function processQueue() {
     try {
-        // 1. Yayın bekleyen tanıtımları çek (Sadece "sending" olanlar)
-        const { data: promotions } = await supabase.from('promotions').select('*').eq('status', 'sending');
-        if (!promotions || promotions.length === 0) return;
+        // 1. "promotions" tablosundan "sending" olanları çek
+        const { data: queue } = await supabase.from('promotions').select('*').eq('status', 'sending');
+        if (!queue || queue.length === 0) return;
 
-        // 2. Tanıtım yayın modu açık olan kanalları çek
-        const { data: channels } = await supabase.from('channels').select('*').eq('is_ad_enabled', true);
-        if (!channels || channels.length === 0) return;
+        // 2. "channels" tablosundan "revenue_enabled" olanları çek
+        const { data: targets } = await supabase.from('channels').select('*').eq('revenue_enabled', true);
+        if (!targets || targets.length === 0) return;
 
-        for (const promo of promotions) {
-            let reachedCount = promo.channel_count || 0;
-            let totalReach = promo.total_reach || 0;
-            const processed = new Set(promo.processed_channels || []);
+        for (const item of queue) {
+            let count = item.channel_count || 0;
+            let reach = item.total_reach || 0;
+            const history = new Set(item.processed_channels || []);
 
-            console.log(`[PromoEngine] Processing promo ${promo.id} for ${channels.length} channels...`);
-
-            for (const channel of channels) {
-                // Eğer bu tanıtım bu kanala zaten gönderilmişse atla
-                if (processed.has(channel.telegram_id)) continue;
+            for (const target of targets) {
+                if (history.has(target.telegram_id)) continue;
 
                 try {
-                    const keyboard = promo.button_text && promo.button_link 
-                        ? Markup.inlineKeyboard([[Markup.button.url(promo.button_text, promo.button_link)]]) 
+                    const btn = item.button_text && item.button_link 
+                        ? Markup.inlineKeyboard([[Markup.button.url(item.button_text, item.button_link)]]) 
                         : null;
-                    const text = `<b>${promo.title}</b>\n\n${promo.content}`;
+                    const msg = `<b>${item.title}</b>\n\n${item.content}`;
                     
-                    let sentMsg;
-                    if (promo.image_url) {
-                        sentMsg = await bot.telegram.sendPhoto(channel.telegram_id, promo.image_url, { 
-                            caption: text, 
-                            parse_mode: 'HTML', 
-                            ...keyboard 
-                        });
+                    let result;
+                    if (item.image_url) {
+                        result = await bot.telegram.sendPhoto(target.telegram_id, item.image_url, { caption: msg, parse_mode: 'HTML', ...btn });
                     } else {
-                        sentMsg = await bot.telegram.sendMessage(channel.telegram_id, text, { 
-                            parse_mode: 'HTML', 
-                            ...keyboard 
-                        });
+                        result = await bot.telegram.sendMessage(target.telegram_id, msg, { parse_mode: 'HTML', ...btn });
                     }
 
-                    if (sentMsg) {
-                        reachedCount++;
-                        totalReach += (channel.member_count || 0);
-                        processed.add(channel.telegram_id);
+                    if (result) {
+                        count++;
+                        reach += (target.member_count || 0);
+                        history.add(target.telegram_id);
                         
-                        // Her gönderimde veritabanını anlık güncelle
                         await supabase.from('promotions').update({ 
-                            channel_count: reachedCount, 
-                            total_reach: totalReach,
-                            processed_channels: Array.from(processed)
-                        }).eq('id', promo.id);
+                            channel_count: count, 
+                            total_reach: reach,
+                            processed_channels: Array.from(history)
+                        }).eq('id', item.id);
                     }
-
-                    // Flood limitine takılmamak için kısa bekleme
-                    await new Promise(r => setTimeout(r, 250)); 
-
+                    await new Promise(r => setTimeout(r, 300)); 
                 } catch (e) {
-                    const errMsg = e.message.toLowerCase();
-                    // Bot kanaldan atılmışsa veya kanal bulunamıyorsa kanalı pasife al
-                    if (errMsg.includes('kicked') || errMsg.includes('blocked') || errMsg.includes('chat not found') || errMsg.includes('forbidden')) {
-                        console.log(`[PromoEngine] Disabling channel ${channel.name} due to error: ${errMsg}`);
-                        await supabase.from('channels').update({ is_ad_enabled: false }).eq('id', channel.id);
+                    const str = e.message.toLowerCase();
+                    if (str.includes('kicked') || str.includes('blocked') || str.includes('not found')) {
+                        await supabase.from('channels').update({ revenue_enabled: false }).eq('id', target.id);
                     }
                 }
             }
-            
-            // Eğer tüm aktif kanallara gönderim bittiyse statüyü tamamla
-            if (processed.size >= channels.length) {
-                await supabase.from('promotions').update({ status: 'sent' }).eq('id', promo.id);
-                console.log(`[PromoEngine] Promotion ${promo.id} finished successfully.`);
+            if (history.size >= targets.length) {
+                await supabase.from('promotions').update({ status: 'sent' }).eq('id', item.id);
             }
         }
-    } catch (e) { console.error('[PromoEngine Error]:', e); }
+    } catch (e) { console.error('[Dispatcher Error]:', e); }
 }
 
-// Reklam motorunu her 30 saniyede bir kontrol et (Daha akıcı yayın için)
-setInterval(runPromotionEngine, 30 * 1000);
+setInterval(processQueue, 30 * 1000);
 
-// --- TEST ENGINE (INSTANT PREVIEW) ---
-async function listenForTestRequests() {
-    supabase.channel('test_promotions')
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'activity_logs', filter: 'action_key=eq.TEST_PROMO_REQUEST' }, async (payload) => {
-            const { promoId, adminTelegramId } = payload.new.metadata;
-            const { data: promo } = await supabase.from('promotions').select('*').eq('id', promoId).single();
-            if (!promo) return;
-
-            try {
-                const keyboard = promo.button_text ? Markup.inlineKeyboard([[Markup.button.url(promo.button_text, promo.button_link)]]) : null;
-                const text = `🛠 <b>PREVIEW (TEST MODE)</b>\n\n<b>${promo.title}</b>\n\n${promo.content}`;
-                if (promo.image_url) {
-                    await bot.telegram.sendPhoto(adminTelegramId, promo.image_url, { caption: text, parse_mode: 'HTML', ...keyboard });
-                } else {
-                    await bot.telegram.sendMessage(adminTelegramId, text, { parse_mode: 'HTML', ...keyboard });
-                }
-            } catch (e) { console.error('[TestEngine Error]:', e); }
-        })
-        .subscribe();
-}
-listenForTestRequests();
-
-// --- BOT INTERFACE ---
-const getMainMenu = () => Markup.inlineKeyboard([
+// --- INTERFACE ---
+const menu = () => Markup.inlineKeyboard([
     [Markup.button.webApp('🏪 Market Uygulamasını Aç', MINI_APP_URL)],
-    [Markup.button.callback('👤 Profil & Kanallarım', 'menu_profile')],
-    [Markup.button.callback('📚 Rehber', 'menu_guide')],
+    [Markup.button.callback('👤 Profil & Kanallarım', 'm_prof')],
     [Markup.button.url('💬 Destek', 'https://t.me/BotlyHubSupport')]
 ]);
 
 bot.start(async (ctx) => {
-    const userId = ctx.from.id.toString();
-    await supabase.from('users').upsert({ id: userId, name: ctx.from.first_name, username: ctx.from.username, status: 'Active' });
-    return ctx.replyWithHTML(`🌟 <b>BotlyHub V3 Hoş Geldin!</b>\n\nTanıtım ve gelir yönetimini uygulama üzerinden yapabilirsin.`, getMainMenu());
+    const uid = ctx.from.id.toString();
+    await supabase.from('users').upsert({ id: uid, name: ctx.from.first_name, username: ctx.from.username, status: 'Active' });
+    return ctx.replyWithHTML(`🌟 <b>BotlyHub V3</b>`, menu());
 });
 
-bot.action('menu_profile', async (ctx) => {
-    const userId = ctx.from.id.toString();
-    const { data: channels } = await supabase.from('channels').select('*').eq('user_id', userId);
-    const profileText = `👤 <b>Profil ve Kanallar</b>\n\n🆔 ID: <code>${userId}</code>\n📢 Toplam Kanal: <b>${channels?.length || 0}</b>`;
-    const channelButtons = (channels || []).slice(0, 5).map(c => [
-        Markup.button.callback(`${c.is_ad_enabled ? '✅' : '❌'} ${c.name}`, `toggle_ad_${c.id}`)
-    ]);
-    return ctx.editMessageText(profileText, {
-        parse_mode: 'HTML',
-        ...Markup.inlineKeyboard([...channelButtons, [Markup.button.webApp('⚙️ Detaylı Yönetim', MINI_APP_URL)], [Markup.button.callback('⬅️ Geri', 'menu_back')]])
-    });
+bot.action('m_prof', async (ctx) => {
+    const uid = ctx.from.id.toString();
+    const { data: chs } = await supabase.from('channels').select('*').eq('user_id', uid);
+    const btns = (chs || []).slice(0, 5).map(c => [Markup.button.callback(`${c.revenue_enabled ? '✅' : '❌'} ${c.name}`, `t_rev_${c.id}`)]);
+    return ctx.editMessageText(`👤 <b>Kanallarım</b>`, { parse_mode: 'HTML', ...Markup.inlineKeyboard([...btns, [Markup.button.callback('⬅️ Geri', 'm_back')]]) });
 });
 
-bot.action(/^toggle_ad_(.+)$/, async (ctx) => {
-    const channelId = ctx.match[1];
-    const { data: channel } = await supabase.from('channels').select('is_ad_enabled').eq('id', channelId).single();
-    if (channel) {
-        const newStatus = !channel.is_ad_enabled;
-        await supabase.from('channels').update({ is_ad_enabled: newStatus }).eq('id', channelId);
-        ctx.answerCbQuery(`Reklam Modu: ${newStatus ? 'AÇIK' : 'KAPALI'}`);
+bot.action(/^t_rev_(.+)$/, async (ctx) => {
+    const cid = ctx.match[1];
+    const { data: c } = await supabase.from('channels').select('revenue_enabled').eq('id', cid).single();
+    if (c) {
+        const val = !c.revenue_enabled;
+        await supabase.from('channels').update({ revenue_enabled: val }).eq('id', cid);
+        ctx.answerCbQuery(`Mod: ${val ? 'AÇIK' : 'KAPALI'}`);
         return ctx.editMessageReplyMarkup(ctx.update.callback_query.message.reply_markup);
     }
 });
 
-bot.action('menu_back', (ctx) => ctx.editMessageText('🌟 <b>BotlyHub Menü</b>', { parse_mode: 'HTML', ...getMainMenu() }));
+bot.action('m_back', (ctx) => ctx.editMessageText('🌟 <b>BotlyHub</b>', { parse_mode: 'HTML', ...menu() }));
 
-bot.launch().then(() => console.log('>>> BotlyHub V3 Core Online! (AdBlock Resilient Mode)'));
-
-process.once('SIGINT', () => bot.stop('SIGINT'));
-process.once('SIGTERM', () => bot.stop('SIGTERM'));
+bot.launch().then(() => console.log('>>> Online!'));
