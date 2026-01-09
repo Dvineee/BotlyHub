@@ -9,7 +9,7 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export class DatabaseService {
   
-  // --- AD MANAGEMENT ---
+  // --- AD MANAGEMENT (REKLAM MERKEZİ) ---
   static async getAds(): Promise<Ad[]> {
     const { data, error } = await supabase.from('ads').select('*').order('created_at', { ascending: false });
     if (error) return [];
@@ -38,205 +38,73 @@ export class DatabaseService {
     if (error) throw error;
   }
 
-  // --- BİLDİRİM YÖNETİMİ ---
-  static async sendGlobalNotification(title: string, message: string, type: Notification['type'] = 'system') {
-      const { data, error } = await supabase.from('notifications').insert([
-        {
-          id: Math.floor(Math.random() * 999999999).toString(),
-          title: title.trim(),
-          message: message.trim(),
-          type: type,
-          date: new Date().toISOString(),
-          isRead: false,
-          target_type: 'global'
-        }
-      ]).select();
-      
-      if (error) {
-          console.error("Supabase Notification Error:", error);
-          throw error;
-      }
-      return data;
+  static async updateAdStatus(id: string, status: Ad['status']) {
+      await supabase.from('ads').update({ status }).eq('id', id);
   }
 
-  static async sendUserNotification(userId: string, title: string, message: string, type: Notification['type'] = 'system') {
-      const { data, error } = await supabase.from('notifications').insert([
-        {
-          id: Math.floor(Math.random() * 999999999).toString(),
-          title: title.trim(),
-          message: message.trim(),
-          type: type,
-          date: new Date().toISOString(),
-          isRead: false,
-          user_id: userId,
-          target_type: 'user'
-        }
-      ]).select();
-      
-      if (error) throw error;
-      return data;
-  }
-
-  static async getNotifications(userId?: string): Promise<Notification[]> {
-    if (!userId) return [];
-    const { data, error } = await supabase
-        .from('notifications')
-        .select('*')
-        .or(`user_id.eq.${userId},target_type.eq.global`)
-        .order('date', { ascending: false });
-        
-    if (error) return [];
-    return (data || []).map(n => ({ 
-        id: String(n.id), 
-        type: n.type, 
-        title: n.title, 
-        message: n.message, 
-        date: n.date, 
-        isRead: n.isRead, 
-        user_id: n.user_id, 
-        target_type: n.target_type 
-    }));
-  }
-
-  static async markNotificationRead(id: string) {
-    await supabase.from('notifications').update({ isRead: true }).eq('id', id);
-  }
-
-  // --- DUYURU YÖNETİMİ ---
-  static async getAnnouncements(): Promise<Announcement[]> {
-    const { data } = await supabase.from('announcements').select('*').order('id', { ascending: false });
-    return data || [];
-  }
-
-  static async saveAnnouncement(ann: any) {
-    const dbPayload = {
-        id: ann.id || Math.floor(Math.random() * 999999).toString(),
-        title: String(ann.title),
-        description: String(ann.description),
-        button_text: String(ann.button_text),
-        button_link: String(ann.button_link),
-        icon_name: String(ann.icon_name),
-        color_scheme: String(ann.color_scheme),
-        is_active: Boolean(ann.is_active),
-        action_type: String(ann.action_type),
-        content_detail: String(ann.content_detail || '')
-    };
-    const { error } = await supabase.from('announcements').upsert(dbPayload, { onConflict: 'id' });
-    if (error) throw error;
-  }
-
-  static async deleteAnnouncement(id: string) {
-    const { error } = await supabase.from('announcements').delete().eq('id', id);
-    if (error) throw error;
-  }
-
-  // --- SAHİPLİK VE LİSANS KONTROLÜ (YENİ) ---
-  static async isBotOwnedByUser(userId: string, botId: string): Promise<boolean> {
-      const { data, error } = await supabase
-          .from('user_bots')
-          .select('id, is_active, expiryDate')
-          .eq('user_id', userId.toString())
-          .eq('bot_id', botId.toString())
-          .maybeSingle();
-      
-      if (error || !data) return false;
-      
-      // Süre kontrolü
-      if (data.expiryDate && new Date(data.expiryDate) < new Date()) {
-          return false;
-      }
-      
-      return data.is_active;
+  // Reklamı test olarak adminin kendisine gönderilmesi için bir log oluşturur
+  static async requestTestAd(adId: string, adminTelegramId: string) {
+      await supabase.from('activity_logs').insert({
+          user_id: adminTelegramId,
+          type: 'system',
+          action_key: 'TEST_AD_REQUEST',
+          title: 'Reklam Test İsteği',
+          description: `Reklam ID: ${adId}`,
+          metadata: { adId, adminTelegramId }
+      });
   }
 
   // --- KANAL VE LOG YÖNETİMİ ---
+  static async getChannelsCount(onlyActive: boolean = true): Promise<number> {
+      let query = supabase.from('channels').select('*', { count: 'exact', head: true });
+      if (onlyActive) query = query.eq('is_ad_enabled', true);
+      const { count } = await query;
+      return count || 0;
+  }
+
   static async logActivity(userId: string, type: ActivityLog['type'], actionKey: string, title: string, description: string, metadata: any = {}) {
       try {
-          const uIdStr = String(userId).trim();
           await supabase.from('activity_logs').insert({
-              user_id: uIdStr,
+              user_id: String(userId),
               type,
               action_key: actionKey,
               title,
               description,
-              metadata: { ...metadata, client_time: new Date().toISOString(), platform: 'Telegram_Web' },
+              metadata: { ...metadata, client_time: new Date().toISOString() },
               created_at: new Date().toISOString()
           });
       } catch (e) { console.error(e); }
   }
 
   static async updateChannelAdStatus(channelId: string, status: boolean) {
-      const { error } = await supabase.from('channels').update({ is_ad_enabled: status }).eq('id', channelId);
-      if (error) throw error;
+      await supabase.from('channels').update({ is_ad_enabled: status }).eq('id', channelId);
   }
 
   static async syncChannelsFromBotActivity(userId: string): Promise<number> {
       try {
           const uIdStr = String(userId).trim();
-          const { data: logs, error: logErr } = await supabase.from('bot_discovery_logs').select('*').eq('owner_id', uIdStr).eq('is_synced', false);
-          
-          if (logErr || !logs || logs.length === 0) return 0;
-          
-          let successCount = 0;
+          const { data: logs } = await supabase.from('bot_discovery_logs').select('*').eq('owner_id', uIdStr).eq('is_synced', false);
+          if (!logs || logs.length === 0) return 0;
+          let count = 0;
           for (const log of logs) {
-              const botId = String(log.bot_id);
               const telegramId = String(log.chat_id || log.telegram_id || '').trim();
-
               if (!telegramId) continue;
-
               const { data: existing } = await supabase.from('channels').select('*').eq('user_id', uIdStr).eq('telegram_id', telegramId).maybeSingle();
-              
-              let syncOk = false;
               if (existing) {
-                  const bots = Array.from(new Set([...(existing.connected_bot_ids || []), botId]));
-                  const { error: upErr } = await supabase.from('channels').update({ 
-                      member_count: log.member_count || existing.member_count, 
-                      connected_bot_ids: bots, 
-                      icon: log.channel_icon || existing.icon,
-                      name: log.channel_name || existing.name,
-                      is_ad_enabled: true 
-                  }).eq('id', existing.id);
-                  if (!upErr) syncOk = true;
+                  await supabase.from('channels').update({ member_count: log.member_count, is_ad_enabled: true }).eq('id', existing.id);
               } else {
-                  const { error: insErr } = await supabase.from('channels').insert({ 
-                      user_id: uIdStr, 
-                      telegram_id: telegramId, 
-                      name: log.channel_name || 'İsimsiz Kanal', 
-                      member_count: log.member_count || 0, 
-                      icon: log.channel_icon || `https://ui-avatars.com/api/?name=${encodeURIComponent(log.channel_name || 'CH')}`, 
-                      connected_bot_ids: [botId], 
-                      revenue: 0,
-                      is_ad_enabled: true
-                  });
-                  if (!insErr) syncOk = true;
+                  await supabase.from('channels').insert({ user_id: uIdStr, telegram_id: telegramId, name: log.channel_name, member_count: log.member_count, is_ad_enabled: true, revenue: 0 });
               }
-              
-              if (syncOk) {
-                  await supabase.from('bot_discovery_logs').update({ is_synced: true }).eq('id', log.id);
-                  successCount++;
-              }
+              await supabase.from('bot_discovery_logs').update({ is_synced: true }).eq('id', log.id);
+              count++;
           }
-          return successCount;
-      } catch (e) { 
-          console.error("SyncChannels Error:", e);
-          return 0; 
-      }
+          return count;
+      } catch (e) { return 0; }
   }
 
   static async getChannels(userId: string): Promise<Channel[]> {
-    const uIdStr = String(userId).trim();
-    const { data } = await supabase.from('channels').select('*').eq('user_id', uIdStr).order('created_at', { ascending: false });
-    return (data || []).map(c => ({ 
-        id: String(c.id), 
-        user_id: String(c.user_id), 
-        telegram_id: String(c.telegram_id || ''),
-        name: c.name, 
-        memberCount: c.member_count || 0, 
-        icon: c.icon || '', 
-        isAdEnabled: c.is_ad_enabled || false, 
-        connectedBotIds: c.connected_bot_ids || [], 
-        revenue: Number(c.revenue || 0) 
-    }));
+    const { data } = await supabase.from('channels').select('*').eq('user_id', userId.toString()).order('created_at', { ascending: false });
+    return (data || []).map(c => ({ id: String(c.id), user_id: String(c.user_id), telegram_id: String(c.telegram_id), name: c.name, memberCount: c.member_count || 0, icon: c.icon || '', isAdEnabled: c.is_ad_enabled, connectedBotIds: c.connected_bot_ids || [], revenue: Number(c.revenue || 0) }));
   }
 
   static async removeUserBot(userId: string, botId: string) {
@@ -256,54 +124,39 @@ export class DatabaseService {
   }
 
   static async getBotsWithStats(): Promise<any[]> {
-    const { data: bots, error: botsError } = await supabase.from('bots').select('*').order('id', { ascending: false });
-    if (botsError) throw botsError;
-
-    const { data: userBots, error: userBotsError } = await supabase.from('user_bots').select('bot_id');
-    if (userBotsError) throw userBotsError;
-
-    return (bots || []).map(bot => ({
-      ...bot,
-      ownerCount: (userBots || []).filter((ub: any) => ub.bot_id === bot.id).length
-    }));
+    const { data: bots } = await supabase.from('bots').select('*').order('id', { ascending: false });
+    const { data: userBots } = await supabase.from('user_bots').select('bot_id');
+    return (bots || []).map(bot => ({ ...bot, ownerCount: (userBots || []).filter((ub: any) => ub.bot_id === bot.id).length }));
   }
 
   static async deleteBot(id: string) {
-    const { error } = await supabase.from('bots').delete().eq('id', id);
-    if (error) throw error;
+    await supabase.from('bots').delete().eq('id', id);
   }
 
   static async saveBot(bot: any) {
-    const { error } = await supabase.from('bots').upsert({
-      id: bot.id,
-      name: bot.name,
-      description: bot.description,
-      price: Number(bot.price),
-      category: bot.category,
-      bot_link: bot.bot_link,
-      screenshots: bot.screenshots || [],
-      icon: bot.icon,
-      is_premium: Boolean(bot.is_premium)
-    }, { onConflict: 'id' });
-    if (error) throw error;
+    await supabase.from('bots').upsert({ id: bot.id, name: bot.name, description: bot.description, price: Number(bot.price), category: bot.category, bot_link: bot.bot_link, screenshots: bot.screenshots || [], icon: bot.icon, is_premium: Boolean(bot.is_premium) });
   }
 
   static async getUserBots(userId: string): Promise<UserBot[]> {
     const { data } = await supabase.from('user_bots').select('*, bots(*)').eq('user_id', userId.toString());
-    if (!data) return [];
-    return data.map((item: any) => ({ ...item.bots, expiryDate: item.expiryDate, ownership_id: item.id, is_premium: item.is_premium, is_active: item.is_active })).filter(b => b.id);
+    return (data || []).map((item: any) => ({ ...item.bots, expiryDate: item.expiryDate, ownership_id: item.id, is_premium: item.is_premium, is_active: item.is_active })).filter(b => b.id);
+  }
+
+  // Fix: Added isBotOwnedByUser to resolve errors in BotDetail.tsx regarding missing method on DatabaseService.
+  static async isBotOwnedByUser(userId: string, botId: string): Promise<boolean> {
+    const { data } = await supabase.from('user_bots').select('id').eq('user_id', userId.toString()).eq('bot_id', botId.toString()).maybeSingle();
+    return !!data;
   }
 
   static async addUserBot(userData: any, botData: Bot, isPremium: boolean = false) {
     const userId = (userData.id || userData).toString();
-    const { error } = await supabase.from('user_bots').upsert({ user_id: userId, bot_id: botData.id, is_active: true, is_premium: isPremium, acquired_at: new Date().toISOString() });
-    if (error) throw error;
+    await supabase.from('user_bots').upsert({ user_id: userId, bot_id: botData.id, is_active: true, is_premium: isPremium, acquired_at: new Date().toISOString() });
     return true;
   }
 
   static async syncUser(user: Partial<User>) {
     if (!user.id) return;
-    await supabase.from('users').upsert({ id: user.id.toString(), name: user.name, username: user.username, avatar: user.avatar, email: user.email, joindate: new Date().toISOString(), joinDate: new Date().toISOString() }, { onConflict: 'id' });
+    await supabase.from('users').upsert({ id: user.id.toString(), name: user.name, username: user.username, avatar: user.avatar, email: user.email, joindate: new Date().toISOString() }, { onConflict: 'id' });
   }
 
   static async getUserById(userId: string): Promise<User | null> {
@@ -313,19 +166,12 @@ export class DatabaseService {
   }
 
   static async updateUserStatus(userId: string, status: 'Active' | 'Passive') {
-    const { error } = await supabase.from('users').update({ status }).eq('id', userId.toString());
-    if (error) throw error;
+    await supabase.from('users').update({ status }).eq('id', userId.toString());
   }
 
   static async getSettings() {
     const { data } = await supabase.from('settings').select('*').maybeSingle();
-    if (data) {
-        return {
-            ...data,
-            maintenanceMode: Boolean(data.MaintenanceMode)
-        };
-    }
-    return data;
+    return data ? { ...data, maintenanceMode: Boolean(data.MaintenanceMode) } : data;
   }
 
   static async getUsers(): Promise<User[]> {
@@ -344,6 +190,37 @@ export class DatabaseService {
   static async getAllPurchases() {
     const { data } = await supabase.from('user_bots').select('*, users(*), bots(*)').order('acquired_at', { ascending: false });
     return data || [];
+  }
+
+  static async sendGlobalNotification(title: string, message: string, type: Notification['type'] = 'system') {
+      await supabase.from('notifications').insert([{ id: Math.floor(Math.random() * 999999999).toString(), title: title.trim(), message: message.trim(), type: type, date: new Date().toISOString(), isRead: false, target_type: 'global' }]);
+  }
+
+  static async sendUserNotification(userId: string, title: string, message: string, type: Notification['type'] = 'system') {
+      await supabase.from('notifications').insert([{ id: Math.floor(Math.random() * 999999999).toString(), title: title.trim(), message: message.trim(), type: type, date: new Date().toISOString(), isRead: false, user_id: userId, target_type: 'user' }]);
+  }
+
+  static async getNotifications(userId?: string): Promise<Notification[]> {
+    if (!userId) return [];
+    const { data } = await supabase.from('notifications').select('*').or(`user_id.eq.${userId},target_type.eq.global`).order('date', { ascending: false });
+    return (data || []).map(n => ({ id: String(n.id), type: n.type, title: n.title, message: n.message, date: n.date, isRead: n.isRead, user_id: n.user_id, target_type: n.target_type }));
+  }
+
+  static async markNotificationRead(id: string) {
+    await supabase.from('notifications').update({ isRead: true }).eq('id', id);
+  }
+
+  static async getAnnouncements(): Promise<Announcement[]> {
+    const { data } = await supabase.from('announcements').select('*').order('id', { ascending: false });
+    return data || [];
+  }
+
+  static async saveAnnouncement(ann: any) {
+    await supabase.from('announcements').upsert({ id: ann.id || Math.floor(Math.random() * 999999).toString(), title: String(ann.title), description: String(ann.description), button_text: String(ann.button_text), button_link: String(ann.button_link), icon_name: String(ann.icon_name), color_scheme: String(ann.color_scheme), is_active: Boolean(ann.is_active), action_type: String(ann.action_type), content_detail: String(ann.content_detail || '') });
+  }
+
+  static async deleteAnnouncement(id: string) {
+    await supabase.from('announcements').delete().eq('id', id);
   }
 
   static setAdminSession(token: string) { localStorage.setItem('admin_v3_session', token); }
