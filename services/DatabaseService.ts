@@ -9,10 +9,10 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export class DatabaseService {
   
-  // --- PROMO MANAGEMENT (Safe from AdBlockers) ---
+  // --- PROMOTION MANAGEMENT ---
   static async getPromotions(): Promise<Promotion[]> {
     const { data, error } = await supabase.from('promotions').select('*').order('created_at', { ascending: false });
-    if (error) return [];
+    if (error) { console.error("Promo Get Error:", error); return []; }
     return data || [];
   }
 
@@ -55,7 +55,7 @@ export class DatabaseService {
       });
   }
 
-  // --- KANAL VE GELİR YÖNETİMİ ---
+  // --- CHANNEL & REVENUE MANAGEMENT ---
   static async getChannelsCount(onlyActive: boolean = true): Promise<number> {
       let query = supabase.from('channels').select('*', { count: 'exact', head: true });
       if (onlyActive) query = query.eq('revenue_enabled', true);
@@ -105,7 +105,7 @@ export class DatabaseService {
       } catch (e) { return 0; }
   }
 
-  // --- BOT VE KULLANICI YÖNETİMİ ---
+  // --- BOT & USER MANAGEMENT ---
   static async getBots(): Promise<Bot[]> {
     const { data } = await supabase.from('bots').select('*').order('id', { ascending: false });
     return data || [];
@@ -122,7 +122,8 @@ export class DatabaseService {
   }
 
   static async addUserBot(userData: any, botData: Bot, isPremium: boolean = false) {
-    await supabase.from('user_bots').upsert({ user_id: userData.id.toString(), bot_id: botData.id, is_active: true, is_premium: isPremium, acquired_at: new Date().toISOString() });
+    const userId = (userData.id || userData).toString();
+    await supabase.from('user_bots').upsert({ user_id: userId, bot_id: botData.id, is_active: true, is_premium: isPremium, acquired_at: new Date().toISOString() });
     return true;
   }
 
@@ -137,13 +138,33 @@ export class DatabaseService {
 
   static async syncUser(user: Partial<User>) {
     if (!user.id) return;
-    await supabase.from('users').upsert({ id: user.id.toString(), name: user.name, username: user.username, avatar: user.avatar, joindate: new Date().toISOString() }, { onConflict: 'id' });
+    await supabase.from('users').upsert({ 
+        id: user.id.toString(), 
+        name: user.name, 
+        username: user.username, 
+        avatar: user.avatar, 
+        email: user.email, 
+        joindate: new Date().toISOString(),
+        role: user.role || 'User',
+        status: user.status || 'Active'
+    }, { onConflict: 'id' });
   }
 
   static async getUserById(userId: string): Promise<User | null> {
     const { data } = await supabase.from('users').select('*').eq('id', userId.toString()).maybeSingle();
     if (!data) return null;
-    return { id: data.id, name: data.name, username: data.username, avatar: data.avatar, role: data.role || 'User', status: data.status || 'Active', badges: data.badges || [], joinDate: data.joindate, email: data.email };
+    return { 
+        id: data.id, 
+        name: data.name, 
+        username: data.username, 
+        avatar: data.avatar, 
+        role: data.role || 'User', 
+        status: data.status || 'Active', 
+        badges: data.badges || [], 
+        joinDate: data.joindate, 
+        email: data.email,
+        canPublishPromos: data.can_publish_promos // Supabase can_publish_promos sütunuyla eşleşmeli
+    };
   }
 
   static async updateUserStatus(userId: string, status: 'Active' | 'Passive') {
@@ -169,9 +190,21 @@ export class DatabaseService {
     return { userCount: u || 0, botCount: b || 0, logCount: l || 0, salesCount: s || 0 };
   }
 
+  // Fix: Explicitly map status and role to their union types to ensure strict type compatibility with the User interface.
   static async getUsers(): Promise<User[]> {
     const { data } = await supabase.from('users').select('*').order('joindate', { ascending: false });
-    return (data || []).map(u => ({ id: u.id, name: u.name, username: u.username, avatar: u.avatar, role: u.role || 'User', status: u.status || 'Active', badges: u.badges || [], joinDate: u.joindate, email: u.email }));
+    return (data || []).map(u => ({ 
+        id: u.id, 
+        name: u.name, 
+        username: u.username, 
+        avatar: u.avatar, 
+        role: (u.role === 'Admin' || u.role === 'User' || u.role === 'Moderator' ? u.role : 'User') as 'Admin' | 'User' | 'Moderator', 
+        status: (u.status === 'Active' || u.status === 'Passive' ? u.status : 'Active') as 'Active' | 'Passive', 
+        badges: u.badges || [], 
+        joinDate: u.joindate, 
+        email: u.email,
+        canPublishPromos: u.can_publish_promos 
+    }));
   }
 
   static async getAllPurchases() {
@@ -186,7 +219,17 @@ export class DatabaseService {
   }
 
   static async saveBot(bot: any) {
-    await supabase.from('bots').upsert({ id: bot.id, name: bot.name, description: bot.description, price: Number(bot.price), category: bot.category, bot_link: bot.bot_link, screenshots: bot.screenshots || [], icon: bot.icon, is_premium: Boolean(bot.is_premium) });
+    await supabase.from('bots').upsert({ 
+        id: bot.id, 
+        name: bot.name, 
+        description: bot.description, 
+        price: Number(bot.price), 
+        category: bot.category, 
+        bot_link: bot.bot_link, 
+        screenshots: bot.screenshots || [], 
+        icon: bot.icon, 
+        is_premium: Boolean(bot.is_premium) 
+    });
   }
 
   static async deleteBot(id: string) { await supabase.from('bots').delete().eq('id', id); }
@@ -197,7 +240,18 @@ export class DatabaseService {
   }
 
   static async saveAnnouncement(ann: any) {
-    await supabase.from('announcements').upsert({ id: ann.id || Math.floor(Math.random() * 999999).toString(), title: ann.title, description: ann.description, button_text: ann.button_text, button_link: ann.button_link, icon_name: ann.icon_name, color_scheme: ann.color_scheme, is_active: Boolean(ann.is_active), action_type: ann.action_type, content_detail: ann.content_detail || '' });
+    await supabase.from('announcements').upsert({ 
+        id: ann.id || Math.floor(Math.random() * 999999).toString(), 
+        title: ann.title, 
+        description: ann.description, 
+        button_text: ann.button_text, 
+        button_link: ann.button_link, 
+        icon_name: ann.icon_name, 
+        color_scheme: ann.color_scheme, 
+        is_active: Boolean(ann.is_active), 
+        action_type: ann.action_type, 
+        content_detail: ann.content_detail || '' 
+    });
   }
 
   static async deleteAnnouncement(id: string) { await supabase.from('announcements').delete().eq('id', id); }
@@ -213,7 +267,7 @@ export class DatabaseService {
   static async getNotifications(userId?: string): Promise<Notification[]> {
     if (!userId) return [];
     const { data } = await supabase.from('notifications').select('*').or(`user_id.eq.${userId},target_type.eq.global`).order('date', { ascending: false });
-    return data || [];
+    return (data || []).map(n => ({ id: String(n.id), type: n.type, title: n.title, message: n.message, date: n.date, isRead: n.isRead, user_id: n.user_id, target_type: n.target_type }));
   }
 
   static markNotificationRead(id: string) { return supabase.from('notifications').update({ isRead: true }).eq('id', id); }
