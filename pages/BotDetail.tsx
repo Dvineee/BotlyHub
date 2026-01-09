@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   ChevronLeft, Share2, Send, Loader2, ShieldCheck, 
   Bot as BotIcon, Zap, Shield, PlusCircle, X, 
-  Maximize2, ChevronRight, Eye
+  Maximize2, ChevronRight, Eye, Lock, Unlock
 } from 'lucide-react';
 import * as Router from 'react-router-dom';
 import { Bot, Channel } from '../types';
@@ -105,7 +105,7 @@ const BotDetail = () => {
         <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-slate-400 hover:text-white transition-colors">
             <ChevronLeft size={24} />
         </button>
-        <span className="text-[10px] font-black tracking-[0.2em] text-white/40 uppercase italic">Bot Bilgileri</span>
+        <span className="text-[10px] font-black tracking-[0.2em] text-white/40 uppercase italic">Lisans Kontrolü</span>
         <button className="p-2 -mr-2 text-slate-400 hover:text-white transition-colors">
             <Share2 size={20} />
         </button>
@@ -113,22 +113,50 @@ const BotDetail = () => {
 
       <div className="pt-24 px-6 mb-12 flex flex-col items-center text-center">
         <div className="relative mb-8 group">
-            <div className="absolute inset-0 bg-blue-600/20 blur-[40px] rounded-full"></div>
+            <div className={`absolute inset-0 blur-[40px] rounded-full ${isOwned ? 'bg-emerald-600/20' : 'bg-blue-600/20'}`}></div>
             <img 
               src={getLiveBotIcon(bot)} 
-              className="w-32 h-32 rounded-[40px] border border-white/10 shadow-2xl relative z-10 object-cover bg-slate-900"
+              className={`w-32 h-32 rounded-[40px] border shadow-2xl relative z-10 object-cover bg-slate-900 transition-all ${isOwned ? 'border-emerald-500/30' : 'border-white/10'}`}
               onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=1e293b&color=fff&bold=true`; }}
             />
+            <div className={`absolute -bottom-2 -right-2 p-2.5 rounded-2xl border-4 border-[#020617] shadow-xl z-20 ${isOwned ? 'bg-emerald-500 text-white' : 'bg-slate-800 text-slate-500'}`}>
+                {isOwned ? <Unlock size={18} /> : <Lock size={18} />}
+            </div>
         </div>
         
         <h1 className="text-3xl font-black text-white tracking-tight mb-6 italic uppercase">{bot.name}</h1>
         
         <div className="max-w-xs p-6 bg-slate-900/40 rounded-[32px] border border-white/5 relative overflow-hidden group">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600/50 to-transparent"></div>
+            {!isOwned && <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600/50 to-transparent"></div>}
+            {isOwned && <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-600/50 to-transparent"></div>}
             <p className="text-sm text-slate-300 leading-relaxed font-bold uppercase italic opacity-90 text-center">
                 {bot.description}
             </p>
         </div>
+      </div>
+
+      <div className="px-6 mb-12">
+          {isOwned ? (
+              <div className="p-6 bg-emerald-500/5 border border-emerald-500/10 rounded-3xl flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                      <ShieldCheck size={20} />
+                  </div>
+                  <div>
+                      <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">ERİŞİM ONAYLANDI</p>
+                      <p className="text-[9px] text-slate-500 font-bold uppercase">Bu bot kütüphanenizde kayıtlıdır.</p>
+                  </div>
+              </div>
+          ) : (
+              <div className="p-6 bg-amber-500/5 border border-amber-500/10 rounded-3xl flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500">
+                      <Lock size={20} />
+                  </div>
+                  <div>
+                      <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest">KÜTÜPHANEDE DEĞİL</p>
+                      <p className="text-[9px] text-slate-500 font-bold uppercase">Botu kullanmak için önce edinmelisiniz.</p>
+                  </div>
+              </div>
+          )}
       </div>
 
       <div className="px-6 mb-12">
@@ -168,7 +196,7 @@ const BotDetail = () => {
                 disabled={isProcessing}
                 className={`w-full h-18 py-5 rounded-[28px] text-[11px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-3 transition-all active:scale-95 disabled:opacity-50 shadow-2xl border-b-4 ${
                     isOwned 
-                    ? 'bg-blue-600 text-white border-blue-800 shadow-blue-600/30' 
+                    ? 'bg-emerald-600 text-white border-emerald-800 shadow-emerald-600/30' 
                     : 'bg-white text-slate-950 border-slate-300 shadow-white/10'
                 }`}
               >
