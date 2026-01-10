@@ -87,6 +87,15 @@ const BotDetail = () => {
               const userData = user || { id: 'guest_user', first_name: 'User' };
               await DatabaseService.addUserBot(userData, bot, false);
               setIsOwned(true);
+              
+              // OTOMATİK BİLDİRİM GÖNDERİMİ (Ücretsiz Edinme)
+              await DatabaseService.sendUserNotification(
+                  userData.id.toString(),
+                  'Yeni Bot Edinildi',
+                  `'${bot.name}' kütüphanenize başarıyla eklendi. Şimdi 'Botlarım' sayfasından yönetebilirsiniz.`,
+                  'bot'
+              );
+
               notification('success');
               // Log activity
               await DatabaseService.logActivity(userData.id.toString(), 'bot_manage', 'BOT_ACQUIRED', 'Ücretsiz Bot Edinildi', `'${bot.name}' kütüphaneye eklendi.`);

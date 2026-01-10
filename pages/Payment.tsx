@@ -46,8 +46,24 @@ const Payment = () => {
           
           if (targetBot) {
               await DatabaseService.addUserBot(userData, targetBot, false);
+              
+              // OTOMATİK BİLDİRİM GÖNDERİMİ (Lisans Aktivasyonu)
+              await DatabaseService.sendUserNotification(
+                  userData.id.toString(),
+                  'Lisans Aktif Edildi',
+                  `'${targetBot.name}' lisans ödemeniz onaylandı ve kütüphanenize eklendi. Keyifli kullanımlar!`,
+                  'payment'
+              );
           } else if (plan) {
               localStorage.setItem('userPlan', plan.id);
+              
+              // OTOMATİK BİLDİRİM GÖNDERİMİ (Plan Aktivasyonu)
+              await DatabaseService.sendUserNotification(
+                  userData.id.toString(),
+                  'Abonelik Aktif Edildi',
+                  `'${plan.name}' üyeliğiniz başarıyla aktif edildi. Avantajlarınız profilinize tanımlandı.`,
+                  'payment'
+              );
           }
           
           await DatabaseService.logActivity(
