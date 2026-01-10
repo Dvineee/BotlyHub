@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, Bell, ShieldCheck, Wallet, Info, CheckCheck, Trash2, Bot, X, Loader2 } from 'lucide-react';
+import { ChevronLeft, Bell, ShieldCheck, Wallet, Info, CheckCheck, Trash2, Bot, X, Loader2, Sparkles, Zap, Shield } from 'lucide-react';
 import * as Router from 'react-router-dom';
 import { Notification } from '../types';
 import { DatabaseService } from '../services/DatabaseService';
@@ -10,7 +10,7 @@ const { useNavigate } = Router as any;
 
 const Notifications = () => {
   const navigate = useNavigate();
-  const { user, haptic } = useTelegram();
+  const { user, haptic, notification: tgNotification } = useTelegram();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedNote, setSelectedNote] = useState<Notification | null>(null);
@@ -28,11 +28,13 @@ const Notifications = () => {
   };
 
   const markAllAsRead = async () => {
+    haptic('medium');
     setIsLoading(true);
     for (const note of notifications) {
         if (!note.isRead) await DatabaseService.markNotificationRead(note.id);
     }
     await loadNotifications();
+    tgNotification('success');
   };
 
   const handleNoteClick = async (note: Notification) => {
@@ -40,50 +42,60 @@ const Notifications = () => {
       setSelectedNote(note);
       if (!note.isRead) {
           await DatabaseService.markNotificationRead(note.id);
-          // UI üzerinde anlık güncelleme
           setNotifications(notifications.map(n => n.id === note.id ? { ...n, isRead: true } : n));
       }
   };
 
   const getIcon = (type: Notification['type']) => {
       switch (type) {
-          case 'payment': return <Wallet className="text-emerald-400" size={18} />;
-          case 'security': return <ShieldCheck className="text-red-400" size={18} />;
-          case 'bot': return <Bot className="text-blue-400" size={18} />;
-          default: return <Info className="text-slate-400" size={18} />;
+          case 'payment': return <Wallet className="text-emerald-400" size={20} />;
+          case 'security': return <ShieldCheck className="text-red-400" size={20} />;
+          case 'bot': return <Bot className="text-blue-400" size={20} />;
+          default: return <Info className="text-slate-400" size={20} />;
       }
   };
 
   const formatTime = (isoString: string) => {
       const date = new Date(isoString);
-      return date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) + ' - ' + date.toLocaleDateString('tr-TR', { day: '2-digit', month: 'short' });
+      return date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) + ' • ' + date.toLocaleDateString('tr-TR', { day: '2-digit', month: 'short' });
   };
 
   return (
-    <div className="min-h-screen bg-[#020617] p-4 pt-8 pb-24">
-      <div className="flex items-center justify-between mb-10 px-1">
-        <div className="flex items-center gap-4">
-            <button onClick={() => navigate('/settings')} className="p-3 bg-slate-900/60 border border-slate-800 rounded-2xl text-slate-400 active:scale-90 transition-transform">
-                <ChevronLeft size={20} />
+    <div className="min-h-screen bg-[#020617] p-4 pt-10 pb-32 animate-in fade-in">
+      {/* Premium Navigation Header */}
+      <div className="flex items-center justify-between mb-12 px-2">
+        <div className="flex items-center gap-5">
+            <button onClick={() => navigate('/settings')} className="p-4 bg-slate-900/60 border border-white/5 rounded-[22px] text-slate-400 active:scale-90 transition-all shadow-xl">
+                <ChevronLeft size={22} />
             </button>
-            <h1 className="text-xl font-black text-white tracking-tight uppercase">Bildirimler</h1>
+            <div>
+                <h1 className="text-2xl font-black text-white tracking-tighter uppercase italic leading-none">Inbox</h1>
+                <p className="text-[8px] font-black text-slate-700 uppercase tracking-[0.4em] mt-1.5 italic">Mesaj Merkezi</p>
+            </div>
         </div>
-        <button onClick={markAllAsRead} className="p-3 bg-slate-900/60 border border-slate-800 rounded-2xl text-blue-400 active:scale-90 transition-all">
-            <CheckCheck size={18} />
+        <button 
+            onClick={markAllAsRead} 
+            className="p-4 bg-blue-600/10 border border-blue-500/20 rounded-[22px] text-blue-500 active:scale-90 transition-all shadow-lg"
+            title="Hepsini Oku"
+        >
+            <CheckCheck size={20} />
         </button>
       </div>
 
       {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-4">
-              <Loader2 className="animate-spin text-blue-500" size={32} />
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-700">Senkronize Ediliyor...</p>
+          <div className="flex flex-col items-center justify-center py-32 gap-5">
+              <div className="relative">
+                  <div className="absolute inset-0 blur-2xl bg-blue-500/20 animate-pulse"></div>
+                  <Loader2 className="animate-spin text-blue-500 relative z-10" size={36} />
+              </div>
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-800 italic">Senkronize Ediliyor</p>
           </div>
       ) : notifications.length === 0 ? (
-          <div className="py-24 text-center">
-              <div className="w-20 h-20 bg-slate-900/50 rounded-[32px] border border-dashed border-slate-800 flex items-center justify-center mx-auto mb-6">
-                <Bell size={32} className="text-slate-800" />
+          <div className="py-32 text-center animate-in zoom-in-95">
+              <div className="w-24 h-24 bg-slate-900/40 rounded-[40px] border-2 border-dashed border-slate-800 flex items-center justify-center mx-auto mb-8 shadow-inner">
+                <Bell size={36} className="text-slate-800" />
               </div>
-              <p className="text-slate-500 font-bold uppercase text-xs tracking-widest">Henüz bildirim bulunmuyor.</p>
+              <p className="text-slate-600 font-black uppercase text-xs tracking-[0.3em] italic">Henüz bir kayıt yok</p>
           </div>
       ) : (
           <div className="space-y-4">
@@ -91,45 +103,58 @@ const Notifications = () => {
                   <div 
                     key={note.id} 
                     onClick={() => handleNoteClick(note)}
-                    className={`p-5 rounded-[28px] border transition-all flex gap-4 relative overflow-hidden group cursor-pointer ${
+                    className={`p-6 rounded-[32px] border transition-all flex gap-5 relative overflow-hidden group cursor-pointer backdrop-blur-md ${
                         note.isRead 
-                        ? 'bg-slate-950/40 border-slate-900/50 grayscale opacity-60' 
-                        : 'bg-slate-900 border-slate-800 shadow-2xl shadow-blue-500/5'
+                        ? 'bg-slate-950/40 border-white/5 opacity-50' 
+                        : 'bg-slate-900/60 border-blue-500/20 shadow-[0_10px_30px_rgba(0,0,0,0.3)]'
                     }`}
                   >
-                      {!note.isRead && <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>}
-                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-inner ${note.isRead ? 'bg-slate-900' : 'bg-slate-850'}`}>
+                      {!note.isRead && <div className="absolute top-0 left-0 w-1.5 h-full bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.8)]"></div>}
+                      
+                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-inner border border-white/5 transition-all group-active:scale-95 ${note.isRead ? 'bg-slate-950' : 'bg-slate-800'}`}>
                           {getIcon(note.type)}
                       </div>
+                      
                       <div className="flex-1 min-w-0">
-                          <div className="flex justify-between items-start mb-1 gap-4">
-                            <h4 className="text-sm font-black text-white truncate group-hover:text-blue-400 transition-colors">{note.title}</h4>
-                            <span className="text-[9px] text-slate-600 font-black whitespace-nowrap mt-1 uppercase tracking-tighter">{formatTime(note.date)}</span>
+                          <div className="flex justify-between items-start mb-2 gap-4">
+                            <h4 className={`text-sm font-black italic uppercase truncate transition-colors ${note.isRead ? 'text-slate-400' : 'text-white'}`}>{note.title}</h4>
+                            <span className="text-[8px] text-slate-600 font-black whitespace-nowrap mt-1 uppercase tracking-tighter">{formatTime(note.date)}</span>
                           </div>
-                          <p className="text-xs text-slate-500 font-medium leading-relaxed line-clamp-2">{note.message}</p>
+                          <p className="text-[10px] text-slate-500 font-bold uppercase italic leading-relaxed line-clamp-2">{note.message}</p>
                       </div>
                   </div>
               ))}
           </div>
       )}
 
-      {/* Notification Modal (Pop-up) */}
+      {/* ZIRVE V3 MOBILE MODAL */}
       {selectedNote && (
-          <div className="fixed inset-0 z-[120] flex items-center justify-center p-6 bg-black/95 backdrop-blur-md animate-in fade-in" onClick={() => setSelectedNote(null)}>
-              <div className="bg-[#020617] w-full max-w-sm rounded-[48px] overflow-hidden shadow-2xl relative border border-white/10" onClick={e => e.stopPropagation()}>
-                  <button onClick={() => setSelectedNote(null)} className="absolute top-6 right-6 p-2 bg-slate-900 rounded-2xl text-slate-500"><X size={18}/></button>
-                  <div className="p-10 text-center">
-                      <div className="w-16 h-16 bg-slate-900 border border-white/5 rounded-[24px] flex items-center justify-center mx-auto mb-8">
+          <div className="fixed inset-0 z-[150] flex items-end lg:items-center justify-center p-0 lg:p-6 bg-black/98 backdrop-blur-2xl animate-in slide-in-from-bottom duration-500" onClick={() => setSelectedNote(null)}>
+              <div className="bg-[#020617] w-full max-w-sm lg:rounded-[56px] rounded-t-[48px] overflow-hidden shadow-2xl relative border-t lg:border border-white/10" onClick={e => e.stopPropagation()}>
+                  <div className="h-1.5 w-16 bg-white/10 rounded-full mx-auto mt-4 mb-2 lg:hidden"></div>
+                  <button onClick={() => setSelectedNote(null)} className="absolute top-8 right-8 p-3 bg-white/5 rounded-2xl text-slate-500 hover:text-white transition-all"><X size={20}/></button>
+                  
+                  <div className="p-12 text-center pb-20 lg:pb-12">
+                      <div className="w-20 h-20 bg-slate-900 border border-white/5 rounded-[32px] flex items-center justify-center mx-auto mb-10 shadow-2xl rotate-3">
                         {getIcon(selectedNote.type)}
                       </div>
-                      <h3 className="text-2xl font-black text-white mb-3 tracking-tighter uppercase italic leading-tight">{selectedNote.title}</h3>
-                      <div className="h-0.5 w-12 bg-blue-600 mx-auto mb-8 rounded-full"></div>
-                      <p className="text-slate-400 text-sm leading-relaxed font-medium mb-10">{selectedNote.message}</p>
+                      
+                      <h3 className="text-3xl font-black text-white mb-4 tracking-tighter uppercase italic leading-none">{selectedNote.title}</h3>
+                      <div className="flex items-center justify-center gap-3 mb-10">
+                          <div className="h-0.5 w-8 bg-blue-600 rounded-full"></div>
+                          <span className="text-[8px] font-black text-slate-700 uppercase tracking-[0.5em]">{selectedNote.type} LOG</span>
+                          <div className="h-0.5 w-8 bg-blue-600 rounded-full"></div>
+                      </div>
+                      
+                      <div className="p-6 bg-white/5 rounded-[32px] border border-white/5 mb-12">
+                          <p className="text-slate-400 text-xs leading-relaxed font-bold uppercase italic">{selectedNote.message}</p>
+                      </div>
+
                       <button 
                         onClick={() => setSelectedNote(null)} 
-                        className="w-full py-5 bg-white text-slate-950 font-black rounded-3xl text-[11px] uppercase tracking-[0.3em] shadow-xl"
+                        className="w-full h-18 bg-white text-[#020617] font-black rounded-3xl text-[11px] uppercase tracking-[0.4em] shadow-2xl active:scale-95 transition-all border-b-4 border-slate-300"
                       >
-                        Tamam, Anladım
+                        ANLADIM
                       </button>
                   </div>
               </div>

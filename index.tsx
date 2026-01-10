@@ -1,5 +1,5 @@
 
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import React, { ErrorInfo, ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import { TranslationProvider } from './TranslationContext';
@@ -18,9 +18,9 @@ interface ErrorBoundaryState {
   error: Error | null; 
 }
 
-// Fix: Using the named 'Component' import and defining state as a class property to ensure TypeScript correctly recognizes inherited members.
-class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  // Fix: Initializing state as a class property instead of within the constructor to resolve property resolution errors.
+// Fix: Directly extending React.Component to ensure that TypeScript correctly identifies inherited members like 'props' and 'state'.
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  // Fix: Initializing state as a class property for better compatibility with class component inheritance.
   state: ErrorBoundaryState = {
     hasError: false,
     error: null
@@ -39,7 +39,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 
   render() {
-    // Fix: Accessing 'state' which is now properly recognized through inherited class member.
+    // Fix: Accessing 'state' which is inherited from React.Component.
     if (this.state.hasError) {
       return (
         <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center p-8 text-center">
@@ -58,7 +58,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       );
     }
     
-    // Fix: Accessing 'props' which is correctly inherited from the React Component base class.
+    // Fix: Accessing 'props' correctly inherited from React.Component to resolve the "Property 'props' does not exist" error.
     return this.props.children;
   }
 }
