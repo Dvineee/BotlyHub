@@ -7,7 +7,7 @@ import {
   Wallet, Search, Database, Radio, Bell, Edit3, Image as ImageIcon,
   CheckCircle2, AlertTriangle, TrendingUp, BarChart3, RadioIcon, Sparkles, UserPlus,
   ShieldCheck, Globe, Zap, Clock, ExternalLink, Filter, PieChart, Layers, 
-  Settings as SettingsIcon, History, Copy, Check, Eye
+  Settings as SettingsIcon, History, Copy, Check, Eye, ChevronRight
 } from 'lucide-react';
 import { DatabaseService } from '../../services/DatabaseService';
 import { User, Bot as BotType, Announcement, Promotion, ActivityLog } from '../../types';
@@ -16,7 +16,7 @@ const { useNavigate, Routes, Route, Link, useLocation } = Router as any;
 
 // Yardımcı Fonksiyon: Telegram İkonu Çekme
 const getLiveBotIcon = (botLink: string) => {
-    if (!botLink) return "https://ui-avatars.com/api/?name=Bot&background=1e293b&color=fff";
+    if (!botLink || botLink === '@') return "https://ui-avatars.com/api/?name=Bot&background=1e293b&color=fff";
     const username = botLink.replace('@', '').replace('https://t.me/', '').split('/').pop()?.trim();
     if (username && username.length > 2) {
         return `https://t.me/i/userpic/320/${username}.jpg`;
@@ -25,7 +25,7 @@ const getLiveBotIcon = (botLink: string) => {
 };
 
 // Yardımcı Fonksiyon: Benzersiz ID Üretme
-const generateUniqueId = () => `BH-${Math.floor(1000 + Math.random() * 9000)}-${Math.random().toString(36).substring(2, 5).toUpperCase()}`;
+const generateUniqueId = () => `BOT-${Math.floor(10000 + Math.random() * 90000)}-${Math.random().toString(36).substring(2, 5).toUpperCase()}`;
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -119,14 +119,12 @@ const AdminDashboard = () => {
   );
 };
 
-// --- BotManagement (REBUILT FROM SCRATCH) ---
 const BotManagement = () => {
     const [bots, setBots] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingBot, setEditingBot] = useState<any>(null);
     const [copiedId, setCopiedId] = useState(false);
-    const [previewMode, setPreviewMode] = useState<'desktop' | 'mobile'>('desktop');
 
     const load = useCallback(async () => {
         setIsLoading(true);
@@ -180,7 +178,7 @@ const BotManagement = () => {
                     onClick={openCreateModal}
                     className="bg-blue-600 hover:bg-blue-500 px-10 py-5 rounded-[28px] text-[10px] font-black uppercase tracking-[0.4em] shadow-2xl shadow-blue-900/40 transition-all active:scale-95 flex items-center gap-3"
                 >
-                    <Plus size={18} /> YENİ BOT EKLE
+                    <Plus size={18} /> YENİ ÜRÜN TANIMLA
                 </button>
             </div>
 
@@ -208,7 +206,7 @@ const BotManagement = () => {
                                 </div>
                                 <div className="flex gap-3">
                                     <button onClick={() => { setEditingBot(b); setIsModalOpen(true); }} className="p-4 bg-white/5 rounded-2xl hover:bg-blue-600 text-slate-500 hover:text-white transition-all"><Edit3 size={18}/></button>
-                                    <button onClick={async () => { if(confirm('Bot marketten tamamen kaldırılacak. Emin misiniz?')) { await DatabaseService.deleteBot(b.id); load(); } }} className="p-4 bg-white/5 rounded-2xl text-red-500 hover:bg-red-500 hover:text-white transition-all"><Trash2 size={18}/></button>
+                                    <button onClick={async () => { if(confirm('Bot marketten tamamen kaldırılacak. Emin misiniz?')) { await DatabaseService.deleteBot(b.id); load(); } }} className="p-4 bg-white/5 rounded-2xl text-red-500 hover:bg-red-600 hover:text-white transition-all"><Trash2 size={18}/></button>
                                 </div>
                             </div>
 
@@ -223,7 +221,7 @@ const BotManagement = () => {
                                     <p className="text-lg font-black uppercase text-blue-500 italic">{b.price > 0 ? `${b.price} TL` : 'ÜCRETSİZ'}</p>
                                 </div>
                                 <div className="flex flex-col text-right">
-                                    <p className="text-[8px] font-black text-slate-800 uppercase tracking-[0.4em] mb-1">USER BASE</p>
+                                    <p className="text-[8px] font-black text-slate-800 uppercase tracking-[0.4em] mb-1">SAHİP SAYISI</p>
                                     <p className="text-lg font-black uppercase text-white italic">{b.ownerCount || 0}</p>
                                 </div>
                             </div>
@@ -232,26 +230,25 @@ const BotManagement = () => {
                 </div>
             )}
 
-            {/* Editor Modal */}
             {isModalOpen && editingBot && (
                 <div className="fixed inset-0 z-[110] bg-black/98 flex items-center justify-center p-4 md:p-10 backdrop-blur-3xl overflow-y-auto animate-in fade-in">
                     <div className="bg-[#020617] border border-white/10 rounded-[64px] w-full max-w-7xl flex flex-col lg:flex-row overflow-hidden shadow-2xl relative">
                         
                         <button onClick={() => setIsModalOpen(false)} className="absolute top-10 right-10 z-[120] p-5 bg-white/5 rounded-3xl hover:bg-red-600 hover:text-white transition-all"><X size={24}/></button>
 
-                        {/* FORM SIDE */}
+                        {/* FORM ALANI */}
                         <div className="flex-1 p-10 md:p-16 overflow-y-auto no-scrollbar border-r border-white/5">
                             <div className="flex items-center gap-4 mb-12">
                                 <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center"><Sparkles size={20} className="text-white"/></div>
-                                <h3 className="text-3xl font-black uppercase italic tracking-tighter">Bot <span className="text-blue-500">Konfigürasyonu</span></h3>
+                                <h3 className="text-3xl font-black uppercase italic tracking-tighter">Ürün <span className="text-blue-500">Editörü</span></h3>
                             </div>
 
                             <form onSubmit={async (e) => { e.preventDefault(); await DatabaseService.saveBot(editingBot); setIsModalOpen(false); load(); }} className="space-y-10">
                                 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                    {/* ID FIELD - READ ONLY */}
+                                    {/* ID ALANI - SADECE OKUNUR */}
                                     <div className="space-y-3">
-                                        <label className="text-[10px] font-black text-slate-700 uppercase tracking-[0.4em] ml-6">SİSTEM KİMLİĞİ (DEĞİŞTİRİLEMEZ)</p>
+                                        <label className="text-[10px] font-black text-slate-700 uppercase tracking-[0.4em] ml-6">SİSTEM KİMLİĞİ (DEĞİŞTİRİLEMEZ)</label>
                                         <div className="relative group">
                                             <input type="text" value={editingBot.id} readOnly className="w-full h-18 bg-slate-950 border border-white/10 rounded-[28px] px-8 text-xs font-black text-slate-500 outline-none uppercase italic cursor-default" />
                                             <button type="button" onClick={copyId} className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/5 rounded-xl hover:bg-blue-600 text-slate-500 hover:text-white transition-all">
@@ -261,11 +258,11 @@ const BotManagement = () => {
                                     </div>
 
                                     <AdminInput label="BOT ADI" value={editingBot.name} onChange={(v:any)=>setEditingBot({...editingBot, name:v})} />
-                                    <AdminInput label="TELEGRAM @USER" value={editingBot.bot_link} onChange={(v:any)=>setEditingBot({...editingBot, bot_link:v})} />
-                                    <AdminInput label="LİSANS ÜCRETİ (TL)" type="number" value={editingBot.price} onChange={(v:any)=>setEditingBot({...editingBot, price:v})} />
+                                    <AdminInput label="TELEGRAM @KULLANICIADI" value={editingBot.bot_link} onChange={(v:any)=>setEditingBot({...editingBot, bot_link:v})} />
+                                    <AdminInput label="TL FİYATI" type="number" value={editingBot.price} onChange={(v:any)=>setEditingBot({...editingBot, price:v})} />
                                     
                                     <div className="space-y-3">
-                                        <label className="text-[10px] font-black text-slate-700 uppercase tracking-[0.4em] ml-6">HİZMET KATEGORİSİ</label>
+                                        <label className="text-[10px] font-black text-slate-700 uppercase tracking-[0.4em] ml-6">KATEGORİ</label>
                                         <select value={editingBot.category} onChange={e => setEditingBot({...editingBot, category: e.target.value})} className="w-full h-18 bg-slate-950 border border-white/10 rounded-[28px] px-8 text-xs font-black text-white outline-none focus:border-blue-500 uppercase italic appearance-none">
                                             <option value="utilities">Araçlar & Servisler</option>
                                             <option value="finance">Finans & Ekonomi</option>
@@ -276,23 +273,22 @@ const BotManagement = () => {
                                     </div>
 
                                     <div className="space-y-3">
-                                        <label className="text-[10px] font-black text-slate-700 uppercase tracking-[0.4em] ml-6">PREMIUM MODU</label>
+                                        <label className="text-[10px] font-black text-slate-700 uppercase tracking-[0.4em] ml-6">ERİŞİM TİPİ</label>
                                         <button type="button" onClick={()=>setEditingBot({...editingBot, is_premium: !editingBot.is_premium})} className={`w-full h-18 rounded-[28px] flex items-center justify-center gap-3 transition-all font-black text-[10px] tracking-widest ${editingBot.is_premium ? 'bg-blue-600 text-white shadow-xl shadow-blue-900/40 border-b-4 border-blue-800' : 'bg-slate-950 text-slate-600 border border-white/10'}`}>
-                                            <ShieldCheck size={18} /> {editingBot.is_premium ? 'PREMIUM AKTİF' : 'STANDART MOD'}
+                                            <ShieldCheck size={18} /> {editingBot.is_premium ? 'PREMIUM ÜRÜN' : 'STANDART ÜRÜN'}
                                         </button>
                                     </div>
                                 </div>
 
                                 <div className="space-y-3">
                                     <label className="text-[10px] font-black text-slate-700 uppercase tracking-[0.4em] ml-6">MARKET AÇIKLAMASI</label>
-                                    <textarea value={editingBot.description} onChange={e => setEditingBot({...editingBot, description: e.target.value})} className="w-full bg-slate-950 border border-white/10 p-8 rounded-[36px] text-xs font-bold h-32 outline-none text-slate-400 focus:border-blue-500/50 uppercase italic leading-relaxed" placeholder="Kullanıcıların göreceği bot açıklaması..." />
+                                    <textarea value={editingBot.description} onChange={e => setEditingBot({...editingBot, description: e.target.value})} className="w-full bg-slate-950 border border-white/10 p-8 rounded-[36px] text-xs font-bold h-32 outline-none text-slate-400 focus:border-blue-500/50 uppercase italic leading-relaxed" placeholder="Market vitrininde görünecek açıklama..." />
                                 </div>
 
-                                {/* Screenshots Management */}
                                 <div className="space-y-6">
                                     <label className="text-[10px] font-black text-slate-700 uppercase tracking-[0.4em] ml-6">EKRAN GÖRÜNTÜLERİ (URL)</label>
                                     <div className="flex gap-4">
-                                        <input type="text" id="scr_input" placeholder="https://..." className="flex-1 h-14 bg-slate-950 border border-white/10 rounded-2xl px-6 text-xs text-white outline-none focus:border-blue-500/50" />
+                                        <input type="text" id="scr_input" placeholder="https://resim-linki.com/gorsel.jpg" className="flex-1 h-14 bg-slate-950 border border-white/10 rounded-2xl px-6 text-xs text-white outline-none focus:border-blue-500/50" />
                                         <button type="button" onClick={() => { const inp = document.getElementById('scr_input') as HTMLInputElement; handleScreenshotAdd(inp.value); inp.value = ''; }} className="h-14 px-8 bg-blue-600 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-500 transition-all">EKLE</button>
                                     </div>
                                     <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4">
@@ -305,18 +301,17 @@ const BotManagement = () => {
                                     </div>
                                 </div>
 
-                                <button type="submit" className="w-full bg-blue-600 py-8 rounded-[36px] font-black text-[12px] uppercase tracking-[0.8em] shadow-2xl shadow-blue-900/40 hover:bg-blue-500 transition-all border-b-8 border-blue-800 active:translate-y-1 active:border-b-4">ENVANTERİ GÜNCELLE</button>
+                                <button type="submit" className="w-full bg-blue-600 py-8 rounded-[36px] font-black text-[12px] uppercase tracking-[0.8em] shadow-2xl shadow-blue-900/40 hover:bg-blue-500 transition-all border-b-8 border-blue-800 active:translate-y-1 active:border-b-4">KAYDI TAMAMLA</button>
                             </form>
                         </div>
 
-                        {/* PREVIEW SIDE */}
+                        {/* ÖNİZLEME ALANI */}
                         <div className="w-full lg:w-[450px] bg-slate-950/50 p-10 md:p-16 flex flex-col items-center justify-center bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/10 via-transparent to-transparent">
                             <div className="text-center mb-10">
-                                <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.6em] italic block mb-2">LIVE PREVIEW</span>
-                                <h4 className="text-lg font-black text-white uppercase italic tracking-widest opacity-30">MARKET GÖRÜNÜMÜ</h4>
+                                <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.6em] italic block mb-2">CANLI ÖNİZLEME</span>
+                                <h4 className="text-lg font-black text-white uppercase italic tracking-widest opacity-30">VİTRİN GÖRÜNÜMÜ</h4>
                             </div>
 
-                            {/* CANLI ÖNİZLEME KARTI */}
                             <div className="w-full max-w-[320px] bg-slate-900 border border-white/10 rounded-[56px] p-8 shadow-2xl transform hover:scale-105 transition-all duration-500 animate-in zoom-in-95">
                                 <div className="flex justify-between items-start mb-8">
                                     <div className="relative">
@@ -330,9 +325,9 @@ const BotManagement = () => {
                                     <div className="bg-white/5 p-3 rounded-2xl text-slate-500"><ChevronRight size={18} /></div>
                                 </div>
                                 <div className="mb-8">
-                                    <h5 className="text-xl font-black text-white italic uppercase tracking-tighter truncate">{editingBot.name || 'Bot Adı'}</h5>
+                                    <h5 className="text-xl font-black text-white italic uppercase tracking-tighter truncate">{editingBot.name || 'Ürün Adı'}</h5>
                                     <p className="text-[10px] text-slate-600 font-bold uppercase italic mt-1 tracking-widest">@{editingBot.bot_link.replace('@','') || 'username'}</p>
-                                    <p className="text-[10px] text-slate-500 line-clamp-2 mt-4 font-bold uppercase leading-relaxed opacity-70 italic">{editingBot.description || 'Bot açıklaması burada görünecek...'}</p>
+                                    <p className="text-[10px] text-slate-500 line-clamp-2 mt-4 font-bold uppercase leading-relaxed opacity-70 italic">{editingBot.description || 'Açıklama alanı...'}</p>
                                 </div>
                                 <div className="flex items-center justify-between pt-6 border-t border-white/5">
                                     <div className="flex flex-col">
@@ -348,7 +343,7 @@ const BotManagement = () => {
                             
                             <div className="mt-14 flex items-center gap-4 bg-white/5 px-6 py-3 rounded-2xl border border-white/5">
                                 <Eye size={16} className="text-blue-500" />
-                                <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest italic leading-none">Canlı veri senkronize ediliyor</span>
+                                <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest italic leading-none">Veri Senkronizasyonu Aktif</span>
                             </div>
                         </div>
                     </div>
@@ -358,7 +353,7 @@ const BotManagement = () => {
     );
 };
 
-// --- ALT BİLEŞENLER ---
+// --- DİĞER BİLEŞENLER (DEĞİŞMEDİ, SADECE DASHBOARD GÖRÜNÜMÜ İÇİN BURADALAR) ---
 
 const HomeView = () => {
     const [stats, setStats] = useState({ userCount: 0, botCount: 0, logCount: 0, salesCount: 0, totalRevenue: 0 });
@@ -732,10 +727,6 @@ const AdminInput = ({ label, value, onChange, type = "text" }: any) => (
         <label className="text-[10px] font-black text-slate-700 uppercase tracking-[0.4em] ml-6">{label}</label>
         <input type={type} value={value} onChange={e => onChange(e.target.value)} className="w-full h-18 bg-slate-950 border border-white/10 rounded-[28px] px-10 text-xs font-black text-white outline-none focus:border-blue-500/50 transition-all uppercase italic" />
     </div>
-);
-
-const ChevronRight = ({ size, className }: any) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m9 18 6-6-6-6"/></svg>
 );
 
 export default AdminDashboard;

@@ -18,16 +18,15 @@ interface ErrorBoundaryState {
   error: Error | null; 
 }
 
-// Fix: Using the named 'Component' import instead of 'React.Component' to help the TS compiler correctly resolve the generic inheritance and make inherited members accessible.
-class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  // Fix: Initializing state explicitly as a class property for better TypeScript support.
-  public state: ErrorBoundaryState = {
-    hasError: false,
-    error: null
-  };
-
+// Fix: Explicitly inheriting from React.Component with ErrorBoundaryProps and ErrorBoundaryState 
+// to ensure the TypeScript compiler correctly identifies inherited members like 'this.props'.
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
+    this.state = {
+      hasError: false,
+      error: null
+    };
   }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
@@ -39,7 +38,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 
   render() {
-    // Fix: Accessing 'this.state' which is inherited from the Component base class.
+    // Fix: accessing state property which is now correctly recognized as part of the React component instance.
     if (this.state.hasError) {
       return (
         <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center p-8 text-center">
@@ -58,7 +57,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       );
     }
     
-    // Fix: Accessing 'this.props' which is now correctly recognized as inherited from the Component class, resolving the error on line 63.
+    // Fix: Accessing 'this.props' which is now correctly recognized as inherited from React.Component.
     return this.props.children;
   }
 }
@@ -68,7 +67,6 @@ if (rootElement) {
   const manifestUrl = 'https://ton-connect.github.io/demo-dapp-with-react-ui/tonconnect-manifest.json';
   const root = createRoot(rootElement);
 
-  // Fix: Rendering the app wrapped in the fixed ErrorBoundary and global providers.
   root.render(
     <React.StrictMode>
       <ErrorBoundary>
