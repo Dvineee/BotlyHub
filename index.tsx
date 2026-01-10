@@ -19,7 +19,8 @@ interface ErrorBoundaryState {
 
 // Fix: Using React.Component with explicit generic types to ensure that inherited members like 'props' and 'state' are correctly identified by the compiler.
 class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  // Fix: Explicitly declaring state property to resolve "Property 'state' does not exist" errors in various environments.
+  // Fix: Explicitly declaring props and state properties to resolve "Property does not exist" errors in various environments.
+  public props: ErrorBoundaryProps;
   public state: ErrorBoundaryState = {
     hasError: false,
     error: null
@@ -27,6 +28,8 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 
   constructor(props: ErrorBoundaryProps) {
     super(props);
+    // Fix: Explicitly initializing props to ensure visibility in the render method and resolve compiler errors.
+    this.props = props;
   }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {

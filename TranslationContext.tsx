@@ -2,20 +2,17 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode, PropsWithChildren } from 'react';
 import './types';
 
-// Çeviri Sözlüğü - Anahtarlar veritabanındaki "category" değerleriyle (küçük harf) eşleşmelidir.
 const translations = {
   tr: {
-    // Navigation & Header
     "market": "Mağaza",
     "profile": "Profil",
     "my_bots": "Botlarım",
     "my_channels": "Kanallarım",
+    "notifications": "Bildirimler",
     "search_placeholder": "Bot ara...",
     "results_found": "sonuç bulundu",
     "no_results": "Sonuç bulunamadı.",
     "search_all_cats": "Tüm Kategorilerde Ara",
-    
-    // Kategoriler (Veritabanındaki ID'ler ile tam eşleşen anahtarlar)
     "cat_all": "Hepsi",
     "cat_productivity": "Üretkenlik",
     "cat_games": "Eğlence & Oyun",
@@ -23,8 +20,6 @@ const translations = {
     "cat_finance": "Finans & Ekonomi",
     "cat_music": "Müzik & Ses",
     "cat_moderation": "Grup Yönetimi",
-    
-    // Bot Detay & Eylemler
     "open": "Aç",
     "premium": "Premium",
     "verified": "Doğrulanmış",
@@ -34,8 +29,6 @@ const translations = {
     "buy_now": "Satın Al",
     "start_bot": "Botu Başlat",
     "share_copied": "Link kopyalandı!",
-
-    // Bölümler
     "featured": "Öne Çıkanlar",
     "search_results": "Arama Sonuçları"
   },
@@ -44,6 +37,7 @@ const translations = {
     "profile": "Profile",
     "my_bots": "My Bots",
     "my_channels": "My Channels",
+    "notifications": "Notifications",
     "search_placeholder": "Search for bots...",
     "results_found": "results found",
     "no_results": "No results found.",
@@ -77,7 +71,6 @@ interface TranslationContextType {
 
 const TranslationContext = createContext<TranslationContextType | undefined>(undefined);
 
-// Fix: Explicitly use PropsWithChildren for TranslationProvider to resolve JSX children missing errors in consumption points like index.tsx.
 export const TranslationProvider = ({ children }: PropsWithChildren<{}>) => {
   const [language, setLanguage] = useState<Language>('tr');
 

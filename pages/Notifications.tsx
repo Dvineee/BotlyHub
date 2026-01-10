@@ -127,32 +127,27 @@ const Notifications = () => {
           </div>
       )}
 
-      {/* ZIRVE V3 MOBILE MODAL */}
+      {/* SADELEŞTİRİLMİŞ BİLDİRİM DETAY MODALI */}
       {selectedNote && (
-          <div className="fixed inset-0 z-[150] flex items-end lg:items-center justify-center p-0 lg:p-6 bg-black/98 backdrop-blur-2xl animate-in slide-in-from-bottom duration-500" onClick={() => setSelectedNote(null)}>
-              <div className="bg-[#020617] w-full max-w-sm lg:rounded-[56px] rounded-t-[48px] overflow-hidden shadow-2xl relative border-t lg:border border-white/10" onClick={e => e.stopPropagation()}>
-                  <div className="h-1.5 w-16 bg-white/10 rounded-full mx-auto mt-4 mb-2 lg:hidden"></div>
-                  <button onClick={() => setSelectedNote(null)} className="absolute top-8 right-8 p-3 bg-white/5 rounded-2xl text-slate-500 hover:text-white transition-all"><X size={20}/></button>
+          <div className="fixed inset-0 z-[150] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm animate-in fade-in" onClick={() => setSelectedNote(null)}>
+              <div className="bg-slate-900/95 w-full max-w-sm rounded-[32px] overflow-hidden shadow-2xl relative border border-white/10 backdrop-blur-xl animate-in zoom-in-95" onClick={e => e.stopPropagation()}>
+                  <button onClick={() => setSelectedNote(null)} className="absolute top-4 right-4 p-2 bg-white/5 rounded-xl text-slate-500 hover:text-white transition-all"><X size={16}/></button>
                   
-                  <div className="p-12 text-center pb-20 lg:pb-12">
-                      <div className="w-20 h-20 bg-slate-900 border border-white/5 rounded-[32px] flex items-center justify-center mx-auto mb-10 shadow-2xl rotate-3">
+                  <div className="p-10 text-center">
+                      <div className="w-16 h-16 bg-white/5 border border-white/5 rounded-2xl flex items-center justify-center mx-auto mb-6">
                         {getIcon(selectedNote.type)}
                       </div>
                       
-                      <h3 className="text-3xl font-black text-white mb-4 tracking-tighter uppercase italic leading-none">{selectedNote.title}</h3>
-                      <div className="flex items-center justify-center gap-3 mb-10">
-                          <div className="h-0.5 w-8 bg-blue-600 rounded-full"></div>
-                          <span className="text-[8px] font-black text-slate-700 uppercase tracking-[0.5em]">{selectedNote.type} LOG</span>
-                          <div className="h-0.5 w-8 bg-blue-600 rounded-full"></div>
-                      </div>
+                      <h3 className="text-xl font-black text-white mb-2 tracking-tight uppercase italic">{selectedNote.title}</h3>
+                      <p className="text-[8px] font-black text-blue-500 uppercase tracking-[0.4em] mb-6">{selectedNote.type} LOG</p>
                       
-                      <div className="p-6 bg-white/5 rounded-[32px] border border-white/5 mb-12">
-                          <p className="text-slate-400 text-xs leading-relaxed font-bold uppercase italic">{selectedNote.message}</p>
+                      <div className="p-5 bg-white/5 rounded-2xl border border-white/5 mb-8">
+                          <p className="text-slate-400 text-[11px] leading-relaxed font-bold uppercase italic">{selectedNote.message}</p>
                       </div>
 
                       <button 
                         onClick={() => setSelectedNote(null)} 
-                        className="w-full h-18 bg-white text-[#020617] font-black rounded-3xl text-[11px] uppercase tracking-[0.4em] shadow-2xl active:scale-95 transition-all border-b-4 border-slate-300"
+                        className="w-full py-4 bg-white text-slate-950 font-black rounded-2xl text-[10px] uppercase tracking-[0.3em] active:scale-95 transition-all shadow-lg"
                       >
                         ANLADIM
                       </button>

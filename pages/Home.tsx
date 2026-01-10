@@ -2,11 +2,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp } from 'lucide-react';
 import * as Router from 'react-router-dom';
-import { Bot, Announcement } from '../types';
+import { Bot, Announcement, Notification } from '../types';
 import { categories } from '../data';
 import { useTranslation } from '../TranslationContext';
 import { DatabaseService } from '../services/DatabaseService';
 import PriceService from '../services/PriceService';
+import { useTelegram } from '../hooks/useTelegram';
 
 const { useNavigate } = Router as any;
 
@@ -109,9 +110,11 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = ({ bot, tonRate }) => {
 const Home = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { user } = useTelegram();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [bots, setBots] = useState<Bot[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [tonRate, setTonRate] = useState(250);
   const [selectedAnn, setSelectedAnn] = useState<Announcement | null>(null);
@@ -124,9 +127,18 @@ const Home = () => {
         DatabaseService.getAnnouncements(),
         PriceService.getTonPrice()
     ]);
+    
     setBots(botData);
     setTonRate(pData.tonTry);
     if (annData.length > 0) setAnnouncements(annData.filter(a => a.is_active));
+    
+    // Okunmamış bildirimleri kontrol et
+    if (user?.id) {
+        const notes = await DatabaseService.getNotifications(user.id.toString());
+        const unread = notes.filter(n => !n.isRead).length;
+        setUnreadCount(unread);
+    }
+    
     setIsLoading(false);
   };
 
@@ -137,7 +149,7 @@ const Home = () => {
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [user]);
 
   return (
     <div className="p-4 pt-10 min-h-screen bg-[#020617] pb-32 font-sans text-slate-200">
@@ -154,13 +166,29 @@ const Home = () => {
         <div className="flex items-center gap-3">
             <button onClick={() => navigate('/earnings')} className="p-3 bg-slate-900/60 border border-slate-800 rounded-2xl text-emerald-400 active:scale-90 transition-transform"><DollarSign size={22} /></button>
             <div className="relative" ref={menuRef}>
-                <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-3 bg-slate-900/60 border border-slate-800 rounded-2xl text-slate-300 active:scale-90 transition-transform"><LayoutGrid size={22} /></button>
+                <button 
+                  onClick={() => setIsMenuOpen(!isMenuOpen)} 
+                  className="p-3 bg-slate-900/60 border border-slate-800 rounded-2xl text-slate-300 active:scale-90 transition-transform relative"
+                >
+                    <LayoutGrid size={22} />
+                    {/* Bildirim Sayaç Rozeti (Badge) */}
+                    {unreadCount > 0 && (
+                        <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 rounded-full border-2 border-[#020617] text-[8px] font-black text-white flex items-center justify-center px-1 animate-pulse shadow-lg">
+                            {unreadCount > 9 ? '9+' : unreadCount}
+                        </div>
+                    )}
+                </button>
                 {isMenuOpen && (
                     <div className="absolute right-0 top-full mt-4 w-56 bg-[#020617] border border-slate-800 rounded-[28px] shadow-2xl overflow-hidden z-[100] animate-in fade-in py-2">
                         <button onClick={() => { navigate('/'); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 text-left"><Store size={20} className="text-blue-400" /> <span className="text-[11px] font-black uppercase tracking-tight">{t('market')}</span></button>
                         <button onClick={() => { navigate('/settings'); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 text-left"><User size={20} className="text-purple-400" /> <span className="text-[11px] font-black uppercase tracking-tight">{t('profile')}</span></button>
                         <button onClick={() => { navigate('/my-bots'); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 text-left"><BotIcon size={20} className="text-emerald-400" /> <span className="text-[11px] font-black uppercase tracking-tight">{t('my_bots')}</span></button>
                         <button onClick={() => { navigate('/channels'); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 text-left"><Megaphone size={20} className="text-orange-400" /> <span className="text-[11px] font-black uppercase tracking-tight">{t('my_channels')}</span></button>
+                        <button onClick={() => { navigate('/notifications'); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 text-left relative">
+                            <Bell size={20} className="text-blue-500" /> 
+                            <span className="text-[11px] font-black uppercase tracking-tight">{t('notifications')}</span>
+                            {unreadCount > 0 && <div className="absolute right-6 w-2 h-2 bg-red-600 rounded-full"></div>}
+                        </button>
                     </div>
                 )}
             </div>
@@ -207,15 +235,23 @@ const Home = () => {
           </>
       )}
 
+      {/* SADELEŞTİRİLMİŞ MODAL TASARIMI */}
       {selectedAnn && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center p-6 bg-black/95 backdrop-blur-md animate-in fade-in" onClick={() => setSelectedAnn(null)}>
-            <div className="bg-[#020617] w-full max-w-sm rounded-[48px] overflow-hidden shadow-2xl relative border border-white/10" onClick={e => e.stopPropagation()}>
-                <button onClick={() => setSelectedAnn(null)} className="absolute top-6 right-6 p-2 bg-slate-900 rounded-2xl text-slate-500"><X size={18}/></button>
-                <div className="p-10 text-center">
-                    <div className="w-16 h-16 bg-slate-900 border border-white/5 rounded-[24px] flex items-center justify-center mx-auto mb-8">{React.createElement(iconMap[selectedAnn.icon_name] || Sparkles, { size: 32, className: 'text-blue-400' })}</div>
-                    <h3 className="text-2xl font-black text-white mb-3 tracking-tighter uppercase italic">{selectedAnn.title}</h3>
-                    <p className="text-slate-500 text-xs leading-relaxed font-bold uppercase mb-10">{selectedAnn.content_detail || selectedAnn.description}</p>
-                    <button onClick={() => { window.location.href = selectedAnn.button_link.startsWith('http') ? selectedAnn.button_link : `https://t.me/${selectedAnn.button_link.replace('@','')}`; setSelectedAnn(null); }} className="w-full py-5 bg-blue-600 text-white font-black rounded-3xl text-[11px] uppercase tracking-[0.3em] shadow-xl shadow-blue-600/20">Hemen Katıl</button>
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm animate-in fade-in" onClick={() => setSelectedAnn(null)}>
+            <div className="bg-slate-900/90 w-full max-w-sm rounded-[32px] overflow-hidden shadow-2xl relative border border-white/10 backdrop-blur-xl animate-in zoom-in-95" onClick={e => e.stopPropagation()}>
+                <button onClick={() => setSelectedAnn(null)} className="absolute top-4 right-4 p-2 bg-white/5 rounded-xl text-slate-500 hover:text-white transition-colors"><X size={16}/></button>
+                <div className="p-8 text-center">
+                    <div className="w-14 h-14 bg-white/5 border border-white/5 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        {React.createElement(iconMap[selectedAnn.icon_name] || Sparkles, { size: 24, className: 'text-blue-400' })}
+                    </div>
+                    <h3 className="text-xl font-black text-white mb-2 tracking-tight uppercase italic">{selectedAnn.title}</h3>
+                    <p className="text-slate-400 text-[10px] leading-relaxed font-bold uppercase mb-8 line-clamp-3 px-2">{selectedAnn.content_detail || selectedAnn.description}</p>
+                    <button 
+                        onClick={() => { window.location.href = selectedAnn.button_link.startsWith('http') ? selectedAnn.button_link : `https://t.me/${selectedAnn.button_link.replace('@','')}`; setSelectedAnn(null); }} 
+                        className="w-full py-4 bg-blue-600 text-white font-black rounded-2xl text-[10px] uppercase tracking-[0.2em] shadow-lg active:scale-95 transition-all"
+                    >
+                        {selectedAnn.button_text || 'Hemen Katıl'}
+                    </button>
                 </div>
             </div>
         </div>
