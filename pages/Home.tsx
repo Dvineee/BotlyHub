@@ -56,7 +56,7 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
                 <h3 className="text-white font-black text-2xl mb-1.5 tracking-tight group-hover:translate-x-1 transition-transform">{ann.title}</h3>
                 <p className="text-white/80 text-[11px] max-w-[210px] leading-relaxed line-clamp-2 font-bold uppercase">{ann.description}</p>
             </div>
-            <div className="bg-white/20 backdrop-blur-md text-white text-[9px] font-black py-3 px-8 rounded-2xl w-fit border border-white/30 uppercase tracking-[0.2em] shadow-lg">
+            <div className="bg-white/20 backdrop-blur-md text-white text-[8px] font-black py-2.5 px-6 rounded-xl w-fit border border-white/30 uppercase tracking-[0.2em] shadow-lg">
                 {ann.button_text || 'İncele'}
             </div>
         </div>
@@ -171,23 +171,23 @@ const Home = () => {
                   className="p-3 bg-slate-900/60 border border-slate-800 rounded-2xl text-slate-300 active:scale-90 transition-transform relative"
                 >
                     <LayoutGrid size={22} />
-                    {/* Bildirim Sayaç Rozeti (Badge) */}
+                    {/* BİLDİRİM GELDİĞİNDE GÖZÜKEN SİMGE/RAKAM (Badge) */}
                     {unreadCount > 0 && (
-                        <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 rounded-full border-2 border-[#020617] text-[8px] font-black text-white flex items-center justify-center px-1 animate-pulse shadow-lg">
+                        <div className="absolute -top-1 -right-1 min-w-[20px] h-[20px] bg-red-600 rounded-full border-2 border-[#020617] text-[9px] font-black text-white flex items-center justify-center px-1 animate-in zoom-in shadow-xl">
                             {unreadCount > 9 ? '9+' : unreadCount}
                         </div>
                     )}
                 </button>
                 {isMenuOpen && (
-                    <div className="absolute right-0 top-full mt-4 w-56 bg-[#020617] border border-slate-800 rounded-[28px] shadow-2xl overflow-hidden z-[100] animate-in fade-in py-2">
-                        <button onClick={() => { navigate('/'); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 text-left"><Store size={20} className="text-blue-400" /> <span className="text-[11px] font-black uppercase tracking-tight">{t('market')}</span></button>
-                        <button onClick={() => { navigate('/settings'); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 text-left"><User size={20} className="text-purple-400" /> <span className="text-[11px] font-black uppercase tracking-tight">{t('profile')}</span></button>
-                        <button onClick={() => { navigate('/my-bots'); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 text-left"><BotIcon size={20} className="text-emerald-400" /> <span className="text-[11px] font-black uppercase tracking-tight">{t('my_bots')}</span></button>
-                        <button onClick={() => { navigate('/channels'); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 text-left"><Megaphone size={20} className="text-orange-400" /> <span className="text-[11px] font-black uppercase tracking-tight">{t('my_channels')}</span></button>
-                        <button onClick={() => { navigate('/notifications'); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 text-left relative">
-                            <Bell size={20} className="text-blue-500" /> 
+                    <div className="absolute right-0 top-full mt-4 w-60 bg-slate-900 border border-slate-800 rounded-[32px] shadow-2xl overflow-hidden z-[100] animate-in fade-in py-2 backdrop-blur-xl">
+                        <button onClick={() => { navigate('/'); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 text-left border-b border-white/5 last:border-0"><Store size={18} className="text-blue-400" /> <span className="text-[11px] font-black uppercase tracking-tight">{t('market')}</span></button>
+                        <button onClick={() => { navigate('/settings'); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 text-left border-b border-white/5 last:border-0"><User size={18} className="text-purple-400" /> <span className="text-[11px] font-black uppercase tracking-tight">{t('profile')}</span></button>
+                        <button onClick={() => { navigate('/my-bots'); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 text-left border-b border-white/5 last:border-0"><BotIcon size={18} className="text-emerald-400" /> <span className="text-[11px] font-black uppercase tracking-tight">{t('my_bots')}</span></button>
+                        <button onClick={() => { navigate('/channels'); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 text-left border-b border-white/5 last:border-0"><Megaphone size={18} className="text-orange-400" /> <span className="text-[11px] font-black uppercase tracking-tight">{t('my_channels')}</span></button>
+                        <button onClick={() => { navigate('/notifications'); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 text-left relative group">
+                            <Bell size={18} className="text-blue-500" /> 
                             <span className="text-[11px] font-black uppercase tracking-tight">{t('notifications')}</span>
-                            {unreadCount > 0 && <div className="absolute right-6 w-2 h-2 bg-red-600 rounded-full"></div>}
+                            {unreadCount > 0 && <div className="absolute right-6 w-2.5 h-2.5 bg-red-600 rounded-full shadow-[0_0_8px_rgba(220,38,38,0.6)]"></div>}
                         </button>
                     </div>
                 )}
@@ -235,23 +235,32 @@ const Home = () => {
           </>
       )}
 
-      {/* SADELEŞTİRİLMİŞ MODAL TASARIMI */}
+      {/* SADELEŞTİRİLMİŞ DUYURU MODALI */}
       {selectedAnn && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm animate-in fade-in" onClick={() => setSelectedAnn(null)}>
-            <div className="bg-slate-900/90 w-full max-w-sm rounded-[32px] overflow-hidden shadow-2xl relative border border-white/10 backdrop-blur-xl animate-in zoom-in-95" onClick={e => e.stopPropagation()}>
-                <button onClick={() => setSelectedAnn(null)} className="absolute top-4 right-4 p-2 bg-white/5 rounded-xl text-slate-500 hover:text-white transition-colors"><X size={16}/></button>
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-[#020617]/80 backdrop-blur-md animate-in fade-in" onClick={() => setSelectedAnn(null)}>
+            <div className="bg-slate-900 border border-white/10 w-full max-w-sm rounded-[36px] overflow-hidden shadow-[0_32px_64px_-12px_rgba(0,0,0,0.5)] animate-in zoom-in-95" onClick={e => e.stopPropagation()}>
                 <div className="p-8 text-center">
-                    <div className="w-14 h-14 bg-white/5 border border-white/5 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                        {React.createElement(iconMap[selectedAnn.icon_name] || Sparkles, { size: 24, className: 'text-blue-400' })}
+                    <div className="w-16 h-16 bg-white/5 border border-white/5 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                        {React.createElement(iconMap[selectedAnn.icon_name] || Sparkles, { size: 28, className: 'text-blue-500' })}
                     </div>
                     <h3 className="text-xl font-black text-white mb-2 tracking-tight uppercase italic">{selectedAnn.title}</h3>
-                    <p className="text-slate-400 text-[10px] leading-relaxed font-bold uppercase mb-8 line-clamp-3 px-2">{selectedAnn.content_detail || selectedAnn.description}</p>
-                    <button 
-                        onClick={() => { window.location.href = selectedAnn.button_link.startsWith('http') ? selectedAnn.button_link : `https://t.me/${selectedAnn.button_link.replace('@','')}`; setSelectedAnn(null); }} 
-                        className="w-full py-4 bg-blue-600 text-white font-black rounded-2xl text-[10px] uppercase tracking-[0.2em] shadow-lg active:scale-95 transition-all"
-                    >
-                        {selectedAnn.button_text || 'Hemen Katıl'}
-                    </button>
+                    <div className="h-px w-12 bg-blue-600/30 mx-auto mb-4"></div>
+                    <p className="text-slate-400 text-[11px] leading-relaxed font-bold uppercase mb-8 px-4 opacity-80">{selectedAnn.content_detail || selectedAnn.description}</p>
+                    
+                    <div className="space-y-3">
+                        <button 
+                            onClick={() => { window.location.href = selectedAnn.button_link.startsWith('http') ? selectedAnn.button_link : `https://t.me/${selectedAnn.button_link.replace('@','')}`; setSelectedAnn(null); }} 
+                            className="w-full py-4.5 bg-white text-slate-950 font-black rounded-2xl text-[10px] uppercase tracking-[0.3em] active:scale-95 transition-all shadow-xl"
+                        >
+                            {selectedAnn.button_text || 'Hemen Katıl'}
+                        </button>
+                        <button 
+                            onClick={() => setSelectedAnn(null)} 
+                            className="w-full py-4 text-slate-500 font-black text-[9px] uppercase tracking-widest hover:text-slate-300"
+                        >
+                            KAPAT
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

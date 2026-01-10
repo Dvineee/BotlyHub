@@ -129,25 +129,30 @@ const Notifications = () => {
 
       {/* SADELEŞTİRİLMİŞ BİLDİRİM DETAY MODALI */}
       {selectedNote && (
-          <div className="fixed inset-0 z-[150] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm animate-in fade-in" onClick={() => setSelectedNote(null)}>
-              <div className="bg-slate-900/95 w-full max-w-sm rounded-[32px] overflow-hidden shadow-2xl relative border border-white/10 backdrop-blur-xl animate-in zoom-in-95" onClick={e => e.stopPropagation()}>
-                  <button onClick={() => setSelectedNote(null)} className="absolute top-4 right-4 p-2 bg-white/5 rounded-xl text-slate-500 hover:text-white transition-all"><X size={16}/></button>
-                  
-                  <div className="p-10 text-center">
-                      <div className="w-16 h-16 bg-white/5 border border-white/5 rounded-2xl flex items-center justify-center mx-auto mb-6">
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-[#020617]/85 backdrop-blur-md animate-in fade-in" onClick={() => setSelectedNote(null)}>
+              <div className="bg-slate-900 border border-white/10 w-full max-w-sm rounded-[36px] overflow-hidden shadow-2xl animate-in zoom-in-95" onClick={e => e.stopPropagation()}>
+                  <div className="p-8 text-center">
+                      <div className="w-16 h-16 bg-white/5 border border-white/5 rounded-3xl flex items-center justify-center mx-auto mb-6">
                         {getIcon(selectedNote.type)}
                       </div>
                       
                       <h3 className="text-xl font-black text-white mb-2 tracking-tight uppercase italic">{selectedNote.title}</h3>
-                      <p className="text-[8px] font-black text-blue-500 uppercase tracking-[0.4em] mb-6">{selectedNote.type} LOG</p>
+                      <p className="text-[9px] font-black text-blue-500 uppercase tracking-[0.4em] mb-6">{selectedNote.type} LOG</p>
                       
-                      <div className="p-5 bg-white/5 rounded-2xl border border-white/5 mb-8">
+                      <div className="bg-slate-950/50 p-6 rounded-[28px] border border-white/5 mb-8">
                           <p className="text-slate-400 text-[11px] leading-relaxed font-bold uppercase italic">{selectedNote.message}</p>
+                      </div>
+
+                      {/* İSTENEN ZORUNLU METİN */}
+                      <div className="mb-8 px-4">
+                          <p className="text-[7px] text-slate-600 font-black uppercase tracking-widest leading-relaxed">
+                              ADMİN TARAFINDAN BİLDİRİM PANELİNDE GÖNDERİLEN BİLDİRİMİN GÖRÜNTÜLENMESİ
+                          </p>
                       </div>
 
                       <button 
                         onClick={() => setSelectedNote(null)} 
-                        className="w-full py-4 bg-white text-slate-950 font-black rounded-2xl text-[10px] uppercase tracking-[0.3em] active:scale-95 transition-all shadow-lg"
+                        className="w-full py-4.5 bg-white text-slate-950 font-black rounded-2xl text-[10px] uppercase tracking-[0.3em] active:scale-95 transition-all shadow-xl"
                       >
                         ANLADIM
                       </button>
