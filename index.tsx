@@ -1,5 +1,4 @@
-
-import React, { ErrorInfo, ReactNode } from 'react';
+import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import { TranslationProvider } from './TranslationContext';
@@ -18,16 +17,15 @@ interface ErrorBoundaryState {
   error: Error | null; 
 }
 
-// Fix: Directly extending React.Component to ensure that TypeScript correctly identifies inherited members like 'props' and 'state'.
-class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  // Fix: Initializing state as a class property for better compatibility with class component inheritance.
-  state: ErrorBoundaryState = {
-    hasError: false,
-    error: null
-  };
-
+// Fix: Extending Component directly from React and using generic types to ensure that TypeScript correctly identifies inherited members like 'props' and 'state'.
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
+    // Fix: Initializing state in the constructor for better compatibility with class component inheritance in various TypeScript configurations.
+    this.state = {
+      hasError: false,
+      error: null
+    };
   }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
@@ -39,7 +37,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   }
 
   render() {
-    // Fix: Accessing 'state' which is inherited from React.Component.
+    // Fix: Accessing 'state' which is correctly inherited from the Component class.
     if (this.state.hasError) {
       return (
         <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center p-8 text-center">
@@ -58,7 +56,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
       );
     }
     
-    // Fix: Accessing 'props' correctly inherited from React.Component to resolve the "Property 'props' does not exist" error.
+    // Fix: Accessing 'props' correctly inherited from the Component class to resolve the "Property 'props' does not exist" error.
     return this.props.children;
   }
 }
