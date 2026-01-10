@@ -40,6 +40,10 @@ const Notifications = () => {
   const handleNoteClick = async (note: Notification) => {
       haptic('light');
       setSelectedNote(note);
+      
+      // Admin tarafındaki sayacı artır
+      await DatabaseService.incrementNotificationView(note.id);
+      
       if (!note.isRead) {
           await DatabaseService.markNotificationRead(note.id);
           setNotifications(notifications.map(n => n.id === note.id ? { ...n, isRead: true } : n));
@@ -139,15 +143,8 @@ const Notifications = () => {
                       <h3 className="text-xl font-black text-white mb-2 tracking-tight uppercase italic">{selectedNote.title}</h3>
                       <p className="text-[9px] font-black text-blue-500 uppercase tracking-[0.4em] mb-6">{selectedNote.type} LOG</p>
                       
-                      <div className="bg-slate-950/50 p-6 rounded-[28px] border border-white/5 mb-8">
+                      <div className="bg-slate-950/50 p-6 rounded-[28px] border border-white/5 mb-10">
                           <p className="text-slate-400 text-[11px] leading-relaxed font-bold uppercase italic">{selectedNote.message}</p>
-                      </div>
-
-                      {/* İSTENEN ZORUNLU METİN */}
-                      <div className="mb-8 px-4">
-                          <p className="text-[7px] text-slate-600 font-black uppercase tracking-widest leading-relaxed">
-                              ADMİN TARAFINDAN BİLDİRİM PANELİNDE GÖNDERİLEN BİLDİRİMİN GÖRÜNTÜLENMESİ
-                          </p>
                       </div>
 
                       <button 

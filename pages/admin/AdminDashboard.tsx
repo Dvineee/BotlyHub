@@ -861,7 +861,13 @@ const NotificationCenter = () => {
                 <div className="hidden lg:block overflow-x-auto">
                     <table className="w-full text-left">
                         <thead className="bg-white/5 text-[9px] uppercase tracking-[0.4em] text-slate-700 font-black">
-                            <tr><th className="px-10 py-8">BAŞLIK & TİP</th><th className="px-10 py-8">HEDEF</th><th className="px-10 py-8">TARİH</th><th className="px-10 py-8 text-right">AKSİYON</th></tr>
+                            <tr>
+                                <th className="px-10 py-8">BAŞLIK & TİP</th>
+                                <th className="px-10 py-8">HEDEF</th>
+                                <th className="px-10 py-8 text-center">GÖRÜNTÜLENME</th>
+                                <th className="px-10 py-8">TARİH</th>
+                                <th className="px-10 py-8 text-right">AKSİYON</th>
+                            </tr>
                         </thead>
                         <tbody className="divide-y divide-white/5">
                             {notes.map(n => (
@@ -878,6 +884,12 @@ const NotificationCenter = () => {
                                         </div>
                                     </td>
                                     <td className="px-10 py-8"><span className="text-[10px] font-black text-slate-400 uppercase italic">{n.target_type === 'global' ? 'GLOBAL' : `USER: ${n.user_id}`}</span></td>
+                                    <td className="px-10 py-8 text-center">
+                                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 rounded-lg border border-white/5">
+                                            <Eye size={12} className="text-blue-500" />
+                                            <span className="text-[11px] font-black text-white">{n.view_count || 0}</span>
+                                        </div>
+                                    </td>
                                     <td className="px-10 py-8 text-slate-600 text-[10px] font-bold uppercase">{new Date(n.date).toLocaleString()}</td>
                                     <td className="px-10 py-8 text-right">
                                         <button onClick={async () => { if(confirm('Silsin mi?')) { await DatabaseService.deleteNotification(n.id); load(); } }} className="p-3 bg-white/5 rounded-xl text-red-500 opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={16}/></button>
@@ -897,7 +909,12 @@ const NotificationCenter = () => {
                                     <div className={`p-2 rounded-lg bg-white/5 ${n.type === 'payment' ? 'text-emerald-500' : n.type === 'security' ? 'text-red-500' : 'text-blue-500'}`}><Bell size={14}/></div>
                                     <p className="font-black text-white italic uppercase text-xs">{n.title}</p>
                                 </div>
-                                <button onClick={async () => { await DatabaseService.deleteNotification(n.id); load(); }} className="text-red-500"><Trash2 size={14}/></button>
+                                <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-1.5 text-[9px] font-black text-slate-500">
+                                        <Eye size={10}/> {n.view_count || 0}
+                                    </div>
+                                    <button onClick={async () => { await DatabaseService.deleteNotification(n.id); load(); }} className="text-red-500"><Trash2 size={14}/></button>
+                                </div>
                             </div>
                             <p className="text-[10px] text-slate-600 uppercase font-black italic">{n.message}</p>
                         </div>

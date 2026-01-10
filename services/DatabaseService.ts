@@ -93,7 +93,8 @@ export class DatabaseService {
           type, 
           date: new Date().toISOString(), 
           isRead: false, 
-          target_type: 'global' 
+          target_type: 'global',
+          view_count: 0
       }]);
       if (error) throw error;
   }
@@ -107,7 +108,8 @@ export class DatabaseService {
           type, 
           date: new Date().toISOString(), 
           isRead: false, 
-          target_type: 'user' 
+          target_type: 'user',
+          view_count: 0
       }]);
       if (error) throw error;
   }
@@ -115,6 +117,16 @@ export class DatabaseService {
   static async deleteNotification(id: string) {
       const { error } = await supabase.from('notifications').delete().eq('id', id);
       if (error) throw error;
+  }
+
+  static async incrementNotificationView(id: string) {
+      // Supabase supports increments using specialized syntax in modern versions
+      // Using direct call to get current and update for simplicity in this bridge
+      const { data } = await supabase.from('notifications').select('view_count').eq('id', id).maybeSingle();
+      if (data) {
+          const current = Number(data.view_count || 0);
+          await supabase.from('notifications').update({ view_count: current + 1 }).eq('id', id);
+      }
   }
 
   // --- LOGS ---
@@ -276,7 +288,17 @@ export class DatabaseService {
     const query = supabase.from('notifications').select('*').order('date', { ascending: false });
     if (userId) query.or(`user_id.eq.${userId},target_type.eq.global`);
     const { data } = await query;
-    return (data || []).map(n => ({ id: String(n.id), type: n.type, title: n.title, message: n.message, date: n.date, isRead: n.isRead, user_id: n.user_id, target_type: n.target_type }));
+    return (data || []).map(n => ({ 
+        id: String(n.id), 
+        type: n.type, 
+        title: n.title, 
+        message: n.message, 
+        date: n.date, 
+        isRead: n.isRead, 
+        user_id: n.user_id, 
+        target_type: n.target_type,
+        view_count: Number(n.view_count || 0)
+    }));
   }
 
   static markNotificationRead(id: string) { return supabase.from('notifications').update({ isRead: true }).eq('id', id); }

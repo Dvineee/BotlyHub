@@ -112,6 +112,7 @@ export interface Notification {
   isRead: boolean;
   user_id?: string;
   target_type?: 'user' | 'global';
+  view_count?: number;
 }
 
 export interface SubscriptionPlan {
