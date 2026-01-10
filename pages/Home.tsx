@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, ShieldCheck } from 'lucide-react';
+import { Search, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio } from 'lucide-react';
 import * as Router from 'react-router-dom';
 import { Bot, Announcement, Notification } from '../types';
 import { categories } from '../data';
@@ -15,20 +15,13 @@ const iconMap: Record<string, any> = {
   Sparkles, Megaphone, Zap, Gift, Star, Info, BotIcon, Heart, Bell, Shield
 };
 
-const HomeSkeleton = () => (
-    <div className="space-y-8 animate-pulse">
-        <div className="flex gap-4 overflow-hidden px-1">
-            <div className="min-w-[310px] h-44 rounded-[40px] skeleton"></div>
-            <div className="min-w-[310px] h-44 rounded-[40px] skeleton"></div>
-        </div>
-        <div className="grid grid-cols-4 gap-3">
-            {[1,2,3,4].map(i => <div key={i} className="h-24 rounded-[28px] skeleton"></div>)}
-        </div>
-        <div className="space-y-3">
-            {[1,2,3].map(i => <div key={i} className="h-24 rounded-[32px] skeleton"></div>)}
-        </div>
-    </div>
-);
+const getLiveBotIcon = (bot: Bot) => {
+    if (bot.bot_link) {
+        const username = bot.bot_link.replace('@', '').replace('https://t.me/', '').split('/').pop()?.trim();
+        if (username) return `https://t.me/i/userpic/320/${username}.jpg`;
+    }
+    return bot.icon || `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=random&color=fff`;
+};
 
 const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) => void }> = ({ ann, onShowPopup }) => {
   const navigate = useNavigate();
@@ -57,15 +50,9 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
         className={`min-w-[310px] h-44 bg-gradient-to-br ${colors[ann.color_scheme] || colors.purple} p-7 rounded-[40px] relative overflow-hidden shadow-2xl shrink-0 transition-all active:scale-[0.97] cursor-pointer group`}
         onClick={handleAction}
     >
-        <div className="absolute top-6 right-8">
-            <div className="flex items-center gap-1.5 bg-black/20 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
-                <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
-                <span className="text-[8px] font-black text-white uppercase tracking-widest">LIVE</span>
-            </div>
-        </div>
         <div className="relative z-10 flex flex-col h-full justify-between">
             <div>
-                <h3 className="text-white font-black text-2xl mb-1.5 tracking-tight group-hover:translate-x-1 transition-transform italic uppercase">{ann.title}</h3>
+                <h3 className="text-white font-black text-2xl mb-1.5 tracking-tight italic uppercase">{ann.title}</h3>
                 <p className="text-white/80 text-[11px] max-w-[210px] leading-relaxed line-clamp-2 font-bold uppercase italic">{ann.description}</p>
             </div>
             <div className="bg-white/20 backdrop-blur-md text-white text-[8px] font-black py-2.5 px-6 rounded-xl w-fit border border-white/30 uppercase tracking-[0.2em]">
@@ -87,7 +74,7 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = ({ bot, tonRate }) => {
     <div onClick={() => navigate(`/bot/${bot.id}`)} className="flex items-center p-5 cursor-pointer group hover:bg-slate-900/60 rounded-[32px] transition-all border border-transparent hover:border-slate-800/50 mb-3 active:bg-slate-900 shadow-xl">
         <div className="relative shrink-0">
             <img 
-                src={bot.bot_link ? `https://t.me/i/userpic/320/${bot.bot_link.replace('@', '')}.jpg` : bot.icon} 
+                src={getLiveBotIcon(bot)} 
                 alt={bot.name} 
                 className="w-20 h-20 rounded-[28px] object-cover bg-slate-900 border border-slate-800 group-hover:scale-105 transition-transform" 
                 onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
@@ -99,10 +86,7 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = ({ bot, tonRate }) => {
             )}
         </div>
         <div className="flex-1 ml-5 min-w-0 mr-3">
-            <div className="flex items-center gap-2 mb-1.5">
-                <h3 className="font-black text-lg text-slate-100 truncate italic tracking-tighter uppercase leading-none">{bot.name}</h3>
-                <ShieldCheck size={14} className="text-blue-500 shrink-0" />
-            </div>
+            <h3 className="font-black text-lg text-slate-100 truncate italic tracking-tighter uppercase leading-none mb-1.5">{bot.name}</h3>
             <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest truncate mb-2 italic">{bot.description}</p>
             <div className="flex items-center gap-3">
                 {bot.price === 0 ? (
@@ -166,20 +150,15 @@ const Home = () => {
   }, [user]);
 
   return (
-    <div className="p-4 pt-10 min-h-screen bg-[#020617] pb-32 font-sans text-slate-200">
-      {/* Institutional Header with System Status */}
-      <div className="flex justify-between items-start mb-10 px-1 relative">
+    <div className="p-4 pt-10 min-h-screen bg-[#020617] pb-32 font-sans text-slate-200 animate-in">
+      <div className="flex justify-between items-center mb-10 px-1 relative">
         <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-blue-600 rounded-[20px] flex items-center justify-center shadow-2xl rotate-3 relative overflow-hidden">
-                <div className="absolute inset-0 bg-white/10 animate-pulse"></div>
-                <BotIcon size={24} className="text-white relative z-10" />
+            <div className="w-12 h-12 bg-blue-600 rounded-[20px] flex items-center justify-center shadow-2xl rotate-3">
+                <BotIcon size={24} className="text-white" />
             </div>
             <div>
                 <h1 className="text-2xl font-black text-white tracking-tighter uppercase italic leading-none">Botly<span className="text-blue-500">Hub</span></h1>
-                <div className="flex items-center gap-2 mt-1.5">
-                    <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
-                    <span className="text-[8px] font-black text-slate-500 uppercase tracking-[0.2em] italic">Network Online</span>
-                </div>
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1 italic">V3 PREMİUM ENGINE</p>
             </div>
         </div>
         <div className="flex items-center gap-3">
@@ -225,12 +204,12 @@ const Home = () => {
       </div>
 
       {isLoading ? (
-          <HomeSkeleton />
+          <div className="flex flex-col items-center justify-center py-24 gap-4"><Loader2 className="animate-spin text-blue-500" size={32} /></div>
       ) : (
           <>
             {announcements.length > 0 && (
                 <div className="mb-12">
-                    <h2 className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em] mb-6 flex items-center gap-3 px-2">
+                    <h2 className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em] mb-6 px-2">
                         {t('featured')}
                     </h2>
                     <div className="flex gap-6 overflow-x-auto no-scrollbar -mx-4 px-4 pb-4 snap-x">
@@ -253,8 +232,8 @@ const Home = () => {
             </div>
 
             <div className="space-y-1">
-                <h2 className="text-[10px] font-black text-slate-700 uppercase tracking-[0.4em] mb-8 px-2 flex items-center gap-3">
-                    <Radio size={14} className="text-slate-800" /> TOP RATED BOTS
+                <h2 className="text-[10px] font-black text-slate-700 uppercase tracking-[0.4em] mb-8 px-2">
+                    MAĞAZA VİTRİNİ
                 </h2>
                 {bots.length > 0 ? bots.map(bot => <BotCard key={bot.id} bot={bot} tonRate={tonRate} />) : <div className="py-24 text-center text-slate-700 font-bold uppercase text-xs tracking-widest">Sonuç yok.</div>}
             </div>
@@ -269,7 +248,6 @@ const Home = () => {
                         {React.createElement(iconMap[selectedAnn.icon_name] || Sparkles, { size: 28, className: 'text-blue-500' })}
                     </div>
                     <h3 className="text-xl font-black text-white mb-2 tracking-tight uppercase italic">{selectedAnn.title}</h3>
-                    <div className="h-px w-12 bg-blue-600/30 mx-auto mb-4"></div>
                     <p className="text-slate-400 text-[11px] leading-relaxed font-bold uppercase mb-8 px-4 opacity-80 italic">{selectedAnn.content_detail || selectedAnn.description}</p>
                     
                     <button 
