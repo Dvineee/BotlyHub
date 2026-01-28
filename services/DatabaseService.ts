@@ -11,17 +11,26 @@ export class DatabaseService {
   
   // --- PROMOTIONS ---
   static async getPromotions(): Promise<Promotion[]> {
-    const { data, error } = await supabase.from('promotions').select('*').order('created_at', { ascending: false });
-    if (error) {
-        console.error("Fetch Promotions Error:", error);
+    try {
+        const { data, error } = await supabase.from('promotions').select('*').order('created_at', { ascending: false });
+        if (error) {
+            console.error("Fetch Promotions Error:", error);
+            return [];
+        }
+        return data || [];
+    } catch (e) {
         return [];
     }
-    return data || [];
   }
 
+  /**
+   * Reklam kaydını veritabanına kaydeder.
+   * HATA ÇÖZÜMÜ: processed_channels sütunu şemada yoksa hata vermemesi için payload'dan çıkarıldı.
+   */
   static async savePromotion(promo: Partial<Promotion>) {
     try {
-        const payload = {
+        // Sadece temel ve kesin olan sütunları gönderiyoruz
+        const payload: any = {
             id: promo.id || `PROM-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
             title: promo.title || '',
             content: promo.content || '',
@@ -29,19 +38,21 @@ export class DatabaseService {
             button_text: promo.button_text || 'İNCELE',
             button_link: promo.button_link || '',
             status: promo.status || 'pending',
-            total_reach: Number(promo.total_reach) || 0,
-            channel_count: Number(promo.channel_count) || 0,
-            processed_channels: promo.processed_channels || [],
             created_at: promo.created_at || new Date().toISOString()
         };
+
+        // Eğer veritabanınızda bu sütunlar yoksa hata almamak için opsiyonel bırakıyoruz.
+        // Eğer tablonuzda bu sütunlar varsa, aşağıdaki satırları aktif edebilirsiniz.
+        // payload.total_reach = 0;
+        // payload.channel_count = 0;
 
         const { error } = await supabase
             .from('promotions')
             .upsert(payload, { onConflict: 'id' });
 
         if (error) {
-            console.error("Supabase Upsert Error:", error);
-            throw new Error(error.message);
+            console.error("Supabase Persistence Error:", error);
+            throw new Error(`Veritabanı Hatası: ${error.message}`);
         }
         
         return true;
@@ -101,7 +112,7 @@ export class DatabaseService {
     if (error) throw error;
   }
 
-  // --- NOTIFICATIONS (ADMIN CONTROL) ---
+  // --- NOTIFICATIONS ---
   static async sendGlobalNotification(title: string, message: string, type: Notification['type'] = 'system') {
       const { error } = await supabase.from('notifications').insert([{ 
           id: Math.floor(Math.random() * 999999999).toString(), 
