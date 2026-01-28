@@ -27,6 +27,7 @@ const PublishPromo = () => {
   const handleForge = async () => {
     if (!formData.title || !formData.content) {
         haptic('rigid');
+        alert("Lütfen başlık ve mesaj içeriğini doldurun.");
         return;
     }
 
@@ -34,9 +35,12 @@ const PublishPromo = () => {
     haptic('medium');
 
     try {
+        // ID'yi burada oluşturup gönderiyoruz
+        const promoId = `U-PROM-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+        
         await DatabaseService.savePromotion({
             ...formData,
-            id: `U-PROM-${Date.now()}`,
+            id: promoId,
             status: 'pending',
             total_reach: 0,
             channel_count: 0,
@@ -56,12 +60,13 @@ const PublishPromo = () => {
         notification('success');
         haptic('heavy');
         
-        // Başarı sayfasına yönlendirme yerine popup veya ana sayfa
         alert("Reklamınız başarıyla oluşturuldu ve onay için sıraya alındı.");
         navigate('/');
-    } catch (e) {
+    } catch (e: any) {
+        console.error("Publishing Error:", e);
         notification('error');
-        alert("Sistem hatası. Lütfen daha sonra tekrar deneyin.");
+        // Kullanıcıya daha detaylı bilgi veriyoruz
+        alert(`Reklam yayınlanırken bir hata oluştu: ${e.message || "Bilinmeyen Hata"}`);
     } finally {
         setIsLoading(false);
     }

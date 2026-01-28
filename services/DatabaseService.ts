@@ -12,26 +12,43 @@ export class DatabaseService {
   // --- PROMOTIONS ---
   static async getPromotions(): Promise<Promotion[]> {
     const { data, error } = await supabase.from('promotions').select('*').order('created_at', { ascending: false });
-    if (error) return [];
+    if (error) {
+        console.error("Fetch Promotions Error:", error);
+        return [];
+    }
     return data || [];
   }
 
   static async savePromotion(promo: Partial<Promotion>) {
-    const payload = {
-        id: promo.id || Math.floor(Math.random() * 999999).toString(),
-        title: promo.title,
-        content: promo.content,
-        image_url: promo.image_url,
-        button_text: promo.button_text,
-        button_link: promo.button_link,
-        status: promo.status || 'pending',
-        total_reach: Number(promo.total_reach || 0),
-        channel_count: Number(promo.channel_count || 0),
-        processed_channels: promo.processed_channels || [],
-        created_at: promo.created_at || new Date().toISOString()
-    };
-    const { error } = await supabase.from('promotions').upsert(payload, { onConflict: 'id' });
-    if (error) throw error;
+    try {
+        const payload = {
+            id: promo.id || `PROM-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+            title: promo.title || '',
+            content: promo.content || '',
+            image_url: promo.image_url || '',
+            button_text: promo.button_text || 'İNCELE',
+            button_link: promo.button_link || '',
+            status: promo.status || 'pending',
+            total_reach: Number(promo.total_reach) || 0,
+            channel_count: Number(promo.channel_count) || 0,
+            processed_channels: promo.processed_channels || [],
+            created_at: promo.created_at || new Date().toISOString()
+        };
+
+        const { error } = await supabase
+            .from('promotions')
+            .upsert(payload, { onConflict: 'id' });
+
+        if (error) {
+            console.error("Supabase Upsert Error:", error);
+            throw new Error(error.message);
+        }
+        
+        return true;
+    } catch (err: any) {
+        console.error("DatabaseService.savePromotion Exception:", err);
+        throw err;
+    }
   }
 
   static async deletePromotion(id: string) {
@@ -120,8 +137,6 @@ export class DatabaseService {
   }
 
   static async incrementNotificationView(id: string) {
-      // Supabase supports increments using specialized syntax in modern versions
-      // Using direct call to get current and update for simplicity in this bridge
       const { data } = await supabase.from('notifications').select('view_count').eq('id', id).maybeSingle();
       if (data) {
           const current = Number(data.view_count || 0);
