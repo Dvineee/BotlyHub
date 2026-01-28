@@ -7,6 +7,14 @@ const SUPABASE_ANON_KEY = 'sb_publishable_VeYQ304ZpUpj3ymB3ihpjw_jt49W1G-';
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+// UUID v4 üretici (Veritabanı UUID beklediği için standart formatta üretim yapar)
+const generateUUID = () => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+};
+
 export class DatabaseService {
   
   // --- PROMOTIONS ---
@@ -25,13 +33,15 @@ export class DatabaseService {
 
   /**
    * Reklam kaydını veritabanına kaydeder.
-   * HATA ÇÖZÜMÜ: processed_channels sütunu şemada yoksa hata vermemesi için payload'dan çıkarıldı.
+   * UUID HATASI ÇÖZÜMÜ: Geçersiz string ID yerine gerçek UUID v4 kullanılır.
    */
   static async savePromotion(promo: Partial<Promotion>) {
     try {
-        // Sadece temel ve kesin olan sütunları gönderiyoruz
+        // Eğer promo.id bir UUID değilse veya boşsa yeni bir UUID oluştur
+        const isUUID = (id: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id);
+        
         const payload: any = {
-            id: promo.id || `PROM-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+            id: (promo.id && isUUID(promo.id)) ? promo.id : generateUUID(),
             title: promo.title || '',
             content: promo.content || '',
             image_url: promo.image_url || '',
@@ -40,11 +50,6 @@ export class DatabaseService {
             status: promo.status || 'pending',
             created_at: promo.created_at || new Date().toISOString()
         };
-
-        // Eğer veritabanınızda bu sütunlar yoksa hata almamak için opsiyonel bırakıyoruz.
-        // Eğer tablonuzda bu sütunlar varsa, aşağıdaki satırları aktif edebilirsiniz.
-        // payload.total_reach = 0;
-        // payload.channel_count = 0;
 
         const { error } = await supabase
             .from('promotions')

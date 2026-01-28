@@ -35,12 +35,9 @@ const PublishPromo = () => {
     haptic('medium');
 
     try {
-        // ID'yi burada oluşturup gönderiyoruz
-        const promoId = `U-PROM-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-        
+        // ID parametresini göndermiyoruz, DatabaseService içerisinde UUID olarak oluşturulacak
         await DatabaseService.savePromotion({
             ...formData,
-            id: promoId,
             status: 'pending',
             total_reach: 0,
             channel_count: 0,
@@ -65,7 +62,6 @@ const PublishPromo = () => {
     } catch (e: any) {
         console.error("Publishing Error:", e);
         notification('error');
-        // Kullanıcıya daha detaylı bilgi veriyoruz
         alert(`Reklam yayınlanırken bir hata oluştu: ${e.message || "Bilinmeyen Hata"}`);
     } finally {
         setIsLoading(false);
