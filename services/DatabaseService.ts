@@ -101,7 +101,9 @@ export class DatabaseService {
 
   static setAdminSession(token: string) { localStorage.setItem('admin_token', token); }
 
-  // PROMOTIONS ENGINE METHODS
+  static get supabase() { return supabase; }
+
+  // --- PROMOTIONS ENGINE ---
   static async getPromotions(): Promise<Promotion[]> {
     const { data, error } = await supabase.from('promotions').select('*').order('created_at', { ascending: false });
     if (error) throw error;
