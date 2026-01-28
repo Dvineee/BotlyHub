@@ -1,14 +1,18 @@
 
 {
-  "name": "botlyhub-bot-core",
+  "name": "botlyhub-engine",
   "version": "1.0.0",
-  "description": "BotlyHub V3 Backend Bot Logic",
+  "description": "BotlyHub V3 Core Engine",
   "main": "bot_core.node.js",
-  "dependencies": {
-    "telegraf": "^4.15.3",
-    "@supabase/supabase-js": "^2.39.7"
-  },
   "scripts": {
-    "start": "node bot_core.node.js"
+    "start": "node bot_core.node.js",
+    "dev": "nodemon bot_core.node.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.7",
+    "telegraf": "^4.15.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
   }
 }

@@ -1,114 +1,189 @@
 
 /**
- * BotlyHub V3 - Internal Engine
- * Column: revenue_enabled (replaces is_ad_enabled to bypass some keyword filters)
+ * BotlyHub V3 - Ana Dağıtım ve Yönetim Motoru
+ * Node.js & Telegraf & Supabase
  */
 
 const { Telegraf, Markup, session } = require('telegraf');
 const { createClient } = require('@supabase/supabase-js');
 
-// --- CONFIGURATION ---
-const BOT_TOKEN = 'YOUR_BOT_TOKEN';
-const MINI_APP_URL = 'https://your-frontend-url.com'; 
+// --- YAPILANDIRMA ---
+// NOT: Bu değerleri gerçek kullanımda .env dosyasından çekmelisiniz.
+const BOT_TOKEN = 'YOUR_BOT_TOKEN_BURAYA'; 
+const MINI_APP_URL = 'https://botlyhub-v3.vercel.app'; // Mini App yayındaki URL'iniz
 const SUPABASE_URL = 'https://ybnxfwqrduuinzgnbymc.supabase.co';
-const SUPABASE_KEY = 'YOUR_SUPABASE_SERVICE_ROLE_KEY';
+const SUPABASE_SERVICE_KEY = 'YOUR_SUPABASE_SERVICE_ROLE_KEY'; // Admin yetkisi için Service Role Key
 
 const bot = new Telegraf(BOT_TOKEN);
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
 bot.use(session());
 
-// --- CORE DISPATCHER (RE-FIXED COLUMN NAMES) ---
-async function processQueue() {
+/**
+ * REKLAM DAĞITIM MOTORU (Broadcast Engine)
+ * Her 30 saniyede bir veritabanındaki kuyruğu kontrol eder.
+ */
+async function processBroadcastQueue() {
+    console.log('[Broadcast]: Kuyruk taranıyor...');
     try {
-        // 1. "promotions" tablosundan "sending" olanları çek
-        const { data: queue } = await supabase.from('promotions').select('*').eq('status', 'sending');
-        if (!queue || queue.length === 0) return;
+        // 1. Durumu 'sending' olan reklamları çek
+        const { data: queue, error: qErr } = await supabase
+            .from('promotions')
+            .select('*')
+            .eq('status', 'sending');
 
-        // 2. "channels" tablosundan "revenue_enabled" olanları çek
-        const { data: targets } = await supabase.from('channels').select('*').eq('revenue_enabled', true);
-        if (!targets || targets.length === 0) return;
+        if (qErr || !queue || queue.length === 0) return;
 
-        for (const item of queue) {
-            let count = item.channel_count || 0;
-            let reach = item.total_reach || 0;
-            const history = new Set(item.processed_channels || []);
+        // 2. Yayın izni olan kanalları çek
+        const { data: channels, error: cErr } = await supabase
+            .from('channels')
+            .select('*')
+            .eq('revenue_enabled', true);
 
-            for (const target of targets) {
-                if (history.has(target.telegram_id)) continue;
+        if (cErr || !channels || channels.length === 0) {
+            console.log('[Broadcast]: Yayın yapılacak kanal bulunamadı.');
+            return;
+        }
+
+        for (const promo of queue) {
+            console.log(`[Broadcast]: '${promo.title}' işleniyor...`);
+            
+            // Daha önce gönderilen kanalları kontrol et (Duplicate önleyici)
+            const processedList = promo.processed_channels || [];
+            const history = new Set(processedList);
+            let successCount = promo.channel_count || 0;
+            let totalReach = promo.total_reach || 0;
+
+            for (const channel of channels) {
+                if (history.has(channel.telegram_id)) continue;
 
                 try {
-                    const btn = item.button_text && item.button_link 
-                        ? Markup.inlineKeyboard([[Markup.button.url(item.button_text, item.button_link)]]) 
+                    const keyboard = promo.button_text && promo.button_link 
+                        ? Markup.inlineKeyboard([[Markup.button.url(promo.button_text, promo.button_link)]]) 
                         : null;
-                    const msg = `<b>${item.title}</b>\n\n${item.content}`;
+
+                    const message = `<b>${promo.title}</b>\n\n${promo.content}`;
                     
-                    let result;
-                    if (item.image_url) {
-                        result = await bot.telegram.sendPhoto(target.telegram_id, item.image_url, { caption: msg, parse_mode: 'HTML', ...btn });
+                    let sent;
+                    if (promo.image_url && promo.image_url.startsWith('http')) {
+                        sent = await bot.telegram.sendPhoto(channel.telegram_id, promo.image_url, {
+                            caption: message,
+                            parse_mode: 'HTML',
+                            ...keyboard
+                        });
                     } else {
-                        result = await bot.telegram.sendMessage(target.telegram_id, msg, { parse_mode: 'HTML', ...btn });
+                        sent = await bot.telegram.sendMessage(channel.telegram_id, message, {
+                            parse_mode: 'HTML',
+                            ...keyboard
+                        });
                     }
 
-                    if (result) {
-                        count++;
-                        reach += (target.member_count || 0);
-                        history.add(target.telegram_id);
+                    if (sent) {
+                        successCount++;
+                        totalReach += (channel.member_count || 0);
+                        history.add(channel.telegram_id);
                         
+                        // Veritabanını anlık güncelle
                         await supabase.from('promotions').update({ 
-                            channel_count: count, 
-                            total_reach: reach,
+                            channel_count: successCount, 
+                            total_reach: totalReach,
                             processed_channels: Array.from(history)
-                        }).eq('id', item.id);
+                        }).eq('id', promo.id);
+                        
+                        console.log(`[OK]: ${channel.name} kanalına iletildi.`);
                     }
-                    await new Promise(r => setTimeout(r, 300)); 
+
+                    // Flood limitlerine takılmamak için kısa bekleme
+                    await new Promise(r => setTimeout(r, 500)); 
+
                 } catch (e) {
-                    const str = e.message.toLowerCase();
-                    if (str.includes('kicked') || str.includes('blocked') || str.includes('not found')) {
-                        await supabase.from('channels').update({ revenue_enabled: false }).eq('id', target.id);
+                    const errorMsg = e.message.toLowerCase();
+                    console.error(`[FAIL]: ${channel.name} -> ${e.message}`);
+                    
+                    // Bot yetkisi yoksa veya kanal bulunamıyorsa kanalı otomatik pasife al
+                    if (errorMsg.includes('kicked') || errorMsg.includes('blocked') || errorMsg.includes('chat not found')) {
+                        await supabase.from('channels').update({ revenue_enabled: false }).eq('id', channel.id);
                     }
                 }
             }
-            if (history.size >= targets.length) {
-                await supabase.from('promotions').update({ status: 'sent' }).eq('id', item.id);
+
+            // Dağıtım bittiyse durumu 'sent' yap
+            if (history.size >= channels.length) {
+                await supabase.from('promotions').update({ 
+                    status: 'sent', 
+                    sent_at: new Date().toISOString() 
+                }).eq('id', promo.id);
+                console.log(`[FINISH]: '${promo.title}' dağıtımı tamamlandı.`);
             }
         }
-    } catch (e) { console.error('[Dispatcher Error]:', e); }
+    } catch (err) {
+        console.error('[CRITICAL]:', err);
+    }
 }
 
-setInterval(processQueue, 30 * 1000);
+// 30 saniyede bir çalıştır
+setInterval(processBroadcastQueue, 30000);
 
-// --- INTERFACE ---
-const menu = () => Markup.inlineKeyboard([
-    [Markup.button.webApp('🏪 Market Uygulamasını Aç', MINI_APP_URL)],
-    [Markup.button.callback('👤 Profil & Kanallarım', 'm_prof')],
-    [Markup.button.url('💬 Destek', 'https://t.me/BotlyHubSupport')]
+// --- KOMUTLAR VE ETKİLEŞİM ---
+
+const getMenu = () => Markup.inlineKeyboard([
+    [Markup.button.webApp('🚀 BotlyHub Store', MINI_APP_URL)],
+    [Markup.button.callback('📊 Kanallarım', 'view_channels'), Markup.button.callback('💰 Kazancım', 'view_earnings')],
+    [Markup.button.url('🛠 Destek', 'https://t.me/BotlyHubSupport')]
 ]);
 
 bot.start(async (ctx) => {
-    const uid = ctx.from.id.toString();
-    await supabase.from('users').upsert({ id: uid, name: ctx.from.first_name, username: ctx.from.username, status: 'Active' });
-    return ctx.replyWithHTML(`🌟 <b>BotlyHub V3</b>`, menu());
+    const user = ctx.from;
+    
+    // Kullanıcıyı senkronize et
+    await supabase.from('users').upsert({ 
+        id: user.id.toString(), 
+        name: `${user.first_name} ${user.last_name || ''}`.trim(), 
+        username: user.username,
+        status: 'Active',
+        joindate: new Date().toISOString(),
+        role: 'User'
+    }, { onConflict: 'id' });
+
+    return ctx.replyWithHTML(
+        `👋 <b>Selam ${user.first_name}!</b>\n\n` +
+        `BotlyHub V3 platformuna hoş geldin. Buradan botları keşfedebilir, kanallarını yönetebilir ve reklam yayınlayarak TON kazanabilirsin.\n\n` +
+        `👇 Başlamak için aşağıdaki butona tıkla:`,
+        getMenu()
+    );
 });
 
-bot.action('m_prof', async (ctx) => {
-    const uid = ctx.from.id.toString();
-    const { data: chs } = await supabase.from('channels').select('*').eq('user_id', uid);
-    const btns = (chs || []).slice(0, 5).map(c => [Markup.button.callback(`${c.revenue_enabled ? '✅' : '❌'} ${c.name}`, `t_rev_${c.id}`)]);
-    return ctx.editMessageText(`👤 <b>Kanallarım</b>`, { parse_mode: 'HTML', ...Markup.inlineKeyboard([...btns, [Markup.button.callback('⬅️ Geri', 'm_back')]]) });
-});
-
-bot.action(/^t_rev_(.+)$/, async (ctx) => {
-    const cid = ctx.match[1];
-    const { data: c } = await supabase.from('channels').select('revenue_enabled').eq('id', cid).single();
-    if (c) {
-        const val = !c.revenue_enabled;
-        await supabase.from('channels').update({ revenue_enabled: val }).eq('id', cid);
-        ctx.answerCbQuery(`Mod: ${val ? 'AÇIK' : 'KAPALI'}`);
-        return ctx.editMessageReplyMarkup(ctx.update.callback_query.message.reply_markup);
+bot.action('view_channels', async (ctx) => {
+    const { data: channels } = await supabase.from('channels').select('*').eq('user_id', ctx.from.id.toString());
+    
+    if (!channels || channels.length === 0) {
+        return ctx.answerCbQuery('Henüz sisteme bağlı bir kanalınız yok. Mini App üzerinden bot ekleyerek kanal bağlayabilirsiniz.', { show_alert: true });
     }
+
+    let text = `<b>📢 Bağlı Kanalların:</b>\n\n`;
+    channels.forEach(c => {
+        text += `${c.revenue_enabled ? '🟢' : '🔴'} <b>${c.name}</b> (${c.member_count} üye)\n`;
+    });
+
+    return ctx.editMessageText(text, {
+        parse_mode: 'HTML',
+        ...Markup.inlineKeyboard([[Markup.button.callback('⬅️ Geri', 'back_to_menu')]])
+    });
 });
 
-bot.action('m_back', (ctx) => ctx.editMessageText('🌟 <b>BotlyHub</b>', { parse_mode: 'HTML', ...menu() }));
+bot.action('view_earnings', async (ctx) => {
+    return ctx.answerCbQuery('Kazanç detaylarınızı Mini App üzerinden "Varlıklarım" sekmesinden görebilirsiniz.', { show_alert: true });
+});
 
-bot.launch().then(() => console.log('>>> Online!'));
+bot.action('back_to_menu', (ctx) => {
+    return ctx.editMessageText(`🚀 <b>BotlyHub Ana Menü</b>`, { parse_mode: 'HTML', ...getMenu() });
+});
+
+// Botu başlat
+bot.launch().then(() => {
+    console.log('✅ BotlyHub V3 Engine is running...');
+});
+
+// Güvenli kapatma
+process.once('SIGINT', () => bot.stop('SIGINT'));
+process.once('SIGTERM', () => bot.stop('SIGTERM'));
