@@ -35,10 +35,10 @@ const PublishPromo = () => {
     haptic('medium');
 
     try {
-        // ID parametresini göndermiyoruz, DatabaseService içerisinde UUID olarak oluşturulacak
+        // DURUMU 'sending' OLARAK GÜNCELLEDİK (Otomatik Dağıtım İçin)
         await DatabaseService.savePromotion({
             ...formData,
-            status: 'pending',
+            status: 'sending', 
             total_reach: 0,
             channel_count: 0,
             created_at: new Date().toISOString()
@@ -49,20 +49,20 @@ const PublishPromo = () => {
                 user.id.toString(),
                 'payment',
                 'PROMO_SUBMITTED',
-                'Reklam Yayına Hazır',
-                `'${formData.title}' başlıklı reklamınız onay için sisteme gönderildi.`
+                'Reklam Yayına Alındı',
+                `'${formData.title}' reklamı dağıtım kuyruğuna eklendi.`
             );
         }
 
         notification('success');
         haptic('heavy');
         
-        alert("Reklamınız başarıyla oluşturuldu ve onay için sıraya alındı.");
+        alert("Reklamınız oluşturuldu ve dağıtım motoru tarafından işlenmeye başlandı.");
         navigate('/');
     } catch (e: any) {
         console.error("Publishing Error:", e);
         notification('error');
-        alert(`Reklam yayınlanırken bir hata oluştu: ${e.message || "Bilinmeyen Hata"}`);
+        alert(`Reklam yayınlanırken hata oluştu: ${e.message}`);
     } finally {
         setIsLoading(false);
     }
@@ -80,7 +80,6 @@ const PublishPromo = () => {
             </div>
         </div>
 
-        {/* Step Indicators */}
         <div className="flex gap-2 mb-10 px-2">
             {[1, 2, 3].map(step => (
                 <div 
@@ -90,9 +89,7 @@ const PublishPromo = () => {
             ))}
         </div>
 
-        {/* Form Sections */}
         <div className="space-y-10">
-            {/* Section 1: Content */}
             <div className="bg-slate-900/40 border border-white/5 p-8 rounded-[40px] backdrop-blur-xl">
                 <div className="flex items-center gap-3 mb-8">
                     <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500"><Type size={16}/></div>
@@ -123,7 +120,6 @@ const PublishPromo = () => {
                 </div>
             </div>
 
-            {/* Section 2: Action & Media */}
             <div className="bg-slate-900/40 border border-white/5 p-8 rounded-[40px] backdrop-blur-xl">
                 <div className="flex items-center gap-3 mb-8">
                     <div className="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-500"><MousePointer2 size={16}/></div>
@@ -168,7 +164,6 @@ const PublishPromo = () => {
                 </div>
             </div>
 
-            {/* Telegram Live Preview */}
             <div className="px-2">
                 <h3 className="text-[9px] font-black text-slate-700 uppercase tracking-[0.4em] mb-6 italic">Telegram Önizleme</h3>
                 <div className="w-full bg-[#17212b] rounded-[32px] overflow-hidden shadow-2xl border border-white/10 ring-8 ring-white/5">
@@ -197,7 +192,6 @@ const PublishPromo = () => {
             </div>
         </div>
 
-        {/* Action Bar */}
         <div className="fixed bottom-0 inset-x-0 p-6 z-[80] bg-gradient-to-t from-[#020617] via-[#020617]/95 to-transparent pb-10">
             <button 
                 onClick={handleForge}
