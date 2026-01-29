@@ -11,31 +11,7 @@ export interface User {
   email?: string;
   phone?: string;
   isRestricted?: boolean;
-  canPublishPromos?: boolean; // canPublishAds yerine
-}
-
-export interface ActivityLog {
-  id: string;
-  user_id: string;
-  type: 'auth' | 'bot_manage' | 'channel_sync' | 'payment' | 'security' | 'system';
-  action_key: string;
-  title: string;
-  description: string;
-  metadata: any;
-  created_at: string;
-}
-
-export interface Bot {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  price: number;
-  category: string;
-  bot_link: string;
-  screenshots: string[];
-  isNew?: boolean;
-  features?: string[];
+  canPublishPromos?: boolean;
 }
 
 export interface Promotion {
@@ -45,6 +21,7 @@ export interface Promotion {
   image_url?: string;
   button_text?: string;
   button_link?: string;
+  click_count: number; // Tıklama takibi için
   status: 'pending' | 'sending' | 'sent' | 'failed';
   total_reach: number;
   channel_count: number;
@@ -66,15 +43,28 @@ export interface Announcement {
   content_detail?: string;
 }
 
-export interface ExtendedBot extends Bot {
-  isPremium?: boolean;
-}
-
 export interface UserBot extends Bot {
-  revenueEnabled: boolean; // isAdEnabled yerine
+  revenueEnabled: boolean;
   isActive: boolean;
   expiryDate?: string;
   ownership_id?: string;
+}
+
+export interface Bot {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  price: number;
+  category: string;
+  bot_link: string;
+  screenshots: string[];
+  isNew?: boolean;
+  features?: string[];
+}
+
+export interface ExtendedBot extends Bot {
+  isPremium?: boolean;
 }
 
 export interface Channel {
@@ -84,25 +74,12 @@ export interface Channel {
   name: string;
   memberCount: number;
   icon: string;
-  revenueEnabled: boolean; // isAdEnabled yerine
+  revenueEnabled: boolean;
   connectedBotIds: string[];
   revenue: number;
 }
 
-export type ChainType = 'TON' | 'BSC' | 'TRX' | 'SOL' | 'STARS';
-
-export interface CryptoTransaction {
-  id: string;
-  type: 'Deposit' | 'Withdrawal' | 'BotEarnings';
-  amount: number;
-  symbol: string;
-  chain: ChainType;
-  toAddress?: string;
-  date: string;
-  status: 'Success' | 'Pending' | 'Failed' | 'Processing';
-  hash: string;
-}
-
+// Fix: Exporting Notification interface to resolve missing member errors in Home.tsx, data.tsx, Notifications.tsx, and DatabaseService.ts
 export interface Notification {
   id: string;
   type: 'system' | 'payment' | 'security' | 'bot';
@@ -111,10 +88,11 @@ export interface Notification {
   date: string;
   isRead: boolean;
   user_id?: string;
-  target_type?: 'user' | 'global';
+  target_type?: 'global' | 'user';
   view_count?: number;
 }
 
+// Fix: Exporting SubscriptionPlan interface to resolve missing member error in data.tsx
 export interface SubscriptionPlan {
   id: string;
   name: string;
@@ -127,6 +105,19 @@ export interface SubscriptionPlan {
   features: string[];
 }
 
+// Fix: Exporting ActivityLog interface to resolve missing member error in DatabaseService.ts
+export interface ActivityLog {
+  id: string;
+  user_id: string;
+  type: string;
+  action_key: string;
+  title: string;
+  description: string;
+  metadata?: any;
+  created_at: string;
+}
+
+// Fix: Augmenting global Window interface to include Telegram WebApp to resolve property existence errors in App.tsx, TranslationContext.tsx, and useTelegram.ts
 declare global {
   interface Window {
     Telegram?: {
@@ -134,3 +125,5 @@ declare global {
     };
   }
 }
+
+export {};
