@@ -24,6 +24,7 @@ export class DatabaseService {
         image_url: promo.image_url,
         button_text: promo.button_text,
         button_link: promo.button_link,
+        click_count: Number(promo.click_count || 0),
         status: promo.status || 'pending',
         total_reach: Number(promo.total_reach || 0),
         channel_count: Number(promo.channel_count || 0),
@@ -120,8 +121,6 @@ export class DatabaseService {
   }
 
   static async incrementNotificationView(id: string) {
-      // Supabase supports increments using specialized syntax in modern versions
-      // Using direct call to get current and update for simplicity in this bridge
       const { data } = await supabase.from('notifications').select('view_count').eq('id', id).maybeSingle();
       if (data) {
           const current = Number(data.view_count || 0);

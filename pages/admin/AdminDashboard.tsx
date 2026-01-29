@@ -5,7 +5,7 @@ import {
   Trash2, Megaphone, X, LayoutDashboard, Users as UsersIcon, 
   Settings, LogOut, Shield, Activity, Loader2, DollarSign, 
   Bot as BotIcon, Share2, Send, Plus, Eye, MousePointer2, 
-  Image as ImageIcon, Link2, Monitor, AlertCircle
+  Image as ImageIcon, Link2, Monitor, AlertCircle, Sparkles
 } from 'lucide-react';
 import { Promotion } from '../../types';
 import { DatabaseService } from '../../services/DatabaseService';
@@ -185,7 +185,7 @@ const AdSharingCenter = () => {
                             {/* Telegram Mesaj Balonu */}
                             <div className="w-full bg-[#020617] border border-white/10 rounded-[40px] overflow-hidden shadow-[0_50px_100px_rgba(0,0,0,0.6)] animate-in zoom-in-95">
                                 {editingAd.image_url && editingAd.image_url.startsWith('http') ? (
-                                    <img src={editingAd.image_url} className="w-full h-48 object-cover border-b border-white/5" onError={(e)=>(e.target as any).style.display='none'} />
+                                    <img src={editingAd.image_url} className="w-full h-48 object-cover border-b border-white/5" onError={(e)=>(e.target as any).src=''} />
                                 ) : (
                                     <div className="w-full h-32 bg-slate-900/40 flex flex-col items-center justify-center border-b border-white/5">
                                         <ImageIcon className="text-slate-800 mb-2" size={32} />
@@ -194,7 +194,7 @@ const AdSharingCenter = () => {
                                 )}
                                 <div className="p-8 space-y-4">
                                     <h5 className="text-white font-black text-lg italic uppercase tracking-tighter truncate">{editingAd.title || 'REKLAM BAŞLIĞI'}</h5>
-                                    <p className="text-slate-400 text-[10px] font-bold uppercase italic leading-relaxed line-clamp-4 min-h-[60px]">{editingAd.content || 'Mesaj içeriği burada görünecek...'}</p>
+                                    <p className="text-slate-400 text-[10px] font-bold uppercase italic leading-relaxed line-clamp-4 min-h-[60px] whitespace-pre-wrap">{editingAd.content || 'Mesaj içeriği burada görünecek...'}</p>
                                     
                                     {editingAd.button_text && (
                                         <div className="pt-4">
@@ -268,6 +268,7 @@ const AdminDashboard = () => {
 
     return (
         <div className="min-h-screen bg-[#020617] flex font-sans">
+            {/* Sidebar */}
             <aside className="w-72 bg-slate-900/50 border-r border-white/5 hidden lg:flex flex-col h-screen sticky top-0 backdrop-blur-3xl">
                 <div className="p-10 flex items-center gap-4">
                     <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-2xl">
@@ -277,7 +278,7 @@ const AdminDashboard = () => {
                 </div>
                 <nav className="flex-1 px-6 space-y-2 mt-4">
                     {menu.map((m) => (
-                        <Link key={m.path} to={m.path} className={`flex items-center gap-4 px-6 py-4 rounded-2xl transition-all ${location.pathname === m.path ? 'bg-blue-600 text-white shadow-xl shadow-blue-900/20' : 'text-slate-500 hover:bg-white/5'}`}>
+                        <Link key={m.path} to={m.path} className={`flex items-center gap-4 px-6 py-4 rounded-2xl transition-all ${location.pathname === m.path || (m.path === '/a/dashboard/users' && location.pathname.startsWith('/a/dashboard/users')) ? 'bg-blue-600 text-white shadow-xl shadow-blue-900/20' : 'text-slate-500 hover:bg-white/5'}`}>
                             <m.icon size={18} />
                             <span className="text-[11px] font-black uppercase tracking-widest italic">{m.label}</span>
                         </Link>
@@ -291,6 +292,7 @@ const AdminDashboard = () => {
                 </div>
             </aside>
 
+            {/* Main Content Area */}
             <main className="flex-1 p-6 lg:p-12 overflow-x-hidden">
                 <Routes>
                     <Route path="/" element={<Overview />} />
