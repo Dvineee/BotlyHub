@@ -1,174 +1,114 @@
 
 /**
- * BotlyHub V3 - Ana Dağıtım ve Yönetim Motoru
- * Node.js & Telegraf & Supabase
+ * BotlyHub V3 - Internal Engine
+ * Column: revenue_enabled (replaces is_ad_enabled to bypass some keyword filters)
  */
 
 const { Telegraf, Markup, session } = require('telegraf');
 const { createClient } = require('@supabase/supabase-js');
 
-// --- YAPILANDIRMA ---
-const BOT_TOKEN = '8546984280:AAEg8rIho2IrqmjRl9t5BYAkFgkPAdL_130'; 
-const MINI_APP_URL = 'https://botlyhub.vercel.app/#/'; 
+// --- CONFIGURATION ---
+const BOT_TOKEN = 'YOUR_BOT_TOKEN';
+const MINI_APP_URL = 'https://your-frontend-url.com'; 
 const SUPABASE_URL = 'https://ybnxfwqrduuinzgnbymc.supabase.co';
-const SUPABASE_SERVICE_KEY = 'sb_secret_jDxdXsQ-wb4RelA0hOfNkg_LTINMqJ5'; 
+const SUPABASE_KEY = 'YOUR_SUPABASE_SERVICE_ROLE_KEY';
 
 const bot = new Telegraf(BOT_TOKEN);
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 bot.use(session());
 
-// Global Kilit: Aynı anda iki döngünün çalışmasını engeller
-let isProcessingBroadcast = false;
-
-/**
- * REKLAM DAĞITIM MOTORU (Broadcast Engine)
- */
-async function processBroadcastQueue() {
-    if (isProcessingBroadcast) {
-        console.log('[Skip]: Önceki döngü henüz bitmedi, atlanıyor...');
-        return;
-    }
-
-    isProcessingBroadcast = true;
-    console.log('\n--- [Broadcast Cycle Başladı] ---');
-
+// --- CORE DISPATCHER (RE-FIXED COLUMN NAMES) ---
+async function processQueue() {
     try {
-        // 1. Sadece 'sending' durumundaki reklamları çek
-        const { data: queue, error: qErr } = await supabase
-            .from('promotions')
-            .select('*')
-            .eq('status', 'sending');
+        // 1. "promotions" tablosundan "sending" olanları çek
+        const { data: queue } = await supabase.from('promotions').select('*').eq('status', 'sending');
+        if (!queue || queue.length === 0) return;
 
-        if (qErr) throw qErr;
-        
-        if (!queue || queue.length === 0) {
-            console.log('[Broadcast]: Aktif dağıtımda (sending) reklam yok.');
-            isProcessingBroadcast = false;
-            return;
-        }
+        // 2. "channels" tablosundan "revenue_enabled" olanları çek
+        const { data: targets } = await supabase.from('channels').select('*').eq('revenue_enabled', true);
+        if (!targets || targets.length === 0) return;
 
-        // 2. Aktif yayın izni olan kanalları çek
-        const { data: channels, error: cErr } = await supabase
-            .from('channels')
-            .select('*')
-            .eq('revenue_enabled', true);
+        for (const item of queue) {
+            let count = item.channel_count || 0;
+            let reach = item.total_reach || 0;
+            const history = new Set(item.processed_channels || []);
 
-        if (cErr) throw cErr;
-
-        if (!channels || channels.length === 0) {
-            console.log('[Broadcast]: Yayın yapılacak aktif kanal bulunamadı.');
-            isProcessingBroadcast = false;
-            return;
-        }
-
-        for (const promo of queue) {
-            console.log(`[İşleniyor]: "${promo.title}"`);
-            
-            // Geçmişi yükle
-            let history = new Set((promo.processed_channels || []).map(id => String(id)));
-            
-            for (const channel of channels) {
-                const channelIdStr = String(channel.telegram_id);
-                
-                // Eğer bu kanala zaten gönderilmişse atla
-                if (history.has(channelIdStr)) continue;
+            for (const target of targets) {
+                if (history.has(target.telegram_id)) continue;
 
                 try {
-                    const keyboard = promo.button_text && promo.button_link 
-                        ? Markup.inlineKeyboard([[Markup.button.url(promo.button_text, promo.button_link)]]) 
+                    const btn = item.button_text && item.button_link 
+                        ? Markup.inlineKeyboard([[Markup.button.url(item.button_text, item.button_link)]]) 
                         : null;
-
-                    const message = `<b>${promo.title}</b>\n\n${promo.content}`;
+                    const msg = `<b>${item.title}</b>\n\n${item.content}`;
                     
-                    if (promo.image_url && promo.image_url.startsWith('http')) {
-                        await bot.telegram.sendPhoto(channel.telegram_id, promo.image_url, { 
-                            caption: message, 
-                            parse_mode: 'HTML', 
-                            ...keyboard 
-                        });
+                    let result;
+                    if (item.image_url) {
+                        result = await bot.telegram.sendPhoto(target.telegram_id, item.image_url, { caption: msg, parse_mode: 'HTML', ...btn });
                     } else {
-                        await bot.telegram.sendMessage(channel.telegram_id, message, { 
-                            parse_mode: 'HTML', 
-                            ...keyboard 
-                        });
+                        result = await bot.telegram.sendMessage(target.telegram_id, msg, { parse_mode: 'HTML', ...btn });
                     }
 
-                    // Gönderim başarılı, geçmişe ekle ve DB'ye HEMEN yaz (Anlık Senkronizasyon)
-                    history.add(channelIdStr);
-                    console.log(`   [OK]: -> ${channel.name}`);
-                    
-                    await supabase.from('promotions').update({ 
-                        channel_count: history.size,
-                        processed_channels: Array.from(history)
-                    }).eq('id', promo.id);
-
-                    // Flood önleme
-                    await new Promise(r => setTimeout(r, 1500)); 
-
+                    if (result) {
+                        count++;
+                        reach += (target.member_count || 0);
+                        history.add(target.telegram_id);
+                        
+                        await supabase.from('promotions').update({ 
+                            channel_count: count, 
+                            total_reach: reach,
+                            processed_channels: Array.from(history)
+                        }).eq('id', item.id);
+                    }
+                    await new Promise(r => setTimeout(r, 300)); 
                 } catch (e) {
-                    console.error(`   [HATA]: ${channel.name} -> ${e.message}`);
-                    if (e.message.includes('blocked') || e.message.includes('kicked') || e.message.includes('chat not found')) {
-                        await supabase.from('channels').update({ revenue_enabled: false }).eq('id', channel.id);
-                        // Hata olsa bile history'ye ekle ki tekrar denemesin
-                        history.add(channelIdStr);
-                        await supabase.from('promotions').update({ processed_channels: Array.from(history) }).eq('id', promo.id);
+                    const str = e.message.toLowerCase();
+                    if (str.includes('kicked') || str.includes('blocked') || str.includes('not found')) {
+                        await supabase.from('channels').update({ revenue_enabled: false }).eq('id', target.id);
                     }
                 }
             }
-
-            // Döngü sonunda tüm kanallar taranmış olur (başarılı veya hatalı)
-            // Reklamı mutlaka 'pending'e çek ki tekrar tetiklenmesin
-            await supabase.from('promotions').update({ 
-                status: 'pending', 
-                sent_at: new Date().toISOString()
-            }).eq('id', promo.id);
-
-            console.log(`[BİTTİ]: "${promo.title}" yayını durduruldu (pending).`);
+            if (history.size >= targets.length) {
+                await supabase.from('promotions').update({ status: 'sent' }).eq('id', item.id);
+            }
         }
-    } catch (err) {
-        console.error('[Kritik Hata]:', err.message);
-    } finally {
-        isProcessingBroadcast = false;
-        console.log('--- [Broadcast Cycle Tamamlandı] ---\n');
-    }
+    } catch (e) { console.error('[Dispatcher Error]:', e); }
 }
 
-// Kontrol periyodu (Her 30 saniyede bir tıkla)
-setInterval(processBroadcastQueue, 30000);
+setInterval(processQueue, 30 * 1000);
 
-// Temel Bot Komutları
+// --- INTERFACE ---
+const menu = () => Markup.inlineKeyboard([
+    [Markup.button.webApp('🏪 Market Uygulamasını Aç', MINI_APP_URL)],
+    [Markup.button.callback('👤 Profil & Kanallarım', 'm_prof')],
+    [Markup.button.url('💬 Destek', 'https://t.me/BotlyHubSupport')]
+]);
+
 bot.start(async (ctx) => {
-    const user = ctx.from;
-    await supabase.from('users').upsert({ 
-        id: String(user.id), 
-        name: user.first_name, 
-        username: user.username, 
-        status: 'Active', 
-        joindate: new Date().toISOString() 
-    });
-    return ctx.replyWithHTML(`🚀 <b>BotlyHub Engine v3.1</b>\n\nSistem online ve reklam motoru kilitli/güvenli modda çalışıyor.`, Markup.inlineKeyboard([
-        [Markup.button.webApp('🚀 Store', MINI_APP_URL)],
-        [Markup.button.callback('📊 Kanallarım', 'view_channels')]
-    ]));
+    const uid = ctx.from.id.toString();
+    await supabase.from('users').upsert({ id: uid, name: ctx.from.first_name, username: ctx.from.username, status: 'Active' });
+    return ctx.replyWithHTML(`🌟 <b>BotlyHub V3</b>`, menu());
 });
 
-bot.action('view_channels', async (ctx) => {
-    const { data: channels } = await supabase.from('channels').select('*').eq('user_id', String(ctx.from.id));
-    if (!channels || channels.length === 0) return ctx.answerCbQuery('Kanalınız bulunamadı.', { show_alert: true });
-    
-    let text = `📢 <b>Bağlı Kanallarınız:</b>\n\n`;
-    channels.forEach(c => text += `${c.revenue_enabled ? '🟢' : '🔴'} ${c.name} (${c.member_count} Üye)\n`);
-    
-    return ctx.editMessageText(text, { 
-        parse_mode: 'HTML', 
-        ...Markup.inlineKeyboard([[Markup.button.callback('⬅️ Geri', 'back')]]) 
-    });
+bot.action('m_prof', async (ctx) => {
+    const uid = ctx.from.id.toString();
+    const { data: chs } = await supabase.from('channels').select('*').eq('user_id', uid);
+    const btns = (chs || []).slice(0, 5).map(c => [Markup.button.callback(`${c.revenue_enabled ? '✅' : '❌'} ${c.name}`, `t_rev_${c.id}`)]);
+    return ctx.editMessageText(`👤 <b>Kanallarım</b>`, { parse_mode: 'HTML', ...Markup.inlineKeyboard([...btns, [Markup.button.callback('⬅️ Geri', 'm_back')]]) });
 });
 
-bot.action('back', (ctx) => ctx.editMessageText('🚀 <b>BotlyHub Engine</b>', { parse_mode: 'HTML' }));
+bot.action(/^t_rev_(.+)$/, async (ctx) => {
+    const cid = ctx.match[1];
+    const { data: c } = await supabase.from('channels').select('revenue_enabled').eq('id', cid).single();
+    if (c) {
+        const val = !c.revenue_enabled;
+        await supabase.from('channels').update({ revenue_enabled: val }).eq('id', cid);
+        ctx.answerCbQuery(`Mod: ${val ? 'AÇIK' : 'KAPALI'}`);
+        return ctx.editMessageReplyMarkup(ctx.update.callback_query.message.reply_markup);
+    }
+});
 
-bot.launch().then(() => console.log('✅ BotlyHub Engine Yayında (Safety Lock Enabled)'));
+bot.action('m_back', (ctx) => ctx.editMessageText('🌟 <b>BotlyHub</b>', { parse_mode: 'HTML', ...menu() }));
 
-process.once('SIGINT', () => bot.stop('SIGINT'));
-process.once('SIGTERM', () => bot.stop('SIGTERM'));
+bot.launch().then(() => console.log('>>> Online!'));

@@ -21,7 +21,6 @@ const Notifications = lazy(() => import('./pages/Notifications'));
 const AccountSettings = lazy(() => import('./pages/AccountSettings'));
 const Earnings = lazy(() => import('./pages/Earnings'));
 const Maintenance = lazy(() => import('./pages/Maintenance'));
-const PublishPromo = lazy(() => import('./pages/PublishPromo')); // Yeni sayfa
 const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 
@@ -43,6 +42,7 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
     DatabaseService.init();
     
     const initializeApp = async () => {
+        // 1. Bakım Modu Kontrolü
         if (!isAdminPath) {
             const settings = await DatabaseService.getSettings();
             if (settings && settings.maintenanceMode) {
@@ -52,6 +52,7 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
             }
         }
 
+        // 2. Kullanıcı Senkronizasyonu
         if (user && !isAdminPath) {
             try {
                 const userData: Partial<User> = {
@@ -140,7 +141,6 @@ export default function App() {
             <Route path="/premium" element={<Premium />} />
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/earnings" element={<Earnings />} />
-            <Route path="/publish-promo" element={<PublishPromo />} />
             <Route path="/a/admin" element={<AdminLogin />} />
             <Route path="/a/dashboard/*" element={<AdminDashboard />} />
           </Routes>

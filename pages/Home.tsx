@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, PlusSquare } from 'lucide-react';
+import { Search, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio } from 'lucide-react';
 import * as Router from 'react-router-dom';
 import { Bot, Announcement, Notification } from '../types';
 import { categories } from '../data';
@@ -217,27 +217,6 @@ const Home = () => {
                     </div>
                 </div>
             )}
-
-            {/* Quick Promo Forge Button */}
-            <div className="mb-12 px-2">
-                <button 
-                    onClick={() => { haptic('medium'); navigate('/publish-promo'); }}
-                    className="w-full bg-gradient-to-r from-emerald-600/20 to-blue-600/20 border border-emerald-500/30 p-6 rounded-[32px] flex items-center justify-between group active:scale-[0.98] transition-all shadow-xl backdrop-blur-md"
-                >
-                    <div className="flex items-center gap-5">
-                        <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:rotate-6 transition-transform">
-                            <PlusSquare size={24} className="text-white" />
-                        </div>
-                        <div className="text-left">
-                            <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest italic">Hızlı Reklam Ver</p>
-                            <h4 className="text-sm font-black text-white uppercase italic tracking-tighter">Global Ağa Katılın</h4>
-                        </div>
-                    </div>
-                    <div className="p-3 bg-white/5 rounded-xl text-slate-400 group-hover:text-emerald-500 transition-colors">
-                        <ChevronRight size={20} />
-                    </div>
-                </button>
-            </div>
 
             <div className="grid grid-cols-4 gap-3 mb-12">
                 {categories.map((cat) => (

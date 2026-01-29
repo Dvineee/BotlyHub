@@ -7,62 +7,57 @@ const SUPABASE_ANON_KEY = 'sb_publishable_VeYQ304ZpUpj3ymB3ihpjw_jt49W1G-';
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const generateUUID = () => {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-};
-
 export class DatabaseService {
   
+  // --- PROMOTIONS ---
   static async getPromotions(): Promise<Promotion[]> {
-    try {
-        const { data, error } = await supabase.from('promotions').select('*').order('created_at', { ascending: false });
-        if (error) return [];
-        return data || [];
-    } catch (e) { return []; }
+    const { data, error } = await supabase.from('promotions').select('*').order('created_at', { ascending: false });
+    if (error) return [];
+    return data || [];
   }
 
   static async savePromotion(promo: Partial<Promotion>) {
-    try {
-        const isUUID = (id: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id);
-        
-        const payload: any = {
-            id: (promo.id && isUUID(promo.id)) ? promo.id : generateUUID(),
-            title: promo.title || '',
-            content: promo.content || '',
-            image_url: promo.image_url || '',
-            button_text: promo.button_text || 'İNCELE',
-            button_link: promo.button_link || '',
-            status: promo.status || 'pending', // Eğer promo.status varsa onu kullanır
-            created_at: promo.created_at || new Date().toISOString()
-        };
-
-        const { error } = await supabase.from('promotions').upsert(payload, { onConflict: 'id' });
-        if (error) throw error;
-        return true;
-    } catch (err: any) {
-        console.error("Save Promotion Error:", err);
-        throw err;
-    }
+    const payload = {
+        id: promo.id || Math.floor(Math.random() * 999999).toString(),
+        title: promo.title,
+        content: promo.content,
+        image_url: promo.image_url,
+        button_text: promo.button_text,
+        button_link: promo.button_link,
+        status: promo.status || 'pending',
+        total_reach: Number(promo.total_reach || 0),
+        channel_count: Number(promo.channel_count || 0),
+        processed_channels: promo.processed_channels || [],
+        created_at: promo.created_at || new Date().toISOString()
+    };
+    const { error } = await supabase.from('promotions').upsert(payload, { onConflict: 'id' });
+    if (error) throw error;
   }
 
   static async deletePromotion(id: string) {
-    await supabase.from('promotions').delete().eq('id', id);
+    const { error } = await supabase.from('promotions').delete().eq('id', id);
+    if (error) throw error;
   }
 
   static async updatePromotionStatus(id: string, status: Promotion['status']) {
-      await supabase.from('promotions').update({ status }).eq('id', id);
+      const { error } = await supabase.from('promotions').update({ status }).eq('id', id);
+      if (error) throw error;
   }
 
-  // --- Diğer Metotlar Aynı Kalacak ---
+  // --- USERS ---
   static async getUsers(): Promise<User[]> {
     const { data, error } = await supabase.from('users').select('*').order('joindate', { ascending: false });
     if (error) return [];
     return (data || []).map(u => ({ 
-        id: u.id, name: u.name, username: u.username, avatar: u.avatar, role: (u.role || 'User') as any, 
-        status: (u.status || 'Active') as any, badges: u.badges || [], joinDate: u.joindate, email: u.email,
+        id: u.id, 
+        name: u.name, 
+        username: u.username, 
+        avatar: u.avatar, 
+        role: (u.role || 'User') as any, 
+        status: (u.status || 'Active') as any, 
+        badges: u.badges || [], 
+        joinDate: u.joindate, 
+        email: u.email,
         canPublishPromos: u.can_publish_promos 
     }));
   }
@@ -71,29 +66,62 @@ export class DatabaseService {
     const { data, error } = await supabase.from('users').select('*').eq('id', userId.toString()).maybeSingle();
     if (error || !data) return null;
     return { 
-        id: data.id, name: data.name, username: data.username, avatar: data.avatar, role: (data.role || 'User') as any, 
-        status: (data.status || 'Active') as any, badges: data.badges || [], joinDate: data.joindate, email: data.email,
+        id: data.id, 
+        name: data.name, 
+        username: data.username, 
+        avatar: data.avatar, 
+        role: (data.role || 'User') as any, 
+        status: (data.status || 'Active') as any, 
+        badges: data.badges || [], 
+        joinDate: data.joindate, 
+        email: data.email,
         canPublishPromos: data.can_publish_promos 
     };
   }
 
   static async updateUserStatus(userId: string, status: 'Active' | 'Passive') {
-    await supabase.from('users').update({ status }).eq('id', userId.toString());
+    const { error } = await supabase.from('users').update({ status }).eq('id', userId.toString());
+    if (error) throw error;
   }
 
+  // --- NOTIFICATIONS (ADMIN CONTROL) ---
   static async sendGlobalNotification(title: string, message: string, type: Notification['type'] = 'system') {
-      await supabase.from('notifications').insert([{ id: generateUUID(), title, message, type, date: new Date().toISOString(), isRead: false, target_type: 'global', view_count: 0 }]);
+      const { error } = await supabase.from('notifications').insert([{ 
+          id: Math.floor(Math.random() * 999999999).toString(), 
+          title, 
+          message, 
+          type, 
+          date: new Date().toISOString(), 
+          isRead: false, 
+          target_type: 'global',
+          view_count: 0
+      }]);
+      if (error) throw error;
   }
 
   static async sendUserNotification(userId: string, title: string, message: string, type: Notification['type'] = 'system') {
-      await supabase.from('notifications').insert([{ id: generateUUID(), user_id: userId.toString(), title, message, type, date: new Date().toISOString(), isRead: false, target_type: 'user', view_count: 0 }]);
+      const { error } = await supabase.from('notifications').insert([{ 
+          id: Math.floor(Math.random() * 999999999).toString(), 
+          user_id: userId.toString(),
+          title, 
+          message, 
+          type, 
+          date: new Date().toISOString(), 
+          isRead: false, 
+          target_type: 'user',
+          view_count: 0
+      }]);
+      if (error) throw error;
   }
 
   static async deleteNotification(id: string) {
-      await supabase.from('notifications').delete().eq('id', id);
+      const { error } = await supabase.from('notifications').delete().eq('id', id);
+      if (error) throw error;
   }
 
   static async incrementNotificationView(id: string) {
+      // Supabase supports increments using specialized syntax in modern versions
+      // Using direct call to get current and update for simplicity in this bridge
       const { data } = await supabase.from('notifications').select('view_count').eq('id', id).maybeSingle();
       if (data) {
           const current = Number(data.view_count || 0);
@@ -101,31 +129,50 @@ export class DatabaseService {
       }
   }
 
+  // --- LOGS ---
   static async getActivityLogs(): Promise<ActivityLog[]> {
     const { data, error } = await supabase.from('activity_logs').select('*').order('created_at', { ascending: false }).limit(50);
     if (error) return [];
     return data || [];
   }
 
+  // --- BOT MANAGEMENT ---
   static async getBotsWithStats(): Promise<any[]> {
     const { data: bots } = await supabase.from('bots').select('*').order('id', { ascending: false });
     const { data: userBots } = await supabase.from('user_bots').select('bot_id');
-    return (bots || []).map(bot => ({ ...bot, ownerCount: (userBots || []).filter((ub: any) => ub.bot_id === bot.id).length }));
+    return (bots || []).map(bot => ({ 
+        ...bot, 
+        ownerCount: (userBots || []).filter((ub: any) => ub.bot_id === bot.id).length 
+    }));
   }
 
   static async saveBot(bot: any) {
-    await supabase.from('bots').upsert({ id: bot.id, name: bot.name, description: bot.description, price: Number(bot.price), category: bot.category, bot_link: bot.bot_link, screenshots: bot.screenshots || [], icon: bot.icon, is_premium: Boolean(bot.is_premium) });
+    const { error } = await supabase.from('bots').upsert({ 
+        id: bot.id, 
+        name: bot.name, 
+        description: bot.description, 
+        price: Number(bot.price), 
+        category: bot.category, 
+        bot_link: bot.bot_link, 
+        screenshots: bot.screenshots || [], 
+        icon: bot.icon, 
+        is_premium: Boolean(bot.is_premium) 
+    });
+    if (error) throw error;
   }
 
   static async deleteBot(id: string) {
-    await supabase.from('bots').delete().eq('id', id);
+    const { error } = await supabase.from('bots').delete().eq('id', id);
+    if (error) throw error;
   }
 
+  // --- FINANCE ---
   static async getAllPurchases() {
     const { data } = await supabase.from('user_bots').select('*, users(*), bots(*)').order('acquired_at', { ascending: false });
     return data || [];
   }
 
+  // --- STATS ---
   static async getAdminStats() {
     const [u, b, l, s, c] = await Promise.all([
         supabase.from('users').select('*', { count: 'exact', head: true }),
@@ -138,14 +185,29 @@ export class DatabaseService {
     return { userCount: u.count || 0, botCount: b.count || 0, logCount: l.count || 0, salesCount: s.count || 0, totalRevenue };
   }
 
+  // --- ANNOUNCEMENTS ---
   static async saveAnnouncement(ann: any) {
-    await supabase.from('announcements').upsert({ id: ann.id || generateUUID(), title: ann.title, description: ann.description, button_text: ann.button_text, button_link: ann.button_link, icon_name: ann.icon_name, color_scheme: ann.color_scheme, is_active: Boolean(ann.is_active), action_type: ann.action_type, content_detail: ann.content_detail || '' });
+    const { error } = await supabase.from('announcements').upsert({ 
+        id: ann.id || Math.floor(Math.random() * 999999).toString(), 
+        title: ann.title, 
+        description: ann.description, 
+        button_text: ann.button_text, 
+        button_link: ann.button_link, 
+        icon_name: ann.icon_name, 
+        color_scheme: ann.color_scheme, 
+        is_active: Boolean(ann.is_active), 
+        action_type: ann.action_type, 
+        content_detail: ann.content_detail || '' 
+    });
+    if (error) throw error;
   }
 
   static async deleteAnnouncement(id: string) {
-    await supabase.from('announcements').delete().eq('id', id);
+    const { error } = await supabase.from('announcements').delete().eq('id', id);
+    if (error) throw error;
   }
 
+  // --- BOT DATA ---
   static async getUserBots(userId: string): Promise<UserBot[]> {
     const { data } = await supabase.from('user_bots').select('*, bots(*)').eq('user_id', userId.toString());
     return (data || []).map((item: any) => ({ ...item.bots, expiryDate: item.expiryDate, ownership_id: item.id, is_premium: item.is_premium, isActive: item.is_active, revenueEnabled: false })).filter(b => b.id);
@@ -176,6 +238,7 @@ export class DatabaseService {
     await supabase.from('user_bots').delete().eq('user_id', userId.toString()).eq('bot_id', botId.toString());
   }
 
+  // --- CHANNELS ---
   static async getChannels(userId: string): Promise<Channel[]> {
     const { data } = await supabase.from('channels').select('*').eq('user_id', userId.toString()).order('created_at', { ascending: false });
     return (data || []).map(c => ({ id: String(c.id), user_id: String(c.user_id), telegram_id: String(c.telegram_id), name: c.name, memberCount: c.member_count || 0, icon: c.icon || '', revenueEnabled: c.revenue_enabled, connectedBotIds: c.connected_bot_ids || [], revenue: Number(c.revenue || 0) }));
@@ -226,7 +289,15 @@ export class DatabaseService {
     if (userId) query.or(`user_id.eq.${userId},target_type.eq.global`);
     const { data } = await query;
     return (data || []).map(n => ({ 
-        id: String(n.id), type: n.type, title: n.title, message: n.message, date: n.date, isRead: n.isRead, user_id: n.user_id, target_type: n.target_type, view_count: Number(n.view_count || 0)
+        id: String(n.id), 
+        type: n.type, 
+        title: n.title, 
+        message: n.message, 
+        date: n.date, 
+        isRead: n.isRead, 
+        user_id: n.user_id, 
+        target_type: n.target_type,
+        view_count: Number(n.view_count || 0)
     }));
   }
 
