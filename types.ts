@@ -48,6 +48,7 @@ export interface Promotion {
   status: 'pending' | 'sending' | 'sent' | 'failed';
   total_reach: number;
   channel_count: number;
+  click_count: number; // Added engagement tracking
   processed_channels?: string[]; 
   created_at: string;
   sent_at?: string;

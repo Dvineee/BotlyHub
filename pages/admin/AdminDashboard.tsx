@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import * as Router from 'react-router-dom';
 import { 
@@ -8,7 +7,8 @@ import {
   CheckCircle2, AlertTriangle, TrendingUp, BarChart3, RadioIcon, Sparkles, UserPlus,
   ShieldCheck, Globe, Zap, Clock, ExternalLink, Filter, PieChart, Layers, 
   Settings as SettingsIcon, History, Copy, Check, Eye, ChevronRight, Monitor, Smartphone, Cpu,
-  Info, Star
+  // Fix: Added AlertCircle to imports to resolve the "Cannot find name 'AlertCircle'" error.
+  Info, Star, MousePointer2, Link2, AlertCircle
 } from 'lucide-react';
 import { DatabaseService } from '../../services/DatabaseService';
 import { User, Bot as BotType, Announcement, Promotion, ActivityLog, Notification } from '../../types';
@@ -137,15 +137,17 @@ const StatCard = ({ icon: Icon, label, value, color }: any) => {
     );
 };
 
-const AdminInput = ({ label, value, onChange, type = "text" }: any) => (
+const AdminInput = ({ label, value, onChange, type = "text", placeholder = "", icon: Icon }: any) => (
     <div className="space-y-2 text-white group">
         <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 group-focus-within:text-blue-500 transition-colors italic">{label}</label>
         <div className="relative">
+            {Icon && <Icon className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-700 group-focus-within:text-blue-500 transition-colors" size={18} />}
             <input 
                 type={type} 
                 value={value} 
                 onChange={e => onChange(e.target.value)} 
-                className="w-full h-14 lg:h-18 bg-slate-950 border border-white/5 rounded-[22px] lg:rounded-[28px] px-8 text-[11px] font-black text-white outline-none focus:border-blue-500 transition-all uppercase italic shadow-inner" 
+                placeholder={placeholder}
+                className={`w-full h-14 lg:h-18 bg-slate-950 border border-white/5 rounded-[22px] lg:rounded-[28px] ${Icon ? 'pl-14' : 'px-8'} pr-8 text-[11px] font-black text-white outline-none focus:border-blue-500 transition-all uppercase italic shadow-inner`} 
             />
         </div>
     </div>
@@ -1024,34 +1026,187 @@ const NotificationCenter = () => {
     );
 };
 
+/**
+ * PROMOTION MANAGEMENT - REDESIGNED Ad Sharing Center
+ */
 const PromotionManagement = () => {
     const [promos, setPromos] = useState<Promotion[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingPromo, setEditingPromo] = useState<any>(null);
-    const load = useCallback(async () => setPromos(await DatabaseService.getPromotions()), []);
+
+    const load = useCallback(async () => {
+        setIsLoading(true);
+        const data = await DatabaseService.getPromotions();
+        setPromos(data);
+        setIsLoading(false);
+    }, []);
+
     useEffect(() => { load(); }, [load]);
+
+    const getStatusBadge = (status: string) => {
+        switch(status) {
+            case 'sending': return <span className="px-3 py-1 bg-blue-500/10 text-blue-500 border border-blue-500/20 rounded-full text-[9px] font-black uppercase animate-pulse">AKTİF YAYINDA</span>;
+            case 'sent': return <span className="px-3 py-1 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-full text-[9px] font-black uppercase">TAMAMLANDI</span>;
+            default: return <span className="px-3 py-1 bg-slate-500/10 text-slate-500 border border-white/5 rounded-full text-[9px] font-black uppercase">BEKLEMEDE</span>;
+        }
+    };
+
     return (
-        <div className="space-y-8 animate-in fade-in">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6"><h2 className="text-3xl font-black text-white italic uppercase tracking-tighter leading-none">Promo <span className="text-blue-500">Engine</span></h2><button onClick={() => { setEditingPromo({ title: '', content: '', status: 'pending', button_text: 'İncele', processed_channels: [] }); setIsModalOpen(true); }} className="w-full sm:w-auto bg-emerald-600 px-8 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl active:scale-95">YENİ YAYIN</button></div>
-            <div className="grid grid-cols-1 gap-6">
-                {promos.map(p => (
-                    <div key={p.id} className="bg-slate-900/40 border border-white/5 rounded-[40px] p-6 lg:p-10 flex flex-col md:flex-row items-center gap-8 group shadow-2xl relative overflow-hidden">
-                        <div className="flex-1 text-center md:text-left"><h4 className="text-xl lg:text-2xl font-black italic uppercase mb-4 truncate">{p.title}</h4></div>
-                        <div className="flex w-full md:w-auto gap-2">
-                            <button onClick={async () => { await DatabaseService.updatePromotionStatus(p.id, p.status === 'sending' ? 'pending' : 'sending'); load(); }} className={`flex-1 md:flex-none px-6 py-4 rounded-xl text-[9px] font-black uppercase tracking-widest ${p.status === 'sending' ? 'bg-orange-500/10 text-orange-500 border border-orange-500/20' : 'bg-emerald-600 text-white'}`}>{p.status === 'sending' ? 'DURDUR' : 'BAŞLAT'}</button>
-                            <button onClick={async () => { if(confirm('Silsin mi?')) { await DatabaseService.deletePromotion(p.id); load(); } }} className="p-4 bg-white/5 rounded-xl text-red-500 hover:bg-red-600 hover:text-white transition-all"><Trash2 size={18}/></button>
-                        </div>
-                    </div>
-                ))}
+        <div className="space-y-12 animate-in fade-in">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <div>
+                    <h2 className="text-4xl font-black text-white italic uppercase tracking-tighter leading-none">Promo <span className="text-blue-500">Engine</span></h2>
+                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em] mt-2 italic">Kanallar üzerinden toplu reklam dağıtımı yapın</p>
+                </div>
+                <button 
+                    onClick={() => { 
+                        setEditingPromo({ title: '', content: '', image_url: '', status: 'pending', button_text: 'İNCELE', button_link: '', click_count: 0, processed_channels: [] }); 
+                        setIsModalOpen(true); 
+                    }} 
+                    className="w-full md:w-auto bg-emerald-600 hover:bg-emerald-500 px-10 py-5 rounded-[28px] text-[11px] font-black uppercase tracking-widest shadow-2xl active:scale-95 border-b-4 border-emerald-900 transition-all flex items-center gap-3"
+                >
+                    <Plus size={18} /> YENİ REKLAM OLUŞTUR
+                </button>
             </div>
+
+            {isLoading ? (
+                <div className="flex flex-col items-center justify-center py-24 gap-4">
+                    <Loader2 className="animate-spin text-blue-500" size={32} />
+                    <span className="text-[10px] font-black text-slate-800 uppercase tracking-widest italic">Senkronize Ediliyor...</span>
+                </div>
+            ) : promos.length === 0 ? (
+                <div className="bg-slate-900/20 border-2 border-dashed border-slate-800 rounded-[48px] p-24 text-center">
+                    <Megaphone size={48} className="text-slate-800 mx-auto mb-6" />
+                    <p className="text-slate-600 font-black uppercase italic tracking-widest">Henüz bir kampanya tanımlanmadı.</p>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 gap-6">
+                    {promos.map(p => (
+                        <div key={p.id} className="bg-slate-900/40 border border-white/5 rounded-[48px] p-10 flex flex-col lg:flex-row items-center justify-between group shadow-2xl hover:border-blue-500/20 transition-all">
+                            <div className="flex-1 min-w-0 text-center lg:text-left">
+                                <div className="flex items-center justify-center lg:justify-start gap-3 mb-4">
+                                    {getStatusBadge(p.status)}
+                                    <span className="text-[10px] font-bold text-slate-700 uppercase tracking-[0.2em]">{new Date(p.created_at).toLocaleDateString()}</span>
+                                </div>
+                                <h4 className="text-2xl font-black italic uppercase text-white truncate mb-4">{p.title}</h4>
+                                <div className="flex items-center justify-center lg:justify-start gap-8">
+                                    <div className="flex items-center gap-2">
+                                        <Monitor size={14} className="text-slate-500" />
+                                        <span className="text-[10px] font-black text-slate-500 uppercase">{p.channel_count || 0} KANAL</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <TrendingUp size={14} className="text-blue-500" />
+                                        <span className="text-[10px] font-black text-blue-500 uppercase">{p.total_reach?.toLocaleString() || 0} ERİŞİM</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <MousePointer2 size={14} className="text-emerald-500" />
+                                        <span className="text-[10px] font-black text-emerald-500 uppercase">{p.click_count || 0} TIKLAMA</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex gap-3 mt-8 lg:mt-0">
+                                <button 
+                                    onClick={async () => { 
+                                        const nextStatus = p.status === 'sending' ? 'pending' : 'sending';
+                                        await DatabaseService.updatePromotionStatus(p.id, nextStatus); 
+                                        load(); 
+                                    }} 
+                                    className={`px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 flex items-center gap-2 ${p.status === 'sending' ? 'bg-orange-500/10 text-orange-500 border border-orange-500/20' : 'bg-blue-600 text-white shadow-xl shadow-blue-900/20'}`}
+                                >
+                                    {p.status === 'sending' ? 'DURDUR' : 'YAYINA AL'}
+                                    <Send size={14} />
+                                </button>
+                                <button onClick={async () => { if(confirm('Bu kampanya silinsin mi?')) { await DatabaseService.deletePromotion(p.id); load(); } }} className="p-4 bg-white/5 rounded-2xl text-red-500 hover:bg-red-600 hover:text-white transition-all shadow-xl">
+                                    <Trash2 size={20}/>
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
             {isModalOpen && editingPromo && (
-                <div className="fixed inset-0 z-[110] bg-black/98 flex items-end lg:items-center justify-center p-0 lg:p-8 backdrop-blur-3xl animate-in slide-in-from-bottom">
-                    <div className="bg-[#020617] p-8 lg:p-16 rounded-t-[40px] lg:rounded-[64px] w-full max-w-3xl border-t lg:border border-white/10 shadow-2xl relative h-[90vh] lg:h-auto overflow-y-auto no-scrollbar pb-24">
-                        <button onClick={() => setIsModalOpen(false)} className="absolute top-8 right-8 p-4 bg-white/5 rounded-2xl hover:bg-red-600 transition-all active:scale-90"><X size={20}/></button>
-                        <h3 className="text-2xl lg:text-3xl font-black mb-10 uppercase italic tracking-tighter">Yayın <span className="text-emerald-500">Forge</span></h3>
-                        <form onSubmit={async (e) => { e.preventDefault(); await DatabaseService.savePromotion(editingPromo); setIsModalOpen(false); load(); }} className="space-y-6">
-                            <AdminInput label="BAŞLIK" value={editingPromo.title} onChange={(v:any)=>setEditingPromo({...editingPromo, title:v})}/><AdminInput label="İÇERİK" value={editingPromo.content} onChange={(v:any)=>setEditingPromo({...editingPromo, content:v})}/><button type="submit" className="w-full h-16 lg:h-20 bg-emerald-600 py-6 rounded-[28px] lg:rounded-[32px] font-black text-[11px] uppercase tracking-widest shadow-2xl active:scale-95 border-b-4 border-emerald-800">ŞİMDİ YAYINLA</button>
-                        </form>
+                <div className="fixed inset-0 z-[110] bg-black/98 flex items-center justify-center p-0 lg:p-6 backdrop-blur-3xl animate-in fade-in">
+                    <div className="bg-[#020617] p-8 lg:p-14 rounded-t-[40px] lg:rounded-[64px] w-full max-w-7xl h-[94vh] lg:h-[90vh] overflow-hidden border-t lg:border border-white/10 shadow-2xl relative flex flex-col lg:flex-row gap-12">
+                        <button onClick={() => setIsModalOpen(false)} className="absolute top-8 right-8 p-4 bg-white/5 rounded-2xl text-slate-500 hover:text-white z-50 transition-all">
+                            <X size={24}/>
+                        </button>
+                        
+                        {/* LEFT: Ad Composer Form */}
+                        <div className="flex-1 overflow-y-auto pr-2 no-scrollbar space-y-8">
+                            <div>
+                                <h3 className="text-3xl font-black mb-2 uppercase italic tracking-tighter">Campaign <span className="text-emerald-500">Forge</span></h3>
+                                <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">Yayınlanacak reklamın içeriğini tasarlayın</p>
+                            </div>
+
+                            <form onSubmit={async (e) => { 
+                                e.preventDefault(); 
+                                await DatabaseService.savePromotion({ ...editingPromo, status: 'pending' }); 
+                                setIsModalOpen(false); 
+                                load(); 
+                            }} className="space-y-8 pb-10">
+                                <AdminInput label="REKLAM BAŞLIĞI" value={editingPromo.title} onChange={(v:any)=>setEditingPromo({...editingPromo, title:v})} placeholder="Örn: Haftalık Kampanya" />
+                                
+                                <div className="space-y-2">
+                                    <label className="text-[9px] font-black text-slate-600 uppercase tracking-widest ml-4 italic">ANA MESAJ (HTML DESTEKLİ)</label>
+                                    <textarea 
+                                        value={editingPromo.content} 
+                                        onChange={e => setEditingPromo({...editingPromo, content: e.target.value})} 
+                                        className="w-full bg-slate-950 border border-white/5 p-8 rounded-[36px] text-[11px] font-black h-40 outline-none text-slate-400 focus:border-emerald-500/30 uppercase italic leading-relaxed" 
+                                        placeholder="Kanalda görünecek reklam metni..." 
+                                    />
+                                </div>
+
+                                <AdminInput label="GÖRSEL URL (OPSİYONEL)" value={editingPromo.image_url} onChange={(v:any)=>setEditingPromo({...editingPromo, image_url:v})} icon={ImageIcon} placeholder="https://..." />
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <AdminInput label="BUTON METNİ" value={editingPromo.button_text} onChange={(v:any)=>setEditingPromo({...editingPromo, button_text:v})} placeholder="İNCELE" />
+                                    <AdminInput label="BUTON LİNKİ" value={editingPromo.button_link} onChange={(v:any)=>setEditingPromo({...editingPromo, button_link:v})} icon={Link2} placeholder="https://t.me/..." />
+                                </div>
+
+                                <button type="submit" className="w-full h-20 bg-blue-600 hover:bg-blue-500 rounded-[32px] font-black text-[12px] uppercase tracking-[0.4em] shadow-2xl border-b-8 border-blue-900 transition-all active:translate-y-1 active:border-b-4">KAMPANYAYI SİSTEME KAYDET</button>
+                            </form>
+                        </div>
+
+                        {/* RIGHT: LIVE HOLOGRAPHIC TELEGRAM SIMULATOR */}
+                        <div className="hidden lg:flex w-[460px] flex-col items-center justify-center bg-slate-900/20 border-l border-white/5 p-12 relative overflow-hidden">
+                            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-emerald-600/5 via-transparent to-transparent"></div>
+                            
+                            <div className="text-center mb-12 space-y-2">
+                                <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.5em] italic block">TELEGRAM PREVIEW</span>
+                                <p className="text-[9px] font-black text-slate-700 uppercase tracking-widest">REAL-TIME SIMULATOR</p>
+                            </div>
+
+                            {/* Telegram Message UI */}
+                            <div className="w-full bg-[#020617] border border-white/10 rounded-[40px] overflow-hidden shadow-[0_50px_100px_rgba(0,0,0,0.6)] animate-in zoom-in-95">
+                                {editingPromo.image_url && editingPromo.image_url.startsWith('http') ? (
+                                    <img src={editingPromo.image_url} className="w-full h-48 object-cover border-b border-white/5" onError={(e)=>(e.target as any).src=''} />
+                                ) : (
+                                    <div className="w-full h-32 bg-slate-900/40 flex flex-col items-center justify-center border-b border-white/5">
+                                        <ImageIcon className="text-slate-800 mb-2" size={32} />
+                                        <span className="text-[8px] font-black text-slate-800 uppercase tracking-widest">Görsel Alanı</span>
+                                    </div>
+                                )}
+                                <div className="p-8 space-y-4">
+                                    <h5 className="text-white font-black text-lg italic uppercase tracking-tighter truncate leading-none">{editingPromo.title || 'REKLAM BAŞLIĞI'}</h5>
+                                    <p className="text-slate-400 text-[10px] font-bold uppercase italic leading-relaxed line-clamp-4 min-h-[60px] whitespace-pre-wrap">{editingPromo.content || 'Yayın içeriği burada görünecek...'}</p>
+                                    
+                                    {editingPromo.button_text && (
+                                        <div className="pt-4">
+                                            <div className="w-full py-4 bg-blue-600/10 border border-blue-500/30 rounded-2xl text-blue-500 text-[9px] font-black text-center uppercase tracking-widest">
+                                                {editingPromo.button_text}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="mt-12 flex items-center gap-3 opacity-30">
+                                <AlertCircle size={14} className="text-slate-500" />
+                                <span className="text-[8px] font-black text-slate-500 uppercase tracking-[0.3em]">Görünüm Telegram istemcisine göre değişebilir</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}
