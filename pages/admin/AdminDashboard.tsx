@@ -7,7 +7,6 @@ import {
   CheckCircle2, AlertTriangle, TrendingUp, BarChart3, RadioIcon, Sparkles, UserPlus,
   ShieldCheck, Globe, Zap, Clock, ExternalLink, Filter, PieChart, Layers, 
   Settings as SettingsIcon, History, Copy, Check, Eye, ChevronRight, Monitor, Smartphone, Cpu,
-  // Fix: Added AlertCircle to imports to resolve the "Cannot find name 'AlertCircle'" error.
   Info, Star, MousePointer2, Link2, AlertCircle
 } from 'lucide-react';
 import { DatabaseService } from '../../services/DatabaseService';
@@ -1028,12 +1027,14 @@ const NotificationCenter = () => {
 
 /**
  * PROMOTION MANAGEMENT - REDESIGNED Ad Sharing Center
+ * FIXED: Status update logic for "Yayına Al" button.
  */
 const PromotionManagement = () => {
     const [promos, setPromos] = useState<Promotion[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingPromo, setEditingPromo] = useState<any>(null);
+    const [updatingId, setUpdatingId] = useState<string | null>(null);
 
     const load = useCallback(async () => {
         setIsLoading(true);
@@ -1043,6 +1044,34 @@ const PromotionManagement = () => {
     }, []);
 
     useEffect(() => { load(); }, [load]);
+
+    const handleToggleStatus = async (p: Promotion) => {
+        if (updatingId) return;
+        
+        // Mantıksal Durum Belirleme
+        // Eğer durum 'sending' ise 'pending'e çek, aksi halde 'sending' yap.
+        const nextStatus: Promotion['status'] = p.status === 'sending' ? 'pending' : 'sending';
+        
+        setUpdatingId(p.id);
+        
+        try {
+            // Optimistik UI Güncellemesi (Anlık tepki için)
+            setPromos(prev => prev.map(item => item.id === p.id ? { ...item, status: nextStatus } : item));
+            
+            // Veritabanı Güncellemesi
+            await DatabaseService.updatePromotionStatus(p.id, nextStatus);
+            
+            // Verileri tazele
+            const freshData = await DatabaseService.getPromotions();
+            setPromos(freshData);
+        } catch (error) {
+            console.error("Status update failed:", error);
+            // Hata durumunda listeyi eski haline döndür
+            load();
+        } finally {
+            setUpdatingId(null);
+        }
+    };
 
     const getStatusBadge = (status: string) => {
         switch(status) {
@@ -1070,7 +1099,7 @@ const PromotionManagement = () => {
                 </button>
             </div>
 
-            {isLoading ? (
+            {isLoading && !updatingId ? (
                 <div className="flex flex-col items-center justify-center py-24 gap-4">
                     <Loader2 className="animate-spin text-blue-500" size={32} />
                     <span className="text-[10px] font-black text-slate-800 uppercase tracking-widest italic">Senkronize Ediliyor...</span>
@@ -1107,17 +1136,29 @@ const PromotionManagement = () => {
                             </div>
                             <div className="flex gap-3 mt-8 lg:mt-0">
                                 <button 
-                                    onClick={async () => { 
-                                        const nextStatus = p.status === 'sending' ? 'pending' : 'sending';
-                                        await DatabaseService.updatePromotionStatus(p.id, nextStatus); 
-                                        load(); 
-                                    }} 
-                                    className={`px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 flex items-center gap-2 ${p.status === 'sending' ? 'bg-orange-500/10 text-orange-500 border border-orange-500/20' : 'bg-blue-600 text-white shadow-xl shadow-blue-900/20'}`}
+                                    disabled={updatingId === p.id}
+                                    onClick={() => handleToggleStatus(p)} 
+                                    className={`px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 flex items-center gap-2 min-w-[140px] justify-center ${
+                                        updatingId === p.id 
+                                        ? 'bg-slate-800 text-slate-600 opacity-50' 
+                                        : p.status === 'sending' 
+                                          ? 'bg-orange-500/10 text-orange-500 border border-orange-500/20' 
+                                          : 'bg-blue-600 text-white shadow-xl shadow-blue-900/20'
+                                    }`}
                                 >
-                                    {p.status === 'sending' ? 'DURDUR' : 'YAYINA AL'}
-                                    <Send size={14} />
+                                    {updatingId === p.id ? (
+                                        <Loader2 className="animate-spin" size={14} />
+                                    ) : (
+                                        <>
+                                            {p.status === 'sending' ? 'YAYINI DURDUR' : 'YAYINA AL'}
+                                            <Send size={14} />
+                                        </>
+                                    )}
                                 </button>
-                                <button onClick={async () => { if(confirm('Bu kampanya silinsin mi?')) { await DatabaseService.deletePromotion(p.id); load(); } }} className="p-4 bg-white/5 rounded-2xl text-red-500 hover:bg-red-600 hover:text-white transition-all shadow-xl">
+                                <button 
+                                    onClick={async () => { if(confirm('Bu kampanya silinsin mi?')) { await DatabaseService.deletePromotion(p.id); load(); } }} 
+                                    className="p-4 bg-white/5 rounded-2xl text-red-500 hover:bg-red-600 hover:text-white transition-all shadow-xl"
+                                >
                                     <Trash2 size={20}/>
                                 </button>
                             </div>
@@ -1149,7 +1190,7 @@ const PromotionManagement = () => {
                                 <AdminInput label="REKLAM BAŞLIĞI" value={editingPromo.title} onChange={(v:any)=>setEditingPromo({...editingPromo, title:v})} placeholder="Örn: Haftalık Kampanya" />
                                 
                                 <div className="space-y-2">
-                                    <label className="text-[9px] font-black text-slate-600 uppercase tracking-widest ml-4 italic">ANA MESAJ (HTML DESTEKLİ)</label>
+                                    <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">ANA MESAJ (HTML DESTEKLİ)</label>
                                     <textarea 
                                         value={editingPromo.content} 
                                         onChange={e => setEditingPromo({...editingPromo, content: e.target.value})} 
