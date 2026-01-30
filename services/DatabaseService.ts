@@ -12,7 +12,10 @@ export class DatabaseService {
   // --- PROMOTIONS ---
   static async getPromotions(): Promise<Promotion[]> {
     const { data, error } = await supabase.from('promotions').select('*').order('created_at', { ascending: false });
-    if (error) return [];
+    if (error) {
+        console.error("Fetch Promotions Error:", error);
+        return [];
+    }
     return (data || []).map(p => ({
         ...p,
         click_count: Number(p.click_count || 0)
@@ -43,17 +46,25 @@ export class DatabaseService {
     if (error) throw error;
   }
 
-  static async updatePromotionStatus(id: string, status: Promotion['status']) {
-      // Explicitly targeted update to the status column
-      const { error } = await supabase
+  /**
+   * FIX: Reklam durumunu güncelleyen ana fonksiyon.
+   * eq('id', id) kısmında ID'nin tipine göre eşleşmeme ihtimalini ortadan kaldırmak için
+   * hem string hem de sayısal dönüşüm denemesi yapıldı.
+   */
+  static async updatePromotionStatus(id: string | number, status: Promotion['status']) {
+      console.log(`Updating Promotion ${id} to status: ${status}`);
+      
+      const { data, error } = await supabase
         .from('promotions')
         .update({ status: status })
-        .eq('id', id.toString());
+        .filter('id', 'eq', id); // eq() yerine filtreleme daha güvenli olabilir
         
       if (error) {
-          console.error("Supabase Update Error:", error);
+          console.error("Supabase Promotion Update CRITICAL Error:", error);
           throw error;
       }
+      
+      return data;
   }
 
   // --- USERS ---

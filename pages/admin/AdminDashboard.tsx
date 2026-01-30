@@ -1039,9 +1039,14 @@ const PromotionManagement = () => {
 
     const load = useCallback(async () => {
         setIsLoading(true);
-        const data = await DatabaseService.getPromotions();
-        setPromos(data);
-        setIsLoading(false);
+        try {
+            const data = await DatabaseService.getPromotions();
+            setPromos(data);
+        } catch (e) {
+            console.error("Promotion load failed:", e);
+        } finally {
+            setIsLoading(false);
+        }
     }, []);
 
     useEffect(() => { load(); }, [load]);
@@ -1049,25 +1054,30 @@ const PromotionManagement = () => {
     /**
      * FIXED TOGGLE LOGIC:
      * Correctly transitions status to 'sending' and back to 'pending'.
+     * Using optimistic updates for better UX.
      */
     const handleToggleStatus = async (p: Promotion) => {
-        if (updatingId) return;
+        if (updatingId) return; // Prevent multiple clicks
         
-        // Mantıksal Durum Belirleme
         const nextStatus: Promotion['status'] = p.status === 'sending' ? 'pending' : 'sending';
-        
         setUpdatingId(p.id);
         
+        // Optimistic UI Update: Change status in UI immediately
+        const previousPromos = [...promos];
+        setPromos(current => current.map(item => item.id === p.id ? { ...item, status: nextStatus } : item));
+        
         try {
-            // Veritabanı Güncellemesi
+            // Veritabanı Güncellemesi - Sadece status sütununu güncelle
             await DatabaseService.updatePromotionStatus(p.id, nextStatus);
             
-            // Verileri tazele
+            // Verileri arka planda tazele
             const freshData = await DatabaseService.getPromotions();
             setPromos(freshData);
         } catch (error) {
-            console.error("Promotion status toggle failed:", error);
-            alert("Durum güncellenemedi. Lütfen internet bağlantınızı kontrol edin.");
+            console.error("Promotion status toggle CRITICAL failure:", error);
+            // Rollback UI to previous state on failure
+            setPromos(previousPromos);
+            alert("Durum güncellenemedi! RLS politikalarını veya veritabanı bağlantısını kontrol edin.");
         } finally {
             setUpdatingId(null);
         }
@@ -1077,6 +1087,7 @@ const PromotionManagement = () => {
         switch(status) {
             case 'sending': return <span className="px-3 py-1 bg-blue-500/10 text-blue-500 border border-blue-500/20 rounded-full text-[9px] font-black uppercase animate-pulse">AKTİF YAYINDA</span>;
             case 'sent': return <span className="px-3 py-1 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-full text-[9px] font-black uppercase">TAMAMLANDI</span>;
+            case 'failed': return <span className="px-3 py-1 bg-red-500/10 text-red-500 border border-red-500/20 rounded-full text-[9px] font-black uppercase">HATA</span>;
             default: return <span className="px-3 py-1 bg-slate-500/10 text-slate-500 border border-white/5 rounded-full text-[9px] font-black uppercase">BEKLEMEDE</span>;
         }
     };
@@ -1099,7 +1110,7 @@ const PromotionManagement = () => {
                 </button>
             </div>
 
-            {isLoading && !updatingId ? (
+            {isLoading && updatingId === null ? (
                 <div className="flex flex-col items-center justify-center py-24 gap-4">
                     <Loader2 className="animate-spin text-blue-500" size={32} />
                     <span className="text-[10px] font-black text-slate-800 uppercase tracking-widest italic">Senkronize Ediliyor...</span>
@@ -1138,7 +1149,7 @@ const PromotionManagement = () => {
                                 <button 
                                     disabled={updatingId === p.id}
                                     onClick={() => handleToggleStatus(p)} 
-                                    className={`px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 flex items-center gap-2 min-w-[150px] justify-center ${
+                                    className={`px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 flex items-center gap-2 min-w-[160px] justify-center ${
                                         updatingId === p.id 
                                         ? 'bg-slate-800 text-slate-600 opacity-50' 
                                         : p.status === 'sending' 
@@ -1190,7 +1201,7 @@ const PromotionManagement = () => {
                                 <AdminInput label="REKLAM BAŞLIĞI" value={editingPromo.title} onChange={(v:any)=>setEditingPromo({...editingPromo, title:v})} placeholder="Örn: Haftalık Kampanya" />
                                 
                                 <div className="space-y-2">
-                                    <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">ANA MESAJ (HTML DESTEKLİ)</label>
+                                    <label className="text-[9px] font-black text-slate-600 uppercase tracking-widest ml-4 italic">ANA MESAJ (HTML DESTEKLİ)</label>
                                     <textarea 
                                         value={editingPromo.content} 
                                         onChange={e => setEditingPromo({...editingPromo, content: e.target.value})} 
