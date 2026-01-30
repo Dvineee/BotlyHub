@@ -17,7 +17,7 @@ export class DatabaseService {
       .order('created_at', { ascending: false });
       
     if (error) {
-        console.error("Promotions listesi çekilemedi:", error);
+        console.error("Promotions Fetch Error:", error);
         return [];
     }
     return (data || []).map(p => ({
@@ -29,7 +29,7 @@ export class DatabaseService {
   }
 
   static async savePromotion(promo: Partial<Promotion>) {
-    // Sadece tabloda olan kolonları filtreleyerek gönderiyoruz
+    // Veritabanı şemasıyla birebir uyumlu payload
     const payload: any = {
         title: promo.title,
         content: promo.content,
@@ -44,34 +44,29 @@ export class DatabaseService {
     };
 
     if (promo.id && promo.id !== '') {
-        // MEVCUT REKLAMI GÜNCELLE
-        console.log(`Güncelleniyor: ${promo.id}`);
-        const { data, error } = await supabase
+        // GÜNCELLEME (UPDATE)
+        console.log(`Veritabanı Güncelleniyor: ${promo.id}`);
+        const { error } = await supabase
             .from('promotions')
             .update(payload)
-            .eq('id', promo.id)
-            .select();
+            .eq('id', promo.id);
             
         if (error) {
-            console.error("Güncelleme Hatası Details:", error);
+            console.error("Supabase Update Detail:", error);
             throw new Error(`Güncelleme başarısız: ${error.message}`);
         }
-        if (!data || data.length === 0) {
-            throw new Error("Güncelleme yapıldı ancak veritabanında satır değişmedi (RLS Engeli?).");
-        }
     } else {
-        // YENİ REKLAM EKLE
-        console.log("Yeni kayıt oluşturuluyor...");
-        // Yeni kayıtta oluşturulma tarihini ekle
+        // YENİ KAYIT (INSERT)
+        console.log("Yeni kayıt veritabanına ekleniyor...");
         payload.created_at = new Date().toISOString();
         
-        const { data, error } = await supabase
+        // ÖNEMLİ: ID kolonu payload'da hiç olmamalı ki DB (UUID) otomatik atasın
+        const { error } = await supabase
             .from('promotions')
-            .insert([payload])
-            .select();
+            .insert([payload]);
             
         if (error) {
-            console.error("Ekleme Hatası Details:", error);
+            console.error("Supabase Insert Detail:", error);
             throw new Error(`Ekleme başarısız: ${error.message}`);
         }
     }
@@ -83,21 +78,16 @@ export class DatabaseService {
   }
 
   static async updatePromotionStatus(id: string, status: Promotion['status']) {
-      console.log(`Durum Değişiyor -> ID: ${id}, Yeni Durum: ${status}`);
+      console.log(`Statü Güncelleniyor -> ID: ${id}, Status: ${status}`);
       
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('promotions')
         .update({ status: status })
-        .eq('id', id)
-        .select();
+        .eq('id', id);
         
       if (error) {
-          console.error("Durum Güncelleme Hatası:", error);
-          throw new Error(`Statü değişikliği başarısız: ${error.message}`);
-      }
-
-      if (!data || data.length === 0) {
-          throw new Error("Durum güncellenemedi. ID bulunamadı veya RLS izniniz yok.");
+          console.error("Status Update Fail:", error);
+          throw new Error(`Durum değişikliği başarısız: ${error.message}`);
       }
       
       return true;

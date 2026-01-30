@@ -1091,7 +1091,8 @@ const PromotionManagement = () => {
             load(); 
         } catch (err: any) {
             console.error("Save Promotion Error:", err);
-            alert(err.message || "Kayıt sırasında hata oluştu.");
+            // Sunucudan gelen hatayı doğrudan gösteriyoruz ki sorun net anlaşılsın
+            alert(`Sistem Hatası: ${err.message || 'Kayıt yapılamadı.'}`);
         }
     };
 
@@ -1214,7 +1215,7 @@ const PromotionManagement = () => {
                                 <AdminInput label="REKLAM BAŞLIĞI" value={editingPromo.title} onChange={(v:any)=>setEditingPromo({...editingPromo, title:v})} placeholder="Örn: Haftalık Kampanya" />
                                 
                                 <div className="space-y-2">
-                                    <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">ANA MESAJ (HTML DESTEKLİ)</label>
+                                    <label className="text-[9px] font-black text-slate-600 uppercase tracking-widest ml-4 italic">ANA MESAJ (HTML DESTEKLİ)</label>
                                     <textarea 
                                         value={editingPromo.content} 
                                         onChange={e => setEditingPromo({...editingPromo, content: e.target.value})} 
