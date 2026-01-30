@@ -1070,10 +1070,10 @@ const PromotionManagement = () => {
             // Veriyi Supabase'den tazeleyelim
             const fresh = await DatabaseService.getPromotions();
             setPromos(fresh);
-        } catch (error) {
-            console.error("Promotion Toggle CRITICAL error:", error);
+        } catch (error: any) {
+            console.error("Promotion Toggle Error:", error);
             setPromos(prev); // Rollback
-            alert("Veritabanı güncellenemedi. RLS izinlerini veya ID tipini kontrol edin.");
+            alert(error.message || "İşlem sırasında bir hata oluştu.");
         } finally {
             setUpdatingId(null);
         }
@@ -1085,14 +1085,13 @@ const PromotionManagement = () => {
             // ID alanı boş ise DatabaseService.savePromotion bunu yeni kayıt olarak algılayacak
             await DatabaseService.savePromotion({ 
                 ...editingPromo, 
-                id: editingPromo.id === '' ? undefined : editingPromo.id,
-                status: editingPromo.status || 'pending' 
+                id: editingPromo.id === '' ? undefined : editingPromo.id
             }); 
             setIsModalOpen(false); 
             load(); 
-        } catch (err) {
+        } catch (err: any) {
             console.error("Save Promotion Error:", err);
-            alert("Kayıt sırasında hata oluştu. Lütfen konsolu kontrol edin.");
+            alert(err.message || "Kayıt sırasında hata oluştu.");
         }
     };
 

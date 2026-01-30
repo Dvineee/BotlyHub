@@ -11,50 +11,68 @@ export class DatabaseService {
   
   // --- PROMOTIONS ---
   static async getPromotions(): Promise<Promotion[]> {
-    const { data, error } = await supabase.from('promotions').select('*').order('created_at', { ascending: false });
+    const { data, error } = await supabase
+      .from('promotions')
+      .select('*')
+      .order('created_at', { ascending: false });
+      
     if (error) {
-        console.error("Fetch Promotions Error:", error);
+        console.error("Promotions listesi çekilemedi:", error);
         return [];
     }
     return (data || []).map(p => ({
         ...p,
-        click_count: Number(p.click_count || 0)
+        click_count: Number(p.click_count || 0),
+        total_reach: Number(p.total_reach || 0),
+        channel_count: Number(p.channel_count || 0)
     }));
   }
 
-  /**
-   * RE-FIXED: savePromotion logic. 
-   * If promo.id is null or empty, we treat it as a NEW record (INSERT).
-   * This allows Supabase to handle auto-increment IDs.
-   */
   static async savePromotion(promo: Partial<Promotion>) {
+    // Sadece tabloda olan kolonları filtreleyerek gönderiyoruz
     const payload: any = {
         title: promo.title,
         content: promo.content,
-        image_url: promo.image_url,
-        button_text: promo.button_text,
-        button_link: promo.button_link,
+        image_url: promo.image_url || null,
+        button_text: promo.button_text || 'İNCELE',
+        button_link: promo.button_link || null,
         status: promo.status || 'pending',
         click_count: Number(promo.click_count || 0),
         total_reach: Number(promo.total_reach || 0),
         channel_count: Number(promo.channel_count || 0),
-        processed_channels: promo.processed_channels || [],
-        created_at: promo.created_at || new Date().toISOString()
+        processed_channels: promo.processed_channels || []
     };
 
-    // ID kontrolü: Eğer ID varsa UPDATE (upsert), yoksa INSERT
     if (promo.id && promo.id !== '') {
-        payload.id = promo.id;
-        const { error } = await supabase.from('promotions').upsert(payload, { onConflict: 'id' });
+        // MEVCUT REKLAMI GÜNCELLE
+        console.log(`Güncelleniyor: ${promo.id}`);
+        const { data, error } = await supabase
+            .from('promotions')
+            .update(payload)
+            .eq('id', promo.id)
+            .select();
+            
         if (error) {
-            console.error("Promotion Update Error:", error);
-            throw error;
+            console.error("Güncelleme Hatası Details:", error);
+            throw new Error(`Güncelleme başarısız: ${error.message}`);
+        }
+        if (!data || data.length === 0) {
+            throw new Error("Güncelleme yapıldı ancak veritabanında satır değişmedi (RLS Engeli?).");
         }
     } else {
-        const { error } = await supabase.from('promotions').insert([payload]);
+        // YENİ REKLAM EKLE
+        console.log("Yeni kayıt oluşturuluyor...");
+        // Yeni kayıtta oluşturulma tarihini ekle
+        payload.created_at = new Date().toISOString();
+        
+        const { data, error } = await supabase
+            .from('promotions')
+            .insert([payload])
+            .select();
+            
         if (error) {
-            console.error("Promotion Insert Error:", error);
-            throw error;
+            console.error("Ekleme Hatası Details:", error);
+            throw new Error(`Ekleme başarısız: ${error.message}`);
         }
     }
   }
@@ -64,22 +82,24 @@ export class DatabaseService {
     if (error) throw error;
   }
 
-  /**
-   * FIXED: Explicit update for status.
-   */
-  static async updatePromotionStatus(id: string | number, status: Promotion['status']) {
-      // Konsolda tam olarak ne gönderildiğini görelim
-      console.log(`Supabase Request: Update Promotion ID:${id} to Status:${status}`);
+  static async updatePromotionStatus(id: string, status: Promotion['status']) {
+      console.log(`Durum Değişiyor -> ID: ${id}, Yeni Durum: ${status}`);
       
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('promotions')
         .update({ status: status })
-        .eq('id', id); 
+        .eq('id', id)
+        .select();
         
       if (error) {
-          console.error("Supabase Promotion Update Status Failed:", error);
-          throw error;
+          console.error("Durum Güncelleme Hatası:", error);
+          throw new Error(`Statü değişikliği başarısız: ${error.message}`);
       }
+
+      if (!data || data.length === 0) {
+          throw new Error("Durum güncellenemedi. ID bulunamadı veya RLS izniniz yok.");
+      }
+      
       return true;
   }
 
