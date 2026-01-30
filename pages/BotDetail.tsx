@@ -7,7 +7,7 @@ import {
   Sparkles, Star, Download, Info, CheckCircle2, Globe, Cpu
 } from 'lucide-react';
 import * as Router from 'react-router-dom';
-import { Bot, Channel } from '../types';
+import { Bot, Channel, User } from '../types';
 import { useTelegram } from '../hooks/useTelegram';
 import { DatabaseService } from '../services/DatabaseService';
 import PriceService from '../services/PriceService';
@@ -70,19 +70,40 @@ const BotDetail = () => {
           setIsProcessing(true);
           try {
               const userData = user || { id: 'guest_user', first_name: 'User' };
+              
+              // 1. Kullanıcıyı senkronize et (Eğer yoksa veritabanına kaydetmek için)
+              // Bu adım Foreign Key hatalarını önler.
+              const syncData: Partial<User> = {
+                  id: userData.id.toString(),
+                  name: `${userData.first_name} ${userData.last_name || ''}`.trim(),
+                  username: userData.username || 'user',
+                  avatar: userData.photo_url || `https://ui-avatars.com/api/?name=${userData.first_name}`,
+                  role: 'User',
+                  status: 'Active',
+                  joinDate: new Date().toISOString()
+              };
+              await DatabaseService.syncUser(syncData);
+
+              // 2. Botu kullanıcıya ekle
               await DatabaseService.addUserBot(userData, bot, false);
               
-              await DatabaseService.sendUserNotification(
-                  userData.id.toString(),
-                  'Kütüphaneye Eklendi',
-                  `'${bot.name}' botu kütüphanenize başarıyla eklendi.`,
-                  'bot'
-              );
+              // 3. Bildirim gönder (Bu işlem kritik değil, hata alsa bile süreci bozmamalı)
+              try {
+                  await DatabaseService.sendUserNotification(
+                      userData.id.toString(),
+                      'Kütüphaneye Eklendi',
+                      `'${bot.name}' botu kütüphanenize başarıyla eklendi.`,
+                      'bot'
+                  );
+              } catch (noteErr) {
+                  console.warn("Bildirim gönderilemedi ancak bot eklendi.", noteErr);
+              }
 
               setIsOwned(true);
               notification('success');
           } catch (e: any) {
-              alert("İşlem başarısız.");
+              console.error("Action failed:", e);
+              alert("İşlem başarısız: " + (e.message || "Lütfen tekrar deneyin."));
           } finally {
               setIsProcessing(false);
           }
@@ -168,7 +189,6 @@ const BotDetail = () => {
                     </div>
                   ))
               ) : (
-                  // Placeholder screenshots for visual completeness
                   [1,2,3].map(i => (
                     <div key={i} className="min-w-[160px] h-[280px] rounded-[24px] bg-slate-900/50 border border-white/5 overflow-hidden snap-center shrink-0 flex items-center justify-center">
                         <ImageIcon className="text-slate-800" size={32} />
