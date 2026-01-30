@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import * as Router from 'react-router-dom';
 import { 
@@ -1045,19 +1046,19 @@ const PromotionManagement = () => {
 
     useEffect(() => { load(); }, [load]);
 
+    /**
+     * FIXED TOGGLE LOGIC:
+     * Correctly transitions status to 'sending' and back to 'pending'.
+     */
     const handleToggleStatus = async (p: Promotion) => {
         if (updatingId) return;
         
         // Mantıksal Durum Belirleme
-        // Eğer durum 'sending' ise 'pending'e çek, aksi halde 'sending' yap.
         const nextStatus: Promotion['status'] = p.status === 'sending' ? 'pending' : 'sending';
         
         setUpdatingId(p.id);
         
         try {
-            // Optimistik UI Güncellemesi (Anlık tepki için)
-            setPromos(prev => prev.map(item => item.id === p.id ? { ...item, status: nextStatus } : item));
-            
             // Veritabanı Güncellemesi
             await DatabaseService.updatePromotionStatus(p.id, nextStatus);
             
@@ -1065,9 +1066,8 @@ const PromotionManagement = () => {
             const freshData = await DatabaseService.getPromotions();
             setPromos(freshData);
         } catch (error) {
-            console.error("Status update failed:", error);
-            // Hata durumunda listeyi eski haline döndür
-            load();
+            console.error("Promotion status toggle failed:", error);
+            alert("Durum güncellenemedi. Lütfen internet bağlantınızı kontrol edin.");
         } finally {
             setUpdatingId(null);
         }
@@ -1138,12 +1138,12 @@ const PromotionManagement = () => {
                                 <button 
                                     disabled={updatingId === p.id}
                                     onClick={() => handleToggleStatus(p)} 
-                                    className={`px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 flex items-center gap-2 min-w-[140px] justify-center ${
+                                    className={`px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 flex items-center gap-2 min-w-[150px] justify-center ${
                                         updatingId === p.id 
                                         ? 'bg-slate-800 text-slate-600 opacity-50' 
                                         : p.status === 'sending' 
-                                          ? 'bg-orange-500/10 text-orange-500 border border-orange-500/20' 
-                                          : 'bg-blue-600 text-white shadow-xl shadow-blue-900/20'
+                                          ? 'bg-orange-500/10 text-orange-500 border border-orange-500/20 shadow-lg' 
+                                          : 'bg-blue-600 text-white shadow-xl shadow-blue-900/40 hover:bg-blue-500'
                                     }`}
                                 >
                                     {updatingId === p.id ? (

@@ -44,8 +44,16 @@ export class DatabaseService {
   }
 
   static async updatePromotionStatus(id: string, status: Promotion['status']) {
-      const { error } = await supabase.from('promotions').update({ status }).eq('id', id);
-      if (error) throw error;
+      // Explicitly targeted update to the status column
+      const { error } = await supabase
+        .from('promotions')
+        .update({ status: status })
+        .eq('id', id.toString());
+        
+      if (error) {
+          console.error("Supabase Update Error:", error);
+          throw error;
+      }
   }
 
   // --- USERS ---
