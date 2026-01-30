@@ -1028,7 +1028,7 @@ const NotificationCenter = () => {
 
 /**
  * PROMOTION MANAGEMENT - REDESIGNED Ad Sharing Center
- * FIXED: Status update logic for "Yayına Al" button.
+ * FIXED: Veritabanı işlemleri (Save ve Status Update) stabilize edildi.
  */
 const PromotionManagement = () => {
     const [promos, setPromos] = useState<Promotion[]>([]);
@@ -1043,7 +1043,7 @@ const PromotionManagement = () => {
             const data = await DatabaseService.getPromotions();
             setPromos(data);
         } catch (e) {
-            console.error("Promotion load failed:", e);
+            console.error("Promos Load Error:", e);
         } finally {
             setIsLoading(false);
         }
@@ -1053,33 +1053,46 @@ const PromotionManagement = () => {
 
     /**
      * FIXED TOGGLE LOGIC:
-     * Correctly transitions status to 'sending' and back to 'pending'.
-     * Using optimistic updates for better UX.
+     * Durumu anlık olarak 'sending'e çeker.
      */
     const handleToggleStatus = async (p: Promotion) => {
-        if (updatingId) return; // Prevent multiple clicks
+        if (updatingId) return; 
         
         const nextStatus: Promotion['status'] = p.status === 'sending' ? 'pending' : 'sending';
         setUpdatingId(p.id);
         
-        // Optimistic UI Update: Change status in UI immediately
-        const previousPromos = [...promos];
+        // UI optimistik güncelleme
+        const prev = [...promos];
         setPromos(current => current.map(item => item.id === p.id ? { ...item, status: nextStatus } : item));
         
         try {
-            // Veritabanı Güncellemesi - Sadece status sütununu güncelle
             await DatabaseService.updatePromotionStatus(p.id, nextStatus);
-            
-            // Verileri arka planda tazele
-            const freshData = await DatabaseService.getPromotions();
-            setPromos(freshData);
+            // Veriyi Supabase'den tazeleyelim
+            const fresh = await DatabaseService.getPromotions();
+            setPromos(fresh);
         } catch (error) {
-            console.error("Promotion status toggle CRITICAL failure:", error);
-            // Rollback UI to previous state on failure
-            setPromos(previousPromos);
-            alert("Durum güncellenemedi! RLS politikalarını veya veritabanı bağlantısını kontrol edin.");
+            console.error("Promotion Toggle CRITICAL error:", error);
+            setPromos(prev); // Rollback
+            alert("Veritabanı güncellenemedi. RLS izinlerini veya ID tipini kontrol edin.");
         } finally {
             setUpdatingId(null);
+        }
+    };
+
+    const handleSave = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            // ID alanı boş ise DatabaseService.savePromotion bunu yeni kayıt olarak algılayacak
+            await DatabaseService.savePromotion({ 
+                ...editingPromo, 
+                id: editingPromo.id === '' ? undefined : editingPromo.id,
+                status: editingPromo.status || 'pending' 
+            }); 
+            setIsModalOpen(false); 
+            load(); 
+        } catch (err) {
+            console.error("Save Promotion Error:", err);
+            alert("Kayıt sırasında hata oluştu. Lütfen konsolu kontrol edin.");
         }
     };
 
@@ -1101,7 +1114,7 @@ const PromotionManagement = () => {
                 </div>
                 <button 
                     onClick={() => { 
-                        setEditingPromo({ title: '', content: '', image_url: '', status: 'pending', button_text: 'İNCELE', button_link: '', click_count: 0, processed_channels: [] }); 
+                        setEditingPromo({ id: '', title: '', content: '', image_url: '', status: 'pending', button_text: 'İNCELE', button_link: '', click_count: 0, processed_channels: [] }); 
                         setIsModalOpen(true); 
                     }} 
                     className="w-full md:w-auto bg-emerald-600 hover:bg-emerald-500 px-10 py-5 rounded-[28px] text-[11px] font-black uppercase tracking-widest shadow-2xl active:scale-95 border-b-4 border-emerald-900 transition-all flex items-center gap-3"
@@ -1167,8 +1180,14 @@ const PromotionManagement = () => {
                                     )}
                                 </button>
                                 <button 
+                                    onClick={() => { setEditingPromo(p); setIsModalOpen(true); }}
+                                    className="p-4 bg-white/5 rounded-2xl text-blue-400 hover:bg-blue-600 hover:text-white transition-all shadow-xl"
+                                >
+                                    <Edit3 size={20}/>
+                                </button>
+                                <button 
                                     onClick={async () => { if(confirm('Bu kampanya silinsin mi?')) { await DatabaseService.deletePromotion(p.id); load(); } }} 
-                                    className="p-4 bg-white/5 rounded-2xl text-red-500 hover:bg-red-600 hover:text-white transition-all shadow-xl"
+                                    className="p-4 bg-white/5 rounded-2xl text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-xl"
                                 >
                                     <Trash2 size={20}/>
                                 </button>
@@ -1192,16 +1211,11 @@ const PromotionManagement = () => {
                                 <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">Yayınlanacak reklamın içeriğini tasarlayın</p>
                             </div>
 
-                            <form onSubmit={async (e) => { 
-                                e.preventDefault(); 
-                                await DatabaseService.savePromotion({ ...editingPromo, status: 'pending' }); 
-                                setIsModalOpen(false); 
-                                load(); 
-                            }} className="space-y-8 pb-10">
+                            <form onSubmit={handleSave} className="space-y-8 pb-10">
                                 <AdminInput label="REKLAM BAŞLIĞI" value={editingPromo.title} onChange={(v:any)=>setEditingPromo({...editingPromo, title:v})} placeholder="Örn: Haftalık Kampanya" />
                                 
                                 <div className="space-y-2">
-                                    <label className="text-[9px] font-black text-slate-600 uppercase tracking-widest ml-4 italic">ANA MESAJ (HTML DESTEKLİ)</label>
+                                    <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">ANA MESAJ (HTML DESTEKLİ)</label>
                                     <textarea 
                                         value={editingPromo.content} 
                                         onChange={e => setEditingPromo({...editingPromo, content: e.target.value})} 

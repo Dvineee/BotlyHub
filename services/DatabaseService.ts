@@ -22,9 +22,13 @@ export class DatabaseService {
     }));
   }
 
+  /**
+   * RE-FIXED: savePromotion logic. 
+   * If promo.id is null or empty, we treat it as a NEW record (INSERT).
+   * This allows Supabase to handle auto-increment IDs.
+   */
   static async savePromotion(promo: Partial<Promotion>) {
-    const payload = {
-        id: promo.id || Math.floor(Math.random() * 999999).toString(),
+    const payload: any = {
         title: promo.title,
         content: promo.content,
         image_url: promo.image_url,
@@ -37,8 +41,22 @@ export class DatabaseService {
         processed_channels: promo.processed_channels || [],
         created_at: promo.created_at || new Date().toISOString()
     };
-    const { error } = await supabase.from('promotions').upsert(payload, { onConflict: 'id' });
-    if (error) throw error;
+
+    // ID kontrolü: Eğer ID varsa UPDATE (upsert), yoksa INSERT
+    if (promo.id && promo.id !== '') {
+        payload.id = promo.id;
+        const { error } = await supabase.from('promotions').upsert(payload, { onConflict: 'id' });
+        if (error) {
+            console.error("Promotion Update Error:", error);
+            throw error;
+        }
+    } else {
+        const { error } = await supabase.from('promotions').insert([payload]);
+        if (error) {
+            console.error("Promotion Insert Error:", error);
+            throw error;
+        }
+    }
   }
 
   static async deletePromotion(id: string) {
@@ -47,24 +65,22 @@ export class DatabaseService {
   }
 
   /**
-   * FIX: Reklam durumunu güncelleyen ana fonksiyon.
-   * eq('id', id) kısmında ID'nin tipine göre eşleşmeme ihtimalini ortadan kaldırmak için
-   * hem string hem de sayısal dönüşüm denemesi yapıldı.
+   * FIXED: Explicit update for status.
    */
   static async updatePromotionStatus(id: string | number, status: Promotion['status']) {
-      console.log(`Updating Promotion ${id} to status: ${status}`);
+      // Konsolda tam olarak ne gönderildiğini görelim
+      console.log(`Supabase Request: Update Promotion ID:${id} to Status:${status}`);
       
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('promotions')
         .update({ status: status })
-        .filter('id', 'eq', id); // eq() yerine filtreleme daha güvenli olabilir
+        .eq('id', id); 
         
       if (error) {
-          console.error("Supabase Promotion Update CRITICAL Error:", error);
+          console.error("Supabase Promotion Update Status Failed:", error);
           throw error;
       }
-      
-      return data;
+      return true;
   }
 
   // --- USERS ---
