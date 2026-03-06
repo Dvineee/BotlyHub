@@ -1,0 +1,52 @@
+
+import { encryptData, decryptData } from '../security';
+
+// Kullanıcı tarafından belirtilen Admin Cüzdan Adresi (TON Mainnet)
+const ADMIN_WALLET_ADDRESS = "UQD8ulQVVbEf01COyBRuy1RZtqCewT-bfv7SoVblZiBVuo_i";
+
+export class WalletService {
+    
+    static getAdminAddress() {
+        return ADMIN_WALLET_ADDRESS;
+    }
+
+    // --- Key Management ---
+    static generateMnemonic(): string {
+        return Array(12).fill(0).map(() => Math.random().toString(36).substring(2, 7)).join(' ');
+    }
+
+    static saveWallet(mnemonic: string) {
+        const encrypted = encryptData(mnemonic);
+        localStorage.setItem('secure_wallet_seed', encrypted);
+        localStorage.setItem('wallet_created_at', new Date().toISOString());
+    }
+
+    static getWallet() {
+        const encrypted = localStorage.getItem('secure_wallet_seed');
+        if (!encrypted) return null;
+        return decryptData(encrypted);
+    }
+
+    /**
+     * TON Connect Transaction Payload Generator
+     * Admin adresine ödeme gönderimi için kullanılır.
+     */
+    static createTonTransaction(amountTON: number) {
+        const nanoTons = (BigInt(Math.floor(amountTON * 1000000000))).toString();
+        
+        return {
+            validUntil: Math.floor(Date.now() / 1000) + 600,
+            messages: [
+                {
+                    address: ADMIN_WALLET_ADDRESS,
+                    amount: nanoTons,
+                }
+            ]
+        };
+    }
+
+    static isValidAddress(chain: string, address: string): boolean {
+        if (chain === 'TON') return address.length >= 48;
+        return address.length > 10;
+    }
+}
