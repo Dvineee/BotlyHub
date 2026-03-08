@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-=======
-
->>>>>>> e89adc49cd47974c931285eab89136e716c901df
 {
   "name": "botlyhub-v3",
   "private": true,
@@ -14,14 +10,9 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-<<<<<<< HEAD
     "@supabase/supabase-js": "^2.39.7",
     "@tonconnect/ui-react": "^2.0.0",
     "beautifulsoup4": "^0.0.1-security",
-=======
-    "@tonconnect/ui-react": "^2.0.0",
-    "@supabase/supabase-js": "^2.39.7",
->>>>>>> e89adc49cd47974c931285eab89136e716c901df
     "crypto-js": "^4.2.0",
     "ethers": "^6.11.1",
     "lucide-react": "^0.292.0",
