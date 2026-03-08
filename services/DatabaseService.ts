@@ -2,8 +2,13 @@
 import { createClient } from '@supabase/supabase-js';
 import { Bot, User, Channel, Announcement, Notification, UserBot, ActivityLog, Promotion } from '../types';
 
+<<<<<<< HEAD
 const SUPABASE_URL = 'https://yrbnzyvbhitlquaxnruc.supabase.co'; 
 const SUPABASE_ANON_KEY = 'sb_secret_F0j5s-9UJAWdQwA75PMzQw_IuACUZbV'; 
+=======
+const SUPABASE_URL = 'https://ybnxfwqrduuinzgnbymc.supabase.co'; 
+const SUPABASE_ANON_KEY = 'sb_publishable_VeYQ304ZpUpj3ymB3ihpjw_jt49W1G-'; 
+>>>>>>> e89adc49cd47974c931285eab89136e716c901df
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -314,7 +319,11 @@ export class DatabaseService {
     const [u, b, l, s, c] = await Promise.all([
         supabase.from('users').select('*', { count: 'exact', head: true }),
         supabase.from('bots').select('*', { count: 'exact', head: true }),
+<<<<<<< HEAD
         supabase.from('bot_logs').select('*', { count: 'exact', head: true }),
+=======
+        supabase.from('activity_logs').select('*', { count: 'exact', head: true }),
+>>>>>>> e89adc49cd47974c931285eab89136e716c901df
         supabase.from('user_bots').select('*', { count: 'exact', head: true }),
         supabase.from('channels').select('revenue')
     ]);
@@ -328,7 +337,11 @@ export class DatabaseService {
   }
 
   static async logActivity(userId: string, type: ActivityLog['type'], actionKey: string, title: string, description: string) {
+<<<<<<< HEAD
       await supabase.from('bot_logs').insert({ 
+=======
+      await supabase.from('activity_logs').insert({ 
+>>>>>>> e89adc49cd47974c931285eab89136e716c901df
           user_id: String(userId), 
           type, 
           action_key: actionKey, 
@@ -339,7 +352,11 @@ export class DatabaseService {
   }
 
   static async getActivityLogs(): Promise<ActivityLog[]> {
+<<<<<<< HEAD
     const { data } = await supabase.from('bot_logs').select('*').order('created_at', { ascending: false }).limit(50);
+=======
+    const { data } = await supabase.from('activity_logs').select('*').order('created_at', { ascending: false }).limit(50);
+>>>>>>> e89adc49cd47974c931285eab89136e716c901df
     return data || [];
   }
 
