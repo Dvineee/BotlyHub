@@ -5,13 +5,8 @@ const { createClient } = require('@supabase/supabase-js');
 // --- CONFIG ---
 const BOT_TOKEN = process.env.BOT_TOKEN || 'YOUR_TELEGRAM_BOT_TOKEN';
 const MINI_APP_URL = 'https://botlyhub-v3.vercel.app'; // Kendi URL'nizle değiştirin
-<<<<<<< HEAD
 const SUPABASE_URL = 'https://yrbnzyvbhitlquaxnruc.supabase.co';
 const SUPABASE_KEY = 'sb_secret_F0j5s-9UJAWdQwA75PMzQw_IuACUZbV';
-=======
-const SUPABASE_URL = 'https://ybnxfwqrduuinzgnbymc.supabase.co';
-const SUPABASE_KEY = 'YOUR_SUPABASE_SERVICE_ROLE_KEY';
->>>>>>> e89adc49cd47974c931285eab89136e716c901df
 
 const bot = new Telegraf(BOT_TOKEN);
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);

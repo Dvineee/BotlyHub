@@ -1,14 +1,10 @@
 import asyncio
 import logging
 import datetime
-<<<<<<< HEAD
 import httpx
 import re
 from datetime import timezone
 from bs4 import BeautifulSoup
-=======
-from datetime import timezone
->>>>>>> e89adc49cd47974c931285eab89136e716c901df
 
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import CommandStart
@@ -20,13 +16,8 @@ from supabase import create_client, Client
 # --- CONFIG ---
 # Kullanıcı tarafından sağlanan güncel bilgiler
 BOT_TOKEN = "8468942589:AAEmh541e7JYCd0iNsyi9iyyN1O9e8njJFc"
-<<<<<<< HEAD
 SUPABASE_URL = "https://yrbnzyvbhitlquaxnruc.supabase.co"
 SUPABASE_KEY = "sb_secret_F0j5s-9UJAWdQwA75PMzQw_IuACUZbV"
-=======
-SUPABASE_URL = "https://ybnxfwqrduuinzgnbymc.supabase.co"
-SUPABASE_KEY = "sb_secret_jDxdXsQ-wb4RelA0hOfNkg_LTINMqJ5"
->>>>>>> e89adc49cd47974c931285eab89136e716c901df
 MINI_APP_URL = "https://botlyhub.vercel.app/#/"
 MARKETPLACE_BOT_ID = "BOT-82202-C5G"
 
@@ -40,7 +31,6 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 UTCNOW = lambda: datetime.datetime.now(timezone.utc).isoformat()
 
 # =====================================================
-<<<<<<< HEAD
 # 📊 GÖRÜNTÜLENME TARAMA FONKSİYONLARI
 # =====================================================
 def parse_views(views_str):
@@ -134,8 +124,6 @@ async def update_views_loop():
             await asyncio.sleep(60)
 
 # =====================================================
-=======
->>>>>>> e89adc49cd47974c931285eab89136e716c901df
 # 🔥 1. REKLAM DAĞITIM MOTORU (KANAL LOCK SİSTEMİ)
 # =====================================================
 async def ad_dispatcher_task():
@@ -155,7 +143,6 @@ async def ad_dispatcher_task():
             logger.info(f"📢 {len(promos)} adet aktif reklam bulundu")
 
             # 2. Reklam alabilecek kanalları çek
-<<<<<<< HEAD
             all_channels_res = supabase.table("channels").select("*").execute()
             all_channels = all_channels_res.data or []
             
@@ -171,18 +158,6 @@ async def ad_dispatcher_task():
                 f"Arşivlenmemiş={not_archived_count} | "
                 f"Yayınlanabilir={len(channels)}"
             )
-=======
-            # Not: archived=False yerine archived is not True kontrolü daha güvenli (NULL durumları için)
-            channels_data = supabase.table("channels") \
-                .select("*") \
-                .eq("revenue_enabled", True) \
-                .execute().data or []
-            
-            # Filtreleme: archived True olmayanları al (False veya None/Null olanlar)
-            channels = [c for c in channels_data if not c.get("archived")]
-
-            logger.info(f"📡 Reklam alabilecek {len(channels)} kanal var")
->>>>>>> e89adc49cd47974c931285eab89136e716c901df
 
             if not channels:
                 logger.warning("⚠️ Reklam var ama yayınlanacak kanal bulunamadı (Tüm kanallar pasif veya arşivlenmiş olabilir)")
@@ -228,7 +203,6 @@ async def ad_dispatcher_task():
                         if promo.get("button_text") and promo.get("button_link"):
                             kb.row(types.InlineKeyboardButton(
                                 text=promo["button_text"],
-<<<<<<< HEAD
                                 url=promo["button_link"]
                             ))
 
@@ -263,33 +237,10 @@ async def ad_dispatcher_task():
                                 )
                             else:
                                 raise photo_err
-=======
-                                callback_data=f"promo_click_{promo['id']}"
-                            ))
-
-                        caption = f"<b>{promo['title']}</b>\n\n{promo['content']}"
-
-                        if promo.get("image_url"):
-                            await bot.send_photo(
-                                chat_id=tg_id,
-                                photo=promo["image_url"],
-                                caption=caption,
-                                parse_mode="HTML",
-                                reply_markup=kb.as_markup()
-                            )
-                        else:
-                            await bot.send_message(
-                                chat_id=tg_id,
-                                text=caption,
-                                parse_mode="HTML",
-                                reply_markup=kb.as_markup()
-                            )
->>>>>>> e89adc49cd47974c931285eab89136e716c901df
 
                         processed.add(tg_id)
                         reach += int(ch.get("member_count") or 0)
                         newly_processed_count += 1
-<<<<<<< HEAD
                         
                         # Mesaj ID'sini kaydet
                         if "message_map" not in promo or promo["message_map"] is None:
@@ -320,15 +271,6 @@ async def ad_dispatcher_task():
                                 supabase.table("promotions").update(update_data).eq("id", promo["id"]).execute()
                             else:
                                 raise db_err
-=======
-
-                        # Her başarılı gönderimde reklamı güncelle
-                        supabase.table("promotions").update({
-                            "processed_channels": list(processed),
-                            "total_reach": reach,
-                            "channel_count": len(processed)
-                        }).eq("id", promo["id"]).execute()
->>>>>>> e89adc49cd47974c931285eab89136e716c901df
 
                         logger.info(f"✅ Gönderildi | Kanal {tg_id}")
                         await asyncio.sleep(0.5) # Rate limit koruması
@@ -337,7 +279,6 @@ async def ad_dispatcher_task():
                         err_msg = str(e).lower()
                         logger.error(f"❌ Gönderim Hatası | Kanal {tg_id} | {e}")
                         
-<<<<<<< HEAD
                         # Hatayı veritabanına işle (Kullanıcının görmesi için)
                         try:
                             supabase.table("promotions").update({
@@ -346,8 +287,6 @@ async def ad_dispatcher_task():
                         except:
                             pass
                         
-=======
->>>>>>> e89adc49cd47974c931285eab89136e716c901df
                         # Bot kanaldan atılmışsa veya kanal bulunamıyorsa pasife al
                         if any(x in err_msg for x in ["kicked", "chat not found", "blocked", "forbidden"]):
                             supabase.table("channels").update({
@@ -372,7 +311,6 @@ async def ad_dispatcher_task():
         await asyncio.sleep(20)
 
 # =====================================================
-<<<<<<< HEAD
 # ❤️ 2. TEPKİ TAKİBİ (REACTIONS)
 # =====================================================
 @dp.message_reaction()
@@ -431,31 +369,6 @@ async def on_reaction_update(event: types.MessageReactionUpdated):
             
     except Exception as e:
         logger.error(f"❌ Tepki kayıt hatası: {e}")
-=======
-# 🔘 2. CLICK TRACK
-# =====================================================
-@dp.callback_query(F.data.startswith("promo_click_"))
-async def promo_click(cb: CallbackQuery):
-    pid = cb.data.replace("promo_click_", "")
-    promo = supabase.table("promotions") \
-        .select("click_count, button_link") \
-        .eq("id", pid) \
-        .maybe_single().execute().data
-
-    if promo:
-        supabase.table("promotions").update({
-            "click_count": int(promo.get("click_count") or 0) + 1
-        }).eq("id", pid).execute()
-
-        if promo.get("button_link"):
-            await cb.message.answer(
-                "🔗 Bağlantı hazır",
-                reply_markup=InlineKeyboardBuilder().row(
-                    types.InlineKeyboardButton(text="Aç", url=promo["button_link"])
-                ).as_markup()
-            )
-    await cb.answer()
->>>>>>> e89adc49cd47974c931285eab89136e716c901df
 
 # =====================================================
 # 🚀 3. /START (OWNER + ADMIN)
@@ -527,7 +440,6 @@ async def start_cmd(msg: types.Message):
     }).execute()
 
     kb = InlineKeyboardBuilder()
-<<<<<<< HEAD
     # WebApp URL'sinin sonundaki /#/' kısmını temizleyip deneyelim, bazı sürümlerde sorun çıkarabiliyor
     clean_url = MINI_APP_URL.rstrip('/')
     
@@ -549,21 +461,10 @@ async def start_cmd(msg: types.Message):
 
 # =====================================================
 # 🔄 4. BOT ADMIN OLURSA/DÜŞERSE → KAYIT VE KİLİT
-=======
-    kb.row(types.InlineKeyboardButton(
-        text="Mağaza",
-        web_app=types.WebAppInfo(url=MINI_APP_URL)
-    ))
-    await msg.answer("👋 BotlyHub", reply_markup=kb.as_markup())
-
-# =====================================================
-# 🔄 4. BOT ADMIN DÜŞERSE → KİLİT KALKAR
->>>>>>> e89adc49cd47974c931285eab89136e716c901df
 # =====================================================
 @dp.my_chat_member()
 async def admin_watch(event: ChatMemberUpdated):
     chat_id = str(event.chat.id)
-<<<<<<< HEAD
     chat_title = event.chat.title or "İsimsiz Kanal"
 
     if event.new_chat_member.status == "administrator":
@@ -595,15 +496,10 @@ async def admin_watch(event: ChatMemberUpdated):
 
     elif event.new_chat_member.status in ("left", "kicked", "member"):
         # 🔴 Bot çıkarıldı veya yetkisi alındı
-=======
-
-    if event.new_chat_member.status != "administrator":
->>>>>>> e89adc49cd47974c931285eab89136e716c901df
         supabase.table("channels").update({
             "revenue_enabled": False,
             "ad_bot_id": None
         }).eq("telegram_id", chat_id).execute()
-<<<<<<< HEAD
         
         supabase.table("bot_connections").update({
             "status": "passive"
@@ -656,12 +552,6 @@ async def channel_message_logger(post: types.Message):
     """Kanalda paylaşılan herhangi bir mesajı loglar (Algılama testi için)"""
     if post.text:
         logger.info(f"📡 Kanal Mesajı Algılandı [{post.chat.title}]: {post.text[:50]}...")
-=======
-
-        supabase.table("bot_connections").update({
-            "status": "passive"
-        }).eq("channel_id", chat_id).execute()
->>>>>>> e89adc49cd47974c931285eab89136e716c901df
 
 # =====================================================
 # 🗑️ 5. GRUP SİLİNİRSE → ARŞİV + KİLİT KALKAR
@@ -680,10 +570,7 @@ async def group_removed(event: ChatMemberUpdated):
 # =====================================================
 async def main():
     asyncio.create_task(ad_dispatcher_task())
-<<<<<<< HEAD
     asyncio.create_task(update_views_loop())
-=======
->>>>>>> e89adc49cd47974c931285eab89136e716c901df
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
