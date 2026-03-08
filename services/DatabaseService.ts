@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { Bot, User, Channel, Announcement, Notification, UserBot, ActivityLog, Promotion } from '../types';
 
 const SUPABASE_URL = 'https://yrbnzyvbhitlquaxnruc.supabase.co'; 
-const SUPABASE_ANON_KEY = 'sb_secret_F0j5s-9UJAWdQwA75PMzQw_IuACUZbV'; 
+const SUPABASE_ANON_KEY = 'sb_publishable_h9QTmZjwi0pH_JX6i4xfWg_LJFY86GP'; 
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
