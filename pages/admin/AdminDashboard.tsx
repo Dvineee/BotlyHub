@@ -283,7 +283,7 @@ const BotManagement = () => {
                                 </div>
                                 <div className="flex gap-2">
                                     <button onClick={() => { setEditingBot(b); setIsModalOpen(true); }} className="p-3 bg-white/5 rounded-xl hover:bg-blue-600 text-slate-500 hover:text-white transition-all"><Edit3 size={18}/></button>
-                                    <button onClick={async () => { if(confirm('Silsin mi?')) { await DatabaseService.deleteBot(b.id); load(); } }} className="p-3 bg-white/5 rounded-xl text-red-500 hover:bg-red-500 hover:text-white transition-all"><Trash2 size={18}/></button>
+                                    <button onClick={async () => { if(confirm('Silsin mi?')) { await DatabaseService.deleteBot(b.id); await DatabaseService.logActivity('admin', 'bot_manage', 'bot_deleted', 'Bot Silindi', `${b.name} isimli bot sistemden silindi.`); load(); } }} className="p-3 bg-white/5 rounded-xl text-red-500 hover:bg-red-500 hover:text-white transition-all"><Trash2 size={18}/></button>
                                 </div>
                             </div>
 
@@ -335,7 +335,7 @@ const BotManagement = () => {
                             </div>
 
                             <div className="flex-1 overflow-y-auto p-8 lg:p-12 space-y-8 no-scrollbar pb-32 lg:pb-12">
-                                <form onSubmit={async (e) => { e.preventDefault(); await DatabaseService.saveBot(editingBot); setIsModalOpen(false); load(); }} className="space-y-8">
+                                <form onSubmit={async (e) => { e.preventDefault(); await DatabaseService.saveBot(editingBot); await DatabaseService.logActivity('admin', 'bot_manage', 'bot_saved', 'Bot Kaydedildi', `${editingBot.name} isimli bot bilgileri güncellendi/oluşturuldu.`); setIsModalOpen(false); load(); }} className="space-y-8">
                                     {activeTab === 'info' && (
                                         <div className="space-y-8 animate-in slide-in-from-left-4">
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
@@ -460,7 +460,7 @@ const UserManagement = () => {
                                         </div>
                                     </td>
                                     <td className="px-10 py-8 text-right">
-                                        <button onClick={async () => { await DatabaseService.updateUserStatus(u.id, u.status === 'Active' ? 'Passive' : 'Active'); load(); }} className="px-6 py-3 bg-white/5 rounded-xl text-[9px] font-black uppercase hover:bg-white/10 transition-all tracking-widest">GÜNCELLE</button>
+                                        <button onClick={async () => { const nextStatus = u.status === 'Active' ? 'Passive' : 'Active'; await DatabaseService.updateUserStatus(u.id, nextStatus); await DatabaseService.logActivity('admin', 'security', 'user_status_changed', 'Kullanıcı Statüsü Değişti', `@${u.username} kullanıcısının durumu ${nextStatus} olarak güncellendi.`); load(); }} className="px-6 py-3 bg-white/5 rounded-xl text-[9px] font-black uppercase hover:bg-white/10 transition-all tracking-widest">GÜNCELLE</button>
                                     </td>
                                 </tr>
                             ))}
@@ -570,6 +570,7 @@ const AnnouncementCenter = () => {
                 delete payload.id;
             }
             await DatabaseService.saveAnnouncement(payload);
+            await DatabaseService.logActivity('admin', 'system', 'announcement_saved', 'Duyuru Kaydedildi', `${editingAnn.title} başlıklı duyuru güncellendi/oluşturuldu.`);
             setIsModalOpen(false);
             load();
             alert('Duyuru başarıyla kaydedildi.');
@@ -613,7 +614,7 @@ const AnnouncementCenter = () => {
                                 </div>
                                 <div className="flex gap-2">
                                     <button onClick={() => { setEditingAnn(a); setIsModalOpen(true); }} className="p-3 bg-white/5 rounded-xl hover:bg-blue-600 text-slate-500 hover:text-white transition-all"><Edit3 size={18}/></button>
-                                    <button onClick={async () => { if(confirm('Silsin mi?')) { await DatabaseService.deleteAnnouncement(a.id); load(); } }} className="p-3 bg-white/5 rounded-xl text-red-500 hover:bg-red-500 hover:text-white transition-all"><Trash2 size={18}/></button>
+                                    <button onClick={async () => { if(confirm('Silsin mi?')) { await DatabaseService.deleteAnnouncement(a.id); await DatabaseService.logActivity('admin', 'system', 'announcement_deleted', 'Duyuru Silindi', `${a.title} başlıklı duyuru silindi.`); load(); } }} className="p-3 bg-white/5 rounded-xl text-red-500 hover:bg-red-500 hover:text-white transition-all"><Trash2 size={18}/></button>
                                 </div>
                             </div>
 
@@ -852,9 +853,11 @@ const NotificationCenter = () => {
         try {
             if (newNote.target_type === 'global') {
                 await DatabaseService.sendGlobalNotification(newNote.title, newNote.message, newNote.type);
+                await DatabaseService.logActivity('admin', 'system', 'notification_sent', 'Global Bildirim Gönderildi', `${newNote.title} başlıklı bildirim tüm kullanıcılara gönderildi.`);
             } else {
                 if (!newNote.user_id) return alert('Kullanıcı ID gereklidir.');
                 await DatabaseService.sendUserNotification(newNote.user_id, newNote.title, newNote.message, newNote.type);
+                await DatabaseService.logActivity('admin', 'system', 'notification_sent', 'Özel Bildirim Gönderildi', `${newNote.title} başlıklı bildirim ${newNote.user_id} ID'li kullanıcıya gönderildi.`);
             }
             setIsModalOpen(false);
             load();
@@ -911,7 +914,7 @@ const NotificationCenter = () => {
                                     </td>
                                     <td className="px-10 py-8 text-slate-600 text-[10px] font-bold uppercase">{new Date(n.date).toLocaleString()}</td>
                                     <td className="px-10 py-8 text-right">
-                                        <button onClick={async () => { if(confirm('Silsin mi?')) { await DatabaseService.deleteNotification(n.id); load(); } }} className="p-3 bg-white/5 rounded-xl text-red-500 opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={16}/></button>
+                                        <button onClick={async () => { if(confirm('Silsin mi?')) { await DatabaseService.deleteNotification(n.id); await DatabaseService.logActivity('admin', 'system', 'notification_deleted', 'Bildirim Silindi', `${n.title} başlıklı bildirim silindi.`); load(); } }} className="p-3 bg-white/5 rounded-xl text-red-500 opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={16}/></button>
                                     </td>
                                 </tr>
                             ))}
@@ -1084,6 +1087,7 @@ const PromotionManagement = () => {
         
         try {
             await DatabaseService.updatePromotionStatus(p.id, nextStatus);
+            await DatabaseService.logActivity('admin', 'bot_manage', 'promotion_status_changed', 'Tanıtım Statüsü Değişti', `${p.title} kampanyasının durumu ${nextStatus} olarak güncellendi.`);
             // Veriyi Supabase'den tazeleyelim
             const fresh = await DatabaseService.getPromotions();
             setPromos(fresh);
@@ -1104,6 +1108,7 @@ const PromotionManagement = () => {
                 ...editingPromo, 
                 id: editingPromo.id === '' ? undefined : editingPromo.id
             }); 
+            await DatabaseService.logActivity('admin', 'bot_manage', 'promotion_saved', 'Tanıtım Kaydedildi', `${editingPromo.title} kampanyası güncellendi/oluşturuldu.`);
             setIsModalOpen(false); 
             load(); 
         } catch (err: any) {
@@ -1203,7 +1208,7 @@ const PromotionManagement = () => {
                                     <Edit3 size={20}/>
                                 </button>
                                 <button 
-                                    onClick={async () => { if(confirm('Bu kampanya silinsin mi?')) { await DatabaseService.deletePromotion(p.id); load(); } }} 
+                                    onClick={async () => { if(confirm('Bu kampanya silinsin mi?')) { await DatabaseService.deletePromotion(p.id); await DatabaseService.logActivity('admin', 'bot_manage', 'promotion_deleted', 'Tanıtım Silindi', `${p.title} kampanyası silindi.`); load(); } }} 
                                     className="p-4 bg-white/5 rounded-2xl text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-xl"
                                 >
                                     <Trash2 size={20}/>
