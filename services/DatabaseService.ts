@@ -239,15 +239,32 @@ export class DatabaseService {
 
   // --- USER BOTS ---
   static async getUserBots(userId: string): Promise<UserBot[]> {
-    const { data } = await supabase.from('user_bots').select('*, bots(*)').eq('user_id', userId.toString());
-    return (data || []).map((item: any) => ({ 
-        ...item.bots, 
-        expiryDate: item.expiryDate, 
-        ownership_id: item.id, 
-        is_premium: item.is_premium, 
-        isActive: item.is_active, 
-        revenueEnabled: false 
-    })).filter(b => b.id);
+    const { data, error } = await supabase
+      .from('user_bots')
+      .select(`
+        *,
+        bot:bot_id (*)
+      `)
+      .eq('user_id', userId.toString());
+    
+    if (error) {
+        console.error("Error fetching user bots:", error);
+        return [];
+    }
+
+    return (data || []).map((item: any) => {
+        const botData = Array.isArray(item.bot) ? item.bot[0] : item.bot;
+        if (!botData) return null;
+
+        return { 
+            ...botData, 
+            expiryDate: item.expiry_date || item.expiryDate, 
+            ownership_id: item.id, 
+            is_premium: item.is_premium, 
+            isActive: item.is_active, 
+            revenueEnabled: false 
+        } as UserBot;
+    }).filter((b): b is UserBot => b !== null && !!b.id);
   }
 
   static async addUserBot(userData: any, botData: Bot, isPremium: boolean = false) {
