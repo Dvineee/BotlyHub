@@ -144,6 +144,16 @@ export class DatabaseService {
     }));
   }
 
+  static async updateUserBot(ownershipId: string, updates: any) {
+    const { error } = await supabase.from('user_bots').update(updates).eq('id', ownershipId);
+    if (error) throw error;
+  }
+
+  static async removeUserBotById(ownershipId: string) {
+    const { error } = await supabase.from('user_bots').delete().eq('id', ownershipId);
+    if (error) throw error;
+  }
+
   static async syncChannelsFromBotActivity(userId: string): Promise<number> {
       try {
           const uIdStr = String(userId).trim();
@@ -290,6 +300,16 @@ export class DatabaseService {
 
   static async removeUserBot(userId: string, botId: string) {
     const { error } = await supabase.from('user_bots').delete().eq('user_id', userId.toString()).eq('bot_id', botId.toString());
+    if (error) throw error;
+  }
+
+  static async updateUserBot(ownershipId: string, updates: any) {
+    const { error } = await supabase.from('user_bots').update(updates).eq('id', ownershipId);
+    if (error) throw error;
+  }
+
+  static async removeUserBotById(ownershipId: string) {
+    const { error } = await supabase.from('user_bots').delete().eq('id', ownershipId);
     if (error) throw error;
   }
 

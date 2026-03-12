@@ -8,7 +8,7 @@ import {
   CheckCircle2, AlertTriangle, TrendingUp, BarChart3, RadioIcon, Sparkles, UserPlus,
   ShieldCheck, Globe, Zap, Clock, ExternalLink, Filter, PieChart, Layers, 
   Settings as SettingsIcon, History, Copy, Check, Eye, ChevronRight, Monitor, Smartphone, Cpu,
-  Info, Star, MousePointer2, Link2, AlertCircle
+  Info, Star, MousePointer2, Link2, AlertCircle, Shield, Calendar, Hash
 } from 'lucide-react';
 import { DatabaseService } from '../../services/DatabaseService';
 import { User, Bot as BotType, Announcement, Promotion, ActivityLog, Notification } from '../../types';
@@ -417,10 +417,246 @@ const BotManagement = () => {
     );
 };
 
+const UserDetailModal = ({ user, onClose, onUpdate }: { user: User, onClose: () => void, onUpdate: () => void }) => {
+    const [channels, setChannels] = useState<any[]>([]);
+    const [bots, setBots] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState<'overview' | 'channels' | 'bots'>('overview');
+
+    const loadDetails = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            const [c, b] = await Promise.all([
+                DatabaseService.getChannels(user.id),
+                DatabaseService.getUserBots(user.id)
+            ]);
+            setChannels(c);
+            setBots(b);
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [user.id]);
+
+    useEffect(() => { loadDetails(); }, [loadDetails]);
+
+    const toggleBotStatus = async (bot: any) => {
+        try {
+            await DatabaseService.updateUserBot(bot.ownership_id, { is_active: !bot.isActive });
+            loadDetails();
+        } catch (e) { alert("Hata oluştu"); }
+    };
+
+    const toggleBotPremium = async (bot: any) => {
+        try {
+            await DatabaseService.updateUserBot(bot.ownership_id, { is_premium: !bot.is_premium });
+            loadDetails();
+        } catch (e) { alert("Hata oluştu"); }
+    };
+
+    const removeBot = async (bot: any) => {
+        if (!confirm("Bu botu kullanıcının kütüphanesinden kaldırmak istediğinize emin misiniz?")) return;
+        try {
+            await DatabaseService.removeUserBotById(bot.ownership_id);
+            loadDetails();
+        } catch (e) { alert("Hata oluştu"); }
+    };
+
+    return (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 lg:p-10">
+            <div className="absolute inset-0 bg-[#020617]/95 backdrop-blur-xl" onClick={onClose}></div>
+            <div className="relative w-full max-w-5xl bg-slate-900 border border-white/10 rounded-[44px] lg:rounded-[64px] overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-300">
+                {/* Header */}
+                <div className="p-8 lg:p-12 border-b border-white/5 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                    <div className="flex items-center gap-6">
+                        <div className="relative">
+                            <img src={user.avatar} className="w-16 h-16 lg:w-24 lg:h-24 rounded-[24px] lg:rounded-[32px] object-cover border border-white/10 shadow-2xl" />
+                            <div className={`absolute -bottom-2 -right-2 w-6 h-6 lg:w-8 lg:h-8 rounded-full border-4 border-slate-900 flex items-center justify-center ${user.status === 'Active' ? 'bg-emerald-500' : 'bg-slate-500'}`}>
+                                <CheckCircle2 size={12} className="text-white" />
+                            </div>
+                        </div>
+                        <div>
+                            <h2 className="text-2xl lg:text-4xl font-black text-white italic uppercase tracking-tighter leading-none mb-2">{user.name}</h2>
+                            <div className="flex items-center gap-3">
+                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">@{user.username}</span>
+                                <div className="w-1 h-1 bg-slate-800 rounded-full"></div>
+                                <span className={`text-[9px] font-black px-2 py-0.5 rounded bg-white/5 border border-white/5 uppercase tracking-widest ${user.role === 'Admin' ? 'text-blue-500' : 'text-slate-500'}`}>{user.role}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="flex gap-3">
+                        <button onClick={onClose} className="w-12 h-12 lg:w-16 lg:h-16 bg-white/5 hover:bg-white/10 text-slate-500 hover:text-white rounded-2xl lg:rounded-[24px] flex items-center justify-center transition-all">
+                            <X size={24} />
+                        </button>
+                    </div>
+                </div>
+
+                {/* Tabs */}
+                <div className="flex px-8 lg:px-12 border-b border-white/5 gap-8">
+                    {[
+                        { id: 'overview', label: 'GENEL BAKIŞ', icon: LayoutDashboard },
+                        { id: 'channels', label: 'KANALLAR', icon: Radio },
+                        { id: 'bots', label: 'BOTLAR', icon: Bot }
+                    ].map(tab => (
+                        <button 
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id as any)}
+                            className={`py-6 lg:py-8 text-[10px] font-black uppercase tracking-[0.3em] flex items-center gap-3 transition-all border-b-2 ${activeTab === tab.id ? 'text-blue-500 border-blue-500' : 'text-slate-600 border-transparent hover:text-slate-400'}`}
+                        >
+                            <tab.icon size={16} /> {tab.label}
+                        </button>
+                    ))}
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 overflow-y-auto p-8 lg:p-12 no-scrollbar">
+                    {isLoading ? (
+                        <div className="flex flex-col items-center justify-center py-20 gap-4">
+                            <Loader2 className="animate-spin text-blue-500" size={32} />
+                            <span className="text-[10px] font-black text-slate-800 uppercase tracking-widest italic">Veriler Çekiliyor...</span>
+                        </div>
+                    ) : (
+                        <div className="animate-in fade-in slide-in-from-bottom-4">
+                            {activeTab === 'overview' && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    <div className="bg-slate-950/50 border border-white/5 p-8 rounded-[32px] space-y-4">
+                                        <p className="text-[9px] font-black text-slate-700 uppercase tracking-widest italic">İletişim Bilgileri</p>
+                                        <div className="space-y-3">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-[10px] text-slate-500 uppercase font-bold">E-Posta</span>
+                                                <span className="text-[11px] text-white font-black italic">{user.email || 'Belirtilmemiş'}</span>
+                                            </div>
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-[10px] text-slate-500 uppercase font-bold">Telefon</span>
+                                                <span className="text-[11px] text-white font-black italic">{user.phone || 'Belirtilmemiş'}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="bg-slate-950/50 border border-white/5 p-8 rounded-[32px] space-y-4">
+                                        <p className="text-[9px] font-black text-slate-700 uppercase tracking-widest italic">Hesap Durumu</p>
+                                        <div className="space-y-3">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-[10px] text-slate-500 uppercase font-bold">Kayıt Tarihi</span>
+                                                <span className="text-[11px] text-white font-black italic">{new Date(user.joinDate).toLocaleDateString()}</span>
+                                            </div>
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-[10px] text-slate-500 uppercase font-bold">Kısıtlama</span>
+                                                <span className={`text-[11px] font-black italic ${user.isRestricted ? 'text-red-500' : 'text-emerald-500'}`}>{user.isRestricted ? 'KISITLI' : 'YOK'}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="bg-slate-950/50 border border-white/5 p-8 rounded-[32px] space-y-4">
+                                        <p className="text-[9px] font-black text-slate-700 uppercase tracking-widest italic">Varlık Özeti</p>
+                                        <div className="space-y-3">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-[10px] text-slate-500 uppercase font-bold">Toplam Kanal</span>
+                                                <span className="text-[11px] text-white font-black italic">{channels.length}</span>
+                                            </div>
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-[10px] text-slate-500 uppercase font-bold">Sahip Olunan Bot</span>
+                                                <span className="text-[11px] text-white font-black italic">{bots.length}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'channels' && (
+                                <div className="space-y-4">
+                                    {channels.length === 0 ? (
+                                        <div className="py-20 text-center bg-slate-950/30 rounded-[32px] border-2 border-dashed border-slate-900">
+                                            <Radio size={40} className="mx-auto text-slate-800 mb-4" />
+                                            <p className="text-slate-600 text-[10px] font-black uppercase tracking-widest">Henüz kanal eklenmemiş</p>
+                                        </div>
+                                    ) : (
+                                        channels.map(channel => (
+                                            <div key={channel.id} className="bg-slate-950/50 border border-white/5 p-6 rounded-[28px] flex items-center justify-between group hover:border-white/10 transition-all">
+                                                <div className="flex items-center gap-5">
+                                                    <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-blue-500 shadow-inner">
+                                                        <Radio size={20} />
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="text-sm font-black text-white uppercase italic tracking-tight">{channel.name}</h4>
+                                                        <div className="flex items-center gap-3 mt-1">
+                                                            <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest italic">ID: {channel.telegram_id}</span>
+                                                            <div className="w-1 h-1 bg-slate-800 rounded-full"></div>
+                                                            <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest italic">{channel.memberCount.toLocaleString()} ÜYE</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-4">
+                                                    <div className={`px-3 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest ${channel.revenueEnabled ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'bg-slate-800 text-slate-500 border border-white/5'}`}>
+                                                        {channel.revenueEnabled ? 'GELİR AKTİF' : 'GELİR PASİF'}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            )}
+
+                            {activeTab === 'bots' && (
+                                <div className="space-y-4">
+                                    {bots.length === 0 ? (
+                                        <div className="py-20 text-center bg-slate-950/30 rounded-[32px] border-2 border-dashed border-slate-900">
+                                            <Bot size={40} className="mx-auto text-slate-800 mb-4" />
+                                            <p className="text-slate-600 text-[10px] font-black uppercase tracking-widest">Henüz bot edinilmemiş</p>
+                                        </div>
+                                    ) : (
+                                        bots.map(bot => (
+                                            <div key={bot.id} className="bg-slate-950/50 border border-white/5 p-6 rounded-[28px] flex flex-col lg:flex-row lg:items-center justify-between gap-6 group hover:border-white/10 transition-all">
+                                                <div className="flex items-center gap-5">
+                                                    <img src={bot.icon || getLiveBotIcon(bot.bot_link)} className="w-14 h-14 rounded-2xl object-cover border border-white/5 shadow-xl" />
+                                                    <div>
+                                                        <h4 className="text-sm font-black text-white uppercase italic tracking-tight">{bot.name}</h4>
+                                                        <div className="flex items-center gap-3 mt-1">
+                                                            <span className={`text-[8px] font-black px-2 py-0.5 rounded bg-white/5 border border-white/5 uppercase tracking-widest ${bot.is_premium ? 'text-blue-500' : 'text-slate-500'}`}>
+                                                                {bot.is_premium ? 'PREMIUM' : 'STANDART'}
+                                                            </span>
+                                                            <div className="w-1 h-1 bg-slate-800 rounded-full"></div>
+                                                            <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest italic">SKT: {bot.expiryDate ? new Date(bot.expiryDate).toLocaleDateString() : 'SÜRESİZ'}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <button 
+                                                        onClick={() => toggleBotStatus(bot)}
+                                                        className={`h-10 px-4 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all border ${bot.isActive ? 'bg-emerald-600/10 border-emerald-500/20 text-emerald-500' : 'bg-slate-800 border-white/5 text-slate-500'}`}
+                                                    >
+                                                        {bot.isActive ? 'DURDUR' : 'BAŞLAT'}
+                                                    </button>
+                                                    <button 
+                                                        onClick={() => toggleBotPremium(bot)}
+                                                        className={`h-10 px-4 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all border ${bot.is_premium ? 'bg-blue-600/10 border-blue-500/20 text-blue-500' : 'bg-slate-800 border-white/5 text-slate-500'}`}
+                                                    >
+                                                        PREMIUM
+                                                    </button>
+                                                    <button 
+                                                        onClick={() => removeBot(bot)}
+                                                        className="h-10 w-10 flex items-center justify-center bg-red-600/10 border border-red-500/20 text-red-500 rounded-xl hover:bg-red-600 hover:text-white transition-all"
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const UserManagement = () => {
     const [users, setUsers] = useState<User[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
     const load = useCallback(async () => {
         setIsLoading(true);
@@ -462,7 +698,12 @@ const UserManagement = () => {
                                         </div>
                                     </td>
                                     <td className="px-10 py-8 text-right">
-                                        <button onClick={async () => { const nextStatus = u.status === 'Active' ? 'Passive' : 'Active'; await DatabaseService.updateUserStatus(u.id, nextStatus); await DatabaseService.logActivity('admin', 'security', 'user_status_changed', 'Kullanıcı Statüsü Değişti', `@${u.username} kullanıcısının durumu ${nextStatus} olarak güncellendi.`); load(); }} className="px-6 py-3 bg-white/5 rounded-xl text-[9px] font-black uppercase hover:bg-white/10 transition-all tracking-widest">GÜNCELLE</button>
+                                        <button 
+                                            onClick={() => setSelectedUser(u)}
+                                            className="px-6 py-3 bg-white/5 rounded-xl text-[9px] font-black uppercase hover:bg-white/10 transition-all tracking-widest"
+                                        >
+                                            YÖNET
+                                        </button>
                                     </td>
                                 </tr>
                             ))}
@@ -470,6 +711,14 @@ const UserManagement = () => {
                     </table>
                 </div>
             </div>
+
+            {selectedUser && (
+                <UserDetailModal 
+                    user={selectedUser} 
+                    onClose={() => setSelectedUser(null)} 
+                    onUpdate={load} 
+                />
+            )}
         </div>
     );
 };
