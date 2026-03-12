@@ -562,6 +562,23 @@ const AnnouncementCenter = () => {
         setActiveTab('info');
     };
 
+    const handleSave = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            const payload = { ...editingAnn };
+            if (!payload.id || payload.id === '') {
+                delete payload.id;
+            }
+            await DatabaseService.saveAnnouncement(payload);
+            setIsModalOpen(false);
+            load();
+            alert('Duyuru başarıyla kaydedildi.');
+        } catch (err: any) {
+            console.error("Save Announcement Error:", err);
+            alert(`Hata: ${err.message || 'Duyuru kaydedilemedi.'}`);
+        }
+    };
+
     const previewColors: Record<string, string> = {
         purple: 'from-[#6366f1] to-[#a855f7]',
         blue: 'from-[#3b82f6] to-[#60a5fa]',
@@ -653,7 +670,7 @@ const AnnouncementCenter = () => {
                             </div>
 
                             <div className="flex-1 overflow-y-auto p-8 lg:p-12 space-y-8 no-scrollbar pb-32 lg:pb-12">
-                                <form onSubmit={async (e) => { e.preventDefault(); await DatabaseService.saveAnnouncement(editingAnn); setIsModalOpen(false); load(); }} className="space-y-8">
+                                <form onSubmit={handleSave} className="space-y-8">
                                     
                                     {activeTab === 'info' && (
                                         <div className="space-y-8 animate-in slide-in-from-left-4">
