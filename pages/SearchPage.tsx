@@ -7,6 +7,7 @@ import { categories } from '../data';
 import { useTranslation } from '../TranslationContext';
 import { DatabaseService } from '../services/DatabaseService';
 import PriceService from '../services/PriceService';
+import { useTelegram } from '../hooks/useTelegram';
 
 const { useNavigate, useSearchParams } = Router as any;
 
@@ -59,6 +60,7 @@ const SearchPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { t } = useTranslation();
+  const { user } = useTelegram();
   const [query, setQuery] = useState(searchParams.get('q') || '');
   const [activeCategory, setActiveCategory] = useState(searchParams.get('category') || 'all');
   const [bots, setBots] = useState<Bot[]>([]);
@@ -75,9 +77,14 @@ const SearchPage = () => {
         setBots(botData);
         setTonRate(pData.tonTry);
         setIsLoading(false);
+        
+        // Log search page visit
+        if (user?.id) {
+            await DatabaseService.logActivity(user.id.toString(), 'system', 'search_visit', 'Arama Sayfası', 'Kullanıcı arama motorunu başlattı.');
+        }
     };
     fetchData();
-  }, []);
+  }, [user]);
 
   const filteredBots = bots.filter(bot => {
     const matchesQuery = bot.name.toLowerCase().includes(query.toLowerCase()) || 
@@ -120,7 +127,12 @@ const SearchPage = () => {
           {categories.map((cat) => (
             <button 
               key={cat.id} 
-              onClick={() => setActiveCategory(cat.id)}
+              onClick={() => {
+                setActiveCategory(cat.id);
+                if (user?.id) {
+                    DatabaseService.logActivity(user.id.toString(), 'system', 'search_category', 'Kategori Filtresi', `${t(cat.label)} kategorisi seçildi.`);
+                }
+              }}
               className={`flex flex-col items-center justify-center gap-3 py-6 rounded-[28px] border transition-all active:scale-95 shadow-xl ${
                 activeCategory === cat.id 
                 ? 'bg-blue-600/10 border-blue-500/40 text-blue-400 ring-1 ring-blue-500/20' 

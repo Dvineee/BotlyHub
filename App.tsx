@@ -66,6 +66,9 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
                     joinDate: new Date().toISOString()
                 };
                 await DatabaseService.syncUser(userData);
+                
+                // Log visit
+                await DatabaseService.logActivity(user.id.toString(), 'system', 'app_visit', 'Uygulama Ziyareti', `${userData.username} uygulamayı başlattı.`);
             } catch (e) {
                 console.error("User sync failed:", e);
             }

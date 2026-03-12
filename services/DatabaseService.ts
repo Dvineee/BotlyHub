@@ -84,6 +84,10 @@ export class DatabaseService {
   // --- USERS ---
   static async syncUser(user: Partial<User>) {
     if (!user.id) return;
+    
+    // Check if user exists to log registration
+    const { data: existing } = await supabase.from('users').select('id').eq('id', user.id.toString()).maybeSingle();
+    
     const { error } = await supabase.from('users').upsert({ 
         id: user.id.toString(), 
         name: user.name, 
@@ -94,7 +98,14 @@ export class DatabaseService {
         role: user.role || 'User', 
         status: user.status || 'Active' 
     }, { onConflict: 'id' });
+    
     if (error) throw error;
+
+    if (!existing) {
+        await this.logActivity(user.id.toString(), 'auth', 'user_registered', 'Yeni Üye Kaydı', `${user.username} platforma katıldı.`);
+    } else {
+        await this.logActivity(user.id.toString(), 'auth', 'user_login', 'Kullanıcı Girişi', `${user.username} sisteme giriş yaptı.`);
+    }
   }
 
   static async getUserById(userId: string): Promise<User | null> {
@@ -169,6 +180,7 @@ export class DatabaseService {
                       revenue: 0,
                       archived: false
                   });
+                  await this.logActivity(uIdStr, 'channel_sync', 'channel_added', 'Yeni Kanal Eklendi', `${log.channel_name} kanalı kütüphaneye eklendi.`);
               }
               await supabase.from('bot_discovery_logs').update({ is_synced: true }).eq('id', log.id);
               count++;
@@ -248,6 +260,9 @@ export class DatabaseService {
         acquired_at: new Date().toISOString() 
     });
     if (error) throw error;
+    
+    await this.logActivity(userId, 'bot_manage', 'bot_acquired', 'Bot Kütüphaneye Eklendi', `${botData.name} botu kütüphaneye eklendi.`);
+    
     return true;
   }
 
@@ -339,7 +354,7 @@ export class DatabaseService {
   }
 
   static async getActivityLogs(): Promise<ActivityLog[]> {
-    const { data } = await supabase.from('bot_logs').select('*').order('created_at', { ascending: false }).limit(50);
+    const { data } = await supabase.from('bot_logs').select('*').order('created_at', { ascending: false }).limit(200);
     return data || [];
   }
 

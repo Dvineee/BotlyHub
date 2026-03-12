@@ -67,11 +67,12 @@ const AdminDashboard = () => {
             </div>
           </div>
           
-          <nav className="flex-1 space-y-2 overflow-y-auto no-scrollbar">
+            <nav className="flex-1 space-y-2 overflow-y-auto no-scrollbar">
             <NavItem to="/a/dashboard" icon={LayoutDashboard} label="Dashboard" />
             <div className="pt-8 pb-3 px-6"><span className="text-[9px] font-black text-slate-800 uppercase tracking-widest italic">İzleme</span></div>
             <NavItem to="/a/dashboard/users" icon={Users} label="Kullanıcılar" />
-            <NavItem to="/a/dashboard/logs" icon={History} label="Aktiviteler" />
+            <NavItem to="/a/dashboard/admin-logs" icon={ShieldCheck} label="Admin Logları" />
+            <NavItem to="/a/dashboard/user-logs" icon={History} label="Üye Hareketleri" />
             <NavItem to="/a/dashboard/sales" icon={Wallet} label="Satışlar" />
             
             <div className="pt-8 pb-3 px-6"><span className="text-[9px] font-black text-slate-800 uppercase tracking-widest italic">İçerik</span></div>
@@ -107,7 +108,8 @@ const AdminDashboard = () => {
             <Routes>
               <Route path="/" element={<HomeView />} />
               <Route path="users" element={<UserManagement />} />
-              <Route path="logs" element={<ActivityCenter />} />
+              <Route path="admin-logs" element={<ActivityCenter filterType="admin" />} />
+              <Route path="user-logs" element={<ActivityCenter filterType="user" />} />
               <Route path="bots" element={<BotManagement />} />
               <Route path="sales" element={<SalesManagement />} />
               <Route path="promotions" element={<PromotionManagement />} />
@@ -472,25 +474,131 @@ const UserManagement = () => {
     );
 };
 
-const ActivityCenter = () => {
+const ActivityCenter = ({ filterType }: { filterType: 'admin' | 'user' }) => {
     const [logs, setLogs] = useState<ActivityLog[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    useEffect(() => { DatabaseService.getActivityLogs().then(data => { setLogs(data); setIsLoading(false); }); }, []);
-    const typeColors: any = { payment: 'text-emerald-500', bot_manage: 'text-blue-500', security: 'text-red-500', system: 'text-slate-500' };
+    const [searchQuery, setSearchQuery] = useState('');
+    const [activeTypeFilter, setActiveTypeFilter] = useState<string>('all');
+
+    useEffect(() => { 
+        setIsLoading(true);
+        DatabaseService.getActivityLogs().then(data => { 
+            setLogs(data); 
+            setIsLoading(false); 
+        }); 
+    }, [filterType]);
+
+    const typeColors: any = { 
+        payment: 'text-emerald-500', 
+        bot_manage: 'text-blue-500', 
+        security: 'text-red-500', 
+        system: 'text-slate-500',
+        auth: 'text-purple-500',
+        channel_sync: 'text-orange-500'
+    };
+
+    const filteredLogs = logs.filter(log => {
+        // First filter by Admin vs User
+        const isAdminLog = log.user_id === 'admin';
+        if (filterType === 'admin' && !isAdminLog) return false;
+        if (filterType === 'user' && isAdminLog) return false;
+
+        // Then filter by search query (User ID or Action Key or Title)
+        const matchesSearch = 
+            log.user_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            log.action_key.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            log.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            log.description.toLowerCase().includes(searchQuery.toLowerCase());
+        
+        if (!matchesSearch) return false;
+
+        // Then filter by type
+        if (activeTypeFilter !== 'all' && log.type !== activeTypeFilter) return false;
+
+        return true;
+    });
+
+    const types = ['all', ...Array.from(new Set(logs.map(l => l.type)))];
+
     return (
         <div className="space-y-10 animate-in fade-in">
-            <h2 className="text-3xl font-black text-white italic uppercase tracking-tighter leading-none">Global <span className="text-blue-500">Activity</span></h2>
-            {isLoading ? <div className="flex justify-center py-24"><Loader2 className="animate-spin text-blue-500" /></div> : (
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div>
+                    <h2 className="text-3xl font-black text-white italic uppercase tracking-tighter leading-none">
+                        {filterType === 'admin' ? 'Admin' : 'Üye'} <span className="text-blue-500">Logları</span>
+                    </h2>
+                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em] mt-2 italic">
+                        {filterType === 'admin' ? 'Yönetici işlemlerini takip edin' : 'Kullanıcı hareketlerini detaylıca izleyin'}
+                    </p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="relative group">
+                        <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-700 group-focus-within:text-blue-500 transition-colors" size={18} />
+                        <input 
+                            type="text"
+                            placeholder="KULLANICI ID VEYA İŞLEM ARA..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full sm:w-80 h-14 bg-slate-950 border border-white/5 rounded-[22px] pl-14 pr-8 text-[11px] font-black text-white outline-none focus:border-blue-500 transition-all uppercase italic shadow-inner"
+                        />
+                    </div>
+                    
+                    <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 sm:pb-0">
+                        {types.map(t => (
+                            <button
+                                key={t}
+                                onClick={() => setActiveTypeFilter(t)}
+                                className={`px-6 h-14 rounded-[22px] text-[9px] font-black uppercase tracking-widest transition-all whitespace-nowrap border ${
+                                    activeTypeFilter === t 
+                                    ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-600/20' 
+                                    : 'bg-slate-900/40 border-white/5 text-slate-500 hover:border-white/10'
+                                }`}
+                            >
+                                {t === 'all' ? 'HEPSİ' : t.replace('_', ' ')}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {isLoading ? (
+                <div className="flex flex-col items-center justify-center py-32 gap-4">
+                    <Loader2 className="animate-spin text-blue-500" size={40} />
+                    <span className="text-[10px] font-black text-slate-800 uppercase tracking-widest italic">Loglar Yükleniyor...</span>
+                </div>
+            ) : filteredLogs.length === 0 ? (
+                <div className="py-32 text-center bg-slate-900/20 rounded-[44px] border-2 border-dashed border-slate-900">
+                    <History size={48} className="mx-auto text-slate-800 mb-4" />
+                    <p className="text-slate-500 text-sm font-bold uppercase tracking-widest">Sonuç Bulunamadı</p>
+                    <p className="text-[10px] text-slate-700 mt-2 italic font-medium">Arama kriterlerinizi değiştirmeyi deneyin.</p>
+                </div>
+            ) : (
                 <div className="space-y-4">
-                    {logs.map(log => (
-                        <div key={log.id} className="bg-slate-900/40 border border-white/5 p-6 lg:p-8 rounded-[32px] lg:rounded-[40px] flex items-center gap-6 group hover:border-white/10 transition-all">
-                            <div className={`w-12 h-12 shrink-0 bg-white/5 rounded-2xl flex items-center justify-center ${typeColors[log.type] || 'text-white'}`}><Activity size={20} /></div>
+                    {filteredLogs.map(log => (
+                        <div key={log.id} className="bg-slate-900/40 border border-white/5 p-6 lg:p-8 rounded-[32px] lg:rounded-[40px] flex items-center gap-6 group hover:border-white/10 transition-all relative overflow-hidden">
+                            <div className={`w-12 h-12 shrink-0 bg-white/5 rounded-2xl flex items-center justify-center ${typeColors[log.type] || 'text-white'} shadow-inner`}><Activity size={20} /></div>
                             <div className="flex-1 min-w-0">
-                                <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-1">
-                                    <h4 className="font-black text-white italic text-sm lg:text-base uppercase truncate">{log.title}</h4>
-                                    <span className="text-[8px] lg:text-[10px] font-black text-slate-700 uppercase tracking-widest">{new Date(log.created_at).toLocaleString()}</span>
+                                <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-1 gap-2">
+                                    <div className="flex items-center gap-3">
+                                        <h4 className="font-black text-white italic text-sm lg:text-base uppercase truncate">{log.title}</h4>
+                                        <span className={`text-[8px] font-black px-2 py-0.5 rounded bg-white/5 border border-white/5 ${typeColors[log.type] || 'text-slate-500'} uppercase tracking-widest`}>{log.type}</span>
+                                    </div>
+                                    <span className="text-[8px] lg:text-[10px] font-black text-slate-700 uppercase tracking-widest flex items-center gap-2">
+                                        <Clock size={10} /> {new Date(log.created_at).toLocaleString()}
+                                    </span>
                                 </div>
-                                <p className="text-slate-500 text-[10px] font-bold uppercase italic truncate opacity-80">{log.description}</p>
+                                <p className="text-slate-500 text-[10px] font-bold uppercase italic truncate opacity-80 mb-2">{log.description}</p>
+                                <div className="flex items-center gap-4">
+                                    <div className="flex items-center gap-1.5">
+                                        <Users size={10} className="text-slate-700" />
+                                        <span className="text-[9px] font-black text-slate-600 uppercase tracking-tighter">ID: {log.user_id}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5">
+                                        <Zap size={10} className="text-slate-700" />
+                                        <span className="text-[9px] font-black text-slate-600 uppercase tracking-tighter">KEY: {log.action_key}</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     ))}

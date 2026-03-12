@@ -49,6 +49,11 @@ const BotDetail = () => {
         if (user?.id) {
             const owned = await DatabaseService.isBotOwnedByUser(user.id.toString(), id);
             setIsOwned(owned);
+            
+            // Log bot view
+            if (data) {
+                await DatabaseService.logActivity(user.id.toString(), 'system', 'bot_view', 'Bot İnceleme', `${data.name} botu detayları görüntülendi.`);
+            }
         }
     } catch (e) { console.error(e); }
     finally { setIsLoading(false); }

@@ -89,6 +89,9 @@ const MyChannels = () => {
   const handleManualRefresh = async () => {
       setIsSyncing(true);
       haptic('medium');
+      if (user?.id) {
+          await DatabaseService.logActivity(user.id.toString(), 'channel_sync', 'manual_refresh', 'Manuel Yenileme', 'Kanal listesi manuel olarak yenilendi.');
+      }
       await triggerSync();
       setIsSyncing(false);
   };
