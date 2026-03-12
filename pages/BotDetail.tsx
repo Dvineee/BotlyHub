@@ -4,8 +4,10 @@ import {
   ChevronLeft, Share2, Send, Loader2, ShieldCheck, 
   Bot as BotIcon, Zap, Shield, PlusCircle, X, 
   Maximize2, ChevronRight, Eye, Lock, Unlock, AlertTriangle, 
-  Sparkles, Star, Download, Info, CheckCircle2, Globe, Cpu
+  Sparkles, Star, Download, Info, CheckCircle2, Globe, Cpu,
+  Play, UserPlus, MessageSquare, BarChart3, MousePointer2
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import * as Router from 'react-router-dom';
 import { Bot, Channel, User } from '../types';
 import { useTelegram } from '../hooks/useTelegram';
@@ -34,6 +36,7 @@ const BotDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
   const [tonRate, setTonRate] = useState(250);
+  const [showGuide, setShowGuide] = useState(false);
   
   useEffect(() => {
     fetchBotData();
@@ -106,6 +109,7 @@ const BotDetail = () => {
 
               setIsOwned(true);
               notification('success');
+              setTimeout(() => setShowGuide(true), 500);
           } catch (e: any) {
               console.error("Action failed:", e);
               alert("İşlem başarısız: " + (e.message || "Lütfen tekrar deneyin."));
@@ -263,6 +267,83 @@ const BotDetail = () => {
               </button>
           </div>
       </div>
+
+      {/* Onboarding Guide Modal */}
+      <AnimatePresence>
+        {showGuide && (
+          <div className="fixed inset-0 z-[300] flex items-center justify-center p-6">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowGuide(false)}
+              className="absolute inset-0 bg-[#020617]/95 backdrop-blur-xl"
+            />
+            
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-sm bg-slate-900 border border-white/10 rounded-[44px] overflow-hidden shadow-2xl"
+            >
+              <div className="p-8 lg:p-10">
+                <div className="flex justify-between items-center mb-8">
+                  <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-2xl shadow-blue-600/20">
+                    <Sparkles className="text-white" size={24} />
+                  </div>
+                  <button onClick={() => setShowGuide(false)} className="p-2 text-slate-500 hover:text-white transition-colors">
+                    <X size={24} />
+                  </button>
+                </div>
+
+                <h2 className="text-2xl font-black text-white italic uppercase tracking-tighter leading-none mb-3">
+                  Tebrikler! <br/> <span className="text-blue-500">Botunuz Hazır</span>
+                </h2>
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-10 italic">
+                  Botu kullanmaya başlamak için şu adımları izleyin:
+                </p>
+
+                <div className="space-y-6 mb-10">
+                  {[
+                    { icon: Play, title: 'Botu Başlat', desc: 'Aşağıdaki butona basarak Telegram\'a gidin ve /start komutunu verin.' },
+                    { icon: UserPlus, title: 'Kanala Ekle', desc: 'Botu yönetmek istediğiniz kanalınıza "Yönetici" olarak ekleyin.' },
+                    { icon: MessageSquare, title: 'İlk Sinyal', desc: 'Botun yönetim panelinden veya komutlarından ilk paylaşımınızı tetikleyin.' },
+                    { icon: BarChart3, title: 'Kazanç İzle', desc: 'BotlyHub ana sayfasından kanal gelirlerinizi anlık takip edin.' }
+                  ].map((step, i) => (
+                    <div key={i} className="flex gap-5 group">
+                      <div className="w-10 h-10 shrink-0 bg-white/5 rounded-xl flex items-center justify-center text-blue-500 border border-white/5 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
+                        <step.icon size={18} />
+                      </div>
+                      <div>
+                        <h4 className="text-[11px] font-black text-white uppercase tracking-widest mb-1 italic">{i+1}. {step.title}</h4>
+                        <p className="text-[9px] text-slate-500 font-bold uppercase leading-relaxed italic">{step.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="space-y-3">
+                  <button 
+                    onClick={() => {
+                      setShowGuide(false);
+                      handleAction();
+                    }}
+                    className="w-full py-5 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-[24px] text-[10px] uppercase tracking-[0.4em] shadow-2xl shadow-blue-900/40 transition-all active:scale-95 flex items-center justify-center gap-3"
+                  >
+                    <Send size={16} /> ŞİMDİ BAŞLAT
+                  </button>
+                  <button 
+                    onClick={() => setShowGuide(false)}
+                    className="w-full py-4 text-slate-600 font-black text-[9px] uppercase tracking-widest hover:text-slate-400 transition-colors"
+                  >
+                    DAHA SONRA
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
