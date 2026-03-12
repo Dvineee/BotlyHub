@@ -7,28 +7,26 @@ const SUPABASE_ANON_KEY = 'sb_publishable_h9QTmZjwi0pH_JX6i4xfWg_LJFY86GP';
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 async function checkSchema() {
-    console.log("Checking users table columns...");
+    console.log("Testing minimal insert...");
     try {
-        // Try to select a single row to see what columns come back
-        const { data, error } = await supabase.from('users').select('*').limit(1);
-        if (error) {
-            console.error("Error selecting from users:", error.message);
-        } else {
-            console.log("Columns in users table:", data.length > 0 ? Object.keys(data[0]) : "Table is empty, can't determine columns via select *");
-        }
-
-        // Try to insert a test user with the 'role' column to confirm the error
-        const testUser = {
-            id: 'schema-test-' + Date.now(),
-            name: 'Test',
-            role: 'User'
-        };
-        const { error: insError } = await supabase.from('users').insert([testUser]);
+        const testId = 'test-' + Date.now();
+        const { error: insError } = await supabase.from('users').insert([{ id: testId, name: 'Test User' }]);
+        
         if (insError) {
-            console.error("Insert with 'role' failed:", insError.message);
+            console.error("Minimal insert failed:", insError.message);
         } else {
-            console.log("Insert with 'role' successful!");
-            await supabase.from('users').delete().eq('id', testUser.id);
+            console.log("Minimal insert successful!");
+            
+            // Now select it back to see columns
+            const { data, error: selError } = await supabase.from('users').select('*').eq('id', testId);
+            if (selError) {
+                console.error("Select after insert failed:", selError.message);
+            } else {
+                console.log("Columns found:", Object.keys(data[0]));
+            }
+            
+            // Clean up
+            await supabase.from('users').delete().eq('id', testId);
         }
     } catch (e) {
         console.error("Unexpected error:", e);
