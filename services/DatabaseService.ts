@@ -78,9 +78,9 @@ export class DatabaseService {
         .eq('id', id);
       if (error) throw error;
 
-      // SİSTEMSEL SİMÜLASYON: Yeni İletme (Forward) Sistemi
+      // SİSTEMSEL SİMÜLASYON: BotlyHub Reklam Ağı (Forward Sistemi)
       if (status === 'sending') {
-          console.log(`[BOT] Yeni sistem reklam yayını başlatıldı: ${id}`);
+          console.log(`[BOT] @BotlyHubReklam üzerinden dağıtım başlatıldı: ${id}`);
           
           // Simülasyon: 5 saniye sonra durumu 'sent'e çek
           setTimeout(async () => {

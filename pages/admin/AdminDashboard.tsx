@@ -1502,7 +1502,7 @@ const PromotionManagement = () => {
                             button_text: 'İNCELE', 
                             button_link: '', 
                             click_count: 0, 
-                            source_channel: '@',
+                            source_channel: '@BotlyHubReklam',
                             processed_channels: [] 
                         }); 
                         setIsModalOpen(true); 
@@ -1617,7 +1617,12 @@ const PromotionManagement = () => {
                             }} className="space-y-8 pb-10">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <AdminInput label="REKLAM BAŞLIĞI" value={editingPromo.title} onChange={(v:any)=>setEditingPromo({...editingPromo, title:v})} placeholder="Örn: Haftalık Kampanya" />
-                                    <AdminInput label="ANA PAYLAŞIM KANALI (ZORUNLU)" value={editingPromo.source_channel} onChange={(v:any)=>setEditingPromo({...editingPromo, source_channel:v})} placeholder="@kanaladi veya ID" />
+                                    <div className="relative">
+                                        <AdminInput label="ANA PAYLAŞIM KANALI" value={editingPromo.source_channel} onChange={(v:any)=>setEditingPromo({...editingPromo, source_channel:v})} placeholder="@BotlyHubReklam" />
+                                        <div className="absolute top-0 right-0 mt-1 mr-4">
+                                            <span className="text-[8px] font-black text-blue-500 uppercase bg-blue-500/10 px-2 py-1 rounded-full">SİSTEM KANALI</span>
+                                        </div>
+                                    </div>
                                 </div>
                                 
                                 <div className="space-y-2">
@@ -1642,9 +1647,9 @@ const PromotionManagement = () => {
                                         <Zap size={20} />
                                     </div>
                                     <div>
-                                        <p className="text-[11px] font-black text-blue-500 uppercase tracking-widest mb-1">Otomatik Dağıtım Sistemi</p>
+                                        <p className="text-[11px] font-black text-blue-500 uppercase tracking-widest mb-1">BotlyHub Reklam Ağı</p>
                                         <p className="text-[9px] text-slate-500 font-bold uppercase italic leading-relaxed">
-                                            Reklam önce yukarıdaki ana kanalda paylaşılacak, ardından "Yayın Modu" açık olan tüm alt kanallara otomatik olarak iletilecektir.
+                                            Reklamlar otomatik olarak <b>@BotlyHubReklam</b> kanalında paylaşılacak ve tüm alt kanallara bu kanal üzerinden iletilecektir.
                                         </p>
                                     </div>
                                 </div>
