@@ -97,9 +97,23 @@ async def update_views_loop():
                     try:
                         # source_channel @ ile başlıyorsa temizle
                         username = str(source_channel).replace("@", "")
-                        views, reacts = await get_telegram_stats(username, source_msg_id)
-                        total_views = views
-                        total_reactions = reacts
+                        
+                        # Eğer numeric ID ise (örn: -100...) username'i bot üzerinden çekmeye çalış (Scraping için username şart)
+                        if username.startswith("-"):
+                            try:
+                                chat = await bot.get_chat(source_channel)
+                                if chat.username:
+                                    username = chat.username
+                                else:
+                                    # Username yoksa scraping yapılamaz, 0 kalır
+                                    logger.warning(f"⚠️ Ana kanal ({source_channel}) username'e sahip değil, istatistik çekilemiyor.")
+                            except Exception as e:
+                                logger.error(f"❌ Kanal bilgisi alınamadı: {e}")
+
+                        if not username.startswith("-"):
+                            views, reacts = await get_telegram_stats(username, source_msg_id)
+                            total_views = views
+                            total_reactions = reacts
                     except Exception as e:
                         logger.error(f"❌ Ana kanal istatistik hatası: {e}")
 

@@ -80,7 +80,7 @@ export class DatabaseService {
 
       // SİSTEMSEL SİMÜLASYON: BotlyHub Reklam Ağı (Forward Sistemi)
       if (status === 'sending') {
-          console.log(`[BOT] @BotlyHubReklam üzerinden dağıtım başlatıldı: ${id}`);
+          console.log(`[BOT] -1003826684282 üzerinden dağıtım başlatıldı: ${id}`);
           
           // Simülasyon: 5 saniye sonra durumu 'sent'e çek
           setTimeout(async () => {
