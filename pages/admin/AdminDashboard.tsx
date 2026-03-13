@@ -8,7 +8,7 @@ import {
   CheckCircle2, AlertTriangle, TrendingUp, BarChart3, RadioIcon, Sparkles, UserPlus,
   ShieldCheck, Globe, Zap, Clock, ExternalLink, Filter, PieChart, Layers, 
   Settings as SettingsIcon, History, Copy, Check, Eye, ChevronRight, Monitor, Smartphone, Cpu,
-  Info, Star, MousePointer2, Link2, AlertCircle, Shield, Calendar, Hash
+  Info, Star, MousePointer2, Link2, AlertCircle, Shield, Calendar, Hash, Heart
 } from 'lucide-react';
 import { DatabaseService } from '../../services/DatabaseService';
 import { User, Bot as BotType, Announcement, Promotion, ActivityLog, Notification } from '../../types';
@@ -1541,6 +1541,14 @@ const PromotionManagement = () => {
                                     <div className="flex items-center gap-2">
                                         <TrendingUp size={14} className="text-blue-500" />
                                         <span className="text-[10px] font-black text-blue-500 uppercase">{p.total_reach?.toLocaleString() || 0} ERİŞİM</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Eye size={14} className="text-emerald-500" />
+                                        <span className="text-[10px] font-black text-emerald-500 uppercase">{p.total_views?.toLocaleString() || 0} GÖRÜNTÜLENME</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Heart size={14} className="text-rose-500" />
+                                        <span className="text-[10px] font-black text-rose-500 uppercase">{p.total_reactions?.toLocaleString() || 0} TEPKİ</span>
                                     </div>
                                     {p.source_channel && (
                                         <div className="flex items-center gap-2">
