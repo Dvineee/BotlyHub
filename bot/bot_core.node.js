@@ -91,10 +91,11 @@ async function adDispatcher() {
 
                 try {
                     // Sadece İLETME (Forward) yapıyoruz, eski direkt gönderim sistemi kaldırıldı.
+                    console.log(`[BOT] İletiliyor: ${promo.source_channel} (Msg: ${sourceMsgId}) -> ${channel.name} (${channel.telegram_id})`);
                     const sentMsg = await bot.telegram.forwardMessage(channel.telegram_id, promo.source_channel, sourceMsgId);
                     
                     if (sentMsg) {
-                        console.log(`[BOT] Mesaj iletildi -> ${channel.name}`);
+                        console.log(`[BOT] ✅ Başarıyla iletildi: ${channel.name}`);
                         processed.add(channel.telegram_id);
                         currentReach += Number(channel.member_count || 0);
 
