@@ -85,20 +85,35 @@ async def update_views_loop():
             
             promos = res.data or []
             for p in promos:
+                source_channel = p.get("source_channel")
+                source_msg_id = p.get("source_message_id")
                 message_map = p.get("message_map") or {}
-                if not message_map: continue
                 
                 total_views = 0
                 total_reactions = 0
-                for tg_id, msg_id in message_map.items():
+                
+                # ÖNCELİK: ANA KANAL (Merkezi İstatistik)
+                if source_channel and source_msg_id:
                     try:
-                        chat = await bot.get_chat(tg_id)
-                        if chat.username:
-                            views, reacts = await get_telegram_stats(chat.username, msg_id)
-                            total_views += views
-                            total_reactions += reacts
+                        # source_channel @ ile başlıyorsa temizle
+                        username = str(source_channel).replace("@", "")
+                        views, reacts = await get_telegram_stats(username, source_msg_id)
+                        total_views = views
+                        total_reactions = reacts
                     except Exception as e:
-                        pass
+                        logger.error(f"❌ Ana kanal istatistik hatası: {e}")
+
+                # EĞER ANA KANAL YOKSA VEYA 0 DÖNDÜYSE (Eski sistem veya fallback)
+                if total_views == 0 and message_map:
+                    for tg_id, msg_id in message_map.items():
+                        try:
+                            chat = await bot.get_chat(tg_id)
+                            if chat.username:
+                                views, reacts = await get_telegram_stats(chat.username, msg_id)
+                                total_views += views
+                                total_reactions += reacts
+                        except Exception:
+                            pass
                 
                 # Veritabanını güncelle
                 try:
@@ -140,170 +155,89 @@ async def ad_dispatcher_task():
                 await asyncio.sleep(20)
                 continue
 
-            logger.info(f"📢 {len(promos)} adet aktif reklam bulundu")
-
             # 2. Reklam alabilecek kanalları çek
-            all_channels_res = supabase.table("channels").select("*").execute()
-            all_channels = all_channels_res.data or []
-            
-            # Filtreleme detaylarını logla
-            revenue_enabled_count = len([c for c in all_channels if c.get("revenue_enabled")])
-            not_archived_count = len([c for c in all_channels if not c.get("archived")])
-            
-            channels = [c for c in all_channels if c.get("revenue_enabled") and not c.get("archived")]
-
-            logger.info(
-                f"📡 Kanal İstatistiği: Toplam={len(all_channels)} | "
-                f"Gelir Aktif={revenue_enabled_count} | "
-                f"Arşivlenmemiş={not_archived_count} | "
-                f"Yayınlanabilir={len(channels)}"
-            )
-
-            if not channels:
-                logger.warning("⚠️ Reklam var ama yayınlanacak kanal bulunamadı (Tüm kanallar pasif veya arşivlenmiş olabilir)")
-                await asyncio.sleep(30)
-                continue
+            channels = supabase.table("channels") \
+                .select("*") \
+                .eq("revenue_enabled", True) \
+                .eq("archived", False) \
+                .execute().data or []
 
             for promo in promos:
-                logger.info(f"🚀 Reklam başlatıldı | ID={promo['id']} | {promo['title']}")
-
+                source_channel = promo.get("source_channel")
+                source_msg_id = promo.get("source_message_id")
                 processed = set(promo.get("processed_channels") or [])
                 reach = int(promo.get("total_reach") or 0)
                 
-                # Bu reklam için bu döngüde yeni bir işlem yapıldı mı?
-                newly_processed_count = 0
+                # 1. ADIM: ANA KANALA PAYLAŞIM (ZORUNLU)
+                if source_channel and not source_msg_id:
+                    try:
+                        logger.info(f"📢 Ana kanala paylaşılıyor: {source_channel}")
+                        kb = InlineKeyboardBuilder()
+                        if promo.get("button_text") and promo.get("button_link"):
+                            kb.row(types.InlineKeyboardButton(text=promo["button_text"], url=promo["button_link"]))
 
+                        caption = f"<b>{promo['title']}</b>\n\n{promo['content']}"
+                        sent = None
+                        
+                        if promo.get("image_url"):
+                            sent = await bot.send_photo(chat_id=source_channel, photo=promo["image_url"], caption=caption, parse_mode="HTML", reply_markup=kb.as_markup())
+                        else:
+                            sent = await bot.send_message(chat_id=source_channel, text=caption, parse_mode="HTML", reply_markup=kb.as_markup())
+
+                        if sent:
+                            source_msg_id = sent.message_id
+                            supabase.table("promotions").update({"source_message_id": source_msg_id}).eq("id", promo["id"]).execute()
+                            logger.info(f"✅ Ana kanal paylaşımı başarılı. ID: {source_msg_id}")
+                    except Exception as e:
+                        logger.error(f"❌ Ana kanal paylaşım hatası ({source_channel}): {e}")
+                        continue # Ana kanala paylaşılamazsa ilerleyemeyiz
+
+                if not source_channel or not source_msg_id:
+                    logger.warning(f"⚠️ Reklam atlanıyor: Ana kanal veya Mesaj ID eksik ({promo['title']})")
+                    continue
+
+                # 2. ADIM: DİĞER KANALLARA İLETME (ZORUNLU)
+                newly_processed = 0
                 for ch in channels:
-                    tg_id = ch["telegram_id"]
-
-                    # 🔒 KANAL BOT KİLİDİ (Başka bir bot bu kanalı sahiplenmiş mi?)
-                    if ch.get("ad_bot_id") and ch["ad_bot_id"] != MARKETPLACE_BOT_ID:
-                        # logger.info(f"⛔ Kanal kilitli | Kanal {tg_id} | Yetkili Bot: {ch['ad_bot_id']}")
-                        continue
-
-                    # 🔐 KİLİT YOKSA BU BOT KİLİTLER
-                    if not ch.get("ad_bot_id"):
-                        try:
-                            supabase.table("channels").update({
-                                "ad_bot_id": MARKETPLACE_BOT_ID
-                            }).eq("id", ch["id"]).execute()
-                            logger.info(f"🔐 Kanal kilitlendi | Kanal {tg_id} | Bot {MARKETPLACE_BOT_ID}")
-                        except Exception as lock_err:
-                            logger.error(f"❌ Kilit hatası: {lock_err}")
-                            continue
-
-                    # Zaten gönderilmişse atla
-                    if tg_id in processed:
+                    tg_id = str(ch["telegram_id"])
+                    
+                    # Ana kanalın kendisine veya zaten işlenmişlere gönderme
+                    if tg_id == str(source_channel) or tg_id in processed:
                         continue
 
                     try:
-                        logger.info(f"➡️ Gönderiliyor | Reklam {promo['id']} → Kanal {tg_id}")
-
-                        kb = InlineKeyboardBuilder()
-                        if promo.get("button_text") and promo.get("button_link"):
-                            kb.row(types.InlineKeyboardButton(
-                                text=promo["button_text"],
-                                url=promo["button_link"]
-                            ))
-
-                        caption = f"<b>{promo['title']}</b>\n\n{promo['content']}"
-                        sent_msg = None
-
-                        try:
-                            if promo.get("image_url"):
-                                sent_msg = await bot.send_photo(
-                                    chat_id=tg_id,
-                                    photo=promo["image_url"],
-                                    caption=caption,
-                                    parse_mode="HTML",
-                                    reply_markup=kb.as_markup()
-                                )
-                            else:
-                                sent_msg = await bot.send_message(
-                                    chat_id=tg_id,
-                                    text=caption,
-                                    parse_mode="HTML",
-                                    reply_markup=kb.as_markup()
-                                )
-                        except Exception as photo_err:
-                            # Resim gönderme hatası (URL geçersiz vb.) durumunda metin olarak dene
-                            if promo.get("image_url"):
-                                logger.warning(f"⚠️ Resim gönderilemedi, metin olarak deneniyor: {photo_err}")
-                                sent_msg = await bot.send_message(
-                                    chat_id=tg_id,
-                                    text=f"{caption}\n\n<i>(Görsel yüklenemedi: {str(photo_err)[:50]}...)</i>",
-                                    parse_mode="HTML",
-                                    reply_markup=kb.as_markup()
-                                )
-                            else:
-                                raise photo_err
-
-                        processed.add(tg_id)
-                        reach += int(ch.get("member_count") or 0)
-                        newly_processed_count += 1
-                        
-                        # Mesaj ID'sini kaydet
-                        if "message_map" not in promo or promo["message_map"] is None:
-                            promo["message_map"] = {}
+                        # Sadece İLETME (Forward) yapıyoruz
+                        # aiogram: forward_message(chat_id, from_chat_id, message_id)
+                        sent_msg = await bot.forward_message(chat_id=tg_id, from_chat_id=source_channel, message_id=source_msg_id)
                         
                         if sent_msg:
-                            promo["message_map"][str(tg_id)] = sent_msg.message_id
-
-                        # Her başarılı gönderimde reklamı güncelle
-                        update_data = {
-                            "processed_channels": list(processed),
-                            "total_reach": reach,
-                            "channel_count": len(processed),
-                            "last_error": None
-                        }
-                        
-                        # message_map sütunu varsa ekle
-                        if promo.get("message_map"):
-                            update_data["message_map"] = promo["message_map"]
-
-                        try:
-                            supabase.table("promotions").update(update_data).eq("id", promo["id"]).execute()
-                        except Exception as db_err:
-                            # Eğer message_map hatası alırsak, onsuz tekrar dene
-                            if "message_map" in str(db_err):
-                                logger.warning("⚠️ 'message_map' sütunu bulunamadı, bu veri kaydedilmeyecek.")
-                                update_data.pop("message_map", None)
-                                supabase.table("promotions").update(update_data).eq("id", promo["id"]).execute()
-                            else:
-                                raise db_err
-
-                        logger.info(f"✅ Gönderildi | Kanal {tg_id}")
-                        await asyncio.sleep(0.5) # Rate limit koruması
-
-                    except Exception as e:
-                        err_msg = str(e).lower()
-                        logger.error(f"❌ Gönderim Hatası | Kanal {tg_id} | {e}")
-                        
-                        # Hatayı veritabanına işle (Kullanıcının görmesi için)
-                        try:
+                            processed.add(tg_id)
+                            reach += int(ch.get("member_count") or 0)
+                            newly_processed += 1
+                            
+                            # Mesaj haritasını güncelle (İstatistik takibi için)
+                            m_map = promo.get("message_map") or {}
+                            m_map[tg_id] = sent_msg.message_id
+                            
                             supabase.table("promotions").update({
-                                "last_error": f"Kanal {tg_id}: {str(e)}"
+                                "processed_channels": list(processed),
+                                "total_reach": reach,
+                                "channel_count": len(processed),
+                                "message_map": m_map
                             }).eq("id", promo["id"]).execute()
-                        except:
-                            pass
+                            
+                            logger.info(f"✅ İletildi -> {ch['name']}")
                         
-                        # Bot kanaldan atılmışsa veya kanal bulunamıyorsa pasife al
-                        if any(x in err_msg for x in ["kicked", "chat not found", "blocked", "forbidden"]):
-                            supabase.table("channels").update({
-                                "revenue_enabled": False,
-                                "ad_bot_id": None
-                            }).eq("id", ch["id"]).execute()
-                            logger.warning(f"🚫 Kanal pasife alındı: {tg_id}")
+                        await asyncio.sleep(0.5)
+                    except Exception as e:
+                        logger.error(f"❌ İletim Hatası ({ch['name']}): {e}")
+                        if any(x in str(e).lower() for x in ["kicked", "chat not found", "blocked"]):
+                            supabase.table("channels").update({"revenue_enabled": False}).eq("id", ch["id"]).execute()
 
-                # Eğer tüm kanallara gönderildiyse durumu 'sent' yap
-                if len(channels) > 0 and len(processed) >= len(channels):
-                    supabase.table("promotions").update({
-                        "status": "sent",
-                        "sent_at": UTCNOW()
-                    }).eq("id", promo["id"]).execute()
-                    logger.info(f"🏁 Reklam tamamlandı | ID={promo['id']} | Reach={reach}")
-                elif newly_processed_count == 0:
-                    logger.info(f"⏳ Reklam beklemede (Bu döngüde yeni kanal yok) | ID={promo['id']}")
+                # Bitiş kontrolü
+                if len(channels) > 0 and len(processed) >= (len(channels) - 1 if source_channel in [c["telegram_id"] for c in channels] else len(channels)):
+                    supabase.table("promotions").update({"status": "sent", "sent_at": UTCNOW()}).eq("id", promo["id"]).execute()
+                    logger.info(f"🏁 Reklam tamamlandı: {promo['title']}")
 
         except Exception:
             logger.exception("🔥 Dispatcher error")
