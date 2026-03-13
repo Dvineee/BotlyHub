@@ -249,44 +249,93 @@ export class DatabaseService {
 
   // --- USER BOTS ---
   static async getUserBots(userId: string): Promise<UserBot[]> {
-    const { data, error } = await supabase
-      .from('user_bots')
-      .select(`
-        *,
-        bot:bot_id (*)
-      `)
-      .eq('user_id', userId.toString());
-    
-    if (error) {
-        console.error("Error fetching user bots:", error);
+    try {
+      // Join yerine iki aşamalı sorgu yaparak ilişki hatalarını ekarte ediyoruz
+      const { data: userBots, error: ubError } = await supabase
+        .from('user_bots')
+        .select('*')
+        .eq('user_id', userId.toString());
+
+      if (ubError) {
+        console.error("UserBots Fetch Error:", ubError);
         return [];
+      }
+
+      if (!userBots || userBots.length === 0) return [];
+
+      const botIds = userBots.map(ub => ub.bot_id);
+      const { data: bots, error: bError } = await supabase
+        .from('bots')
+        .select('*')
+        .in('id', botIds);
+
+      if (bError) {
+        console.error("Bots Fetch Error for UserBots:", bError);
+        return [];
+      }
+
+      if (!bots) return [];
+
+      return userBots.map((ub: any) => {
+          const botData = bots.find(b => b.id === ub.bot_id);
+          if (!botData) return null;
+
+          return { 
+              ...botData, 
+              expiryDate: ub.expiry_date || ub.expiryDate, 
+              ownership_id: ub.id, 
+              is_premium: ub.is_premium, 
+              isActive: ub.is_active, 
+              revenueEnabled: false 
+          } as UserBot;
+      }).filter((b): b is UserBot => b !== null);
+    } catch (e) {
+      console.error("getUserBots Exception:", e);
+      return [];
     }
-
-    return (data || []).map((item: any) => {
-        const botData = Array.isArray(item.bot) ? item.bot[0] : item.bot;
-        if (!botData) return null;
-
-        return { 
-            ...botData, 
-            expiryDate: item.expiry_date || item.expiryDate, 
-            ownership_id: item.id, 
-            is_premium: item.is_premium, 
-            isActive: item.is_active, 
-            revenueEnabled: false 
-        } as UserBot;
-    }).filter((b): b is UserBot => b !== null && !!b.id);
   }
 
   static async addUserBot(userData: any, botData: Bot, isPremium: boolean = false) {
     const userId = (userData.id || userData).toString();
-    const { error } = await supabase.from('user_bots').upsert({ 
-        user_id: userId, 
-        bot_id: botData.id, 
-        is_active: true, 
-        is_premium: isPremium, 
-        acquired_at: new Date().toISOString() 
-    });
-    if (error) throw error;
+    
+    // Önce kullanıcının bu bota zaten sahip olup olmadığını kontrol et (Upsert yerine manuel kontrol daha güvenli olabilir)
+    const { data: existing } = await supabase
+        .from('user_bots')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('bot_id', botData.id)
+        .maybeSingle();
+
+    let error;
+    if (existing) {
+        // Zaten varsa güncelle
+        const { error: updateError } = await supabase
+            .from('user_bots')
+            .update({
+                is_active: true,
+                is_premium: isPremium,
+                acquired_at: new Date().toISOString()
+            })
+            .eq('id', existing.id);
+        error = updateError;
+    } else {
+        // Yoksa yeni ekle
+        const { error: insertError } = await supabase
+            .from('user_bots')
+            .insert({ 
+                user_id: userId, 
+                bot_id: botData.id, 
+                is_active: true, 
+                is_premium: isPremium, 
+                acquired_at: new Date().toISOString() 
+            });
+        error = insertError;
+    }
+
+    if (error) {
+        console.error("AddUserBot Error:", error);
+        throw error;
+    }
     
     await this.logActivity(userId, 'bot_manage', 'bot_acquired', 'Bot Kütüphaneye Eklendi', `${botData.name} botu kütüphaneye eklendi.`);
     
