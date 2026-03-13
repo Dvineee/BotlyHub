@@ -25,6 +25,7 @@ export class DatabaseService {
         click_count: Number(p.click_count || 0),
         total_reach: Number(p.total_reach || 0),
         channel_count: Number(p.channel_count || 0),
+        source_channel: p.source_channel || '',
         processed_channels: p.processed_channels || []
     }));
   }
@@ -47,7 +48,8 @@ export class DatabaseService {
         status: promo.status || 'pending',
         click_count: Number(promo.click_count || 0),
         total_reach: Number(promo.total_reach || 0),
-        channel_count: Number(promo.channel_count || 0)
+        channel_count: Number(promo.channel_count || 0),
+        source_channel: promo.source_channel || null
     };
 
     if (promo.id && promo.id !== '') {
@@ -73,6 +75,22 @@ export class DatabaseService {
         .update({ status: status })
         .eq('id', id);
       if (error) throw error;
+
+      // SİSTAMSEL SİMÜLASYON: Yayın başlatıldığında kanallara dağıtım simülasyonu
+      if (status === 'sending') {
+          console.log(`[BOT] Reklam yayını başlatıldı: ${id}`);
+          // 1. Ana kanala paylaşım (Simülasyon)
+          // 2. Yayın modu açık kanalları bul ve ilet (Simülasyon)
+          
+          // Gerçek sistemde burada bir Edge Function veya Backend tetiklenir.
+          setTimeout(async () => {
+              await supabase.from('promotions').update({ 
+                  status: 'sent', 
+                  sent_at: new Date().toISOString() 
+              }).eq('id', id);
+          }, 5000);
+      }
+
       return true;
   }
 

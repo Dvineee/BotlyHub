@@ -1493,7 +1493,18 @@ const PromotionManagement = () => {
                 </div>
                 <button 
                     onClick={() => { 
-                        setEditingPromo({ id: '', title: '', content: '', image_url: '', status: 'pending', button_text: 'İNCELE', button_link: '', click_count: 0, processed_channels: [] }); 
+                        setEditingPromo({ 
+                            id: '', 
+                            title: '', 
+                            content: '', 
+                            image_url: '', 
+                            status: 'pending', 
+                            button_text: 'İNCELE', 
+                            button_link: '', 
+                            click_count: 0, 
+                            source_channel: '@',
+                            processed_channels: [] 
+                        }); 
                         setIsModalOpen(true); 
                     }} 
                     className="w-full md:w-auto bg-emerald-600 hover:bg-emerald-500 px-10 py-5 rounded-[28px] text-[11px] font-black uppercase tracking-widest shadow-2xl active:scale-95 border-b-4 border-emerald-900 transition-all flex items-center gap-3"
@@ -1531,6 +1542,12 @@ const PromotionManagement = () => {
                                         <TrendingUp size={14} className="text-blue-500" />
                                         <span className="text-[10px] font-black text-blue-500 uppercase">{p.total_reach?.toLocaleString() || 0} ERİŞİM</span>
                                     </div>
+                                    {p.source_channel && (
+                                        <div className="flex items-center gap-2">
+                                            <Megaphone size={14} className="text-emerald-500" />
+                                            <span className="text-[10px] font-black text-emerald-500 uppercase">{p.source_channel}</span>
+                                        </div>
+                                    )}
                                     <div className="flex items-center gap-2">
                                         <MousePointer2 size={14} className="text-emerald-500" />
                                         <span className="text-[10px] font-black text-emerald-500 uppercase">{p.click_count || 0} TIKLAMA</span>
@@ -1591,7 +1608,10 @@ const PromotionManagement = () => {
                             </div>
 
                             <form onSubmit={handleSave} className="space-y-8 pb-10">
-                                <AdminInput label="REKLAM BAŞLIĞI" value={editingPromo.title} onChange={(v:any)=>setEditingPromo({...editingPromo, title:v})} placeholder="Örn: Haftalık Kampanya" />
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <AdminInput label="REKLAM BAŞLIĞI" value={editingPromo.title} onChange={(v:any)=>setEditingPromo({...editingPromo, title:v})} placeholder="Örn: Haftalık Kampanya" />
+                                    <AdminInput label="ANA PAYLAŞIM KANALI" value={editingPromo.source_channel} onChange={(v:any)=>setEditingPromo({...editingPromo, source_channel:v})} placeholder="@kanaladi veya ID" />
+                                </div>
                                 
                                 <div className="space-y-2">
                                     <label className="text-[9px] font-black text-slate-600 uppercase tracking-widest ml-4 italic">ANA MESAJ (HTML DESTEKLİ)</label>
@@ -1608,6 +1628,18 @@ const PromotionManagement = () => {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <AdminInput label="BUTON METNİ" value={editingPromo.button_text} onChange={(v:any)=>setEditingPromo({...editingPromo, button_text:v})} placeholder="İNCELE" />
                                     <AdminInput label="BUTON LİNKİ" value={editingPromo.button_link} onChange={(v:any)=>setEditingPromo({...editingPromo, button_link:v})} icon={Link2} placeholder="https://t.me/..." />
+                                </div>
+
+                                <div className="bg-blue-600/5 border border-blue-500/10 p-6 rounded-[32px] flex items-start gap-4">
+                                    <div className="p-3 bg-blue-600/10 rounded-2xl text-blue-500">
+                                        <Zap size={20} />
+                                    </div>
+                                    <div>
+                                        <p className="text-[11px] font-black text-blue-500 uppercase tracking-widest mb-1">Otomatik Dağıtım Sistemi</p>
+                                        <p className="text-[9px] text-slate-500 font-bold uppercase italic leading-relaxed">
+                                            Reklam önce yukarıdaki ana kanalda paylaşılacak, ardından "Yayın Modu" açık olan tüm alt kanallara otomatik olarak iletilecektir.
+                                        </p>
+                                    </div>
                                 </div>
 
                                 <button type="submit" className="w-full h-20 bg-blue-600 hover:bg-blue-500 rounded-[32px] font-black text-[12px] uppercase tracking-[0.4em] shadow-2xl border-b-8 border-blue-900 transition-all active:translate-y-1 active:border-b-4">KAMPANYAYI SİSTEME KAYDET</button>
