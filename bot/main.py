@@ -178,16 +178,6 @@ async def ad_dispatcher_task():
 
             for promo in promos:
                 source_channel = promo.get("source_channel")
-                
-                # AUTO-FIX: Eski kanal adını yeni ID ile değiştir
-                if source_channel == "@BotlyHubReklam":
-                    source_channel = "-1003826684282"
-                    try:
-                        supabase.table("promotions").update({"source_channel": source_channel}).eq("id", promo["id"]).execute()
-                        logger.info(f"🔄 Reklam {promo['id']} için kanal ID güncellendi: @BotlyHubReklam -> {source_channel}")
-                    except Exception as e:
-                        logger.error(f"❌ Kanal ID güncelleme hatası: {e}")
-
                 source_msg_id = promo.get("source_message_id")
                 processed = set(promo.get("processed_channels") or [])
                 reach = int(promo.get("total_reach") or 0)
