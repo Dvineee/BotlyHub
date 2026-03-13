@@ -303,16 +303,6 @@ export class DatabaseService {
     if (error) throw error;
   }
 
-  static async updateUserBot(ownershipId: string, updates: any) {
-    const { error } = await supabase.from('user_bots').update(updates).eq('id', ownershipId);
-    if (error) throw error;
-  }
-
-  static async removeUserBotById(ownershipId: string) {
-    const { error } = await supabase.from('user_bots').delete().eq('id', ownershipId);
-    if (error) throw error;
-  }
-
   // --- NOTIFICATIONS ---
   static async getNotifications(userId?: string): Promise<Notification[]> {
     const query = supabase.from('notifications').select('*').order('date', { ascending: false });
