@@ -50,6 +50,7 @@ export interface Promotion {
   channel_count: number;
   click_count: number; // Added engagement tracking
   source_channel?: string; // Ana paylaşımın yapılacağı kanal
+  source_message_id?: number; // Ana kanaldaki mesaj ID'si (iletme için)
   processed_channels?: string[]; 
   created_at: string;
   sent_at?: string;

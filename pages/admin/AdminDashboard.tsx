@@ -1607,10 +1607,17 @@ const PromotionManagement = () => {
                                 <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">Yayınlanacak reklamın içeriğini tasarlayın</p>
                             </div>
 
-                            <form onSubmit={handleSave} className="space-y-8 pb-10">
+                            <form onSubmit={(e) => {
+                                if (!editingPromo.source_channel || editingPromo.source_channel === '@' || editingPromo.source_channel.length < 3) {
+                                    e.preventDefault();
+                                    alert('Lütfen geçerli bir ana paylaşım kanalı giriniz (Örn: @kanaladi)');
+                                    return;
+                                }
+                                handleSave(e);
+                            }} className="space-y-8 pb-10">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <AdminInput label="REKLAM BAŞLIĞI" value={editingPromo.title} onChange={(v:any)=>setEditingPromo({...editingPromo, title:v})} placeholder="Örn: Haftalık Kampanya" />
-                                    <AdminInput label="ANA PAYLAŞIM KANALI" value={editingPromo.source_channel} onChange={(v:any)=>setEditingPromo({...editingPromo, source_channel:v})} placeholder="@kanaladi veya ID" />
+                                    <AdminInput label="ANA PAYLAŞIM KANALI (ZORUNLU)" value={editingPromo.source_channel} onChange={(v:any)=>setEditingPromo({...editingPromo, source_channel:v})} placeholder="@kanaladi veya ID" />
                                 </div>
                                 
                                 <div className="space-y-2">

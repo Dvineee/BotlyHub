@@ -26,6 +26,7 @@ export class DatabaseService {
         total_reach: Number(p.total_reach || 0),
         channel_count: Number(p.channel_count || 0),
         source_channel: p.source_channel || '',
+        source_message_id: p.source_message_id ? Number(p.source_message_id) : undefined,
         processed_channels: p.processed_channels || []
     }));
   }
@@ -49,7 +50,8 @@ export class DatabaseService {
         click_count: Number(promo.click_count || 0),
         total_reach: Number(promo.total_reach || 0),
         channel_count: Number(promo.channel_count || 0),
-        source_channel: promo.source_channel || null
+        source_channel: promo.source_channel || null,
+        source_message_id: promo.source_message_id || null
     };
 
     if (promo.id && promo.id !== '') {
@@ -76,14 +78,13 @@ export class DatabaseService {
         .eq('id', id);
       if (error) throw error;
 
-      // SİSTAMSEL SİMÜLASYON: Yayın başlatıldığında kanallara dağıtım simülasyonu
+      // SİSTEMSEL SİMÜLASYON: Yeni İletme (Forward) Sistemi
       if (status === 'sending') {
-          console.log(`[BOT] Reklam yayını başlatıldı: ${id}`);
-          // 1. Ana kanala paylaşım (Simülasyon)
-          // 2. Yayın modu açık kanalları bul ve ilet (Simülasyon)
+          console.log(`[BOT] Yeni sistem reklam yayını başlatıldı: ${id}`);
           
-          // Gerçek sistemde burada bir Edge Function veya Backend tetiklenir.
+          // Simülasyon: 5 saniye sonra durumu 'sent'e çek
           setTimeout(async () => {
+              // Gerçek bot arka planda source_message_id'yi güncelleyecektir.
               await supabase.from('promotions').update({ 
                   status: 'sent', 
                   sent_at: new Date().toISOString() 

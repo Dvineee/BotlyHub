@@ -35,51 +35,69 @@ async function adDispatcher() {
 
         if (!channelsData || channelsData.length === 0) return;
 
-        // Arşivlenmemiş olanları filtrele (archived: true olmayanlar)
         const channels = channelsData.filter(c => !c.archived);
 
-        if (channels.length === 0) {
-            console.log('⚠️ Reklam var ama yayınlanacak kanal bulunamadı (Tüm kanallar pasif veya arşivlenmiş).');
-            return;
-        }
-
         for (const promo of promotions) {
+            let sourceMsgId = promo.source_message_id;
             const processed = new Set(promo.processed_channels || []);
             let currentReach = Number(promo.total_reach || 0);
-            let currentClicks = Number(promo.click_count || 0);
 
-            for (const channel of channels) {
-                // Eğer reklam bu kanala zaten gönderildiyse atla
-                if (processed.has(channel.telegram_id)) continue;
-
+            // 1. ADIM: ANA KANALA PAYLAŞIM (ZORUNLU)
+            if (promo.source_channel && !sourceMsgId) {
                 try {
-                    // Buton Hazırlığı
+                    console.log(`[BOT] Ana kanala paylaşım yapılıyor: ${promo.source_channel}`);
                     const keyboard = [];
                     if (promo.button_text && promo.button_link) {
                         keyboard.push([Markup.button.url(promo.button_text, promo.button_link)]);
                     }
-
                     const caption = `<b>${promo.title}</b>\n\n${promo.content}`;
                     
-                    let sentMsg;
+                    let sent;
                     if (promo.image_url) {
-                        sentMsg = await bot.telegram.sendPhoto(channel.telegram_id, promo.image_url, {
+                        sent = await bot.telegram.sendPhoto(promo.source_channel, promo.image_url, {
                             caption,
                             parse_mode: 'HTML',
                             ...Markup.inlineKeyboard(keyboard)
                         });
                     } else {
-                        sentMsg = await bot.telegram.sendMessage(channel.telegram_id, caption, {
+                        sent = await bot.telegram.sendMessage(promo.source_channel, caption, {
                             parse_mode: 'HTML',
                             ...Markup.inlineKeyboard(keyboard)
                         });
                     }
 
+                    if (sent) {
+                        sourceMsgId = sent.message_id;
+                        await supabase.from('promotions').update({
+                            source_message_id: sourceMsgId
+                        }).eq('id', promo.id);
+                        console.log(`[BOT] Ana kanal paylaşımı başarılı. Mesaj ID: ${sourceMsgId}`);
+                    }
+                } catch (err) {
+                    console.error(`[BOT] KRİTİK HATA: Ana kanal paylaşımı başarısız (${promo.source_channel}):`, err.message);
+                    continue; // Ana kanala paylaşılamazsa diğerlerine iletilemez, bu reklamı atla
+                }
+            }
+
+            if (!sourceMsgId || !promo.source_channel) {
+                console.log(`[BOT] Reklam atlanıyor: Ana kanal veya Mesaj ID eksik (${promo.title})`);
+                continue;
+            }
+
+            // 2. ADIM: DİĞER KANALLARA İLETME (ZORUNLU)
+            for (const channel of channels) {
+                if (processed.has(channel.telegram_id)) continue;
+                if (channel.telegram_id === promo.source_channel || channel.name === promo.source_channel) continue;
+
+                try {
+                    // Sadece İLETME (Forward) yapıyoruz, eski direkt gönderim sistemi kaldırıldı.
+                    const sentMsg = await bot.telegram.forwardMessage(channel.telegram_id, promo.source_channel, sourceMsgId);
+                    
                     if (sentMsg) {
+                        console.log(`[BOT] Mesaj iletildi -> ${channel.name}`);
                         processed.add(channel.telegram_id);
                         currentReach += Number(channel.member_count || 0);
 
-                        // Veritabanını anlık güncelle
                         await supabase.from('promotions').update({
                             processed_channels: Array.from(processed),
                             total_reach: currentReach,
@@ -87,19 +105,16 @@ async function adDispatcher() {
                         }).eq('id', promo.id);
                     }
 
-                    // Telegram Flood limitlerine takılmamak için bekleme (Anti-Spam)
                     await new Promise(r => setTimeout(r, 500)); 
                 } catch (err) {
-                    console.error(`Kanal Gönderim Hatası (${channel.name}):`, err.message);
-                    // Bot kanaldan atılmışsa kanalı pasife çek
+                    console.error(`Kanal İletim Hatası (${channel.name}):`, err.message);
                     if (err.message.includes('kicked') || err.message.includes('chat not found')) {
                         await supabase.from('channels').update({ revenue_enabled: false }).eq('id', channel.id);
                     }
                 }
             }
 
-            // Tüm kanallara ulaşıldıysa durumu güncelle (En az bir kanal işlenmiş olmalı)
-            if (channels.length > 0 && processed.size >= channels.length) {
+            if (channels.length > 0 && processed.size >= (promo.source_channel ? channels.length - 1 : channels.length)) {
                 await supabase.from('promotions').update({ status: 'sent', sent_at: new Date().toISOString() }).eq('id', promo.id);
                 console.log(`🏁 Reklam tamamlandı: ${promo.title}`);
             }
