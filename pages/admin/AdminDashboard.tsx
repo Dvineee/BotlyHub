@@ -1533,33 +1533,33 @@ const PromotionManagement = () => {
                                     <span className="text-[10px] font-bold text-slate-700 uppercase tracking-[0.2em]">{new Date(p.created_at).toLocaleDateString()}</span>
                                 </div>
                                 <h4 className="text-2xl font-black italic uppercase text-white truncate mb-4">{p.title}</h4>
-                                <div className="flex items-center justify-center lg:justify-start gap-6 flex-wrap">
-                                    <div className="flex items-center gap-2 bg-slate-950/50 px-4 py-2 rounded-xl border border-white/5">
+                                <div className="flex items-center justify-center lg:justify-start gap-8">
+                                    <div className="flex items-center gap-2">
                                         <Monitor size={14} className="text-slate-500" />
-                                        <span className="text-[10px] font-black text-slate-400 uppercase">{p.channel_count || 0} KANAL</span>
+                                        <span className="text-[10px] font-black text-slate-500 uppercase">{p.channel_count || 0} KANAL</span>
                                     </div>
-                                    <div className="flex items-center gap-2 bg-blue-500/5 px-4 py-2 rounded-xl border border-blue-500/10">
+                                    <div className="flex items-center gap-2">
                                         <TrendingUp size={14} className="text-blue-500" />
                                         <span className="text-[10px] font-black text-blue-500 uppercase">{p.total_reach?.toLocaleString() || 0} ERİŞİM</span>
                                     </div>
-                                    <div className="flex items-center gap-2 bg-emerald-500/5 px-4 py-2 rounded-xl border border-emerald-500/10">
+                                    <div className="flex items-center gap-2">
                                         <Eye size={14} className="text-emerald-500" />
                                         <span className="text-[10px] font-black text-emerald-500 uppercase">{p.total_views?.toLocaleString() || 0} GÖRÜNTÜLENME</span>
                                     </div>
-                                    <div className="flex items-center gap-2 bg-rose-500/5 px-4 py-2 rounded-xl border border-rose-500/10">
+                                    <div className="flex items-center gap-2">
                                         <Heart size={14} className="text-rose-500" />
                                         <span className="text-[10px] font-black text-rose-500 uppercase">{p.total_reactions?.toLocaleString() || 0} TEPKİ</span>
                                     </div>
-                                    <div className="flex items-center gap-2 bg-amber-500/5 px-4 py-2 rounded-xl border border-amber-500/10">
-                                        <MousePointer2 size={14} className="text-amber-500" />
-                                        <span className="text-[10px] font-black text-amber-500 uppercase">{p.click_count || 0} TIKLAMA</span>
-                                    </div>
                                     {p.source_channel && (
-                                        <div className="flex items-center gap-2 bg-slate-950/50 px-4 py-2 rounded-xl border border-white/5">
+                                        <div className="flex items-center gap-2">
                                             <Megaphone size={14} className="text-emerald-500" />
                                             <span className="text-[10px] font-black text-emerald-500 uppercase">{p.source_channel}</span>
                                         </div>
                                     )}
+                                    <div className="flex items-center gap-2">
+                                        <MousePointer2 size={14} className="text-emerald-500" />
+                                        <span className="text-[10px] font-black text-emerald-500 uppercase">{p.click_count || 0} TIKLAMA</span>
+                                    </div>
                                 </div>
                             </div>
                             <div className="flex gap-3 mt-8 lg:mt-0">
