@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ArrowUpRight, ArrowDownLeft, BarChart3, Wallet as WalletIcon, TrendingUp, Zap, Clock, ShieldCheck, PieChart, Eye, Megaphone, Loader2 } from 'lucide-react';
+import { ChevronLeft, ArrowUpRight, ArrowDownLeft, BarChart3, Wallet as WalletIcon, TrendingUp, Zap, Clock, ShieldCheck, PieChart, Eye, Megaphone, Loader2, RefreshCw } from 'lucide-react';
 import * as Router from 'react-router-dom';
 import { TonConnectButton, useTonWallet, useTonAddress } from '@tonconnect/ui-react';
 import { useTranslation } from '../TranslationContext';
@@ -62,6 +62,7 @@ const Earnings = () => {
         <div className="flex-1 overflow-y-auto no-scrollbar px-1">
             {activeTab === 'wallet' ? (
                 <div className="animate-in slide-in-from-bottom-4">
+                    {/* ... wallet content ... */}
                     <div className="bg-gradient-to-br from-blue-600 to-indigo-700 p-8 rounded-[44px] mb-8 relative overflow-hidden shadow-2xl">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-3xl"></div>
                         <div className="relative z-10">
@@ -103,6 +104,16 @@ const Earnings = () => {
                 </div>
             ) : (
                 <div className="animate-in slide-in-from-bottom-4">
+                    <div className="flex justify-between items-center mb-6 px-4">
+                        <p className="text-[10px] font-black text-slate-700 uppercase tracking-[0.4em] italic">Performans Özeti</p>
+                        <button 
+                            onClick={loadStats} 
+                            disabled={isLoading}
+                            className="p-2 bg-slate-900/60 border border-slate-800 rounded-xl text-slate-400 active:scale-90 transition-all disabled:opacity-30"
+                        >
+                            <RefreshCw size={16} className={isLoading ? 'animate-spin text-blue-500' : ''} />
+                        </button>
+                    </div>
                     <div className="grid grid-cols-2 gap-4 mb-8">
                         <div className="bg-slate-900/40 border border-white/5 p-6 rounded-[32px] flex flex-col items-center gap-3">
                             <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-500"><ArrowUpRight size={20} /></div>
@@ -151,7 +162,7 @@ const Earnings = () => {
                                                     {s.promotion?.title || 'Bilinmeyen Reklam'}
                                                 </h5>
                                                 <p className="text-[8px] font-black text-slate-600 uppercase tracking-widest">
-                                                    ID: {s.channel_id}
+                                                    Kanal: {s.channel_name || s.channel_id}
                                                 </p>
                                             </div>
                                         </div>

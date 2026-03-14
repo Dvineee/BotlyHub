@@ -103,15 +103,20 @@ export class DatabaseService {
   }
 
   static async getPromotionChannelStats(userId: string): Promise<any[]> {
+    const uId = userId.toString();
     // Kullanıcının kanallarını al
     const { data: channels } = await supabase
       .from('channels')
       .select('telegram_id, name')
-      .eq('user_id', userId.toString());
+      .eq('user_id', uId);
     
-    if (!channels || channels.length === 0) return [];
+    if (!channels || channels.length === 0) {
+        console.log("No channels found for user:", uId);
+        return [];
+    }
 
-    const channelIds = channels.map(c => c.telegram_id);
+    const channelIds = channels.map(c => String(c.telegram_id));
+    console.log("Fetching stats for channels:", channelIds);
 
     // Bu kanallara ait istatistikleri çek
     const { data, error } = await supabase
@@ -125,7 +130,16 @@ export class DatabaseService {
       return [];
     }
 
-    return data || [];
+    console.log("Fetched stats count:", data?.length || 0);
+    
+    // Kanal isimlerini istatistiklere ekle
+    return (data || []).map(stat => {
+        const channel = channels.find(c => String(c.telegram_id) === String(stat.channel_id));
+        return {
+            ...stat,
+            channel_name: channel ? channel.name : 'Bilinmeyen Kanal'
+        };
+    });
   }
 
   // --- USERS ---
