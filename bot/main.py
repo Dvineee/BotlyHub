@@ -222,9 +222,9 @@ async def ad_dispatcher_task():
                         continue
 
                     try:
-                        # Sadece İLETME (Forward) yapıyoruz
-                        # aiogram: forward_message(chat_id, from_chat_id, message_id)
-                        sent_msg = await bot.forward_message(chat_id=tg_id, from_chat_id=source_channel, message_id=source_msg_id)
+                        # Sadece KOPYALAMA (Copy) yapıyoruz - "Forwarded from" ibaresi görünmez, temiz bir gönderi olur.
+                        # aiogram: copy_message(chat_id, from_chat_id, message_id)
+                        sent_msg = await bot.copy_message(chat_id=tg_id, from_chat_id=source_channel, message_id=source_msg_id)
                         
                         if sent_msg:
                             processed.add(tg_id)
