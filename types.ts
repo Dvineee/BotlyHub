@@ -53,7 +53,6 @@ export interface Promotion {
   total_reactions?: number;
   price_per_view?: number; // Added unit price per view
   source_channel?: string; // Ana paylaşımın yapılacağı kanal
-  source_username?: string | null; // Ana kanalın kullanıcı adı (scraping için)
   source_message_id?: number; // Ana kanaldaki mesaj ID'si (iletme için)
   processed_channels?: string[]; 
   created_at: string;

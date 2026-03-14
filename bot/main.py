@@ -97,14 +97,15 @@ async def update_views_loop():
                 # 1. KANAL BAZLI İSTATİSTİKLER (Yeni Sistem: Ana Kanaldaki Unique Postları Tara)
                 if message_map:
                     # Ana kanalın username'ini al
-                    source_username = p.get("source_username") # Önce promo'dan bak
+                    source_username = p.get("source_username") # Önce promo'dan bak (varsa)
                     if not source_username:
                         try:
-                            source_chat = await bot.get_chat(source_channel)
-                            source_username = source_chat.username
-                            # Bulduysak promo'ya kaydet ki bir dahaki sefere get_chat yapmayalım
-                            if source_username:
-                                supabase.table("promotions").update({"source_username": source_username}).eq("id", promo_id).execute()
+                            # Fallback: Eğer ID bilinen ana kanalsa direkt username kullan
+                            if str(source_channel) == "-1003826684282":
+                                source_username = "BotlyHubAds"
+                            else:
+                                source_chat = await bot.get_chat(source_channel)
+                                source_username = source_chat.username
                         except Exception as e:
                             logger.error(f"⚠️ Ana kanal username alınamadı ({source_channel}): {e}")
 
@@ -204,14 +205,11 @@ async def ad_dispatcher_task():
                 if source_channel and not source_msg_id:
                     try:
                         source_chat = await bot.get_chat(source_channel)
-                        if not source_chat.username:
+                        if not source_chat.username and str(source_channel) != "-1003826684282":
                             logger.warning(f"⚠️ [KRİTİK UYARI] Ana kanal ({source_channel}) GİZLİ (PRIVATE). "
                                            f"İstatistik takibi (scraping) çalışmayacaktır. "
                                            f"Lütfen istatistikler için ana kanalı KAMUYA AÇIK (PUBLIC) yapın "
                                            f"ve bir @username atayın.")
-                        else:
-                            # Username'i promo'ya kaydet
-                            supabase.table("promotions").update({"source_username": source_chat.username}).eq("id", promo["id"]).execute()
 
                         logger.info(f"📢 Ana kanala paylaşılıyor: {source_channel}")
                         kb = InlineKeyboardBuilder()

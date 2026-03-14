@@ -1555,7 +1555,7 @@ const PromotionManagement = () => {
                                         <div className="flex items-center gap-2">
                                             <Megaphone size={14} className="text-emerald-500" />
                                             <span className="text-[10px] font-black text-emerald-500 uppercase">
-                                                {p.source_username ? `@${p.source_username}` : p.source_channel}
+                                                {p.source_channel}
                                             </span>
                                         </div>
                                     )}

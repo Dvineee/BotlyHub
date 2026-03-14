@@ -27,7 +27,6 @@ export class DatabaseService {
         channel_count: Number(p.channel_count || 0),
         price_per_view: Number(p.price_per_view || 0),
         source_channel: p.source_channel || '',
-        source_username: p.source_username || null,
         source_message_id: p.source_message_id ? Number(p.source_message_id) : undefined,
         processed_channels: p.processed_channels || []
     }));
