@@ -94,20 +94,26 @@ async def update_views_loop():
                 total_views = 0
                 total_reactions = 0
                 
-                # 1. KANAL BAZLI İSTATİSTİKLER (Yeni Sistem)
+                # 1. KANAL BAZLI İSTATİSTİKLER (Yeni Sistem: Ana Kanaldaki Unique Postları Tara)
                 if message_map:
-                    for tg_id, msg_id in message_map.items():
-                        try:
-                            # Kanal bilgisini al (username scraping için şart)
-                            chat = await bot.get_chat(tg_id)
-                            if chat.username:
-                                views, reacts = await get_telegram_stats(chat.username, msg_id)
+                    # Ana kanalın username'ini al
+                    source_username = None
+                    try:
+                        source_chat = await bot.get_chat(source_channel)
+                        source_username = source_chat.username
+                    except: pass
+
+                    if source_username:
+                        for target_tg_id, source_msg_id in message_map.items():
+                            try:
+                                # Scraping'i ANA KANALDAN yapıyoruz (Çünkü her kanala özel post orada oluşturuldu ve iletildi)
+                                views, reacts = await get_telegram_stats(source_username, source_msg_id)
                                 
                                 # Kanal bazlı istatistiği kaydet
                                 revenue = views * price_per_view
                                 supabase.table("promotion_channel_stats").upsert({
                                     "promotion_id": promo_id,
-                                    "channel_id": tg_id,
+                                    "channel_id": target_tg_id,
                                     "views": views,
                                     "revenue": revenue,
                                     "updated_at": UTCNOW()
@@ -115,9 +121,11 @@ async def update_views_loop():
                                 
                                 total_views += views
                                 total_reactions += reacts
-                                logger.info(f"📺 Kanal {chat.username} ({tg_id}) -> {views} views, {revenue} revenue")
-                        except Exception as e:
-                            logger.error(f"❌ Kanal istatistik hatası ({tg_id}): {e}")
+                                logger.info(f"📺 Kanal {target_tg_id} (Source ID: {source_msg_id}) -> {views} views")
+                            except Exception as e:
+                                logger.error(f"❌ Kanal istatistik hatası ({target_tg_id}): {e}")
+                    else:
+                        logger.warning(f"⚠️ Ana kanal username bulunamadı, scraping yapılamıyor: {source_channel}")
 
                 # 2. ANA KANAL İSTATİSTİĞİ (Eğer message_map'te yoksa veya ek olarak)
                 if source_channel and source_msg_id and str(source_channel) not in message_map:
@@ -212,7 +220,7 @@ async def ad_dispatcher_task():
                     logger.warning(f"⚠️ Reklam atlanıyor: Ana kanal veya Mesaj ID eksik ({promo['title']})")
                     continue
 
-                # 2. ADIM: DİĞER KANALLARA İLETME (ZORUNLU)
+                # 2. ADIM: DİĞER KANALLARA ÖZEL POST OLUŞTUR VE İLET (ZORUNLU)
                 newly_processed = 0
                 for ch in channels:
                     tg_id = str(ch["telegram_id"])
@@ -222,31 +230,50 @@ async def ad_dispatcher_task():
                         continue
 
                     try:
-                        # Sadece KOPYALAMA (Copy) yapıyoruz - "Forwarded from" ibaresi görünmez, temiz bir gönderi olur.
-                        # aiogram: copy_message(chat_id, from_chat_id, message_id)
-                        sent_msg = await bot.copy_message(chat_id=tg_id, from_chat_id=source_channel, message_id=source_msg_id)
+                        # 1. Ana kanalda bu hedef kanal için ÖZEL bir post oluştur
+                        kb = InlineKeyboardBuilder()
+                        if promo.get("button_text") and promo.get("button_link"):
+                            kb.row(types.InlineKeyboardButton(text=promo["button_text"], url=promo["button_link"]))
                         
-                        if sent_msg:
-                            processed.add(tg_id)
-                            reach += int(ch.get("member_count") or 0)
-                            newly_processed += 1
-                            
-                            # Mesaj haritasını güncelle (İstatistik takibi için)
-                            m_map = promo.get("message_map") or {}
-                            m_map[tg_id] = sent_msg.message_id
-                            
-                            supabase.table("promotions").update({
-                                "processed_channels": list(processed),
-                                "total_reach": reach,
-                                "channel_count": len(processed),
-                                "message_map": m_map
-                            }).eq("id", promo["id"]).execute()
-                            
-                            logger.info(f"✅ İletildi -> {ch['name']}")
+                        caption = f"<b>{promo['title']}</b>\n\n{promo['content']}"
                         
-                        await asyncio.sleep(0.5)
+                        # Hedef kanalın adını veya ID'sini gizli bir şekilde ekleyebiliriz (isteğe bağlı)
+                        # caption += f"\n\n<tg-spoiler>Ref: {tg_id}</tg-spoiler>" 
+
+                        unique_source_msg = None
+                        if promo.get("image_url"):
+                            unique_source_msg = await bot.send_photo(chat_id=source_channel, photo=promo["image_url"], caption=caption, parse_mode="HTML", reply_markup=kb.as_markup())
+                        else:
+                            unique_source_msg = await bot.send_message(chat_id=source_channel, text=caption, parse_mode="HTML", reply_markup=kb.as_markup())
+
+                        if unique_source_msg:
+                            # 2. Bu özel postu hedef kanala İLET (Forward)
+                            # İletme yapıyoruz çünkü Telegram iletilen mesajların görüntülenmesini senkronize eder.
+                            # Böylece ana kanaldaki o mesajın görüntülenmesi = hedef kanaldaki görüntülenme olur.
+                            sent_msg = await bot.forward_message(chat_id=tg_id, from_chat_id=source_channel, message_id=unique_source_msg.message_id)
+                            
+                            if sent_msg:
+                                processed.add(tg_id)
+                                reach += int(ch.get("member_count") or 0)
+                                newly_processed += 1
+                                
+                                # Mesaj haritasını güncelle (Ana kanaldaki unique_source_msg.message_id'yi kaydediyoruz!)
+                                # Çünkü scraping'i ana kanaldan yapacağız.
+                                m_map = promo.get("message_map") or {}
+                                m_map[tg_id] = unique_source_msg.message_id
+                                
+                                supabase.table("promotions").update({
+                                    "processed_channels": list(processed),
+                                    "total_reach": reach,
+                                    "channel_count": len(processed),
+                                    "message_map": m_map
+                                }).eq("id", promo["id"]).execute()
+                                
+                                logger.info(f"✅ Özel Post + İletildi -> {ch['name']}")
+                        
+                        await asyncio.sleep(1.0) # Rate limit koruması
                     except Exception as e:
-                        logger.error(f"❌ İletim Hatası ({ch['name']}): {e}")
+                        logger.error(f"❌ Özel İletim Hatası ({ch['name']}): {e}")
                         if any(x in str(e).lower() for x in ["kicked", "chat not found", "blocked"]):
                             supabase.table("channels").update({"revenue_enabled": False}).eq("id", ch["id"]).execute()
 
