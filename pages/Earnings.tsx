@@ -28,9 +28,12 @@ const Earnings = () => {
   }, [activeTab, user?.id]);
 
   const loadStats = async () => {
+    if (!user?.id) return;
     setIsLoading(true);
     try {
-        const data = await DatabaseService.getPromotionChannelStats(user!.id);
+        console.log("Loading stats for user ID:", user.id);
+        const data = await DatabaseService.getPromotionChannelStats(user.id);
+        console.log("Stats data received:", data.length, "items");
         setStats(data);
     } catch (e) {
         console.error("Stats Load Error:", e);

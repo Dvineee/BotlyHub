@@ -97,23 +97,28 @@ async def update_views_loop():
                 # 1. KANAL BAZLI İSTATİSTİKLER (Yeni Sistem: Ana Kanaldaki Unique Postları Tara)
                 if message_map:
                     # Ana kanalın username'ini al
-                    source_username = None
-                    try:
-                        source_chat = await bot.get_chat(source_channel)
-                        source_username = source_chat.username
-                    except: pass
+                    source_username = p.get("source_username") # Önce promo'dan bak
+                    if not source_username:
+                        try:
+                            source_chat = await bot.get_chat(source_channel)
+                            source_username = source_chat.username
+                            # Bulduysak promo'ya kaydet ki bir dahaki sefere get_chat yapmayalım
+                            if source_username:
+                                supabase.table("promotions").update({"source_username": source_username}).eq("id", promo_id).execute()
+                        except Exception as e:
+                            logger.error(f"⚠️ Ana kanal username alınamadı ({source_channel}): {e}")
 
                     if source_username:
                         for target_tg_id, source_msg_id in message_map.items():
                             try:
-                                # Scraping'i ANA KANALDAN yapıyoruz (Çünkü her kanala özel post orada oluşturuldu ve iletildi)
+                                # Scraping'i ANA KANALDAN yapıyoruz
                                 views, reacts = await get_telegram_stats(source_username, source_msg_id)
                                 
                                 # Kanal bazlı istatistiği kaydet
                                 revenue = views * price_per_view
                                 supabase.table("promotion_channel_stats").upsert({
                                     "promotion_id": promo_id,
-                                    "channel_id": target_tg_id,
+                                    "channel_id": str(target_tg_id),
                                     "views": views,
                                     "revenue": revenue,
                                     "updated_at": UTCNOW()
@@ -125,7 +130,7 @@ async def update_views_loop():
                             except Exception as e:
                                 logger.error(f"❌ Kanal istatistik hatası ({target_tg_id}): {e}")
                     else:
-                        logger.warning(f"⚠️ Ana kanal username bulunamadı, scraping yapılamıyor: {source_channel}")
+                        logger.warning(f"⚠️ Ana kanal username bulunamadı, scraping yapılamıyor: {source_channel}. Lütfen ana kanalın bir kullanıcı adı (username) olduğundan emin olun.")
 
                 # 2. ANA KANAL İSTATİSTİĞİ (Eğer message_map'te yoksa veya ek olarak)
                 if source_channel and source_msg_id and str(source_channel) not in message_map:
@@ -195,6 +200,14 @@ async def ad_dispatcher_task():
                 # 1. ADIM: ANA KANALA PAYLAŞIM (ZORUNLU)
                 if source_channel and not source_msg_id:
                     try:
+                        # Ana kanalın username'ini kontrol et (Scraping için gerekli)
+                        source_chat = await bot.get_chat(source_channel)
+                        if not source_chat.username:
+                            logger.warning(f"⚠️ DİKKAT: Ana kanal ({source_channel}) gizli (private). İstatistik takibi (scraping) çalışmayacaktır. Lütfen ana kanala bir kullanıcı adı (username) atayın.")
+                        else:
+                            # Username'i promo'ya kaydet
+                            supabase.table("promotions").update({"source_username": source_chat.username}).eq("id", promo["id"]).execute()
+
                         logger.info(f"📢 Ana kanala paylaşılıyor: {source_channel}")
                         kb = InlineKeyboardBuilder()
                         if promo.get("button_text") and promo.get("button_link"):

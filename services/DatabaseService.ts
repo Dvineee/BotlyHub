@@ -130,11 +130,12 @@ export class DatabaseService {
       return [];
     }
 
-    console.log("Fetched stats count:", data?.length || 0);
+    console.log("RAW STATS DATA:", data);
     
     // Kanal isimlerini istatistiklere ekle
     return (data || []).map(stat => {
         const channel = channels.find(c => String(c.telegram_id) === String(stat.channel_id));
+        console.log(`Matching stat for channel ${stat.channel_id}:`, channel ? "Found" : "Not Found");
         return {
             ...stat,
             channel_name: channel ? channel.name : 'Bilinmeyen Kanal'
