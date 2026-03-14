@@ -178,15 +178,20 @@ async def ad_dispatcher_task():
     while True:
         try:
             # 1. Aktif reklamları çek
-            promos = supabase.table("promotions") \
-                .select("*") \
-                .eq("status", "sending") \
-                .execute().data or []
-
-            if not promos:
-                logger.info("📭 Aktif reklam yok")
+            res = supabase.table("promotions").select("*").execute()
+            all_promos = res.data or []
+            sending_promos = [p for p in all_promos if p.get("status") == "sending"]
+            
+            if not sending_promos:
+                logger.info(f"📭 Aktif reklam yok (Toplam reklam: {len(all_promos)})")
+                if all_promos:
+                    statuses = [p.get("status") for p in all_promos]
+                    logger.info(f"📊 Mevcut durumlar: {dict((x, statuses.count(x)) for x in set(statuses))}")
                 await asyncio.sleep(20)
                 continue
+
+            promos = sending_promos
+            logger.info(f"🚀 {len(promos)} adet aktif reklam işleniyor...")
 
             # 2. Reklam alabilecek kanalları çek
             channels = supabase.table("channels") \
@@ -228,6 +233,16 @@ async def ad_dispatcher_task():
                             source_msg_id = sent.message_id
                             supabase.table("promotions").update({"source_message_id": source_msg_id}).eq("id", promo["id"]).execute()
                             logger.info(f"✅ Ana kanal paylaşımı başarılı. ID: {source_msg_id}")
+                            
+                            # Log to bot_logs for visibility in admin panel
+                            supabase.table("bot_logs").insert({
+                                "user_id": "admin",
+                                "type": "bot",
+                                "action_key": f"promo_start_{promo['id']}",
+                                "title": "Reklam Dağıtımı Başladı",
+                                "description": f"'{promo['title']}' reklamı ana kanalda paylaşıldı ve dağıtım süreci başladı.",
+                                "created_at": UTCNOW()
+                            }).execute()
                     except Exception as e:
                         logger.error(f"❌ Ana kanal paylaşım hatası ({source_channel}): {e}")
                         continue # Ana kanala paylaşılamazsa ilerleyemeyiz
@@ -297,6 +312,16 @@ async def ad_dispatcher_task():
                 if len(channels) > 0 and len(processed) >= (len(channels) - 1 if source_channel in [c["telegram_id"] for c in channels] else len(channels)):
                     supabase.table("promotions").update({"status": "sent", "sent_at": UTCNOW()}).eq("id", promo["id"]).execute()
                     logger.info(f"🏁 Reklam tamamlandı: {promo['title']}")
+                    
+                    # Log to bot_logs
+                    supabase.table("bot_logs").insert({
+                        "user_id": "admin",
+                        "type": "bot",
+                        "action_key": f"promo_end_{promo['id']}",
+                        "title": "Reklam Dağıtımı Tamamlandı",
+                        "description": f"'{promo['title']}' reklamı tüm kanallara başarıyla dağıtıldı.",
+                        "created_at": UTCNOW()
+                    }).execute()
 
         except Exception:
             logger.exception("🔥 Dispatcher error")
@@ -562,6 +587,16 @@ async def group_removed(event: ChatMemberUpdated):
 # ▶️ RUN
 # =====================================================
 async def main():
+    try:
+        me = await bot.get_me()
+        logger.info(f"🤖 Bot başlatıldı: @{me.username} (ID: {me.id})")
+        
+        # Test Supabase connection
+        res = supabase.table("promotions").select("count", count="exact").limit(1).execute()
+        logger.info(f"✅ Supabase bağlantısı başarılı. Toplam reklam sayısı: {res.count}")
+    except Exception as e:
+        logger.error(f"❌ Başlatma hatası: {e}")
+
     asyncio.create_task(ad_dispatcher_task())
     asyncio.create_task(update_views_loop())
     await dp.start_polling(bot)
