@@ -349,7 +349,7 @@ export class DatabaseService {
               ownership_id: ub.id, 
               is_premium: ub.is_premium, 
               isActive: ub.is_active, 
-              revenueEnabled: false 
+              revenueEnabled: ub.revenue_enabled 
           } as UserBot;
       }).filter((b): b is UserBot => b !== null);
     } catch (e) {

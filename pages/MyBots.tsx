@@ -49,11 +49,7 @@ const MyBots = () => {
                     await DatabaseService.removeUserBot(user.id.toString(), b.id);
                     expiredNames.push(b.name);
                 } else {
-                    validBots.push({
-                        ...b,
-                        revenueEnabled: false,
-                        isActive: true
-                    } as UserBot);
+                    validBots.push(b);
                 }
             }
 
@@ -76,31 +72,46 @@ const MyBots = () => {
 
   const toggleAdRevenue = async (botId: string) => {
       const bot = bots.find(b => b.id === botId);
-      if (!bot) return;
+      if (!bot || !bot.ownership_id) return;
 
+      const newStatus = !bot.revenueEnabled;
       const updatedBots = bots.map(b => 
-        b.id === botId ? { ...b, revenueEnabled: !b.revenueEnabled } : b
+        b.id === botId ? { ...b, revenueEnabled: newStatus } : b
       );
       setBots(updatedBots);
       localStorage.setItem('ownedBots', JSON.stringify(updatedBots));
 
-      if (user?.id) {
-          await DatabaseService.logActivity(user.id.toString(), 'bot_manage', 'Ayar Değişti', 'Gelir Ayarı Güncellendi', `'${bot.name}' botu için gelir modu ${!bot.revenueEnabled ? 'AÇILDI' : 'KAPATILDI'}.`);
+      try {
+          await DatabaseService.updateUserBot(bot.ownership_id, { revenue_enabled: newStatus });
+          if (user?.id) {
+              await DatabaseService.logActivity(user.id.toString(), 'bot_manage', 'Ayar Değişti', 'Gelir Ayarı Güncellendi', `'${bot.name}' botu için gelir modu ${newStatus ? 'AÇILDI' : 'KAPATILDI'}.`);
+          }
+          haptic('light');
+      } catch (e) {
+          console.error("Gelir modu güncellenemedi", e);
+          // Rollback UI if needed, but usually we trust the optimistic update or just let the user try again
       }
   };
 
   const toggleActiveStatus = async (botId: string) => {
     const bot = bots.find(b => b.id === botId);
-    if (!bot) return;
+    if (!bot || !bot.ownership_id) return;
 
+    const newStatus = !bot.isActive;
     const updatedBots = bots.map(b => 
-        b.id === botId ? { ...b, isActive: !b.isActive } : b
+        b.id === botId ? { ...b, isActive: newStatus } : b
     );
     setBots(updatedBots);
     localStorage.setItem('ownedBots', JSON.stringify(updatedBots));
 
-    if (user?.id) {
-        await DatabaseService.logActivity(user.id.toString(), 'bot_manage', 'Statü Değişti', 'Bot Durumu Güncellendi', `'${bot.name}' bot durumu ${!bot.isActive ? 'AKTİF' : 'PASİF'} yapıldı.`);
+    try {
+        await DatabaseService.updateUserBot(bot.ownership_id, { is_active: newStatus });
+        if (user?.id) {
+            await DatabaseService.logActivity(user.id.toString(), 'bot_manage', 'Statü Değişti', 'Bot Durumu Güncellendi', `'${bot.name}' bot durumu ${newStatus ? 'AKTİF' : 'PASİF'} yapıldı.`);
+        }
+        haptic('light');
+    } catch (e) {
+        console.error("Bot durumu güncellenemedi", e);
     }
   };
 
