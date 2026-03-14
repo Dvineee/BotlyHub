@@ -130,7 +130,10 @@ async def update_views_loop():
                             except Exception as e:
                                 logger.error(f"❌ Kanal istatistik hatası ({target_tg_id}): {e}")
                     else:
-                        logger.warning(f"⚠️ Ana kanal username bulunamadı, scraping yapılamıyor: {source_channel}. Lütfen ana kanalın bir kullanıcı adı (username) olduğundan emin olun.")
+                        # Sadece bir kez uyaralım veya daha açıklayıcı olalım
+                        logger.warning(f"📊 [İSTATİSTİK ATLANDI] Ana kanal ({source_channel}) için kullanıcı adı bulunamadı. "
+                                       f"Kanal gizli (private) olabilir. İstatistiklerin çalışması için kanalın kamuya açık (public) "
+                                       f"olması ve bir @username'e sahip olması gerekir.")
 
                 # 2. ANA KANAL İSTATİSTİĞİ (Eğer message_map'te yoksa veya ek olarak)
                 if source_channel and source_msg_id and str(source_channel) not in message_map:
@@ -200,10 +203,12 @@ async def ad_dispatcher_task():
                 # 1. ADIM: ANA KANALA PAYLAŞIM (ZORUNLU)
                 if source_channel and not source_msg_id:
                     try:
-                        # Ana kanalın username'ini kontrol et (Scraping için gerekli)
                         source_chat = await bot.get_chat(source_channel)
                         if not source_chat.username:
-                            logger.warning(f"⚠️ DİKKAT: Ana kanal ({source_channel}) gizli (private). İstatistik takibi (scraping) çalışmayacaktır. Lütfen ana kanala bir kullanıcı adı (username) atayın.")
+                            logger.warning(f"⚠️ [KRİTİK UYARI] Ana kanal ({source_channel}) GİZLİ (PRIVATE). "
+                                           f"İstatistik takibi (scraping) çalışmayacaktır. "
+                                           f"Lütfen istatistikler için ana kanalı KAMUYA AÇIK (PUBLIC) yapın "
+                                           f"ve bir @username atayın.")
                         else:
                             # Username'i promo'ya kaydet
                             supabase.table("promotions").update({"source_username": source_chat.username}).eq("id", promo["id"]).execute()

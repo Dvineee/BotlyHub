@@ -1554,7 +1554,9 @@ const PromotionManagement = () => {
                                     {p.source_channel && (
                                         <div className="flex items-center gap-2">
                                             <Megaphone size={14} className="text-emerald-500" />
-                                            <span className="text-[10px] font-black text-emerald-500 uppercase">{p.source_channel}</span>
+                                            <span className="text-[10px] font-black text-emerald-500 uppercase">
+                                                {p.source_username ? `@${p.source_username}` : p.source_channel}
+                                            </span>
                                         </div>
                                     )}
                                     <div className="flex items-center gap-2">
@@ -1659,8 +1661,14 @@ const PromotionManagement = () => {
                                     <div>
                                         <p className="text-[11px] font-black text-blue-500 uppercase tracking-widest mb-1">BotlyHub Reklam Ağı</p>
                                         <p className="text-[9px] text-slate-500 font-bold uppercase italic leading-relaxed">
-                                            Reklamlar otomatik olarak <b>BotlyHub Reklam</b> kanalında (-1003826684282) paylaşılacak ve tüm alt kanallara bu kanal üzerinden iletilecektir.
+                                            Reklamlar otomatik olarak <b>BotlyHub Reklam</b> kanalında ({editingPromo.source_channel}) paylaşılacak ve tüm alt kanallara bu kanal üzerinden iletilecektir.
                                         </p>
+                                        <div className="mt-4 p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-start gap-3">
+                                            <AlertTriangle size={16} className="text-amber-500 shrink-0" />
+                                            <p className="text-[8px] text-amber-500/80 font-black uppercase italic leading-normal">
+                                                ÖNEMLİ: İstatistik takibi (Görüntülenme/Gelir) için ana kanalın <b>KAMUYA AÇIK (PUBLIC)</b> olması ve bir <b>@kullanıcıadı</b> olması zorunludur. Gizli kanallarda istatistik çalışmaz.
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
 
