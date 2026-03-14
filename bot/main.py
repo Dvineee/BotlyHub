@@ -85,6 +85,8 @@ async def update_views_loop():
             
             promos = res.data or []
             for p in promos:
+                promo_id = p["id"]
+                price_per_view = float(p.get("price_per_view") or 0)
                 source_channel = p.get("source_channel")
                 source_msg_id = p.get("source_message_id")
                 message_map = p.get("message_map") or {}
@@ -92,60 +94,60 @@ async def update_views_loop():
                 total_views = 0
                 total_reactions = 0
                 
-                # ÖNCELİK: ANA KANAL (Merkezi İstatistik)
-                if source_channel and source_msg_id:
-                    try:
-                        # source_channel @ ile başlıyorsa temizle
-                        username = str(source_channel).replace("@", "")
-                        
-                        # Eğer numeric ID ise (örn: -100...) username'i bot üzerinden çekmeye çalış (Scraping için username şart)
-                        if username.startswith("-"):
-                            try:
-                                chat = await bot.get_chat(source_channel)
-                                if chat.username:
-                                    username = chat.username
-                                else:
-                                    # Username yoksa scraping yapılamaz, 0 kalır
-                                    logger.warning(f"⚠️ Ana kanal ({source_channel}) username'e sahip değil, istatistik çekilemiyor.")
-                            except Exception as e:
-                                logger.error(f"❌ Kanal bilgisi alınamadı: {e}")
-
-                        if not username.startswith("-"):
-                            views, reacts = await get_telegram_stats(username, source_msg_id)
-                            total_views = views
-                            total_reactions = reacts
-                    except Exception as e:
-                        logger.error(f"❌ Ana kanal istatistik hatası: {e}")
-
-                # EĞER ANA KANAL YOKSA VEYA 0 DÖNDÜYSE (Eski sistem veya fallback)
-                if total_views == 0 and message_map:
+                # 1. KANAL BAZLI İSTATİSTİKLER (Yeni Sistem)
+                if message_map:
                     for tg_id, msg_id in message_map.items():
                         try:
+                            # Kanal bilgisini al (username scraping için şart)
                             chat = await bot.get_chat(tg_id)
                             if chat.username:
                                 views, reacts = await get_telegram_stats(chat.username, msg_id)
+                                
+                                # Kanal bazlı istatistiği kaydet
+                                revenue = views * price_per_view
+                                supabase.table("promotion_channel_stats").upsert({
+                                    "promotion_id": promo_id,
+                                    "channel_id": tg_id,
+                                    "views": views,
+                                    "revenue": revenue,
+                                    "updated_at": UTCNOW()
+                                }, on_conflict="promotion_id,channel_id").execute()
+                                
                                 total_views += views
                                 total_reactions += reacts
-                        except Exception:
-                            pass
+                                logger.info(f"📺 Kanal {chat.username} ({tg_id}) -> {views} views, {revenue} revenue")
+                        except Exception as e:
+                            logger.error(f"❌ Kanal istatistik hatası ({tg_id}): {e}")
+
+                # 2. ANA KANAL İSTATİSTİĞİ (Eğer message_map'te yoksa veya ek olarak)
+                if source_channel and source_msg_id and str(source_channel) not in message_map:
+                    try:
+                        username = str(source_channel).replace("@", "")
+                        if username.startswith("-"):
+                            try:
+                                chat = await bot.get_chat(source_channel)
+                                if chat.username: username = chat.username
+                            except: pass
+
+                        if not username.startswith("-"):
+                            views, reacts = await get_telegram_stats(username, source_msg_id)
+                            total_views += views
+                            total_reactions += reacts
+                    except Exception as e:
+                        logger.error(f"❌ Ana kanal istatistik hatası: {e}")
                 
-                # Veritabanını güncelle
+                # 3. GENEL TOPLAMI GÜNCELLE
                 try:
                     supabase.table("promotions").update({
                         "total_views": total_views,
                         "total_reactions": total_reactions,
                         "views_updated_at": UTCNOW()
-                    }).eq("id", p["id"]).execute()
+                    }).eq("id", promo_id).execute()
                     
-                    if total_views > 0 or total_reactions > 0:
-                        logger.info(f"📈 Reklam {p['id']} güncellendi: {total_views} gözlem, {total_reactions} tepki")
+                    if total_views > 0:
+                        logger.info(f"📈 Reklam {promo_id} TOPLAM: {total_views} views")
                 except Exception as db_err:
-                    # Sütunlar yoksa sessizce geç
-                    err_str = str(db_err)
-                    if "total_views" in err_str or "total_reactions" in err_str:
-                        pass
-                    else:
-                        logger.error(f"❌ Stats Update DB Error: {db_err}")
+                    logger.error(f"❌ Stats Update DB Error: {db_err}")
 
             await asyncio.sleep(60) # 1 dakikada bir güncelle
         except Exception as e:

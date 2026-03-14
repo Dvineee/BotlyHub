@@ -25,6 +25,7 @@ export class DatabaseService {
         click_count: Number(p.click_count || 0),
         total_reach: Number(p.total_reach || 0),
         channel_count: Number(p.channel_count || 0),
+        price_per_view: Number(p.price_per_view || 0),
         source_channel: p.source_channel || '',
         source_message_id: p.source_message_id ? Number(p.source_message_id) : undefined,
         processed_channels: p.processed_channels || []
@@ -50,6 +51,7 @@ export class DatabaseService {
         click_count: Number(promo.click_count || 0),
         total_reach: Number(promo.total_reach || 0),
         channel_count: Number(promo.channel_count || 0),
+        price_per_view: Number(promo.price_per_view || 0),
         source_channel: promo.source_channel || null,
         source_message_id: promo.source_message_id || null
     };
@@ -98,6 +100,32 @@ export class DatabaseService {
   static async deletePromotion(id: string) {
     const { error } = await supabase.from('promotions').delete().eq('id', id);
     if (error) throw error;
+  }
+
+  static async getPromotionChannelStats(userId: string): Promise<any[]> {
+    // Kullanıcının kanallarını al
+    const { data: channels } = await supabase
+      .from('channels')
+      .select('telegram_id, name')
+      .eq('user_id', userId.toString());
+    
+    if (!channels || channels.length === 0) return [];
+
+    const channelIds = channels.map(c => c.telegram_id);
+
+    // Bu kanallara ait istatistikleri çek
+    const { data, error } = await supabase
+      .from('promotion_channel_stats')
+      .select('*, promotions(*)')
+      .in('channel_id', channelIds)
+      .order('updated_at', { ascending: false });
+
+    if (error) {
+      console.error("Promotion Stats Fetch Error:", error);
+      return [];
+    }
+
+    return data || [];
   }
 
   // --- USERS ---

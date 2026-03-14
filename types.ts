@@ -51,11 +51,23 @@ export interface Promotion {
   click_count: number; // Added engagement tracking
   total_views?: number;
   total_reactions?: number;
+  price_per_view?: number; // Added unit price per view
   source_channel?: string; // Ana paylaşımın yapılacağı kanal
   source_message_id?: number; // Ana kanaldaki mesaj ID'si (iletme için)
   processed_channels?: string[]; 
   created_at: string;
   sent_at?: string;
+}
+
+export interface PromotionChannelStats {
+  id: string;
+  promotion_id: string;
+  channel_id: string;
+  views: number;
+  revenue: number;
+  updated_at: string;
+  promotion?: Promotion;
+  channel?: Channel;
 }
 
 export interface Announcement {

@@ -1502,6 +1502,7 @@ const PromotionManagement = () => {
                             button_text: 'İNCELE', 
                             button_link: '', 
                             click_count: 0, 
+                            price_per_view: 0,
                             source_channel: '-1003826684282',
                             processed_channels: [] 
                         }); 
@@ -1623,7 +1624,7 @@ const PromotionManagement = () => {
                                 }
                                 handleSave(e);
                             }} className="space-y-8 pb-10">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                     <AdminInput label="REKLAM BAŞLIĞI" value={editingPromo.title} onChange={(v:any)=>setEditingPromo({...editingPromo, title:v})} placeholder="Örn: Haftalık Kampanya" />
                                     <div className="relative">
                                         <AdminInput label="ANA PAYLAŞIM KANALI" value={editingPromo.source_channel} onChange={(v:any)=>setEditingPromo({...editingPromo, source_channel:v})} placeholder="-1003826684282" />
@@ -1631,6 +1632,7 @@ const PromotionManagement = () => {
                                             <span className="text-[8px] font-black text-blue-500 uppercase bg-blue-500/10 px-2 py-1 rounded-full">SİSTEM KANALI</span>
                                         </div>
                                     </div>
+                                    <AdminInput label="GÖRÜNTÜLENME BİRİM FİYATI" value={editingPromo.price_per_view} onChange={(v:any)=>setEditingPromo({...editingPromo, price_per_view:v})} placeholder="0.005" icon={TrendingUp} />
                                 </div>
                                 
                                 <div className="space-y-2">

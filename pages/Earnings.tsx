@@ -1,24 +1,46 @@
 
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ArrowUpRight, ArrowDownLeft, BarChart3, Wallet as WalletIcon, TrendingUp, Zap, Clock, ShieldCheck, PieChart } from 'lucide-react';
+import { ChevronLeft, ArrowUpRight, ArrowDownLeft, BarChart3, Wallet as WalletIcon, TrendingUp, Zap, Clock, ShieldCheck, PieChart, Eye, Megaphone, Loader2 } from 'lucide-react';
 import * as Router from 'react-router-dom';
 import { TonConnectButton, useTonWallet, useTonAddress } from '@tonconnect/ui-react';
 import { useTranslation } from '../TranslationContext';
 import { useTelegram } from '../hooks/useTelegram';
+import { DatabaseService } from '../services/DatabaseService';
+import { PromotionChannelStats } from '../types';
 
 const { useNavigate } = Router as any;
 
 const Earnings = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { haptic } = useTelegram();
+  const { haptic, user } = useTelegram();
   const tonWallet = useTonWallet();
   const userFriendlyAddress = useTonAddress();
   const [activeTab, setActiveTab] = useState<'wallet' | 'revenue'>('wallet');
+  const [stats, setStats] = useState<PromotionChannelStats[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     haptic('light');
-  }, [activeTab]);
+    if (activeTab === 'revenue' && user?.id) {
+        loadStats();
+    }
+  }, [activeTab, user?.id]);
+
+  const loadStats = async () => {
+    setIsLoading(true);
+    try {
+        const data = await DatabaseService.getPromotionChannelStats(user!.id);
+        setStats(data);
+    } catch (e) {
+        console.error("Stats Load Error:", e);
+    } finally {
+        setIsLoading(false);
+    }
+  };
+
+  const totalRevenue = stats.reduce((acc, curr) => acc + (curr.revenue || 0), 0);
+  const totalViews = stats.reduce((acc, curr) => acc + (curr.views || 0), 0);
 
   return (
     <div className="min-h-screen bg-[#020617] p-4 pt-10 pb-32 flex flex-col transition-colors animate-in fade-in">
@@ -85,29 +107,72 @@ const Earnings = () => {
                         <div className="bg-slate-900/40 border border-white/5 p-6 rounded-[32px] flex flex-col items-center gap-3">
                             <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-500"><ArrowUpRight size={20} /></div>
                             <p className="text-[8px] font-black text-slate-600 uppercase tracking-widest">Toplam Gelir</p>
-                            <h4 className="text-xl font-black text-white italic tracking-tighter leading-none">₺0.00</h4>
+                            <h4 className="text-xl font-black text-white italic tracking-tighter leading-none">₺{totalRevenue.toFixed(2)}</h4>
                         </div>
                         <div className="bg-slate-900/40 border border-white/5 p-6 rounded-[32px] flex flex-col items-center gap-3">
                             <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-500"><TrendingUp size={20} /></div>
-                            <p className="text-[8px] font-black text-slate-600 uppercase tracking-widest">Kanal Hacmi</p>
-                            <h4 className="text-xl font-black text-white italic tracking-tighter leading-none">0</h4>
+                            <p className="text-[8px] font-black text-slate-600 uppercase tracking-widest">Toplam İzlenme</p>
+                            <h4 className="text-xl font-black text-white italic tracking-tighter leading-none">{totalViews.toLocaleString()}</h4>
                         </div>
                     </div>
 
-                    <div className="bg-slate-900/40 border border-white/5 rounded-[44px] p-10 flex flex-col items-center justify-center gap-8 relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-8 opacity-5">
-                            <PieChart size={120} className="text-blue-500" />
+                    {isLoading ? (
+                        <div className="flex flex-col items-center justify-center py-20 gap-4">
+                            <Loader2 className="animate-spin text-blue-500" size={32} />
+                            <span className="text-[10px] font-black text-slate-700 uppercase tracking-widest italic">Veriler Yükleniyor...</span>
                         </div>
-                        <div className="w-24 h-24 bg-slate-950 rounded-full flex items-center justify-center border-2 border-dashed border-slate-800 shadow-inner">
-                            <BarChart3 size={40} className="text-slate-800" />
+                    ) : stats.length === 0 ? (
+                        <div className="bg-slate-900/40 border border-white/5 rounded-[44px] p-10 flex flex-col items-center justify-center gap-8 relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-8 opacity-5">
+                                <PieChart size={120} className="text-blue-500" />
+                            </div>
+                            <div className="w-24 h-24 bg-slate-950 rounded-full flex items-center justify-center border-2 border-dashed border-slate-800 shadow-inner">
+                                <BarChart3 size={40} className="text-slate-800" />
+                            </div>
+                            <div className="text-center">
+                                <p className="text-slate-500 text-xs font-black uppercase tracking-[0.2em] italic mb-3">Henüz Veri Yok</p>
+                                <p className="text-[10px] text-slate-700 font-bold uppercase italic max-w-[180px] leading-relaxed mx-auto">
+                                    Reklamlar kanallarınızda yayınlandığında detaylı istatistikler burada belirecek.
+                                </p>
+                            </div>
                         </div>
-                        <div className="text-center">
-                            <p className="text-slate-500 text-xs font-black uppercase tracking-[0.2em] italic mb-3">Henüz Veri Yok</p>
-                            <p className="text-[10px] text-slate-700 font-bold uppercase italic max-w-[180px] leading-relaxed mx-auto">
-                                Botlarınız çalışmaya başladığında detaylı hasılat grafikleri burada belirecek.
-                            </p>
+                    ) : (
+                        <div className="space-y-4">
+                            <p className="text-[10px] font-black text-slate-700 uppercase tracking-[0.4em] mb-4 italic ml-4">Kanal Bazlı Reklam Performansı</p>
+                            {stats.map(s => (
+                                <div key={s.id} className="bg-slate-900/40 border border-white/5 p-6 rounded-[32px] space-y-4 group hover:border-blue-500/20 transition-all">
+                                    <div className="flex justify-between items-start">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 bg-blue-600/10 rounded-xl flex items-center justify-center text-blue-500">
+                                                <Megaphone size={18} />
+                                            </div>
+                                            <div>
+                                                <h5 className="text-xs font-black text-white uppercase italic tracking-tighter truncate max-w-[150px]">
+                                                    {s.promotion?.title || 'Bilinmeyen Reklam'}
+                                                </h5>
+                                                <p className="text-[8px] font-black text-slate-600 uppercase tracking-widest">
+                                                    ID: {s.channel_id}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-[10px] font-black text-emerald-500 italic leading-none">+₺{s.revenue?.toFixed(3)}</p>
+                                            <p className="text-[8px] font-black text-slate-700 uppercase tracking-widest mt-1">Hakediş</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center justify-between pt-4 border-t border-white/5">
+                                        <div className="flex items-center gap-2 text-slate-500">
+                                            <Eye size={12} />
+                                            <span className="text-[10px] font-black uppercase">{s.views?.toLocaleString()} Görüntülenme</span>
+                                        </div>
+                                        <span className="text-[8px] font-black text-slate-700 uppercase italic">
+                                            {new Date(s.updated_at).toLocaleDateString()}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
-                    </div>
+                    )}
 
                     <div className="mt-8 flex items-center gap-4 p-5 bg-blue-600/5 border border-blue-500/10 rounded-3xl">
                         <div className="w-10 h-10 bg-blue-600/10 rounded-xl flex items-center justify-center text-blue-500"><Clock size={18}/></div>
