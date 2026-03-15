@@ -38,29 +38,29 @@ const UserList = () => {
         </button>
       </div>
 
-      <div className="flex gap-2 mb-6">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+      <div className="flex gap-3 mb-8">
+        <div className="relative flex-1 group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4 group-focus-within:text-blue-500 transition-colors" />
           <input 
             type="text" 
-            placeholder="İsim veya kullanıcı adına göre" 
-            className="w-full bg-slate-900 border border-slate-800 rounded-xl py-3 pl-9 pr-4 text-sm focus:outline-none focus:border-blue-500"
+            placeholder="Kullanıcı ara..." 
+            className="w-full bg-slate-900/40 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-[11px] font-black uppercase tracking-widest focus:outline-none focus:border-blue-500/50 focus:bg-slate-900/60 transition-all placeholder:text-slate-700 italic"
           />
         </div>
-        <button className="p-3 bg-slate-800 rounded-xl border border-slate-700 text-slate-300">
+        <button className="p-4 bg-slate-900/40 rounded-2xl border border-white/5 text-slate-500 hover:bg-white/5 hover:text-slate-300 transition-all">
             <SlidersHorizontal className="w-5 h-5" />
         </button>
       </div>
 
-      <div className="grid grid-cols-4 gap-2 mb-6">
+      <div className="flex gap-3 mb-8 overflow-x-auto pb-2 no-scrollbar">
         {filters.map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className={`py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center ${
+            className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 whitespace-nowrap border italic ${
               filter === f 
-              ? 'bg-blue-600 text-white' 
-              : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+              ? 'bg-blue-600 border-blue-400 text-white shadow-xl shadow-blue-900/40 scale-105 -translate-y-0.5' 
+              : 'bg-slate-900/40 border-white/5 text-slate-500 hover:bg-white/5 hover:text-slate-300 hover:border-white/10'
             }`}
           >
             {f}
@@ -68,30 +68,35 @@ const UserList = () => {
         ))}
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {filteredUsers.map((user) => (
           <div 
             key={user.id} 
             onClick={() => navigate(`/users/${user.id}`)}
-            className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-900 transition-colors cursor-pointer"
+            className="flex items-center justify-between p-4 rounded-[28px] bg-slate-900/40 border border-white/5 hover:border-blue-500/30 hover:bg-slate-900/60 transition-all cursor-pointer group"
           >
             <div className="flex items-center gap-4">
-              <img src={user.avatar} alt={user.name} className="w-12 h-12 rounded-full object-cover" />
+              <div className="relative">
+                <img src={user.avatar} alt={user.name} className="w-14 h-14 rounded-2xl object-cover border border-white/10 group-hover:scale-105 transition-transform" />
+                {user.status === 'Active' && (
+                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-[#020617] rounded-full"></div>
+                )}
+              </div>
               <div>
-                <h3 className="font-semibold text-white">{user.name}</h3>
-                <p className="text-slate-500 text-sm">{user.username}</p>
+                <h3 className="text-sm font-black text-white uppercase italic tracking-tight">{user.name}</h3>
+                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">{user.username}</p>
               </div>
             </div>
             
             <div className="flex gap-2">
                 {user.badges.includes('Premium') && (
-                    <span className="bg-yellow-500/10 text-yellow-500 text-[10px] font-bold px-2 py-1 rounded-md">Premium</span>
+                    <span className="bg-amber-500/10 text-amber-500 text-[8px] font-black uppercase tracking-widest px-2 py-1 rounded-lg border border-amber-500/20">Premium</span>
                 )}
                 {user.badges.includes('Reklamcı') && (
-                    <span className="bg-green-500/10 text-green-500 text-[10px] font-bold px-2 py-1 rounded-md">Reklamcı</span>
+                    <span className="bg-blue-500/10 text-blue-500 text-[8px] font-black uppercase tracking-widest px-2 py-1 rounded-lg border border-blue-500/20">Reklamcı</span>
                 )}
                 {user.status === 'Passive' && (
-                    <span className="bg-red-500/10 text-red-500 text-[10px] font-bold px-2 py-1 rounded-md">Pasif</span>
+                    <span className="bg-red-500/10 text-red-500 text-[8px] font-black uppercase tracking-widest px-2 py-1 rounded-lg border border-red-500/20">Pasif</span>
                 )}
             </div>
           </div>
