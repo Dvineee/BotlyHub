@@ -7,7 +7,7 @@ import {
   Wallet, Search, Database, Radio, Bell, Edit3, Image as ImageIcon,
   CheckCircle2, AlertTriangle, TrendingUp, BarChart3, RadioIcon, Sparkles, UserPlus,
   ShieldCheck, ShieldAlert, Globe, Zap, Clock, ExternalLink, Filter, PieChart, Layers, 
-  Settings as SettingsIcon, History, Copy, Check, Eye, ChevronRight, Monitor, Smartphone, Cpu, Save,
+  Settings as SettingsIcon, History, Copy, Check, Eye, ChevronRight, Monitor, Smartphone, Cpu, Save, Key,
   Info, Star, MousePointer2, Link2, AlertCircle, Shield, Calendar, Hash, Heart
 } from 'lucide-react';
 import { DatabaseService } from '../../services/DatabaseService';
@@ -626,6 +626,48 @@ const UserDetailModal = ({ user, onClose, onUpdate }: { user: User, onClose: () 
                                                     </div>
                                                 </div>
                                             </button>
+
+                                            <div className="bg-slate-950/50 border border-white/5 p-6 rounded-2xl lg:col-span-2 space-y-4">
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="w-10 h-10 bg-purple-600/10 rounded-xl flex items-center justify-center text-purple-500">
+                                                            <Key size={20} />
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-[10px] font-black uppercase italic">Kullanıcı Paneli Erişimi</p>
+                                                            <p className="text-[8px] font-bold opacity-60 uppercase tracking-widest">Özel yönetim paneli giriş yetkisi</p>
+                                                        </div>
+                                                    </div>
+                                                    {user.hasPanelAccess && (
+                                                        <span className="text-[8px] font-black bg-emerald-500/10 text-emerald-500 px-2 py-0.5 rounded border border-emerald-500/20">AKTİF</span>
+                                                    )}
+                                                </div>
+
+                                                <div className="flex gap-3">
+                                                    <input 
+                                                        type="text" 
+                                                        placeholder="Panel Şifresi Belirle..." 
+                                                        id="panelPasswordInput"
+                                                        className="flex-1 h-12 bg-slate-900 border border-white/5 rounded-xl px-4 text-[10px] font-black text-white outline-none focus:border-purple-500 italic"
+                                                     />
+                                                    <button 
+                                                        onClick={async () => {
+                                                            const input = document.getElementById('panelPasswordInput') as HTMLInputElement;
+                                                            if (!input.value) return alert("Şifre giriniz");
+                                                            try {
+                                                                await DatabaseService.grantPanelAccess(user.id, input.value);
+                                                                await DatabaseService.logActivity('admin', 'system', 'panel_access_granted', 'Panel Erişimi Verildi', `${user.username} kullanıcısına panel erişimi ve şifre tanımlandı.`);
+                                                                alert("Panel erişimi başarıyla tanımlandı.");
+                                                                onUpdate();
+                                                                onClose();
+                                                            } catch (e) { alert("Hata oluştu"); }
+                                                        }}
+                                                        className="px-6 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-[9px] font-black uppercase tracking-widest transition-all"
+                                                    >
+                                                        YETKİ VER
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

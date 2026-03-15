@@ -24,6 +24,8 @@ const Maintenance = lazy(() => import('./pages/Maintenance'));
 const Restricted = lazy(() => import('./pages/Restricted'));
 const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+const UserPanelLogin = lazy(() => import('./pages/UserPanelLogin'));
+const UserPanel = lazy(() => import('./pages/UserPanel'));
 
 const PageLoader = () => (
   <div className="flex flex-col items-center justify-center min-h-[50vh] text-slate-500">
@@ -175,6 +177,8 @@ export default function App() {
             <Route path="/earnings" element={<Earnings />} />
             <Route path="/a/admin" element={<AdminLogin />} />
             <Route path="/a/dashboard/*" element={<AdminDashboard />} />
+            <Route path="/u/login" element={<UserPanelLogin />} />
+            <Route path="/u/panel/*" element={<UserPanel />} />
           </Routes>
         </Suspense>
       </TelegramWrapper>

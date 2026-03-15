@@ -12,6 +12,8 @@ export interface User {
   phone?: string;
   isRestricted?: boolean;
   canPublishPromos?: boolean; // canPublishAds yerine
+  hasPanelAccess?: boolean;
+  panelPassword?: string;
 }
 
 export interface ActivityLog {

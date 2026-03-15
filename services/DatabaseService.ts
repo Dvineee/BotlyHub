@@ -544,9 +544,33 @@ export class DatabaseService {
     } : null;
   }
 
-  static async updateSettings(updates: { maintenance_mode?: boolean, marquee_text?: string, version?: string }) {
+  static async updateSettings(updates: any) {
     const { error } = await supabase.from('settings').update(updates).eq('id', 1);
     if (error) throw error;
+  }
+
+  static async grantPanelAccess(userId: string, password: string) {
+    const { error } = await supabase
+      .from('users')
+      .update({ 
+        has_panel_access: true, 
+        panel_password: password 
+      })
+      .eq('id', userId);
+    if (error) throw error;
+  }
+
+  static async loginPanel(username: string, password: string) {
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('username', username.replace('@', ''))
+      .eq('panel_password', password)
+      .eq('has_panel_access', true)
+      .maybeSingle();
+    
+    if (error) throw error;
+    return data;
   }
 
   static async logActivity(userId: string, type: ActivityLog['type'], actionKey: string, title: string, description: string) {
