@@ -1,7 +1,7 @@
 
 import React, { useEffect, Suspense, lazy, useState } from 'react';
 import * as Router from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Megaphone } from 'lucide-react';
 import { DatabaseService } from './services/DatabaseService';
 import { useTelegram } from './hooks/useTelegram';
 import { User } from './types';
@@ -39,18 +39,18 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
   const isAdminPath = location.pathname.startsWith('/a/');
   const [isMaintenance, setIsMaintenance] = useState(false);
   const [isRestricted, setIsRestricted] = useState(false);
+  const [marqueeText, setMarqueeText] = useState<string | null>(null);
 
   useEffect(() => {
     DatabaseService.init();
     
     const initializeApp = async () => {
-        // 1. Bakım Modu Kontrolü
+        // 1. Bakım Modu & Ayarlar Kontrolü
         if (!isAdminPath) {
             const settings = await DatabaseService.getSettings();
-            if (settings && settings.maintenanceMode) {
-                setIsMaintenance(true);
-            } else {
-                setIsMaintenance(false);
+            if (settings) {
+                if (settings.maintenanceMode) setIsMaintenance(true);
+                if (settings.marqueeText) setMarqueeText(settings.marqueeText);
             }
         }
 
@@ -136,6 +136,21 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
 
   return (
     <div className={`${isAdminPath ? 'bg-[#020617]' : 'bg-slate-950'} flex flex-col min-h-screen`}>
+      {marqueeText && !isAdminPath && (
+        <div className="h-8 bg-blue-600/10 border-b border-blue-500/20 flex items-center overflow-hidden relative z-[60]">
+          <div className="flex items-center gap-2 px-4 bg-blue-600 h-full z-10 shadow-[4px_0_10px_rgba(37,99,235,0.3)]">
+            <Megaphone size={12} className="text-white" />
+            <span className="text-[8px] font-black text-white uppercase tracking-widest italic">DUYURU</span>
+          </div>
+          <div className="flex-1 overflow-hidden">
+            <div className="animate-marquee inline-block">
+              <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest italic px-4">
+                {marqueeText}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
       {children}
     </div>
   );

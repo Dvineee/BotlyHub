@@ -7,7 +7,7 @@ import {
   Wallet, Search, Database, Radio, Bell, Edit3, Image as ImageIcon,
   CheckCircle2, AlertTriangle, TrendingUp, BarChart3, RadioIcon, Sparkles, UserPlus,
   ShieldCheck, ShieldAlert, Globe, Zap, Clock, ExternalLink, Filter, PieChart, Layers, 
-  Settings as SettingsIcon, History, Copy, Check, Eye, ChevronRight, Monitor, Smartphone, Cpu,
+  Settings as SettingsIcon, History, Copy, Check, Eye, ChevronRight, Monitor, Smartphone, Cpu, Save,
   Info, Star, MousePointer2, Link2, AlertCircle, Shield, Calendar, Hash, Heart
 } from 'lucide-react';
 import { DatabaseService } from '../../services/DatabaseService';
@@ -1005,13 +1005,62 @@ const SettingsManager = () => {
                     </div>
                 </div>
 
-                <div className="bg-slate-900/40 border border-white/5 p-8 lg:p-12 rounded-[44px] flex flex-col justify-center items-center text-center space-y-6 opacity-40">
-                    <div className="w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center text-slate-600">
-                        <SettingsIcon size={40} />
+                <div className="bg-slate-900/40 border border-white/5 p-8 lg:p-12 rounded-[44px] space-y-8">
+                    <div className="flex items-center gap-6">
+                        <div className="w-16 h-16 rounded-3xl flex items-center justify-center border bg-blue-500/10 border-blue-500/20 text-blue-500">
+                            <Megaphone size={32} />
+                        </div>
+                        <div>
+                            <h4 className="text-lg font-black text-white uppercase italic">Görsel & Metin</h4>
+                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">Duyuru bandı ve versiyon yönetimi</p>
+                        </div>
                     </div>
-                    <div>
-                        <h4 className="text-sm font-black text-slate-500 uppercase italic">Diğer Ayarlar</h4>
-                        <p className="text-[9px] font-black text-slate-700 uppercase tracking-widest mt-2 italic">Yakında eklenecek özellikler</p>
+
+                    <div className="space-y-6">
+                        <div className="space-y-2">
+                            <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">DUYURU BANDI (MARQUEE)</label>
+                            <input 
+                                type="text"
+                                value={settings?.marqueeText || ''}
+                                onChange={e => setSettings({ ...settings, marqueeText: e.target.value })}
+                                className="w-full h-16 px-6 bg-slate-950/50 border border-white/5 rounded-2xl text-xs font-black text-white focus:border-blue-500/40 outline-none transition-all uppercase italic"
+                                placeholder="ÖRN: YENİ BOTLAR MARKETTE! HEMEN İNCELE..."
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">UYGULAMA VERSİYONU</label>
+                            <input 
+                                type="text"
+                                value={settings?.version || ''}
+                                onChange={e => setSettings({ ...settings, version: e.target.value })}
+                                className="w-full h-16 px-6 bg-slate-950/50 border border-white/5 rounded-2xl text-xs font-black text-white focus:border-blue-500/40 outline-none transition-all uppercase italic"
+                                placeholder="ÖRN: V3.1.2"
+                            />
+                        </div>
+
+                        <button 
+                            onClick={async () => {
+                                setIsSaving(true);
+                                try {
+                                    await DatabaseService.updateSettings({ 
+                                        marquee_text: settings.marqueeText,
+                                        version: settings.version
+                                    });
+                                    await DatabaseService.logActivity('admin', 'system', 'settings_update', 'Sistem Ayarları Güncellendi', 'Duyuru bandı veya versiyon bilgisi güncellendi.');
+                                    alert("Ayarlar başarıyla kaydedildi.");
+                                } catch (e) {
+                                    alert("Hata oluştu");
+                                } finally {
+                                    setIsSaving(false);
+                                }
+                            }}
+                            disabled={isSaving}
+                            className="w-full h-16 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-2xl text-[10px] uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-3 shadow-xl shadow-blue-900/20"
+                        >
+                            {isSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                            AYARLARI KAYDET
+                        </button>
                     </div>
                 </div>
             </div>

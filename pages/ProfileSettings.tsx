@@ -12,6 +12,7 @@ const ProfileSettings = () => {
   const navigate = useNavigate();
   const { user } = useTelegram();
   const [currentPlanName, setCurrentPlanName] = useState('Başlangıç');
+  const [version, setVersion] = useState<string | null>(null);
 
   useEffect(() => {
       const planId = localStorage.getItem('userPlan');
@@ -19,6 +20,13 @@ const ProfileSettings = () => {
           const plan = subscriptionPlans.find(p => p.id === planId);
           if (plan) setCurrentPlanName(plan.name);
       }
+      
+      // Fetch version
+      import('../services/DatabaseService').then(({ DatabaseService }) => {
+          DatabaseService.getSettings().then(settings => {
+              if (settings?.version) setVersion(settings.version);
+          });
+      });
   }, []);
 
   // Kullanıcı adı veya isim yoksa varsayılan değerler
@@ -98,6 +106,12 @@ const ProfileSettings = () => {
             />
             <MenuItem icon={Globe} label="Dil Seçimi" value="Türkçe" />
         </div>
+
+        {version && (
+            <div className="mt-12 text-center opacity-20">
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">BOTLYHUB {version}</p>
+            </div>
+        )}
     </div>
   );
 };

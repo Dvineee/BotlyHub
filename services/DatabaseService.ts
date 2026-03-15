@@ -536,10 +536,15 @@ export class DatabaseService {
 
   static async getSettings() {
     const { data } = await supabase.from('settings').select('*').eq('id', 1).maybeSingle();
-    return data ? { ...data, maintenanceMode: Boolean(data.maintenance_mode) } : null;
+    return data ? { 
+        ...data, 
+        maintenanceMode: Boolean(data.maintenance_mode),
+        marqueeText: data.marquee_text,
+        version: data.version
+    } : null;
   }
 
-  static async updateSettings(updates: { maintenance_mode?: boolean }) {
+  static async updateSettings(updates: { maintenance_mode?: boolean, marquee_text?: string, version?: string }) {
     const { error } = await supabase.from('settings').update(updates).eq('id', 1);
     if (error) throw error;
   }
