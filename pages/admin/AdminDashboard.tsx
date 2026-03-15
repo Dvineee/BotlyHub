@@ -684,7 +684,7 @@ const UserDetailModal = ({ user, onClose, onUpdate }: { user: User, onClose: () 
                                                 <div className="w-10 h-10 bg-emerald-600/10 rounded-xl flex items-center justify-center text-emerald-500">
                                                     <TrendingUp size={20} />
                                                 </div>
-                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Toplam Kazanç</p>
+                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Toplam Gelir</p>
                                             </div>
                                             
                                             <div className="space-y-4">
@@ -697,7 +697,7 @@ const UserDetailModal = ({ user, onClose, onUpdate }: { user: User, onClose: () 
                                                     />
                                                     <span className="absolute right-6 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-600 uppercase italic">TRY</span>
                                                 </div>
-                                                <p className="text-[9px] text-slate-600 font-bold uppercase italic px-2">Kullanıcının platform üzerinden bugüne kadar kazandığı toplam tutar.</p>
+                                                <p className="text-[9px] text-slate-600 font-bold uppercase italic px-2">Kullanıcının platform üzerinden elde ettiği tüm zamanların toplam geliri.</p>
                                             </div>
                                         </div>
                                     </div>

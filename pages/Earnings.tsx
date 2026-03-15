@@ -18,28 +18,35 @@ const Earnings = () => {
   const userFriendlyAddress = useTonAddress();
   const [activeTab, setActiveTab] = useState<'wallet' | 'revenue'>('wallet');
   const [stats, setStats] = useState<PromotionChannelStats[]>([]);
+  const [wallet, setWallet] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     haptic('light');
-    if (activeTab === 'revenue' && user?.id) {
-        loadStats();
+    if (user?.id) {
+        loadData();
     }
   }, [activeTab, user?.id]);
 
-  const loadStats = async () => {
+  const loadData = async () => {
     if (!user?.id) return;
     setIsLoading(true);
     try {
-        console.log("Loading stats for user ID:", user.id);
-        const data = await DatabaseService.getPromotionChannelStats(user.id);
-        console.log("Stats data received:", data.length, "items");
-        setStats(data);
+        const [statsData, walletData] = await Promise.all([
+            DatabaseService.getPromotionChannelStats(user.id),
+            DatabaseService.getUserWallet(user.id)
+        ]);
+        setStats(statsData);
+        setWallet(walletData);
     } catch (e) {
-        console.error("Stats Load Error:", e);
+        console.error("Data Load Error:", e);
     } finally {
         setIsLoading(false);
     }
+  };
+
+  const loadStats = async () => {
+    await loadData();
   };
 
   const totalRevenue = stats.reduce((acc, curr) => acc + (curr.revenue || 0), 0);
@@ -79,8 +86,29 @@ const Earnings = () => {
                                 </div>
                             </div>
                             <p className="text-[10px] font-black text-white/60 uppercase tracking-[0.3em] mb-2 italic">Mevcut Bakiye</p>
-                            <h2 className="text-4xl font-black text-white italic tracking-tighter mb-1 leading-none">0.00 <span className="text-lg">TON</span></h2>
-                            <p className="text-[9px] font-black text-white/40 uppercase tracking-widest">≈ ₺0.00 TRY</p>
+                            <h2 className="text-4xl font-black text-white italic tracking-tighter mb-1 leading-none">
+                                {wallet ? (wallet.balance / 10).toFixed(2) : '0.00'} <span className="text-lg">TON</span>
+                            </h2>
+                            <p className="text-[9px] font-black text-white/40 uppercase tracking-widest">
+                                ≈ ₺{wallet ? wallet.balance.toLocaleString() : '0.00'} TRY
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4 mb-8">
+                        <div className="bg-slate-900/40 border border-white/5 p-6 rounded-[32px] flex flex-col items-center gap-3">
+                            <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-500"><TrendingUp size={20} /></div>
+                            <p className="text-[8px] font-black text-slate-600 uppercase tracking-widest">Toplam Gelir</p>
+                            <h4 className="text-xl font-black text-white italic tracking-tighter leading-none">
+                                ₺{wallet ? wallet.total_earned.toLocaleString() : '0.00'}
+                            </h4>
+                        </div>
+                        <div className="bg-slate-900/40 border border-white/5 p-6 rounded-[32px] flex flex-col items-center gap-3">
+                            <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-500"><PieChart size={20} /></div>
+                            <p className="text-[8px] font-black text-slate-600 uppercase tracking-widest">Kanal Sayısı</p>
+                            <h4 className="text-xl font-black text-white italic tracking-tighter leading-none">
+                                {new Set(stats.map(s => s.channel_id)).size}
+                            </h4>
                         </div>
                     </div>
 
