@@ -539,6 +539,11 @@ export class DatabaseService {
     return data ? { ...data, maintenanceMode: Boolean(data.maintenance_mode) } : null;
   }
 
+  static async updateSettings(updates: { maintenance_mode?: boolean }) {
+    const { error } = await supabase.from('settings').update(updates).eq('id', 1);
+    if (error) throw error;
+  }
+
   static async logActivity(userId: string, type: ActivityLog['type'], actionKey: string, title: string, description: string) {
       await supabase.from('bot_logs').insert({ 
           user_id: String(userId), 

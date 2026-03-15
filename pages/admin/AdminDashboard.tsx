@@ -80,6 +80,9 @@ const AdminDashboard = () => {
             <NavItem to="/a/dashboard/promotions" icon={RadioIcon} label="Tanıtım Motoru" />
             <NavItem to="/a/dashboard/announcements" icon={Megaphone} label="Duyuru Merkezi" />
             <NavItem to="/a/dashboard/notifications" icon={Bell} label="Bildirim Gönder" />
+            
+            <div className="pt-8 pb-3 px-6"><span className="text-[9px] font-black text-slate-800 uppercase tracking-widest italic">Sistem</span></div>
+            <NavItem to="/a/dashboard/settings" icon={SettingsIcon} label="Sistem Ayarları" />
           </nav>
 
           <button onClick={() => { DatabaseService.logoutAdmin(); navigate('/a/admin'); }} className="mt-8 flex items-center gap-4 px-8 py-5 text-red-500 font-black text-[10px] uppercase tracking-widest hover:bg-red-500/10 rounded-[24px] transition-all group border border-transparent hover:border-red-500/20">
@@ -115,6 +118,7 @@ const AdminDashboard = () => {
               <Route path="promotions" element={<PromotionManagement />} />
               <Route path="announcements" element={<AnnouncementCenter />} />
               <Route path="notifications" element={<NotificationCenter />} />
+              <Route path="settings" element={<SettingsManager />} />
             </Routes>
           </div>
         </div>
@@ -926,6 +930,91 @@ const UserManagement = () => {
                     onUpdate={load} 
                 />
             )}
+        </div>
+    );
+};
+
+const SettingsManager = () => {
+    const [settings, setSettings] = useState<any>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isSaving, setIsSaving] = useState(false);
+
+    const load = useCallback(async () => {
+        setIsLoading(true);
+        const data = await DatabaseService.getSettings();
+        setSettings(data);
+        setIsLoading(false);
+    }, []);
+
+    useEffect(() => { load(); }, [load]);
+
+    const toggleMaintenance = async () => {
+        if (!settings) return;
+        setIsSaving(true);
+        try {
+            const newValue = !settings.maintenanceMode;
+            await DatabaseService.updateSettings({ maintenance_mode: newValue });
+            await DatabaseService.logActivity('admin', 'system', 'maintenance_toggle', 'Bakım Modu Değiştirildi', `Bakım modu ${newValue ? 'AKTİF' : 'PASİF'} hale getirildi.`);
+            setSettings({ ...settings, maintenanceMode: newValue });
+            alert(`Bakım modu ${newValue ? 'etkinleştirildi' : 'devre dışı bırakıldı'}.`);
+        } catch (e) {
+            alert("Hata oluştu");
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    if (isLoading) return <div className="flex justify-center py-24"><Loader2 className="animate-spin text-blue-500" size={32} /></div>;
+
+    return (
+        <div className="space-y-10 animate-in fade-in">
+            <div className="flex flex-col gap-2">
+                <h2 className="text-3xl font-black text-white italic uppercase tracking-tighter leading-none">Sistem <span className="text-blue-500">Ayarları</span></h2>
+                <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em] mt-2 italic">Platform genel yapılandırmasını yönetin</p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="bg-slate-900/40 border border-white/5 p-8 lg:p-12 rounded-[44px] space-y-8">
+                    <div className="flex items-center gap-6">
+                        <div className={`w-16 h-16 rounded-3xl flex items-center justify-center border transition-all ${settings?.maintenanceMode ? 'bg-red-500/10 border-red-500/20 text-red-500' : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500'}`}>
+                            <AlertTriangle size={32} />
+                        </div>
+                        <div>
+                            <h4 className="text-lg font-black text-white uppercase italic">Bakım Modu</h4>
+                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">Tüm kullanıcı erişimini kısıtlar</p>
+                        </div>
+                    </div>
+
+                    <div className="p-8 bg-slate-950/50 rounded-3xl border border-white/5 space-y-6">
+                        <p className="text-slate-400 text-xs font-bold leading-relaxed uppercase italic opacity-70">
+                            Bakım modu aktif edildiğinde, adminler hariç tüm kullanıcılar "Bakımdayız" sayfasıyla karşılaşır. Kritik güncellemeler sırasında kullanılması önerilir.
+                        </p>
+                        
+                        <button 
+                            onClick={toggleMaintenance}
+                            disabled={isSaving}
+                            className={`w-full py-6 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 shadow-2xl ${
+                                settings?.maintenanceMode 
+                                ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-900/20' 
+                                : 'bg-red-600 hover:bg-red-500 text-white shadow-red-900/20'
+                            }`}
+                        >
+                            {isSaving ? <Loader2 size={16} className="animate-spin" /> : (settings?.maintenanceMode ? <Check size={16} /> : <AlertTriangle size={16} />)}
+                            {settings?.maintenanceMode ? 'BAKIM MODUNU KAPAT' : 'BAKIM MODUNU AÇ'}
+                        </button>
+                    </div>
+                </div>
+
+                <div className="bg-slate-900/40 border border-white/5 p-8 lg:p-12 rounded-[44px] flex flex-col justify-center items-center text-center space-y-6 opacity-40">
+                    <div className="w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center text-slate-600">
+                        <SettingsIcon size={40} />
+                    </div>
+                    <div>
+                        <h4 className="text-sm font-black text-slate-500 uppercase italic">Diğer Ayarlar</h4>
+                        <p className="text-[9px] font-black text-slate-700 uppercase tracking-widest mt-2 italic">Yakında eklenecek özellikler</p>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };
