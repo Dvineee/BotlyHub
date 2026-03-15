@@ -421,21 +421,24 @@ const UserDetailModal = ({ user, onClose, onUpdate }: { user: User, onClose: () 
     const [channels, setChannels] = useState<any[]>([]);
     const [bots, setBots] = useState<any[]>([]);
     const [wallet, setWallet] = useState<any>(null);
+    const [stats, setStats] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState<'overview' | 'channels' | 'bots' | 'wallet'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'channels' | 'bots' | 'wallet' | 'stats'>('overview');
     const [isSavingWallet, setIsSavingWallet] = useState(false);
 
     const loadDetails = useCallback(async () => {
         setIsLoading(true);
         try {
-            const [c, b, w] = await Promise.all([
+            const [c, b, w, s] = await Promise.all([
                 DatabaseService.getChannels(user.id),
                 DatabaseService.getUserBots(user.id),
-                DatabaseService.getUserWallet(user.id)
+                DatabaseService.getUserWallet(user.id),
+                DatabaseService.getPromotionChannelStats(user.id)
             ]);
             setChannels(c);
             setBots(b);
             setWallet(w);
+            setStats(s);
         } catch (e) {
             console.error(e);
         } finally {
@@ -502,7 +505,8 @@ const UserDetailModal = ({ user, onClose, onUpdate }: { user: User, onClose: () 
                         { id: 'overview', label: 'GENEL BAKIŞ', icon: LayoutDashboard },
                         { id: 'channels', label: 'KANALLAR', icon: Radio },
                         { id: 'bots', label: 'BOTLAR', icon: Bot },
-                        { id: 'wallet', label: 'CÜZDAN', icon: Wallet }
+                        { id: 'wallet', label: 'CÜZDAN', icon: Wallet },
+                        { id: 'stats', label: 'İSTATİSTİK', icon: BarChart3 }
                     ].map(tab => (
                         <button 
                             key={tab.id}
@@ -721,6 +725,66 @@ const UserDetailModal = ({ user, onClose, onUpdate }: { user: User, onClose: () 
                                             {isSavingWallet ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
                                             DEĞİŞİKLİKLERİ KAYDET
                                         </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'stats' && (
+                                <div className="space-y-6 animate-in slide-in-from-bottom-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div className="bg-slate-950/50 border border-white/5 p-6 rounded-3xl">
+                                            <p className="text-[9px] font-black text-slate-700 uppercase tracking-widest italic mb-2">Toplam Gösterim</p>
+                                            <h4 className="text-2xl font-black text-white italic">{stats.reduce((acc, s) => acc + (s.views || 0), 0).toLocaleString()}</h4>
+                                        </div>
+                                        <div className="bg-slate-950/50 border border-white/5 p-6 rounded-3xl">
+                                            <p className="text-[9px] font-black text-slate-700 uppercase tracking-widest italic mb-2">Toplam Gelir</p>
+                                            <h4 className="text-2xl font-black text-emerald-500 italic">₺{stats.reduce((acc, s) => acc + (s.revenue || 0), 0).toLocaleString()}</h4>
+                                        </div>
+                                        <div className="bg-slate-950/50 border border-white/5 p-6 rounded-3xl">
+                                            <p className="text-[9px] font-black text-slate-700 uppercase tracking-widest italic mb-2">Aktif Reklam Sayısı</p>
+                                            <h4 className="text-2xl font-black text-blue-500 italic">{new Set(stats.map(s => s.promotion_id)).size}</h4>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-slate-950/50 border border-white/5 rounded-[32px] overflow-hidden">
+                                        <table className="w-full text-left">
+                                            <thead className="bg-white/5 text-[8px] uppercase tracking-widest text-slate-700 font-black">
+                                                <tr>
+                                                    <th className="px-6 py-4">REKLAM</th>
+                                                    <th className="px-6 py-4">KANAL</th>
+                                                    <th className="px-6 py-4">GÖSTERİM</th>
+                                                    <th className="px-6 py-4 text-right">GELİR</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-white/5">
+                                                {stats.length === 0 ? (
+                                                    <tr>
+                                                        <td colSpan={4} className="px-6 py-12 text-center text-[10px] font-black text-slate-800 uppercase italic">Henüz veri bulunmuyor</td>
+                                                    </tr>
+                                                ) : (
+                                                    stats.map((s, idx) => (
+                                                        <tr key={idx} className="hover:bg-white/5 transition-all">
+                                                            <td className="px-6 py-4">
+                                                                <p className="text-[11px] font-black text-white uppercase italic truncate max-w-[150px]">
+                                                                    {s.promotion?.title || 'Bilinmeyen Reklam'}
+                                                                </p>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <p className="text-[10px] font-black text-slate-500 uppercase italic">
+                                                                    {s.channel_name || 'Bilinmeyen Kanal'}
+                                                                </p>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <span className="text-[11px] font-black text-blue-500 italic">{s.views.toLocaleString()}</span>
+                                                            </td>
+                                                            <td className="px-6 py-4 text-right">
+                                                                <span className="text-[11px] font-black text-emerald-500 italic">₺{s.revenue.toLocaleString()}</span>
+                                                            </td>
+                                                        </tr>
+                                                    ))
+                                                )}
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             )}
