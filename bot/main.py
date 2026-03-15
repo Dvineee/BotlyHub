@@ -35,20 +35,37 @@ UTCNOW = lambda: datetime.datetime.now(timezone.utc).isoformat()
 # =====================================================
 def parse_views(views_str):
     if not views_str: return 0
-    views_str = views_str.upper().replace(',', '.')
+    views_str = views_str.upper().strip()
+    # Sayısal kısmı ve birimi (K, M) ayıkla (Örn: "1.2K", "500", "1,2M")
+    match = re.search(r'([\d\.,]+)\s*([KM]?)', views_str)
+    if not match:
+        # Eğer regex bulamazsa eski yöntemi dene (fallback)
+        try:
+            val_str = re.sub(r'[^\d\.,]', '', views_str).replace(',', '.')
+            return int(float(val_str))
+        except:
+            return 0
+    
+    val_str = match.group(1).replace(',', '.')
+    unit = match.group(2)
+    
     try:
-        if 'K' in views_str:
-            return int(float(views_str.replace('K', '')) * 1000)
-        if 'M' in views_str:
-            return int(float(views_str.replace('M', '')) * 1000000)
-        return int(re.sub(r'\D', '', views_str) or 0)
+        val = float(val_str)
+        if unit == 'K':
+            return int(val * 1000)
+        if unit == 'M':
+            return int(val * 1000000)
+        return int(val)
     except:
         return 0
 
 async def get_telegram_stats(username, message_id):
     if not username or not message_id: return 0, 0
     url = f"https://t.me/{username}/{message_id}?embed=1"
-    async with httpx.AsyncClient(timeout=10.0) as client:
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+    }
+    async with httpx.AsyncClient(timeout=15.0, headers=headers) as client:
         try:
             resp = await client.get(url)
             if resp.status_code == 200:
@@ -57,6 +74,10 @@ async def get_telegram_stats(username, message_id):
                 # Görüntülenme çek
                 views = 0
                 views_span = soup.find('span', class_='tgme_widget_message_views')
+                if not views_span:
+                    # Alternatif class'ları dene
+                    views_span = soup.find('span', class_=re.compile(r'.*views.*'))
+                
                 if views_span:
                     views = parse_views(views_span.text)
                 
@@ -68,6 +89,8 @@ async def get_telegram_stats(username, message_id):
                     reactions = sum(parse_views(t.text) for t in count_tags)
                 
                 return views, reactions
+            else:
+                logger.warning(f"⚠️ Scrape HTTP {resp.status_code} ({username}/{message_id})")
         except Exception as e:
             logger.error(f"Scrape Error ({username}/{message_id}): {e}")
     return 0, 0
@@ -99,15 +122,30 @@ async def update_views_loop():
                     # Ana kanalın username'ini al
                     source_username = p.get("source_username") # Önce promo'dan bak (varsa)
                     if not source_username:
+                        # Önce kanallar tablosundan bak (daha hızlı)
                         try:
-                            # Fallback: Eğer ID bilinen ana kanalsa direkt username kullan
-                            if str(source_channel) == "-1003826684282":
-                                source_username = "BotlyHubAds"
-                            else:
-                                source_chat = await bot.get_chat(source_channel)
-                                source_username = source_chat.username
-                        except Exception as e:
-                            logger.error(f"⚠️ Ana kanal username alınamadı ({source_channel}): {e}")
+                            ch_res = supabase.table("channels").select("username").eq("telegram_id", str(source_channel)).execute()
+                            if ch_res.data and ch_res.data[0].get("username"):
+                                source_username = ch_res.data[0]["username"]
+                        except: pass
+
+                        if not source_username:
+                            try:
+                                # Fallback: Eğer ID bilinen ana kanalsa direkt username kullan
+                                if str(source_channel) == "-1003826684282":
+                                    source_username = "BotlyHubAds"
+                                else:
+                                    source_chat = await bot.get_chat(source_channel)
+                                    source_username = source_chat.username
+                                    
+                                # Bulduysak promotions tablosuna kaydet (opsiyonel, hata verirse pas geç)
+                                # Not: source_username kolonu yoksa hata verebilir, bu yüzden pas geçiyoruz
+                                # if source_username:
+                                #     try:
+                                #         supabase.table("promotions").update({"source_username": source_username}).eq("id", promo_id).execute()
+                                #     except: pass
+                            except Exception as e:
+                                logger.error(f"⚠️ Ana kanal username alınamadı ({source_channel}): {e}")
 
                     if source_username:
                         for target_tg_id, source_msg_id in message_map.items():
@@ -135,6 +173,18 @@ async def update_views_loop():
                         logger.warning(f"📊 [İSTATİSTİK ATLANDI] Ana kanal ({source_channel}) için kullanıcı adı bulunamadı. "
                                        f"Kanal gizli (private) olabilir. İstatistiklerin çalışması için kanalın kamuya açık (public) "
                                        f"olması ve bir @username'e sahip olması gerekir.")
+                        
+                        # Log to bot_logs for user visibility
+                        try:
+                            supabase.table("bot_logs").insert({
+                                "user_id": "system",
+                                "type": "warning",
+                                "action_key": f"stats_skip_{promo_id}",
+                                "title": "İstatistik Takibi Atlandı",
+                                "description": f"'{p['title']}' reklamı için ana kanal ({source_channel}) username bulunamadı. Kanal gizli olabilir.",
+                                "created_at": UTCNOW()
+                            }).execute()
+                        except: pass
 
                 # 2. ANA KANAL İSTATİSTİĞİ (Eğer message_map'te yoksa veya ek olarak)
                 if source_channel and source_msg_id and str(source_channel) not in message_map:
@@ -210,7 +260,9 @@ async def ad_dispatcher_task():
                 if source_channel and not source_msg_id:
                     try:
                         source_chat = await bot.get_chat(source_channel)
-                        if not source_chat.username and str(source_channel) != "-1003826684282":
+                        source_username = source_chat.username
+                        
+                        if not source_username and str(source_channel) != "-1003826684282":
                             logger.warning(f"⚠️ [KRİTİK UYARI] Ana kanal ({source_channel}) GİZLİ (PRIVATE). "
                                            f"İstatistik takibi (scraping) çalışmayacaktır. "
                                            f"Lütfen istatistikler için ana kanalı KAMUYA AÇIK (PUBLIC) yapın "
@@ -231,7 +283,12 @@ async def ad_dispatcher_task():
 
                         if sent:
                             source_msg_id = sent.message_id
-                            supabase.table("promotions").update({"source_message_id": source_msg_id}).eq("id", promo["id"]).execute()
+                            update_data = {"source_message_id": source_msg_id}
+                            # source_username kolonu mevcut değilse hata verir, bu yüzden devre dışı bırakıldı
+                            # if source_username:
+                            #     update_data["source_username"] = source_username
+                                
+                            supabase.table("promotions").update(update_data).eq("id", promo["id"]).execute()
                             logger.info(f"✅ Ana kanal paylaşımı başarılı. ID: {source_msg_id}")
                             
                             # Log to bot_logs for visibility in admin panel

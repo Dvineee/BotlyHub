@@ -136,9 +136,15 @@ export class DatabaseService {
     return (data || []).map(stat => {
         const channel = channels.find(c => String(c.telegram_id) === String(stat.channel_id));
         console.log(`Matching stat for channel ${stat.channel_id}:`, channel ? "Found" : "Not Found");
+        
+        // Supabase returns the joined table as an object or array with the table name
+        // We map it to 'promotion' (singular) as expected by the frontend
+        const promotion = Array.isArray(stat.promotions) ? stat.promotions[0] : stat.promotions;
+        
         return {
             ...stat,
-            channel_name: channel ? channel.name : 'Bilinmeyen Kanal'
+            channel_name: channel ? channel.name : 'Bilinmeyen Kanal',
+            promotion: promotion
         };
     });
   }
