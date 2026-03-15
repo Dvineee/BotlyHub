@@ -21,6 +21,7 @@ const Notifications = lazy(() => import('./pages/Notifications'));
 const AccountSettings = lazy(() => import('./pages/AccountSettings'));
 const Earnings = lazy(() => import('./pages/Earnings'));
 const Maintenance = lazy(() => import('./pages/Maintenance'));
+const Restricted = lazy(() => import('./pages/Restricted'));
 const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 
@@ -37,6 +38,7 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
   const { user } = useTelegram();
   const isAdminPath = location.pathname.startsWith('/a/');
   const [isMaintenance, setIsMaintenance] = useState(false);
+  const [isRestricted, setIsRestricted] = useState(false);
 
   useEffect(() => {
     DatabaseService.init();
@@ -67,6 +69,14 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
                 };
                 await DatabaseService.syncUser(userData);
                 
+                // 3. Kısıtlama Kontrolü
+                const dbUser = await DatabaseService.getUser(user.id.toString());
+                if (dbUser && dbUser.isRestricted) {
+                    setIsRestricted(true);
+                } else {
+                    setIsRestricted(false);
+                }
+
                 // Log visit
                 await DatabaseService.logActivity(user.id.toString(), 'system', 'app_visit', 'Uygulama Ziyareti', `${userData.username} uygulamayı başlattı.`);
             } catch (e) {
@@ -118,6 +128,10 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
 
   if (isMaintenance && !isAdminPath) {
       return <Maintenance />;
+  }
+
+  if (isRestricted && !isAdminPath) {
+      return <Restricted />;
   }
 
   return (

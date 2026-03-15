@@ -6,7 +6,7 @@ import {
   Loader2, Plus, Trash2, Megaphone, Send, Activity, 
   Wallet, Search, Database, Radio, Bell, Edit3, Image as ImageIcon,
   CheckCircle2, AlertTriangle, TrendingUp, BarChart3, RadioIcon, Sparkles, UserPlus,
-  ShieldCheck, Globe, Zap, Clock, ExternalLink, Filter, PieChart, Layers, 
+  ShieldCheck, ShieldAlert, Globe, Zap, Clock, ExternalLink, Filter, PieChart, Layers, 
   Settings as SettingsIcon, History, Copy, Check, Eye, ChevronRight, Monitor, Smartphone, Cpu,
   Info, Star, MousePointer2, Link2, AlertCircle, Shield, Calendar, Hash, Heart
 } from 'lucide-react';
@@ -462,6 +462,22 @@ const UserDetailModal = ({ user, onClose, onUpdate }: { user: User, onClose: () 
         } catch (e) { alert("Hata oluştu"); }
     };
 
+    const toggleRestriction = async () => {
+        try {
+            await DatabaseService.updateUserRestriction(user.id, !user.isRestricted);
+            onUpdate();
+            onClose();
+        } catch (e) { alert("Hata oluştu"); }
+    };
+
+    const togglePublishStatus = async () => {
+        try {
+            await DatabaseService.updateUserPublishStatus(user.id, !user.canPublishPromos);
+            onUpdate();
+            onClose();
+        } catch (e) { alert("Hata oluştu"); }
+    };
+
     const removeBot = async (bot: any) => {
         if (!confirm("Bu botu kullanıcının kütüphanesinden kaldırmak istediğinize emin misiniz?")) return;
         try {
@@ -566,6 +582,46 @@ const UserDetailModal = ({ user, onClose, onUpdate }: { user: User, onClose: () 
                                                 <span className="text-[10px] text-slate-500 uppercase font-bold">Sahip Olunan Bot</span>
                                                 <span className="text-[11px] text-white font-black italic">{bots.length}</span>
                                             </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-slate-950/50 border border-white/5 p-8 rounded-[32px] space-y-6 lg:col-span-3">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <p className="text-[9px] font-black text-slate-700 uppercase tracking-widest italic mb-1">Hızlı İşlemler</p>
+                                                <h4 className="text-sm font-black text-white uppercase italic">Hesap Yönetimi</h4>
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <button 
+                                                onClick={toggleRestriction}
+                                                className={`flex items-center justify-between p-6 rounded-2xl border transition-all ${user.isRestricted ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : 'bg-red-500/10 border-red-500/20 text-red-500'}`}
+                                            >
+                                                <div className="flex items-center gap-4">
+                                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${user.isRestricted ? 'bg-emerald-500/20' : 'bg-red-500/20'}`}>
+                                                        {user.isRestricted ? <ShieldCheck size={20} /> : <ShieldAlert size={20} />}
+                                                    </div>
+                                                    <div className="text-left">
+                                                        <p className="text-[10px] font-black uppercase italic">{user.isRestricted ? 'Kısıtlamayı Kaldır' : 'Kullanıcıyı Kısıtla'}</p>
+                                                        <p className="text-[8px] font-bold opacity-60 uppercase tracking-widest">{user.isRestricted ? 'Kullanıcı tüm yetkilerine geri döner' : 'Kullanıcının platform erişimi kısıtlanır'}</p>
+                                                    </div>
+                                                </div>
+                                            </button>
+
+                                            <button 
+                                                onClick={togglePublishStatus}
+                                                className={`flex items-center justify-between p-6 rounded-2xl border transition-all ${user.canPublishPromos ? 'bg-blue-500/10 border-blue-500/20 text-blue-500' : 'bg-slate-800 border-white/5 text-slate-500'}`}
+                                            >
+                                                <div className="flex items-center gap-4">
+                                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${user.canPublishPromos ? 'bg-blue-500/20' : 'bg-slate-900'}`}>
+                                                        <Megaphone size={20} />
+                                                    </div>
+                                                    <div className="text-left">
+                                                        <p className="text-[10px] font-black uppercase italic">{user.canPublishPromos ? 'Reklam Yetkisini Al' : 'Reklam Yetkisi Ver'}</p>
+                                                        <p className="text-[8px] font-bold opacity-60 uppercase tracking-widest">{user.canPublishPromos ? 'Kullanıcı artık reklam yayınlayamaz' : 'Kullanıcı platformda reklam yayınlayabilir'}</p>
+                                                    </div>
+                                                </div>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -837,8 +893,15 @@ const UserManagement = () => {
                                     <td className="px-10 py-8 font-black italic text-sm truncate max-w-[200px]">@{u.username}</td>
                                     <td className="px-10 py-8"><span className="text-[10px] font-black text-slate-500 uppercase italic">{u.role}</span></td>
                                     <td className="px-10 py-8">
-                                        <div className={`flex items-center gap-2.5 text-[10px] font-black uppercase tracking-widest ${u.status === 'Active' ? 'text-emerald-500' : 'text-red-500'}`}>
-                                            <div className={`w-2 h-2 rounded-full ${u.status === 'Active' ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`}></div>{u.status}
+                                        <div className="flex flex-col gap-2">
+                                            <div className={`flex items-center gap-2.5 text-[10px] font-black uppercase tracking-widest ${u.status === 'Active' ? 'text-emerald-500' : 'text-red-500'}`}>
+                                                <div className={`w-2 h-2 rounded-full ${u.status === 'Active' ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`}></div>{u.status}
+                                            </div>
+                                            {u.isRestricted && (
+                                                <div className="flex items-center gap-2 text-[8px] font-black text-red-500 uppercase tracking-widest bg-red-500/10 px-2 py-0.5 rounded border border-red-500/20 w-fit">
+                                                    <ShieldAlert size={10} /> KISITLI
+                                                </div>
+                                            )}
                                         </div>
                                     </td>
                                     <td className="px-10 py-8 text-right">

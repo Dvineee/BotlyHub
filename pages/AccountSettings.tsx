@@ -29,7 +29,7 @@ const AccountSettings = () => {
         }
         
         try {
-            const currentUser = await DatabaseService.getUserById(user.id.toString());
+            const currentUser = await DatabaseService.getUser(user.id.toString());
             if (currentUser) {
                 const verified = !!currentUser.email;
                 setIsVerified(verified);

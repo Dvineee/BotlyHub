@@ -176,23 +176,39 @@ export class DatabaseService {
     }
   }
 
-  static async getUserById(userId: string): Promise<User | null> {
+  static async getUser(userId: string): Promise<User | null> {
     const { data } = await supabase.from('users').select('*').eq('id', userId.toString()).maybeSingle();
     if (!data) return null;
     return {
         ...data,
         joinDate: data.joindate,
-        canPublishPromos: data.can_publish_promos
+        canPublishPromos: data.can_publish_promos,
+        isRestricted: data.is_restricted
     };
   }
 
   static async getUsers(): Promise<User[]> {
       const { data } = await supabase.from('users').select('*').order('joindate', { ascending: false });
-      return (data || []).map(u => ({ ...u, joinDate: u.joindate }));
+      return (data || []).map(u => ({ 
+          ...u, 
+          joinDate: u.joindate,
+          isRestricted: u.is_restricted,
+          canPublishPromos: u.can_publish_promos
+      }));
   }
 
   static async updateUserStatus(userId: string, status: 'Active' | 'Passive') {
       const { error } = await supabase.from('users').update({ status }).eq('id', userId);
+      if (error) throw error;
+  }
+
+  static async updateUserRestriction(userId: string, isRestricted: boolean) {
+      const { error } = await supabase.from('users').update({ is_restricted: isRestricted }).eq('id', userId);
+      if (error) throw error;
+  }
+
+  static async updateUserPublishStatus(userId: string, canPublish: boolean) {
+      const { error } = await supabase.from('users').update({ can_publish_promos: canPublish }).eq('id', userId);
       if (error) throw error;
   }
 
