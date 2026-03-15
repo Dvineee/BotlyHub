@@ -196,6 +196,43 @@ export class DatabaseService {
       if (error) throw error;
   }
 
+  // --- WALLETS ---
+  static async getUserWallet(userId: string) {
+      const { data, error } = await supabase
+          .from('user_wallets')
+          .select('*')
+          .eq('user_id', userId)
+          .maybeSingle();
+      
+      if (error) throw error;
+      
+      if (!data) {
+          // Create wallet if it doesn't exist
+          const { data: newWallet, error: createError } = await supabase
+              .from('user_wallets')
+              .insert({ user_id: userId, balance: 0, total_earned: 0 })
+              .select()
+              .single();
+          
+          if (createError) throw createError;
+          return newWallet;
+      }
+      
+      return data;
+  }
+
+  static async updateUserWallet(userId: string, updates: { balance?: number, total_earned?: number }) {
+      const { error } = await supabase
+          .from('user_wallets')
+          .update({ 
+              ...updates,
+              updated_at: new Date().toISOString()
+          })
+          .eq('user_id', userId);
+      
+      if (error) throw error;
+  }
+
   // --- CHANNELS & DISCOVERY ---
   static async getChannels(userId: string): Promise<Channel[]> {
     const { data } = await supabase.from('channels').select('*').eq('user_id', userId.toString()).order('created_at', { ascending: false });

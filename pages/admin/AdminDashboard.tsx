@@ -420,18 +420,22 @@ const BotManagement = () => {
 const UserDetailModal = ({ user, onClose, onUpdate }: { user: User, onClose: () => void, onUpdate: () => void }) => {
     const [channels, setChannels] = useState<any[]>([]);
     const [bots, setBots] = useState<any[]>([]);
+    const [wallet, setWallet] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState<'overview' | 'channels' | 'bots'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'channels' | 'bots' | 'wallet'>('overview');
+    const [isSavingWallet, setIsSavingWallet] = useState(false);
 
     const loadDetails = useCallback(async () => {
         setIsLoading(true);
         try {
-            const [c, b] = await Promise.all([
+            const [c, b, w] = await Promise.all([
                 DatabaseService.getChannels(user.id),
-                DatabaseService.getUserBots(user.id)
+                DatabaseService.getUserBots(user.id),
+                DatabaseService.getUserWallet(user.id)
             ]);
             setChannels(c);
             setBots(b);
+            setWallet(w);
         } catch (e) {
             console.error(e);
         } finally {
@@ -493,11 +497,12 @@ const UserDetailModal = ({ user, onClose, onUpdate }: { user: User, onClose: () 
                 </div>
 
                 {/* Tabs */}
-                <div className="flex px-8 lg:px-12 border-b border-white/5 gap-8">
+                <div className="flex px-8 lg:px-12 border-b border-white/5 gap-8 overflow-x-auto no-scrollbar">
                     {[
                         { id: 'overview', label: 'GENEL BAKIŞ', icon: LayoutDashboard },
                         { id: 'channels', label: 'KANALLAR', icon: Radio },
-                        { id: 'bots', label: 'BOTLAR', icon: Bot }
+                        { id: 'bots', label: 'BOTLAR', icon: Bot },
+                        { id: 'wallet', label: 'CÜZDAN', icon: Wallet }
                     ].map(tab => (
                         <button 
                             key={tab.id}
@@ -642,6 +647,81 @@ const UserDetailModal = ({ user, onClose, onUpdate }: { user: User, onClose: () 
                                             </div>
                                         ))
                                     )}
+                                </div>
+                            )}
+
+                            {activeTab === 'wallet' && wallet && (
+                                <div className="space-y-8 animate-in slide-in-from-bottom-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="bg-slate-950/50 border border-white/5 p-8 rounded-[32px] space-y-6">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-10 h-10 bg-blue-600/10 rounded-xl flex items-center justify-center text-blue-500">
+                                                    <Wallet size={20} />
+                                                </div>
+                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Cüzdan Bakiyesi</p>
+                                            </div>
+                                            
+                                            <div className="space-y-4">
+                                                <div className="relative">
+                                                    <input 
+                                                        type="number" 
+                                                        value={wallet.balance} 
+                                                        onChange={(e) => setWallet({...wallet, balance: parseFloat(e.target.value)})}
+                                                        className="w-full h-16 bg-slate-900 border border-white/5 rounded-2xl px-6 text-xl font-black text-white outline-none focus:border-blue-500 italic"
+                                                    />
+                                                    <span className="absolute right-6 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-600 uppercase italic">TRY</span>
+                                                </div>
+                                                <p className="text-[9px] text-slate-600 font-bold uppercase italic px-2">Kullanıcının harcayabileceği veya çekebileceği güncel bakiye.</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-slate-950/50 border border-white/5 p-8 rounded-[32px] space-y-6">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-10 h-10 bg-emerald-600/10 rounded-xl flex items-center justify-center text-emerald-500">
+                                                    <TrendingUp size={20} />
+                                                </div>
+                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Toplam Kazanç</p>
+                                            </div>
+                                            
+                                            <div className="space-y-4">
+                                                <div className="relative">
+                                                    <input 
+                                                        type="number" 
+                                                        value={wallet.total_earned} 
+                                                        onChange={(e) => setWallet({...wallet, total_earned: parseFloat(e.target.value)})}
+                                                        className="w-full h-16 bg-slate-900 border border-white/5 rounded-2xl px-6 text-xl font-black text-white outline-none focus:border-emerald-500 italic"
+                                                    />
+                                                    <span className="absolute right-6 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-600 uppercase italic">TRY</span>
+                                                </div>
+                                                <p className="text-[9px] text-slate-600 font-bold uppercase italic px-2">Kullanıcının platform üzerinden bugüne kadar kazandığı toplam tutar.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex justify-end">
+                                        <button 
+                                            onClick={async () => {
+                                                setIsSavingWallet(true);
+                                                try {
+                                                    await DatabaseService.updateUserWallet(user.id, {
+                                                        balance: wallet.balance,
+                                                        total_earned: wallet.total_earned
+                                                    });
+                                                    await DatabaseService.logActivity('admin', 'payment', 'wallet_updated', 'Cüzdan Güncellendi', `${user.username} cüzdan bilgileri admin tarafından güncellendi.`);
+                                                    alert("Cüzdan başarıyla güncellendi.");
+                                                } catch (e) {
+                                                    alert("Hata oluştu");
+                                                } finally {
+                                                    setIsSavingWallet(false);
+                                                }
+                                            }}
+                                            disabled={isSavingWallet}
+                                            className="px-10 py-5 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-800 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-2xl shadow-blue-900/40 transition-all flex items-center gap-3"
+                                        >
+                                            {isSavingWallet ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
+                                            DEĞİŞİKLİKLERİ KAYDET
+                                        </button>
+                                    </div>
                                 </div>
                             )}
                         </div>
