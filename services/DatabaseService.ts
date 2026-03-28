@@ -217,6 +217,27 @@ export class DatabaseService {
       if (error) throw error;
   }
 
+  static async deleteUser(userId: string) {
+      const userIdStr = userId.toString();
+      
+      // Delete related data first to avoid FK issues
+      await Promise.all([
+          supabase.from('user_wallets').delete().eq('user_id', userIdStr),
+          supabase.from('channels').delete().eq('user_id', userIdStr),
+          supabase.from('user_bots').delete().eq('user_id', userIdStr),
+          supabase.from('bot_discovery_logs').delete().eq('user_id', userIdStr),
+          supabase.from('bot_logs').delete().eq('user_id', userIdStr),
+          supabase.from('notifications').delete().eq('user_id', userIdStr),
+          supabase.from('transactions').delete().eq('user_id', userIdStr),
+          supabase.from('referrals').delete().or(`referrer_id.eq.${userIdStr},referred_id.eq.${userIdStr}`),
+          supabase.from('promotion_channel_stats').delete().eq('user_id', userIdStr)
+      ]);
+
+      // Finally delete the user record
+      const { error } = await supabase.from('users').delete().eq('id', userIdStr);
+      if (error) throw error;
+  }
+
   // --- WALLETS ---
   static async getUserWallet(userId: string) {
       const { data, error } = await supabase

@@ -513,6 +513,25 @@ const UserDetailModal = ({ user, onClose, onUpdate }: { user: User, onClose: () 
                         </div>
                     </div>
                     <div className="flex gap-3">
+                        <button 
+                            onClick={async () => {
+                                if (confirm(`DİKKAT: @${user.username} kullanıcısını ve kullanıcıya ait TÜM verileri (kanallar, botlar, cüzdan, işlemler vb.) silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`)) {
+                                    try {
+                                        await DatabaseService.deleteUser(user.id);
+                                        await DatabaseService.logActivity('admin', 'system', 'user_deleted', 'Kullanıcı Silindi', `${user.username} kullanıcısı ve tüm verileri sistemden kalıcı olarak silindi.`);
+                                        alert("Kullanıcı başarıyla silindi.");
+                                        onUpdate();
+                                        onClose();
+                                    } catch (e) {
+                                        alert("Hata oluştu: " + (e as any).message);
+                                    }
+                                }
+                            }} 
+                            className="w-12 h-12 lg:w-16 lg:h-16 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-2xl lg:rounded-[24px] flex items-center justify-center transition-all"
+                            title="Kullanıcıyı Sil"
+                        >
+                            <Trash2 size={24} />
+                        </button>
                         <button onClick={onClose} className="w-12 h-12 lg:w-16 lg:h-16 bg-white/5 hover:bg-white/10 text-slate-500 hover:text-white rounded-2xl lg:rounded-[24px] flex items-center justify-center transition-all">
                             <X size={24} />
                         </button>
@@ -951,12 +970,31 @@ const UserManagement = () => {
                                         </div>
                                     </td>
                                     <td className="px-10 py-8 text-right">
-                                        <button 
-                                            onClick={() => setSelectedUser(u)}
-                                            className="px-6 py-3 bg-white/5 rounded-xl text-[9px] font-black uppercase hover:bg-white/10 transition-all tracking-widest"
-                                        >
-                                            YÖNET
-                                        </button>
+                                        <div className="flex items-center justify-end gap-2">
+                                            <button 
+                                                onClick={() => setSelectedUser(u)}
+                                                className="px-6 py-3 bg-white/5 rounded-xl text-[9px] font-black uppercase hover:bg-white/10 transition-all tracking-widest"
+                                            >
+                                                YÖNET
+                                            </button>
+                                            <button 
+                                                onClick={async () => {
+                                                    if (confirm(`@${u.username} kullanıcısını ve tüm verilerini silmek istediğinizden emin misiniz?`)) {
+                                                        try {
+                                                            await DatabaseService.deleteUser(u.id);
+                                                            await DatabaseService.logActivity('admin', 'system', 'user_deleted', 'Kullanıcı Silindi', `${u.username} kullanıcısı silindi.`);
+                                                            load();
+                                                        } catch (e) {
+                                                            alert("Hata oluştu");
+                                                        }
+                                                    }
+                                                }}
+                                                className="p-3 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl transition-all"
+                                                title="Sil"
+                                            >
+                                                <Trash2 size={14} />
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
