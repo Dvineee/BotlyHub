@@ -5,6 +5,15 @@ import { TranslationProvider } from './TranslationContext';
 import { TonConnectUIProvider } from '@tonconnect/ui-react';
 import './index.css';
 
+// Polyfills for TON libraries
+import { Buffer } from 'buffer';
+import process from 'process';
+
+if (typeof window !== 'undefined') {
+  window.Buffer = Buffer;
+  window.process = process;
+}
+
 /**
  * Uygulama Hata Yakalayıcı (ErrorBoundary)
  * Beklenmedik uygulama hatalarını yakalar ve kullanıcıya güvenli bir geri dönüş sunar.
@@ -49,7 +58,12 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
             <span className="text-4xl">⚠️</span>
           </div>
           <h2 className="text-2xl font-black text-white mb-4 uppercase tracking-tighter italic">Uygulama Hatası</h2>
-          <p className="text-slate-500 text-sm mb-8 max-w-xs font-medium">Bir şeyler ters gitti. Uygulamayı yeniden başlatmayı deneyin.</p>
+          <p className="text-slate-500 text-sm mb-4 max-w-xs font-medium">Bir şeyler ters gitti. Uygulamayı yeniden başlatmayı deneyin.</p>
+          {this.state.error && (
+            <div className="bg-red-900/10 border border-red-500/20 rounded-xl p-4 mb-8 max-w-xs w-full">
+              <p className="text-red-400 text-[10px] font-mono break-all">{this.state.error.toString()}</p>
+            </div>
+          )}
           <button 
             onClick={() => window.location.reload()} 
             className="px-10 py-4 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-2xl transition-all shadow-xl shadow-blue-900/20 active:scale-95 text-xs uppercase tracking-widest"

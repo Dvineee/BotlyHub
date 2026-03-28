@@ -96,7 +96,8 @@ const Payment = () => {
           
           const data = await response.json();
           if (!response.ok) {
-              throw new Error(data.error || `Server error: ${response.status}`);
+              const errorDetail = typeof data.error === 'object' ? JSON.stringify(data.error) : data.error;
+              throw new Error(errorDetail || `Sunucu hatası: ${response.status}`);
           }
           
           setOrderId(data.orderId);
@@ -114,7 +115,12 @@ const Payment = () => {
           await tonConnectUI.openModal();
           return;
       }
-      
+
+      if (!item) {
+          alert("Ürün bulunamadı. Lütfen tekrar deneyin.");
+          return;
+      }
+
       setIsLoading(true);
       haptic('medium');
       
@@ -134,26 +140,32 @@ const Payment = () => {
           const result = await tonConnectUI.sendTransaction(transactionPayload);
           
           if (result && result.boc) {
-              // Calculate transaction hash from BOC
-              const hash = Cell.fromBase64(result.boc).hash().toString('hex');
-              console.log("Calculated Transaction Hash:", hash);
+              try {
+                  // Calculate transaction hash from BOC
+                  const hash = Cell.fromBase64(result.boc).hash().toString('hex');
+                  console.log("Calculated Transaction Hash:", hash);
 
-              // Verify on backend
-              const verifyRes = await fetch('/api/payments/verify-ton', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                      transactionHash: hash,
-                      orderId: order.orderId,
-                      userId: effectiveUser.id.toString()
-                  })
-              });
-              const verifyData = await verifyRes.json();
-              
-              if (verifyData.success) {
-                  await handleSuccess(order.orderId, hash);
-              } else {
-                  throw new Error(verifyData.error || "İşlem doğrulanamadı.");
+                  // Verify on backend
+                  const verifyRes = await fetch('/api/payments/verify-ton', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                          transactionHash: hash,
+                          orderId: order.orderId,
+                          userId: effectiveUser.id.toString()
+                      })
+                  });
+                  const verifyData = await verifyRes.json();
+                  
+                  if (verifyData.success) {
+                      await handleSuccess(order.orderId, hash);
+                  } else {
+                      throw new Error(verifyData.error || "İşlem doğrulanamadı.");
+                  }
+              } catch (cellError: any) {
+                  console.error("BOC Parsing Error:", cellError);
+                  alert("İşlem verisi okunamadı, ancak ödeme gönderilmiş olabilir. Lütfen destek ile iletişime geçin.");
+                  setIsLoading(false);
               }
           }
       } catch (e: any) {
