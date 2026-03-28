@@ -252,7 +252,14 @@ export class DatabaseService {
 
           // 3. Nullify referrals in users table (if this user was a referrer)
           const { error: refUpdateError } = await supabase.from('users').update({ referred_by: null }).eq('referred_by', userIdStr);
-          if (refUpdateError) throw refUpdateError;
+          if (refUpdateError) {
+              // If column doesn't exist, we skip it
+              if (refUpdateError.code === 'PGRST204') {
+                  console.warn("[DatabaseService] Warning: 'referred_by' column not found in 'users' table. Skipping referral nullification.");
+              } else {
+                  console.warn("[DatabaseService] Warning: Could not nullify 'referred_by':", refUpdateError.message);
+              }
+          }
 
           // 4. Delete other related data
           const tablesToDelete = [
