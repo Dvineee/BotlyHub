@@ -40,7 +40,8 @@ export class WalletService {
                 {
                     address: ADMIN_WALLET_ADDRESS,
                     amount: nanoTons,
-                    payload: orderId // In TON, this can be a comment
+                    // For security, you can add a BOC payload here.
+                    // For now, we'll keep it simple to ensure compatibility.
                 }
             ]
         };

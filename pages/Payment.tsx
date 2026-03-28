@@ -36,8 +36,8 @@ const Payment = () => {
   const plan = subscriptionPlans.find(p => p.id === id);
   const item = targetBot || plan;
 
-  const handleSuccess = async (txHash?: string) => {
-      if (!item || !orderId) return;
+  const handleSuccess = async (currentOrderId: string, txHash?: string) => {
+      if (!item || !currentOrderId) return;
       
       haptic('heavy');
       notification('success');
@@ -46,7 +46,7 @@ const Payment = () => {
           const userData = user || { id: 'guest', first_name: 'User' };
           
           // Update transaction in DB
-          await DatabaseService.updateTransactionStatus(orderId, 'completed', txHash);
+          await DatabaseService.updateTransactionStatus(currentOrderId, 'completed', txHash);
 
           if (targetBot) {
               await DatabaseService.addUserBot(userData, targetBot, false);
@@ -69,6 +69,7 @@ const Payment = () => {
           navigate(targetBot ? '/my-bots' : '/settings');
       } catch (e) {
           console.error("Post-Payment Error:", e);
+          alert("Ödeme sonrası işlem başarısız: " + (e instanceof Error ? e.message : String(e)));
       }
   };
 
@@ -121,7 +122,7 @@ const Payment = () => {
       
       try {
           const order = await createOrder('TON');
-          if (!order) throw new Error("Order creation failed");
+          if (!order) throw new Error("Sipariş oluşturulamadı. Lütfen Telegram üzerinden girdiğinizden emin olun.");
 
           const transactionPayload = WalletService.createTonTransaction(prices.ton, order.orderId);
           const result = await tonConnectUI.sendTransaction(transactionPayload);
@@ -139,11 +140,15 @@ const Payment = () => {
               const verifyData = await verifyRes.json();
               
               if (verifyData.success) {
-                  await handleSuccess(result.boc);
+                  await handleSuccess(order.orderId, result.boc);
+              } else {
+                  throw new Error(verifyData.error || "İşlem doğrulanamadı.");
               }
           }
       } catch (e: any) {
+          console.error("TON Payment Error:", e);
           notification('error');
+          alert("Ödeme hatası: " + (e.message || "Lütfen tekrar deneyin."));
           setIsLoading(false);
       }
   };
@@ -154,13 +159,13 @@ const Payment = () => {
       
       try {
           const order = await createOrder('STARS');
-          if (!order) throw new Error("Order creation failed");
+          if (!order) throw new Error("Sipariş oluşturulamadı. Lütfen Telegram üzerinden girdiğinizden emin olun.");
 
           // Telegram Stars Invoice
           if (tg && tg.openInvoice) {
               tg.openInvoice(order.invoiceUrl, async (status: string) => {
                   if (status === 'paid') {
-                      await handleSuccess();
+                      await handleSuccess(order.orderId);
                   } else {
                       setIsLoading(false);
                   }
@@ -170,8 +175,9 @@ const Payment = () => {
               alert("Bu ödeme yöntemi sadece Telegram içinde kullanılabilir.");
               setIsLoading(false);
           }
-      } catch (e) {
+      } catch (e: any) {
           console.error("Stars Payment Error:", e);
+          alert("Yıldız ödeme hatası: " + (e.message || "Lütfen tekrar deneyin."));
           setIsLoading(false);
       }
   };
