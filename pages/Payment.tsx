@@ -33,6 +33,21 @@ const Payment = () => {
     if (tg) {
         tg.setHeaderColor('#020617');
     }
+
+    // Test backend connectivity
+    const testBackend = async () => {
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/health`);
+            if (res.ok) {
+                console.log("[PAYMENT] Backend is reachable");
+            } else {
+                console.warn("[PAYMENT] Backend health check failed:", res.status);
+            }
+        } catch (e) {
+            console.error("[PAYMENT] Backend is unreachable:", e);
+        }
+    };
+    testBackend();
   }, [id, tg]);
 
   const plan = subscriptionPlans.find(p => p.id === id);
@@ -81,8 +96,11 @@ const Payment = () => {
       const effectiveUser = user || { id: 'guest', first_name: 'User' };
       if (!item) return null;
       
+      const url = `${API_BASE_URL}/api/payments/create-order`;
+      console.log(`[PAYMENT] Creating order at: ${url}`);
+
       try {
-          const response = await fetch(`${API_BASE_URL}/api/payments/create-order`, {
+          const response = await fetch(url, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -95,17 +113,29 @@ const Payment = () => {
               })
           });
           
-          const data = await response.json();
           if (!response.ok) {
-              const errorDetail = typeof data.error === 'object' ? JSON.stringify(data.error) : data.error;
-              throw new Error(errorDetail || `Sunucu hatası: ${response.status}`);
+              const text = await response.text();
+              console.error(`[PAYMENT] Order creation failed (${response.status}):`, text);
+              try {
+                  const data = JSON.parse(text);
+                  const errorDetail = typeof data.error === 'object' ? JSON.stringify(data.error) : data.error;
+                  throw new Error(errorDetail || `Sunucu hatası: ${response.status}`);
+              } catch (parseError) {
+                  throw new Error(`Sunucu hatası (${response.status}): ${text.substring(0, 100)}`);
+              }
           }
           
+          const data = await response.json();
           setOrderId(data.orderId);
           return data;
       } catch (e: any) {
-          console.error("Order Creation Error:", e);
-          alert("Sipariş oluşturma hatası: " + (e.message || "Bilinmeyen hata"));
+          console.error("[PAYMENT] Order Creation Error:", e);
+          // Check if it's a fetch error
+          if (e.message === 'Failed to fetch') {
+              alert(`Bağlantı Hatası: Sunucuya ulaşılamıyor. Lütfen internet bağlantınızı kontrol edin veya daha sonra tekrar deneyin. (URL: ${url})`);
+          } else {
+              alert("Sipariş oluşturma hatası: " + (e.message || "Bilinmeyen hata"));
+          }
           return null;
       }
   };
@@ -147,7 +177,10 @@ const Payment = () => {
                   console.log("Calculated Transaction Hash:", hash);
 
                   // Verify on backend
-                  const verifyRes = await fetch(`${API_BASE_URL}/api/payments/verify-ton`, {
+                  const verifyUrl = `${API_BASE_URL}/api/payments/verify-ton`;
+                  console.log(`[PAYMENT] Verifying transaction at: ${verifyUrl}`);
+
+                  const verifyRes = await fetch(verifyUrl, {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({
@@ -156,6 +189,13 @@ const Payment = () => {
                           userId: effectiveUser.id.toString()
                       })
                   });
+                  
+                  if (!verifyRes.ok) {
+                      const text = await verifyRes.text();
+                      console.error(`[PAYMENT] Verification failed (${verifyRes.status}):`, text);
+                      throw new Error(`Doğrulama hatası (${verifyRes.status}): ${text.substring(0, 100)}`);
+                  }
+
                   const verifyData = await verifyRes.json();
                   
                   if (verifyData.success) {

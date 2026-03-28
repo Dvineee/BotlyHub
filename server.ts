@@ -7,9 +7,9 @@ import dotenv from "dotenv";
 import crypto from "crypto";
 import { rateLimit } from "express-rate-limit";
 import { z } from "zod";
-import { DatabaseService, supabase } from "./services/DatabaseService.js";
-import { TonService } from "./services/TonService.js";
-import { SecurityUtils } from "./services/SecurityUtils.js";
+import { DatabaseService, supabase } from "./services/DatabaseService";
+import { TonService } from "./services/TonService";
+import { SecurityUtils } from "./services/SecurityUtils";
 
 dotenv.config();
 
@@ -53,7 +53,13 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  app.use(cors());
+  app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-goog-api-key'],
+    credentials: true
+  }));
+  app.options('*', cors());
   app.use(express.json());
 
   // --- DYNAMIC TON CONNECT MANIFEST ---
@@ -77,6 +83,10 @@ async function startServer() {
   });
 
   // --- API ROUTES ---
+  app.get("/api/health", (req, res) => {
+    res.json({ status: "ok", time: new Date().toISOString() });
+  });
+
   app.use("/api", globalLimiter);
 
   // 1. Telegram initData Verification
