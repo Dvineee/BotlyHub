@@ -1,7 +1,7 @@
 {
-  "url": "https://botlyhub-git-main-dvineees-projects.vercel.app",
+  "url": "https://botlyhub.vercel.app",
   "name": "BotlyHub V3",
-  "iconUrl": "https://botlyhub-git-main-dvineees-projects.vercel.app/favicon.ico",
-  "termsOfServiceUrl": "https://botlyhub-git-main-dvineees-projects.vercel.app/terms",
-  "privacyPolicyUrl": "https://botlyhub-git-main-dvineees-projects.vercel.app/privacy"
+  "iconUrl": "https://botlyhub.vercel.app/favicon.ico",
+  "termsOfServiceUrl": "https://botlyhub.vercel.app/terms",
+  "privacyPolicyUrl": "https://botlyhub.vercel.app/privacy"
 }

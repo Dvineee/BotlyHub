@@ -61,7 +61,12 @@ async function startServer() {
   app.get("/tonconnect-manifest.json", (req, res) => {
     const protocol = req.headers['x-forwarded-proto'] || req.protocol;
     const host = req.get('host');
-    const origin = `${protocol}://${host}`;
+    
+    // Prefer the user's specific Vercel URL if requested from there, else use dynamic origin
+    let origin = `${protocol}://${host}`;
+    if (host?.includes('botlyhub.vercel.app')) {
+        origin = 'https://botlyhub.vercel.app';
+    }
     
     res.json({
       url: origin,
