@@ -55,7 +55,6 @@ async function startServer() {
 
   app.use(cors());
   app.use(express.json());
-  app.use(globalLimiter);
 
   // --- DYNAMIC TON CONNECT MANIFEST ---
   app.get("/tonconnect-manifest.json", (req, res) => {
@@ -78,6 +77,7 @@ async function startServer() {
   });
 
   // --- API ROUTES ---
+  app.use("/api", globalLimiter);
 
   // 1. Telegram initData Verification
   app.post("/api/verify-telegram", (req, res) => {

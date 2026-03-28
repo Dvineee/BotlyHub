@@ -10,6 +10,7 @@ import { DatabaseService } from '../services/DatabaseService';
 import { useTelegram } from '../hooks/useTelegram';
 import { WalletService } from '../services/WalletService';
 import PriceService from '../services/PriceService';
+import { API_BASE_URL } from '../constants';
 
 const { useNavigate, useParams } = Router as any;
 
@@ -81,7 +82,7 @@ const Payment = () => {
       if (!item) return null;
       
       try {
-          const response = await fetch('/api/payments/create-order', {
+          const response = await fetch(`${API_BASE_URL}/api/payments/create-order`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -146,7 +147,7 @@ const Payment = () => {
                   console.log("Calculated Transaction Hash:", hash);
 
                   // Verify on backend
-                  const verifyRes = await fetch('/api/payments/verify-ton', {
+                  const verifyRes = await fetch(`${API_BASE_URL}/api/payments/verify-ton`, {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({
