@@ -5,6 +5,7 @@ import * as Router from 'react-router-dom';
 import { subscriptionPlans } from '../data';
 import { Bot } from '../types';
 import { useTonConnectUI } from '@tonconnect/ui-react';
+import { Cell } from 'ton-core';
 import { DatabaseService } from '../services/DatabaseService';
 import { useTelegram } from '../hooks/useTelegram';
 import { WalletService } from '../services/WalletService';
@@ -75,7 +76,7 @@ const Payment = () => {
 
   const prices = item ? PriceService.convert(item.price, tonPrice) : { ton: 0 };
 
-  const createOrder = async (currency: string) => {
+  const createOrder = async (currency: string, senderAddress?: string) => {
       if (!user || !item) return null;
       
       try {
@@ -87,22 +88,14 @@ const Payment = () => {
                   itemId: item.id,
                   itemType: targetBot ? 'bot' : 'plan',
                   amount: currency === 'TON' ? prices.ton : item.price,
-                  currency
+                  currency,
+                  senderAddress
               })
           });
           const data = await response.json();
+          if (data.error) throw new Error(data.error);
+          
           setOrderId(data.orderId);
-          
-          // Save to DB
-          await DatabaseService.createTransaction(
-              user.id.toString(),
-              item.id,
-              targetBot ? 'bot' : 'plan',
-              currency === 'TON' ? prices.ton : item.price,
-              currency,
-              data.orderId
-          );
-          
           return data;
       } catch (e) {
           console.error("Order Creation Error:", e);
@@ -111,7 +104,7 @@ const Payment = () => {
   };
 
   const payWithTON = async () => {
-      if (!tonConnectUI.connected) {
+      if (!tonConnectUI.connected || !tonConnectUI.account) {
           notification('warning');
           await tonConnectUI.openModal();
           return;
@@ -121,26 +114,32 @@ const Payment = () => {
       haptic('medium');
       
       try {
-          const order = await createOrder('TON');
+          const walletAddress = tonConnectUI.account.address;
+          const order = await createOrder('TON', walletAddress);
           if (!order) throw new Error("Sipariş oluşturulamadı. Lütfen Telegram üzerinden girdiğinizden emin olun.");
 
-          const transactionPayload = WalletService.createTonTransaction(prices.ton, order.orderId);
+          const transactionPayload = WalletService.createTonTransaction(prices.ton, order.orderId, user.id.toString());
           const result = await tonConnectUI.sendTransaction(transactionPayload);
           
-          if (result) {
+          if (result && result.boc) {
+              // Calculate transaction hash from BOC
+              const hash = Cell.fromBase64(result.boc).hash().toString('hex');
+              console.log("Calculated Transaction Hash:", hash);
+
               // Verify on backend
               const verifyRes = await fetch('/api/payments/verify-ton', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
-                      transactionHash: result.boc, // TON Connect returns BOC
-                      orderId: order.orderId
+                      transactionHash: hash,
+                      orderId: order.orderId,
+                      userId: user.id.toString()
                   })
               });
               const verifyData = await verifyRes.json();
               
               if (verifyData.success) {
-                  await handleSuccess(order.orderId, result.boc);
+                  await handleSuccess(order.orderId, hash);
               } else {
                   throw new Error(verifyData.error || "İşlem doğrulanamadı.");
               }

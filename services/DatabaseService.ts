@@ -744,7 +744,7 @@ export class DatabaseService {
   }
 
   // --- PAYMENTS ---
-  static async createTransaction(userId: string, itemId: string, itemType: 'bot' | 'plan', amount: number, currency: string, orderId: string) {
+  static async createTransaction(userId: string, itemId: string, itemType: 'bot' | 'plan', amount: number, currency: string, orderId: string, senderAddress?: string) {
     const { error } = await supabase.from('transactions').insert({
         user_id: userId,
         item_id: itemId,
@@ -752,10 +752,24 @@ export class DatabaseService {
         amount,
         currency,
         order_id: orderId,
+        sender_address: senderAddress,
         status: 'pending',
         created_at: new Date().toISOString()
     });
     if (error) throw error;
+  }
+
+  static async getPendingTransactions() {
+    const { data, error } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('status', 'pending')
+        .eq('currency', 'TON')
+        .order('created_at', { ascending: true })
+        .limit(10);
+    
+    if (error) throw error;
+    return data || [];
   }
 
   static async getAllTransactions() {
@@ -769,6 +783,28 @@ export class DatabaseService {
     
     if (error) throw error;
     return data || [];
+  }
+
+  static async getTransactionByOrderId(orderId: string) {
+    const { data, error } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('order_id', orderId)
+        .maybeSingle();
+    
+    if (error) throw error;
+    return data;
+  }
+
+  static async getTransactionByHash(txHash: string) {
+    const { data, error } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('tx_hash', txHash)
+        .maybeSingle();
+    
+    if (error) throw error;
+    return data;
   }
 
   static async updateTransactionStatus(orderId: string, status: 'completed' | 'failed', txHash?: string) {
