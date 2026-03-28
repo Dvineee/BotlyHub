@@ -77,14 +77,15 @@ const Payment = () => {
   const prices = item ? PriceService.convert(item.price, tonPrice) : { ton: 0 };
 
   const createOrder = async (currency: string, senderAddress?: string) => {
-      if (!user || !item) return null;
+      const effectiveUser = user || { id: 'guest', first_name: 'User' };
+      if (!item) return null;
       
       try {
           const response = await fetch('/api/payments/create-order', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                  userId: user.id.toString(),
+                  userId: effectiveUser.id.toString(),
                   itemId: item.id,
                   itemType: targetBot ? 'bot' : 'plan',
                   amount: currency === 'TON' ? prices.ton : item.price,
@@ -92,13 +93,17 @@ const Payment = () => {
                   senderAddress
               })
           });
+          
           const data = await response.json();
-          if (data.error) throw new Error(data.error);
+          if (!response.ok) {
+              throw new Error(data.error || `Server error: ${response.status}`);
+          }
           
           setOrderId(data.orderId);
           return data;
-      } catch (e) {
+      } catch (e: any) {
           console.error("Order Creation Error:", e);
+          alert("Sipariş oluşturma hatası: " + (e.message || "Bilinmeyen hata"));
           return null;
       }
   };
@@ -114,11 +119,18 @@ const Payment = () => {
       haptic('medium');
       
       try {
+          const effectiveUser = user || { id: 'guest', first_name: 'User' };
           const walletAddress = tonConnectUI.account.address;
           const order = await createOrder('TON', walletAddress);
-          if (!order) throw new Error("Sipariş oluşturulamadı. Lütfen Telegram üzerinden girdiğinizden emin olun.");
+          if (!order || !order.signedPayload) {
+              if (order && !order.signedPayload) {
+                  alert("Sunucudan imzalı veri alınamadı. Lütfen tekrar deneyin.");
+              }
+              setIsLoading(false);
+              return;
+          }
 
-          const transactionPayload = WalletService.createTonTransaction(prices.ton, order.orderId, user.id.toString());
+          const transactionPayload = WalletService.createTonTransaction(prices.ton, order.signedPayload);
           const result = await tonConnectUI.sendTransaction(transactionPayload);
           
           if (result && result.boc) {
@@ -133,7 +145,7 @@ const Payment = () => {
                   body: JSON.stringify({
                       transactionHash: hash,
                       orderId: order.orderId,
-                      userId: user.id.toString()
+                      userId: effectiveUser.id.toString()
                   })
               });
               const verifyData = await verifyRes.json();
@@ -157,8 +169,9 @@ const Payment = () => {
       haptic('medium');
       
       try {
+          const effectiveUser = user || { id: 'guest', first_name: 'User' };
           const order = await createOrder('STARS');
-          if (!order) throw new Error("Sipariş oluşturulamadı. Lütfen Telegram üzerinden girdiğinizden emin olun.");
+          if (!order) return; // createOrder already alerted the user
 
           // Telegram Stars Invoice
           if (tg && tg.openInvoice) {

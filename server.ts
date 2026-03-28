@@ -107,6 +107,12 @@ async function startServer() {
       
       const orderId = `order_${crypto.randomBytes(8).toString("hex")}`;
       
+      // Generate SIGNED payload for TON transactions
+      let signedPayload = null;
+      if (currency === 'TON') {
+          signedPayload = SecurityUtils.createSignedPaymentString(orderId, userId);
+      }
+      
       // Save to DB as 'pending'
       await DatabaseService.createTransaction(userId, itemId, itemType, amount, currency, orderId, senderAddress);
       
@@ -119,13 +125,13 @@ async function startServer() {
         });
       }
 
-      res.json({ orderId, status: "pending" });
+      res.json({ orderId, signedPayload, status: "pending" });
     } catch (error: any) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ error: error.errors });
       }
-      console.error("Order Creation Error:", error);
-      res.status(500).json({ error: "Internal server error" });
+      console.error("[PAYMENT] Order Creation Error:", error);
+      res.status(500).json({ error: "Internal server error: " + (error.message || "Unknown error") });
     }
   });
 
