@@ -219,41 +219,75 @@ export class DatabaseService {
 
   static async deleteUser(userId: string) {
       const userIdStr = userId.toString();
+      console.log(`[DatabaseService] Deleting user ${userIdStr}...`);
       
       try {
-          // 1. Get user's channels to delete related stats
-          const { data: channels } = await supabase
+          // 1. Get user's channels to delete related data
+          const { data: channels, error: fetchChannelsError } = await supabase
               .from('channels')
-              .select('telegram_id')
+              .select('id, telegram_id')
               .eq('user_id', userIdStr);
           
-          const channelIds = (channels || []).map(c => String(c.telegram_id));
+          if (fetchChannelsError) throw fetchChannelsError;
+          
+          const channelIds = (channels || []).map(c => String(c.id));
+          const telegramIds = (channels || []).map(c => String(c.telegram_id));
 
-          // 2. Delete stats related to those channels
+          // 2. Delete data that references channels (must be done before deleting channels)
+          if (telegramIds.length > 0) {
+              // promotion_channel_stats uses telegram_id as channel_id
+              const { error: statsError } = await supabase.from('promotion_channel_stats').delete().in('channel_id', telegramIds);
+              if (statsError) console.warn("[DatabaseService] Warning: Could not delete from promotion_channel_stats:", statsError.message);
+          }
+          
           if (channelIds.length > 0) {
-              await supabase.from('promotion_channel_stats').delete().in('channel_id', channelIds);
+              // bot_connections uses channel UUID as channel_id
+              const { error: connError1 } = await supabase.from('bot_connections').delete().in('channel_id', channelIds);
+              if (connError1) console.warn("[DatabaseService] Warning: Could not delete from bot_connections by channel_id:", connError1.message);
           }
 
+          // Also delete from bot_connections by user_id directly
+          const { error: connError2 } = await supabase.from('bot_connections').delete().eq('user_id', userIdStr);
+          if (connError2) console.warn("[DatabaseService] Warning: Could not delete from bot_connections by user_id:", connError2.message);
+
           // 3. Nullify referrals in users table (if this user was a referrer)
-          await supabase.from('users').update({ referred_by: null }).eq('referred_by', userIdStr);
+          const { error: refUpdateError } = await supabase.from('users').update({ referred_by: null }).eq('referred_by', userIdStr);
+          if (refUpdateError) throw refUpdateError;
 
           // 4. Delete other related data
-          await Promise.all([
-              supabase.from('user_wallets').delete().eq('user_id', userIdStr),
-              supabase.from('user_bots').delete().eq('user_id', userIdStr),
-              supabase.from('bot_discovery_logs').delete().eq('owner_id', userIdStr), // Corrected: owner_id
-              supabase.from('bot_logs').delete().eq('user_id', userIdStr),
-              supabase.from('notifications').delete().eq('user_id', userIdStr),
-              supabase.from('transactions').delete().eq('user_id', userIdStr),
-              supabase.from('referrals').delete().or(`referrer_id.eq.${userIdStr},referred_id.eq.${userIdStr}`)
-          ]);
+          const tablesToDelete = [
+              { name: 'user_wallets', field: 'user_id' },
+              { name: 'user_bots', field: 'user_id' },
+              { name: 'bot_discovery_logs', field: 'owner_id' },
+              { name: 'bot_logs', field: 'user_id' },
+              { name: 'notifications', field: 'user_id' },
+              { name: 'transactions', field: 'user_id' }
+          ];
 
-          // 5. Delete channels (now that stats are gone)
-          await supabase.from('channels').delete().eq('user_id', userIdStr);
+          for (const table of tablesToDelete) {
+              const { error } = await supabase.from(table.name).delete().eq(table.field, userIdStr);
+              if (error) console.warn(`[DatabaseService] Warning: Could not delete from ${table.name}:`, error.message);
+          }
+
+          // Special case for referrals (OR condition)
+          const { error: referralsError } = await supabase.from('referrals').delete().or(`referrer_id.eq.${userIdStr},referred_id.eq.${userIdStr}`);
+          if (referralsError) console.warn("[DatabaseService] Warning: Could not delete from referrals:", referralsError.message);
+
+          // 5. Delete channels (now that all references are gone)
+          const { error: channelsDeleteError } = await supabase.from('channels').delete().eq('user_id', userIdStr);
+          if (channelsDeleteError) {
+              console.error("[DatabaseService] CRITICAL: Failed to delete channels:", channelsDeleteError);
+              throw channelsDeleteError;
+          }
 
           // 6. Finally delete the user record
-          const { error } = await supabase.from('users').delete().eq('id', userIdStr);
-          if (error) throw error;
+          const { error: userDeleteError } = await supabase.from('users').delete().eq('id', userIdStr);
+          if (userDeleteError) {
+              console.error("[DatabaseService] CRITICAL: Failed to delete user record:", userDeleteError);
+              throw userDeleteError;
+          }
+          
+          console.log(`[DatabaseService] User ${userIdStr} and all associated data deleted successfully.`);
       } catch (error) {
           console.error("Delete User Error:", error);
           throw error;
