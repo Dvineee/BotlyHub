@@ -1,14 +1,12 @@
 
 import React, { useEffect, Suspense, lazy, useState } from 'react';
-import * as Router from 'react-router-dom';
+import { HashRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { Loader2, Megaphone } from 'lucide-react';
 import { DatabaseService } from './services/DatabaseService';
 import { useTelegram } from './hooks/useTelegram';
 import { User } from './types';
 import { checkAccountQuality, getDeviceFingerprint } from './security';
 import './types';
-
-const { HashRouter, Routes, Route, useLocation, useNavigate } = Router as any;
 
 const Home = lazy(() => import('./pages/Home'));
 const SearchPage = lazy(() => import('./pages/SearchPage'));

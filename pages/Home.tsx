@@ -1,15 +1,13 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio } from 'lucide-react';
-import * as Router from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Bot, Announcement, Notification } from '../types';
 import { categories } from '../data';
 import { useTranslation } from '../TranslationContext';
 import { DatabaseService } from '../services/DatabaseService';
 import PriceService from '../services/PriceService';
 import { useTelegram } from '../hooks/useTelegram';
-
-const { useNavigate } = Router as any;
 
 const iconMap: Record<string, any> = {
   Sparkles, Megaphone, Zap, Gift, Star, Info, BotIcon, Heart, Bell, Shield
