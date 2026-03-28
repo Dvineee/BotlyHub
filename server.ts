@@ -57,6 +57,21 @@ async function startServer() {
   app.use(express.json());
   app.use(globalLimiter);
 
+  // --- DYNAMIC TON CONNECT MANIFEST ---
+  app.get("/tonconnect-manifest.json", (req, res) => {
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+    const host = req.get('host');
+    const origin = `${protocol}://${host}`;
+    
+    res.json({
+      url: origin,
+      name: "BotlyHub V3",
+      iconUrl: `${origin}/favicon.ico`,
+      termsOfServiceUrl: `${origin}/terms`,
+      privacyPolicyUrl: `${origin}/privacy`
+    });
+  });
+
   // --- API ROUTES ---
 
   // 1. Telegram initData Verification
@@ -250,6 +265,8 @@ async function startServer() {
     console.log(`Server running on http://localhost:${PORT}`);
     startBackgroundPaymentChecker();
   });
+
+  return app;
 }
 
 // --- BACKGROUND JOB ---
@@ -309,4 +326,5 @@ async function startBackgroundPaymentChecker() {
     }, 20000); // Every 20 seconds
 }
 
-startServer();
+const appPromise = startServer();
+export default appPromise;
