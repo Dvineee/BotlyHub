@@ -220,22 +220,44 @@ export class DatabaseService {
   static async deleteUser(userId: string) {
       const userIdStr = userId.toString();
       
-      // Delete related data first to avoid FK issues
-      await Promise.all([
-          supabase.from('user_wallets').delete().eq('user_id', userIdStr),
-          supabase.from('channels').delete().eq('user_id', userIdStr),
-          supabase.from('user_bots').delete().eq('user_id', userIdStr),
-          supabase.from('bot_discovery_logs').delete().eq('user_id', userIdStr),
-          supabase.from('bot_logs').delete().eq('user_id', userIdStr),
-          supabase.from('notifications').delete().eq('user_id', userIdStr),
-          supabase.from('transactions').delete().eq('user_id', userIdStr),
-          supabase.from('referrals').delete().or(`referrer_id.eq.${userIdStr},referred_id.eq.${userIdStr}`),
-          supabase.from('promotion_channel_stats').delete().eq('user_id', userIdStr)
-      ]);
+      try {
+          // 1. Get user's channels to delete related stats
+          const { data: channels } = await supabase
+              .from('channels')
+              .select('telegram_id')
+              .eq('user_id', userIdStr);
+          
+          const channelIds = (channels || []).map(c => String(c.telegram_id));
 
-      // Finally delete the user record
-      const { error } = await supabase.from('users').delete().eq('id', userIdStr);
-      if (error) throw error;
+          // 2. Delete stats related to those channels
+          if (channelIds.length > 0) {
+              await supabase.from('promotion_channel_stats').delete().in('channel_id', channelIds);
+          }
+
+          // 3. Nullify referrals in users table (if this user was a referrer)
+          await supabase.from('users').update({ referred_by: null }).eq('referred_by', userIdStr);
+
+          // 4. Delete other related data
+          await Promise.all([
+              supabase.from('user_wallets').delete().eq('user_id', userIdStr),
+              supabase.from('user_bots').delete().eq('user_id', userIdStr),
+              supabase.from('bot_discovery_logs').delete().eq('owner_id', userIdStr), // Corrected: owner_id
+              supabase.from('bot_logs').delete().eq('user_id', userIdStr),
+              supabase.from('notifications').delete().eq('user_id', userIdStr),
+              supabase.from('transactions').delete().eq('user_id', userIdStr),
+              supabase.from('referrals').delete().or(`referrer_id.eq.${userIdStr},referred_id.eq.${userIdStr}`)
+          ]);
+
+          // 5. Delete channels (now that stats are gone)
+          await supabase.from('channels').delete().eq('user_id', userIdStr);
+
+          // 6. Finally delete the user record
+          const { error } = await supabase.from('users').delete().eq('id', userIdStr);
+          if (error) throw error;
+      } catch (error) {
+          console.error("Delete User Error:", error);
+          throw error;
+      }
   }
 
   // --- WALLETS ---
