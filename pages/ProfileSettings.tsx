@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { ChevronLeft, User, CreditCard, Bell, Globe, ChevronRight, Crown } from 'lucide-react';
+import { ChevronLeft, User, CreditCard, Bell, Globe, ChevronRight, Crown, Users } from 'lucide-react';
 // Fixed: Use namespace import for react-router-dom to resolve "no exported member" errors
 import * as Router from 'react-router-dom';
 import { subscriptionPlans } from '../data';
@@ -94,6 +94,11 @@ const ProfileSettings = () => {
                 label="Abonelik Yönetimi" 
                 value={currentPlanName} 
                 onClick={() => navigate('/premium')}
+            />
+            <MenuItem 
+                icon={Users} 
+                label="Referans Sistemi" 
+                onClick={() => navigate('/referral')}
             />
         </div>
 

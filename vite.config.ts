@@ -9,13 +9,7 @@ export default defineConfig({
   },
   server: {
     host: true,
-    port: 5173,
-    // ngrok tüneli üzerinden HMR (Hot Module Replacement) çalışması için
-    hmr: {
-        clientPort: 443
-    },
-    // ngrok gibi dış servislerin erişimine izin ver
-    allowedHosts: ['all'] 
+    port: 3000,
   },
   base: './', 
 });

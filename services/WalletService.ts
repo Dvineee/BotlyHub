@@ -31,7 +31,7 @@ export class WalletService {
      * TON Connect Transaction Payload Generator
      * Admin adresine ödeme gönderimi için kullanılır.
      */
-    static createTonTransaction(amountTON: number) {
+    static createTonTransaction(amountTON: number, orderId: string) {
         const nanoTons = (BigInt(Math.floor(amountTON * 1000000000))).toString();
         
         return {
@@ -40,6 +40,7 @@ export class WalletService {
                 {
                     address: ADMIN_WALLET_ADDRESS,
                     amount: nanoTons,
+                    payload: orderId // In TON, this can be a comment
                 }
             ]
         };

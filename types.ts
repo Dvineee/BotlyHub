@@ -14,6 +14,10 @@ export interface User {
   canPublishPromos?: boolean; // canPublishAds yerine
   hasPanelAccess?: boolean;
   panelPassword?: string;
+  referred_by?: string;
+  referral_count?: number;
+  referral_earnings?: number;
+  is_premium?: boolean;
 }
 
 export interface ActivityLog {
@@ -145,6 +149,29 @@ export interface SubscriptionPlan {
   icon: any;
   isPopular?: boolean;
   features: string[];
+}
+
+export interface Referral {
+  id: string;
+  referrer_id: string;
+  referred_id: string;
+  status: 'pending' | 'confirmed' | 'rejected';
+  reward_amount: number;
+  created_at: string;
+  confirmed_at?: string;
+  ip_address?: string;
+  device_fingerprint?: string;
+  is_premium_referral: boolean;
+}
+
+export interface ReferralSettings {
+  id: string;
+  standard_reward: number;
+  premium_reward: number;
+  min_days_active: number;
+  require_group_join: boolean;
+  group_id: string;
+  pending_duration_hours: number;
 }
 
 declare global {

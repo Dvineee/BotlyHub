@@ -5,6 +5,7 @@ import { Loader2, Megaphone } from 'lucide-react';
 import { DatabaseService } from './services/DatabaseService';
 import { useTelegram } from './hooks/useTelegram';
 import { User } from './types';
+import { checkAccountQuality, getDeviceFingerprint } from './security';
 import './types';
 
 const { HashRouter, Routes, Route, useLocation, useNavigate } = Router as any;
@@ -26,6 +27,7 @@ const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const UserPanelLogin = lazy(() => import('./pages/UserPanelLogin'));
 const UserPanel = lazy(() => import('./pages/UserPanel'));
+const ReferralPage = lazy(() => import('./pages/ReferralPage'));
 
 const PageLoader = () => (
   <div className="flex flex-col items-center justify-center min-h-[50vh] text-slate-500">
@@ -41,7 +43,6 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
   const isAdminPath = location.pathname.startsWith('/a/');
   const [isMaintenance, setIsMaintenance] = useState(false);
   const [isRestricted, setIsRestricted] = useState(false);
-  const [marqueeText, setMarqueeText] = useState<string | null>(null);
 
   useEffect(() => {
     DatabaseService.init();
@@ -52,7 +53,6 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
             const settings = await DatabaseService.getSettings();
             if (settings) {
                 if (settings.maintenanceMode) setIsMaintenance(true);
-                if (settings.marqueeText) setMarqueeText(settings.marqueeText);
             }
         }
 
@@ -71,7 +71,47 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
                 };
                 await DatabaseService.syncUser(userData);
                 
-                // 3. Kısıtlama Kontrolü
+                // 3. Referans Kontrolü
+                const tg = window.Telegram?.WebApp;
+                const startParam = tg?.initDataUnsafe?.start_param;
+                
+                if (startParam && startParam.startsWith('ref_')) {
+                    const referrerId = startParam.replace('ref_', '');
+                    
+                    // Kendini davet edemez
+                    if (referrerId !== user.id.toString()) {
+                        const existingUser = await DatabaseService.getUser(user.id.toString());
+                        
+                        // Sadece yeni kullanıcılar referans olabilir (veya henüz referansı olmayanlar)
+                        if (!existingUser || !existingUser.referred_by) {
+                            try {
+                                // IP ve Fingerprint al
+                                const ipRes = await fetch('https://api.ipify.org?format=json');
+                                const { ip } = await ipRes.json();
+                                const fingerprint = getDeviceFingerprint();
+                                
+                                // Hesap Kalite Kontrolü
+                                const quality = checkAccountQuality(user);
+                                
+                                if (quality.isValid) {
+                                    await DatabaseService.createReferral(
+                                        referrerId, 
+                                        user.id.toString(), 
+                                        ip, 
+                                        fingerprint, 
+                                        !!user.is_premium
+                                    );
+                                } else {
+                                    console.warn("Referral rejected: Low account quality", quality.reason);
+                                }
+                            } catch (err) {
+                                console.error("Referral processing failed:", err);
+                            }
+                        }
+                    }
+                }
+
+                // 4. Kısıtlama Kontrolü
                 const dbUser = await DatabaseService.getUser(user.id.toString());
                 if (dbUser && dbUser.isRestricted) {
                     setIsRestricted(true);
@@ -138,21 +178,6 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
 
   return (
     <div className={`${isAdminPath ? 'bg-[#020617]' : 'bg-slate-950'} flex flex-col min-h-screen`}>
-      {marqueeText && !isAdminPath && (
-        <div className="h-8 bg-blue-600/10 border-b border-blue-500/20 flex items-center overflow-hidden relative z-[60]">
-          <div className="flex items-center gap-2 px-4 bg-blue-600 h-full z-10 shadow-[4px_0_10px_rgba(37,99,235,0.3)]">
-            <Megaphone size={12} className="text-white" />
-            <span className="text-[8px] font-black text-white uppercase tracking-widest italic">DUYURU</span>
-          </div>
-          <div className="flex-1 overflow-hidden">
-            <div className="animate-marquee inline-block">
-              <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest italic px-4">
-                {marqueeText}
-              </span>
-            </div>
-          </div>
-        </div>
-      )}
       {children}
     </div>
   );
@@ -179,6 +204,7 @@ export default function App() {
             <Route path="/a/dashboard/*" element={<AdminDashboard />} />
             <Route path="/u/login" element={<UserPanelLogin />} />
             <Route path="/u/panel/*" element={<UserPanel />} />
+            <Route path="/referral" element={<ReferralPage />} />
           </Routes>
         </Suspense>
       </TelegramWrapper>

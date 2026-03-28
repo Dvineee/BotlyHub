@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, Wallet, CheckCircle2, Loader2, ShieldCheck, Zap, AlertTriangle, ShieldAlert } from 'lucide-react';
+import { ChevronLeft, Wallet, CheckCircle2, Loader2, ShieldCheck, Zap, AlertTriangle, ShieldAlert, Star } from 'lucide-react';
 import * as Router from 'react-router-dom';
 import { subscriptionPlans } from '../data';
 import { Bot } from '../types';
@@ -20,6 +20,7 @@ const Payment = () => {
   const [targetBot, setTargetBot] = useState<Bot | null>(null);
   const [tonPrice, setTonPrice] = useState(250);
   const [tonConnectUI] = useTonConnectUI();
+  const [orderId, setOrderId] = useState<string | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -35,8 +36,8 @@ const Payment = () => {
   const plan = subscriptionPlans.find(p => p.id === id);
   const item = targetBot || plan;
 
-  const handleSuccess = async () => {
-      if (!item) return;
+  const handleSuccess = async (txHash?: string) => {
+      if (!item || !orderId) return;
       
       haptic('heavy');
       notification('success');
@@ -44,44 +45,69 @@ const Payment = () => {
       try {
           const userData = user || { id: 'guest', first_name: 'User' };
           
+          // Update transaction in DB
+          await DatabaseService.updateTransactionStatus(orderId, 'completed', txHash);
+
           if (targetBot) {
               await DatabaseService.addUserBot(userData, targetBot, false);
-              
-              // OTOMATİK BİLDİRİM GÖNDERİMİ (Lisans Aktivasyonu)
               await DatabaseService.sendUserNotification(
                   userData.id.toString(),
                   'Lisans Aktif Edildi',
-                  `'${targetBot.name}' lisans ödemeniz onaylandı ve kütüphanenize eklendi. Keyifli kullanımlar!`,
+                  `'${targetBot.name}' lisans ödemeniz onaylandı.`,
                   'payment'
               );
           } else if (plan) {
               localStorage.setItem('userPlan', plan.id);
-              
-              // OTOMATİK BİLDİRİM GÖNDERİMİ (Plan Aktivasyonu)
               await DatabaseService.sendUserNotification(
                   userData.id.toString(),
                   'Abonelik Aktif Edildi',
-                  `'${plan.name}' üyeliğiniz başarıyla aktif edildi. Avantajlarınız profilinize tanımlandı.`,
+                  `'${plan.name}' üyeliğiniz başarıyla aktif edildi.`,
                   'payment'
               );
           }
           
-          await DatabaseService.logActivity(
-              userData.id.toString(), 
-              'payment', 
-              'PAYMENT_COMPLETE', 
-              'TON İşlemi Başarılı', 
-              `${item.name} için TON ödemesi onaylandı.`
-          );
-
           navigate(targetBot ? '/my-bots' : '/settings');
       } catch (e) {
           console.error("Post-Payment Error:", e);
-          alert("Ödeme onaylandı ancak aktivasyon hatası oluştu.");
       }
   };
 
   const prices = item ? PriceService.convert(item.price, tonPrice) : { ton: 0 };
+
+  const createOrder = async (currency: string) => {
+      if (!user || !item) return null;
+      
+      try {
+          const response = await fetch('/api/payments/create-order', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                  userId: user.id.toString(),
+                  itemId: item.id,
+                  itemType: targetBot ? 'bot' : 'plan',
+                  amount: currency === 'TON' ? prices.ton : item.price,
+                  currency
+              })
+          });
+          const data = await response.json();
+          setOrderId(data.orderId);
+          
+          // Save to DB
+          await DatabaseService.createTransaction(
+              user.id.toString(),
+              item.id,
+              targetBot ? 'bot' : 'plan',
+              currency === 'TON' ? prices.ton : item.price,
+              currency,
+              data.orderId
+          );
+          
+          return data;
+      } catch (e) {
+          console.error("Order Creation Error:", e);
+          return null;
+      }
+  };
 
   const payWithTON = async () => {
       if (!tonConnectUI.connected) {
@@ -94,14 +120,58 @@ const Payment = () => {
       haptic('medium');
       
       try {
-          const transactionPayload = WalletService.createTonTransaction(prices.ton);
+          const order = await createOrder('TON');
+          if (!order) throw new Error("Order creation failed");
+
+          const transactionPayload = WalletService.createTonTransaction(prices.ton, order.orderId);
           const result = await tonConnectUI.sendTransaction(transactionPayload);
           
           if (result) {
-              await handleSuccess();
+              // Verify on backend
+              const verifyRes = await fetch('/api/payments/verify-ton', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                      transactionHash: result.boc, // TON Connect returns BOC
+                      orderId: order.orderId
+                  })
+              });
+              const verifyData = await verifyRes.json();
+              
+              if (verifyData.success) {
+                  await handleSuccess(result.boc);
+              }
           }
       } catch (e: any) {
           notification('error');
+          setIsLoading(false);
+      }
+  };
+
+  const payWithStars = async () => {
+      setIsLoading(true);
+      haptic('medium');
+      
+      try {
+          const order = await createOrder('STARS');
+          if (!order) throw new Error("Order creation failed");
+
+          // Telegram Stars Invoice
+          if (tg && tg.openInvoice) {
+              tg.openInvoice(order.invoiceUrl, async (status: string) => {
+                  if (status === 'paid') {
+                      await handleSuccess();
+                  } else {
+                      setIsLoading(false);
+                  }
+              });
+          } else {
+              // Fallback for non-telegram environments
+              alert("Bu ödeme yöntemi sadece Telegram içinde kullanılabilir.");
+              setIsLoading(false);
+          }
+      } catch (e) {
+          console.error("Stars Payment Error:", e);
           setIsLoading(false);
       }
   };
@@ -116,7 +186,7 @@ const Payment = () => {
             </button>
             <div className="flex items-center gap-2 px-4 py-2 bg-blue-600/10 border border-blue-500/20 rounded-full">
                 <ShieldCheck size={14} className="text-blue-500" />
-                <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">Güvenli TON Ödemesi</span>
+                <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">Güvenli Ödeme</span>
             </div>
         </div>
 
@@ -128,6 +198,7 @@ const Payment = () => {
                 <img 
                     src={targetBot ? (targetBot.icon || `https://ui-avatars.com/api/?name=${encodeURIComponent(targetBot.name)}&background=334155&color=fff`) : `https://ui-avatars.com/api/?name=${encodeURIComponent(plan?.name || 'P')}&background=1e293b&color=fff`} 
                     className="w-32 h-32 rounded-[44px] border-4 border-slate-800 shadow-2xl object-cover relative z-10 bg-slate-900" 
+                    referrerPolicy="no-referrer"
                 />
             </div>
 
@@ -139,26 +210,35 @@ const Payment = () => {
                     <Zap size={32} className="text-blue-500 mb-3" />
                     <span className="text-[11px] text-slate-600 font-black uppercase tracking-widest mb-1">Toplam Tutar</span>
                     <p className="text-3xl font-black text-white italic tracking-tighter">{prices.ton} TON</p>
-                    <p className="text-[9px] text-slate-700 font-bold uppercase mt-2">≈ {item.price} TL</p>
+                    <p className="text-[9px] text-slate-700 font-bold uppercase mt-2">veya {item.price} Yıldız</p>
                 </div>
             </div>
         </div>
 
-        <div className="space-y-5">
+        <div className="space-y-4">
             <button 
                 onClick={payWithTON} 
                 disabled={isLoading}
-                className="w-full bg-blue-600 hover:bg-blue-500 py-7 rounded-[32px] text-white font-black shadow-2xl shadow-blue-600/20 flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 uppercase tracking-[0.2em] text-xs border-b-4 border-blue-800"
+                className="w-full bg-blue-600 hover:bg-blue-500 py-6 rounded-[32px] text-white font-black shadow-2xl shadow-blue-600/20 flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 uppercase tracking-[0.2em] text-xs border-b-4 border-blue-800"
             >
                 {isLoading ? <Loader2 className="animate-spin" size={24} /> : <Wallet size={24} />}
-                Cüzdanı Bağla ve Öde
+                TON ile Öde
+            </button>
+
+            <button 
+                onClick={payWithStars} 
+                disabled={isLoading}
+                className="w-full bg-amber-500 hover:bg-amber-400 py-6 rounded-[32px] text-white font-black shadow-2xl shadow-amber-600/20 flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 uppercase tracking-[0.2em] text-xs border-b-4 border-amber-700"
+            >
+                {isLoading ? <Loader2 className="animate-spin" size={24} /> : <Star size={24} />}
+                Yıldız ile Öde
             </button>
         </div>
         
-        <div className="mt-16 flex flex-col items-center gap-6 opacity-40">
+        <div className="mt-12 flex flex-col items-center gap-6 opacity-40">
             <div className="flex items-center gap-3">
                 <ShieldAlert size={18} className="text-slate-500" />
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] italic text-slate-500">Blokzincir Güvenceli İşlem</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] italic text-slate-500">Güvenli ve Şeffaf Ödeme</span>
             </div>
         </div>
     </div>

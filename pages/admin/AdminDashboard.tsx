@@ -73,7 +73,7 @@ const AdminDashboard = () => {
             <NavItem to="/a/dashboard/users" icon={Users} label="Kullanıcılar" />
             <NavItem to="/a/dashboard/admin-logs" icon={ShieldCheck} label="Admin Logları" />
             <NavItem to="/a/dashboard/user-logs" icon={History} label="Üye Hareketleri" />
-            <NavItem to="/a/dashboard/sales" icon={Wallet} label="Satışlar" />
+            <NavItem to="/a/dashboard/sales" icon={Wallet} label="Finans" />
             
             <div className="pt-8 pb-3 px-6"><span className="text-[9px] font-black text-slate-800 uppercase tracking-widest italic">İçerik</span></div>
             <NavItem to="/a/dashboard/bots" icon={Bot} label="Market Botları" />
@@ -1054,22 +1054,11 @@ const SettingsManager = () => {
                         </div>
                         <div>
                             <h4 className="text-lg font-black text-white uppercase italic">Görsel & Metin</h4>
-                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">Duyuru bandı ve versiyon yönetimi</p>
+                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">Versiyon yönetimi</p>
                         </div>
                     </div>
 
                     <div className="space-y-6">
-                        <div className="space-y-2">
-                            <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">DUYURU BANDI (MARQUEE)</label>
-                            <input 
-                                type="text"
-                                value={settings?.marqueeText || ''}
-                                onChange={e => setSettings({ ...settings, marqueeText: e.target.value })}
-                                className="w-full h-16 px-6 bg-slate-950/50 border border-white/5 rounded-2xl text-xs font-black text-white focus:border-blue-500/40 outline-none transition-all uppercase italic"
-                                placeholder="ÖRN: YENİ BOTLAR MARKETTE! HEMEN İNCELE..."
-                            />
-                        </div>
-
                         <div className="space-y-2">
                             <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">UYGULAMA VERSİYONU</label>
                             <input 
@@ -1086,10 +1075,9 @@ const SettingsManager = () => {
                                 setIsSaving(true);
                                 try {
                                     await DatabaseService.updateSettings({ 
-                                        marquee_text: settings.marqueeText,
                                         version: settings.version
                                     });
-                                    await DatabaseService.logActivity('admin', 'system', 'settings_update', 'Sistem Ayarları Güncellendi', 'Duyuru bandı veya versiyon bilgisi güncellendi.');
+                                    await DatabaseService.logActivity('admin', 'system', 'settings_update', 'Sistem Ayarları Güncellendi', 'Versiyon bilgisi güncellendi.');
                                     alert("Ayarlar başarıyla kaydedildi.");
                                 } catch (e) {
                                     alert("Hata oluştu");
@@ -1245,30 +1233,135 @@ const ActivityCenter = ({ filterType }: { filterType: 'admin' | 'user' }) => {
 };
 
 const SalesManagement = () => {
-    const [sales, setSales] = useState<any[]>([]);
+    const [transactions, setTransactions] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    useEffect(() => { DatabaseService.getAllPurchases().then(s => { setSales(s); setIsLoading(false); }); }, []);
+    const [filter, setFilter] = useState<'all' | 'completed' | 'pending' | 'failed'>('all');
+
+    useEffect(() => { 
+        DatabaseService.getAllTransactions().then(t => { 
+            setTransactions(t); 
+            setIsLoading(false); 
+        }); 
+    }, []);
+
+    const filtered = transactions.filter(t => filter === 'all' || t.status === filter);
+
+    const stats = {
+        totalRevenue: transactions.filter(t => t.status === 'completed').reduce((acc, curr) => {
+            if (curr.currency === 'TRY') return acc + Number(curr.amount);
+            if (curr.currency === 'TON') return acc + (Number(curr.amount) * 250);
+            if (curr.currency === 'STARS') return acc + (Number(curr.amount) * 0.5);
+            return acc;
+        }, 0),
+        tonRevenue: transactions.filter(t => t.status === 'completed' && t.currency === 'TON').reduce((acc, curr) => acc + Number(curr.amount), 0),
+        starsRevenue: transactions.filter(t => t.status === 'completed' && t.currency === 'STARS').reduce((acc, curr) => acc + Number(curr.amount), 0),
+        tryRevenue: transactions.filter(t => t.status === 'completed' && t.currency === 'TRY').reduce((acc, curr) => acc + Number(curr.amount), 0)
+    };
+
     return (
         <div className="space-y-10 animate-in fade-in">
-            <h2 className="text-3xl font-black text-white italic uppercase tracking-tighter leading-none">Financial <span className="text-blue-500">Center</span></h2>
+            <div className="flex flex-col gap-2">
+                <h2 className="text-3xl lg:text-4xl font-black text-white italic uppercase tracking-tighter leading-none">Financial <span className="text-blue-500">Center</span></h2>
+                <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em] mt-2 italic">Platform gelirlerini ve ödeme akışlarını izleyin</p>
+            </div>
+
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8">
+                <StatCard icon={TrendingUp} label="TOPLAM CİRO (TRY)" value={`₺${stats.totalRevenue.toLocaleString()}`} color="emerald" />
+                <StatCard icon={Zap} label="TON GELİRİ" value={`${stats.tonRevenue.toLocaleString()} TON`} color="blue" />
+                <StatCard icon={Star} label="STARS GELİRİ" value={`${stats.starsRevenue.toLocaleString()} ⭐`} color="purple" />
+                <StatCard icon={Wallet} label="TRY GELİRİ" value={`₺${stats.tryRevenue.toLocaleString()}`} color="orange" />
+            </div>
+
+            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+                {['all', 'completed', 'pending', 'failed'].map(f => (
+                    <button
+                        key={f}
+                        onClick={() => setFilter(f as any)}
+                        className={`px-6 h-12 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all border ${
+                            filter === f 
+                            ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-600/20' 
+                            : 'bg-slate-900/40 border-white/5 text-slate-500 hover:border-white/10'
+                        }`}
+                    >
+                        {f === 'all' ? 'TÜMÜ' : f === 'completed' ? 'TAMAMLANDI' : f === 'pending' ? 'BEKLEYEN' : 'İPTAL'}
+                    </button>
+                ))}
+            </div>
+
             <div className="bg-slate-900/40 border border-white/5 rounded-[44px] overflow-hidden shadow-2xl">
-                <div className="hidden lg:block overflow-x-auto">
-                    <table className="w-full text-left">
-                        <thead className="bg-white/5 text-[9px] uppercase tracking-[0.4em] text-slate-700 font-black">
-                            <tr><th className="px-10 py-8">MÜŞTERİ</th><th className="px-10 py-8">ÜRÜN</th><th className="px-10 py-8">TARİH</th><th className="px-10 py-8 text-right">HASILAT</th></tr>
-                        </thead>
-                        <tbody className="divide-y divide-white/5">
-                            {sales.map((s, idx) => (
-                                <tr key={idx} className="hover:bg-white/5 transition-all text-white">
-                                    <td className="px-10 py-8 font-black italic text-sm">@{s.users?.username || 'Guest'}</td>
-                                    <td className="px-10 py-8 font-black uppercase text-xs tracking-tight">{s.bots?.name || 'Paket'}</td>
-                                    <td className="px-10 py-8 font-bold text-slate-600 uppercase text-[9px] tracking-widest">{new Date(s.acquired_at).toLocaleDateString()}</td>
-                                    <td className="px-10 py-8 text-right font-black text-emerald-500 italic text-lg">₺{s.bots?.price || 0}</td>
+                {isLoading ? (
+                    <div className="flex flex-col items-center justify-center py-32 gap-4">
+                        <Loader2 className="animate-spin text-blue-500" size={40} />
+                        <span className="text-[10px] font-black text-slate-800 uppercase tracking-widest italic">İşlemler Yükleniyor...</span>
+                    </div>
+                ) : filtered.length === 0 ? (
+                    <div className="py-32 text-center">
+                        <History size={48} className="mx-auto text-slate-800 mb-4" />
+                        <p className="text-slate-500 text-sm font-bold uppercase tracking-widest">İşlem Bulunamadı</p>
+                    </div>
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                            <thead className="bg-white/5 text-[9px] uppercase tracking-[0.4em] text-slate-700 font-black">
+                                <tr>
+                                    <th className="px-10 py-8">MÜŞTERİ</th>
+                                    <th className="px-10 py-8">ÜRÜN / TİP</th>
+                                    <th className="px-10 py-8">TARİH</th>
+                                    <th className="px-10 py-8">DURUM</th>
+                                    <th className="px-10 py-8 text-right">TUTAR</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                            </thead>
+                            <tbody className="divide-y divide-white/5">
+                                {filtered.map((t) => (
+                                    <tr key={t.id} className="hover:bg-white/5 transition-all text-white">
+                                        <td className="px-10 py-8">
+                                            <div className="flex items-center gap-4">
+                                                <img src={t.user?.avatar || `https://ui-avatars.com/api/?name=${t.user?.username}`} className="w-10 h-10 rounded-xl border border-white/5" />
+                                                <div>
+                                                    <p className="text-sm font-black italic uppercase tracking-tighter">@{t.user?.username || 'Guest'}</p>
+                                                    <p className="text-[8px] text-slate-600 font-bold uppercase tracking-widest">ID: {t.user_id}</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-10 py-8">
+                                            <div className="flex flex-col gap-1">
+                                                <span className="text-xs font-black uppercase tracking-tight">{t.item_id}</span>
+                                                <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest">{t.item_type}</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-10 py-8">
+                                            <div className="flex flex-col gap-1">
+                                                <span className="text-[10px] font-bold text-white uppercase tracking-widest">{new Date(t.created_at).toLocaleDateString()}</span>
+                                                <span className="text-[8px] text-slate-600 font-bold uppercase tracking-widest">{new Date(t.created_at).toLocaleTimeString()}</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-10 py-8">
+                                            <span className={`text-[9px] font-black px-3 py-1 rounded-lg border uppercase tracking-widest ${
+                                                t.status === 'completed' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' :
+                                                t.status === 'pending' ? 'bg-blue-500/10 border-blue-500/20 text-blue-500' :
+                                                'bg-red-500/10 border-red-500/20 text-red-500'
+                                            }`}>
+                                                {t.status === 'completed' ? 'BAŞARILI' : t.status === 'pending' ? 'BEKLEMEDE' : 'İPTAL'}
+                                            </span>
+                                        </td>
+                                        <td className="px-10 py-8 text-right">
+                                            <div className="flex flex-col items-end gap-1">
+                                                <span className={`text-lg font-black italic ${t.status === 'completed' ? 'text-emerald-500' : 'text-slate-500'}`}>
+                                                    {t.currency === 'TRY' ? '₺' : ''}{t.amount} {t.currency !== 'TRY' ? t.currency : ''}
+                                                </span>
+                                                {t.tx_hash && (
+                                                    <a href={`https://tonviewer.com/transaction/${t.tx_hash}`} target="_blank" className="text-[8px] text-blue-500 hover:underline uppercase font-black tracking-widest flex items-center gap-1">
+                                                        TX <ExternalLink size={8} />
+                                                    </a>
+                                                )}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "tsx server.ts",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "tsc --noEmit"
@@ -12,14 +12,21 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.39.7",
     "@tonconnect/ui-react": "^2.0.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.5.0",
+    "cors": "^2.8.6",
     "crypto-js": "^4.2.0",
+    "dotenv": "^17.3.1",
     "ethers": "^6.11.1",
+    "express": "^5.2.1",
     "lucide-react": "^0.292.0",
     "motion": "^12.36.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.20.0",
-    "recharts": "^2.10.3"
+    "recharts": "^2.10.3",
+    "tsx": "^4.21.0"
   },
   "devDependencies": {
     "@types/crypto-js": "^4.2.2",

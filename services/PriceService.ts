@@ -35,13 +35,16 @@ class PriceService {
     }
 
     /**
-     * TL tutarını sadece TON birimine dönüştürür.
-     * Stars (Yıldız) sistemi kaldırılmıştır.
+     * TL tutarını TON ve Yıldız (Stars) birimlerine dönüştürür.
      */
     static convert(tl: number, tonRate: number) {
         const amount = Number(tl) || 0;
+        // 1 Yıldız ≈ 0.50 TL (Yaklaşık)
+        const starRate = 0.50; 
+        
         return {
-            ton: parseFloat((amount / tonRate).toFixed(3))
+            ton: parseFloat((amount / tonRate).toFixed(3)),
+            stars: Math.ceil(amount / starRate)
         };
     }
 }

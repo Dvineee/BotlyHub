@@ -1,6 +1,6 @@
 
 import { createClient } from '@supabase/supabase-js';
-import { Bot, User, Channel, Announcement, Notification, UserBot, ActivityLog, Promotion } from '../types';
+import { Bot, User, Channel, Announcement, Notification, UserBot, ActivityLog, Promotion, Referral, ReferralSettings } from '../types';
 
 const SUPABASE_URL = 'https://yrbnzyvbhitlquaxnruc.supabase.co'; 
 const SUPABASE_ANON_KEY = 'sb_publishable_h9QTmZjwi0pH_JX6i4xfWg_LJFY86GP'; 
@@ -153,19 +153,24 @@ export class DatabaseService {
   static async syncUser(user: Partial<User>) {
     if (!user.id) return;
     
-    // Check if user exists to log registration
-    const { data: existing } = await supabase.from('users').select('id').eq('id', user.id.toString()).maybeSingle();
+    // Check if user exists
+    const { data: existing } = await supabase.from('users').select('*').eq('id', user.id.toString()).maybeSingle();
     
-    const { error } = await supabase.from('users').upsert({ 
+    const payload: any = {
         id: user.id.toString(), 
         name: user.name, 
         username: user.username, 
         avatar: user.avatar, 
-        email: user.email, 
-        joindate: new Date().toISOString(), 
-        role: user.role || 'User', 
-        status: user.status || 'Active' 
-    }, { onConflict: 'id' });
+        email: user.email || existing?.email, 
+        role: existing?.role || user.role || 'User', 
+        status: existing?.status || user.status || 'Active' 
+    };
+
+    if (!existing) {
+        payload.joindate = new Date().toISOString();
+    }
+
+    const { error } = await supabase.from('users').upsert(payload, { onConflict: 'id' });
     
     if (error) throw error;
 
@@ -523,15 +528,32 @@ export class DatabaseService {
 
   // --- STATS & ADMIN ---
   static async getAdminStats() {
-    const [u, b, l, s, c] = await Promise.all([
-        supabase.from('users').select('*', { count: 'exact', head: true }),
-        supabase.from('bots').select('*', { count: 'exact', head: true }),
-        supabase.from('bot_logs').select('*', { count: 'exact', head: true }),
-        supabase.from('user_bots').select('*', { count: 'exact', head: true }),
-        supabase.from('channels').select('revenue')
-    ]);
-    const totalRevenue = (c.data || []).reduce((acc, curr) => acc + (Number(curr.revenue) || 0), 0);
-    return { userCount: u.count || 0, botCount: b.count || 0, logCount: l.count || 0, salesCount: s.count || 0, totalRevenue };
+    try {
+        const [u, b, l, t] = await Promise.all([
+            supabase.from('users').select('*', { count: 'exact', head: true }),
+            supabase.from('bots').select('*', { count: 'exact', head: true }),
+            supabase.from('bot_logs').select('*', { count: 'exact', head: true }),
+            supabase.from('transactions').select('amount, currency, status').eq('status', 'completed')
+        ]);
+
+        const totalRevenue = (t.data || []).reduce((acc, curr) => {
+            if (curr.currency === 'TRY') return acc + Number(curr.amount);
+            if (curr.currency === 'TON') return acc + (Number(curr.amount) * 250); // Örnek kur
+            if (curr.currency === 'STARS') return acc + (Number(curr.amount) * 0.5); // Örnek kur
+            return acc;
+        }, 0);
+
+        return { 
+            userCount: u.count || 0, 
+            botCount: b.count || 0, 
+            logCount: l.count || 0, 
+            salesCount: (t.data || []).length, 
+            totalRevenue 
+        };
+    } catch (e) {
+        console.error(e);
+        return { userCount: 0, botCount: 0, logCount: 0, salesCount: 0, totalRevenue: 0 };
+    }
   }
 
   static async getSettings() {
@@ -616,4 +638,150 @@ export class DatabaseService {
   static logoutAdmin() { localStorage.removeItem('admin_v3_session'); }
   
   static async init() { }
+
+  // --- REFERRALS ---
+  static async getReferralSettings(): Promise<ReferralSettings> {
+    const { data } = await supabase.from('referral_settings').select('*').eq('id', 1).maybeSingle();
+    return data || {
+        id: '1',
+        standard_reward: 10,
+        premium_reward: 25,
+        min_days_active: 0,
+        require_group_join: true,
+        group_id: '-1003826684282',
+        pending_duration_hours: 24
+    };
+  }
+
+  static async createReferral(referrerId: string, referredId: string, ip: string, fingerprint: string, isPremium: boolean) {
+    const settings = await this.getReferralSettings();
+    const reward = isPremium ? settings.premium_reward : settings.standard_reward;
+
+    // Check if already referred
+    const { data: existing } = await supabase
+        .from('referrals')
+        .select('id')
+        .eq('referred_id', referredId)
+        .maybeSingle();
+    
+    if (existing) return;
+
+    const { error } = await supabase.from('referrals').insert({
+        referrer_id: referrerId,
+        referred_id: referredId,
+        status: 'pending',
+        reward_amount: reward,
+        ip_address: ip,
+        device_fingerprint: fingerprint,
+        is_premium_referral: isPremium,
+        created_at: new Date().toISOString()
+    });
+
+    if (error) throw error;
+
+    // Update user's referred_by
+    await supabase.from('users').update({ referred_by: referrerId }).eq('id', referredId);
+    
+    await this.logActivity(referrerId, 'system', 'referral_pending', 'Yeni Referans (Beklemede)', `Bir kullanıcı davet linkinizle katıldı. Onay bekleniyor.`);
+  }
+
+  static async getUserReferrals(userId: string): Promise<Referral[]> {
+    const { data } = await supabase
+        .from('referrals')
+        .select('*')
+        .eq('referrer_id', userId)
+        .order('created_at', { ascending: false });
+    return data || [];
+  }
+
+  static async getReferralStats(userId: string) {
+    const referrals = await this.getUserReferrals(userId);
+    const confirmed = referrals.filter(r => r.status === 'confirmed');
+    const pending = referrals.filter(r => r.status === 'pending');
+    const totalEarnings = confirmed.reduce((acc, curr) => acc + curr.reward_amount, 0);
+
+    return {
+        total: referrals.length,
+        confirmed: confirmed.length,
+        pending: pending.length,
+        earnings: totalEarnings
+    };
+  }
+
+  /**
+   * Grubun katılımını kontrol eder (SİMÜLASYON)
+   * Gerçekte bir Telegram Bot API çağrısı veya Supabase Edge Function gerektirir.
+   */
+  static async checkGroupJoin(userId: string, groupId: string): Promise<boolean> {
+    // Simülasyon: %80 ihtimalle grupta varsayalım (Test için)
+    return Math.random() > 0.2;
+  }
+
+  static async confirmReferral(referralId: string) {
+    const { data: referral } = await supabase.from('referrals').select('*').eq('id', referralId).maybeSingle();
+    if (!referral || referral.status !== 'pending') return;
+
+    // Update referral status
+    await supabase.from('referrals').update({ 
+        status: 'confirmed', 
+        confirmed_at: new Date().toISOString() 
+    }).eq('id', referralId);
+
+    // Update referrer's wallet and referral count
+    const { data: wallet } = await this.getUserWallet(referral.referrer_id);
+    await this.updateUserWallet(referral.referrer_id, {
+        balance: (wallet.balance || 0) + referral.reward_amount,
+        total_earned: (wallet.total_earned || 0) + referral.reward_amount
+    });
+
+    // Update referral count in user profile
+    const { data: user } = await supabase.from('users').select('referral_count').eq('id', referral.referrer_id).maybeSingle();
+    await supabase.from('users').update({ 
+        referral_count: (user?.referral_count || 0) + 1 
+    }).eq('id', referral.referrer_id);
+
+    await this.logActivity(referral.referrer_id, 'payment', 'referral_confirmed', 'Referans Ödülü Onaylandı', `${referral.reward_amount} Hub Puanı hesabınıza eklendi.`);
+  }
+
+  // --- PAYMENTS ---
+  static async createTransaction(userId: string, itemId: string, itemType: 'bot' | 'plan', amount: number, currency: string, orderId: string) {
+    const { error } = await supabase.from('transactions').insert({
+        user_id: userId,
+        item_id: itemId,
+        item_type: itemType,
+        amount,
+        currency,
+        order_id: orderId,
+        status: 'pending',
+        created_at: new Date().toISOString()
+    });
+    if (error) throw error;
+  }
+
+  static async getAllTransactions() {
+    const { data, error } = await supabase
+        .from('transactions')
+        .select(`
+            *,
+            user:users(username, avatar)
+        `)
+        .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return data || [];
+  }
+
+  static async updateTransactionStatus(orderId: string, status: 'completed' | 'failed', txHash?: string) {
+    const { data: tx } = await supabase.from('transactions').select('*').eq('order_id', orderId).maybeSingle();
+    if (!tx) return;
+
+    const { error } = await supabase.from('transactions').update({ 
+        status, 
+        tx_hash: txHash,
+        updated_at: new Date().toISOString() 
+    }).eq('order_id', orderId);
+
+    if (error) throw error;
+    return tx;
+  }
 }
