@@ -999,7 +999,7 @@ const UserManagement = () => {
                                                     if (confirm(`@${u.username} kullanıcısını ve tüm verilerini silmek istediğinizden emin misiniz?`)) {
                                                         try {
                                                             await DatabaseService.deleteUser(u.id);
-                                                            await DatabaseService.logActivity('admin', 'system', 'user_deleted', 'Kullanıcı Silindi', `${u.username} kullanıcısı silindi.`);
+                                                            await DatabaseService.logActivity('admin', 'system', 'user_deleted', 'Kullanıcı Silindi', `${u.username} kullanıcısı ve tüm verileri sistemden kalıcı olarak silindi.`);
                                                             load();
                                                         } catch (e) {
                                                             alert("Hata oluştu");
@@ -1102,7 +1102,7 @@ const SettingsManager = () => {
         try {
             const newValue = !settings.maintenanceMode;
             await DatabaseService.updateSettings({ maintenance_mode: newValue });
-            await DatabaseService.logActivity('admin', 'system', 'maintenance_toggle', 'Bakım Modu Değiştirildi', `Bakım modu ${newValue ? 'AKTİF' : 'PASİF'} hale getirildi.`);
+            await DatabaseService.logActivity('admin', 'system', 'maintenance_toggle', 'Bakım Modu Değiştirildi', `Sistem bakım modu yönetici tarafından ${newValue ? 'AKTİF' : 'PASİF'} hale getirildi.`);
             setSettings({ ...settings, maintenanceMode: newValue });
             alert(`Bakım modu ${newValue ? 'etkinleştirildi' : 'devre dışı bırakıldı'}.`);
         } catch (e) {
@@ -1183,7 +1183,7 @@ const SettingsManager = () => {
                                     await DatabaseService.updateSettings({ 
                                         version: settings.version
                                     });
-                                    await DatabaseService.logActivity('admin', 'system', 'settings_update', 'Sistem Ayarları Güncellendi', 'Versiyon bilgisi güncellendi.');
+                                    await DatabaseService.logActivity('admin', 'system', 'settings_update', 'Sistem Ayarları Güncellendi', `Sistem ayarları ve versiyon bilgisi (${settings.version}) yönetici tarafından güncellendi.`);
                                     alert("Ayarlar başarıyla kaydedildi.");
                                 } catch (e) {
                                     alert("Hata oluştu");

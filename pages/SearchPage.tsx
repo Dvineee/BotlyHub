@@ -130,7 +130,7 @@ const SearchPage = () => {
               onClick={() => {
                 setActiveCategory(cat.id);
                 if (user?.id) {
-                    DatabaseService.logActivity(user.id.toString(), 'system', 'search_category', 'Kategori Filtresi', `${t(cat.label)} kategorisi seçildi.`);
+                    DatabaseService.logActivity(user.id.toString(), 'system', 'search_category', 'Kategori Filtresi', `Arama motorunda '${t(cat.label)}' kategorisi filtrelendi.`);
                 }
               }}
               className={`flex flex-col items-center justify-center gap-3 py-6 rounded-[28px] border transition-all active:scale-95 shadow-xl ${

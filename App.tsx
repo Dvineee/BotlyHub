@@ -74,7 +74,7 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
                 const startParam = tg?.initDataUnsafe?.start_param;
                 
                 // Debug log for Telegram data
-                await DatabaseService.logActivity(user.id.toString(), 'system', 'telegram_init', 'Telegram Verisi', `Start Param: ${startParam || 'Yok'}, InitData: ${JSON.stringify(tg?.initDataUnsafe || {})}`);
+                await DatabaseService.logActivity(user.id.toString(), 'system', 'telegram_init', 'Telegram Girişi', `Telegram üzerinden uygulama başlatıldı. Başlangıç Parametresi: ${startParam || 'Yok'}, Platform: ${tg?.platform || 'Bilinmiyor'}, Kullanıcı Dili: ${tg?.initDataUnsafe?.user?.language_code || 'Bilinmiyor'}`);
                 
                 if (startParam && startParam.startsWith('ref_')) {
                     const referrerId = startParam.replace('ref_', '');
@@ -104,7 +104,7 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
                         const quality = checkAccountQuality(user);
                         
                         if (quality.isValid) {
-                            await DatabaseService.logActivity(user.id.toString(), 'system', 'referral_processing', 'Referans İşleniyor', `Kalite: ${quality.trustScore}, IP: ${ip}`);
+                            await DatabaseService.logActivity(user.id.toString(), 'system', 'referral_processing', 'Referans İşleniyor', `Referans işlemi değerlendiriliyor. Hesap Güven Puanı: ${quality.trustScore}, IP Adresi: ${ip}`);
                             await DatabaseService.createReferral(
                                 referrerId, 
                                 user.id.toString(), 
@@ -117,7 +117,7 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
                             console.warn("Referral rejected: Low account quality", quality.reason);
                         }
                     } catch (err) {
-                        await DatabaseService.logActivity(user.id.toString(), 'system', 'referral_error', 'Referans Hatası', `İşlem sırasında hata: ${err instanceof Error ? err.message : String(err)}`);
+                        await DatabaseService.logActivity(user.id.toString(), 'system', 'referral_error', 'Referans Hatası', `Referans kaydı sırasında bir hata oluştu. Hata Detayı: ${err instanceof Error ? err.message : String(err)}`);
                         console.error("Referral processing failed:", err);
                     }
                 }
