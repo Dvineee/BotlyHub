@@ -785,10 +785,10 @@ export class DatabaseService {
   static async getUserReferrals(userId: string): Promise<Referral[]> {
     const { data } = await supabase
         .from('referrals')
-        .select('*')
+        .select('*, referred_user:users!referred_id(name, avatar, username)')
         .eq('referrer_id', userId)
         .order('created_at', { ascending: false });
-    return data || [];
+    return data as any || [];
   }
 
   static async getReferralStats(userId: string) {

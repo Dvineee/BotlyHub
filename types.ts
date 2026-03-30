@@ -162,6 +162,11 @@ export interface Referral {
   ip_address?: string;
   device_fingerprint?: string;
   is_premium_referral: boolean;
+  referred_user?: {
+    name: string;
+    avatar: string;
+    username?: string;
+  };
 }
 
 export interface ReferralSettings {

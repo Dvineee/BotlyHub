@@ -177,12 +177,28 @@ const ReferralPage = () => {
                         referrals.map((ref) => (
                             <div key={ref.id} className="bg-slate-900/40 border border-white/5 p-5 rounded-[28px] flex items-center justify-between">
                                 <div className="flex items-center gap-4">
-                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${ref.status === 'confirmed' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : ref.status === 'pending' ? 'bg-orange-500/10 border-orange-500/20 text-orange-500' : 'bg-red-500/10 border-red-500/20 text-red-500'}`}>
-                                        {ref.status === 'confirmed' ? <CheckCircle2 size={18} /> : ref.status === 'pending' ? <Clock size={18} /> : <XCircle size={18} />}
-                                    </div>
+                                    {ref.referred_user?.avatar ? (
+                                        <div className="relative">
+                                            <img 
+                                                src={ref.referred_user.avatar} 
+                                                alt={ref.referred_user.name} 
+                                                className="w-10 h-10 rounded-xl object-cover border border-white/10"
+                                                referrerPolicy="no-referrer"
+                                            />
+                                            <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-slate-950 flex items-center justify-center ${ref.status === 'confirmed' ? 'bg-emerald-500 text-white' : ref.status === 'pending' ? 'bg-orange-500 text-white' : 'bg-red-500 text-white'}`}>
+                                                {ref.status === 'confirmed' ? <CheckCircle2 size={10} /> : ref.status === 'pending' ? <Clock size={10} /> : <XCircle size={10} />}
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${ref.status === 'confirmed' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : ref.status === 'pending' ? 'bg-orange-500/10 border-orange-500/20 text-orange-500' : 'bg-red-500/10 border-red-500/20 text-red-500'}`}>
+                                            {ref.status === 'confirmed' ? <CheckCircle2 size={18} /> : ref.status === 'pending' ? <Clock size={18} /> : <XCircle size={18} />}
+                                        </div>
+                                    )}
                                     <div className="space-y-1">
                                         <div className="flex items-center gap-2">
-                                            <span className="text-[11px] font-black text-white uppercase italic">Kullanıcı #{ref.referred_id.slice(-4)}</span>
+                                            <span className="text-[11px] font-black text-white uppercase italic">
+                                                {ref.referred_user?.name || `Kullanıcı #${ref.referred_id.slice(-4)}`}
+                                            </span>
                                             {ref.is_premium_referral && (
                                                 <span className="px-2 py-0.5 bg-blue-600/20 border border-blue-500/20 text-[7px] font-black text-blue-400 rounded-full uppercase tracking-tighter">PREMIUM</span>
                                             )}
