@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import * as Router from 'react-router-dom';
+import { motion } from 'motion/react';
 import { 
   LayoutDashboard, Users, Bot, LogOut, Menu, X, 
   Loader2, Plus, Trash2, Megaphone, Send, Activity, 
@@ -63,12 +64,12 @@ const AdminDashboard = () => {
             </div>
             <div>
                 <h2 className="text-xl font-black text-white italic tracking-tighter uppercase leading-none">Botly<span className="text-blue-500">Hub</span></h2>
-                <span className="text-[8px] font-black text-slate-700 uppercase tracking-[0.4em] mt-1.5 block">Enterprise Console</span>
+                <span className="text-[8px] font-black text-slate-700 uppercase tracking-[0.4em] mt-1.5 block">Kurumsal Konsol</span>
             </div>
           </div>
           
             <nav className="flex-1 space-y-2 overflow-y-auto no-scrollbar">
-            <NavItem to="/a/dashboard" icon={LayoutDashboard} label="Dashboard" />
+            <NavItem to="/a/dashboard" icon={LayoutDashboard} label="Panel" />
             <div className="pt-8 pb-3 px-6"><span className="text-[9px] font-black text-slate-800 uppercase tracking-widest italic">İzleme</span></div>
             <NavItem to="/a/dashboard/users" icon={Users} label="Kullanıcılar" />
             <NavItem to="/a/dashboard/admin-logs" icon={ShieldCheck} label="Admin Logları" />
@@ -101,9 +102,22 @@ const AdminDashboard = () => {
            <div className="flex items-center gap-4 lg:gap-8 ml-auto">
               <div className="hidden sm:flex items-center gap-3 bg-white/5 px-4 py-2 rounded-xl border border-white/5">
                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
-                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Live Core</span>
+                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">CANLI SİSTEM</span>
               </div>
-              <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-xl lg:rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center font-black text-white italic text-xl shadow-xl shadow-blue-600/20">A</div>
+              <motion.div 
+                  animate={{ 
+                    boxShadow: [
+                      "0 0 20px rgba(37, 99, 235, 0.2)",
+                      "0 0 40px rgba(37, 99, 235, 0.6)",
+                      "0 0 20px rgba(37, 99, 235, 0.2)"
+                    ],
+                    scale: [1, 1.05, 1]
+                  }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                  className="w-10 h-10 lg:w-12 lg:h-12 rounded-xl lg:rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center font-black text-white italic text-xl shadow-xl shadow-blue-600/20"
+               >
+                 A
+               </motion.div>
            </div>
         </header>
 
@@ -174,7 +188,7 @@ const HomeView = () => {
     return (
         <div className="animate-in fade-in duration-700 space-y-12">
             <div className="flex flex-col gap-2">
-                <h1 className="text-4xl lg:text-5xl font-black text-white uppercase italic tracking-tighter leading-none">Enterprise <span className="text-blue-500">Overview</span></h1>
+                <h1 className="text-4xl lg:text-5xl font-black text-white uppercase italic tracking-tighter leading-none">Kurumsal <span className="text-blue-500">Genel Bakış</span></h1>
                 <p className="text-[10px] font-black text-slate-700 uppercase tracking-[0.5em] italic">Platform büyüme ve performans metrikleri</p>
             </div>
 
@@ -260,7 +274,7 @@ const BotManagement = () => {
         <div className="space-y-12 animate-in fade-in">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div>
-                    <h2 className="text-3xl lg:text-4xl font-black text-white italic uppercase tracking-tighter leading-none">Market <span className="text-blue-500">Inventory</span></h2>
+                    <h2 className="text-3xl lg:text-4xl font-black text-white italic uppercase tracking-tighter leading-none">Market <span className="text-blue-500">Envanteri</span></h2>
                     <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em] mt-2 italic">Platform envanterini profesyonelce yönetin</p>
                 </div>
                 <button 
@@ -324,8 +338,8 @@ const BotManagement = () => {
                                         <Cpu size={24} className="text-white"/>
                                     </div>
                                     <div>
-                                        <h3 className="text-2xl lg:text-3xl font-black uppercase italic tracking-tighter">Product <span className="text-blue-500">Forge</span></h3>
-                                        <p className="text-[9px] font-black text-slate-700 uppercase tracking-[0.4em] mt-1 italic">V3.5 ENGINE</p>
+                                        <h3 className="text-2xl lg:text-3xl font-black uppercase italic tracking-tighter">Ürün <span className="text-blue-500">Atölyesi</span></h3>
+                                        <p className="text-[9px] font-black text-slate-700 uppercase tracking-[0.4em] mt-1 italic">V3.5 MOTORU</p>
                                     </div>
                                 </div>
 
@@ -942,7 +956,7 @@ const UserManagement = () => {
     return (
         <div className="space-y-10 animate-in fade-in">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
-                <h2 className="text-3xl font-black text-white italic uppercase tracking-tighter leading-none">User <span className="text-blue-500">Registry</span></h2>
+                <h2 className="text-3xl font-black text-white italic uppercase tracking-tighter leading-none">Kullanıcı <span className="text-blue-500">Kayıtları</span></h2>
                 <div className="relative w-full sm:w-80">
                     <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-700" size={18} />
                     <input type="text" placeholder="Üye ara..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full h-14 bg-slate-900 border border-white/5 rounded-2xl py-4 pl-14 pr-6 text-[10px] outline-none focus:border-blue-500 text-white font-black italic uppercase" />
@@ -1195,6 +1209,7 @@ const ActivityCenter = ({ filterType }: { filterType: 'admin' | 'user' }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [activeTypeFilter, setActiveTypeFilter] = useState<string>('all');
+    const [selectedLog, setSelectedLog] = useState<ActivityLog | null>(null);
 
     useEffect(() => { 
         setIsLoading(true);
@@ -1244,7 +1259,7 @@ const ActivityCenter = ({ filterType }: { filterType: 'admin' | 'user' }) => {
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 <div>
                     <h2 className="text-3xl font-black text-white italic uppercase tracking-tighter leading-none">
-                        {filterType === 'admin' ? 'Admin' : 'Üye'} <span className="text-blue-500">Logları</span>
+                        {filterType === 'admin' ? 'Yönetici' : 'Üye'} <span className="text-blue-500">Logları</span>
                     </h2>
                     <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em] mt-2 italic">
                         {filterType === 'admin' ? 'Yönetici işlemlerini takip edin' : 'Kullanıcı hareketlerini detaylıca izleyin'}
@@ -1295,7 +1310,11 @@ const ActivityCenter = ({ filterType }: { filterType: 'admin' | 'user' }) => {
             ) : (
                 <div className="space-y-4">
                     {filteredLogs.map(log => (
-                        <div key={log.id} className="bg-slate-900/40 border border-white/5 p-6 lg:p-8 rounded-[32px] lg:rounded-[40px] flex items-center gap-6 group hover:border-white/10 transition-all relative overflow-hidden">
+                        <div 
+                            key={log.id} 
+                            onClick={() => setSelectedLog(log)}
+                            className="bg-slate-900/40 border border-white/5 p-6 lg:p-8 rounded-[32px] lg:rounded-[40px] flex items-center gap-6 group hover:border-white/10 transition-all relative overflow-hidden cursor-pointer active:scale-[0.99]"
+                        >
                             <div className={`w-12 h-12 shrink-0 bg-white/5 rounded-2xl flex items-center justify-center ${typeColors[log.type] || 'text-white'} shadow-inner`}><Activity size={20} /></div>
                             <div className="flex-1 min-w-0">
                                 <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-1 gap-2">
@@ -1317,12 +1336,92 @@ const ActivityCenter = ({ filterType }: { filterType: 'admin' | 'user' }) => {
                                     </div>
                                     <div className="flex items-center gap-1.5">
                                         <Zap size={10} className="text-slate-700" />
-                                        <span className="text-[9px] font-black text-slate-600 uppercase tracking-tighter">KEY: {log.action_key}</span>
+                                        <span className="text-[9px] font-black text-slate-600 uppercase tracking-tighter">ANAHTAR: {log.action_key}</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     ))}
+                </div>
+            )}
+
+            {selectedLog && (
+                <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 lg:p-10">
+                    <div className="absolute inset-0 bg-black/90 backdrop-blur-xl" onClick={() => setSelectedLog(null)}></div>
+                    <motion.div 
+                        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        className="relative w-full max-w-2xl bg-slate-900 border border-white/10 rounded-[40px] lg:rounded-[56px] overflow-hidden shadow-2xl flex flex-col max-h-[85vh]"
+                    >
+                        <div className="p-8 lg:p-12 border-b border-white/5 flex items-center justify-between">
+                            <div className="flex items-center gap-5">
+                                <div className={`w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center ${typeColors[selectedLog.type] || 'text-white'}`}>
+                                    <Activity size={24} />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl lg:text-2xl font-black text-white uppercase italic tracking-tighter">İşlem <span className="text-blue-500">Detayı</span></h3>
+                                    <p className="text-[9px] font-black text-slate-700 uppercase tracking-[0.4em] mt-1 italic">LOG REF: {selectedLog.id.slice(0, 8)}</p>
+                                </div>
+                            </div>
+                            <button onClick={() => setSelectedLog(null)} className="p-3 bg-white/5 rounded-xl hover:bg-red-600 transition-all">
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        <div className="flex-1 overflow-y-auto p-8 lg:p-12 space-y-8 no-scrollbar">
+                            <div className="space-y-6">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="bg-slate-950/50 border border-white/5 p-5 rounded-2xl space-y-1">
+                                        <span className="text-[9px] font-black text-slate-700 uppercase tracking-widest italic">İşlem Tipi</span>
+                                        <p className={`text-xs font-black uppercase italic ${typeColors[selectedLog.type]}`}>{selectedLog.type.replace('_', ' ')}</p>
+                                    </div>
+                                    <div className="bg-slate-950/50 border border-white/5 p-5 rounded-2xl space-y-1">
+                                        <span className="text-[9px] font-black text-slate-700 uppercase tracking-widest italic">Tarih</span>
+                                        <p className="text-xs font-black text-white uppercase italic">{new Date(selectedLog.created_at).toLocaleString()}</p>
+                                    </div>
+                                </div>
+
+                                <div className="bg-slate-950/50 border border-white/5 p-6 rounded-3xl space-y-2">
+                                    <span className="text-[9px] font-black text-slate-700 uppercase tracking-widest italic">Başlık</span>
+                                    <p className="text-sm font-black text-white uppercase italic leading-tight">{selectedLog.title}</p>
+                                </div>
+
+                                <div className="bg-slate-950/50 border border-white/5 p-6 rounded-3xl space-y-2">
+                                    <span className="text-[9px] font-black text-slate-700 uppercase tracking-widest italic">Açıklama</span>
+                                    <p className="text-xs font-bold text-slate-400 uppercase italic leading-relaxed">{selectedLog.description}</p>
+                                </div>
+
+                                <div className="bg-slate-950/50 border border-white/5 p-6 rounded-3xl space-y-4">
+                                    <span className="text-[9px] font-black text-slate-700 uppercase tracking-widest italic">Kullanıcı Bilgileri</span>
+                                    <div className="flex items-center gap-4">
+                                        <img src={selectedLog.user?.avatar || `https://ui-avatars.com/api/?name=${selectedLog.user_id}`} className="w-12 h-12 rounded-xl object-cover border border-white/10" />
+                                        <div>
+                                            <p className="text-xs font-black text-white uppercase italic">{selectedLog.user?.name || 'Bilinmeyen Kullanıcı'}</p>
+                                            <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest">@{selectedLog.user?.username || 'bilinmiyor'}</p>
+                                            <p className="text-[8px] font-bold text-slate-800 mt-1">KULLANICI ID: {selectedLog.user_id}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-slate-950/50 border border-white/5 p-6 rounded-3xl space-y-2">
+                                    <span className="text-[9px] font-black text-slate-700 uppercase tracking-widest italic">İşlem Anahtarı (Action Key)</span>
+                                    <div className="flex items-center gap-2 bg-slate-900 p-3 rounded-xl border border-white/5">
+                                        <Zap size={14} className="text-blue-500" />
+                                        <code className="text-[10px] font-black text-blue-400 uppercase tracking-widest">{selectedLog.action_key}</code>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="p-8 lg:p-12 bg-slate-950/50 border-t border-white/5">
+                            <button 
+                                onClick={() => setSelectedLog(null)}
+                                className="w-full h-14 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] transition-all"
+                            >
+                                KAPAT
+                            </button>
+                        </div>
+                    </motion.div>
                 </div>
             )}
         </div>
@@ -1358,7 +1457,7 @@ const SalesManagement = () => {
     return (
         <div className="space-y-10 animate-in fade-in">
             <div className="flex flex-col gap-2">
-                <h2 className="text-3xl lg:text-4xl font-black text-white italic uppercase tracking-tighter leading-none">Financial <span className="text-blue-500">Center</span></h2>
+                <h2 className="text-3xl lg:text-4xl font-black text-white italic uppercase tracking-tighter leading-none">Finans <span className="text-blue-500">Merkezi</span></h2>
                 <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em] mt-2 italic">Platform gelirlerini ve ödeme akışlarını izleyin</p>
             </div>
 
@@ -1580,7 +1679,7 @@ const AnnouncementCenter = () => {
         <div className="space-y-12 animate-in fade-in">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div>
-                    <h2 className="text-3xl lg:text-4xl font-black text-white italic uppercase tracking-tighter leading-none">Broadcast <span className="text-blue-500">Center</span></h2>
+                    <h2 className="text-3xl lg:text-4xl font-black text-white italic uppercase tracking-tighter leading-none">Duyuru <span className="text-blue-500">Merkezi</span></h2>
                     <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em] mt-2 italic">Global platform duyurularını yönetin</p>
                 </div>
                 <button 
