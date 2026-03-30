@@ -279,30 +279,30 @@ const BotManagement = () => {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                     {bots.map(b => (
-                        <div key={b.id} className="bg-slate-900/40 border border-white/5 rounded-[44px] lg:rounded-[56px] p-8 lg:p-10 flex flex-col gap-6 lg:gap-8 group hover:border-blue-500/30 transition-all relative overflow-hidden shadow-2xl backdrop-blur-sm">
+                        <div key={b.id} className="bg-slate-900/40 border border-white/5 rounded-[32px] lg:rounded-[56px] p-6 lg:p-10 flex flex-col gap-6 lg:gap-8 group hover:border-blue-500/30 transition-all relative overflow-hidden shadow-2xl backdrop-blur-sm">
                             <div className="flex justify-between items-start relative z-10">
                                 <div className="relative">
                                     <img 
                                         src={getLiveBotIcon(b.bot_link)} 
-                                        className="w-16 h-16 lg:w-20 lg:h-20 rounded-[28px] lg:rounded-[32px] border border-white/10 shadow-2xl object-cover bg-slate-950 group-hover:rotate-6 group-hover:scale-105 transition-all" 
+                                        className="w-14 h-14 lg:w-20 lg:h-20 rounded-[24px] lg:rounded-[32px] border border-white/10 shadow-2xl object-cover bg-slate-950 group-hover:rotate-6 group-hover:scale-105 transition-all" 
                                         onError={(e) => (e.target as any).src = `https://ui-avatars.com/api/?name=${b.name}`}
                                     />
-                                    {b.price > 0 && <div className="absolute -top-2 -right-2 w-7 h-7 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg border-4 border-[#020617]"><Zap size={12} fill="currentColor" /></div>}
+                                    {b.price > 0 && <div className="absolute -top-2 -right-2 w-6 h-6 lg:w-7 lg:h-7 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg border-4 border-[#020617]"><Zap size={10} fill="currentColor" /></div>}
                                 </div>
                                 <div className="flex gap-2">
-                                    <button onClick={() => { setEditingBot(b); setIsModalOpen(true); }} className="p-3 bg-white/5 rounded-xl hover:bg-blue-600 text-slate-500 hover:text-white transition-all"><Edit3 size={18}/></button>
-                                    <button onClick={async () => { if(confirm('Silsin mi?')) { await DatabaseService.deleteBot(b.id); await DatabaseService.logActivity('admin', 'bot_manage', 'bot_deleted', 'Bot Silindi', `${b.name} isimli bot sistemden silindi.`); load(); } }} className="p-3 bg-white/5 rounded-xl text-red-500 hover:bg-red-500 hover:text-white transition-all"><Trash2 size={18}/></button>
+                                    <button onClick={() => { setEditingBot(b); setIsModalOpen(true); }} className="p-2.5 lg:p-3 bg-white/5 rounded-xl hover:bg-blue-600 text-slate-500 hover:text-white transition-all"><Edit3 size={16}/></button>
+                                    <button onClick={async () => { if(confirm('Silsin mi?')) { await DatabaseService.deleteBot(b.id); await DatabaseService.logActivity('admin', 'bot_manage', 'bot_deleted', 'Bot Silindi', `${b.name} isimli bot sistemden silindi.`); load(); } }} className="p-2.5 lg:p-3 bg-white/5 rounded-xl text-red-500 hover:bg-red-500 hover:text-white transition-all"><Trash2 size={16}/></button>
                                 </div>
                             </div>
 
                             <div className="relative z-10">
-                                <h4 className="text-xl lg:text-2xl font-black text-white italic uppercase tracking-tighter truncate leading-none mb-3">{b.name}</h4>
-                                <p className="text-[10px] text-slate-600 line-clamp-2 leading-relaxed font-bold uppercase italic h-10">{b.description}</p>
+                                <h4 className="text-lg lg:text-2xl font-black text-white italic uppercase tracking-tighter truncate leading-none mb-2 lg:mb-3">{b.name}</h4>
+                                <p className="text-[9px] lg:text-[10px] text-slate-600 line-clamp-2 leading-relaxed font-bold uppercase italic h-8 lg:h-10">{b.description}</p>
                             </div>
 
-                            <div className="flex items-center justify-between pt-6 border-t border-white/5 relative z-10">
-                                <p className="text-lg font-black uppercase text-blue-500 italic tracking-tighter leading-none">{b.price > 0 ? `${b.price} TL` : 'ÜCRETSİZ'}</p>
-                                <p className="text-lg font-black uppercase text-white italic tracking-tighter leading-none">{b.ownerCount || 0} <span className="text-[8px] text-slate-700">LİSANS</span></p>
+                            <div className="flex items-center justify-between pt-4 lg:pt-6 border-t border-white/5 relative z-10">
+                                <p className="text-base lg:text-lg font-black uppercase text-blue-500 italic tracking-tighter leading-none">{b.price > 0 ? `${b.price} TL` : 'ÜCRETSİZ'}</p>
+                                <p className="text-base lg:text-lg font-black uppercase text-white italic tracking-tighter leading-none">{b.ownerCount || 0} <span className="text-[8px] text-slate-700">LİSANS</span></p>
                             </div>
                         </div>
                     ))}
@@ -570,127 +570,127 @@ const UserDetailModal = ({ user, onClose, onUpdate }: { user: User, onClose: () 
                         <div className="animate-in fade-in slide-in-from-bottom-4">
                             {activeTab === 'overview' && (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    <div className="bg-slate-950/50 border border-white/5 p-8 rounded-[32px] space-y-4">
-                                        <p className="text-[9px] font-black text-slate-700 uppercase tracking-widest italic">İletişim Bilgileri</p>
-                                        <div className="space-y-3">
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-[10px] text-slate-500 uppercase font-bold">E-Posta</span>
-                                                <span className="text-[11px] text-white font-black italic">{user.email || 'Belirtilmemiş'}</span>
-                                            </div>
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-[10px] text-slate-500 uppercase font-bold">Telefon</span>
-                                                <span className="text-[11px] text-white font-black italic">{user.phone || 'Belirtilmemiş'}</span>
-                                            </div>
+                    <div className="bg-slate-950/50 border border-white/5 p-6 lg:p-8 rounded-[32px] space-y-4">
+                        <p className="text-[9px] font-black text-slate-700 uppercase tracking-widest italic">İletişim Bilgileri</p>
+                        <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                                <span className="text-[10px] text-slate-500 uppercase font-bold">E-Posta</span>
+                                <span className="text-[11px] text-white font-black italic truncate ml-4">{user.email || 'Belirtilmemiş'}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="text-[10px] text-slate-500 uppercase font-bold">Telefon</span>
+                                <span className="text-[11px] text-white font-black italic">{user.phone || 'Belirtilmemiş'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="bg-slate-950/50 border border-white/5 p-6 lg:p-8 rounded-[32px] space-y-4">
+                        <p className="text-[9px] font-black text-slate-700 uppercase tracking-widest italic">Hesap Durumu</p>
+                        <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                                <span className="text-[10px] text-slate-500 uppercase font-bold">Kayıt Tarihi</span>
+                                <span className="text-[11px] text-white font-black italic">{new Date(user.joinDate).toLocaleDateString()}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="text-[10px] text-slate-500 uppercase font-bold">Kısıtlama</span>
+                                <span className={`text-[11px] font-black italic ${user.isRestricted ? 'text-red-500' : 'text-emerald-500'}`}>{user.isRestricted ? 'KISITLI' : 'YOK'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="bg-slate-950/50 border border-white/5 p-6 lg:p-8 rounded-[32px] space-y-4">
+                        <p className="text-[9px] font-black text-slate-700 uppercase tracking-widest italic">Varlık Özeti</p>
+                        <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                                <span className="text-[10px] text-slate-500 uppercase font-bold">Toplam Kanal</span>
+                                <span className="text-[11px] text-white font-black italic">{channels.length}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="text-[10px] text-slate-500 uppercase font-bold">Sahip Olunan Bot</span>
+                                <span className="text-[11px] text-white font-black italic">{bots.length}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-slate-950/50 border border-white/5 p-6 lg:p-8 rounded-[32px] space-y-6 lg:col-span-3">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-[9px] font-black text-slate-700 uppercase tracking-widest italic mb-1">Hızlı İşlemler</p>
+                                <h4 className="text-sm font-black text-white uppercase italic">Hesap Yönetimi</h4>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <button 
+                                onClick={toggleRestriction}
+                                className={`flex items-center justify-between p-5 lg:p-6 rounded-2xl border transition-all ${user.isRestricted ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : 'bg-red-500/10 border-red-500/20 text-red-500'}`}
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${user.isRestricted ? 'bg-emerald-500/20' : 'bg-red-500/20'}`}>
+                                        {user.isRestricted ? <ShieldCheck size={20} /> : <ShieldAlert size={20} />}
+                                    </div>
+                                    <div className="text-left">
+                                        <p className="text-[10px] font-black uppercase italic">{user.isRestricted ? 'Kısıtlamayı Kaldır' : 'Kullanıcıyı Kısıtla'}</p>
+                                        <p className="text-[8px] font-bold opacity-60 uppercase tracking-widest">{user.isRestricted ? 'Kullanıcı tüm yetkilerine geri döner' : 'Kullanıcının platform erişimi kısıtlanır'}</p>
+                                    </div>
+                                </div>
+                            </button>
+
+                            <button 
+                                onClick={togglePublishStatus}
+                                className={`flex items-center justify-between p-5 lg:p-6 rounded-2xl border transition-all ${user.canPublishPromos ? 'bg-blue-500/10 border-blue-500/20 text-blue-500' : 'bg-slate-800 border-white/5 text-slate-500'}`}
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${user.canPublishPromos ? 'bg-blue-500/20' : 'bg-slate-900'}`}>
+                                        <Megaphone size={20} />
+                                    </div>
+                                    <div className="text-left">
+                                        <p className="text-[10px] font-black uppercase italic">{user.canPublishPromos ? 'Reklam Yetkisini Al' : 'Reklam Yetkisi Ver'}</p>
+                                        <p className="text-[8px] font-bold opacity-60 uppercase tracking-widest">{user.canPublishPromos ? 'Kullanıcı artık reklam yayınlayamaz' : 'Kullanıcı platformda reklam yayınlayabilir'}</p>
+                                    </div>
+                                </div>
+                            </button>
+
+                            <div className="bg-slate-950/50 border border-white/5 p-5 lg:p-6 rounded-2xl lg:col-span-2 space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 bg-purple-600/10 rounded-xl flex items-center justify-center text-purple-500">
+                                            <Key size={20} />
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] font-black uppercase italic">Kullanıcı Paneli Erişimi</p>
+                                            <p className="text-[8px] font-bold opacity-60 uppercase tracking-widest">Özel yönetim paneli giriş yetkisi</p>
                                         </div>
                                     </div>
-                                    <div className="bg-slate-950/50 border border-white/5 p-8 rounded-[32px] space-y-4">
-                                        <p className="text-[9px] font-black text-slate-700 uppercase tracking-widest italic">Hesap Durumu</p>
-                                        <div className="space-y-3">
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-[10px] text-slate-500 uppercase font-bold">Kayıt Tarihi</span>
-                                                <span className="text-[11px] text-white font-black italic">{new Date(user.joinDate).toLocaleDateString()}</span>
-                                            </div>
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-[10px] text-slate-500 uppercase font-bold">Kısıtlama</span>
-                                                <span className={`text-[11px] font-black italic ${user.isRestricted ? 'text-red-500' : 'text-emerald-500'}`}>{user.isRestricted ? 'KISITLI' : 'YOK'}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="bg-slate-950/50 border border-white/5 p-8 rounded-[32px] space-y-4">
-                                        <p className="text-[9px] font-black text-slate-700 uppercase tracking-widest italic">Varlık Özeti</p>
-                                        <div className="space-y-3">
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-[10px] text-slate-500 uppercase font-bold">Toplam Kanal</span>
-                                                <span className="text-[11px] text-white font-black italic">{channels.length}</span>
-                                            </div>
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-[10px] text-slate-500 uppercase font-bold">Sahip Olunan Bot</span>
-                                                <span className="text-[11px] text-white font-black italic">{bots.length}</span>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    {user.hasPanelAccess && (
+                                        <span className="text-[8px] font-black bg-emerald-500/10 text-emerald-500 px-2 py-0.5 rounded border border-emerald-500/20">AKTİF</span>
+                                    )}
+                                </div>
 
-                                    <div className="bg-slate-950/50 border border-white/5 p-8 rounded-[32px] space-y-6 lg:col-span-3">
-                                        <div className="flex items-center justify-between">
-                                            <div>
-                                                <p className="text-[9px] font-black text-slate-700 uppercase tracking-widest italic mb-1">Hızlı İşlemler</p>
-                                                <h4 className="text-sm font-black text-white uppercase italic">Hesap Yönetimi</h4>
-                                            </div>
-                                        </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <button 
-                                                onClick={toggleRestriction}
-                                                className={`flex items-center justify-between p-6 rounded-2xl border transition-all ${user.isRestricted ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : 'bg-red-500/10 border-red-500/20 text-red-500'}`}
-                                            >
-                                                <div className="flex items-center gap-4">
-                                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${user.isRestricted ? 'bg-emerald-500/20' : 'bg-red-500/20'}`}>
-                                                        {user.isRestricted ? <ShieldCheck size={20} /> : <ShieldAlert size={20} />}
-                                                    </div>
-                                                    <div className="text-left">
-                                                        <p className="text-[10px] font-black uppercase italic">{user.isRestricted ? 'Kısıtlamayı Kaldır' : 'Kullanıcıyı Kısıtla'}</p>
-                                                        <p className="text-[8px] font-bold opacity-60 uppercase tracking-widest">{user.isRestricted ? 'Kullanıcı tüm yetkilerine geri döner' : 'Kullanıcının platform erişimi kısıtlanır'}</p>
-                                                    </div>
-                                                </div>
-                                            </button>
-
-                                            <button 
-                                                onClick={togglePublishStatus}
-                                                className={`flex items-center justify-between p-6 rounded-2xl border transition-all ${user.canPublishPromos ? 'bg-blue-500/10 border-blue-500/20 text-blue-500' : 'bg-slate-800 border-white/5 text-slate-500'}`}
-                                            >
-                                                <div className="flex items-center gap-4">
-                                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${user.canPublishPromos ? 'bg-blue-500/20' : 'bg-slate-900'}`}>
-                                                        <Megaphone size={20} />
-                                                    </div>
-                                                    <div className="text-left">
-                                                        <p className="text-[10px] font-black uppercase italic">{user.canPublishPromos ? 'Reklam Yetkisini Al' : 'Reklam Yetkisi Ver'}</p>
-                                                        <p className="text-[8px] font-bold opacity-60 uppercase tracking-widest">{user.canPublishPromos ? 'Kullanıcı artık reklam yayınlayamaz' : 'Kullanıcı platformda reklam yayınlayabilir'}</p>
-                                                    </div>
-                                                </div>
-                                            </button>
-
-                                            <div className="bg-slate-950/50 border border-white/5 p-6 rounded-2xl lg:col-span-2 space-y-4">
-                                                <div className="flex items-center justify-between">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="w-10 h-10 bg-purple-600/10 rounded-xl flex items-center justify-center text-purple-500">
-                                                            <Key size={20} />
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-[10px] font-black uppercase italic">Kullanıcı Paneli Erişimi</p>
-                                                            <p className="text-[8px] font-bold opacity-60 uppercase tracking-widest">Özel yönetim paneli giriş yetkisi</p>
-                                                        </div>
-                                                    </div>
-                                                    {user.hasPanelAccess && (
-                                                        <span className="text-[8px] font-black bg-emerald-500/10 text-emerald-500 px-2 py-0.5 rounded border border-emerald-500/20">AKTİF</span>
-                                                    )}
-                                                </div>
-
-                                                <div className="flex gap-3">
-                                                    <input 
-                                                        type="text" 
-                                                        placeholder="Panel Şifresi Belirle..." 
-                                                        id="panelPasswordInput"
-                                                        className="flex-1 h-12 bg-slate-900 border border-white/5 rounded-xl px-4 text-[10px] font-black text-white outline-none focus:border-purple-500 italic"
-                                                     />
-                                                    <button 
-                                                        onClick={async () => {
-                                                            const input = document.getElementById('panelPasswordInput') as HTMLInputElement;
-                                                            if (!input.value) return alert("Şifre giriniz");
-                                                            try {
-                                                                await DatabaseService.grantPanelAccess(user.id, input.value);
-                                                                await DatabaseService.logActivity('admin', 'system', 'panel_access_granted', 'Panel Erişimi Verildi', `${user.username} kullanıcısına panel erişimi ve şifre tanımlandı.`);
-                                                                alert("Panel erişimi başarıyla tanımlandı.");
-                                                                onUpdate();
-                                                                onClose();
-                                                            } catch (e) { alert("Hata oluştu"); }
-                                                        }}
-                                                        className="px-6 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-[9px] font-black uppercase tracking-widest transition-all"
-                                                    >
-                                                        YETKİ VER
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <div className="flex flex-col sm:flex-row gap-3">
+                                    <input 
+                                        type="text" 
+                                        placeholder="Panel Şifresi Belirle..." 
+                                        id="panelPasswordInput"
+                                        className="flex-1 h-12 bg-slate-900 border border-white/5 rounded-xl px-4 text-[10px] font-black text-white outline-none focus:border-purple-500 italic"
+                                     />
+                                    <button 
+                                        onClick={async () => {
+                                            const input = document.getElementById('panelPasswordInput') as HTMLInputElement;
+                                            if (!input.value) return alert("Şifre giriniz");
+                                            try {
+                                                await DatabaseService.grantPanelAccess(user.id, input.value);
+                                                await DatabaseService.logActivity('admin', 'system', 'panel_access_granted', 'Panel Erişimi Verildi', `${user.username} kullanıcısına panel erişimi ve şifre tanımlandı.`);
+                                                alert("Panel erişimi başarıyla tanımlandı.");
+                                                onUpdate();
+                                                onClose();
+                                            } catch (e) { alert("Hata oluştu"); }
+                                        }}
+                                        className="h-12 px-6 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-[9px] font-black uppercase tracking-widest transition-all"
+                                    >
+                                        YETKİ VER
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                                 </div>
                             )}
 
@@ -949,6 +949,7 @@ const UserManagement = () => {
                 </div>
             </div>
             <div className="bg-slate-900/40 border border-white/5 rounded-[44px] overflow-hidden shadow-2xl">
+                {/* Desktop Table */}
                 <div className="hidden lg:block overflow-x-auto">
                     <table className="w-full text-left">
                         <thead className="bg-white/5 text-[9px] uppercase tracking-[0.4em] text-slate-700 font-black">
@@ -1002,6 +1003,57 @@ const UserManagement = () => {
                             ))}
                         </tbody>
                     </table>
+                </div>
+
+                {/* Mobile Card View */}
+                <div className="lg:hidden divide-y divide-white/5">
+                    {filtered.map(u => (
+                        <div key={u.id} className="p-6 space-y-4 hover:bg-white/5 transition-all">
+                            <div className="flex justify-between items-start">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center font-black text-white italic text-lg shadow-lg">
+                                        {u.username?.[0]?.toUpperCase() || 'U'}
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-black text-white italic uppercase tracking-tighter">@{u.username}</p>
+                                        <p className="text-[9px] text-slate-600 font-bold uppercase tracking-widest">{u.role}</p>
+                                    </div>
+                                </div>
+                                <div className="flex flex-col items-end gap-2">
+                                    <div className={`flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest ${u.status === 'Active' ? 'text-emerald-500' : 'text-red-500'}`}>
+                                        <div className={`w-1.5 h-1.5 rounded-full ${u.status === 'Active' ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`}></div>
+                                        {u.status}
+                                    </div>
+                                    {u.isRestricted && (
+                                        <div className="text-[7px] font-black text-red-500 uppercase tracking-widest bg-red-500/10 px-1.5 py-0.5 rounded border border-red-500/20">
+                                            KISITLI
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="flex gap-2">
+                                <button 
+                                    onClick={() => setSelectedUser(u)}
+                                    className="flex-1 py-4 bg-white/5 rounded-2xl text-[9px] font-black uppercase tracking-widest hover:bg-white/10 transition-all border border-white/5"
+                                >
+                                    YÖNET
+                                </button>
+                                <button 
+                                    onClick={async () => {
+                                        if (confirm(`@${u.username} kullanıcısını silmek istediğinizden emin misiniz?`)) {
+                                            try {
+                                                await DatabaseService.deleteUser(u.id);
+                                                load();
+                                            } catch (e) { alert("Hata oluştu"); }
+                                        }
+                                    }}
+                                    className="px-6 py-4 bg-red-500/10 text-red-500 rounded-2xl transition-all border border-red-500/10"
+                                >
+                                    <Trash2 size={16} />
+                                </button>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </div>
 
@@ -1340,67 +1392,122 @@ const SalesManagement = () => {
                         <p className="text-slate-500 text-sm font-bold uppercase tracking-widest">İşlem Bulunamadı</p>
                     </div>
                 ) : (
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left">
-                            <thead className="bg-white/5 text-[9px] uppercase tracking-[0.4em] text-slate-700 font-black">
-                                <tr>
-                                    <th className="px-10 py-8">MÜŞTERİ</th>
-                                    <th className="px-10 py-8">ÜRÜN / TİP</th>
-                                    <th className="px-10 py-8">TARİH</th>
-                                    <th className="px-10 py-8">DURUM</th>
-                                    <th className="px-10 py-8 text-right">TUTAR</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-white/5">
-                                {filtered.map((t) => (
-                                    <tr key={t.id} className="hover:bg-white/5 transition-all text-white">
-                                        <td className="px-10 py-8">
-                                            <div className="flex items-center gap-4">
-                                                <img src={t.user?.avatar || `https://ui-avatars.com/api/?name=${t.user?.username}`} className="w-10 h-10 rounded-xl border border-white/5" />
-                                                <div>
-                                                    <p className="text-sm font-black italic uppercase tracking-tighter">@{t.user?.username || 'Guest'}</p>
-                                                    <p className="text-[8px] text-slate-600 font-bold uppercase tracking-widest">ID: {t.user_id}</p>
+                    <>
+                        {/* Desktop Table View */}
+                        <div className="hidden lg:block overflow-x-auto">
+                            <table className="w-full text-left">
+                                <thead className="bg-white/5 text-[9px] uppercase tracking-[0.4em] text-slate-700 font-black">
+                                    <tr>
+                                        <th className="px-10 py-8">MÜŞTERİ</th>
+                                        <th className="px-10 py-8">ÜRÜN / TİP</th>
+                                        <th className="px-10 py-8">TARİH</th>
+                                        <th className="px-10 py-8">DURUM</th>
+                                        <th className="px-10 py-8 text-right">TUTAR</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-white/5">
+                                    {filtered.map((t) => (
+                                        <tr key={t.id} className="hover:bg-white/5 transition-all text-white">
+                                            <td className="px-10 py-8">
+                                                <div className="flex items-center gap-4">
+                                                    <img src={t.user?.avatar || `https://ui-avatars.com/api/?name=${t.user?.username}`} className="w-10 h-10 rounded-xl border border-white/5" />
+                                                    <div>
+                                                        <p className="text-sm font-black italic uppercase tracking-tighter">@{t.user?.username || 'Guest'}</p>
+                                                        <p className="text-[8px] text-slate-600 font-bold uppercase tracking-widest">ID: {t.user_id}</p>
+                                                    </div>
                                                 </div>
+                                            </td>
+                                            <td className="px-10 py-8">
+                                                <div className="flex flex-col gap-1">
+                                                    <span className="text-xs font-black uppercase tracking-tight">{t.item_id}</span>
+                                                    <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest">{t.item_type}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-10 py-8">
+                                                <div className="flex flex-col gap-1">
+                                                    <span className="text-[10px] font-bold text-white uppercase tracking-widest">{new Date(t.created_at).toLocaleDateString()}</span>
+                                                    <span className="text-[8px] text-slate-600 font-bold uppercase tracking-widest">{new Date(t.created_at).toLocaleTimeString()}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-10 py-8">
+                                                <span className={`text-[9px] font-black px-3 py-1 rounded-lg border uppercase tracking-widest ${
+                                                    t.status === 'completed' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' :
+                                                    t.status === 'pending' ? 'bg-blue-500/10 border-blue-500/20 text-blue-500' :
+                                                    'bg-red-500/10 border-red-500/20 text-red-500'
+                                                }`}>
+                                                    {t.status === 'completed' ? 'BAŞARILI' : t.status === 'pending' ? 'BEKLEMEDE' : 'İPTAL'}
+                                                </span>
+                                            </td>
+                                            <td className="px-10 py-8 text-right">
+                                                <div className="flex flex-col items-end gap-1">
+                                                    <span className={`text-lg font-black italic ${t.status === 'completed' ? 'text-emerald-500' : 'text-slate-500'}`}>
+                                                        {t.currency === 'TRY' ? '₺' : ''}{t.amount} {t.currency !== 'TRY' ? t.currency : ''}
+                                                    </span>
+                                                    {t.tx_hash && (
+                                                        <a href={`https://tonviewer.com/transaction/${t.tx_hash}`} target="_blank" className="text-[8px] text-blue-500 hover:underline uppercase font-black tracking-widest flex items-center gap-1">
+                                                            TX <ExternalLink size={8} />
+                                                        </a>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Mobile Card View */}
+                        <div className="lg:hidden divide-y divide-white/5">
+                            {filtered.map((t) => (
+                                <div key={t.id} className="p-6 space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <img src={t.user?.avatar || `https://ui-avatars.com/api/?name=${t.user?.username}`} className="w-10 h-10 rounded-xl border border-white/5" />
+                                            <div>
+                                                <p className="text-sm font-black italic uppercase tracking-tighter text-white">@{t.user?.username || 'Guest'}</p>
+                                                <p className="text-[8px] text-slate-600 font-bold uppercase tracking-widest">ID: {t.user_id}</p>
                                             </div>
-                                        </td>
-                                        <td className="px-10 py-8">
-                                            <div className="flex flex-col gap-1">
-                                                <span className="text-xs font-black uppercase tracking-tight">{t.item_id}</span>
+                                        </div>
+                                        <span className={`text-[8px] font-black px-2 py-1 rounded border uppercase tracking-widest ${
+                                            t.status === 'completed' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' :
+                                            t.status === 'pending' ? 'bg-blue-500/10 border-blue-500/20 text-blue-500' :
+                                            'bg-red-500/10 border-red-500/20 text-red-500'
+                                        }`}>
+                                            {t.status === 'completed' ? 'BAŞARILI' : t.status === 'pending' ? 'BEKLEMEDE' : 'İPTAL'}
+                                        </span>
+                                    </div>
+
+                                    <div className="flex justify-between items-end">
+                                        <div className="space-y-1">
+                                            <p className="text-[9px] font-black text-slate-700 uppercase tracking-widest">ÜRÜN / TİP</p>
+                                            <div className="flex flex-col">
+                                                <span className="text-xs font-black uppercase tracking-tight text-white">{t.item_id}</span>
                                                 <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest">{t.item_type}</span>
                                             </div>
-                                        </td>
-                                        <td className="px-10 py-8">
-                                            <div className="flex flex-col gap-1">
-                                                <span className="text-[10px] font-bold text-white uppercase tracking-widest">{new Date(t.created_at).toLocaleDateString()}</span>
-                                                <span className="text-[8px] text-slate-600 font-bold uppercase tracking-widest">{new Date(t.created_at).toLocaleTimeString()}</span>
-                                            </div>
-                                        </td>
-                                        <td className="px-10 py-8">
-                                            <span className={`text-[9px] font-black px-3 py-1 rounded-lg border uppercase tracking-widest ${
-                                                t.status === 'completed' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' :
-                                                t.status === 'pending' ? 'bg-blue-500/10 border-blue-500/20 text-blue-500' :
-                                                'bg-red-500/10 border-red-500/20 text-red-500'
-                                            }`}>
-                                                {t.status === 'completed' ? 'BAŞARILI' : t.status === 'pending' ? 'BEKLEMEDE' : 'İPTAL'}
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-[9px] font-black text-slate-700 uppercase tracking-widest mb-1">TUTAR</p>
+                                            <span className={`text-lg font-black italic ${t.status === 'completed' ? 'text-emerald-500' : 'text-slate-500'}`}>
+                                                {t.currency === 'TRY' ? '₺' : ''}{t.amount} {t.currency !== 'TRY' ? t.currency : ''}
                                             </span>
-                                        </td>
-                                        <td className="px-10 py-8 text-right">
-                                            <div className="flex flex-col items-end gap-1">
-                                                <span className={`text-lg font-black italic ${t.status === 'completed' ? 'text-emerald-500' : 'text-slate-500'}`}>
-                                                    {t.currency === 'TRY' ? '₺' : ''}{t.amount} {t.currency !== 'TRY' ? t.currency : ''}
-                                                </span>
-                                                {t.tx_hash && (
-                                                    <a href={`https://tonviewer.com/transaction/${t.tx_hash}`} target="_blank" className="text-[8px] text-blue-500 hover:underline uppercase font-black tracking-widest flex items-center gap-1">
-                                                        TX <ExternalLink size={8} />
-                                                    </a>
-                                                )}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex justify-between items-center pt-2">
+                                        <div className="flex flex-col">
+                                            <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{new Date(t.created_at).toLocaleDateString()}</span>
+                                            <span className="text-[8px] text-slate-700 font-bold uppercase tracking-widest">{new Date(t.created_at).toLocaleTimeString()}</span>
+                                        </div>
+                                        {t.tx_hash && (
+                                            <a href={`https://tonviewer.com/transaction/${t.tx_hash}`} target="_blank" className="h-8 px-4 bg-blue-600/10 text-blue-500 rounded-lg text-[8px] font-black uppercase tracking-widest flex items-center gap-2 border border-blue-500/20">
+                                                TX DETAY <ExternalLink size={10} />
+                                            </a>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </>
                 )}
             </div>
         </div>
@@ -2047,49 +2154,41 @@ const PromotionManagement = () => {
             ) : (
                 <div className="grid grid-cols-1 gap-6">
                     {promos.map(p => (
-                        <div key={p.id} className="bg-slate-900/40 border border-white/5 rounded-[48px] p-10 flex flex-col lg:flex-row items-center justify-between group shadow-2xl hover:border-blue-500/20 transition-all">
-                            <div className="flex-1 min-w-0 text-center lg:text-left">
-                                <div className="flex items-center justify-center lg:justify-start gap-3 mb-4">
+                        <div key={p.id} className="bg-slate-900/40 border border-white/5 rounded-[48px] p-6 lg:p-10 flex flex-col lg:flex-row items-center justify-between group shadow-2xl hover:border-blue-500/20 transition-all gap-8">
+                            <div className="flex-1 min-w-0 text-center lg:text-left w-full">
+                                <div className="flex items-center justify-center lg:justify-start gap-3 mb-6">
                                     {getStatusBadge(p.status)}
                                     <span className="text-[10px] font-bold text-slate-700 uppercase tracking-[0.2em]">{new Date(p.created_at).toLocaleDateString()}</span>
                                 </div>
-                                <h4 className="text-2xl font-black italic uppercase text-white truncate mb-4">{p.title}</h4>
-                                <div className="flex items-center justify-center lg:justify-start gap-8">
-                                    <div className="flex items-center gap-2">
+                                <h4 className="text-xl lg:text-2xl font-black italic uppercase text-white truncate mb-6">{p.title}</h4>
+                                <div className="grid grid-cols-2 md:grid-cols-3 lg:flex lg:items-center gap-4 lg:gap-8">
+                                    <div className="flex items-center gap-2 justify-center lg:justify-start bg-white/5 p-3 lg:p-0 rounded-2xl lg:bg-transparent">
                                         <Monitor size={14} className="text-slate-500" />
-                                        <span className="text-[10px] font-black text-slate-500 uppercase">{p.channel_count || 0} KANAL</span>
+                                        <span className="text-[9px] lg:text-[10px] font-black text-slate-500 uppercase">{p.channel_count || 0} KANAL</span>
                                     </div>
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2 justify-center lg:justify-start bg-white/5 p-3 lg:p-0 rounded-2xl lg:bg-transparent">
                                         <TrendingUp size={14} className="text-blue-500" />
-                                        <span className="text-[10px] font-black text-blue-500 uppercase">{p.total_reach?.toLocaleString() || 0} ERİŞİM</span>
+                                        <span className="text-[9px] lg:text-[10px] font-black text-blue-500 uppercase">{p.total_reach?.toLocaleString() || 0} ERİŞİM</span>
                                     </div>
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2 justify-center lg:justify-start bg-white/5 p-3 lg:p-0 rounded-2xl lg:bg-transparent">
                                         <Eye size={14} className="text-emerald-500" />
-                                        <span className="text-[10px] font-black text-emerald-500 uppercase">{p.total_views?.toLocaleString() || 0} GÖRÜNTÜLENME</span>
+                                        <span className="text-[9px] lg:text-[10px] font-black text-emerald-500 uppercase">{p.total_views?.toLocaleString() || 0} GÖRÜNTÜ</span>
                                     </div>
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2 justify-center lg:justify-start bg-white/5 p-3 lg:p-0 rounded-2xl lg:bg-transparent">
                                         <Heart size={14} className="text-rose-500" />
-                                        <span className="text-[10px] font-black text-rose-500 uppercase">{p.total_reactions?.toLocaleString() || 0} TEPKİ</span>
+                                        <span className="text-[9px] lg:text-[10px] font-black text-rose-500 uppercase">{p.total_reactions?.toLocaleString() || 0} TEPKİ</span>
                                     </div>
-                                    {p.source_channel && (
-                                        <div className="flex items-center gap-2">
-                                            <Megaphone size={14} className="text-emerald-500" />
-                                            <span className="text-[10px] font-black text-emerald-500 uppercase">
-                                                {p.source_channel}
-                                            </span>
-                                        </div>
-                                    )}
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2 justify-center lg:justify-start bg-white/5 p-3 lg:p-0 rounded-2xl lg:bg-transparent">
                                         <MousePointer2 size={14} className="text-emerald-500" />
-                                        <span className="text-[10px] font-black text-emerald-500 uppercase">{p.click_count || 0} TIKLAMA</span>
+                                        <span className="text-[9px] lg:text-[10px] font-black text-emerald-500 uppercase">{p.click_count || 0} TIK</span>
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex gap-3 mt-8 lg:mt-0">
+                            <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
                                 <button 
                                     disabled={updatingId === p.id}
                                     onClick={() => handleToggleStatus(p)} 
-                                    className={`px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 flex items-center gap-2 min-w-[160px] justify-center ${
+                                    className={`flex-1 lg:flex-none px-8 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 flex items-center gap-2 min-w-[160px] justify-center ${
                                         updatingId === p.id 
                                         ? 'bg-slate-800 text-slate-600 opacity-50' 
                                         : p.status === 'sending' 
@@ -2101,23 +2200,25 @@ const PromotionManagement = () => {
                                         <Loader2 className="animate-spin" size={14} />
                                     ) : (
                                         <>
-                                            {p.status === 'sending' ? 'YAYINI DURDUR' : 'YAYINA AL'}
+                                            {p.status === 'sending' ? 'DURDUR' : 'YAYINA AL'}
                                             <Send size={14} />
                                         </>
                                     )}
                                 </button>
-                                <button 
-                                    onClick={() => { setEditingPromo(p); setIsModalOpen(true); }}
-                                    className="p-4 bg-white/5 rounded-2xl text-blue-400 hover:bg-blue-600 hover:text-white transition-all shadow-xl"
-                                >
-                                    <Edit3 size={20}/>
-                                </button>
-                                <button 
-                                    onClick={async () => { if(confirm('Bu kampanya silinsin mi?')) { await DatabaseService.deletePromotion(p.id); await DatabaseService.logActivity('admin', 'bot_manage', 'promotion_deleted', 'Tanıtım Silindi', `${p.title} kampanyası silindi.`); load(); } }} 
-                                    className="p-4 bg-white/5 rounded-2xl text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-xl"
-                                >
-                                    <Trash2 size={20}/>
-                                </button>
+                                <div className="flex gap-3 flex-1 lg:flex-none">
+                                    <button 
+                                        onClick={() => { setEditingPromo(p); setIsModalOpen(true); }}
+                                        className="flex-1 lg:flex-none p-5 bg-white/5 rounded-2xl text-blue-400 hover:bg-blue-600 hover:text-white transition-all shadow-xl flex items-center justify-center"
+                                    >
+                                        <Edit3 size={20}/>
+                                    </button>
+                                    <button 
+                                        onClick={async () => { if(confirm('Bu kampanya silinsin mi?')) { await DatabaseService.deletePromotion(p.id); await DatabaseService.logActivity('admin', 'bot_manage', 'promotion_deleted', 'Tanıtım Silindi', `${p.title} kampanyası silindi.`); load(); } }} 
+                                        className="flex-1 lg:flex-none p-5 bg-white/5 rounded-2xl text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-xl flex items-center justify-center"
+                                    >
+                                        <Trash2 size={20}/>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     ))}
@@ -2326,7 +2427,8 @@ const ReferralManagement = () => {
             </div>
 
             <div className="bg-slate-900/40 border border-white/5 rounded-[44px] overflow-hidden shadow-2xl">
-                <div className="overflow-x-auto">
+                {/* Desktop Table */}
+                <div className="hidden lg:block overflow-x-auto">
                     <table className="w-full text-left">
                         <thead className="bg-white/5 text-[9px] uppercase tracking-[0.4em] text-slate-700 font-black">
                             <tr>
@@ -2386,6 +2488,54 @@ const ReferralManagement = () => {
                             ))}
                         </tbody>
                     </table>
+                </div>
+
+                {/* Mobile Card View */}
+                <div className="lg:hidden divide-y divide-white/5">
+                    {isLoading ? (
+                        <div className="py-20 text-center"><Loader2 className="animate-spin text-blue-500 mx-auto" size={32} /></div>
+                    ) : filtered.length === 0 ? (
+                        <div className="py-20 text-center text-slate-500 font-black uppercase tracking-widest italic">Kayıt Bulunamadı</div>
+                    ) : filtered.map(r => (
+                        <div key={r.id} className="p-6 space-y-6 hover:bg-white/5 transition-all">
+                            <div className="flex justify-between items-start">
+                                <div className="space-y-4 flex-1">
+                                    <div className="flex items-center gap-3">
+                                        <img src={r.referrer?.avatar || `https://ui-avatars.com/api/?name=${r.referrer?.username}`} className="w-8 h-8 rounded-lg border border-white/5" />
+                                        <div>
+                                            <p className="text-[8px] text-slate-600 font-black uppercase tracking-widest">DAVET EDEN</p>
+                                            <p className="text-xs font-black text-white italic uppercase">@{r.referrer?.username || 'Unknown'}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <img src={r.referred?.avatar || `https://ui-avatars.com/api/?name=${r.referred?.username}`} className="w-8 h-8 rounded-lg border border-white/5" />
+                                        <div>
+                                            <p className="text-[8px] text-slate-600 font-black uppercase tracking-widest">KATILAN ÜYE</p>
+                                            <p className="text-xs font-black text-white italic uppercase">@{r.referred?.username || 'Unknown'}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex flex-col items-end gap-2">
+                                    <span className={`text-[8px] font-black px-2 py-1 rounded-md border uppercase tracking-widest ${
+                                        r.status === 'confirmed' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' :
+                                        r.status === 'pending' ? 'bg-orange-500/10 border-orange-500/20 text-orange-500' :
+                                        'bg-red-500/10 border-red-500/20 text-red-500'
+                                    }`}>
+                                        {r.status === 'confirmed' ? 'ONAYLI' : r.status === 'pending' ? 'BEKLEMEDE' : 'REDDEDİLDİ'}
+                                    </span>
+                                    <p className="text-[8px] text-slate-600 font-bold uppercase">{new Date(r.created_at).toLocaleDateString()}</p>
+                                </div>
+                            </div>
+                            {r.status === 'pending' && (
+                                <button 
+                                    onClick={() => handleConfirm(r.id)}
+                                    className="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl text-[9px] font-black uppercase tracking-[0.2em] transition-all shadow-lg shadow-emerald-900/20"
+                                >
+                                    REFERANSI ONAYLA
+                                </button>
+                            )}
+                        </div>
+                    ))}
                 </div>
             </div>
 
