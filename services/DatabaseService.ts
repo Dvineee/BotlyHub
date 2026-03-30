@@ -691,8 +691,12 @@ export class DatabaseService {
   }
 
   static async getActivityLogs(): Promise<ActivityLog[]> {
-    const { data } = await supabase.from('bot_logs').select('*').order('created_at', { ascending: false }).limit(200);
-    return data || [];
+    const { data } = await supabase
+        .from('bot_logs')
+        .select('*, user:users!user_id(name, username, avatar)')
+        .order('created_at', { ascending: false })
+        .limit(200);
+    return data as any || [];
   }
 
   static async getAllPurchases(): Promise<any[]> {

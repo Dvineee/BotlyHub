@@ -1219,12 +1219,15 @@ const ActivityCenter = ({ filterType }: { filterType: 'admin' | 'user' }) => {
         if (filterType === 'admin' && !isAdminLog) return false;
         if (filterType === 'user' && isAdminLog) return false;
 
-        // Then filter by search query (User ID or Action Key or Title)
+        // Then filter by search query (User ID or Action Key or Title or Name)
+        const q = searchQuery.toLowerCase();
         const matchesSearch = 
-            log.user_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            log.action_key.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            log.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            log.description.toLowerCase().includes(searchQuery.toLowerCase());
+            log.user_id.toLowerCase().includes(q) ||
+            log.action_key.toLowerCase().includes(q) ||
+            log.title.toLowerCase().includes(q) ||
+            log.description.toLowerCase().includes(q) ||
+            log.user?.name?.toLowerCase().includes(q) ||
+            log.user?.username?.toLowerCase().includes(q);
         
         if (!matchesSearch) return false;
 
@@ -1308,7 +1311,9 @@ const ActivityCenter = ({ filterType }: { filterType: 'admin' | 'user' }) => {
                                 <div className="flex items-center gap-4">
                                     <div className="flex items-center gap-1.5">
                                         <Users size={10} className="text-slate-700" />
-                                        <span className="text-[9px] font-black text-slate-600 uppercase tracking-tighter">ID: {log.user_id}</span>
+                                        <span className="text-[9px] font-black text-slate-600 uppercase tracking-tighter">
+                                            {log.user?.name ? `${log.user.name} (@${log.user.username})` : `ID: ${log.user_id}`}
+                                        </span>
                                     </div>
                                     <div className="flex items-center gap-1.5">
                                         <Zap size={10} className="text-slate-700" />

@@ -29,6 +29,11 @@ export interface ActivityLog {
   description: string;
   metadata: any;
   created_at: string;
+  user?: {
+    name: string;
+    username: string;
+    avatar: string;
+  };
 }
 
 export interface Bot {
