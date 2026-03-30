@@ -27,6 +27,22 @@ const getLiveBotIcon = (botLink: string) => {
 
 const generateUniqueId = () => `BOT-${Math.floor(10000 + Math.random() * 90000)}-${Math.random().toString(36).substring(2, 5).toUpperCase()}`;
 
+const translateType = (type: string) => {
+    const translations: any = {
+        all: 'HEPSİ',
+        payment: 'ÖDEME',
+        bot_manage: 'BOT YÖNETİMİ',
+        security: 'GÜVENLİK',
+        system: 'SİSTEM',
+        auth: 'YETKİLENDİRME',
+        channel_sync: 'KANAL SENKRONİZASYONU',
+        referral: 'REFERANS',
+        referral_processing: 'REFERANS İŞLEME',
+        referral_error: 'REFERANS HATASI'
+    };
+    return translations[type] || type.replace('_', ' ').toUpperCase();
+};
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -442,23 +458,26 @@ const UserDetailModal = ({ user, onClose, onUpdate }: { user: User, onClose: () 
     const [bots, setBots] = useState<any[]>([]);
     const [wallet, setWallet] = useState<any>(null);
     const [stats, setStats] = useState<any[]>([]);
+    const [logs, setLogs] = useState<ActivityLog[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState<'overview' | 'channels' | 'bots' | 'wallet' | 'stats'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'channels' | 'bots' | 'wallet' | 'stats' | 'logs'>('overview');
     const [isSavingWallet, setIsSavingWallet] = useState(false);
 
     const loadDetails = useCallback(async () => {
         setIsLoading(true);
         try {
-            const [c, b, w, s] = await Promise.all([
+            const [c, b, w, s, l] = await Promise.all([
                 DatabaseService.getChannels(user.id),
                 DatabaseService.getUserBots(user.id),
                 DatabaseService.getUserWallet(user.id),
-                DatabaseService.getPromotionChannelStats(user.id)
+                DatabaseService.getPromotionChannelStats(user.id),
+                DatabaseService.getActivityLogs(user.id)
             ]);
             setChannels(c);
             setBots(b);
             setWallet(w);
             setStats(s);
+            setLogs(l);
         } catch (e) {
             console.error(e);
         } finally {
@@ -484,7 +503,9 @@ const UserDetailModal = ({ user, onClose, onUpdate }: { user: User, onClose: () 
 
     const toggleRestriction = async () => {
         try {
-            await DatabaseService.updateUserRestriction(user.id, !user.isRestricted);
+            const newStatus = !user.isRestricted;
+            await DatabaseService.updateUserRestriction(user.id, newStatus);
+            await DatabaseService.logActivity('admin', 'security', 'user_restriction_toggle', 'Kullanıcı Kısıtlaması Değiştirildi', `${user.username} kullanıcısının kısıtlama durumu ${newStatus ? 'AKTİF (Engellendi)' : 'PASİF (Kaldırıldı)'} olarak güncellendi.`);
             onUpdate();
             onClose();
         } catch (e) { alert("Hata oluştu"); }
@@ -492,7 +513,9 @@ const UserDetailModal = ({ user, onClose, onUpdate }: { user: User, onClose: () 
 
     const togglePublishStatus = async () => {
         try {
-            await DatabaseService.updateUserPublishStatus(user.id, !user.canPublishPromos);
+            const newStatus = !user.canPublishPromos;
+            await DatabaseService.updateUserPublishStatus(user.id, newStatus);
+            await DatabaseService.logActivity('admin', 'system', 'user_publish_status_toggle', 'Reklam Yayın Yetkisi Değiştirildi', `${user.username} kullanıcısının reklam yayınlama yetkisi ${newStatus ? 'VERİLDİ' : 'ALINDI'} olarak güncellendi.`);
             onUpdate();
             onClose();
         } catch (e) { alert("Hata oluştu"); }
@@ -561,7 +584,8 @@ const UserDetailModal = ({ user, onClose, onUpdate }: { user: User, onClose: () 
                         { id: 'channels', label: 'KANALLAR', icon: Radio },
                         { id: 'bots', label: 'BOTLAR', icon: Bot },
                         { id: 'wallet', label: 'CÜZDAN', icon: Wallet },
-                        { id: 'stats', label: 'İSTATİSTİK', icon: BarChart3 }
+                        { id: 'stats', label: 'İSTATİSTİK', icon: BarChart3 },
+                        { id: 'logs', label: 'HAREKETLER', icon: History }
                     ].map(tab => (
                         <button 
                             key={tab.id}
@@ -925,6 +949,40 @@ const UserDetailModal = ({ user, onClose, onUpdate }: { user: User, onClose: () 
                                     </div>
                                 </div>
                             )}
+
+                            {activeTab === 'logs' && (
+                                <div className="space-y-4 animate-in slide-in-from-bottom-4">
+                                    {logs.length === 0 ? (
+                                        <div className="py-20 text-center bg-slate-950/30 rounded-[32px] border-2 border-dashed border-slate-900">
+                                            <History size={40} className="mx-auto text-slate-800 mb-4" />
+                                            <p className="text-slate-600 text-[10px] font-black uppercase tracking-widest">Henüz hareket kaydı yok</p>
+                                        </div>
+                                    ) : (
+                                        <div className="relative pl-8 space-y-6 before:absolute before:left-4 before:top-2 before:bottom-2 before:w-0.5 before:bg-white/5">
+                                            {logs.map(log => (
+                                                <div key={log.id} className="relative group">
+                                                    <div className="absolute -left-8 top-2 w-4 h-4 bg-[#020617] border-2 border-slate-800 rounded-full z-10 group-hover:border-blue-500 transition-colors"></div>
+                                                    <div className="bg-slate-950/50 border border-white/5 p-5 rounded-2xl flex items-center gap-4 group-hover:border-white/10 transition-all shadow-lg">
+                                                        <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-slate-500 shadow-inner group-hover:text-blue-500 transition-colors">
+                                                            <Activity size={16} />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className="flex justify-between items-center mb-1">
+                                                                <div className="flex items-center gap-2">
+                                                                    <h4 className="text-[11px] font-black text-white uppercase italic truncate">{log.title}</h4>
+                                                                    <span className="text-[7px] font-black px-1.5 py-0.5 rounded bg-white/5 border border-white/5 text-slate-500 uppercase tracking-widest">{translateType(log.type)}</span>
+                                                                </div>
+                                                                <span className="text-[8px] font-black text-slate-700 uppercase tracking-widest">{new Date(log.created_at).toLocaleString()}</span>
+                                                            </div>
+                                                            <p className="text-[9px] text-slate-500 font-bold uppercase italic truncate opacity-80">{log.description}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
@@ -973,11 +1031,11 @@ const UserManagement = () => {
                             {filtered.map(u => (
                                 <tr key={u.id} className="hover:bg-white/5 transition-all text-white">
                                     <td className="px-10 py-8 font-black italic text-sm truncate max-w-[200px]">@{u.username}</td>
-                                    <td className="px-10 py-8"><span className="text-[10px] font-black text-slate-500 uppercase italic">{u.role}</span></td>
+                                    <td className="px-10 py-8"><span className="text-[10px] font-black text-slate-500 uppercase italic">{u.role === 'Admin' ? 'ADMİN' : 'ÜYE'}</span></td>
                                     <td className="px-10 py-8">
                                         <div className="flex flex-col gap-2">
                                             <div className={`flex items-center gap-2.5 text-[10px] font-black uppercase tracking-widest ${u.status === 'Active' ? 'text-emerald-500' : 'text-red-500'}`}>
-                                                <div className={`w-2 h-2 rounded-full ${u.status === 'Active' ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`}></div>{u.status}
+                                                <div className={`w-2 h-2 rounded-full ${u.status === 'Active' ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`}></div>{u.status === 'Active' ? 'AKTİF' : 'PASİF'}
                                             </div>
                                             {u.isRestricted && (
                                                 <div className="flex items-center gap-2 text-[8px] font-black text-red-500 uppercase tracking-widest bg-red-500/10 px-2 py-0.5 rounded border border-red-500/20 w-fit">
@@ -1030,13 +1088,13 @@ const UserManagement = () => {
                                     </div>
                                     <div>
                                         <p className="text-sm font-black text-white italic uppercase tracking-tighter">@{u.username}</p>
-                                        <p className="text-[9px] text-slate-600 font-bold uppercase tracking-widest">{u.role}</p>
+                                        <p className="text-[9px] text-slate-600 font-bold uppercase tracking-widest">{u.role === 'Admin' ? 'ADMİN' : 'ÜYE'}</p>
                                     </div>
                                 </div>
                                 <div className="flex flex-col items-end gap-2">
                                     <div className={`flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest ${u.status === 'Active' ? 'text-emerald-500' : 'text-red-500'}`}>
                                         <div className={`w-1.5 h-1.5 rounded-full ${u.status === 'Active' ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`}></div>
-                                        {u.status}
+                                        {u.status === 'Active' ? 'AKTİF' : 'PASİF'}
                                     </div>
                                     {u.isRestricted && (
                                         <div className="text-[7px] font-black text-red-500 uppercase tracking-widest bg-red-500/10 px-1.5 py-0.5 rounded border border-red-500/20">
@@ -1289,7 +1347,7 @@ const ActivityCenter = ({ filterType }: { filterType: 'admin' | 'user' }) => {
                                     : 'bg-slate-900/40 border-white/5 text-slate-500 hover:border-white/10'
                                 }`}
                             >
-                                {t === 'all' ? 'HEPSİ' : t.replace('_', ' ')}
+                                {translateType(t)}
                             </button>
                         ))}
                     </div>
@@ -1320,7 +1378,7 @@ const ActivityCenter = ({ filterType }: { filterType: 'admin' | 'user' }) => {
                                 <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-1 gap-2">
                                     <div className="flex items-center gap-3">
                                         <h4 className="font-black text-white italic text-sm lg:text-base uppercase truncate">{log.title}</h4>
-                                        <span className={`text-[8px] font-black px-2 py-0.5 rounded bg-white/5 border border-white/5 ${typeColors[log.type] || 'text-slate-500'} uppercase tracking-widest`}>{log.type}</span>
+                                        <span className={`text-[8px] font-black px-2 py-0.5 rounded bg-white/5 border border-white/5 ${typeColors[log.type] || 'text-slate-500'} uppercase tracking-widest`}>{translateType(log.type)}</span>
                                     </div>
                                     <span className="text-[8px] lg:text-[10px] font-black text-slate-700 uppercase tracking-widest flex items-center gap-2">
                                         <Clock size={10} /> {new Date(log.created_at).toLocaleString()}
@@ -1373,7 +1431,7 @@ const ActivityCenter = ({ filterType }: { filterType: 'admin' | 'user' }) => {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="bg-slate-950/50 border border-white/5 p-5 rounded-2xl space-y-1">
                                         <span className="text-[9px] font-black text-slate-700 uppercase tracking-widest italic">İşlem Tipi</span>
-                                        <p className={`text-xs font-black uppercase italic ${typeColors[selectedLog.type]}`}>{selectedLog.type.replace('_', ' ')}</p>
+                                        <p className={`text-xs font-black uppercase italic ${typeColors[selectedLog.type]}`}>{translateType(selectedLog.type)}</p>
                                     </div>
                                     <div className="bg-slate-950/50 border border-white/5 p-5 rounded-2xl space-y-1">
                                         <span className="text-[9px] font-black text-slate-700 uppercase tracking-widest italic">Tarih</span>

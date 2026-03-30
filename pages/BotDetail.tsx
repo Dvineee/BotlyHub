@@ -95,6 +95,9 @@ const BotDetail = () => {
               // 2. Botu kullanıcıya ekle
               await DatabaseService.addUserBot(userData, bot, false);
               
+              // Log bot addition
+              await DatabaseService.logActivity(userData.id.toString(), 'system', 'bot_added', 'Kütüphaneye Ekleme', `${bot.name} botu kütüphaneye eklendi.`);
+              
               // 3. Bildirim gönder (Bu işlem kritik değil, hata alsa bile süreci bozmamalı)
               try {
                   await DatabaseService.sendUserNotification(

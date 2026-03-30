@@ -67,6 +67,7 @@ const Payment = () => {
 
           if (targetBot) {
               await DatabaseService.addUserBot(userData, targetBot, false);
+              await DatabaseService.logActivity(userData.id.toString(), 'payment', 'bot_purchase', 'Bot Satın Alımı', `${targetBot.name} botu başarıyla satın alındı ve kütüphaneye eklendi.`);
               await DatabaseService.sendUserNotification(
                   userData.id.toString(),
                   'Lisans Aktif Edildi',
@@ -75,6 +76,7 @@ const Payment = () => {
               );
           } else if (plan) {
               localStorage.setItem('userPlan', plan.id);
+              await DatabaseService.logActivity(userData.id.toString(), 'payment', 'plan_purchase', 'Abonelik Satın Alımı', `${plan.name} aboneliği başarıyla aktif edildi.`);
               await DatabaseService.sendUserNotification(
                   userData.id.toString(),
                   'Abonelik Aktif Edildi',

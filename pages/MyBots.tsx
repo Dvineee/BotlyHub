@@ -132,6 +132,7 @@ const MyBots = () => {
       
       try {
           await DatabaseService.removeUserBot(user.id.toString(), botToDelete.id);
+          await DatabaseService.logActivity(user.id.toString(), 'bot_manage', 'bot_removed', 'Bot Kütüphaneden Kaldırıldı', `'${botToDelete.name}' botu kullanıcı tarafından kütüphanesinden kaldırıldı.`);
           const updatedBots = bots.filter(b => b.id !== botToDelete.id);
           setBots(updatedBots);
           localStorage.setItem('ownedBots', JSON.stringify(updatedBots));

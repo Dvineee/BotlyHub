@@ -43,11 +43,13 @@ const ReferralPage = () => {
     const handleCopy = () => {
         navigator.clipboard.writeText(referralLink);
         setCopied(true);
+        DatabaseService.logActivity(user.id.toString(), 'system', 'referral_link_copied', 'Referans Linki Kopyalandı', 'Kullanıcı referans linkini kopyaladı.');
         setTimeout(() => setCopied(false), 2000);
     };
 
     const handleShare = () => {
         const text = `🚀 BotlyHub V3'e katıl ve en iyi Telegram botlarını keşfet! Benim linkimle katılarak özel ödüller kazanabilirsin: ${referralLink}`;
+        DatabaseService.logActivity(user.id.toString(), 'system', 'referral_link_shared', 'Referans Linki Paylaşıldı', 'Kullanıcı referans linkini Telegram üzerinden paylaştı.');
         window.open(`https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(text)}`);
     };
 

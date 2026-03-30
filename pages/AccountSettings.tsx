@@ -68,6 +68,8 @@ const AccountSettings = () => {
 
         await DatabaseService.syncUser(payload);
         
+        await DatabaseService.logActivity(user.id.toString(), 'auth', 'email_verified', 'E-posta Doğrulama', `E-posta adresi (${formData.email}) başarıyla doğrulandı.`);
+        
         notification('success');
         setIsVerified(true);
         haptic('heavy');

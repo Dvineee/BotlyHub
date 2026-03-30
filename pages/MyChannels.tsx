@@ -114,7 +114,7 @@ const MyChannels = () => {
               await DatabaseService.logActivity(
                   user.id.toString(), 
                   'channel_sync', 
-                  'Yayın Ayarı', 
+                  'channel_ad_toggle', 
                   'Kanal Yayın Modu Değişti', 
                   `'${channel.name}' kanalı için yayın modu ${newStatus ? 'AÇILDI' : 'KAPATILDI'}.`
               );

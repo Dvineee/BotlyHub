@@ -690,12 +690,18 @@ export class DatabaseService {
       });
   }
 
-  static async getActivityLogs(): Promise<ActivityLog[]> {
-    const { data: logs, error: logsError } = await supabase
+  static async getActivityLogs(userId?: string): Promise<ActivityLog[]> {
+    let query = supabase
         .from('bot_logs')
         .select('*')
         .order('created_at', { ascending: false })
         .limit(200);
+    
+    if (userId) {
+        query = query.eq('user_id', userId);
+    }
+
+    const { data: logs, error: logsError } = await query;
     
     if (logsError || !logs) return [];
 
