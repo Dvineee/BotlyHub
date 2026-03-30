@@ -20,6 +20,7 @@ const UserPanelLogin: React.FC = () => {
             if (user) {
                 // Store panel session
                 localStorage.setItem('panel_user', JSON.stringify(user));
+                await DatabaseService.logActivity(user.id.toString(), 'auth', 'panel_login', 'Panel Girişi', `${user.username} kullanıcı paneline giriş yaptı.`);
                 navigate('/u/panel');
             } else {
                 setError('Geçersiz kullanıcı adı veya şifre, ya da panel erişiminiz yok.');

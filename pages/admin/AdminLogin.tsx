@@ -24,6 +24,7 @@ const AdminLogin = () => {
 
     if (username === 'admin' && password === 'admin123') {
       DatabaseService.setAdminSession('v3_token_' + Math.random());
+      await DatabaseService.logActivity('admin', 'auth', 'admin_login', 'Admin Girişi', 'Yönetici paneline başarıyla giriş yapıldı.');
       navigate('/a/dashboard');
     } else {
       setError('Geçersiz kullanıcı adı veya şifre.');

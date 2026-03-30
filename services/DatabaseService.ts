@@ -691,12 +691,32 @@ export class DatabaseService {
   }
 
   static async getActivityLogs(): Promise<ActivityLog[]> {
-    const { data } = await supabase
+    const { data: logs, error: logsError } = await supabase
         .from('bot_logs')
-        .select('*, user:users!user_id(name, username, avatar)')
+        .select('*')
         .order('created_at', { ascending: false })
         .limit(200);
-    return data as any || [];
+    
+    if (logsError || !logs) return [];
+
+    // Manually fetch user details for the logs
+    const userIds = Array.from(new Set(logs.map(l => l.user_id).filter(id => id !== 'admin')));
+    
+    if (userIds.length > 0) {
+        const { data: users } = await supabase
+            .from('users')
+            .select('id, name, username, avatar')
+            .in('id', userIds);
+        
+        if (users) {
+            return logs.map(log => ({
+                ...log,
+                user: users.find(u => u.id === log.user_id)
+            }));
+        }
+    }
+
+    return logs as any || [];
   }
 
   static async getAllPurchases(): Promise<any[]> {
