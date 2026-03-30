@@ -130,22 +130,28 @@ const ReferralPage = () => {
             </div>
 
             {/* Security Info */}
-            <div className="bg-slate-900/40 border border-white/5 p-6 rounded-[32px] space-y-4">
+            <div className="bg-blue-600/10 border border-blue-500/20 p-6 rounded-[32px] space-y-4">
                 <div className="flex items-center gap-3">
-                    <ShieldCheck className="text-emerald-500" size={18} />
-                    <h4 className="text-[11px] font-black text-white uppercase italic">Güvenlik ve Doğrulama</h4>
+                    <ShieldCheck className="text-blue-500" size={18} />
+                    <h4 className="text-[11px] font-black text-white uppercase italic">Nasıl Ödül Kazanılır?</h4>
                 </div>
                 <div className="space-y-3">
                     <div className="flex gap-3">
+                        <div className="w-1 h-auto bg-blue-500/20 rounded-full" />
+                        <p className="text-[10px] font-bold text-slate-400 leading-relaxed uppercase italic">
+                            1. Davet linkini arkadaşınla paylaş.
+                        </p>
+                    </div>
+                    <div className="flex gap-3">
                         <div className="w-1 h-auto bg-emerald-500/20 rounded-full" />
-                        <p className="text-[10px] font-bold text-slate-500 leading-relaxed uppercase italic">
-                            Sistemimiz kötüye kullanımı önlemek için IP, cihaz parmak izi ve hesap kalitesini otomatik olarak denetler.
+                        <p className="text-[10px] font-bold text-emerald-400 leading-relaxed uppercase italic">
+                            2. Arkadaşın botu başlattıktan sonra <span className="underline">resmi grubumuza</span> katılmalı.
                         </p>
                     </div>
                     <div className="flex gap-3">
                         <div className="w-1 h-auto bg-blue-500/20 rounded-full" />
-                        <p className="text-[10px] font-bold text-slate-500 leading-relaxed uppercase italic">
-                            Ödüllerin onaylanması için davet edilen kişinin Telegram grubumuza katılması ve 24 saat aktif kalması gerekebilir.
+                        <p className="text-[10px] font-bold text-slate-400 leading-relaxed uppercase italic">
+                            3. Katılım sağlandığı an ödülün otomatik olarak cüzdanına yansır.
                         </p>
                     </div>
                 </div>
@@ -154,10 +160,10 @@ const ReferralPage = () => {
             {/* Referral List */}
             <div className="space-y-4">
                 <div className="flex items-center justify-between px-2">
-                    <h3 className="text-[11px] font-black text-white uppercase italic tracking-widest">Son Davetler</h3>
+                    <h3 className="text-[11px] font-black text-white uppercase italic tracking-widest">Davet Durumları</h3>
                     <div className="flex items-center gap-1 text-[9px] font-black text-slate-600 uppercase italic">
                         <Clock size={10} />
-                        <span>GÜNCEL</span>
+                        <span>OTOMATİK ONAY AKTİF</span>
                     </div>
                 </div>
 
@@ -181,15 +187,17 @@ const ReferralPage = () => {
                                                 <span className="px-2 py-0.5 bg-blue-600/20 border border-blue-500/20 text-[7px] font-black text-blue-400 rounded-full uppercase tracking-tighter">PREMIUM</span>
                                             )}
                                         </div>
-                                        <span className="text-[9px] font-bold text-slate-600 uppercase italic">{new Date(ref.created_at).toLocaleDateString('tr-TR')}</span>
+                                        <span className="text-[9px] font-bold text-slate-600 uppercase italic">
+                                            {ref.status === 'pending' ? 'Grup Katılımı Bekleniyor' : new Date(ref.created_at).toLocaleDateString('tr-TR')}
+                                        </span>
                                     </div>
                                 </div>
                                 <div className="text-right">
                                     <span className={`text-xs font-black italic ${ref.status === 'confirmed' ? 'text-emerald-500' : 'text-slate-600'}`}>
                                         +{ref.reward_amount} HP
                                     </span>
-                                    <p className="text-[8px] font-black text-slate-700 uppercase tracking-tighter italic">
-                                        {ref.status === 'confirmed' ? 'ONAYLANDI' : ref.status === 'pending' ? 'BEKLEMEDE' : 'REDDEDİLDİ'}
+                                    <p className={`text-[8px] font-black uppercase tracking-tighter italic ${ref.status === 'confirmed' ? 'text-emerald-500/50' : 'text-orange-500/50'}`}>
+                                        {ref.status === 'confirmed' ? 'TAMAMLANDI' : ref.status === 'pending' ? 'BEKLEMEDE' : 'REDDEDİLDİ'}
                                     </p>
                                 </div>
                             </div>
