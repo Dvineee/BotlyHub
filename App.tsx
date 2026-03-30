@@ -73,36 +73,51 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
                 const tg = window.Telegram?.WebApp;
                 const startParam = tg?.initDataUnsafe?.start_param;
                 
+                // Debug log for Telegram data
+                await DatabaseService.logActivity(user.id.toString(), 'system', 'telegram_init', 'Telegram Verisi', `Start Param: ${startParam || 'Yok'}, InitData: ${JSON.stringify(tg?.initDataUnsafe || {})}`);
+                
                 if (startParam && startParam.startsWith('ref_')) {
                     const referrerId = startParam.replace('ref_', '');
+                    await DatabaseService.logActivity(user.id.toString(), 'system', 'referral_detected', 'Referans Linki Tespit Edildi', `Davet eden ID: ${referrerId}`);
                     
                     // Kendini davet edemez
-                    if (referrerId !== user.id.toString()) {
-                        const existingUser = await DatabaseService.getUser(user.id.toString());
+                    if (referrerId === user.id.toString()) {
+                        await DatabaseService.logActivity(user.id.toString(), 'security', 'referral_self', 'Kendi Kendini Davet', 'Kullanıcı kendi referans linkini kullandı.');
+                        return;
+                    }
+
+                    const existingUser = await DatabaseService.getUser(user.id.toString());
+                    
+                    // Sadece yeni kullanıcılar referans olabilir (veya henüz referansı olmayanlar)
+                    if (existingUser && existingUser.referred_by) {
+                        await DatabaseService.logActivity(user.id.toString(), 'security', 'referral_already', 'Zaten Referanslı', `Kullanıcının zaten bir referansı var: ${existingUser.referred_by}`);
+                        return;
+                    }
+
+                    try {
+                        // IP ve Fingerprint al
+                        const ipRes = await fetch('https://api.ipify.org?format=json');
+                        const { ip } = await ipRes.json();
+                        const fingerprint = getDeviceFingerprint();
                         
-                        // Sadece yeni kullanıcılar referans olabilir (veya henüz referansı olmayanlar)
-                        if (!existingUser || !existingUser.referred_by) {
-                            try {
-                                // IP ve Fingerprint al
-                                const ipRes = await fetch('https://api.ipify.org?format=json');
-                                const { ip } = await ipRes.json();
-                                const fingerprint = getDeviceFingerprint();
-                                
-                                // Hesap Kalite Kontrolü
-                                const quality = checkAccountQuality(user);
-                                
-                                if (quality.isValid) {
-                                    await DatabaseService.createReferral(
-                                        referrerId, 
-                                        user.id.toString(), 
-                                        ip, 
-                                        fingerprint, 
-                                        !!user.is_premium
-                                    );
-                                } else {
+                        // Hesap Kalite Kontrolü
+                        const quality = checkAccountQuality(user);
+                        
+                        if (quality.isValid) {
+                            await DatabaseService.logActivity(user.id.toString(), 'system', 'referral_processing', 'Referans İşleniyor', `Kalite: ${quality.trustScore}, IP: ${ip}`);
+                            await DatabaseService.createReferral(
+                                referrerId, 
+                                user.id.toString(), 
+                                ip, 
+                                fingerprint, 
+                                !!user.is_premium
+                            );
+                        } else {
+                                    await DatabaseService.logActivity(user.id.toString(), 'security', 'referral_rejected', 'Referans Reddedildi', `Düşük hesap kalitesi: ${quality.reason}`);
                                     console.warn("Referral rejected: Low account quality", quality.reason);
                                 }
                             } catch (err) {
+                                await DatabaseService.logActivity(user.id.toString(), 'system', 'referral_error', 'Referans Hatası', `İşlem sırasında hata: ${err instanceof Error ? err.message : String(err)}`);
                                 console.error("Referral processing failed:", err);
                             }
                         }

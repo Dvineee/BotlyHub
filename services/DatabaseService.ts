@@ -750,6 +750,14 @@ export class DatabaseService {
     
     if (existing) return;
 
+    // Check if referrer exists in users table to avoid foreign key error
+    const { data: referrerExists } = await supabase.from('users').select('id').eq('id', referrerId).maybeSingle();
+    if (!referrerExists) {
+        console.warn(`Referrer ${referrerId} not found. Referral cannot be created.`);
+        await this.logActivity(referredId, 'security', 'referral_failed', 'Referans Başarısız', `Davet eden kullanıcı (${referrerId}) sistemde bulunamadı.`);
+        return;
+    }
+
     const { error } = await supabase.from('referrals').insert({
         referrer_id: referrerId,
         referred_id: referredId,
@@ -765,6 +773,11 @@ export class DatabaseService {
 
     // Update user's referred_by
     await supabase.from('users').update({ referred_by: referrerId }).eq('id', referredId);
+    
+    // Increment referrer's referral_count
+    const { data: referrerData } = await supabase.from('users').select('referral_count').eq('id', referrerId).maybeSingle();
+    const currentCount = referrerData?.referral_count || 0;
+    await supabase.from('users').update({ referral_count: currentCount + 1 }).eq('id', referrerId);
     
     await this.logActivity(referrerId, 'system', 'referral_pending', 'Yeni Referans (Beklemede)', `Bir kullanıcı davet linkinizle katıldı. Onay bekleniyor.`);
   }
