@@ -11,7 +11,7 @@ import {
   Info, Star, MousePointer2, Link2, AlertCircle, Shield, Calendar, Hash, Heart
 } from 'lucide-react';
 import { DatabaseService } from '../../services/DatabaseService';
-import { User, Bot as BotType, Announcement, Promotion, ActivityLog, Notification } from '../../types';
+import { User, Bot as BotType, Announcement, Promotion, ActivityLog, Notification, Referral, ReferralSettings } from '../../types';
 
 const { useNavigate, Routes, Route, Link, useLocation } = Router as any;
 
@@ -74,6 +74,7 @@ const AdminDashboard = () => {
             <NavItem to="/a/dashboard/admin-logs" icon={ShieldCheck} label="Admin Logları" />
             <NavItem to="/a/dashboard/user-logs" icon={History} label="Üye Hareketleri" />
             <NavItem to="/a/dashboard/sales" icon={Wallet} label="Finans" />
+            <NavItem to="/a/dashboard/referrals" icon={UserPlus} label="Referanslar" />
             
             <div className="pt-8 pb-3 px-6"><span className="text-[9px] font-black text-slate-800 uppercase tracking-widest italic">İçerik</span></div>
             <NavItem to="/a/dashboard/bots" icon={Bot} label="Market Botları" />
@@ -115,6 +116,7 @@ const AdminDashboard = () => {
               <Route path="user-logs" element={<ActivityCenter filterType="user" />} />
               <Route path="bots" element={<BotManagement />} />
               <Route path="sales" element={<SalesManagement />} />
+              <Route path="referrals" element={<ReferralManagement />} />
               <Route path="promotions" element={<PromotionManagement />} />
               <Route path="announcements" element={<AnnouncementCenter />} />
               <Route path="notifications" element={<NotificationCenter />} />
@@ -2231,6 +2233,209 @@ const PromotionManagement = () => {
                                 <AlertCircle size={14} className="text-slate-500" />
                                 <span className="text-[8px] font-black text-slate-500 uppercase tracking-[0.3em]">Görünüm Telegram istemcisine göre değişebilir</span>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+const ReferralManagement = () => {
+    const [referrals, setReferrals] = useState<any[]>([]);
+    const [settings, setSettings] = useState<ReferralSettings | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+    const [filter, setFilter] = useState<'all' | 'pending' | 'confirmed' | 'rejected'>('all');
+
+    const load = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            const [refs, sets] = await Promise.all([
+                DatabaseService.getAllReferrals(),
+                DatabaseService.getReferralSettings()
+            ]);
+            setReferrals(refs);
+            setSettings(sets);
+        } catch (e) {
+            console.error("Referral Load Error:", e);
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    useEffect(() => { load(); }, [load]);
+
+    const handleUpdateSettings = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!settings) return;
+        try {
+            await DatabaseService.updateReferralSettings(settings);
+            await DatabaseService.logActivity('admin', 'system', 'referral_settings_updated', 'Referans Ayarları Güncellendi', 'Referans sistemi ödülleri ve kuralları güncellendi.');
+            setIsSettingsModalOpen(false);
+            alert('Ayarlar kaydedildi.');
+        } catch (e) { alert('Hata oluştu.'); }
+    };
+
+    const handleConfirm = async (refId: string) => {
+        if (!confirm('Bu referansı onaylamak istediğinize emin misiniz? Ödül cüzdana eklenecektir.')) return;
+        try {
+            await DatabaseService.confirmReferral(refId);
+            load();
+        } catch (e) { alert('Hata oluştu.'); }
+    };
+
+    const filtered = referrals.filter(r => filter === 'all' || r.status === filter);
+
+    return (
+        <div className="space-y-12 animate-in fade-in">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <div>
+                    <h2 className="text-3xl lg:text-4xl font-black text-white italic uppercase tracking-tighter leading-none">Referral <span className="text-blue-500">Network</span></h2>
+                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em] mt-2 italic">Referans sistemini ve ödülleri yönetin</p>
+                </div>
+                <button 
+                    onClick={() => setIsSettingsModalOpen(true)}
+                    className="w-full md:w-auto bg-blue-600 hover:bg-blue-500 px-8 py-5 rounded-[24px] text-[10px] font-black uppercase tracking-[0.4em] shadow-2xl shadow-blue-900/40 transition-all active:scale-95 flex items-center justify-center gap-3"
+                >
+                    <SettingsIcon size={18} /> SİSTEM AYARLARI
+                </button>
+            </div>
+
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8">
+                <StatCard icon={Users} label="TOPLAM REFERANS" value={referrals.length.toString()} color="blue" />
+                <StatCard icon={CheckCircle2} label="ONAYLANAN" value={referrals.filter(r => r.status === 'confirmed').length.toString()} color="emerald" />
+                <StatCard icon={Clock} label="BEKLEYEN" value={referrals.filter(r => r.status === 'pending').length.toString()} color="orange" />
+                <StatCard icon={TrendingUp} label="TOPLAM ÖDÜL" value={`₺${referrals.filter(r => r.status === 'confirmed').reduce((acc, r) => acc + r.reward_amount, 0).toLocaleString()}`} color="purple" />
+            </div>
+
+            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+                {['all', 'pending', 'confirmed', 'rejected'].map(f => (
+                    <button
+                        key={f}
+                        onClick={() => setFilter(f as any)}
+                        className={`px-6 h-12 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all border ${
+                            filter === f 
+                            ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-600/20' 
+                            : 'bg-slate-900/40 border-white/5 text-slate-500 hover:border-white/10'
+                        }`}
+                    >
+                        {f === 'all' ? 'TÜMÜ' : f === 'pending' ? 'BEKLEYEN' : f === 'confirmed' ? 'ONAYLI' : 'REDDEDİLEN'}
+                    </button>
+                ))}
+            </div>
+
+            <div className="bg-slate-900/40 border border-white/5 rounded-[44px] overflow-hidden shadow-2xl">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                        <thead className="bg-white/5 text-[9px] uppercase tracking-[0.4em] text-slate-700 font-black">
+                            <tr>
+                                <th className="px-10 py-8">DAVET EDEN</th>
+                                <th className="px-10 py-8">KATILAN ÜYE</th>
+                                <th className="px-10 py-8">TARİH</th>
+                                <th className="px-10 py-8">DURUM</th>
+                                <th className="px-10 py-8 text-right">AKSİYON</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5">
+                            {isLoading ? (
+                                <tr><td colSpan={5} className="py-20 text-center"><Loader2 className="animate-spin text-blue-500 mx-auto" size={32} /></td></tr>
+                            ) : filtered.length === 0 ? (
+                                <tr><td colSpan={5} className="py-20 text-center text-slate-500 font-black uppercase tracking-widest italic">Kayıt Bulunamadı</td></tr>
+                            ) : filtered.map(r => (
+                                <tr key={r.id} className="hover:bg-white/5 transition-all text-white group">
+                                    <td className="px-10 py-8">
+                                        <div className="flex items-center gap-4">
+                                            <img src={r.referrer?.avatar || `https://ui-avatars.com/api/?name=${r.referrer?.username}`} className="w-10 h-10 rounded-xl border border-white/5" />
+                                            <div>
+                                                <p className="text-sm font-black italic uppercase tracking-tighter">@{r.referrer?.username || 'Unknown'}</p>
+                                                <p className="text-[8px] text-slate-600 font-bold uppercase tracking-widest">ID: {r.referrer_id}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-10 py-8">
+                                        <div className="flex items-center gap-4">
+                                            <img src={r.referred?.avatar || `https://ui-avatars.com/api/?name=${r.referred?.username}`} className="w-10 h-10 rounded-xl border border-white/5" />
+                                            <div>
+                                                <p className="text-sm font-black italic uppercase tracking-tighter">@{r.referred?.username || 'Unknown'}</p>
+                                                <p className="text-[8px] text-slate-600 font-bold uppercase tracking-widest">ID: {r.referred_id}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-10 py-8 text-slate-600 text-[10px] font-bold uppercase">{new Date(r.created_at).toLocaleString()}</td>
+                                    <td className="px-10 py-8">
+                                        <span className={`text-[9px] font-black px-3 py-1 rounded-lg border uppercase tracking-widest ${
+                                            r.status === 'confirmed' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' :
+                                            r.status === 'pending' ? 'bg-orange-500/10 border-orange-500/20 text-orange-500' :
+                                            'bg-red-500/10 border-red-500/20 text-red-500'
+                                        }`}>
+                                            {r.status === 'confirmed' ? 'ONAYLI' : r.status === 'pending' ? 'BEKLEMEDE' : 'REDDEDİLDİ'}
+                                        </span>
+                                    </td>
+                                    <td className="px-10 py-8 text-right">
+                                        {r.status === 'pending' && (
+                                            <button 
+                                                onClick={() => handleConfirm(r.id)}
+                                                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-[9px] font-black uppercase tracking-widest transition-all"
+                                            >
+                                                ONAYLA
+                                            </button>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {isSettingsModalOpen && settings && (
+                <div className="fixed inset-0 z-[110] bg-black/95 flex items-center justify-center p-4 lg:p-8 backdrop-blur-3xl animate-in fade-in">
+                    <div className="bg-[#020617] border border-white/10 rounded-[40px] lg:rounded-[64px] w-full max-w-2xl overflow-hidden shadow-2xl relative">
+                        <button onClick={() => setIsSettingsModalOpen(false)} className="absolute top-6 right-6 p-3 bg-white/5 rounded-2xl hover:bg-red-600 transition-all">
+                            <X size={20} />
+                        </button>
+                        
+                        <div className="p-8 lg:p-12 space-y-8">
+                            <div className="flex items-center gap-5">
+                                <div className="w-12 h-12 bg-blue-600 rounded-[20px] flex items-center justify-center shadow-xl">
+                                    <SettingsIcon size={24} className="text-white"/>
+                                </div>
+                                <div>
+                                    <h3 className="text-2xl font-black uppercase italic tracking-tighter">Referral <span className="text-blue-500">Settings</span></h3>
+                                    <p className="text-[9px] font-black text-slate-700 uppercase tracking-[0.4em] mt-1 italic">SİSTEM PARAMETRELERİ</p>
+                                </div>
+                            </div>
+
+                            <form onSubmit={handleUpdateSettings} className="space-y-6">
+                                <div className="grid grid-cols-2 gap-6">
+                                    <AdminInput label="STANDART ÖDÜL (TRY)" value={settings.standard_reward} onChange={(v:any)=>setSettings({...settings, standard_reward: Number(v)})} />
+                                    <AdminInput label="PREMIUM ÖDÜL (TRY)" value={settings.premium_reward} onChange={(v:any)=>setSettings({...settings, premium_reward: Number(v)})} />
+                                </div>
+                                <div className="grid grid-cols-2 gap-6">
+                                    <AdminInput label="MİN. AKTİF GÜN" value={settings.min_days_active} onChange={(v:any)=>setSettings({...settings, min_days_active: Number(v)})} />
+                                    <AdminInput label="BEKLEME SÜRESİ (SAAT)" value={settings.pending_duration_hours} onChange={(v:any)=>setSettings({...settings, pending_duration_hours: Number(v)})} />
+                                </div>
+                                <AdminInput label="TELEGRAM GRUP ID" value={settings.group_id} onChange={(v:any)=>setSettings({...settings, group_id: v})} />
+                                
+                                <div className="flex items-center justify-between p-6 bg-white/5 rounded-3xl border border-white/5">
+                                    <div className="flex flex-col gap-1">
+                                        <span className="text-[10px] font-black text-white uppercase tracking-widest">GRUP KATILIM ZORUNLULUĞU</span>
+                                        <span className="text-[8px] text-slate-600 font-bold uppercase italic">Üye ödülden önce gruba katılmalı mı?</span>
+                                    </div>
+                                    <button 
+                                        type="button"
+                                        onClick={() => setSettings({...settings, require_group_join: !settings.require_group_join})}
+                                        className={`w-14 h-8 rounded-full transition-all relative ${settings.require_group_join ? 'bg-blue-600' : 'bg-slate-800'}`}
+                                    >
+                                        <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-all ${settings.require_group_join ? 'left-7' : 'left-1'}`} />
+                                    </button>
+                                </div>
+
+                                <button type="submit" className="w-full h-16 bg-blue-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-[0.4em] shadow-2xl border-b-4 border-blue-800 active:translate-y-1 active:border-b-0 transition-all">
+                                    AYARLARI KAYDET
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>

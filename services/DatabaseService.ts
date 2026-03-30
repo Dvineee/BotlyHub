@@ -805,6 +805,32 @@ export class DatabaseService {
     };
   }
 
+  static async getAllReferrals(): Promise<any[]> {
+    const { data, error } = await supabase
+        .from('referrals')
+        .select(`
+            *,
+            referrer:users!referrer_id(username, avatar),
+            referred:users!referred_id(username, avatar)
+        `)
+        .order('created_at', { ascending: false });
+    
+    if (error) {
+        console.error("Error fetching all referrals:", error);
+        return [];
+    }
+    return data || [];
+  }
+
+  static async updateReferralSettings(settings: Partial<ReferralSettings>) {
+    const { error } = await supabase
+        .from('referral_settings')
+        .update(settings)
+        .eq('id', 1);
+    
+    if (error) throw error;
+  }
+
   /**
    * Grubun katılımını kontrol eder (SİMÜLASYON)
    * Gerçekte bir Telegram Bot API çağrısı veya Supabase Edge Function gerektirir.

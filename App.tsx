@@ -113,14 +113,12 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
                                 !!user.is_premium
                             );
                         } else {
-                                    await DatabaseService.logActivity(user.id.toString(), 'security', 'referral_rejected', 'Referans Reddedildi', `Düşük hesap kalitesi: ${quality.reason}`);
-                                    console.warn("Referral rejected: Low account quality", quality.reason);
-                                }
-                            } catch (err) {
-                                await DatabaseService.logActivity(user.id.toString(), 'system', 'referral_error', 'Referans Hatası', `İşlem sırasında hata: ${err instanceof Error ? err.message : String(err)}`);
-                                console.error("Referral processing failed:", err);
-                            }
+                            await DatabaseService.logActivity(user.id.toString(), 'security', 'referral_rejected', 'Referans Reddedildi', `Düşük hesap kalitesi: ${quality.reason}`);
+                            console.warn("Referral rejected: Low account quality", quality.reason);
                         }
+                    } catch (err) {
+                        await DatabaseService.logActivity(user.id.toString(), 'system', 'referral_error', 'Referans Hatası', `İşlem sırasında hata: ${err instanceof Error ? err.message : String(err)}`);
+                        console.error("Referral processing failed:", err);
                     }
                 }
 
