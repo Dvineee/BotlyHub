@@ -2209,9 +2209,16 @@ const PromotionManagement = () => {
 
     const generateAIAd = async () => {
         if (!aiPrompt.trim()) return;
+        
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (!apiKey) {
+            alert("Sistem yapılandırma hatası: Gemini API anahtarı bulunamadı.");
+            return;
+        }
+
         setIsGenerating(true);
         try {
-            const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
+            const ai = new GoogleGenAI({ apiKey });
             
             // Text Generation
             const textResponse = await ai.models.generateContent({
@@ -2236,7 +2243,11 @@ const PromotionManagement = () => {
                 }
             });
 
-            const adData = JSON.parse(textResponse.text || '{}');
+            if (!textResponse.text) {
+                throw new Error("Yapay zeka metin içeriği üretemedi.");
+            }
+
+            const adData = JSON.parse(textResponse.text);
 
             // Image Generation
             const imageResponse = await ai.models.generateContent({
@@ -2252,18 +2263,26 @@ const PromotionManagement = () => {
             });
 
             let imageUrl = '';
-            for (const part of imageResponse.candidates?.[0]?.content?.parts || []) {
-                if (part.inlineData) {
-                    imageUrl = `data:image/png;base64,${part.inlineData.data}`;
-                    break;
+            const parts = imageResponse.candidates?.[0]?.content?.parts;
+            if (parts) {
+                for (const part of parts) {
+                    if (part.inlineData) {
+                        imageUrl = `data:image/png;base64,${part.inlineData.data}`;
+                        break;
+                    }
                 }
+            }
+
+            if (!imageUrl) {
+                console.warn("Yapay zeka görsel üretemedi, varsayılan görsel kullanılacak.");
+                imageUrl = `https://picsum.photos/seed/${encodeURIComponent(aiPrompt)}/1280/720`;
             }
 
             setEditingPromo({
                 id: '',
                 title: adData.title || '',
                 content: adData.content || '',
-                image_url: imageUrl || '',
+                image_url: imageUrl,
                 status: 'pending',
                 button_text: adData.button_text || 'İNCELE',
                 button_link: '',
@@ -2274,9 +2293,10 @@ const PromotionManagement = () => {
             });
             setIsAIModalOpen(false);
             setIsModalOpen(true);
-        } catch (error) {
-            console.error("AI Generation Error:", error);
-            alert("AI içerik oluşturulurken bir hata oluştu.");
+        } catch (error: any) {
+            console.error("AI Generation Detailed Error:", error);
+            const errorMsg = error.message || "Bilinmeyen bir hata oluştu.";
+            alert(`AI içerik oluşturulurken bir hata oluştu: ${errorMsg}`);
         } finally {
             setIsGenerating(false);
         }
