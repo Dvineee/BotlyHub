@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
     LayoutDashboard, 
@@ -29,20 +29,39 @@ const UserPanel: React.FC = () => {
         setUser(JSON.parse(storedUser));
     }, [navigate]);
 
-    const handleLogout = () => {
+    const handleLogout = useCallback(() => {
         localStorage.removeItem('panel_user');
         navigate('/u/login');
-    };
+    }, [navigate]);
 
-    if (!user) return null;
-
-    const menuItems = [
+    const menuItems = useMemo(() => [
         { id: 'dashboard', label: 'Panel Özeti', icon: LayoutDashboard, category: 'GENEL' },
         { id: 'group-users', label: 'Kullanıcılar', icon: Users, category: 'GRUP YÖNETİMİ' },
         { id: 'group-settings', label: 'Grup Ayarları', icon: Settings, category: 'GRUP YÖNETİMİ' },
         { id: 'bot-management', label: 'Bot Yönetimi', icon: Bot, category: 'KÜTÜPHANE' },
         { id: 'library', label: 'Bot Arşivi', icon: Library, category: 'KÜTÜPHANE' },
-    ];
+    ], []);
+
+    const StatCard = React.memo(({ label, value, icon: Icon, color }: { label: string, value: string, icon: any, color: string }) => (
+        <div className="bg-slate-900 border border-white/5 p-6 rounded-[32px] relative overflow-hidden group hover:border-white/10 transition-all">
+            <div className={`absolute top-0 right-0 w-32 h-32 bg-${color}-500/5 blur-3xl -mr-16 -mt-16 group-hover:bg-${color}-500/10 transition-all`} />
+            <div className="flex items-center justify-between mb-4">
+                <div className={`w-12 h-12 bg-${color}-500/10 rounded-2xl flex items-center justify-center text-${statColorMap[color] || color}`}>
+                    <Icon size={24} />
+                </div>
+            </div>
+            <p className="text-3xl font-black text-white italic mb-1 tracking-tighter">{value}</p>
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{label}</p>
+        </div>
+    ));
+
+    const statColorMap: Record<string, string> = {
+        'blue': 'blue-500',
+        'purple': 'purple-500',
+        'emerald': 'emerald-500'
+    };
+
+    if (!user) return null;
 
     return (
         <div className="min-h-screen bg-slate-950 flex font-sans text-slate-200">
@@ -152,16 +171,13 @@ const UserPanel: React.FC = () => {
                                     { label: 'Aktif Botlar', value: '0', icon: Bot, color: 'purple' },
                                     { label: 'Toplam Üye', value: '0', icon: Users, color: 'emerald' },
                                 ].map((stat, i) => (
-                                    <div key={i} className="bg-slate-900 border border-white/5 p-6 rounded-3xl relative overflow-hidden group">
-                                        <div className={`absolute top-0 right-0 w-32 h-32 bg-${stat.color}-500/5 blur-3xl -mr-16 -mt-16 group-hover:bg-${stat.color}-500/10 transition-all`} />
-                                        <div className="flex items-center justify-between mb-4">
-                                            <div className={`w-12 h-12 bg-${stat.color}-500/10 rounded-2xl flex items-center justify-center text-${stat.color}-500`}>
-                                                <stat.icon size={24} />
-                                            </div>
-                                        </div>
-                                        <p className="text-3xl font-black text-white italic mb-1">{stat.value}</p>
-                                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{stat.label}</p>
-                                    </div>
+                                    <StatCard 
+                                        key={i}
+                                        label={stat.label}
+                                        value={stat.value}
+                                        icon={stat.icon}
+                                        color={stat.color}
+                                    />
                                 ))}
 
                                 <div className="md:col-span-3 bg-slate-900 border border-white/5 p-8 rounded-[2.5rem] relative overflow-hidden">

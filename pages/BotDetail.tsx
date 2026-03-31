@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
   ChevronLeft, Share2, Send, Loader2, ShieldCheck, 
   Bot as BotIcon, Zap, Shield, PlusCircle, X, 
@@ -62,7 +62,7 @@ const BotDetail = () => {
     finally { setIsLoading(false); }
   };
 
-  const handleAction = async () => {
+  const handleAction = useCallback(async () => {
       if (isProcessing || !bot) return;
       haptic('medium');
       
@@ -79,26 +79,20 @@ const BotDetail = () => {
           try {
               const userData = user || { id: 'guest_user', first_name: 'User' };
               
-              // 1. Kullanıcıyı senkronize et (Eğer yoksa veritabanına kaydetmek için)
-              // Bu adım Foreign Key hatalarını önler.
               const syncData: Partial<User> = {
                   id: userData.id.toString(),
                   name: `${userData.first_name} ${userData.last_name || ''}`.trim(),
                   username: userData.username || 'user',
-                  avatar: userData.photo_url || `https://ui-avatars.com/api/?name=${userData.first_name}`,
                   role: 'User',
                   status: 'Active',
                   joinDate: new Date().toISOString()
               };
               await DatabaseService.syncUser(syncData);
 
-              // 2. Botu kullanıcıya ekle
               await DatabaseService.addUserBot(userData, bot, false);
               
-              // Log bot addition
-              await DatabaseService.logActivity(userData.id.toString(), 'system', 'bot_added', 'Kütüphaneye Ekleme', `${bot.name} botu kütüphaneye eklendi.`);
+              DatabaseService.logActivity(userData.id.toString(), 'system', 'bot_added', 'Kütüphaneye Ekleme', `${bot.name} botu kütüphaneye eklendi.`);
               
-              // 3. Bildirim gönder (Bu işlem kritik değil, hata alsa bile süreci bozmamalı)
               try {
                   await DatabaseService.sendUserNotification(
                       userData.id.toString(),
@@ -122,7 +116,7 @@ const BotDetail = () => {
       } else {
           navigate(`/payment/${id}`);
       }
-  };
+  }, [isProcessing, bot, isOwned, haptic, tg, user, notification, setShowGuide, navigate, id]);
 
   if (isLoading) return (
     <div className="min-h-screen bg-[#020617] flex items-center justify-center">
@@ -131,7 +125,7 @@ const BotDetail = () => {
   );
 
   if (!bot) return null;
-  const prices = PriceService.convert(bot.price, tonRate);
+  const prices = useMemo(() => PriceService.convert(bot.price, tonRate), [bot.price, tonRate]);
 
   return (
     <div className="min-h-screen bg-[#020617] text-slate-200 pb-40 animate-in fade-in">
@@ -151,6 +145,7 @@ const BotDetail = () => {
         <div className="relative shrink-0">
             <img 
               src={getLiveBotIcon(bot)} 
+              loading="lazy"
               className="w-24 h-24 rounded-[24px] border border-white/10 shadow-2xl object-cover bg-slate-900" 
               onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=1e293b&color=fff&bold=true`; }}
             />
@@ -197,7 +192,7 @@ const BotDetail = () => {
               {bot.screenshots && bot.screenshots.length > 0 ? (
                   bot.screenshots.map((s, i) => (
                     <div key={i} className="min-w-[160px] h-[280px] rounded-[24px] bg-slate-900 border border-white/5 overflow-hidden snap-center shrink-0 shadow-xl">
-                        <img src={s} className="w-full h-full object-cover" />
+                        <img src={s} loading="lazy" className="w-full h-full object-cover" />
                     </div>
                   ))
               ) : (

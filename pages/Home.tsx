@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Search, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Bot, Announcement, Notification } from '../types';
@@ -21,7 +21,7 @@ const getLiveBotIcon = (bot: Bot) => {
     return bot.icon || `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=random&color=fff`;
 };
 
-const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) => void }> = ({ ann, onShowPopup }) => {
+const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) => void }> = React.memo(({ ann, onShowPopup }) => {
   const navigate = useNavigate();
   const colors: Record<string, string> = {
     purple: 'from-[#6366f1] to-[#a855f7]',
@@ -70,11 +70,11 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
         </div>
     </div>
   );
-};
+});
 
-const BotCard: React.FC<{ bot: Bot, tonRate: number }> = ({ bot, tonRate }) => {
+const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonRate }) => {
   const navigate = useNavigate();
-  const prices = PriceService.convert(bot.price, tonRate);
+  const prices = useMemo(() => PriceService.convert(bot.price, tonRate), [bot.price, tonRate]);
   
   return (
     <div onClick={() => navigate(`/bot/${bot.id}`)} className="flex items-center p-5 cursor-pointer group hover:bg-slate-900/60 rounded-[32px] transition-all border border-transparent hover:border-slate-800/50 mb-3 active:bg-slate-900 shadow-xl">
@@ -82,6 +82,7 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = ({ bot, tonRate }) => {
             <img 
                 src={getLiveBotIcon(bot)} 
                 alt={bot.name} 
+                loading="lazy"
                 className="w-20 h-20 rounded-[28px] object-cover bg-slate-900 border border-slate-800 group-hover:scale-105 transition-transform" 
                 onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
             />
@@ -110,7 +111,7 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = ({ bot, tonRate }) => {
         </div>
     </div>
   );
-};
+});
 
 const Home = () => {
   const navigate = useNavigate();
@@ -125,26 +126,27 @@ const Home = () => {
   const [selectedAnn, setSelectedAnn] = useState<Announcement | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const loadData = async () => {
-    setIsLoading(true);
-    const [botData, annData, pData] = await Promise.all([
+  const loadData = useCallback(async () => {
+    // İlk yüklemede sadece botları ve duyuruları çek, fiyatı arka planda güncelle
+    const [botData, annData] = await Promise.all([
         DatabaseService.getBots(),
-        DatabaseService.getAnnouncements(),
-        PriceService.getTonPrice()
+        DatabaseService.getAnnouncements()
     ]);
     
     setBots(botData);
-    setTonRate(pData.tonTry);
     if (annData.length > 0) setAnnouncements(annData.filter(a => a.is_active));
+    setIsLoading(false);
+
+    // Fiyat ve bildirimleri arka planda çek
+    PriceService.getTonPrice().then(pData => setTonRate(pData.tonTry));
     
     if (user?.id) {
-        const notes = await DatabaseService.getNotifications(user.id.toString());
-        const unread = notes.filter(n => !n.isRead).length;
-        setUnreadCount(unread);
+        DatabaseService.getNotifications(user.id.toString()).then(notes => {
+            const unread = notes.filter(n => !n.isRead).length;
+            setUnreadCount(unread);
+        });
     }
-    
-    setIsLoading(false);
-  };
+  }, [user]);
 
   useEffect(() => {
     loadData();
