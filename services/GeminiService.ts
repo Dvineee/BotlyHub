@@ -3,17 +3,12 @@ import { GoogleGenAI } from "@google/genai";
 import { Bot } from "../types";
 
 export class GeminiService {
-  private static ai: GoogleGenAI | null = null;
-
   private static getAI() {
-    if (!this.ai) {
-      const apiKey = process.env.GEMINI_API_KEY;
-      if (!apiKey) {
-        throw new Error("Gemini API anahtarı yapılandırılmadı. Lütfen ayarlardan API anahtarınızı ekleyin.");
-      }
-      this.ai = new GoogleGenAI({ apiKey });
+    const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error("Gemini API anahtarı yapılandırılmadı. Lütfen ayarlardan API anahtarınızı ekleyin.");
     }
-    return this.ai;
+    return new GoogleGenAI({ apiKey });
   }
 
   static async recommendBots(query: string, availableBots: Bot[]): Promise<string> {

@@ -2208,11 +2208,35 @@ const PromotionManagement = () => {
     const [aiPrompt, setAiPrompt] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
     const [generateImage, setGenerateImage] = useState(true);
+    const [aiError, setAiError] = useState<string | null>(null);
+    const [showKeySelection, setShowKeySelection] = useState(false);
+
+    const openAIModal = async () => {
+        setAiError(null);
+        setShowKeySelection(false);
+        setIsAIModalOpen(true);
+        
+        if ((window as any).aistudio) {
+            const hasKey = await (window as any).aistudio.hasSelectedApiKey();
+            if (!hasKey) {
+                setShowKeySelection(true);
+            }
+        }
+    };
+
+    const handleKeySelection = async () => {
+        if ((window as any).aistudio) {
+            await (window as any).aistudio.openSelectKey();
+            setShowKeySelection(false);
+            setAiError(null);
+        }
+    };
 
     const generateAIAd = async () => {
         if (!aiPrompt.trim()) return;
         
         setIsGenerating(true);
+        setAiError(null);
         try {
             const adData = await GeminiService.generateAd(aiPrompt, generateImage);
 
@@ -2233,8 +2257,14 @@ const PromotionManagement = () => {
             setIsModalOpen(true);
         } catch (error: any) {
             console.error("AI Generation Detailed Error:", error);
-            const errorMsg = error.message || "Bilinmeyen bir hata oluştu.";
-            alert(`AI içerik oluşturulurken bir hata oluştu: ${errorMsg}`);
+            const errorStr = typeof error === 'string' ? error : (error.message || JSON.stringify(error));
+            
+            if (errorStr.includes("leaked") || errorStr.includes("PERMISSION_DENIED")) {
+                setAiError("API anahtarınız sızdırılmış veya geçersiz. Lütfen yeni bir anahtar seçin.");
+                setShowKeySelection(true);
+            } else {
+                setAiError(error.message || "AI içerik oluşturulurken bir hata oluştu.");
+            }
         } finally {
             setIsGenerating(false);
         }
@@ -2319,7 +2349,7 @@ const PromotionManagement = () => {
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
                     <button 
-                        onClick={() => setIsAIModalOpen(true)} 
+                        onClick={openAIModal} 
                         className="w-full md:w-auto bg-blue-600 hover:bg-blue-500 px-8 py-5 rounded-[28px] text-[11px] font-black uppercase tracking-widest shadow-2xl active:scale-95 border-b-4 border-blue-900 transition-all flex items-center justify-center gap-3"
                     >
                         <Sparkles size={18} /> AI İLE OLUŞTUR
@@ -2447,6 +2477,44 @@ const PromotionManagement = () => {
                                 <h3 className="text-4xl font-black text-white italic uppercase tracking-tighter mb-4">AI <span className="text-blue-500">Ad Generator</span></h3>
                                 <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">Reklam fikrinizi yazın, gerisini yapay zekaya bırakın</p>
                             </div>
+
+                            {aiError && (
+                                <div className="bg-red-500/10 border border-red-500/20 p-6 rounded-[32px] text-left space-y-4 animate-in slide-in-from-top-2">
+                                    <div className="flex items-start gap-4">
+                                        <AlertCircle className="text-red-500 shrink-0 mt-1" size={20} />
+                                        <div className="space-y-1">
+                                            <p className="text-red-500 text-sm font-bold uppercase tracking-widest">Hata Oluştu</p>
+                                            <p className="text-slate-400 text-xs leading-relaxed">{aiError}</p>
+                                        </div>
+                                    </div>
+                                    {showKeySelection && (
+                                        <button 
+                                            onClick={handleKeySelection}
+                                            className="w-full bg-white/5 hover:bg-white/10 border border-white/10 px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white transition-all flex items-center justify-center gap-3"
+                                        >
+                                            <Key size={14} /> API ANAHTARINI GÜNCELLE
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+
+                            {showKeySelection && !aiError && (
+                                <div className="bg-blue-500/10 border border-blue-500/20 p-6 rounded-[32px] text-left space-y-4">
+                                    <div className="flex items-start gap-4">
+                                        <Info className="text-blue-500 shrink-0 mt-1" size={20} />
+                                        <div className="space-y-1">
+                                            <p className="text-blue-500 text-sm font-bold uppercase tracking-widest">API Anahtarı Gerekli</p>
+                                            <p className="text-slate-400 text-xs leading-relaxed">AI özelliklerini kullanmak için bir API anahtarı seçmelisiniz.</p>
+                                        </div>
+                                    </div>
+                                    <button 
+                                        onClick={handleKeySelection}
+                                        className="w-full bg-white/5 hover:bg-white/10 border border-white/10 px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white transition-all flex items-center justify-center gap-3"
+                                    >
+                                        <Key size={14} /> API ANAHTARI SEÇ
+                                    </button>
+                                </div>
+                            )}
 
                             <div className="space-y-4">
                                 <textarea 
