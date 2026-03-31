@@ -2207,13 +2207,14 @@ const PromotionManagement = () => {
     const [isAIModalOpen, setIsAIModalOpen] = useState(false);
     const [aiPrompt, setAiPrompt] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
+    const [generateImage, setGenerateImage] = useState(true);
 
     const generateAIAd = async () => {
         if (!aiPrompt.trim()) return;
         
         setIsGenerating(true);
         try {
-            const adData = await GeminiService.generateAd(aiPrompt);
+            const adData = await GeminiService.generateAd(aiPrompt, generateImage);
 
             setEditingPromo({
                 id: '',
@@ -2454,6 +2455,20 @@ const PromotionManagement = () => {
                                     placeholder="Örn: Yeni bir kripto cüzdanı için dikkat çekici bir reklam oluştur..."
                                     className="w-full bg-white/5 border border-white/10 rounded-[32px] p-8 text-white text-lg font-medium focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none min-h-[200px] resize-none"
                                 />
+                                
+                                <div className="flex items-center justify-center gap-3 p-4 bg-white/5 rounded-[24px] border border-white/10">
+                                    <input 
+                                        type="checkbox" 
+                                        id="ai-image-toggle"
+                                        checked={generateImage}
+                                        onChange={(e) => setGenerateImage(e.target.checked)}
+                                        className="w-5 h-5 rounded-lg bg-slate-900 border-white/10 text-blue-600 focus:ring-blue-500/20"
+                                    />
+                                    <label htmlFor="ai-image-toggle" className="text-[11px] font-black text-slate-400 uppercase tracking-widest cursor-pointer select-none">
+                                        AI Görseli de Oluşturulsun
+                                    </label>
+                                </div>
+
                                 <button 
                                     disabled={isGenerating || !aiPrompt.trim()}
                                     onClick={generateAIAd}
@@ -2473,7 +2488,7 @@ const PromotionManagement = () => {
                             </div>
                             
                             <p className="text-[10px] font-bold text-slate-700 uppercase tracking-widest">
-                                * Yapay zeka hem görsel hem de metin içeriği üretecektir.
+                                * Seçiminize göre yapay zeka görsel ve metin içeriği üretecektir.
                             </p>
                         </div>
                     </div>

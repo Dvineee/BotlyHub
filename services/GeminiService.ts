@@ -84,7 +84,7 @@ export class GeminiService {
     }
   }
 
-  static async generateAd(prompt: string): Promise<{ title: string; content: string; button_text: string; image_url: string }> {
+  static async generateAd(prompt: string, generateImage: boolean = true): Promise<{ title: string; content: string; button_text: string; image_url: string }> {
     const ai = this.getAI();
     
     try {
@@ -108,27 +108,33 @@ export class GeminiService {
 
       const adData = JSON.parse(textResponse.text);
 
-      // Image Generation
-      const imageResponse = await ai.models.generateContent({
-        model: "gemini-2.5-flash-image",
-        contents: {
-          parts: [{ text: `A high-quality, professional advertisement visual for: ${prompt}. Modern, vibrant, and eye-catching.` }]
-        },
-        config: {
-          imageConfig: {
-            aspectRatio: "16:9"
-          }
-        }
-      });
-
+      // Image Generation with Fallback
       let imageUrl = '';
-      const parts = imageResponse.candidates?.[0]?.content?.parts;
-      if (parts) {
-        for (const part of parts) {
-          if (part.inlineData) {
-            imageUrl = `data:image/png;base64,${part.inlineData.data}`;
-            break;
+      if (generateImage) {
+        try {
+          const imageResponse = await ai.models.generateContent({
+            model: "gemini-2.5-flash-image",
+            contents: {
+              parts: [{ text: `A high-quality, professional advertisement visual for: ${prompt}. Modern, vibrant, and eye-catching.` }]
+            },
+            config: {
+              imageConfig: {
+                aspectRatio: "16:9"
+              }
+            }
+          });
+
+          const parts = imageResponse.candidates?.[0]?.content?.parts;
+          if (parts) {
+            for (const part of parts) {
+              if (part.inlineData) {
+                imageUrl = `data:image/png;base64,${part.inlineData.data}`;
+                break;
+              }
+            }
           }
+        } catch (imgError) {
+          console.warn("Gemini Image Generation failed (likely quota), using fallback:", imgError);
         }
       }
 
