@@ -12,6 +12,7 @@ import {
   Info, Star, MousePointer2, Link2, AlertCircle, Shield, Calendar, Hash, Heart
 } from 'lucide-react';
 import { DatabaseService } from '../../services/DatabaseService';
+import { GeminiService } from '../../services/GeminiService';
 import { GoogleGenAI, Type } from "@google/genai";
 import { User, Bot as BotType, Announcement, Promotion, ActivityLog, Notification, Referral, ReferralSettings } from '../../types';
 
@@ -2210,81 +2211,17 @@ const PromotionManagement = () => {
     const generateAIAd = async () => {
         if (!aiPrompt.trim()) return;
         
-        const apiKey = process.env.GEMINI_API_KEY;
-        if (!apiKey) {
-            alert("Sistem yapılandırma hatası: Gemini API anahtarı bulunamadı.");
-            return;
-        }
-
         setIsGenerating(true);
         try {
-            const ai = new GoogleGenAI({ apiKey });
-            
-            // Text Generation
-            const textResponse = await ai.models.generateContent({
-                model: "gemini-3-flash-preview",
-                contents: `Create a compelling advertisement for: ${aiPrompt}. 
-                Return a JSON object with:
-                - title: A catchy short title (max 40 chars)
-                - content: Engaging ad copy (max 200 chars)
-                - button_text: Short call to action (max 15 chars)
-                All text should be in Turkish.`,
-                config: {
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: Type.OBJECT,
-                        properties: {
-                            title: { type: Type.STRING },
-                            content: { type: Type.STRING },
-                            button_text: { type: Type.STRING }
-                        },
-                        required: ["title", "content", "button_text"]
-                    }
-                }
-            });
-
-            if (!textResponse.text) {
-                throw new Error("Yapay zeka metin içeriği üretemedi.");
-            }
-
-            const adData = JSON.parse(textResponse.text);
-
-            // Image Generation
-            const imageResponse = await ai.models.generateContent({
-                model: "gemini-2.5-flash-image",
-                contents: {
-                    parts: [{ text: `A high-quality, professional advertisement visual for: ${aiPrompt}. Modern, vibrant, and eye-catching.` }]
-                },
-                config: {
-                    imageConfig: {
-                        aspectRatio: "16:9"
-                    }
-                }
-            });
-
-            let imageUrl = '';
-            const parts = imageResponse.candidates?.[0]?.content?.parts;
-            if (parts) {
-                for (const part of parts) {
-                    if (part.inlineData) {
-                        imageUrl = `data:image/png;base64,${part.inlineData.data}`;
-                        break;
-                    }
-                }
-            }
-
-            if (!imageUrl) {
-                console.warn("Yapay zeka görsel üretemedi, varsayılan görsel kullanılacak.");
-                imageUrl = `https://picsum.photos/seed/${encodeURIComponent(aiPrompt)}/1280/720`;
-            }
+            const adData = await GeminiService.generateAd(aiPrompt);
 
             setEditingPromo({
                 id: '',
-                title: adData.title || '',
-                content: adData.content || '',
-                image_url: imageUrl,
+                title: adData.title,
+                content: adData.content,
+                image_url: adData.image_url,
                 status: 'pending',
-                button_text: adData.button_text || 'İNCELE',
+                button_text: adData.button_text,
                 button_link: '',
                 click_count: 0,
                 price_per_view: 0,

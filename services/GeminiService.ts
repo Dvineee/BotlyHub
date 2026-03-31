@@ -9,7 +9,7 @@ export class GeminiService {
     if (!this.ai) {
       const apiKey = process.env.GEMINI_API_KEY;
       if (!apiKey) {
-        throw new Error("GEMINI_API_KEY is not configured");
+        throw new Error("Gemini API anahtarı yapılandırılmadı. Lütfen ayarlardan API anahtarınızı ekleyin.");
       }
       this.ai = new GoogleGenAI({ apiKey });
     }
@@ -81,6 +81,70 @@ export class GeminiService {
     } catch (error) {
       console.error("Gemini Error:", error);
       return "AI asistanı şu anda meşgul. Lütfen daha sonra tekrar deneyin.";
+    }
+  }
+
+  static async generateAd(prompt: string): Promise<{ title: string; content: string; button_text: string; image_url: string }> {
+    const ai = this.getAI();
+    
+    try {
+      // Text Generation
+      const textResponse = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: `Create a compelling advertisement for: ${prompt}. 
+        Return a JSON object with:
+        - title: A catchy short title (max 40 chars)
+        - content: Engaging ad copy (max 200 chars)
+        - button_text: Short call to action (max 15 chars)
+        All text should be in Turkish.`,
+        config: {
+          responseMimeType: "application/json",
+        }
+      });
+
+      if (!textResponse.text) {
+        throw new Error("Yapay zeka metin içeriği üretemedi.");
+      }
+
+      const adData = JSON.parse(textResponse.text);
+
+      // Image Generation
+      const imageResponse = await ai.models.generateContent({
+        model: "gemini-2.5-flash-image",
+        contents: {
+          parts: [{ text: `A high-quality, professional advertisement visual for: ${prompt}. Modern, vibrant, and eye-catching.` }]
+        },
+        config: {
+          imageConfig: {
+            aspectRatio: "16:9"
+          }
+        }
+      });
+
+      let imageUrl = '';
+      const parts = imageResponse.candidates?.[0]?.content?.parts;
+      if (parts) {
+        for (const part of parts) {
+          if (part.inlineData) {
+            imageUrl = `data:image/png;base64,${part.inlineData.data}`;
+            break;
+          }
+        }
+      }
+
+      if (!imageUrl) {
+        imageUrl = `https://picsum.photos/seed/${encodeURIComponent(prompt)}/1280/720`;
+      }
+
+      return {
+        title: adData.title || '',
+        content: adData.content || '',
+        button_text: adData.button_text || 'İNCELE',
+        image_url: imageUrl
+      };
+    } catch (error) {
+      console.error("Gemini Ad Generation Error:", error);
+      throw error;
     }
   }
 
