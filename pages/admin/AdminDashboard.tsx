@@ -12,6 +12,7 @@ import {
   Info, Star, MousePointer2, Link2, AlertCircle, Shield, Calendar, Hash, Heart
 } from 'lucide-react';
 import { DatabaseService } from '../../services/DatabaseService';
+import { GoogleGenAI, Type } from "@google/genai";
 import { User, Bot as BotType, Announcement, Promotion, ActivityLog, Notification, Referral, ReferralSettings } from '../../types';
 
 const { useNavigate, Routes, Route, Link, useLocation } = Router as any;
@@ -2202,6 +2203,84 @@ const PromotionManagement = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingPromo, setEditingPromo] = useState<any>(null);
     const [updatingId, setUpdatingId] = useState<string | null>(null);
+    const [isAIModalOpen, setIsAIModalOpen] = useState(false);
+    const [aiPrompt, setAiPrompt] = useState('');
+    const [isGenerating, setIsGenerating] = useState(false);
+
+    const generateAIAd = async () => {
+        if (!aiPrompt.trim()) return;
+        setIsGenerating(true);
+        try {
+            const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
+            
+            // Text Generation
+            const textResponse = await ai.models.generateContent({
+                model: "gemini-3-flash-preview",
+                contents: `Create a compelling advertisement for: ${aiPrompt}. 
+                Return a JSON object with:
+                - title: A catchy short title (max 40 chars)
+                - content: Engaging ad copy (max 200 chars)
+                - button_text: Short call to action (max 15 chars)
+                All text should be in Turkish.`,
+                config: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: Type.OBJECT,
+                        properties: {
+                            title: { type: Type.STRING },
+                            content: { type: Type.STRING },
+                            button_text: { type: Type.STRING }
+                        },
+                        required: ["title", "content", "button_text"]
+                    }
+                }
+            });
+
+            const adData = JSON.parse(textResponse.text || '{}');
+
+            // Image Generation
+            const imageResponse = await ai.models.generateContent({
+                model: "gemini-2.5-flash-image",
+                contents: {
+                    parts: [{ text: `A high-quality, professional advertisement visual for: ${aiPrompt}. Modern, vibrant, and eye-catching.` }]
+                },
+                config: {
+                    imageConfig: {
+                        aspectRatio: "16:9"
+                    }
+                }
+            });
+
+            let imageUrl = '';
+            for (const part of imageResponse.candidates?.[0]?.content?.parts || []) {
+                if (part.inlineData) {
+                    imageUrl = `data:image/png;base64,${part.inlineData.data}`;
+                    break;
+                }
+            }
+
+            setEditingPromo({
+                id: '',
+                title: adData.title || '',
+                content: adData.content || '',
+                image_url: imageUrl || '',
+                status: 'pending',
+                button_text: adData.button_text || 'İNCELE',
+                button_link: '',
+                click_count: 0,
+                price_per_view: 0,
+                source_channel: '-1003826684282',
+                processed_channels: []
+            });
+            setIsAIModalOpen(false);
+            setIsModalOpen(true);
+        } catch (error) {
+            console.error("AI Generation Error:", error);
+            alert("AI içerik oluşturulurken bir hata oluştu.");
+        } finally {
+            setIsGenerating(false);
+        }
+    };
 
     const load = useCallback(async () => {
         setIsLoading(true);
@@ -2280,27 +2359,35 @@ const PromotionManagement = () => {
                     <h2 className="text-4xl font-black text-white italic uppercase tracking-tighter leading-none">Promo <span className="text-blue-500">Engine</span></h2>
                     <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em] mt-2 italic">Kanallar üzerinden toplu reklam dağıtımı yapın</p>
                 </div>
-                <button 
-                    onClick={() => { 
-                        setEditingPromo({ 
-                            id: '', 
-                            title: '', 
-                            content: '', 
-                            image_url: '', 
-                            status: 'pending', 
-                            button_text: 'İNCELE', 
-                            button_link: '', 
-                            click_count: 0, 
-                            price_per_view: 0,
-                            source_channel: '-1003826684282',
-                            processed_channels: [] 
-                        }); 
-                        setIsModalOpen(true); 
-                    }} 
-                    className="w-full md:w-auto bg-emerald-600 hover:bg-emerald-500 px-10 py-5 rounded-[28px] text-[11px] font-black uppercase tracking-widest shadow-2xl active:scale-95 border-b-4 border-emerald-900 transition-all flex items-center gap-3"
-                >
-                    <Plus size={18} /> YENİ REKLAM OLUŞTUR
-                </button>
+                <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+                    <button 
+                        onClick={() => setIsAIModalOpen(true)} 
+                        className="w-full md:w-auto bg-blue-600 hover:bg-blue-500 px-8 py-5 rounded-[28px] text-[11px] font-black uppercase tracking-widest shadow-2xl active:scale-95 border-b-4 border-blue-900 transition-all flex items-center justify-center gap-3"
+                    >
+                        <Sparkles size={18} /> AI İLE OLUŞTUR
+                    </button>
+                    <button 
+                        onClick={() => { 
+                            setEditingPromo({ 
+                                id: '', 
+                                title: '', 
+                                content: '', 
+                                image_url: '', 
+                                status: 'pending', 
+                                button_text: 'İNCELE', 
+                                button_link: '', 
+                                click_count: 0, 
+                                price_per_view: 0,
+                                source_channel: '-1003826684282',
+                                processed_channels: [] 
+                            }); 
+                            setIsModalOpen(true); 
+                        }} 
+                        className="w-full md:w-auto bg-emerald-600 hover:bg-emerald-500 px-8 py-5 rounded-[28px] text-[11px] font-black uppercase tracking-widest shadow-2xl active:scale-95 border-b-4 border-emerald-900 transition-all flex items-center justify-center gap-3"
+                    >
+                        <Plus size={18} /> MANUEL OLUŞTUR
+                    </button>
+                </div>
             </div>
 
             {isLoading && updatingId === null ? (
@@ -2384,6 +2471,55 @@ const PromotionManagement = () => {
                             </div>
                         </div>
                     ))}
+                </div>
+            )}
+
+            {isAIModalOpen && (
+                <div className="fixed inset-0 z-[120] bg-black/95 flex items-center justify-center p-6 backdrop-blur-xl animate-in fade-in">
+                    <div className="bg-[#020617] p-10 lg:p-16 rounded-[64px] w-full max-w-3xl border border-white/10 shadow-2xl relative">
+                        <button onClick={() => setIsAIModalOpen(false)} className="absolute top-8 right-8 p-4 bg-white/5 rounded-2xl text-slate-500 hover:text-white transition-all">
+                            <X size={24}/>
+                        </button>
+                        
+                        <div className="text-center space-y-8">
+                            <div className="inline-flex p-6 bg-blue-500/10 rounded-[32px] border border-blue-500/20 mb-4">
+                                <Sparkles size={48} className="text-blue-500" />
+                            </div>
+                            <div>
+                                <h3 className="text-4xl font-black text-white italic uppercase tracking-tighter mb-4">AI <span className="text-blue-500">Ad Generator</span></h3>
+                                <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">Reklam fikrinizi yazın, gerisini yapay zekaya bırakın</p>
+                            </div>
+
+                            <div className="space-y-4">
+                                <textarea 
+                                    value={aiPrompt}
+                                    onChange={(e) => setAiPrompt(e.target.value)}
+                                    placeholder="Örn: Yeni bir kripto cüzdanı için dikkat çekici bir reklam oluştur..."
+                                    className="w-full bg-white/5 border border-white/10 rounded-[32px] p-8 text-white text-lg font-medium focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none min-h-[200px] resize-none"
+                                />
+                                <button 
+                                    disabled={isGenerating || !aiPrompt.trim()}
+                                    onClick={generateAIAd}
+                                    className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:hover:bg-blue-600 px-10 py-6 rounded-[32px] text-sm font-black uppercase tracking-[0.2em] shadow-2xl active:scale-95 transition-all flex items-center justify-center gap-4"
+                                >
+                                    {isGenerating ? (
+                                        <>
+                                            <Loader2 size={20} className="animate-spin" />
+                                            OLUŞTURULUYOR...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Zap size={20} /> REKLAMI OLUŞTUR
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+                            
+                            <p className="text-[10px] font-bold text-slate-700 uppercase tracking-widest">
+                                * Yapay zeka hem görsel hem de metin içeriği üretecektir.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             )}
 
