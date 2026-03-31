@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Search as SearchIcon, ChevronLeft, X, Zap, Loader2 } from 'lucide-react';
+import { Search as SearchIcon, ChevronLeft, X, Zap, Loader2, Sparkles, Send, Bot as BotIcon } from 'lucide-react';
 import * as Router from 'react-router-dom';
 import { Bot } from '../types';
 import { categories } from '../data';
@@ -8,6 +8,8 @@ import { useTranslation } from '../TranslationContext';
 import { DatabaseService } from '../services/DatabaseService';
 import PriceService from '../services/PriceService';
 import { useTelegram } from '../hooks/useTelegram';
+import { GeminiService } from '../services/GeminiService';
+import { motion, AnimatePresence } from 'motion/react';
 
 const { useNavigate, useSearchParams } = Router as any;
 
@@ -66,6 +68,10 @@ const SearchPage = () => {
   const [bots, setBots] = useState<Bot[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [tonRate, setTonRate] = useState(250);
+  const [aiQuery, setAiQuery] = useState('');
+  const [aiResponse, setAiResponse] = useState<string | null>(null);
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [showAiAssistant, setShowAiAssistant] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -93,8 +99,95 @@ const SearchPage = () => {
     return matchesQuery && matchesCategory;
   });
 
+  const handleAiSearch = async () => {
+    if (!aiQuery.trim()) return;
+    setIsAiLoading(true);
+    try {
+      const response = await GeminiService.recommendBots(aiQuery, bots);
+      setAiResponse(response);
+      if (user?.id) {
+        await DatabaseService.logActivity(user.id.toString(), 'system', 'ai_search', 'AI Asistanı', `AI asistanına soruldu: ${aiQuery}`);
+      }
+    } catch (error) {
+      console.error("AI Search Error:", error);
+      setAiResponse("Üzgünüm, şu anda yardımcı olamıyorum.");
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#020617] p-4 pt-10 pb-32 animate-in fade-in">
+      {/* AI Assistant Toggle */}
+      <div className="mb-6">
+        <button 
+          onClick={() => setShowAiAssistant(!showAiAssistant)}
+          className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-[28px] group active:scale-[0.98] transition-all"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-600/20">
+              <Sparkles size={20} className="text-white animate-pulse" />
+            </div>
+            <div className="text-left">
+              <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest">AI Bot Asistanı</p>
+              <p className="text-[8px] font-bold text-slate-500 uppercase tracking-tighter">İhtiyacın olan botu yapay zekaya sor</p>
+            </div>
+          </div>
+          <div className="w-8 h-8 bg-slate-900/50 rounded-xl flex items-center justify-center text-slate-500 group-hover:text-blue-400 transition-colors">
+            {showAiAssistant ? <X size={16} /> : <Zap size={16} />}
+          </div>
+        </button>
+
+        <AnimatePresence>
+          {showAiAssistant && (
+            <motion.div 
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="mt-4 p-5 bg-slate-900/40 border border-white/5 rounded-[32px] space-y-4">
+                <div className="relative">
+                  <input 
+                    type="text"
+                    value={aiQuery}
+                    onChange={(e) => setAiQuery(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAiSearch()}
+                    placeholder="Örn: Kripto takibi için bir bot önerir misin?"
+                    className="w-full bg-slate-950/50 border border-white/5 rounded-2xl py-4 pl-5 pr-14 text-xs text-white placeholder:text-slate-600 font-bold uppercase tracking-widest outline-none focus:border-blue-500/50 transition-all"
+                  />
+                  <button 
+                    onClick={handleAiSearch}
+                    disabled={isAiLoading || !aiQuery.trim()}
+                    className="absolute right-2 top-2 w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white disabled:opacity-50 active:scale-90 transition-all"
+                  >
+                    {isAiLoading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+                  </button>
+                </div>
+
+                {aiResponse && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-4 bg-blue-600/5 border border-blue-500/10 rounded-2xl"
+                  >
+                    <div className="flex gap-3 mb-3">
+                      <div className="w-6 h-6 bg-blue-600 rounded-lg flex items-center justify-center shrink-0">
+                        <BotIcon size={14} className="text-white" />
+                      </div>
+                      <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest">AI Yanıtı</p>
+                    </div>
+                    <div className="text-[11px] text-slate-300 leading-relaxed font-medium whitespace-pre-line">
+                      {aiResponse}
+                    </div>
+                  </motion.div>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
       {/* Header & Search Box */}
       <div className="flex items-center gap-4 mb-8">
         <button onClick={() => navigate('/')} className="p-3 bg-slate-900/60 border border-slate-800 rounded-2xl text-slate-400 active:scale-90 transition-transform">

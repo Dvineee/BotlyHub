@@ -14,6 +14,7 @@ import { useTelegram } from '../hooks/useTelegram';
 import { DatabaseService } from '../services/DatabaseService';
 import PriceService from '../services/PriceService';
 import { useTranslation } from '../TranslationContext';
+import { GeminiService } from '../services/GeminiService';
 
 const { useNavigate, useParams } = Router as any;
 
@@ -37,6 +38,9 @@ const BotDetail = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [tonRate, setTonRate] = useState(250);
   const [showGuide, setShowGuide] = useState(false);
+  const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
   
   useEffect(() => {
     fetchBotData();
@@ -118,6 +122,39 @@ const BotDetail = () => {
       }
   }, [isProcessing, bot, isOwned, haptic, tg, user, notification, setShowGuide, navigate, id]);
 
+  const handleAiAnalysis = async () => {
+    if (!bot || isAiLoading) return;
+    setIsAiLoading(true);
+    try {
+      const response = await GeminiService.analyzeBot(bot);
+      setAiAnalysis(response);
+      
+      if (user?.id) {
+        await DatabaseService.logActivity(user.id.toString(), 'system', 'bot_ai_analysis', 'AI Analizi', `${bot.name} botu için AI analizi istendi.`);
+      }
+    } catch (error) {
+      console.error("AI Analysis Error:", error);
+      setAiAnalysis("AI asistanı şu anda meşgul. Lütfen daha sonra tekrar deneyin.");
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
+  const handleShare = () => {
+    if (!bot) return;
+    const shareUrl = `https://t.me/BotlyHubBot/app?startapp=bot_${bot.id}`;
+    const shareText = `BotlyHub'da harika bir bot buldum: ${bot.name}\n\n${bot.description}\n\n${shareUrl}`;
+    
+    if (tg?.openTelegramLink) {
+        tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`);
+    } else {
+        navigator.clipboard.writeText(shareUrl);
+        setIsCopied(true);
+        notification('success');
+        setTimeout(() => setIsCopied(false), 2000);
+    }
+  };
+
   if (isLoading) return (
     <div className="min-h-screen bg-[#020617] flex items-center justify-center">
         <Loader2 className="animate-spin text-blue-500/50" size={32} />
@@ -135,8 +172,20 @@ const BotDetail = () => {
             <ChevronLeft size={24} />
         </button>
         <span className="text-[10px] font-black tracking-[0.2em] text-white/20 uppercase italic">Uygulama Detayı</span>
-        <button className="p-2 -mr-2 text-slate-400">
-            <Share2 size={20} />
+        <button onClick={handleShare} className="p-2 -mr-2 text-slate-400 active:scale-90 transition-transform relative">
+            <Share2 size={20} className={isCopied ? 'text-emerald-500' : ''} />
+            <AnimatePresence>
+                {isCopied && (
+                    <motion.span 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0 }}
+                        className="absolute -bottom-8 right-0 text-[8px] font-black text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-md uppercase whitespace-nowrap"
+                    >
+                        Kopyalandı!
+                    </motion.span>
+                )}
+            </AnimatePresence>
         </button>
       </nav>
 
@@ -207,10 +256,49 @@ const BotDetail = () => {
 
       {/* Description */}
       <div className="px-6 mb-10">
-          <h3 className="px-2 text-[10px] font-black text-slate-700 uppercase tracking-[0.4em] mb-4 italic">Hakkında</h3>
+          <div className="flex items-center justify-between mb-4 px-2">
+            <h3 className="text-[10px] font-black text-slate-700 uppercase tracking-[0.4em] italic">Hakkında</h3>
+            <button 
+              onClick={handleAiAnalysis}
+              disabled={isAiLoading}
+              className="flex items-center gap-2 px-3 py-1.5 bg-blue-600/10 border border-blue-500/20 rounded-xl text-blue-500 text-[8px] font-black uppercase tracking-widest active:scale-95 transition-all disabled:opacity-50"
+            >
+              {isAiLoading ? <Loader2 size={10} className="animate-spin" /> : <Sparkles size={10} className="animate-pulse" />}
+              AI ANALİZİ
+            </button>
+          </div>
           <div className="p-6 bg-slate-900/30 rounded-[32px] border border-white/5 text-xs text-slate-400 font-bold uppercase italic leading-relaxed opacity-90">
               {bot.description}
           </div>
+
+          <AnimatePresence>
+            {aiAnalysis && (
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-4 p-6 bg-gradient-to-br from-blue-600/10 to-purple-600/10 border border-blue-500/20 rounded-[32px] relative overflow-hidden group"
+              >
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <Sparkles size={48} className="text-blue-400" />
+                </div>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20">
+                    <BotIcon size={16} className="text-white" />
+                  </div>
+                  <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest italic">Neden Bu Botu Seçmelisin?</p>
+                </div>
+                <div className="text-[11px] text-slate-300 leading-relaxed font-medium italic whitespace-pre-line relative z-10">
+                  {aiAnalysis}
+                </div>
+                <button 
+                  onClick={() => setAiAnalysis(null)}
+                  className="mt-4 text-[8px] font-black text-slate-500 uppercase tracking-widest hover:text-white transition-colors"
+                >
+                  Kapat
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
       </div>
 
       {/* Key Features */}
