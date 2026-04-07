@@ -158,7 +158,7 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
     }, 150);
 
     return () => clearTimeout(timer);
-  }, [isAdminPath, user, location.pathname]);
+  }, [isAdminPath, user]); // location.pathname removed to prevent re-running on every navigation
 
   useEffect(() => {
     if (isAdminPath) return;
@@ -177,7 +177,7 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
       tg.BackButton.onClick(handleBack);
     }
     return () => tg.BackButton.offClick(handleBack);
-  }, [location, navigate, isAdminPath]);
+  }, [location.pathname, navigate, isAdminPath]); // Optimized dependencies
 
   if (isMaintenance && !isAdminPath) {
       return <Maintenance />;
@@ -197,8 +197,8 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
 export default function App() {
   return (
     <HashRouter>
-      <TelegramWrapper>
-        <Suspense fallback={<PageLoader />}>
+      <Suspense fallback={<PageLoader />}>
+        <TelegramWrapper>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/search" element={<SearchPage />} />
@@ -217,8 +217,8 @@ export default function App() {
             <Route path="/u/panel/*" element={<UserPanel />} />
             <Route path="/referral" element={<ReferralPage />} />
           </Routes>
-        </Suspense>
-      </TelegramWrapper>
+        </TelegramWrapper>
+      </Suspense>
     </HashRouter>
   );
 }

@@ -88,14 +88,12 @@ if (rootElement) {
   const root = createRoot(rootElement);
 
   root.render(
-    <React.StrictMode>
-      <ErrorBoundary>
-        <TonConnectUIProvider manifestUrl={manifestUrl}>
-          <TranslationProvider>
-            <App />
-          </TranslationProvider>
-        </TonConnectUIProvider>
-      </ErrorBoundary>
-    </React.StrictMode>
+    <ErrorBoundary>
+      <TonConnectUIProvider manifestUrl={manifestUrl}>
+        <TranslationProvider>
+          <App />
+        </TranslationProvider>
+      </TonConnectUIProvider>
+    </ErrorBoundary>
   );
 }
