@@ -9,6 +9,8 @@ import { checkAccountQuality, getDeviceFingerprint } from './security';
 import './types';
 
 import Home from './pages/Home';
+import Maintenance from './pages/Maintenance';
+import Restricted from './pages/Restricted';
 const SearchPage = lazy(() => import('./pages/SearchPage'));
 const BotDetail = lazy(() => import('./pages/BotDetail'));
 const Payment = lazy(() => import('./pages/Payment'));
@@ -19,8 +21,6 @@ const Premium = lazy(() => import('./pages/Premium'));
 const Notifications = lazy(() => import('./pages/Notifications'));
 const AccountSettings = lazy(() => import('./pages/AccountSettings'));
 const Earnings = lazy(() => import('./pages/Earnings'));
-const Maintenance = lazy(() => import('./pages/Maintenance'));
-const Restricted = lazy(() => import('./pages/Restricted'));
 const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const UserPanelLogin = lazy(() => import('./pages/UserPanelLogin'));
@@ -153,9 +153,7 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
 
   return (
     <div className={`${isAdminPath ? 'bg-[#020617]' : 'bg-slate-950'} flex flex-col min-h-screen`}>
-      <Suspense fallback={<PageLoader />}>
-        {renderContent()}
-      </Suspense>
+      {renderContent()}
     </div>
   );
 };
@@ -164,24 +162,26 @@ export default function App() {
   return (
     <HashRouter>
       <TelegramWrapper>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/search" element={<SearchPage />} />
-          <Route path="/bot/:id" element={<BotDetail />} />
-          <Route path="/payment/:id" element={<Payment />} />
-          <Route path="/settings" element={<ProfileSettings />} />
-          <Route path="/account-settings" element={<AccountSettings />} />
-          <Route path="/my-bots" element={<MyBots />} />
-          <Route path="/channels" element={<MyChannels />} />
-          <Route path="/premium" element={<Premium />} />
-          <Route path="/notifications" element={<Notifications />} />
-          <Route path="/earnings" element={<Earnings />} />
-          <Route path="/a/admin" element={<AdminLogin />} />
-          <Route path="/a/dashboard/*" element={<AdminDashboard />} />
-          <Route path="/u/login" element={<UserPanelLogin />} />
-          <Route path="/u/panel/*" element={<UserPanel />} />
-          <Route path="/referral" element={<ReferralPage />} />
-        </Routes>
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/bot/:id" element={<BotDetail />} />
+            <Route path="/payment/:id" element={<Payment />} />
+            <Route path="/settings" element={<ProfileSettings />} />
+            <Route path="/account-settings" element={<AccountSettings />} />
+            <Route path="/my-bots" element={<MyBots />} />
+            <Route path="/channels" element={<MyChannels />} />
+            <Route path="/premium" element={<Premium />} />
+            <Route path="/notifications" element={<Notifications />} />
+            <Route path="/earnings" element={<Earnings />} />
+            <Route path="/a/admin" element={<AdminLogin />} />
+            <Route path="/a/dashboard/*" element={<AdminDashboard />} />
+            <Route path="/u/login" element={<UserPanelLogin />} />
+            <Route path="/u/panel/*" element={<UserPanel />} />
+            <Route path="/referral" element={<ReferralPage />} />
+          </Routes>
+        </Suspense>
       </TelegramWrapper>
     </HashRouter>
   );
