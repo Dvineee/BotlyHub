@@ -8,7 +8,7 @@ import { User } from './types';
 import { checkAccountQuality, getDeviceFingerprint } from './security';
 import './types';
 
-const Home = lazy(() => import('./pages/Home'));
+import Home from './pages/Home';
 const SearchPage = lazy(() => import('./pages/SearchPage'));
 const BotDetail = lazy(() => import('./pages/BotDetail'));
 const Payment = lazy(() => import('./pages/Payment'));
@@ -73,52 +73,31 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
                 const tg = window.Telegram?.WebApp;
                 const startParam = tg?.initDataUnsafe?.start_param;
                 
-                // Debug log for Telegram data
-                await DatabaseService.logActivity(user.id.toString(), 'system', 'telegram_init', 'Telegram Girişi', `Telegram üzerinden uygulama başlatıldı. Başlangıç Parametresi: ${startParam || 'Yok'}, Platform: ${tg?.platform || 'Bilinmiyor'}, Kullanıcı Dili: ${tg?.initDataUnsafe?.user?.language_code || 'Bilinmiyor'}`);
-                
                 if (startParam && startParam.startsWith('ref_')) {
                     const referrerId = startParam.replace('ref_', '');
-                    await DatabaseService.logActivity(user.id.toString(), 'system', 'referral_detected', 'Referans Linki Tespit Edildi', `Davet eden ID: ${referrerId}`);
                     
-                    // Kendini davet edemez
-                    if (referrerId === user.id.toString()) {
-                        await DatabaseService.logActivity(user.id.toString(), 'security', 'referral_self', 'Kendi Kendini Davet', 'Kullanıcı kendi referans linkini kullandı.');
-                        return;
-                    }
-
-                    const existingUser = await DatabaseService.getUser(user.id.toString());
-                    
-                    // Sadece yeni kullanıcılar referans olabilir (veya henüz referansı olmayanlar)
-                    if (existingUser && existingUser.referred_by) {
-                        await DatabaseService.logActivity(user.id.toString(), 'security', 'referral_already', 'Zaten Referanslı', `Kullanıcının zaten bir referansı var: ${existingUser.referred_by}`);
-                        return;
-                    }
-
-                    try {
-                        // IP ve Fingerprint al
-                        const ipRes = await fetch('https://api.ipify.org?format=json');
-                        const { ip } = await ipRes.json();
-                        const fingerprint = getDeviceFingerprint();
-                        
-                        // Hesap Kalite Kontrolü
-                        const quality = checkAccountQuality(user);
-                        
-                        if (quality.isValid) {
-                            await DatabaseService.logActivity(user.id.toString(), 'system', 'referral_processing', 'Referans İşleniyor', `Referans işlemi değerlendiriliyor. Hesap Güven Puanı: ${quality.trustScore}, IP Adresi: ${ip}`);
-                            await DatabaseService.createReferral(
-                                referrerId, 
-                                user.id.toString(), 
-                                ip, 
-                                fingerprint, 
-                                !!user.is_premium
-                            );
-                        } else {
-                            await DatabaseService.logActivity(user.id.toString(), 'security', 'referral_rejected', 'Referans Reddedildi', `Düşük hesap kalitesi: ${quality.reason}`);
-                            console.warn("Referral rejected: Low account quality", quality.reason);
+                    if (referrerId !== user.id.toString()) {
+                        const existingUser = await DatabaseService.getUser(user.id.toString());
+                        if (!existingUser || !existingUser.referred_by) {
+                            try {
+                                const ipRes = await fetch('https://api.ipify.org?format=json');
+                                const { ip } = await ipRes.json();
+                                const fingerprint = getDeviceFingerprint();
+                                const quality = checkAccountQuality(user);
+                                
+                                if (quality.isValid) {
+                                    await DatabaseService.createReferral(
+                                        referrerId, 
+                                        user.id.toString(), 
+                                        ip, 
+                                        fingerprint, 
+                                        !!user.is_premium
+                                    );
+                                }
+                            } catch (err) {
+                                console.error("Referral processing failed:", err);
+                            }
                         }
-                    } catch (err) {
-                        await DatabaseService.logActivity(user.id.toString(), 'system', 'referral_error', 'Referans Hatası', `Referans kaydı sırasında bir hata oluştu. Hata Detayı: ${err instanceof Error ? err.message : String(err)}`);
-                        console.error("Referral processing failed:", err);
                     }
                 }
 
@@ -129,9 +108,6 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
                 } else {
                     setIsRestricted(false);
                 }
-
-                // Log visit
-                await DatabaseService.logActivity(user.id.toString(), 'system', 'app_visit', 'Uygulama Ziyareti', `${userData.username} uygulamayı başlattı.`);
             } catch (e) {
                 console.error("User sync failed:", e);
             }
@@ -148,17 +124,7 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
         tg.ready();
       }
     }
-
-    const timer = setTimeout(() => {
-      const loader = document.getElementById('loader');
-      if (loader) {
-        loader.style.opacity = '0';
-        setTimeout(() => loader.remove(), 300);
-      }
-    }, 150);
-
-    return () => clearTimeout(timer);
-  }, [isAdminPath, user]); // location.pathname removed to prevent re-running on every navigation
+  }, [isAdminPath, user]);
 
   useEffect(() => {
     if (isAdminPath) return;
@@ -177,19 +143,19 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
       tg.BackButton.onClick(handleBack);
     }
     return () => tg.BackButton.offClick(handleBack);
-  }, [location.pathname, navigate, isAdminPath]); // Optimized dependencies
+  }, [location.pathname, navigate, isAdminPath]);
 
-  if (isMaintenance && !isAdminPath) {
-      return <Maintenance />;
-  }
-
-  if (isRestricted && !isAdminPath) {
-      return <Restricted />;
-  }
+  const renderContent = () => {
+    if (isMaintenance && !isAdminPath) return <Maintenance />;
+    if (isRestricted && !isAdminPath) return <Restricted />;
+    return children;
+  };
 
   return (
     <div className={`${isAdminPath ? 'bg-[#020617]' : 'bg-slate-950'} flex flex-col min-h-screen`}>
-      {children}
+      <Suspense fallback={<PageLoader />}>
+        {renderContent()}
+      </Suspense>
     </div>
   );
 };
@@ -197,28 +163,26 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
 export default function App() {
   return (
     <HashRouter>
-      <Suspense fallback={<PageLoader />}>
-        <TelegramWrapper>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/search" element={<SearchPage />} />
-            <Route path="/bot/:id" element={<BotDetail />} />
-            <Route path="/payment/:id" element={<Payment />} />
-            <Route path="/settings" element={<ProfileSettings />} />
-            <Route path="/account-settings" element={<AccountSettings />} />
-            <Route path="/my-bots" element={<MyBots />} />
-            <Route path="/channels" element={<MyChannels />} />
-            <Route path="/premium" element={<Premium />} />
-            <Route path="/notifications" element={<Notifications />} />
-            <Route path="/earnings" element={<Earnings />} />
-            <Route path="/a/admin" element={<AdminLogin />} />
-            <Route path="/a/dashboard/*" element={<AdminDashboard />} />
-            <Route path="/u/login" element={<UserPanelLogin />} />
-            <Route path="/u/panel/*" element={<UserPanel />} />
-            <Route path="/referral" element={<ReferralPage />} />
-          </Routes>
-        </TelegramWrapper>
-      </Suspense>
+      <TelegramWrapper>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/bot/:id" element={<BotDetail />} />
+          <Route path="/payment/:id" element={<Payment />} />
+          <Route path="/settings" element={<ProfileSettings />} />
+          <Route path="/account-settings" element={<AccountSettings />} />
+          <Route path="/my-bots" element={<MyBots />} />
+          <Route path="/channels" element={<MyChannels />} />
+          <Route path="/premium" element={<Premium />} />
+          <Route path="/notifications" element={<Notifications />} />
+          <Route path="/earnings" element={<Earnings />} />
+          <Route path="/a/admin" element={<AdminLogin />} />
+          <Route path="/a/dashboard/*" element={<AdminDashboard />} />
+          <Route path="/u/login" element={<UserPanelLogin />} />
+          <Route path="/u/panel/*" element={<UserPanel />} />
+          <Route path="/referral" element={<ReferralPage />} />
+        </Routes>
+      </TelegramWrapper>
     </HashRouter>
   );
 }
