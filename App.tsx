@@ -37,6 +37,13 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
   const [isRestricted, setIsRestricted] = useState(false);
 
   useEffect(() => {
+    // Remove the static loader from index.html once the app is ready
+    const loader = document.getElementById('loader');
+    if (loader) {
+      loader.style.opacity = '0';
+      setTimeout(() => loader.remove(), 300);
+    }
+
     DatabaseService.init();
     
     const initializeApp = async () => {

@@ -1,18 +1,10 @@
+import './polyfills';
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import { TranslationProvider } from './TranslationContext';
 import { TonConnectUIProvider } from '@tonconnect/ui-react';
 import './index.css';
-
-// Polyfills for TON libraries
-import { Buffer } from 'buffer';
-import process from 'process';
-
-if (typeof window !== 'undefined') {
-  window.Buffer = Buffer;
-  window.process = process;
-}
 
 /**
  * Uygulama Hata Yakalayıcı (ErrorBoundary)
@@ -81,7 +73,6 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 
 const rootElement = document.getElementById('root');
 if (rootElement) {
-  rootElement.innerHTML = '';
   const currentOrigin = window.location.origin;
   const manifestUrl = currentOrigin.includes('botlyhub.vercel.app') 
     ? 'https://botlyhub.vercel.app/tonconnect-manifest.json'
