@@ -1,7 +1,8 @@
 
-import React, { useEffect, Suspense, lazy, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { HashRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { Loader2, Megaphone } from 'lucide-react';
+import { PageLoader } from './components/PageLoader';
 import { DatabaseService } from './services/DatabaseService';
 import { useTelegram } from './hooks/useTelegram';
 import { User } from './types';
@@ -11,28 +12,21 @@ import './types';
 import Home from './pages/Home';
 import Maintenance from './pages/Maintenance';
 import Restricted from './pages/Restricted';
-const SearchPage = lazy(() => import('./pages/SearchPage'));
-const BotDetail = lazy(() => import('./pages/BotDetail'));
-const Payment = lazy(() => import('./pages/Payment'));
-const ProfileSettings = lazy(() => import('./pages/ProfileSettings'));
-const MyBots = lazy(() => import('./pages/MyBots'));
-const MyChannels = lazy(() => import('./pages/MyChannels'));
-const Premium = lazy(() => import('./pages/Premium'));
-const Notifications = lazy(() => import('./pages/Notifications'));
-const AccountSettings = lazy(() => import('./pages/AccountSettings'));
-const Earnings = lazy(() => import('./pages/Earnings'));
-const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'));
-const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
-const UserPanelLogin = lazy(() => import('./pages/UserPanelLogin'));
-const UserPanel = lazy(() => import('./pages/UserPanel'));
-const ReferralPage = lazy(() => import('./pages/ReferralPage'));
-
-const PageLoader = () => (
-  <div className="flex flex-col items-center justify-center min-h-[50vh] text-slate-500">
-    <Loader2 className="w-8 h-8 animate-spin text-blue-500 mb-2" />
-    <span className="text-xs font-medium uppercase tracking-widest font-black opacity-40">Senkronize Ediliyor</span>
-  </div>
-);
+import SearchPage from './pages/SearchPage';
+import BotDetail from './pages/BotDetail';
+import Payment from './pages/Payment';
+import ProfileSettings from './pages/ProfileSettings';
+import MyBots from './pages/MyBots';
+import MyChannels from './pages/MyChannels';
+import Premium from './pages/Premium';
+import Notifications from './pages/Notifications';
+import AccountSettings from './pages/AccountSettings';
+import Earnings from './pages/Earnings';
+import AdminLogin from './pages/admin/AdminLogin';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import UserPanelLogin from './pages/UserPanelLogin';
+import UserPanel from './pages/UserPanel';
+import ReferralPage from './pages/ReferralPage';
 
 const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
   const location = useLocation();
@@ -145,15 +139,15 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
     return () => tg.BackButton.offClick(handleBack);
   }, [location.pathname, navigate, isAdminPath]);
 
-  const renderContent = () => {
-    if (isMaintenance && !isAdminPath) return <Maintenance />;
-    if (isRestricted && !isAdminPath) return <Restricted />;
-    return children;
-  };
-
   return (
     <div className={`${isAdminPath ? 'bg-[#020617]' : 'bg-slate-950'} flex flex-col min-h-screen`}>
-      {renderContent()}
+      {isMaintenance && !isAdminPath ? (
+        <Maintenance />
+      ) : isRestricted && !isAdminPath ? (
+        <Restricted />
+      ) : (
+        children
+      )}
     </div>
   );
 };
@@ -162,26 +156,24 @@ export default function App() {
   return (
     <HashRouter>
       <TelegramWrapper>
-        <Suspense fallback={<PageLoader />}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/search" element={<SearchPage />} />
-            <Route path="/bot/:id" element={<BotDetail />} />
-            <Route path="/payment/:id" element={<Payment />} />
-            <Route path="/settings" element={<ProfileSettings />} />
-            <Route path="/account-settings" element={<AccountSettings />} />
-            <Route path="/my-bots" element={<MyBots />} />
-            <Route path="/channels" element={<MyChannels />} />
-            <Route path="/premium" element={<Premium />} />
-            <Route path="/notifications" element={<Notifications />} />
-            <Route path="/earnings" element={<Earnings />} />
-            <Route path="/a/admin" element={<AdminLogin />} />
-            <Route path="/a/dashboard/*" element={<AdminDashboard />} />
-            <Route path="/u/login" element={<UserPanelLogin />} />
-            <Route path="/u/panel/*" element={<UserPanel />} />
-            <Route path="/referral" element={<ReferralPage />} />
-          </Routes>
-        </Suspense>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/bot/:id" element={<BotDetail />} />
+          <Route path="/payment/:id" element={<Payment />} />
+          <Route path="/settings" element={<ProfileSettings />} />
+          <Route path="/account-settings" element={<AccountSettings />} />
+          <Route path="/my-bots" element={<MyBots />} />
+          <Route path="/channels" element={<MyChannels />} />
+          <Route path="/premium" element={<Premium />} />
+          <Route path="/notifications" element={<Notifications />} />
+          <Route path="/earnings" element={<Earnings />} />
+          <Route path="/a/admin" element={<AdminLogin />} />
+          <Route path="/a/dashboard/*" element={<AdminDashboard />} />
+          <Route path="/u/login" element={<UserPanelLogin />} />
+          <Route path="/u/panel/*" element={<UserPanel />} />
+          <Route path="/referral" element={<ReferralPage />} />
+        </Routes>
       </TelegramWrapper>
     </HashRouter>
   );
