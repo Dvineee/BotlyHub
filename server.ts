@@ -65,17 +65,28 @@ async function startServer() {
     next();
   });
 
-  const corsOptions = {
-    origin: true,
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
-  };
-
-  app.use(cors(corsOptions));
-  app.options('*', cors(corsOptions));
+  app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
+    
+    if (req.method === 'OPTIONS') {
+      return res.status(200).end();
+    }
+    next();
+  });
 
   app.use(express.json());
+
+  // Global Error Handler
+  app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    console.error('[SERVER ERROR]', err);
+    res.status(500).json({ 
+      error: 'Internal Server Error', 
+      message: err.message,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
+  });
 
   // --- DYNAMIC TON CONNECT MANIFEST ---
   app.get("/tonconnect-manifest.json", (req, res) => {
