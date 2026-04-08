@@ -40,11 +40,9 @@ const Payment = () => {
                 console.log("[PAYMENT] Backend is reachable");
             } else {
                 console.warn("[PAYMENT] Backend health check failed:", res.status);
-                alert(`Backend Sağlık Kontrolü Başarısız: ${res.status}\nURL: ${API_BASE_URL}/api/health`);
             }
         } catch (e) {
             console.error("[PAYMENT] Backend is unreachable:", e);
-            alert(`Backend'e Erişilemiyor!\nURL: ${API_BASE_URL}/api/health\nOrigin: ${window.location.origin}\nHata: ${e instanceof Error ? e.message : String(e)}`);
         }
     };
     testBackend();

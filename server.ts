@@ -84,7 +84,7 @@ async function startServer() {
     
     // Prefer the user's specific Vercel URL if requested from there, else use dynamic origin
     let origin = `${protocol}://${host}`;
-    if (host && typeof host === 'string' && host.includes('botlyhub.vercel.app')) {
+    if (host && typeof host === 'string' && (host.includes('botlyhub.vercel.app') || req.get('Origin')?.includes('botlyhub.vercel.app'))) {
         origin = 'https://botlyhub.vercel.app';
     }
     
