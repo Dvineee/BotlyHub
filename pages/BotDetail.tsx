@@ -46,13 +46,14 @@ const BotDetail = () => {
     try {
         const data = await DatabaseService.getBotById(id);
         setBot(data);
-        if (user?.id) {
-            const owned = await DatabaseService.isBotOwnedByUser(user.id.toString(), id);
+        const userId = user?.id?.toString();
+        if (userId) {
+            const owned = await DatabaseService.isBotOwnedByUser(userId, id);
             setIsOwned(owned);
             
             // Log bot view
             if (data) {
-                await DatabaseService.logActivity(user.id.toString(), 'system', 'bot_view', 'Bot İnceleme', `${data.name} botu detayları görüntülendi.`);
+                await DatabaseService.logActivity(userId, 'system', 'bot_view', 'Bot İnceleme', `${data.name} botu detayları görüntülendi.`);
             }
         }
     } catch (e) { console.error(e); }
@@ -61,8 +62,11 @@ const BotDetail = () => {
 
   useEffect(() => {
     fetchBotData();
-    PriceService.getTonPrice().then(p => setTonRate(p.tonTry));
   }, [fetchBotData]);
+
+  useEffect(() => {
+    PriceService.getTonPrice().then(p => setTonRate(p.tonTry));
+  }, []);
 
   const handleAction = useCallback(async () => {
       if (isProcessing || !bot) return;
