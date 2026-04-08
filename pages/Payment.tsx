@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, Wallet, CheckCircle2, Loader2, ShieldCheck, Zap, AlertTriangle, ShieldAlert, Star } from 'lucide-react';
-import * as Router from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { subscriptionPlans } from '../data';
 import { Bot } from '../types';
 import { useTonConnectUI } from '@tonconnect/ui-react';
@@ -11,8 +11,6 @@ import { useTelegram } from '../hooks/useTelegram';
 import { WalletService } from '../services/WalletService';
 import PriceService from '../services/PriceService';
 import { API_BASE_URL } from '../constants';
-
-const { useNavigate, useParams } = Router as any;
 
 const Payment = () => {
   const navigate = useNavigate();

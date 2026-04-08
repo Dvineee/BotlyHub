@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { Search as SearchIcon, ChevronLeft, X, Zap, Loader2, Sparkles, Send, Bot as BotIcon } from 'lucide-react';
-import * as Router from 'react-router-dom';
 import { Bot } from '../types';
 import { categories } from '../data';
 import { useTranslation } from '../TranslationContext';
@@ -11,7 +10,7 @@ import { useTelegram } from '../hooks/useTelegram';
 import { GeminiService } from '../services/GeminiService';
 import { motion, AnimatePresence } from 'motion/react';
 
-const { useNavigate, useSearchParams } = Router as any;
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const getLiveBotIcon = (bot: Bot) => {
     if (bot.bot_link) {

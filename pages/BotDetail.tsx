@@ -157,6 +157,11 @@ const BotDetail = () => {
     }
   };
 
+  const prices = useMemo(() => {
+    if (!bot) return { ton: 0, stars: 0 };
+    return PriceService.convert(bot.price, tonRate);
+  }, [bot, tonRate]);
+
   if (isLoading) return (
     <div className="min-h-screen bg-[#020617] flex items-center justify-center">
         <Loader2 className="animate-spin text-blue-500/50" size={32} />
@@ -164,7 +169,6 @@ const BotDetail = () => {
   );
 
   if (!bot) return null;
-  const prices = useMemo(() => PriceService.convert(bot.price, tonRate), [bot.price, tonRate]);
 
   return (
     <div className="min-h-screen bg-[#020617] text-slate-200 pb-40 animate-in fade-in">

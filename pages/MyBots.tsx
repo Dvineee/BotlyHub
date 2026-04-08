@@ -1,12 +1,11 @@
 
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ShoppingBag, TrendingUp, Bot, Send, Activity, Trash2, AlertTriangle, X, Loader2, Lock, Clock, Info } from 'lucide-react';
-import * as Router from 'react-router-dom';
 import { UserBot, Bot as BotType } from '../types';
 import { DatabaseService } from '../services/DatabaseService';
 import { useTelegram } from '../hooks/useTelegram';
 
-const { useNavigate } = Router as any;
+import { useNavigate } from 'react-router-dom';
 
 /**
  * Telegram üzerinden güncel profil resmini çeken yardımcı fonksiyon
