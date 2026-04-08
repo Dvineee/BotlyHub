@@ -146,7 +146,7 @@ const Home = () => {
             setUnreadCount(unread);
         });
     }
-  }, [user]);
+  }, [user?.id]);
 
   useEffect(() => {
     loadData();
@@ -155,7 +155,7 @@ const Home = () => {
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [user]);
+  }, [loadData]);
 
   return (
     <div className="p-4 pt-10 min-h-screen bg-[#020617] pb-32 font-sans text-slate-200 animate-in">

@@ -14,6 +14,19 @@ import {
 } from 'lucide-react';
 import { User } from '../types';
 
+const StatCard = React.memo(({ label, value, icon: Icon, color, statColorMap }: { label: string, value: string, icon: any, color: string, statColorMap: Record<string, string> }) => (
+    <div className="bg-slate-900 border border-white/5 p-6 rounded-[32px] relative overflow-hidden group hover:border-white/10 transition-all">
+        <div className={`absolute top-0 right-0 w-32 h-32 bg-${color}-500/5 blur-3xl -mr-16 -mt-16 group-hover:bg-${color}-500/10 transition-all`} />
+        <div className="flex items-center justify-between mb-4">
+            <div className={`w-12 h-12 bg-${color}-500/10 rounded-2xl flex items-center justify-center text-${statColorMap[color] || color}`}>
+                <Icon size={24} />
+            </div>
+        </div>
+        <p className="text-3xl font-black text-white italic mb-1 tracking-tighter">{value}</p>
+        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{label}</p>
+    </div>
+));
+
 const UserPanel: React.FC = () => {
     const [user, setUser] = useState<User | null>(null);
     const [activeSection, setActiveSection] = useState('dashboard');
@@ -41,19 +54,6 @@ const UserPanel: React.FC = () => {
         { id: 'bot-management', label: 'Bot Yönetimi', icon: Bot, category: 'KÜTÜPHANE' },
         { id: 'library', label: 'Bot Arşivi', icon: Library, category: 'KÜTÜPHANE' },
     ], []);
-
-    const StatCard = React.memo(({ label, value, icon: Icon, color }: { label: string, value: string, icon: any, color: string }) => (
-        <div className="bg-slate-900 border border-white/5 p-6 rounded-[32px] relative overflow-hidden group hover:border-white/10 transition-all">
-            <div className={`absolute top-0 right-0 w-32 h-32 bg-${color}-500/5 blur-3xl -mr-16 -mt-16 group-hover:bg-${color}-500/10 transition-all`} />
-            <div className="flex items-center justify-between mb-4">
-                <div className={`w-12 h-12 bg-${color}-500/10 rounded-2xl flex items-center justify-center text-${statColorMap[color] || color}`}>
-                    <Icon size={24} />
-                </div>
-            </div>
-            <p className="text-3xl font-black text-white italic mb-1 tracking-tighter">{value}</p>
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{label}</p>
-        </div>
-    ));
 
     const statColorMap: Record<string, string> = {
         'blue': 'blue-500',
@@ -177,6 +177,7 @@ const UserPanel: React.FC = () => {
                                         value={stat.value}
                                         icon={stat.icon}
                                         color={stat.color}
+                                        statColorMap={statColorMap}
                                     />
                                 ))}
 

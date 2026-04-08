@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import * as Router from 'react-router-dom';
+import { useNavigate, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { 
   LayoutDashboard, Users, Bot, LogOut, Menu, X, 
@@ -15,8 +15,6 @@ import { DatabaseService } from '../../services/DatabaseService';
 import { GeminiService } from '../../services/GeminiService';
 import { GoogleGenAI, Type } from "@google/genai";
 import { User, Bot as BotType, Announcement, Promotion, ActivityLog, Notification, Referral, ReferralSettings } from '../../types';
-
-const { useNavigate, Routes, Route, Link, useLocation } = Router as any;
 
 const getLiveBotIcon = (botLink: string) => {
     if (!botLink || botLink === '@') return "https://ui-avatars.com/api/?name=Bot&background=1e293b&color=fff";
@@ -45,6 +43,19 @@ const translateType = (type: string) => {
     return translations[type] || type.replace('_', ' ').toUpperCase();
 };
 
+const NavItem = ({ to, icon: Icon, label, active, onClick }: any) => {
+  return (
+    <Link 
+      to={to} 
+      onClick={onClick}
+      className={`flex items-center gap-4 px-6 py-4 rounded-[24px] transition-all duration-300 ${active ? 'bg-blue-600 text-white shadow-2xl shadow-blue-600/40' : 'text-slate-500 hover:bg-white/5 hover:text-white'}`}
+    >
+      <Icon size={18} />
+      <span className="font-black text-[10px] uppercase tracking-[0.2em]">{label}</span>
+    </Link>
+  );
+};
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -53,20 +64,6 @@ const AdminDashboard = () => {
   useEffect(() => {
     if (!DatabaseService.isAdminLoggedIn()) navigate('/a/admin');
   }, [navigate]);
-
-  const NavItem = ({ to, icon: Icon, label }: any) => {
-    const active = location.pathname === to || (to !== '/a/dashboard' && location.pathname.startsWith(to));
-    return (
-      <Link 
-        to={to} 
-        onClick={() => setSidebarOpen(false)}
-        className={`flex items-center gap-4 px-6 py-4 rounded-[24px] transition-all duration-300 ${active ? 'bg-blue-600 text-white shadow-2xl shadow-blue-600/40' : 'text-slate-500 hover:bg-white/5 hover:text-white'}`}
-      >
-        <Icon size={18} />
-        <span className="font-black text-[10px] uppercase tracking-[0.2em]">{label}</span>
-      </Link>
-    );
-  };
 
   return (
     <div className="min-h-screen bg-[#020617] flex text-slate-200 overflow-hidden font-sans">
@@ -87,22 +84,22 @@ const AdminDashboard = () => {
           </div>
           
             <nav className="flex-1 space-y-2 overflow-y-auto no-scrollbar">
-            <NavItem to="/a/dashboard" icon={LayoutDashboard} label="Panel" />
+            <NavItem to="/a/dashboard" icon={LayoutDashboard} label="Panel" active={location.pathname === '/a/dashboard'} onClick={() => setSidebarOpen(false)} />
             <div className="pt-8 pb-3 px-6"><span className="text-[9px] font-black text-slate-800 uppercase tracking-widest italic">İzleme</span></div>
-            <NavItem to="/a/dashboard/users" icon={Users} label="Kullanıcılar" />
-            <NavItem to="/a/dashboard/admin-logs" icon={ShieldCheck} label="Admin Logları" />
-            <NavItem to="/a/dashboard/user-logs" icon={History} label="Üye Hareketleri" />
-            <NavItem to="/a/dashboard/sales" icon={Wallet} label="Finans" />
-            <NavItem to="/a/dashboard/referrals" icon={UserPlus} label="Referanslar" />
+            <NavItem to="/a/dashboard/users" icon={Users} label="Kullanıcılar" active={location.pathname.startsWith('/a/dashboard/users')} onClick={() => setSidebarOpen(false)} />
+            <NavItem to="/a/dashboard/admin-logs" icon={ShieldCheck} label="Admin Logları" active={location.pathname.startsWith('/a/dashboard/admin-logs')} onClick={() => setSidebarOpen(false)} />
+            <NavItem to="/a/dashboard/user-logs" icon={History} label="Üye Hareketleri" active={location.pathname.startsWith('/a/dashboard/user-logs')} onClick={() => setSidebarOpen(false)} />
+            <NavItem to="/a/dashboard/sales" icon={Wallet} label="Finans" active={location.pathname.startsWith('/a/dashboard/sales')} onClick={() => setSidebarOpen(false)} />
+            <NavItem to="/a/dashboard/referrals" icon={UserPlus} label="Referanslar" active={location.pathname.startsWith('/a/dashboard/referrals')} onClick={() => setSidebarOpen(false)} />
             
             <div className="pt-8 pb-3 px-6"><span className="text-[9px] font-black text-slate-800 uppercase tracking-widest italic">İçerik</span></div>
-            <NavItem to="/a/dashboard/bots" icon={Bot} label="Market Botları" />
-            <NavItem to="/a/dashboard/promotions" icon={RadioIcon} label="Tanıtım Motoru" />
-            <NavItem to="/a/dashboard/announcements" icon={Megaphone} label="Duyuru Merkezi" />
-            <NavItem to="/a/dashboard/notifications" icon={Bell} label="Bildirim Gönder" />
+            <NavItem to="/a/dashboard/bots" icon={Bot} label="Market Botları" active={location.pathname.startsWith('/a/dashboard/bots')} onClick={() => setSidebarOpen(false)} />
+            <NavItem to="/a/dashboard/promotions" icon={RadioIcon} label="Tanıtım Motoru" active={location.pathname.startsWith('/a/dashboard/promotions')} onClick={() => setSidebarOpen(false)} />
+            <NavItem to="/a/dashboard/announcements" icon={Megaphone} label="Duyuru Merkezi" active={location.pathname.startsWith('/a/dashboard/announcements')} onClick={() => setSidebarOpen(false)} />
+            <NavItem to="/a/dashboard/notifications" icon={Bell} label="Bildirim Gönder" active={location.pathname.startsWith('/a/dashboard/notifications')} onClick={() => setSidebarOpen(false)} />
             
             <div className="pt-8 pb-3 px-6"><span className="text-[9px] font-black text-slate-800 uppercase tracking-widest italic">Sistem</span></div>
-            <NavItem to="/a/dashboard/settings" icon={SettingsIcon} label="Sistem Ayarları" />
+            <NavItem to="/a/dashboard/settings" icon={SettingsIcon} label="Sistem Ayarları" active={location.pathname.startsWith('/a/dashboard/settings')} onClick={() => setSidebarOpen(false)} />
           </nav>
 
           <button onClick={() => { DatabaseService.logoutAdmin(); navigate('/a/admin'); }} className="mt-8 flex items-center gap-4 px-8 py-5 text-red-500 font-black text-[10px] uppercase tracking-widest hover:bg-red-500/10 rounded-[24px] transition-all group border border-transparent hover:border-red-500/20">

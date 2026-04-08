@@ -50,13 +50,13 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
         // 1. Bakım Modu & Ayarlar Kontrolü
         if (!isAdminPath) {
             const settings = await DatabaseService.getSettings();
-            if (settings) {
-                if (settings.maintenanceMode) setIsMaintenance(true);
+            if (settings && settings.maintenanceMode) {
+                setIsMaintenance(true);
             }
         }
 
         // 2. Kullanıcı Senkronizasyonu
-        if (user && !isAdminPath) {
+        if (user?.id && !isAdminPath) {
             try {
                 const userData: Partial<User> = {
                     id: user.id.toString(),
@@ -125,7 +125,7 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
         tg.ready();
       }
     }
-  }, [isAdminPath, user]);
+  }, [isAdminPath, user?.id]);
 
   useEffect(() => {
     if (isAdminPath) return;

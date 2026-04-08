@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 // Fixed: Explicitly import types to ensure global window augmentation is recognized
 import '../types';
 
@@ -16,53 +16,59 @@ export function useTelegram() {
         }
     }, []);
 
-    const onClose = () => {
-        tg?.close();
-    };
+    const user = useMemo(() => tg?.initDataUnsafe?.user, []);
+    const queryId = useMemo(() => tg?.initDataUnsafe?.query_id, []);
+    const platform = useMemo(() => tg?.platform, []);
+    const isExpanded = useMemo(() => tg?.isExpanded, []);
+    const themeParams = useMemo(() => tg?.themeParams, []);
 
-    const onToggleButton = () => {
+    const onClose = useCallback(() => {
+        tg?.close();
+    }, []);
+
+    const onToggleButton = useCallback(() => {
         if (tg?.MainButton.isVisible) {
             tg.MainButton.hide();
         } else {
             tg?.MainButton.show();
         }
-    };
+    }, []);
 
     // Titreşim (Haptic Feedback) tetikleyici
-    const haptic = (style: 'light' | 'medium' | 'heavy' | 'rigid' | 'soft' = 'medium') => {
+    const haptic = useCallback((style: 'light' | 'medium' | 'heavy' | 'rigid' | 'soft' = 'medium') => {
         if (tg?.HapticFeedback) {
             tg.HapticFeedback.impactOccurred(style);
         }
-    };
+    }, []);
 
     // Başarılı/Hata titreşimi
-    const notification = (type: 'error' | 'success' | 'warning') => {
+    const notification = useCallback((type: 'error' | 'success' | 'warning') => {
         if (tg?.HapticFeedback) {
             tg.HapticFeedback.notificationOccurred(type);
         }
-    };
+    }, []);
 
     // Link açma (Native)
-    const openLink = (url: string) => {
+    const openLink = useCallback((url: string) => {
         if (url.startsWith('https://t.me') || url.startsWith('tg://')) {
             tg?.openTelegramLink(url);
         } else {
             tg?.openLink(url);
         }
-    };
+    }, []);
 
-    return {
+    return useMemo(() => ({
         tg,
-        user: tg?.initDataUnsafe?.user,
-        queryId: tg?.initDataUnsafe?.query_id,
-        platform: tg?.platform,
-        isExpanded: tg?.isExpanded,
-        themeParams: tg?.themeParams,
+        user,
+        queryId,
+        platform,
+        isExpanded,
+        themeParams,
         onClose,
         onToggleButton,
         haptic,
         notification,
         openLink,
         isReady
-    };
+    }), [isReady, user, queryId, platform, isExpanded, themeParams, onClose, onToggleButton, haptic, notification, openLink]);
 }

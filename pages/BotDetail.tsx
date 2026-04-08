@@ -8,15 +8,13 @@ import {
   Play, UserPlus, MessageSquare, BarChart3, MousePointer2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import * as Router from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Bot, Channel, User } from '../types';
 import { useTelegram } from '../hooks/useTelegram';
 import { DatabaseService } from '../services/DatabaseService';
 import PriceService from '../services/PriceService';
 import { useTranslation } from '../TranslationContext';
 import { GeminiService } from '../services/GeminiService';
-
-const { useNavigate, useParams } = Router as any;
 
 const getLiveBotIcon = (bot: Bot) => {
     if (bot.bot_link) {
@@ -42,12 +40,7 @@ const BotDetail = () => {
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   
-  useEffect(() => {
-    fetchBotData();
-    PriceService.getTonPrice().then(p => setTonRate(p.tonTry));
-  }, [id, user]);
-
-  const fetchBotData = async () => {
+  const fetchBotData = useCallback(async () => {
     if (!id) return;
     setIsLoading(true);
     try {
@@ -64,7 +57,12 @@ const BotDetail = () => {
         }
     } catch (e) { console.error(e); }
     finally { setIsLoading(false); }
-  };
+  }, [id, user?.id]);
+
+  useEffect(() => {
+    fetchBotData();
+    PriceService.getTonPrice().then(p => setTonRate(p.tonTry));
+  }, [fetchBotData]);
 
   const handleAction = useCallback(async () => {
       if (isProcessing || !bot) return;
