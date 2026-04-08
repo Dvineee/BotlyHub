@@ -35,14 +35,16 @@ const Payment = () => {
     // Test backend connectivity
     const testBackend = async () => {
         try {
-            const res = await fetch(`${API_BASE_URL}/api/health`);
+            const res = await fetch(`${API_BASE_URL}/api/health`, { mode: 'cors' });
             if (res.ok) {
                 console.log("[PAYMENT] Backend is reachable");
             } else {
                 console.warn("[PAYMENT] Backend health check failed:", res.status);
+                alert(`Backend Sağlık Kontrolü Başarısız: ${res.status}\nURL: ${API_BASE_URL}/api/health`);
             }
         } catch (e) {
             console.error("[PAYMENT] Backend is unreachable:", e);
+            alert(`Backend'e Erişilemiyor!\nURL: ${API_BASE_URL}/api/health\nOrigin: ${window.location.origin}\nHata: ${e instanceof Error ? e.message : String(e)}`);
         }
     };
     testBackend();
@@ -102,6 +104,7 @@ const Payment = () => {
       try {
           const response = await fetch(url, {
               method: 'POST',
+              mode: 'cors',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                   userId: effectiveUser.id.toString(),
@@ -131,8 +134,8 @@ const Payment = () => {
       } catch (e: any) {
           console.error("[PAYMENT] Order Creation Error:", e);
           // Check if it's a fetch error
-          if (e.message === 'Failed to fetch') {
-              alert(`Bağlantı Hatası: Sunucuya ulaşılamıyor. Lütfen internet bağlantınızı kontrol edin veya daha sonra tekrar deneyin. (URL: ${url})`);
+          if (e.message === 'Failed to fetch' || e.name === 'TypeError') {
+              alert(`Bağlantı Hatası: Sunucuya ulaşılamıyor.\n\nDetaylar:\n- Hedef: ${url}\n- Mevcut Origin: ${window.location.origin}\n- Hata: ${e.message}\n\nLütfen internet bağlantınızı kontrol edin veya tarayıcı ayarlarınızdan bu siteye izin verildiğinden emin olun.`);
           } else {
               alert("Sipariş oluşturma hatası: " + (e.message || "Bilinmeyen hata"));
           }
@@ -182,6 +185,7 @@ const Payment = () => {
 
                   const verifyRes = await fetch(verifyUrl, {
                       method: 'POST',
+                      mode: 'cors',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({
                           transactionHash: hash,

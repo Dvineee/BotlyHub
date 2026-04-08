@@ -24,7 +24,7 @@ const __dirname = path.dirname(__filename);
 // Global rate limit
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 1000, // increased for debugging
   message: { error: "Too many requests, please try again later." }
 });
 
@@ -58,28 +58,33 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  app.use(cors({
-    origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'x-goog-api-key'],
-    credentials: false
-  }));
-  app.options('*', cors());
-  app.use(express.json());
+  app.set('trust proxy', true);
 
   app.use((req, res, next) => {
-    console.log(`[REQUEST] ${req.method} ${req.url}`);
+    console.log(`[REQUEST] ${req.method} ${req.url} - Origin: ${req.get('Origin')} - UA: ${req.get('User-Agent')} - IP: ${req.ip}`);
     next();
   });
+
+  const corsOptions = {
+    origin: true,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
+  };
+
+  app.use(cors(corsOptions));
+  app.options('*', cors(corsOptions));
+
+  app.use(express.json());
 
   // --- DYNAMIC TON CONNECT MANIFEST ---
   app.get("/tonconnect-manifest.json", (req, res) => {
     const protocol = req.headers['x-forwarded-proto'] || req.protocol;
-    const host = req.get('host');
+    const host = req.headers['x-forwarded-host'] || req.get('host');
     
     // Prefer the user's specific Vercel URL if requested from there, else use dynamic origin
     let origin = `${protocol}://${host}`;
-    if (host?.includes('botlyhub.vercel.app')) {
+    if (host && typeof host === 'string' && host.includes('botlyhub.vercel.app')) {
         origin = 'https://botlyhub.vercel.app';
     }
     
@@ -96,8 +101,6 @@ async function startServer() {
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok", time: new Date().toISOString() });
   });
-
-  app.use("/api", globalLimiter);
 
   // 1. Telegram initData Verification
   app.post("/api/verify-telegram", (req, res) => {
