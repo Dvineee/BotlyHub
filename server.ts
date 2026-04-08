@@ -13,6 +13,9 @@ import { SecurityUtils } from "./services/SecurityUtils";
 
 dotenv.config();
 
+console.log(`[SERVER] Supabase URL: ${process.env.SUPABASE_URL ? 'Configured' : 'Missing'}`);
+console.log(`[SERVER] Supabase Key: ${process.env.SUPABASE_ANON_KEY ? 'Configured' : 'Missing'}`);
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -49,6 +52,8 @@ const VerifyTonSchema = z.object({
   userId: z.string().min(1)
 });
 
+console.log(`[SERVER] Starting with NODE_ENV=${process.env.NODE_ENV}`);
+
 async function startServer() {
   const app = express();
   const PORT = 3000;
@@ -57,10 +62,15 @@ async function startServer() {
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'x-goog-api-key'],
-    credentials: true
+    credentials: false
   }));
   app.options('*', cors());
   app.use(express.json());
+
+  app.use((req, res, next) => {
+    console.log(`[REQUEST] ${req.method} ${req.url}`);
+    next();
+  });
 
   // --- DYNAMIC TON CONNECT MANIFEST ---
   app.get("/tonconnect-manifest.json", (req, res) => {
@@ -131,6 +141,7 @@ async function startServer() {
 
   // 2. Create Payment Order
   app.post("/api/payments/create-order", async (req, res) => {
+    console.log(`[API] Received create-order request:`, req.body);
     try {
       const validated = CreateOrderSchema.parse(req.body);
       const { userId, itemId, itemType, amount, currency, senderAddress } = validated;

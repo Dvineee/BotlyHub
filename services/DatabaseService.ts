@@ -2,8 +2,12 @@
 import { createClient } from '@supabase/supabase-js';
 import { Bot, User, Channel, Announcement, Notification, UserBot, ActivityLog, Promotion, Referral, ReferralSettings } from '../types';
 
-const SUPABASE_URL = 'https://yrbnzyvbhitlquaxnruc.supabase.co'; 
-const SUPABASE_ANON_KEY = 'sb_publishable_h9QTmZjwi0pH_JX6i4xfWg_LJFY86GP'; 
+const SUPABASE_URL = (typeof process !== 'undefined' && process.env?.SUPABASE_URL) || 
+                    (import.meta.env?.VITE_SUPABASE_URL) || 
+                    'https://yrbnzyvbhitlquaxnruc.supabase.co'; 
+const SUPABASE_ANON_KEY = (typeof process !== 'undefined' && process.env?.SUPABASE_ANON_KEY) || 
+                         (import.meta.env?.VITE_SUPABASE_ANON_KEY) || 
+                         'sb_publishable_h9QTmZjwi0pH_JX6i4xfWg_LJFY86GP'; 
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
