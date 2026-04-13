@@ -1,16 +1,18 @@
 
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
-import { ChevronLeft, User, CreditCard, Bell, Globe, ChevronRight, Crown, Users } from 'lucide-react';
+import { ChevronLeft, User, CreditCard, Bell, Globe, ChevronRight, Crown, Users, Sun, Moon } from 'lucide-react';
 // Fixed: Use namespace import for react-router-dom to resolve "no exported member" errors
 import * as Router from 'react-router-dom';
 import { subscriptionPlans } from '../data';
 import { useTelegram } from '../hooks/useTelegram';
+import { useTheme } from '../ThemeContext';
 
 const { useNavigate } = Router as any;
 
 const ProfileSettings = () => {
   const navigate = useNavigate();
   const { user } = useTelegram();
+  const { theme, toggleTheme } = useTheme();
   const [currentPlanName, setCurrentPlanName] = useState('Başlangıç');
   const [version, setVersion] = useState<string | null>(null);
 
@@ -41,50 +43,50 @@ const ProfileSettings = () => {
   const MenuItem = React.memo(({ icon: Icon, label, value, hasArrow = true, onClick }: { icon: any, label: string, value?: string, hasArrow?: boolean, onClick?: () => void }) => (
     <div 
         onClick={onClick}
-        className="flex items-center justify-between p-5 bg-slate-900/40 hover:bg-slate-900/60 transition-all cursor-pointer group first:rounded-t-[32px] last:rounded-b-[32px] border-b border-white/5 last:border-0 active:scale-[0.98]"
+        className="flex items-center justify-between p-5 bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-900/60 transition-all cursor-pointer group first:rounded-t-[32px] last:rounded-b-[32px] border-b border-black/5 dark:border-white/5 last:border-0 active:scale-[0.98]"
     >
         <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-slate-950 group-hover:bg-blue-600/10 flex items-center justify-center transition-all border border-white/5 group-hover:border-blue-500/20">
-                <Icon size={20} className="text-slate-400 group-hover:text-blue-500 transition-colors" />
+            <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-950 group-hover:bg-purple-600/10 flex items-center justify-center transition-all border border-black/5 dark:border-white/5 group-hover:border-purple-500/20 shadow-inner">
+                <Icon size={20} className="text-slate-500 dark:text-slate-400 group-hover:text-purple-500 transition-colors" />
             </div>
-            <span className="font-black text-[11px] text-white uppercase tracking-widest italic">{label}</span>
+            <span className="font-bold text-[11px] text-slate-900 dark:text-white uppercase tracking-wider">{label}</span>
         </div>
         <div className="flex items-center gap-3">
-            {value && <span className="text-slate-500 text-[10px] font-black uppercase tracking-widest italic">{value}</span>}
-            {hasArrow && <ChevronRight size={16} className="text-slate-700 group-hover:text-white transition-colors" />}
+            {value && <span className="text-slate-500 text-[10px] font-bold uppercase tracking-wider">{value}</span>}
+            {hasArrow && <ChevronRight size={18} className="text-slate-400 dark:text-slate-700 group-hover:text-slate-900 dark:group-hover:text-white transition-colors" />}
         </div>
     </div>
   ));
 
   return (
-    <div className="min-h-screen p-6 pt-10 pb-32 bg-slate-950 transition-colors">
-         <div className="flex items-center gap-5 mb-10">
-            <button onClick={() => navigate('/')} className="p-3 bg-slate-900/60 border border-slate-800 rounded-2xl text-white active:scale-90 transition-all">
-                <ChevronLeft className="w-6 h-6" />
+    <div className="min-h-screen p-6 pt-10 pb-32 bg-slate-50 dark:bg-slate-950 transition-colors animate-in fade-in">
+         <div className="flex items-center gap-5 mb-10 px-1">
+            <button onClick={() => navigate('/')} className="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-500 dark:text-slate-400 active:scale-90 transition-transform shadow-lg">
+                <ChevronLeft size={22} />
             </button>
             <div>
-                <h1 className="text-xl font-black text-white italic tracking-tighter uppercase leading-none">Profil Ayarları</h1>
-                <p className="text-[8px] font-black text-slate-700 uppercase tracking-[0.4em] mt-1.5 italic">User Configuration v4</p>
+                <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Profil Ayarları</h1>
+                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">User Configuration v4</p>
             </div>
         </div>
 
         {/* Profile Card */}
-        <div className="flex items-center gap-5 mb-10 p-6 bg-slate-900/40 rounded-[32px] border border-white/5 backdrop-blur-xl shadow-2xl">
-             <div className="w-20 h-20 rounded-[28px] bg-slate-950 flex items-center justify-center overflow-hidden border border-white/10 shadow-inner">
+        <div className="flex items-center gap-5 mb-10 p-6 bg-white dark:bg-slate-900/40 rounded-[32px] border border-black/5 dark:border-white/5 backdrop-blur-xl shadow-xl">
+             <div className="w-20 h-20 rounded-[24px] bg-slate-100 dark:bg-slate-950 flex items-center justify-center overflow-hidden border border-black/10 dark:border-white/10 shadow-inner">
                  <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover" loading="lazy" />
              </div>
              <div className="flex-1 min-w-0">
-                 <h2 className="font-black text-xl text-white italic tracking-tighter uppercase truncate leading-none mb-1">{displayName}</h2>
-                 <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest italic mb-3">{displayUsername}</p>
-                 <div className="inline-flex items-center gap-2 bg-blue-500/10 text-blue-400 px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border border-blue-500/20 shadow-lg shadow-blue-900/20">
-                    <Crown size={12} className="fill-blue-500/20" />
+                 <h2 className="font-bold text-xl text-slate-900 dark:text-white tracking-tight truncate mb-1">{displayName}</h2>
+                 <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-3">{displayUsername}</p>
+                 <div className="inline-flex items-center gap-2 bg-purple-500/10 text-purple-600 dark:text-purple-400 px-4 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider border border-purple-500/20 shadow-lg shadow-purple-900/20">
+                    <Crown size={12} className="fill-purple-500/20" />
                     <span>{currentPlanName}</span>
                  </div>
              </div>
         </div>
 
-        <h3 className="text-[10px] font-black text-slate-700 uppercase tracking-[0.4em] mb-4 italic ml-4">Hesap Yönetimi</h3>
-        <div className="mb-8 rounded-[32px] border border-white/5 bg-slate-900/20 overflow-hidden shadow-xl">
+        <h3 className="text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest mb-4 ml-4">Hesap Yönetimi</h3>
+        <div className="mb-8 rounded-[32px] border border-black/5 dark:border-white/5 bg-white dark:bg-slate-900/20 overflow-hidden shadow-xl">
             <MenuItem 
                 icon={User} 
                 label="Hesap Bilgileri" 
@@ -103,19 +105,25 @@ const ProfileSettings = () => {
             />
         </div>
 
-        <h3 className="text-[10px] font-black text-slate-700 uppercase tracking-[0.4em] mb-4 italic ml-4">Uygulama Tercihleri</h3>
-        <div className="mb-8 rounded-[32px] border border-white/5 bg-slate-900/20 overflow-hidden shadow-xl">
+        <h3 className="text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest mb-4 ml-4">Uygulama Tercihleri</h3>
+        <div className="mb-8 rounded-[32px] border border-black/5 dark:border-white/5 bg-white dark:bg-slate-900/20 overflow-hidden shadow-xl">
             <MenuItem 
                 icon={Bell} 
                 label="Bildirimler" 
                 onClick={() => navigate('/notifications')}
+            />
+            <MenuItem 
+                icon={theme === 'dark' ? Moon : Sun} 
+                label="Görünüm Modu" 
+                value={theme === 'dark' ? 'Karanlık' : 'Aydınlık'} 
+                onClick={toggleTheme}
             />
             <MenuItem icon={Globe} label="Dil Seçimi" value="Türkçe" />
         </div>
 
         {version && (
             <div className="mt-12 text-center opacity-20">
-                <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">BOTLYHUB {version}</p>
+                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">BOTLYHUB {version}</p>
             </div>
         )}
     </div>

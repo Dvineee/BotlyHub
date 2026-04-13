@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Search, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'motion/react';
 import { Bot, Announcement, Notification } from '../types';
 import { categories } from '../data';
 import { useTranslation } from '../TranslationContext';
@@ -24,10 +25,10 @@ const getLiveBotIcon = (bot: Bot) => {
 const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) => void }> = React.memo(({ ann, onShowPopup }) => {
   const navigate = useNavigate();
   const colors: Record<string, string> = {
-    purple: 'from-[#6366f1] to-[#a855f7]',
-    emerald: 'from-[#10b981] to-[#34d399]',
-    blue: 'from-[#3b82f6] to-[#60a5fa]',
-    orange: 'from-[#f59e0b] to-[#ef4444]'
+    purple: 'from-purple-600 to-indigo-600',
+    emerald: 'from-emerald-600 to-teal-600',
+    blue: 'from-blue-600 to-cyan-600',
+    orange: 'from-orange-500 to-red-600'
   };
 
   const handleAction = async (e: React.MouseEvent) => {
@@ -53,20 +54,20 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
 
   return (
     <div 
-        className={`min-w-[310px] h-44 bg-gradient-to-br ${colors[ann.color_scheme] || colors.purple} p-7 rounded-[40px] relative overflow-hidden shadow-2xl shrink-0 transition-all active:scale-[0.97] cursor-pointer group`}
+        className={`min-w-[280px] h-40 bg-gradient-to-br ${colors[ann.color_scheme] || colors.purple} p-6 rounded-[32px] relative overflow-hidden shadow-xl shrink-0 transition-all active:scale-[0.97] cursor-pointer group snap-center`}
         onClick={handleAction}
     >
         <div className="relative z-10 flex flex-col h-full justify-between">
             <div>
-                <h3 className="text-white font-black text-2xl mb-1.5 tracking-tight italic uppercase">{ann.title}</h3>
-                <p className="text-white/80 text-[11px] max-w-[210px] leading-relaxed line-clamp-2 font-bold uppercase italic">{ann.description}</p>
+                <h3 className="text-white font-bold text-xl mb-1 tracking-tight">{ann.title}</h3>
+                <p className="text-white/80 text-[11px] max-w-[180px] leading-relaxed line-clamp-2 font-medium">{ann.description}</p>
             </div>
-            <div className="bg-white/20 backdrop-blur-md text-white text-[8px] font-black py-2.5 px-6 rounded-xl w-fit border border-white/30 uppercase tracking-[0.2em]">
+            <div className="bg-white/20 backdrop-blur-md text-white text-[10px] font-bold py-2 px-5 rounded-xl w-fit border border-white/30 uppercase tracking-wider">
                 {ann.button_text || 'İncele'}
             </div>
         </div>
-        <div className="absolute -right-8 -bottom-8 opacity-20 transform rotate-12 group-hover:scale-110 transition-transform pointer-events-none">
-            {React.createElement(iconMap[ann.icon_name] || Megaphone, { size: 180, className: 'text-white' })}
+        <div className="absolute -right-6 -bottom-6 opacity-20 transform rotate-12 group-hover:scale-110 transition-transform pointer-events-none">
+            {React.createElement(iconMap[ann.icon_name] || Megaphone, { size: 140, className: 'text-white' })}
         </div>
     </div>
   );
@@ -77,36 +78,36 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonR
   const prices = useMemo(() => PriceService.convert(bot.price, tonRate), [bot.price, tonRate]);
   
   return (
-    <div onClick={() => navigate(`/bot/${bot.id}`)} className="flex items-center p-5 cursor-pointer group hover:bg-slate-900/60 rounded-[32px] transition-all border border-transparent hover:border-slate-800/50 mb-3 active:bg-slate-900 shadow-xl">
+    <div onClick={() => navigate(`/bot/${bot.id}`)} className="flex items-center p-5 cursor-pointer group bg-white dark:bg-transparent hover:bg-slate-100 dark:hover:bg-slate-900/60 rounded-[32px] transition-all border border-black/5 dark:border-transparent hover:border-slate-200 dark:hover:border-slate-800/50 active:bg-slate-200 dark:active:bg-slate-900 shadow-xl">
         <div className="relative shrink-0">
             <img 
                 src={getLiveBotIcon(bot)} 
                 alt={bot.name} 
                 loading="lazy"
-                className="w-20 h-20 rounded-[28px] object-cover bg-slate-900 border border-slate-800 group-hover:scale-105 transition-transform" 
+                className="w-20 h-20 rounded-[28px] object-cover bg-slate-200 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 group-hover:scale-105 transition-transform" 
                 onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
             />
             {bot.price > 0 && (
-                <div className="absolute -top-1.5 -right-1.5 w-7 h-7 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg border-4 border-[#020617]">
+                <div className="absolute -top-1.5 -right-1.5 w-7 h-7 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg border-4 border-slate-50 dark:border-[#020617]">
                     <Zap size={10} fill="currentColor" className="text-white" />
                 </div>
             )}
         </div>
         <div className="flex-1 ml-5 min-w-0 mr-3">
-            <h3 className="font-black text-lg text-slate-100 truncate italic tracking-tighter uppercase leading-none mb-1.5">{bot.name}</h3>
-            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest truncate mb-2 italic">{bot.description}</p>
+            <h3 className="font-black text-lg text-slate-900 dark:text-slate-100 truncate italic tracking-tighter uppercase leading-none mb-1.5">{bot.name}</h3>
+            <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest truncate mb-2 italic">{bot.description}</p>
             <div className="flex items-center gap-3">
                 {bot.price === 0 ? (
-                    <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-500/10 px-2 py-1 rounded-md border border-emerald-500/20">Ücretsiz</span>
+                    <span className="text-[8px] font-black text-emerald-600 dark:text-emerald-500 uppercase tracking-widest bg-emerald-500/10 px-2 py-1 rounded-md border border-emerald-500/20">Ücretsiz</span>
                 ) : (
                     <div className="flex items-center gap-2 px-2 py-1 bg-blue-500/10 rounded-md border border-blue-500/20">
-                        <Zap size={10} className="text-blue-500" />
-                        <span className="text-[9px] font-black text-blue-400 uppercase tracking-tighter">{prices.ton} TON</span>
+                        <Zap size={10} className="text-blue-600 dark:text-blue-500" />
+                        <span className="text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-tighter">{prices.ton} TON</span>
                     </div>
                 )}
             </div>
         </div>
-        <div className="bg-slate-800/60 p-2.5 rounded-2xl border border-slate-700/50 text-slate-400 group-hover:text-white group-hover:bg-blue-600 group-hover:border-blue-500 transition-all">
+        <div className="bg-slate-100 dark:bg-slate-800/60 p-2.5 rounded-2xl border border-slate-200 dark:border-slate-700/50 text-slate-400 group-hover:text-white group-hover:bg-blue-600 group-hover:border-blue-500 transition-all">
             <ChevronRight size={18} />
         </div>
     </div>
@@ -158,43 +159,42 @@ const Home = () => {
   }, [loadData]);
 
   return (
-    <div className="p-4 pt-10 min-h-screen bg-[#020617] pb-32 font-sans text-slate-200 animate-in">
-      <div className="flex justify-between items-center mb-10 px-1 relative">
-        <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-blue-600 rounded-[20px] flex items-center justify-center shadow-2xl rotate-3">
-                <BotIcon size={24} className="text-white" />
+    <div className="p-4 pt-10 min-h-screen bg-slate-50 dark:bg-slate-950 pb-32 font-sans text-slate-900 dark:text-slate-200 animate-in transition-colors duration-300">
+      <div className="flex justify-between items-center mb-8 px-1">
+        <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center shadow-lg border-2 border-white/20">
+                <div className="w-5 h-5 bg-white rounded-full shadow-inner" />
             </div>
-            <div>
-                <h1 className="text-2xl font-black text-white tracking-tighter uppercase italic leading-none">Botly<span className="text-blue-500">Hub</span></h1>
-                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1 italic">V3 PREMİUM ENGINE</p>
-            </div>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">BotlyHub</h1>
         </div>
         <div className="flex items-center gap-3">
-            <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="p-3 bg-slate-900/60 border border-slate-800 rounded-2xl text-emerald-400 active:scale-90 transition-transform"><DollarSign size={22} /></button>
+            <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-emerald-600 dark:text-emerald-400 active:scale-90 transition-transform shadow-lg">
+                <DollarSign size={22} />
+            </button>
             <div className="relative" ref={menuRef}>
                 <button 
                   onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
-                  className="p-3 bg-slate-900/60 border border-slate-800 rounded-2xl text-slate-300 active:scale-90 transition-transform relative"
+                  className="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-900 dark:text-white active:scale-90 transition-transform relative shadow-lg"
                 >
                     <LayoutGrid size={22} />
                     {unreadCount > 0 && (
-                        <div className="absolute -top-1 -right-1 min-w-[20px] h-[20px] bg-red-600 rounded-full border-2 border-[#020617] text-[9px] font-black text-white flex items-center justify-center px-1 badge-pop shadow-xl">
+                        <div className="absolute -top-1 -right-1 min-w-[20px] h-[20px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-[#020617] text-[9px] font-black text-white flex items-center justify-center px-1 badge-pop shadow-xl">
                             {unreadCount > 9 ? '9+' : unreadCount}
                         </div>
                     )}
                 </button>
                 {isMenuOpen && (
-                    <div className="absolute right-0 top-full mt-4 w-60 bg-slate-900/95 border border-slate-800 rounded-[32px] shadow-2xl overflow-hidden z-[100] animate-in py-2 backdrop-blur-2xl">
+                    <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-[32px] shadow-2xl overflow-hidden z-[100] animate-in py-2 backdrop-blur-2xl">
                         {[
-                            { path: '/', icon: Store, color: 'text-blue-400', label: 'market' },
-                            { path: '/settings', icon: User, color: 'text-purple-400', label: 'profile' },
-                            { path: '/my-bots', icon: BotIcon, color: 'text-emerald-400', label: 'my_bots' },
-                            { path: '/channels', icon: Megaphone, color: 'text-orange-400', label: 'my_channels' },
-                            { path: '/notifications', icon: Bell, color: 'text-blue-500', label: 'notifications', badge: unreadCount > 0 }
+                            { path: '/', icon: Store, color: 'text-blue-500 dark:text-blue-400', label: 'market' },
+                            { path: '/settings', icon: User, color: 'text-purple-500 dark:text-purple-400', label: 'profile' },
+                            { path: '/my-bots', icon: BotIcon, color: 'text-emerald-500 dark:text-emerald-400', label: 'my_bots' },
+                            { path: '/channels', icon: Megaphone, color: 'text-orange-500 dark:text-orange-400', label: 'my_channels' },
+                            { path: '/notifications', icon: Bell, color: 'text-blue-600 dark:text-blue-500', label: 'notifications', badge: unreadCount > 0 }
                         ].map((item, i) => (
-                            <button key={i} onClick={() => { navigate(item.path); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 text-left border-b border-white/5 last:border-0 relative">
+                            <button key={i} onClick={() => { navigate(item.path); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-black/5 dark:hover:bg-white/5 text-left border-b border-black/5 dark:border-white/5 last:border-0 relative">
                                 <item.icon size={18} className={item.color} /> 
-                                <span className="text-[11px] font-black uppercase tracking-tight">{t(item.label)}</span>
+                                <span className="text-[11px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300">{t(item.label)}</span>
                                 {item.badge && <div className="absolute right-6 w-2.5 h-2.5 bg-red-600 rounded-full shadow-[0_0_8px_rgba(220,38,38,0.6)]"></div>}
                             </button>
                         ))}
@@ -204,10 +204,10 @@ const Home = () => {
         </div>
       </div>
 
-      <div className="relative mb-10 cursor-pointer" onClick={() => navigate('/search')}>
-        <div className="relative flex items-center bg-slate-900/40 backdrop-blur-xl border border-white/5 rounded-[28px] p-1 shadow-2xl transition-all active:scale-[0.98]">
-            <Search className="ml-5 text-slate-600 w-5 h-5" />
-            <div className="w-full py-4 px-4 text-xs text-slate-600 font-bold uppercase tracking-widest">{t('search_placeholder')}</div>
+      <div className="relative mb-8 cursor-pointer" onClick={() => navigate('/search')}>
+        <div className="relative flex items-center bg-white dark:bg-slate-900/80 backdrop-blur-xl border border-black/5 dark:border-white/5 rounded-2xl p-1 shadow-2xl transition-all active:scale-[0.98]">
+            <Search className="ml-5 text-slate-400 w-5 h-5" />
+            <div className="w-full py-4 px-4 text-sm text-slate-400 font-medium">{t('search_placeholder')}</div>
         </div>
       </div>
 
@@ -216,34 +216,47 @@ const Home = () => {
       ) : (
           <>
             {announcements.length > 0 && (
-                <div className="mb-12">
-                    <h2 className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em] mb-6 px-2">
-                        {t('featured')}
-                    </h2>
-                    <div className="flex gap-6 overflow-x-auto no-scrollbar -mx-4 px-4 pb-4 snap-x">
+                <div className="mb-10">
+                    <div className="flex gap-4 overflow-x-auto no-scrollbar -mx-4 px-4 pb-2 snap-x">
                         {announcements.map(ann => <PromoCard key={ann.id} ann={ann} onShowPopup={(a) => setSelectedAnn(a)} />)}
                     </div>
                 </div>
             )}
 
-            <div className="grid grid-cols-4 gap-3 mb-12">
-                {categories.map((cat) => (
-                    <button 
-                        key={cat.id} 
-                        onClick={() => { haptic('light'); navigate(`/search?category=${cat.id}`); }}
-                        className="flex flex-col items-center justify-center gap-3 py-6 rounded-[28px] border bg-slate-900/40 border-white/5 text-slate-600 hover:border-blue-500/30 transition-all active:scale-95 shadow-xl"
-                    >
-                        <cat.icon size={22} className="text-slate-500" />
-                        <span className="text-[8px] font-black tracking-widest text-center uppercase">{t(cat.label)}</span>
-                    </button>
-                ))}
+            <div className="mb-10">
+                <div className="flex gap-3 overflow-x-auto no-scrollbar -mx-4 px-4 pb-2 snap-x">
+                    {categories.map((cat) => (
+                        <motion.button 
+                            key={cat.id} 
+                            whileHover="hover"
+                            onClick={() => { haptic('light'); navigate(`/search?category=${cat.id}`); }}
+                            className="flex items-center gap-3 px-[1rem] py-[0.7rem] rounded-2xl border bg-white dark:bg-slate-900/60 border-black/5 dark:border-white/5 text-slate-900 dark:text-white hover:border-purple-500/30 transition-all active:scale-95 shadow-lg whitespace-nowrap snap-center"
+                        >
+                            <motion.div
+                                variants={{
+                                    hover: { 
+                                        scale: 1.2, 
+                                        rotate: [0, -10, 10, -10, 0],
+                                        filter: "drop-shadow(0 0 8px rgba(19, 159, 236, 0.6))"
+                                    }
+                                }}
+                                transition={{ duration: 0.4 }}
+                            >
+                                <cat.icon size={20} className="text-[#139fec]" />
+                            </motion.div>
+                            <span className="text-[11px] font-bold uppercase tracking-wider">{t(cat.label)}</span>
+                        </motion.button>
+                    ))}
+                </div>
             </div>
 
-            <div className="space-y-1">
-                <h2 className="text-[10px] font-black text-slate-700 uppercase tracking-[0.4em] mb-8 px-2">
+            <div className="space-y-6">
+                <h2 className="text-[10px] font-black text-slate-400 dark:text-slate-700 uppercase tracking-[0.4em] mb-4 px-2">
                     MAĞAZA VİTRİNİ
                 </h2>
-                {bots.length > 0 ? bots.map(bot => <BotCard key={bot.id} bot={bot} tonRate={tonRate} />) : <div className="py-24 text-center text-slate-700 font-bold uppercase text-xs tracking-widest">Sonuç yok.</div>}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {bots.length > 0 ? bots.map(bot => <BotCard key={bot.id} bot={bot} tonRate={tonRate} />) : <div className="col-span-full py-24 text-center text-slate-400 dark:text-slate-700 font-bold uppercase text-xs tracking-widest">Sonuç yok.</div>}
+                </div>
             </div>
           </>
       )}

@@ -25,30 +25,30 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = ({ bot, tonRate }) => {
   const prices = PriceService.convert(bot.price, tonRate);
   
   return (
-    <div onClick={() => navigate(`/bot/${bot.id}`)} className="flex items-center p-5 cursor-pointer group hover:bg-slate-900/60 rounded-[32px] transition-all border border-transparent hover:border-slate-800/50 mb-3 active:bg-slate-900 shadow-xl shadow-black/5">
+    <div onClick={() => navigate(`/bot/${bot.id}`)} className="flex items-center p-4 cursor-pointer group bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-900/80 rounded-[32px] transition-all border border-black/5 dark:border-white/5 mb-3 active:scale-[0.98] shadow-lg">
         <div className="relative shrink-0">
             <img 
                 src={getLiveBotIcon(bot)} 
                 alt={bot.name} 
-                className="w-20 h-20 rounded-[28px] object-cover bg-slate-900 shadow-2xl border border-slate-800 group-hover:scale-105 transition-transform" 
+                className="w-20 h-20 rounded-[24px] object-cover bg-slate-200 dark:bg-slate-900 shadow-xl border border-black/5 dark:border-white/5 group-hover:scale-105 transition-transform" 
                 onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
             />
             {bot.price > 0 && (
-                <div className="absolute -top-1.5 -right-1.5 w-7 h-7 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg border-4 border-[#020617]">
+                <div className="absolute -top-1.5 -right-1.5 w-7 h-7 bg-purple-600 rounded-xl flex items-center justify-center shadow-lg border-2 border-slate-50 dark:border-[#020617]">
                     <Zap size={12} fill="currentColor" className="text-white" />
                 </div>
             )}
         </div>
-        <div className="flex-1 ml-5 min-w-0 mr-3">
-            <h3 className="font-black text-lg text-slate-100 truncate italic tracking-tighter uppercase mb-1.5">{bot.name}</h3>
-            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest truncate mb-2">{bot.description}</p>
+        <div className="flex-1 ml-5 min-w-0">
+            <h3 className="font-bold text-lg text-slate-900 dark:text-white truncate tracking-tight mb-1">{bot.name}</h3>
+            <p className="text-[11px] text-slate-500 font-medium truncate mb-2">{bot.description}</p>
             <div className="flex items-center gap-3">
                 {bot.price === 0 ? (
-                    <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-500/10 px-2 py-1 rounded-md">Ücretsiz</span>
+                    <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider bg-emerald-400/10 px-3 py-1 rounded-xl">Ücretsiz</span>
                 ) : (
-                    <div className="flex items-center gap-2">
-                        <Zap size={10} className="text-blue-500" />
-                        <span className="text-[9px] font-black text-blue-400 uppercase tracking-tighter">{prices.ton} TON</span>
+                    <div className="flex items-center gap-2 bg-purple-500/10 px-3 py-1 rounded-xl">
+                        <Zap size={10} className="text-purple-600 dark:text-purple-400" />
+                        <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider">{prices.ton} TON</span>
                     </div>
                 )}
             </div>
@@ -116,24 +116,24 @@ const SearchPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#020617] p-4 pt-10 pb-32 animate-in fade-in">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#020617] p-4 pt-10 pb-32 animate-in fade-in transition-colors duration-300">
       {/* AI Assistant Toggle */}
-      <div className="mb-6">
+      <div className="mb-8">
         <button 
           onClick={() => setShowAiAssistant(!showAiAssistant)}
-          className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-[28px] group active:scale-[0.98] transition-all"
+          className="w-full flex items-center justify-between p-5 bg-white dark:bg-gradient-to-r dark:from-purple-600/10 dark:to-indigo-600/10 border border-black/5 dark:border-purple-500/20 rounded-[32px] group active:scale-[0.98] transition-all shadow-lg"
         >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-600/20">
-              <Sparkles size={20} className="text-white animate-pulse" />
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-600/20">
+              <Sparkles size={22} className="text-white animate-pulse" />
             </div>
             <div className="text-left">
-              <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest">AI Bot Asistanı</p>
-              <p className="text-[8px] font-bold text-slate-500 uppercase tracking-tighter">İhtiyacın olan botu yapay zekaya sor</p>
+              <p className="text-xs font-bold text-slate-900 dark:text-white">AI Bot Asistanı</p>
+              <p className="text-[10px] font-medium text-slate-500">İhtiyacın olan botu yapay zekaya sor</p>
             </div>
           </div>
-          <div className="w-8 h-8 bg-slate-900/50 rounded-xl flex items-center justify-center text-slate-500 group-hover:text-blue-400 transition-colors">
-            {showAiAssistant ? <X size={16} /> : <Zap size={16} />}
+          <div className="w-10 h-10 bg-slate-100 dark:bg-slate-900/80 rounded-xl flex items-center justify-center text-slate-400 group-hover:text-purple-400 transition-colors">
+            {showAiAssistant ? <X size={18} /> : <Zap size={18} />}
           </div>
         </button>
 
@@ -145,7 +145,7 @@ const SearchPage = () => {
               exit={{ height: 0, opacity: 0 }}
               className="overflow-hidden"
             >
-              <div className="mt-4 p-5 bg-slate-900/40 border border-white/5 rounded-[32px] space-y-4">
+              <div className="mt-4 p-6 bg-white dark:bg-slate-900/60 border border-black/5 dark:border-white/5 rounded-[32px] space-y-5 shadow-xl">
                 <div className="relative">
                   <input 
                     type="text"
@@ -153,14 +153,14 @@ const SearchPage = () => {
                     onChange={(e) => setAiQuery(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleAiSearch()}
                     placeholder="Örn: Kripto takibi için bir bot önerir misin?"
-                    className="w-full bg-slate-950/50 border border-white/5 rounded-2xl py-4 pl-5 pr-14 text-xs text-white placeholder:text-slate-600 font-bold uppercase tracking-widest outline-none focus:border-blue-500/50 transition-all"
+                    className="w-full bg-slate-50 dark:bg-slate-950/50 border border-black/5 dark:border-white/5 rounded-2xl py-4 pl-6 pr-14 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 font-medium outline-none focus:border-purple-500/50 transition-all shadow-inner"
                   />
                   <button 
                     onClick={handleAiSearch}
                     disabled={isAiLoading || !aiQuery.trim()}
-                    className="absolute right-2 top-2 w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white disabled:opacity-50 active:scale-90 transition-all"
+                    className="absolute right-2 top-2 w-10 h-10 bg-purple-600 rounded-xl flex items-center justify-center text-white disabled:opacity-50 active:scale-90 transition-all shadow-lg"
                   >
-                    {isAiLoading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+                    {isAiLoading ? <Loader2 size={20} className="animate-spin" /> : <Send size={20} />}
                   </button>
                 </div>
 
@@ -168,15 +168,15 @@ const SearchPage = () => {
                   <motion.div 
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-4 bg-blue-600/5 border border-blue-500/10 rounded-2xl"
+                    className="p-5 bg-purple-600/5 border border-purple-500/10 rounded-2xl"
                   >
                     <div className="flex gap-3 mb-3">
-                      <div className="w-6 h-6 bg-blue-600 rounded-lg flex items-center justify-center shrink-0">
-                        <BotIcon size={14} className="text-white" />
+                      <div className="w-8 h-8 bg-purple-600 rounded-xl flex items-center justify-center shrink-0 shadow-lg">
+                        <BotIcon size={16} className="text-white" />
                       </div>
-                      <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest">AI Yanıtı</p>
+                      <p className="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider mt-1.5">AI Yanıtı</p>
                     </div>
-                    <div className="text-[11px] text-slate-300 leading-relaxed font-medium whitespace-pre-line">
+                    <div className="text-[12px] text-slate-700 dark:text-slate-300 leading-relaxed font-medium whitespace-pre-line">
                       {aiResponse}
                     </div>
                   </motion.div>
@@ -189,22 +189,22 @@ const SearchPage = () => {
 
       {/* Header & Search Box */}
       <div className="flex items-center gap-4 mb-8">
-        <button onClick={() => navigate('/')} className="p-3 bg-slate-900/60 border border-slate-800 rounded-2xl text-slate-400 active:scale-90 transition-transform">
-          <ChevronLeft size={20} />
+        <button onClick={() => navigate('/')} className="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-500 dark:text-slate-400 active:scale-90 transition-transform shadow-lg">
+          <ChevronLeft size={22} />
         </button>
         <div className="relative flex-1">
-          <div className="relative flex items-center bg-slate-900/40 backdrop-blur-xl border border-white/5 rounded-[28px] p-1 shadow-2xl ring-2 ring-transparent focus-within:ring-blue-500/30 transition-all">
-            <SearchIcon className="ml-5 text-slate-600 w-5 h-5" />
+          <div className="relative flex items-center bg-white dark:bg-slate-900/80 backdrop-blur-xl border border-black/5 dark:border-white/5 rounded-2xl p-1 shadow-2xl ring-2 ring-transparent focus-within:ring-purple-500/30 transition-all">
+            <SearchIcon className="ml-5 text-slate-400 w-5 h-5" />
             <input 
               type="text" 
               value={query} 
               autoFocus
               onChange={(e) => setQuery(e.target.value)} 
               placeholder={t('search_placeholder')} 
-              className="w-full bg-transparent py-4 px-4 text-xs text-white outline-none placeholder:text-slate-600 font-bold uppercase tracking-widest" 
+              className="w-full bg-transparent py-4 px-4 text-sm text-slate-900 dark:text-white outline-none placeholder:text-slate-400 dark:placeholder:text-slate-600 font-medium" 
             />
             {query && (
-              <button onClick={() => setQuery('')} className="mr-5 text-slate-600 hover:text-white">
+              <button onClick={() => setQuery('')} className="mr-5 text-slate-400 hover:text-slate-900 dark:hover:text-white">
                 <X size={18} />
               </button>
             )}
@@ -212,10 +212,9 @@ const SearchPage = () => {
         </div>
       </div>
 
-      {/* Categories Grid (Directly below search box) */}
+      {/* Categories Horizontal Scroll */}
       <div className="mb-10">
-        <p className="text-[10px] font-black text-slate-700 uppercase tracking-[0.4em] mb-6 px-2">Kategoriler</p>
-        <div className="grid grid-cols-4 gap-3">
+        <div className="flex gap-3 overflow-x-auto no-scrollbar -mx-4 px-4 pb-2 snap-x">
           {categories.map((cat) => (
             <button 
               key={cat.id} 
@@ -225,14 +224,14 @@ const SearchPage = () => {
                     DatabaseService.logActivity(user.id.toString(), 'system', 'search_category', 'Kategori Filtresi', `Arama motorunda '${t(cat.label)}' kategorisi filtrelendi.`);
                 }
               }}
-              className={`flex flex-col items-center justify-center gap-3 py-6 rounded-[28px] border transition-all active:scale-95 shadow-xl ${
+              className={`flex items-center gap-3 px-6 py-4 rounded-2xl border transition-all active:scale-95 shadow-lg whitespace-nowrap snap-center ${
                 activeCategory === cat.id 
-                ? 'bg-blue-600/10 border-blue-500/40 text-blue-400 ring-1 ring-blue-500/20' 
-                : 'bg-slate-900/40 border-white/5 text-slate-600'
+                ? 'bg-purple-600/10 border-purple-500/40 text-purple-600 dark:text-purple-400 ring-1 ring-purple-500/20' 
+                : 'bg-white dark:bg-slate-900/60 border-black/5 dark:border-white/5 text-slate-500 dark:text-slate-400'
               }`}
             >
-              <cat.icon size={22} className={activeCategory === cat.id ? 'text-blue-400' : 'text-slate-500'} />
-              <span className="text-[8px] font-black tracking-widest text-center uppercase">{t(cat.label)}</span>
+              <cat.icon size={20} className={activeCategory === cat.id ? 'text-purple-600 dark:text-purple-400' : 'text-slate-400 dark:text-slate-300'} />
+              <span className="text-[11px] font-bold uppercase tracking-wider">{t(cat.label)}</span>
             </button>
           ))}
         </div>
@@ -241,7 +240,7 @@ const SearchPage = () => {
       {/* Results */}
       <div className="space-y-1">
         <div className="flex justify-between items-center mb-6 px-2">
-            <h2 className="text-[10px] font-black text-slate-700 uppercase tracking-[0.4em]">Sonuçlar ({filteredBots.length})</h2>
+            <h2 className="text-[10px] font-black text-slate-400 dark:text-slate-700 uppercase tracking-[0.4em]">Sonuçlar ({filteredBots.length})</h2>
         </div>
 
         {isLoading ? (

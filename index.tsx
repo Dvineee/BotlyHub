@@ -3,6 +3,7 @@ import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import { TranslationProvider } from './TranslationContext';
+import { ThemeProvider } from './ThemeContext';
 import { TonConnectUIProvider } from '@tonconnect/ui-react';
 import './index.css';
 
@@ -75,9 +76,11 @@ if (rootElement) {
   root.render(
     <ErrorBoundary>
       <TonConnectUIProvider manifestUrl={manifestUrl}>
-        <TranslationProvider>
-          <App />
-        </TranslationProvider>
+        <ThemeProvider>
+          <TranslationProvider>
+            <App />
+          </TranslationProvider>
+        </ThemeProvider>
       </TonConnectUIProvider>
     </ErrorBoundary>
   );

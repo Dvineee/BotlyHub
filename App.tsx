@@ -147,7 +147,7 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
   }, [location.pathname, navigate, isAdminPath]);
 
   return (
-    <div className={`${isAdminPath ? 'bg-[#020617]' : 'bg-slate-950'} flex flex-col min-h-screen`}>
+    <div className={`${isAdminPath ? 'bg-slate-950' : 'bg-slate-50 dark:bg-slate-950'} flex flex-col min-h-screen transition-colors duration-300`}>
       {isMaintenance && !isAdminPath ? (
         <Maintenance />
       ) : isRestricted && !isAdminPath ? (

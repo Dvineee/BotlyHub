@@ -163,7 +163,7 @@ const BotDetail = () => {
   }, [bot, tonRate]);
 
   if (isLoading) return (
-    <div className="min-h-screen bg-[#020617] flex items-center justify-center">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#020617] flex items-center justify-center">
         <Loader2 className="animate-spin text-blue-500/50" size={32} />
     </div>
   );
@@ -171,14 +171,14 @@ const BotDetail = () => {
   if (!bot) return null;
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-200 pb-40 animate-in fade-in">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-200 pb-40 animate-in fade-in transition-colors duration-300">
       {/* Navbar */}
-      <nav className="fixed top-0 inset-x-0 h-16 z-[60] flex items-center justify-between px-6 bg-[#020617]/80 backdrop-blur-xl border-b border-white/5">
-        <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-slate-400">
+      <nav className="fixed top-0 inset-x-0 h-16 z-[60] flex items-center justify-between px-6 bg-white/80 dark:bg-[#020617]/80 backdrop-blur-xl border-b border-black/5 dark:border-white/5">
+        <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-slate-500 dark:text-slate-400">
             <ChevronLeft size={24} />
         </button>
-        <span className="text-[10px] font-black tracking-[0.2em] text-white/20 uppercase italic">Uygulama Detayı</span>
-        <button onClick={handleShare} className="p-2 -mr-2 text-slate-400 active:scale-90 transition-transform relative">
+        <span className="text-[10px] font-black tracking-[0.2em] text-slate-400 dark:text-white/20 uppercase italic">Uygulama Detayı</span>
+        <button onClick={handleShare} className="p-2 -mr-2 text-slate-500 dark:text-slate-400 active:scale-90 transition-transform relative">
             <Share2 size={20} className={isCopied ? 'text-emerald-500' : ''} />
             <AnimatePresence>
                 {isCopied && (
@@ -196,64 +196,64 @@ const BotDetail = () => {
       </nav>
 
       {/* Hero Section */}
-      <div className="pt-24 px-6 flex items-start gap-5 mb-10">
+      <div className="pt-24 px-6 flex items-start gap-6 mb-10">
         <div className="relative shrink-0">
             <img 
               src={getLiveBotIcon(bot)} 
               loading="lazy"
-              className="w-24 h-24 rounded-[24px] border border-white/10 shadow-2xl object-cover bg-slate-900" 
+              className="w-24 h-24 rounded-[32px] border border-black/10 dark:border-white/10 shadow-2xl object-cover bg-slate-200 dark:bg-slate-900" 
               onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=1e293b&color=fff&bold=true`; }}
             />
             {isOwned && (
-                <div className="absolute -bottom-2 -right-2 bg-emerald-500 text-white p-1 rounded-lg border-2 border-[#020617]">
+                <div className="absolute -bottom-2 -right-2 bg-emerald-500 text-white p-1.5 rounded-xl border-2 border-slate-50 dark:border-[#020617]">
                     <CheckCircle2 size={14} />
                 </div>
             )}
         </div>
         <div className="flex-1 min-w-0 pt-1">
-            <h1 className="text-2xl font-black text-white tracking-tighter uppercase italic truncate mb-1">{bot.name}</h1>
-            <p className="text-blue-500 text-[10px] font-black uppercase tracking-widest mb-3 italic">{bot.category}</p>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight truncate mb-1">{bot.name}</h1>
+            <p className="text-purple-600 dark:text-purple-500 text-xs font-medium mb-3">{bot.category}</p>
             <div className="flex flex-wrap gap-2">
-                <span className="bg-slate-900 border border-white/5 text-slate-400 text-[8px] font-black px-2 py-1 rounded-md uppercase">v4.2.0</span>
-                <span className="bg-blue-500/10 border border-blue-500/20 text-blue-500 text-[8px] font-black px-2 py-1 rounded-md uppercase flex items-center gap-1">
-                    <ShieldCheck size={10} /> Onaylı
+                <span className="bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 text-slate-500 dark:text-slate-400 text-[10px] font-bold px-3 py-1 rounded-xl uppercase">v4.2.0</span>
+                <span className="bg-purple-500/10 border border-purple-500/20 text-purple-600 dark:text-purple-400 text-[10px] font-bold px-3 py-1 rounded-xl uppercase flex items-center gap-1">
+                    <ShieldCheck size={12} /> Onaylı
                 </span>
             </div>
         </div>
       </div>
 
-      {/* Stats Band (Play Store Style) */}
+      {/* Stats Band */}
       <div className="px-6 mb-10">
-          <div className="flex items-center justify-between bg-slate-900/40 rounded-[28px] border border-white/5 p-5 backdrop-blur-sm">
-              <div className="flex flex-col items-center flex-1 border-r border-white/5">
-                  <span className="text-white font-black italic text-sm">4.8 <Star size={10} className="inline mb-1 fill-white" /></span>
-                  <span className="text-[8px] text-slate-600 font-bold uppercase mt-1">Puan</span>
+          <div className="flex items-center justify-between bg-white dark:bg-slate-900/60 rounded-[32px] border border-black/5 dark:border-white/5 p-6 backdrop-blur-xl shadow-xl">
+              <div className="flex flex-col items-center flex-1 border-r border-black/5 dark:border-white/5">
+                  <span className="text-slate-900 dark:text-white font-bold text-base">4.8 <Star size={12} className="inline mb-1 fill-slate-900 dark:fill-white" /></span>
+                  <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">Puan</span>
               </div>
-              <div className="flex flex-col items-center flex-1 border-r border-white/5">
-                  <span className="text-white font-black italic text-sm">2.4K+</span>
-                  <span className="text-[8px] text-slate-600 font-bold uppercase mt-1">Kullanıcı</span>
+              <div className="flex flex-col items-center flex-1 border-r border-black/5 dark:border-white/5">
+                  <span className="text-slate-900 dark:text-white font-bold text-base">2.4K+</span>
+                  <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">Kullanıcı</span>
               </div>
               <div className="flex flex-col items-center flex-1">
-                  <span className="text-white font-black italic text-sm">Sınırsız</span>
-                  <span className="text-[8px] text-slate-600 font-bold uppercase mt-1">Erişim</span>
+                  <span className="text-slate-900 dark:text-white font-bold text-base">Sınırsız</span>
+                  <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">Erişim</span>
               </div>
           </div>
       </div>
 
       {/* Gallery Section */}
       <div className="mb-10">
-          <h3 className="px-8 text-[10px] font-black text-slate-700 uppercase tracking-[0.4em] mb-4 italic">Ekran Görüntüleri</h3>
+          <h3 className="px-8 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-4">Ekran Görüntüleri</h3>
           <div className="flex gap-4 overflow-x-auto no-scrollbar px-6 snap-x pb-4">
               {bot.screenshots && bot.screenshots.length > 0 ? (
                   bot.screenshots.map((s, i) => (
-                    <div key={i} className="min-w-[160px] h-[280px] rounded-[24px] bg-slate-900 border border-white/5 overflow-hidden snap-center shrink-0 shadow-xl">
+                    <div key={i} className="min-w-[180px] h-[320px] rounded-[32px] bg-slate-200 dark:bg-slate-900 border border-black/5 dark:border-white/5 overflow-hidden snap-center shrink-0 shadow-xl">
                         <img src={s} loading="lazy" className="w-full h-full object-cover" />
                     </div>
                   ))
               ) : (
                   [1,2,3].map(i => (
-                    <div key={i} className="min-w-[160px] h-[280px] rounded-[24px] bg-slate-900/50 border border-white/5 overflow-hidden snap-center shrink-0 flex items-center justify-center">
-                        <ImageIcon className="text-slate-800" size={32} />
+                    <div key={i} className="min-w-[180px] h-[320px] rounded-[32px] bg-slate-100 dark:bg-slate-900/50 border border-black/5 dark:border-white/5 overflow-hidden snap-center shrink-0 flex items-center justify-center">
+                        <ImageIcon className="text-slate-300 dark:text-slate-800" size={32} />
                     </div>
                   ))
               )}
@@ -263,17 +263,17 @@ const BotDetail = () => {
       {/* Description */}
       <div className="px-6 mb-10">
           <div className="flex items-center justify-between mb-4 px-2">
-            <h3 className="text-[10px] font-black text-slate-700 uppercase tracking-[0.4em] italic">Hakkında</h3>
+            <h3 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Hakkında</h3>
             <button 
               onClick={handleAiAnalysis}
               disabled={isAiLoading}
-              className="flex items-center gap-2 px-3 py-1.5 bg-blue-600/10 border border-blue-500/20 rounded-xl text-blue-500 text-[8px] font-black uppercase tracking-widest active:scale-95 transition-all disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 bg-purple-600/10 border border-purple-500/20 rounded-2xl text-purple-600 dark:text-purple-400 text-[10px] font-bold uppercase tracking-wider active:scale-95 transition-all disabled:opacity-50"
             >
-              {isAiLoading ? <Loader2 size={10} className="animate-spin" /> : <Sparkles size={10} className="animate-pulse" />}
+              {isAiLoading ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} className="animate-pulse" />}
               AI ANALİZİ
             </button>
           </div>
-          <div className="p-6 bg-slate-900/30 rounded-[32px] border border-white/5 text-xs text-slate-400 font-bold uppercase italic leading-relaxed opacity-90">
+          <div className="p-8 bg-white dark:bg-slate-900/60 rounded-[32px] border border-black/5 dark:border-white/5 text-sm text-slate-600 dark:text-slate-400 leading-relaxed shadow-lg">
               {bot.description}
           </div>
 
@@ -291,14 +291,14 @@ const BotDetail = () => {
                   <div className="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20">
                     <BotIcon size={16} className="text-white" />
                   </div>
-                  <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest italic">Neden Bu Botu Seçmelisin?</p>
+                  <p className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest italic">Neden Bu Botu Seçmelisin?</p>
                 </div>
-                <div className="text-[11px] text-slate-300 leading-relaxed font-medium italic whitespace-pre-line relative z-10">
+                <div className="text-[11px] text-slate-700 dark:text-slate-300 leading-relaxed font-medium italic whitespace-pre-line relative z-10">
                   {aiAnalysis}
                 </div>
                 <button 
                   onClick={() => setAiAnalysis(null)}
-                  className="mt-4 text-[8px] font-black text-slate-500 uppercase tracking-widest hover:text-white transition-colors"
+                  className="mt-4 text-[8px] font-black text-slate-500 uppercase tracking-widest hover:text-slate-900 dark:hover:text-white transition-colors"
                 >
                   Kapat
                 </button>
@@ -309,7 +309,7 @@ const BotDetail = () => {
 
       {/* Key Features */}
       <div className="px-6 mb-12">
-          <h3 className="px-2 text-[10px] font-black text-slate-700 uppercase tracking-[0.4em] mb-6 italic">Temel Özellikler</h3>
+          <h3 className="px-2 text-[10px] font-black text-slate-400 dark:text-slate-700 uppercase tracking-[0.4em] mb-6 italic">Temel Özellikler</h3>
           <div className="grid grid-cols-2 gap-3">
               {[
                   { icon: Zap, label: 'Ultra Hızlı', desc: 'Anlık Tepki' },
@@ -317,13 +317,13 @@ const BotDetail = () => {
                   { icon: Globe, label: 'Global', desc: '7/24 Aktif' },
                   { icon: Cpu, label: 'AI Destekli', desc: 'Akıllı İşlem' }
               ].map((f, i) => (
-                  <div key={i} className="p-5 bg-slate-900/40 rounded-[28px] border border-white/5 flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-2xl bg-slate-950 flex items-center justify-center text-blue-500 border border-white/5 shadow-inner">
+                  <div key={i} className="p-5 bg-white dark:bg-slate-900/40 rounded-[28px] border border-black/5 dark:border-white/5 flex items-center gap-4 shadow-lg">
+                      <div className="w-10 h-10 rounded-2xl bg-slate-100 dark:bg-slate-950 flex items-center justify-center text-blue-600 dark:text-blue-500 border border-black/5 dark:border-white/5 shadow-inner">
                           <f.icon size={18} />
                       </div>
                       <div>
-                          <p className="text-[10px] font-black text-white italic tracking-tight">{f.label}</p>
-                          <p className="text-[8px] text-slate-600 font-bold uppercase">{f.desc}</p>
+                          <p className="text-[10px] font-black text-slate-900 dark:text-white italic tracking-tight">{f.label}</p>
+                          <p className="text-[8px] text-slate-400 dark:text-slate-600 font-bold uppercase">{f.desc}</p>
                       </div>
                   </div>
               ))}
@@ -331,7 +331,7 @@ const BotDetail = () => {
       </div>
 
       {/* Sticky Action Bar */}
-      <div className="fixed bottom-0 inset-x-0 p-6 z-[70] bg-gradient-to-t from-[#020617] via-[#020617]/95 to-transparent pb-10">
+      <div className="fixed bottom-0 inset-x-0 p-6 z-[70] bg-gradient-to-t from-slate-50 dark:from-[#020617] via-slate-50 dark:via-[#020617]/95 to-transparent pb-10">
           <div className="max-w-md mx-auto">
               <button 
                 onClick={handleAction}
@@ -339,7 +339,7 @@ const BotDetail = () => {
                 className={`w-full h-20 rounded-[32px] text-[11px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 shadow-2xl border-b-8 ${
                     isOwned 
                     ? 'bg-emerald-600 text-white border-emerald-800' 
-                    : 'bg-white text-slate-950 border-slate-300'
+                    : 'bg-slate-900 dark:bg-white text-white dark:text-slate-950 border-slate-700 dark:border-slate-300'
                 }`}
               >
                   {isProcessing ? <Loader2 className="animate-spin" /> : (
@@ -347,10 +347,10 @@ const BotDetail = () => {
                           bot.price === 0 ? <><PlusCircle size={20} /> ÜCRETSİZ EDİN</> : (
                               <div className="flex items-center gap-8">
                                   <div className="text-left">
-                                      <p className="text-[8px] font-black text-slate-500 mb-1 uppercase tracking-widest">LİSANS ÜCRETİ</p>
+                                      <p className="text-[8px] font-black text-slate-400 dark:text-slate-500 mb-1 uppercase tracking-widest">LİSANS ÜCRETİ</p>
                                       <p className="text-lg font-black italic tracking-tighter">{prices.ton} TON</p>
                                   </div>
-                                  <div className="h-10 w-px bg-slate-200/20"></div>
+                                  <div className="h-10 w-px bg-white/20 dark:bg-slate-200/20"></div>
                                   <span className="flex items-center gap-2">SATIN AL <ChevronRight size={18} /></span>
                               </div>
                           )
@@ -369,27 +369,27 @@ const BotDetail = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowGuide(false)}
-              className="absolute inset-0 bg-[#020617]/95 backdrop-blur-xl"
+              className="absolute inset-0 bg-slate-50/95 dark:bg-[#020617]/95 backdrop-blur-xl"
             />
             
             <motion.div 
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-sm bg-slate-900 border border-white/10 rounded-[44px] overflow-hidden shadow-2xl"
+              className="relative w-full max-w-sm bg-white dark:bg-slate-900 border border-black/10 dark:border-white/10 rounded-[44px] overflow-hidden shadow-2xl"
             >
               <div className="p-8 lg:p-10">
                 <div className="flex justify-between items-center mb-8">
                   <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-2xl shadow-blue-600/20">
                     <Sparkles className="text-white" size={24} />
                   </div>
-                  <button onClick={() => setShowGuide(false)} className="p-2 text-slate-500 hover:text-white transition-colors">
+                  <button onClick={() => setShowGuide(false)} className="p-2 text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors">
                     <X size={24} />
                   </button>
                 </div>
 
-                <h2 className="text-2xl font-black text-white italic uppercase tracking-tighter leading-none mb-3">
-                  Tebrikler! <br/> <span className="text-blue-500">Botunuz Hazır</span>
+                <h2 className="text-2xl font-black text-slate-900 dark:text-white italic uppercase tracking-tighter leading-none mb-3">
+                  Tebrikler! <br/> <span className="text-blue-600">Botunuz Hazır</span>
                 </h2>
                 <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-10 italic">
                   Botu kullanmaya başlamak için şu adımları izleyin:
@@ -403,11 +403,11 @@ const BotDetail = () => {
                     { icon: BarChart3, title: 'Kazanç İzle', desc: 'BotlyHub ana sayfasından kanal gelirlerinizi anlık takip edin.' }
                   ].map((step, i) => (
                     <div key={i} className="flex gap-5 group">
-                      <div className="w-10 h-10 shrink-0 bg-white/5 rounded-xl flex items-center justify-center text-blue-500 border border-white/5 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
+                      <div className="w-10 h-10 shrink-0 bg-slate-100 dark:bg-white/5 rounded-xl flex items-center justify-center text-blue-600 dark:text-blue-500 border border-black/5 dark:border-white/5 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
                         <step.icon size={18} />
                       </div>
                       <div>
-                        <h4 className="text-[11px] font-black text-white uppercase tracking-widest mb-1 italic">{i+1}. {step.title}</h4>
+                        <h4 className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-widest mb-1 italic">{i+1}. {step.title}</h4>
                         <p className="text-[9px] text-slate-500 font-bold uppercase leading-relaxed italic">{step.desc}</p>
                       </div>
                     </div>
@@ -426,7 +426,7 @@ const BotDetail = () => {
                   </button>
                   <button 
                     onClick={() => setShowGuide(false)}
-                    className="w-full py-4 text-slate-600 font-black text-[9px] uppercase tracking-widest hover:text-slate-400 transition-colors"
+                    className="w-full py-4 text-slate-400 dark:text-slate-600 font-black text-[9px] uppercase tracking-widest hover:text-slate-900 dark:hover:text-slate-400 transition-colors"
                   >
                     DAHA SONRA
                   </button>

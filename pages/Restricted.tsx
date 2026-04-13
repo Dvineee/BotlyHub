@@ -7,36 +7,36 @@ const Restricted = () => {
     const { user } = useTelegram();
 
     return (
-        <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center p-8 text-center">
-            <div className="w-24 h-24 bg-red-500/10 rounded-[40px] flex items-center justify-center text-red-500 mb-8 animate-pulse">
-                <ShieldAlert size={48} />
+        <div className="min-h-screen bg-slate-50 dark:bg-[#020617] flex flex-col items-center justify-center p-10 text-center animate-in fade-in transition-colors duration-300">
+            <div className="w-28 h-28 bg-red-600/10 dark:bg-red-500/10 rounded-[44px] flex items-center justify-center text-red-600 dark:text-red-500 mb-10 animate-pulse border border-red-500/20 shadow-2xl shadow-red-900/20">
+                <ShieldAlert size={56} />
             </div>
             
-            <h1 className="text-3xl font-black text-white italic uppercase tracking-tighter mb-4">Erişim Kısıtlandı</h1>
-            <p className="text-slate-500 text-sm font-bold uppercase tracking-widest leading-relaxed max-w-xs mb-12 italic">
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-4 tracking-tight">Erişim Kısıtlandı</h1>
+            <p className="text-slate-500 text-sm font-medium uppercase tracking-widest leading-relaxed max-w-xs mb-14 opacity-80">
                 Hesabınız platform kurallarını ihlal ettiği gerekçesiyle kısıtlanmıştır.
             </p>
 
-            <div className="w-full max-w-xs space-y-4">
+            <div className="w-full max-w-sm space-y-5">
                 <a 
                     href="https://t.me/botlyhub_support" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-3 w-full py-5 bg-blue-600 rounded-[28px] text-white text-xs font-black uppercase tracking-[0.2em] shadow-2xl shadow-blue-600/40 active:scale-95 transition-all italic"
+                    className="flex items-center justify-center gap-4 w-full py-6 bg-purple-600 rounded-[28px] text-white text-[11px] font-bold uppercase tracking-widest shadow-2xl shadow-purple-900/30 active:scale-95 transition-all"
                 >
-                    <MessageCircle size={18} />
+                    <MessageCircle size={20} />
                     Destekle İletişime Geç
                 </a>
                 
                 <button 
                     onClick={() => window.location.reload()}
-                    className="flex items-center justify-center gap-3 w-full py-5 bg-slate-900 border border-white/5 rounded-[28px] text-slate-400 text-xs font-black uppercase tracking-[0.2em] active:scale-95 transition-all italic"
+                    className="flex items-center justify-center gap-4 w-full py-6 bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-[28px] text-slate-500 dark:text-slate-400 text-[11px] font-bold uppercase tracking-widest active:scale-95 transition-all shadow-lg"
                 >
                     Tekrar Dene
                 </button>
             </div>
 
-            <p className="mt-12 text-[9px] font-black text-slate-800 uppercase tracking-[0.4em] italic">
+            <p className="mt-20 text-[10px] font-bold text-slate-200 dark:text-slate-800 uppercase tracking-[0.6em]">
                 BotlyHub Security v3.1
             </p>
         </div>

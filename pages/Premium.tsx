@@ -25,21 +25,24 @@ const Premium = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 p-4 pt-8 pb-12">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#020617] p-4 pt-10 pb-32 animate-in fade-in transition-colors duration-300">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-8">
-        <button onClick={() => navigate(-1)} className="p-2 hover:bg-slate-900 rounded-full transition-colors">
-          <ChevronLeft className="w-6 h-6 text-white" />
+      <div className="flex items-center gap-5 mb-10 px-1">
+        <button onClick={() => navigate(-1)} className="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-500 dark:text-slate-400 active:scale-90 transition-transform shadow-lg">
+          <ChevronLeft size={22} />
         </button>
-        <h1 className="text-xl font-bold text-white">Premium Paketler</h1>
+        <div>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Premium Paketler</h1>
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Üyelik Yönetimi</p>
+        </div>
       </div>
 
       {/* Hero */}
-      <div className="text-center mb-10">
-          <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-indigo-400">
-              Limitleri Kaldırın
+      <div className="text-center mb-12 px-4">
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+              Limitleri <span className="text-purple-600">Kaldırın</span>
           </h2>
-          <p className="text-slate-400 text-sm mt-2 max-w-xs mx-auto">
+          <p className="text-slate-500 text-xs mt-3 max-w-xs mx-auto font-medium leading-relaxed">
               Daha düşük komisyon oranları ve özel özelliklerle gelirinizi artırın.
           </p>
       </div>
@@ -51,61 +54,61 @@ const Premium = () => {
               const Icon = plan.icon;
 
               // Color mapping for dynamic styles
-              let borderColor = 'border-slate-800';
-              let shadowColor = '';
-              let btnColor = 'bg-slate-800 text-white';
-              let iconColor = 'text-slate-400';
+              let borderColor = 'border-black/5 dark:border-white/5';
+              let shadowColor = 'shadow-xl';
+              let btnColor = 'bg-slate-900 dark:bg-slate-800 text-white';
+              let iconColor = 'text-slate-500 dark:text-slate-400';
               
               if (plan.color === 'blue') {
-                  borderColor = 'border-blue-500/50';
-                  shadowColor = 'shadow-[0_0_20px_rgba(59,130,246,0.15)]';
-                  btnColor = 'bg-blue-600 hover:bg-blue-500 text-white';
-                  iconColor = 'text-blue-400';
+                  borderColor = 'border-purple-500/20';
+                  shadowColor = 'shadow-xl shadow-purple-900/10';
+                  btnColor = 'bg-purple-600 hover:bg-purple-500 text-white';
+                  iconColor = 'text-purple-600 dark:text-purple-400';
               } else if (plan.color === 'yellow') {
-                  borderColor = 'border-yellow-500/50';
-                  shadowColor = 'shadow-[0_0_20px_rgba(234,179,8,0.15)]';
+                  borderColor = 'border-yellow-500/30';
+                  shadowColor = 'shadow-xl shadow-yellow-900/10';
                   btnColor = 'bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white';
-                  iconColor = 'text-yellow-400';
+                  iconColor = 'text-yellow-600 dark:text-yellow-400';
               }
 
               return (
                   <div 
                     key={plan.id} 
-                    className={`relative bg-slate-900 rounded-2xl p-6 border ${borderColor} ${shadowColor} transition-transform duration-300 ${plan.isPopular ? 'scale-[1.02]' : ''}`}
+                    className={`relative bg-white dark:bg-slate-900/40 rounded-[32px] p-8 border ${borderColor} ${shadowColor} transition-all duration-300 ${plan.isPopular ? 'scale-[1.02] bg-white dark:bg-slate-900/60' : ''}`}
                   >
                       {plan.isPopular && (
-                          <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-lg">
+                          <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-600 text-white text-[10px] font-bold px-4 py-1.5 rounded-full shadow-lg tracking-wider">
                               EN POPÜLER
                           </div>
                       )}
 
-                      <div className="flex justify-between items-start mb-4">
-                          <div className={`p-3 rounded-xl bg-slate-950 border border-slate-800 ${iconColor}`}>
-                              <Icon size={24} />
+                      <div className="flex justify-between items-start mb-6">
+                          <div className={`w-14 h-14 rounded-2xl bg-slate-50 dark:bg-slate-950 flex items-center justify-center border border-black/5 dark:border-white/5 shadow-inner ${iconColor}`}>
+                              <Icon size={28} />
                           </div>
                           <div className="text-right">
                               <div className="flex items-end justify-end gap-1">
-                                  <span className="text-2xl font-bold text-white">₺{plan.price}</span>
-                                  <span className="text-xs text-slate-500 mb-1">/ay</span>
+                                  <span className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">₺{plan.price}</span>
+                                  <span className="text-xs text-slate-500 mb-1.5 font-bold">/ay</span>
                               </div>
-                              <p className="text-[10px] text-slate-400">{plan.billingPeriod} faturalandırılır</p>
+                              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{plan.billingPeriod} faturalandırılır</p>
                           </div>
                       </div>
 
-                      <h3 className={`text-lg font-bold mb-2 ${plan.color === 'yellow' ? 'text-yellow-400' : 'text-white'}`}>
+                      <h3 className={`text-xl font-bold mb-2 tracking-tight ${plan.color === 'yellow' ? 'text-yellow-600 dark:text-yellow-400' : 'text-slate-900 dark:text-white'}`}>
                           {plan.name}
                       </h3>
-                      <p className="text-xs text-slate-400 mb-6 min-h-[40px]">
+                      <p className="text-xs text-slate-500 mb-8 min-h-[40px] font-medium leading-relaxed">
                           {plan.description}
                       </p>
 
-                      <div className="space-y-3 mb-8">
+                      <div className="space-y-4 mb-10">
                           {plan.features.map((feature, idx) => (
                               <div key={idx} className="flex items-center gap-3">
-                                  <div className={`p-0.5 rounded-full ${plan.color === 'yellow' ? 'bg-yellow-500/20 text-yellow-500' : 'bg-blue-500/20 text-blue-500'}`}>
+                                  <div className={`w-5 h-5 rounded-full flex items-center justify-center ${plan.color === 'yellow' ? 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-500' : 'bg-purple-500/10 text-purple-600 dark:text-purple-500'}`}>
                                     <Check size={12} strokeWidth={3} />
                                   </div>
-                                  <span className="text-sm text-slate-300">{feature}</span>
+                                  <span className="text-[13px] text-slate-600 dark:text-slate-300 font-medium">{feature}</span>
                               </div>
                           ))}
                       </div>
@@ -113,9 +116,9 @@ const Premium = () => {
                       <button 
                         onClick={() => handleSelectPlan(plan.id)}
                         disabled={isCurrent}
-                        className={`w-full py-3.5 rounded-xl font-bold text-sm transition-all shadow-lg active:scale-95 ${
+                        className={`w-full py-4.5 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all shadow-lg active:scale-95 ${
                             isCurrent 
-                            ? 'bg-slate-800 text-slate-500 cursor-default' 
+                            ? 'bg-slate-200 dark:bg-slate-800/50 text-slate-400 dark:text-slate-500 cursor-default border border-black/5 dark:border-white/5' 
                             : btnColor
                         }`}
                       >
