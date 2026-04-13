@@ -33,10 +33,21 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
   const navigate = useNavigate();
   const { user } = useTelegram();
   const isAdminPath = location.pathname.startsWith('/a/');
+  const isPanelPath = isAdminPath || location.pathname.startsWith('/u/');
   const [isMaintenance, setIsMaintenance] = useState(false);
   const [isRestricted, setIsRestricted] = useState(false);
 
   useEffect(() => {
+    const root = window.document.documentElement;
+    if (isPanelPath) {
+      root.classList.remove('light');
+      root.classList.add('dark');
+    } else {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      root.classList.remove('light', 'dark');
+      root.classList.add(savedTheme);
+    }
+
     // Remove the static loader from index.html once the app is ready
     const loader = document.getElementById('loader');
     if (loader) {
@@ -147,7 +158,7 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
   }, [location.pathname, navigate, isAdminPath]);
 
   return (
-    <div className={`${isAdminPath ? 'bg-slate-950' : 'bg-slate-50 dark:bg-slate-950'} flex flex-col min-h-screen transition-colors duration-300`}>
+    <div className={`${isPanelPath ? 'dark bg-slate-950' : 'bg-slate-50 dark:bg-slate-950'} flex flex-col min-h-screen transition-colors duration-300`}>
       {isMaintenance && !isAdminPath ? (
         <Maintenance />
       ) : isRestricted && !isAdminPath ? (
