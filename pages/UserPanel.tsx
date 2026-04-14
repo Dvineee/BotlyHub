@@ -65,19 +65,11 @@ const UserPanel: React.FC = () => {
                         <div className="flex items-center gap-4">
                             <div className="w-12 h-12 shrink-0">
                                 <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-[0_0_15px_rgba(34,158,217,0.2)]">
-                                  <defs>
-                                    <linearGradient id="logo_grad_user" x1="0%" y1="0%" x2="100%" y2="100%">
-                                      <stop offset="0%" style={{stopColor:'#229ED9', stopOpacity:0.1}} />
-                                      <stop offset="100%" style={{stopColor:'#FF8A3D', stopOpacity:0.1}} />
-                                    </linearGradient>
-                                  </defs>
-                                  <circle cx="150" cy="150" r="135" fill="url(#logo_grad_user)" />
-                                  <g transform="rotate(26 150 150) scale(1.1)">
-                                    <line x1="150" y1="105" x2="95" y2="195" stroke="#229ED9" strokeWidth="42" strokeLinecap="round"/>
-                                    <line x1="150" y1="105" x2="205" y2="195" stroke="#FF8A3D" strokeWidth="42" strokeLinecap="round"/>
-                                    <line x1="95" y1="195" x2="150" y2="105" stroke="#22C55E" strokeWidth="42" strokeLinecap="round" strokeOpacity="0.7"/>
-                                    <circle cx="150" cy="105" r="12" fill="#229ED9"/>
-                                    <circle cx="205" cy="195" r="12" fill="#FF8A3D"/>
+                                  <g transform="rotate(26 150 150)">
+                                    <polygon points="150,85 225,195 75,195" fill="#229ED9" opacity="0.9"/>
+                                    <line x1="150" y1="85" x2="225" y2="195" stroke="#FF8A3D" strokeWidth="38" strokeLinecap="round" strokeOpacity="0.85"/>
+                                    <line x1="75" y1="195" x2="150" y2="85" stroke="#22C55E" strokeWidth="38" strokeLinecap="round" strokeOpacity="0.85"/>
+                                    <line x1="225" y1="195" x2="75" y2="195" stroke="#229ED9" strokeWidth="38" strokeLinecap="round" strokeOpacity="0.85"/>
                                   </g>
                                 </svg>
                             </div>

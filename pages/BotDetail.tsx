@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
   ChevronLeft, Share2, Send, Loader2, ShieldCheck, 
   Bot as BotIcon, Zap, Shield, PlusCircle, X, 
-  Maximize2, ChevronRight, Eye, Lock, Unlock, AlertTriangle, 
+  Maximize2, ChevronRight, ChevronDown, Eye, Lock, Unlock, AlertTriangle, 
   Sparkles, Star, Download, Info, CheckCircle2, Globe, Cpu,
   Play, UserPlus, MessageSquare, BarChart3, MousePointer2
 } from 'lucide-react';
@@ -40,6 +40,7 @@ const BotDetail = () => {
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   
   const screenshotScroll = useDraggableScroll();
   
@@ -217,11 +218,91 @@ const BotDetail = () => {
           <div className="flex-1 min-w-0 pt-1">
               <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight truncate mb-1">{bot.name}</h1>
               <p className="text-purple-600 dark:text-purple-500 text-xs font-medium mb-3">{bot.category}</p>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 items-center">
                   <span className="bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 text-slate-500 dark:text-slate-400 text-[10px] font-bold px-3 py-1 rounded-xl uppercase">v4.2.0</span>
                   <span className="bg-purple-500/10 border border-purple-500/20 text-purple-600 dark:text-purple-400 text-[10px] font-bold px-3 py-1 rounded-xl uppercase flex items-center gap-1">
                       <ShieldCheck size={12} /> Onaylı
                   </span>
+                  
+                  {/* Dropdown Menu */}
+                  <div className="relative">
+                      <button 
+                          onClick={() => {
+                              if (bot.telegram_group || bot.website_url || bot.app_url || bot.social_url) {
+                                  setIsDropdownOpen(!isDropdownOpen);
+                              }
+                          }}
+                          className={`bg-[#0098ea] text-white text-[10px] font-black px-4 py-1.5 rounded-xl uppercase flex items-center gap-2 shadow-lg active:scale-95 transition-all ${!(bot.telegram_group || bot.website_url || bot.app_url || bot.social_url) ? 'opacity-50 cursor-default' : ''}`}
+                      >
+                          OPEN <ChevronDown size={12} className={`transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                      </button>
+                      
+                      <AnimatePresence>
+                          {isDropdownOpen && (
+                              <>
+                                  <div className="fixed inset-0 z-[70]" onClick={() => setIsDropdownOpen(false)}></div>
+                                  <motion.div 
+                                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                      className="absolute left-0 mt-2 w-48 bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-2xl shadow-2xl z-[80] overflow-hidden"
+                                  >
+                                      <div className="p-2 space-y-1">
+                                          {bot.telegram_group && (
+                                              <button 
+                                                  onClick={() => {
+                                                      const url = bot.telegram_group!.startsWith('@') ? `https://t.me/${bot.telegram_group!.substring(1)}` : bot.telegram_group;
+                                                      window.open(url, '_blank');
+                                                      setIsDropdownOpen(false);
+                                                  }}
+                                                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-colors text-left"
+                                              >
+                                                  <Send size={14} className="text-blue-500" />
+                                                  <span className="text-[10px] font-black uppercase tracking-tight">Telegram Grup</span>
+                                              </button>
+                                          )}
+                                          {bot.website_url && (
+                                              <button 
+                                                  onClick={() => {
+                                                      window.open(bot.website_url, '_blank');
+                                                      setIsDropdownOpen(false);
+                                                  }}
+                                                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-colors text-left"
+                                              >
+                                                  <Globe size={14} className="text-emerald-500" />
+                                                  <span className="text-[10px] font-black uppercase tracking-tight">Web Site</span>
+                                              </button>
+                                          )}
+                                          {bot.app_url && (
+                                              <button 
+                                                  onClick={() => {
+                                                      window.open(bot.app_url, '_blank');
+                                                      setIsDropdownOpen(false);
+                                                  }}
+                                                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-colors text-left"
+                                              >
+                                                  <Cpu size={14} className="text-purple-500" />
+                                                  <span className="text-[10px] font-black uppercase tracking-tight">App</span>
+                                              </button>
+                                          )}
+                                          {bot.social_url && (
+                                              <button 
+                                                  onClick={() => {
+                                                      window.open(bot.social_url, '_blank');
+                                                      setIsDropdownOpen(false);
+                                                  }}
+                                                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-colors text-left"
+                                              >
+                                                  <Share2 size={14} className="text-orange-500" />
+                                                  <span className="text-[10px] font-black uppercase tracking-tight">Sosyal</span>
+                                              </button>
+                                          )}
+                                      </div>
+                                  </motion.div>
+                              </>
+                          )}
+                      </AnimatePresence>
+                  </div>
               </div>
           </div>
         </div>

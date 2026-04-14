@@ -57,9 +57,15 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
 
   return (
     <div 
-        className={`min-w-[280px] h-40 bg-gradient-to-br ${colors[ann.color_scheme] || colors.purple} p-6 rounded-[32px] relative overflow-hidden shadow-xl shrink-0 transition-all active:scale-[0.97] cursor-pointer group snap-center`}
+        className={`min-w-[280px] h-40 ${ann.bg_image_url ? 'bg-slate-900' : `bg-gradient-to-br ${colors[ann.color_scheme] || colors.purple}`} p-6 rounded-[32px] relative overflow-hidden shadow-xl shrink-0 transition-all active:scale-[0.97] cursor-pointer group snap-center`}
         onClick={handleAction}
     >
+        {ann.bg_image_url && (
+            <div className="absolute inset-0 z-0">
+                <img src={ann.bg_image_url} alt="" className="w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity" referrerPolicy="no-referrer" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+            </div>
+        )}
         <div className="relative z-10 flex flex-col h-full justify-between">
             <div>
                 <h3 className="text-white font-bold text-xl mb-1 tracking-tight">{ann.title}</h3>
@@ -191,12 +197,11 @@ const Home = () => {
         <div className="flex items-center gap-3 order-1">
             <div className="w-12 h-12 shrink-0">
                 <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-[0_0_15px_rgba(34,158,217,0.2)]">
-                  <g transform="rotate(26 150 150) scale(1.1)">
-                    <line x1="150" y1="105" x2="95" y2="195" stroke="#229ED9" strokeWidth="42" strokeLinecap="round"/>
-                    <line x1="150" y1="105" x2="205" y2="195" stroke="#FF8A3D" strokeWidth="42" strokeLinecap="round"/>
-                    <line x1="95" y1="195" x2="150" y2="105" stroke="#22C55E" strokeWidth="42" strokeLinecap="round" strokeOpacity="0.7"/>
-                    <circle cx="150" cy="105" r="12" fill="#229ED9"/>
-                    <circle cx="205" cy="195" r="12" fill="#FF8A3D"/>
+                  <g transform="rotate(26 150 150)">
+                    <polygon points="150,85 225,195 75,195" fill="#229ED9" opacity="0.9"/>
+                    <line x1="150" y1="85" x2="225" y2="195" stroke="#FF8A3D" strokeWidth="38" strokeLinecap="round" strokeOpacity="0.85"/>
+                    <line x1="75" y1="195" x2="150" y2="85" stroke="#22C55E" strokeWidth="38" strokeLinecap="round" strokeOpacity="0.85"/>
+                    <line x1="225" y1="195" x2="75" y2="195" stroke="#229ED9" strokeWidth="38" strokeLinecap="round" strokeOpacity="0.85"/>
                   </g>
                 </svg>
             </div>
@@ -345,12 +350,11 @@ const Home = () => {
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 shrink-0">
               <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-                <g transform="rotate(26 150 150) scale(1.1)">
-                  <line x1="150" y1="105" x2="95" y2="195" stroke="#229ED9" strokeWidth="42" strokeLinecap="round"/>
-                  <line x1="150" y1="105" x2="205" y2="195" stroke="#FF8A3D" strokeWidth="42" strokeLinecap="round"/>
-                  <line x1="95" y1="195" x2="150" y2="105" stroke="#22C55E" strokeWidth="42" strokeLinecap="round" strokeOpacity="0.7"/>
-                  <circle cx="150" cy="105" r="12" fill="#229ED9"/>
-                  <circle cx="205" cy="195" r="12" fill="#FF8A3D"/>
+                <g transform="rotate(26 150 150)">
+                  <polygon points="150,85 225,195 75,195" fill="#229ED9" opacity="0.9"/>
+                  <line x1="150" y1="85" x2="225" y2="195" stroke="#FF8A3D" strokeWidth="38" strokeLinecap="round" strokeOpacity="0.85"/>
+                  <line x1="75" y1="195" x2="150" y2="85" stroke="#22C55E" strokeWidth="38" strokeLinecap="round" strokeOpacity="0.85"/>
+                  <line x1="225" y1="195" x2="75" y2="195" stroke="#229ED9" strokeWidth="38" strokeLinecap="round" strokeOpacity="0.85"/>
                 </g>
               </svg>
             </div>

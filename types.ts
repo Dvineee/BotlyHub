@@ -50,6 +50,10 @@ export interface Bot {
   views?: number;
   is_official?: boolean;
   languages?: string[];
+  telegram_group?: string;
+  website_url?: string;
+  app_url?: string;
+  social_url?: string;
 }
 
 export interface Promotion {
@@ -93,6 +97,7 @@ export interface Announcement {
   button_link: string;
   icon_name: string;
   color_scheme: string;
+  bg_image_url?: string;
   is_active: boolean;
   action_type: 'link' | 'popup';
   content_detail?: string;

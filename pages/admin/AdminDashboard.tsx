@@ -76,19 +76,11 @@ const AdminDashboard = () => {
           <div className="flex items-center gap-4 mb-14">
             <div className="w-12 h-12 shrink-0">
                 <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-[0_0_15px_rgba(34,158,217,0.2)]">
-                  <defs>
-                    <linearGradient id="logo_grad_admin" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" style={{stopColor:'#229ED9', stopOpacity:0.1}} />
-                      <stop offset="100%" style={{stopColor:'#FF8A3D', stopOpacity:0.1}} />
-                    </linearGradient>
-                  </defs>
-                  <circle cx="150" cy="150" r="135" fill="url(#logo_grad_admin)" />
-                  <g transform="rotate(26 150 150) scale(1.1)">
-                    <line x1="150" y1="105" x2="95" y2="195" stroke="#229ED9" strokeWidth="42" strokeLinecap="round"/>
-                    <line x1="150" y1="105" x2="205" y2="195" stroke="#FF8A3D" strokeWidth="42" strokeLinecap="round"/>
-                    <line x1="95" y1="195" x2="150" y2="105" stroke="#22C55E" strokeWidth="42" strokeLinecap="round" strokeOpacity="0.7"/>
-                    <circle cx="150" cy="105" r="12" fill="#229ED9"/>
-                    <circle cx="205" cy="195" r="12" fill="#FF8A3D"/>
+                  <g transform="rotate(26 150 150)">
+                    <polygon points="150,85 225,195 75,195" fill="#229ED9" opacity="0.9"/>
+                    <line x1="150" y1="85" x2="225" y2="195" stroke="#FF8A3D" strokeWidth="38" strokeLinecap="round" strokeOpacity="0.85"/>
+                    <line x1="75" y1="195" x2="150" y2="85" stroke="#22C55E" strokeWidth="38" strokeLinecap="round" strokeOpacity="0.85"/>
+                    <line x1="225" y1="195" x2="75" y2="195" stroke="#229ED9" strokeWidth="38" strokeLinecap="round" strokeOpacity="0.85"/>
                   </g>
                 </svg>
             </div>
@@ -100,20 +92,20 @@ const AdminDashboard = () => {
           
             <nav className="flex-1 space-y-2 overflow-y-auto no-scrollbar">
             <NavItem to="/a/dashboard" icon={LayoutDashboard} label="Panel" active={location.pathname === '/a/dashboard'} onClick={() => setSidebarOpen(false)} />
-            <div className="pt-8 pb-3 px-6"><span className="text-[9px] font-black text-slate-800 uppercase tracking-widest italic">İzleme</span></div>
+            <div className="pt-8 pb-3 px-6"><span className="text-[9px] font-black text-slate-600 uppercase tracking-widest italic">İzleme</span></div>
             <NavItem to="/a/dashboard/users" icon={Users} label="Kullanıcılar" active={location.pathname.startsWith('/a/dashboard/users')} onClick={() => setSidebarOpen(false)} />
             <NavItem to="/a/dashboard/admin-logs" icon={ShieldCheck} label="Admin Logları" active={location.pathname.startsWith('/a/dashboard/admin-logs')} onClick={() => setSidebarOpen(false)} />
             <NavItem to="/a/dashboard/user-logs" icon={History} label="Üye Hareketleri" active={location.pathname.startsWith('/a/dashboard/user-logs')} onClick={() => setSidebarOpen(false)} />
             <NavItem to="/a/dashboard/sales" icon={Wallet} label="Finans" active={location.pathname.startsWith('/a/dashboard/sales')} onClick={() => setSidebarOpen(false)} />
             <NavItem to="/a/dashboard/referrals" icon={UserPlus} label="Referanslar" active={location.pathname.startsWith('/a/dashboard/referrals')} onClick={() => setSidebarOpen(false)} />
             
-            <div className="pt-8 pb-3 px-6"><span className="text-[9px] font-black text-slate-800 uppercase tracking-widest italic">İçerik</span></div>
+            <div className="pt-8 pb-3 px-6"><span className="text-[9px] font-black text-slate-600 uppercase tracking-widest italic">İçerik</span></div>
             <NavItem to="/a/dashboard/bots" icon={Bot} label="Market Botları" active={location.pathname.startsWith('/a/dashboard/bots')} onClick={() => setSidebarOpen(false)} />
             <NavItem to="/a/dashboard/promotions" icon={RadioIcon} label="Tanıtım Motoru" active={location.pathname.startsWith('/a/dashboard/promotions')} onClick={() => setSidebarOpen(false)} />
             <NavItem to="/a/dashboard/announcements" icon={Megaphone} label="Duyuru Merkezi" active={location.pathname.startsWith('/a/dashboard/announcements')} onClick={() => setSidebarOpen(false)} />
             <NavItem to="/a/dashboard/notifications" icon={Bell} label="Bildirim Gönder" active={location.pathname.startsWith('/a/dashboard/notifications')} onClick={() => setSidebarOpen(false)} />
             
-            <div className="pt-8 pb-3 px-6"><span className="text-[9px] font-black text-slate-800 uppercase tracking-widest italic">Sistem</span></div>
+            <div className="pt-8 pb-3 px-6"><span className="text-[9px] font-black text-slate-600 uppercase tracking-widest italic">Sistem</span></div>
             <NavItem to="/a/dashboard/settings" icon={SettingsIcon} label="Sistem Ayarları" active={location.pathname.startsWith('/a/dashboard/settings')} onClick={() => setSidebarOpen(false)} />
           </nav>
 
@@ -276,7 +268,11 @@ const BotManagement = () => {
             bot_link: '@',
             icon: '',
             screenshots: [],
-            is_premium: false
+            is_premium: false,
+            telegram_group: '',
+            website_url: '',
+            app_url: '',
+            social_url: ''
         });
         setIsModalOpen(true);
         setActiveTab('info');
@@ -318,7 +314,7 @@ const BotManagement = () => {
             {isLoading ? (
                 <div className="flex flex-col items-center justify-center py-32 gap-4">
                     <Loader2 className="animate-spin text-blue-500" size={40} />
-                    <span className="text-[10px] font-black text-slate-800 uppercase tracking-widest italic">Veriler Senkronize Ediliyor...</span>
+                    <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">Veriler Senkronize Ediliyor...</span>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
@@ -435,6 +431,12 @@ const BotManagement = () => {
                                                             </button>
                                                         ))}
                                                     </div>
+                                                </div>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 md:col-span-2">
+                                                    <AdminInput label="TELEGRAM GRUP (@)" value={editingBot.telegram_group} onChange={(v:any)=>setEditingBot({...editingBot, telegram_group:v})} placeholder="@groupname" />
+                                                    <AdminInput label="WEB SİTE URL" value={editingBot.website_url} onChange={(v:any)=>setEditingBot({...editingBot, website_url:v})} placeholder="https://..." />
+                                                    <AdminInput label="APP URL" value={editingBot.app_url} onChange={(v:any)=>setEditingBot({...editingBot, app_url:v})} placeholder="https://..." />
+                                                    <AdminInput label="SOSYAL MEDYA URL" value={editingBot.social_url} onChange={(v:any)=>setEditingBot({...editingBot, social_url:v})} placeholder="https://..." />
                                                 </div>
                                             </div>
                                             <div className="space-y-2">
@@ -641,7 +643,7 @@ const UserDetailModal = ({ user, onClose, onUpdate }: { user: User, onClose: () 
                     {isLoading ? (
                         <div className="flex flex-col items-center justify-center py-20 gap-4">
                             <Loader2 className="animate-spin text-blue-500" size={32} />
-                            <span className="text-[10px] font-black text-slate-800 uppercase tracking-widest italic">Veriler Çekiliyor...</span>
+                            <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">Veriler Çekiliyor...</span>
                         </div>
                     ) : (
                         <div className="animate-in fade-in slide-in-from-bottom-4">
@@ -775,7 +777,7 @@ const UserDetailModal = ({ user, onClose, onUpdate }: { user: User, onClose: () 
                                 <div className="space-y-4">
                                     {channels.length === 0 ? (
                                         <div className="py-20 text-center bg-slate-950/30 rounded-[32px] border-2 border-dashed border-slate-900">
-                                            <Radio size={40} className="mx-auto text-slate-800 mb-4" />
+                                            <Radio size={40} className="mx-auto text-slate-600 mb-4" />
                                             <p className="text-slate-600 text-[10px] font-black uppercase tracking-widest">Henüz kanal eklenmemiş</p>
                                         </div>
                                     ) : (
@@ -809,7 +811,7 @@ const UserDetailModal = ({ user, onClose, onUpdate }: { user: User, onClose: () 
                                 <div className="space-y-4">
                                     {bots.length === 0 ? (
                                         <div className="py-20 text-center bg-slate-950/30 rounded-[32px] border-2 border-dashed border-slate-900">
-                                            <Bot size={40} className="mx-auto text-slate-800 mb-4" />
+                                            <Bot size={40} className="mx-auto text-slate-600 mb-4" />
                                             <p className="text-slate-600 text-[10px] font-black uppercase tracking-widest">Henüz bot edinilmemiş</p>
                                         </div>
                                     ) : (
@@ -959,7 +961,7 @@ const UserDetailModal = ({ user, onClose, onUpdate }: { user: User, onClose: () 
                                             <tbody className="divide-y divide-white/5">
                                                 {stats.length === 0 ? (
                                                     <tr>
-                                                        <td colSpan={4} className="px-6 py-12 text-center text-[10px] font-black text-slate-800 uppercase italic">Henüz veri bulunmuyor</td>
+                                                        <td colSpan={4} className="px-6 py-12 text-center text-[10px] font-black text-slate-600 uppercase italic">Henüz veri bulunmuyor</td>
                                                     </tr>
                                                 ) : (
                                                     stats.map((s, idx) => (
@@ -993,7 +995,7 @@ const UserDetailModal = ({ user, onClose, onUpdate }: { user: User, onClose: () 
                                 <div className="space-y-4 animate-in slide-in-from-bottom-4">
                                     {logs.length === 0 ? (
                                         <div className="py-20 text-center bg-slate-950/30 rounded-[32px] border-2 border-dashed border-slate-900">
-                                            <History size={40} className="mx-auto text-slate-800 mb-4" />
+                                            <History size={40} className="mx-auto text-slate-600 mb-4" />
                                             <p className="text-slate-600 text-[10px] font-black uppercase tracking-widest">Henüz hareket kaydı yok</p>
                                         </div>
                                     ) : (
@@ -1396,11 +1398,11 @@ const ActivityCenter = ({ filterType }: { filterType: 'admin' | 'user' }) => {
             {isLoading ? (
                 <div className="flex flex-col items-center justify-center py-32 gap-4">
                     <Loader2 className="animate-spin text-blue-500" size={40} />
-                    <span className="text-[10px] font-black text-slate-800 uppercase tracking-widest italic">Loglar Yükleniyor...</span>
+                    <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">Loglar Yükleniyor...</span>
                 </div>
             ) : filteredLogs.length === 0 ? (
                 <div className="py-32 text-center bg-slate-900/20 rounded-[44px] border-2 border-dashed border-slate-900">
-                    <History size={48} className="mx-auto text-slate-800 mb-4" />
+                    <History size={48} className="mx-auto text-slate-600 mb-4" />
                     <p className="text-slate-500 text-sm font-bold uppercase tracking-widest">Sonuç Bulunamadı</p>
                     <p className="text-[10px] text-slate-700 mt-2 italic font-medium">Arama kriterlerinizi değiştirmeyi deneyin.</p>
                 </div>
@@ -1495,7 +1497,7 @@ const ActivityCenter = ({ filterType }: { filterType: 'admin' | 'user' }) => {
                                         <div>
                                             <p className="text-xs font-black text-white uppercase italic">{selectedLog.user?.name || 'Bilinmeyen Kullanıcı'}</p>
                                             <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest">@{selectedLog.user?.username || 'bilinmiyor'}</p>
-                                            <p className="text-[8px] font-bold text-slate-800 mt-1">KULLANICI ID: {selectedLog.user_id}</p>
+                                            <p className="text-[8px] font-bold text-slate-600 mt-1">KULLANICI ID: {selectedLog.user_id}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -1585,11 +1587,11 @@ const SalesManagement = () => {
                 {isLoading ? (
                     <div className="flex flex-col items-center justify-center py-32 gap-4">
                         <Loader2 className="animate-spin text-blue-500" size={40} />
-                        <span className="text-[10px] font-black text-slate-800 uppercase tracking-widest italic">İşlemler Yükleniyor...</span>
+                        <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">İşlemler Yükleniyor...</span>
                     </div>
                 ) : filtered.length === 0 ? (
                     <div className="py-32 text-center">
-                        <History size={48} className="mx-auto text-slate-800 mb-4" />
+                        <History size={48} className="mx-auto text-slate-600 mb-4" />
                         <p className="text-slate-500 text-sm font-bold uppercase tracking-widest">İşlem Bulunamadı</p>
                     </div>
                 ) : (
@@ -1739,6 +1741,7 @@ const AnnouncementCenter = () => {
             button_link: '',
             icon_name: 'Megaphone',
             color_scheme: 'purple',
+            bg_image_url: '',
             is_active: true,
             action_type: 'link',
             content_detail: ''
@@ -1793,8 +1796,14 @@ const AnnouncementCenter = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                     {anns.map(a => (
                         <div key={a.id} className="bg-slate-900/40 border border-white/5 rounded-[44px] p-8 lg:p-10 flex flex-col gap-6 group hover:border-blue-500/30 transition-all relative overflow-hidden shadow-2xl backdrop-blur-sm">
+                            {a.bg_image_url && (
+                                <div className="absolute inset-0 z-0">
+                                    <img src={a.bg_image_url} alt="" className="w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity" referrerPolicy="no-referrer" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
+                                </div>
+                            )}
                             <div className="flex justify-between items-start relative z-10">
-                                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-xl border border-white/5 ${a.is_active ? `bg-gradient-to-br ${previewColors[a.color_scheme] || 'bg-blue-600'} text-white` : 'bg-slate-800 text-slate-600'}`}>
+                                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-xl border border-white/5 ${a.is_active ? (a.bg_image_url ? 'bg-white/10 text-white backdrop-blur-md' : `bg-gradient-to-br ${previewColors[a.color_scheme] || 'bg-blue-600'} text-white`) : 'bg-slate-800 text-slate-600'}`}>
                                     {a.icon_name === 'Megaphone' ? <Megaphone size={24}/> : a.icon_name === 'Sparkles' ? <Sparkles size={24}/> : a.icon_name === 'Zap' ? <Zap size={24}/> : <Star size={24}/>}
                                 </div>
                                 <div className="flex gap-2">
@@ -1812,10 +1821,10 @@ const AnnouncementCenter = () => {
                             </div>
 
                             <div className="flex items-center justify-between pt-6 border-t border-white/5 relative z-10">
-                                <span className={`text-[9px] font-black uppercase tracking-widest ${a.color_scheme === 'purple' ? 'text-purple-500' : a.color_scheme === 'emerald' ? 'text-emerald-500' : a.color_scheme === 'orange' ? 'text-orange-500' : 'text-blue-500'}`}>
-                                    {a.color_scheme.toUpperCase()} SCHEME
+                                <span className={`text-[9px] font-black uppercase tracking-widest ${a.bg_image_url ? 'text-blue-400' : (a.color_scheme === 'purple' ? 'text-purple-500' : a.color_scheme === 'emerald' ? 'text-emerald-500' : a.color_scheme === 'orange' ? 'text-orange-500' : 'text-blue-500')}`}>
+                                    {a.bg_image_url ? 'IMAGE BACKGROUND' : `${a.color_scheme.toUpperCase()} SCHEME`}
                                 </span>
-                                <ChevronRight size={18} className="text-slate-800" />
+                                <ChevronRight size={18} className="text-slate-600" />
                             </div>
                         </div>
                     ))}
@@ -1874,39 +1883,85 @@ const AnnouncementCenter = () => {
 
                                     {activeTab === 'style' && (
                                         <div className="space-y-10 animate-in slide-in-from-left-4">
-                                            {/* Renk Seçimi */}
+                                            {/* Arkaplan Tipi Seçimi */}
                                             <div className="space-y-4">
-                                                <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">RENK ŞEMASI (GÖRSEL ÖNİZLEME)</label>
-                                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                                                    {[
-                                                        { id: 'purple', label: 'Hologram Purple', class: 'from-[#6366f1] to-[#a855f7]' },
-                                                        { id: 'blue', label: 'Deep Sea Blue', class: 'from-[#3b82f6] to-[#60a5fa]' },
-                                                        { id: 'emerald', label: 'Neon Emerald', class: 'from-[#10b981] to-[#34d399]' },
-                                                        { id: 'orange', label: 'Cyber Orange', class: 'from-[#f59e0b] to-[#ef4444]' }
-                                                    ].map(scheme => (
-                                                        <button
-                                                            key={scheme.id}
-                                                            type="button"
-                                                            onClick={() => setEditingAnn({ ...editingAnn, color_scheme: scheme.id })}
-                                                            className={`group relative h-24 rounded-3xl border transition-all overflow-hidden ${
-                                                                editingAnn.color_scheme === scheme.id 
-                                                                ? 'border-white ring-2 ring-white/20' 
-                                                                : 'border-white/5 hover:border-white/20'
-                                                            }`}
-                                                        >
-                                                            <div className={`absolute inset-0 bg-gradient-to-br ${scheme.class} opacity-80 group-hover:opacity-100 transition-opacity`}></div>
-                                                            <div className="absolute inset-0 flex items-center justify-center">
-                                                                <span className="text-[8px] font-black text-white uppercase tracking-tighter drop-shadow-lg">{scheme.label}</span>
-                                                            </div>
-                                                            {editingAnn.color_scheme === scheme.id && (
-                                                                <div className="absolute top-2 right-2 bg-white text-black rounded-full p-1 shadow-xl">
-                                                                    <Check size={8} />
-                                                                </div>
-                                                            )}
-                                                        </button>
-                                                    ))}
+                                                <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">ARKAPLAN TİPİ</label>
+                                                <div className="flex gap-2 bg-white/5 p-1.5 rounded-3xl border border-white/5">
+                                                    <button 
+                                                        type="button"
+                                                        onClick={() => setEditingAnn({ ...editingAnn, bg_image_url: '' })}
+                                                        className={`flex-1 py-3 rounded-[20px] text-[9px] font-black uppercase tracking-widest transition-all ${!editingAnn.bg_image_url ? 'bg-blue-600 text-white shadow-xl' : 'text-slate-500 hover:bg-white/5'}`}
+                                                    >
+                                                        RENK ŞEMASI
+                                                    </button>
+                                                    <button 
+                                                        type="button"
+                                                        onClick={() => setEditingAnn({ ...editingAnn, bg_image_url: editingAnn.bg_image_url || 'https://' })}
+                                                        className={`flex-1 py-3 rounded-[20px] text-[9px] font-black uppercase tracking-widest transition-all ${editingAnn.bg_image_url ? 'bg-blue-600 text-white shadow-xl' : 'text-slate-500 hover:bg-white/5'}`}
+                                                    >
+                                                        PNG GÖRSEL
+                                                    </button>
                                                 </div>
                                             </div>
+
+                                            {!editingAnn.bg_image_url ? (
+                                                /* Renk Seçimi */
+                                                <div className="space-y-4 animate-in fade-in">
+                                                    <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">RENK ŞEMASI (GÖRSEL ÖNİZLEME)</label>
+                                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                                        {[
+                                                            { id: 'purple', label: 'Hologram Purple', class: 'from-[#6366f1] to-[#a855f7]' },
+                                                            { id: 'blue', label: 'Deep Sea Blue', class: 'from-[#3b82f6] to-[#60a5fa]' },
+                                                            { id: 'emerald', label: 'Neon Emerald', class: 'from-[#10b981] to-[#34d399]' },
+                                                            { id: 'orange', label: 'Cyber Orange', class: 'from-[#f59e0b] to-[#ef4444]' }
+                                                        ].map(scheme => (
+                                                            <button
+                                                                key={scheme.id}
+                                                                type="button"
+                                                                onClick={() => setEditingAnn({ ...editingAnn, color_scheme: scheme.id })}
+                                                                className={`group relative h-24 rounded-3xl border transition-all overflow-hidden ${
+                                                                    editingAnn.color_scheme === scheme.id 
+                                                                    ? 'border-white ring-2 ring-white/20' 
+                                                                    : 'border-white/5 hover:border-white/20'
+                                                                }`}
+                                                            >
+                                                                <div className={`absolute inset-0 bg-gradient-to-br ${scheme.class} opacity-80 group-hover:opacity-100 transition-opacity`}></div>
+                                                                <div className="absolute inset-0 flex items-center justify-center">
+                                                                    <span className="text-[8px] font-black text-white uppercase tracking-tighter drop-shadow-lg">{scheme.label}</span>
+                                                                </div>
+                                                                {editingAnn.color_scheme === scheme.id && (
+                                                                    <div className="absolute top-2 right-2 bg-blue-600 text-white rounded-full p-1 shadow-xl">
+                                                                        <Check size={8} />
+                                                                    </div>
+                                                                )}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                /* PNG Görsel Seçimi */
+                                                <div className="space-y-4 animate-in fade-in">
+                                                    <AdminInput 
+                                                        label="PNG GÖRSEL URL" 
+                                                        value={editingAnn.bg_image_url} 
+                                                        onChange={(v:any)=>setEditingAnn({...editingAnn, bg_image_url:v})} 
+                                                        placeholder="https://example.com/image.png"
+                                                    />
+                                                    <div className="p-4 bg-white/5 rounded-3xl border border-white/5 flex items-center gap-4">
+                                                        <div className="w-16 h-16 rounded-xl overflow-hidden bg-slate-950 border border-white/10 flex items-center justify-center shrink-0">
+                                                            {editingAnn.bg_image_url && editingAnn.bg_image_url.startsWith('http') ? (
+                                                                <img src={editingAnn.bg_image_url} alt="Preview" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                                                            ) : (
+                                                                <ImageIcon className="text-slate-700" size={24} />
+                                                            )}
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-[10px] font-black text-white uppercase italic">GÖRSEL ÖNİZLEME</p>
+                                                            <p className="text-[8px] font-bold text-slate-600 uppercase mt-1">Geçerli bir PNG URL'si girin.</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
 
                                             {/* İkon Seçimi */}
                                             <div className="space-y-4">
@@ -1982,9 +2037,16 @@ const AnnouncementCenter = () => {
                                 <h4 className="text-xl font-black text-white italic tracking-widest opacity-20 uppercase">Display Simulator</h4>
                             </div>
 
-                            <div className="w-full max-w-[320px] h-44 rounded-[40px] bg-gradient-to-br transition-all duration-700 p-8 relative overflow-hidden shadow-2xl transform hover:rotate-2 group" style={{ background: 'transparent' }}>
+                            <div className="w-full max-w-[320px] h-44 rounded-[40px] transition-all duration-700 p-8 relative overflow-hidden shadow-2xl transform hover:rotate-2 group">
                                 {/* Dinamik Arkaplan */}
-                                <div className={`absolute inset-0 bg-gradient-to-br ${previewColors[editingAnn.color_scheme] || previewColors.purple} transition-all duration-700`}></div>
+                                {editingAnn.bg_image_url ? (
+                                    <div className="absolute inset-0 z-0">
+                                        <img src={editingAnn.bg_image_url} alt="" className="w-full h-full object-cover opacity-40" referrerPolicy="no-referrer" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                                    </div>
+                                ) : (
+                                    <div className={`absolute inset-0 bg-gradient-to-br ${previewColors[editingAnn.color_scheme] || previewColors.purple} transition-all duration-700`}></div>
+                                )}
                                 
                                 <div className="relative z-10 flex flex-col h-full justify-between">
                                     <div>
@@ -2003,7 +2065,7 @@ const AnnouncementCenter = () => {
                                 </div>
                             </div>
 
-                            <p className="text-[9px] font-black text-slate-800 uppercase tracking-widest mt-10 italic">Gerçek zamanlı görünüm simülasyonu</p>
+                            <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mt-10 italic">Gerçek zamanlı görünüm simülasyonu</p>
                         </div>
                     </div>
                 </div>
@@ -2166,7 +2228,7 @@ const NotificationCenter = () => {
                                             <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">HEDEF KİTLE</label>
                                             <div className="flex gap-2">
                                                 {['global', 'user'].map(t => (
-                                                    <button key={t} type="button" onClick={()=>setNewNote({...newNote, target_type: t})} className={`flex-1 py-4 rounded-2xl text-[8px] font-black uppercase tracking-widest transition-all ${newNote.target_type === t ? 'bg-white text-black shadow-xl' : 'bg-slate-950 text-slate-600 border border-white/5'}`}>{t === 'global' ? 'HERKESE' : 'SPESİFİK'}</button>
+                                                    <button key={t} type="button" onClick={()=>setNewNote({...newNote, target_type: t})} className={`flex-1 py-4 rounded-2xl text-[8px] font-black uppercase tracking-widest transition-all ${newNote.target_type === t ? 'bg-blue-600 text-white shadow-xl' : 'bg-slate-950 text-slate-600 border border-white/5'}`}>{t === 'global' ? 'HERKESE' : 'SPESİFİK'}</button>
                                                 ))}
                                             </div>
                                         </div>
@@ -2418,11 +2480,11 @@ const PromotionManagement = () => {
             {isLoading && updatingId === null ? (
                 <div className="flex flex-col items-center justify-center py-24 gap-4">
                     <Loader2 className="animate-spin text-blue-500" size={32} />
-                    <span className="text-[10px] font-black text-slate-800 uppercase tracking-widest italic">Senkronize Ediliyor...</span>
+                    <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">Senkronize Ediliyor...</span>
                 </div>
             ) : promos.length === 0 ? (
                 <div className="bg-slate-900/20 border-2 border-dashed border-slate-800 rounded-[48px] p-24 text-center">
-                    <Megaphone size={48} className="text-slate-800 mx-auto mb-6" />
+                    <Megaphone size={48} className="text-slate-600 mx-auto mb-6" />
                     <p className="text-slate-600 font-black uppercase italic tracking-widest">Henüz bir kampanya tanımlanmadı.</p>
                 </div>
             ) : (
@@ -2687,8 +2749,8 @@ const PromotionManagement = () => {
                                     <img src={editingPromo.image_url} className="w-full h-48 object-cover border-b border-white/5" onError={(e)=>(e.target as any).src=''} />
                                 ) : (
                                     <div className="w-full h-32 bg-slate-900/40 flex flex-col items-center justify-center border-b border-white/5">
-                                        <ImageIcon className="text-slate-800 mb-2" size={32} />
-                                        <span className="text-[8px] font-black text-slate-800 uppercase tracking-widest">Görsel Alanı</span>
+                                        <ImageIcon className="text-slate-600 mb-2" size={32} />
+                                        <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest">Görsel Alanı</span>
                                     </div>
                                 )}
                                 <div className="p-8 space-y-4">

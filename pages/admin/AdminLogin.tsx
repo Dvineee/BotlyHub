@@ -58,7 +58,7 @@ const AdminLogin = () => {
           </motion.div>
           
           <h1 className="text-5xl font-black text-white mb-4 italic uppercase tracking-tighter leading-none">
-            Botly<span className="text-blue-500">Hub</span> <span className="text-2xl align-top text-slate-700">V3</span>
+            Botly<span className="text-blue-500">Hub</span> <span className="text-2xl align-top text-slate-500">V3</span>
           </h1>
           <div className="flex items-center justify-center gap-2 text-slate-500 font-bold uppercase tracking-[0.2em] text-[10px]">
             <Sparkles size={12} className="text-blue-500" />
@@ -148,7 +148,7 @@ const AdminLogin = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
-          className="text-center text-slate-700 mt-10 text-[9px] font-black uppercase tracking-[0.3em] italic"
+          className="text-center text-slate-500 mt-10 text-[9px] font-black uppercase tracking-[0.3em] italic"
         >
           Güvenliğiniz için her oturum sonunda çıkış yapmayı unutmayın.
         </motion.p>
