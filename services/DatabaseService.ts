@@ -449,8 +449,12 @@ export class DatabaseService {
         bot_link: bot.bot_link, 
         screenshots: bot.screenshots || [], 
         icon: bot.icon, 
-        is_premium: Boolean(bot.is_premium),
-        languages: bot.languages || []
+        is_official: Boolean(bot.is_official),
+        languages: bot.languages || [],
+        telegram_group: bot.telegram_group || null,
+        website_url: bot.website_url || null,
+        app_url: bot.app_url || null,
+        social_url: bot.social_url || null
     });
     if (error) throw error;
   }

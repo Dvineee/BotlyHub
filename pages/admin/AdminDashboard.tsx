@@ -268,7 +268,7 @@ const BotManagement = () => {
             bot_link: '@',
             icon: '',
             screenshots: [],
-            is_premium: false,
+            is_official: false,
             telegram_group: '',
             website_url: '',
             app_url: '',
@@ -330,6 +330,12 @@ const BotManagement = () => {
                                     {b.price > 0 && <div className="absolute -top-2 -right-2 w-6 h-6 lg:w-7 lg:h-7 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg border-4 border-[#020617]"><Zap size={10} fill="currentColor" /></div>}
                                 </div>
                                 <div className="flex gap-2">
+                                    {b.is_official && (
+                                        <div className="px-3 py-1 bg-blue-500/10 border border-blue-500/20 rounded-lg flex items-center gap-1.5">
+                                            <ShieldCheck size={10} className="text-blue-500" />
+                                            <span className="text-[8px] font-black text-blue-500 uppercase tracking-widest">OFFICIAL</span>
+                                        </div>
+                                    )}
                                     <button onClick={() => { setEditingBot(b); setIsModalOpen(true); }} className="p-2.5 lg:p-3 bg-white/5 rounded-xl hover:bg-blue-600 text-slate-500 hover:text-white transition-all"><Edit3 size={16}/></button>
                                     <button onClick={async () => { if(confirm('Silsin mi?')) { await DatabaseService.deleteBot(b.id); await DatabaseService.logActivity('admin', 'bot_manage', 'bot_deleted', 'Bot Silindi', `${b.name} isimli bot sistemden silindi.`); load(); } }} className="p-2.5 lg:p-3 bg-white/5 rounded-xl text-red-500 hover:bg-red-500 hover:text-white transition-all"><Trash2 size={16}/></button>
                                 </div>
@@ -451,8 +457,8 @@ const BotManagement = () => {
                                                 <AdminInput label="LİSANS TUTARI (TRY)" type="number" value={editingBot.price} onChange={(v:any)=>setEditingBot({...editingBot, price:v})} />
                                                 <div className="space-y-2">
                                                     <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4">PLATFORM STATÜSÜ</label>
-                                                    <button type="button" onClick={()=>setEditingBot({...editingBot, is_premium: !editingBot.is_premium})} className={`w-full h-14 lg:h-18 rounded-[22px] lg:rounded-[28px] flex items-center justify-center gap-3 transition-all font-black text-[10px] tracking-widest ${editingBot.is_premium ? 'bg-blue-600 text-white shadow-xl shadow-blue-900/40' : 'bg-slate-950 text-slate-600 border border-white/5'}`}>
-                                                        {editingBot.is_premium ? 'PREMIUM ACCESS' : 'STANDARD ACCESS'}
+                                                    <button type="button" onClick={()=>setEditingBot({...editingBot, is_official: !editingBot.is_official})} className={`w-full h-14 lg:h-18 rounded-[22px] lg:rounded-[28px] flex items-center justify-center gap-3 transition-all font-black text-[10px] tracking-widest ${editingBot.is_official ? 'bg-blue-600 text-white shadow-xl shadow-blue-900/40' : 'bg-slate-950 text-slate-600 border border-white/5'}`}>
+                                                        {editingBot.is_official ? 'OFFICIAL BOT' : 'STANDARD BOT'}
                                                     </button>
                                                 </div>
                                             </div>
