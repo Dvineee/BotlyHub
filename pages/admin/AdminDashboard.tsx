@@ -66,7 +66,7 @@ const AdminDashboard = () => {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-[#020617] flex text-slate-200 overflow-hidden font-sans">
+    <div className="dark min-h-screen bg-[#020617] flex text-slate-200 overflow-hidden font-sans">
       {isSidebarOpen && (
           <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[65] lg:hidden animate-in fade-in" onClick={() => setSidebarOpen(false)}></div>
       )}
