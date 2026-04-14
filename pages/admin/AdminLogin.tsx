@@ -99,7 +99,7 @@ const AdminLogin = () => {
                     type="text" 
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="w-full h-16 bg-slate-950/50 border border-white/5 rounded-2xl py-4 pl-14 pr-6 text-white font-bold outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-slate-800"
+                    className="w-full h-16 bg-slate-950/50 border border-white/5 rounded-[24px] py-4 pl-14 pr-6 text-white font-bold outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-slate-800 uppercase tracking-widest text-sm"
                     placeholder="admin"
                     required
                   />
@@ -114,7 +114,7 @@ const AdminLogin = () => {
                     type="password" 
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full h-16 bg-slate-950/50 border border-white/5 rounded-2xl py-4 pl-14 pr-6 text-white font-bold outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-slate-800"
+                    className="w-full h-16 bg-slate-950/50 border border-white/5 rounded-[24px] py-4 pl-14 pr-6 text-white font-bold outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-slate-800 uppercase tracking-widest text-sm"
                     placeholder="••••••••"
                     required
                   />

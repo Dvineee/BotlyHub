@@ -9,6 +9,9 @@ import PriceService from '../services/PriceService';
 import { useTelegram } from '../hooks/useTelegram';
 import { GeminiService } from '../services/GeminiService';
 import { motion, AnimatePresence } from 'motion/react';
+import { useDraggableScroll } from '../hooks/useDraggableScroll';
+import { useFilter } from '../FilterContext';
+import { FilterMenu } from '../components/FilterMenu';
 
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
@@ -51,6 +54,15 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = ({ bot, tonRate }) => {
                         <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider">{prices.ton} TON</span>
                     </div>
                 )}
+                {bot.languages && bot.languages.length > 0 && (
+                    <div className="flex items-center gap-1.5">
+                        {bot.languages.map((lang, idx) => (
+                            <span key={idx} className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-tighter opacity-80">
+                                {lang}
+                            </span>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     </div>
@@ -67,6 +79,8 @@ const SearchPage = () => {
   const [bots, setBots] = useState<Bot[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [tonRate, setTonRate] = useState(250);
+  const catScroll = useDraggableScroll();
+  const { activeFilter } = useFilter();
   const [aiQuery, setAiQuery] = useState('');
   const [aiResponse, setAiResponse] = useState<string | null>(null);
   const [isAiLoading, setIsAiLoading] = useState(false);
@@ -95,7 +109,16 @@ const SearchPage = () => {
     const matchesQuery = bot.name.toLowerCase().includes(query.toLowerCase()) || 
                          bot.description.toLowerCase().includes(query.toLowerCase());
     const matchesCategory = activeCategory === 'all' || bot.category === activeCategory;
-    return matchesQuery && matchesCategory;
+    
+    let matchesFilter = true;
+    if (activeFilter === 'paid') matchesFilter = bot.price > 0;
+    else if (activeFilter === 'free') matchesFilter = bot.price === 0;
+    else if (activeFilter === 'bhub') matchesFilter = !!bot.is_official;
+    
+    return matchesQuery && matchesCategory && matchesFilter;
+  }).sort((a, b) => {
+    if (activeFilter === 'popular') return (b.views || 0) - (a.views || 0);
+    return 0;
   });
 
   const handleAiSearch = async () => {
@@ -117,104 +140,45 @@ const SearchPage = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#020617] p-4 pt-10 pb-32 animate-in fade-in transition-colors duration-300">
-      {/* AI Assistant Toggle */}
-      <div className="mb-8">
-        <button 
-          onClick={() => setShowAiAssistant(!showAiAssistant)}
-          className="w-full flex items-center justify-between p-5 bg-white dark:bg-gradient-to-r dark:from-purple-600/10 dark:to-indigo-600/10 border border-black/5 dark:border-purple-500/20 rounded-[32px] group active:scale-[0.98] transition-all shadow-lg"
-        >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-600/20">
-              <Sparkles size={22} className="text-white animate-pulse" />
-            </div>
-            <div className="text-left">
-              <p className="text-xs font-bold text-slate-900 dark:text-white">AI Bot Asistanı</p>
-              <p className="text-[10px] font-medium text-slate-500">İhtiyacın olan botu yapay zekaya sor</p>
-            </div>
-          </div>
-          <div className="w-10 h-10 bg-slate-100 dark:bg-slate-900/80 rounded-xl flex items-center justify-center text-slate-400 group-hover:text-purple-400 transition-colors">
-            {showAiAssistant ? <X size={18} /> : <Zap size={18} />}
-          </div>
-        </button>
-
-        <AnimatePresence>
-          {showAiAssistant && (
-            <motion.div 
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="overflow-hidden"
-            >
-              <div className="mt-4 p-6 bg-white dark:bg-slate-900/60 border border-black/5 dark:border-white/5 rounded-[32px] space-y-5 shadow-xl">
-                <div className="relative">
-                  <input 
-                    type="text"
-                    value={aiQuery}
-                    onChange={(e) => setAiQuery(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleAiSearch()}
-                    placeholder="Örn: Kripto takibi için bir bot önerir misin?"
-                    className="w-full bg-slate-50 dark:bg-slate-950/50 border border-black/5 dark:border-white/5 rounded-2xl py-4 pl-6 pr-14 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 font-medium outline-none focus:border-purple-500/50 transition-all shadow-inner"
-                  />
-                  <button 
-                    onClick={handleAiSearch}
-                    disabled={isAiLoading || !aiQuery.trim()}
-                    className="absolute right-2 top-2 w-10 h-10 bg-purple-600 rounded-xl flex items-center justify-center text-white disabled:opacity-50 active:scale-90 transition-all shadow-lg"
-                  >
-                    {isAiLoading ? <Loader2 size={20} className="animate-spin" /> : <Send size={20} />}
-                  </button>
-                </div>
-
-                {aiResponse && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="p-5 bg-purple-600/5 border border-purple-500/10 rounded-2xl"
-                  >
-                    <div className="flex gap-3 mb-3">
-                      <div className="w-8 h-8 bg-purple-600 rounded-xl flex items-center justify-center shrink-0 shadow-lg">
-                        <BotIcon size={16} className="text-white" />
-                      </div>
-                      <p className="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider mt-1.5">AI Yanıtı</p>
-                    </div>
-                    <div className="text-[12px] text-slate-700 dark:text-slate-300 leading-relaxed font-medium whitespace-pre-line">
-                      {aiResponse}
-                    </div>
-                  </motion.div>
-                )}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
       {/* Header & Search Box */}
       <div className="flex items-center gap-4 mb-8">
         <button onClick={() => navigate('/')} className="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-500 dark:text-slate-400 active:scale-90 transition-transform shadow-lg">
           <ChevronLeft size={22} />
         </button>
         <div className="relative flex-1">
-          <div className="relative flex items-center bg-white dark:bg-slate-900/80 backdrop-blur-xl border border-black/5 dark:border-white/5 rounded-2xl p-1 shadow-2xl ring-2 ring-transparent focus-within:ring-purple-500/30 transition-all">
-            <SearchIcon className="ml-5 text-slate-400 w-5 h-5" />
+          <div className="relative flex items-center bg-white dark:bg-slate-900/40 backdrop-blur-2xl border border-black/5 dark:border-white/10 rounded-[28px] p-1.5 shadow-xl ring-2 ring-transparent focus-within:ring-blue-500/30 transition-all group">
+            <div className="ml-4 w-10 h-10 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-2xl text-slate-400 group-focus-within:text-blue-500 transition-colors">
+              <SearchIcon size={20} />
+            </div>
             <input 
               type="text" 
               value={query} 
               autoFocus
               onChange={(e) => setQuery(e.target.value)} 
               placeholder={t('search_placeholder')} 
-              className="w-full bg-transparent py-4 px-4 text-sm text-slate-900 dark:text-white outline-none placeholder:text-slate-400 dark:placeholder:text-slate-600 font-medium" 
+              className="w-full bg-transparent py-3 px-4 text-sm text-slate-900 dark:text-white outline-none placeholder:text-slate-400 dark:placeholder:text-slate-600 font-bold uppercase tracking-widest" 
             />
             {query && (
-              <button onClick={() => setQuery('')} className="mr-5 text-slate-400 hover:text-slate-900 dark:hover:text-white">
-                <X size={18} />
+              <button onClick={() => setQuery('')} className="mr-4 w-8 h-8 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                <X size={16} />
               </button>
             )}
           </div>
         </div>
+        <FilterMenu />
       </div>
 
       {/* Categories Horizontal Scroll */}
       <div className="mb-10">
-        <div className="flex gap-3 overflow-x-auto no-scrollbar -mx-4 px-4 pb-2 snap-x">
+        <div 
+            ref={catScroll.ref}
+            onMouseDown={catScroll.onMouseDown}
+            onMouseUp={catScroll.onMouseUp}
+            onMouseMove={catScroll.onMouseMove}
+            onMouseLeave={catScroll.onMouseLeave}
+            onContextMenu={catScroll.onContextMenu}
+            className={`flex gap-3 overflow-x-auto no-scrollbar -mx-4 px-4 pb-2 snap-x ${catScroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+        >
           {categories.map((cat) => (
             <button 
               key={cat.id} 

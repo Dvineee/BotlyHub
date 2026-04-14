@@ -134,10 +134,10 @@ const AccountSettings = () => {
                         value={formData.email} 
                         readOnly={isVerified}
                         onChange={e => setFormData({...formData, email: e.target.value})} 
-                        className={`w-full h-18 pl-16 pr-6 text-sm font-bold rounded-[32px] border transition-all uppercase tracking-widest shadow-xl ${
+                        className={`w-full h-18 pl-16 pr-6 text-sm font-bold rounded-[28px] border transition-all uppercase tracking-widest shadow-xl ${
                             isVerified 
                             ? 'bg-slate-100 dark:bg-slate-950/50 border-emerald-500/20 text-emerald-600/70 dark:text-emerald-500/70 cursor-default' 
-                            : 'bg-white dark:bg-slate-900/30 border-black/5 dark:border-white/5 text-slate-900 dark:text-white focus:border-purple-500/40 focus:bg-white dark:focus:bg-slate-900/50 outline-none'
+                            : 'bg-white dark:bg-slate-900/30 border-black/5 dark:border-white/10 text-slate-900 dark:text-white focus:border-blue-500/40 focus:bg-white dark:focus:bg-slate-900/50 outline-none'
                         }`} 
                         placeholder="EMAIL@EXAMPLE.COM" 
                       />

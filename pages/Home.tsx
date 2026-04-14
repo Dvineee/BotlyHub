@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Search, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio } from 'lucide-react';
+import { Search, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, Send, Instagram, Youtube, Link } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Bot, Announcement, Notification } from '../types';
@@ -9,6 +9,9 @@ import { useTranslation } from '../TranslationContext';
 import { DatabaseService } from '../services/DatabaseService';
 import PriceService from '../services/PriceService';
 import { useTelegram } from '../hooks/useTelegram';
+import { useDraggableScroll } from '../hooks/useDraggableScroll';
+import { useFilter } from '../FilterContext';
+import { FilterMenu } from '../components/FilterMenu';
 
 const iconMap: Record<string, any> = {
   Sparkles, Megaphone, Zap, Gift, Star, Info, BotIcon, Heart, Bell, Shield
@@ -105,6 +108,15 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonR
                         <span className="text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-tighter">{prices.ton} TON</span>
                     </div>
                 )}
+                {bot.languages && bot.languages.length > 0 && (
+                    <div className="flex items-center gap-1.5">
+                        {bot.languages.map((lang, idx) => (
+                            <span key={idx} className="text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-tighter opacity-80">
+                                {lang}
+                            </span>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
         <div className="bg-slate-100 dark:bg-slate-800/60 p-2.5 rounded-2xl border border-slate-200 dark:border-slate-700/50 text-slate-400 group-hover:text-white group-hover:bg-blue-600 group-hover:border-blue-500 transition-all">
@@ -126,6 +138,21 @@ const Home = () => {
   const [tonRate, setTonRate] = useState(250);
   const [selectedAnn, setSelectedAnn] = useState<Announcement | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const { activeFilter } = useFilter();
+  
+  const annScroll = useDraggableScroll();
+  const catScroll = useDraggableScroll();
+
+  const filteredBots = useMemo(() => {
+    let result = [...bots];
+    
+    if (activeFilter === 'paid') result = result.filter(b => b.price > 0);
+    else if (activeFilter === 'free') result = result.filter(b => b.price === 0);
+    else if (activeFilter === 'popular') result = result.sort((a, b) => (b.views || 0) - (a.views || 0));
+    else if (activeFilter === 'bhub') result = result.filter(b => b.is_official);
+    
+    return result;
+  }, [bots, activeFilter]);
 
   const loadData = useCallback(async () => {
     // İlk yüklemede sadece botları ve duyuruları çek, fiyatı arka planda güncelle
@@ -160,14 +187,32 @@ const Home = () => {
 
   return (
     <div className="p-4 pt-10 min-h-screen bg-slate-50 dark:bg-slate-950 pb-32 font-sans text-slate-900 dark:text-slate-200 animate-in transition-colors duration-300">
-      <div className="flex justify-between items-center mb-8 px-1">
-        <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center shadow-lg border-2 border-white/20">
-                <div className="w-5 h-5 bg-white rounded-full shadow-inner" />
+      <div className="flex flex-wrap md:flex-nowrap items-center justify-between mb-8 px-1 gap-y-6 md:gap-x-6">
+        <div className="flex items-center gap-3 order-1">
+            <div className="w-12 h-12 shrink-0">
+                <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-[0_0_15px_rgba(34,158,217,0.2)]">
+                  <g transform="rotate(26 150 150) scale(1.1)">
+                    <line x1="150" y1="105" x2="95" y2="195" stroke="#229ED9" strokeWidth="42" strokeLinecap="round"/>
+                    <line x1="150" y1="105" x2="205" y2="195" stroke="#FF8A3D" strokeWidth="42" strokeLinecap="round"/>
+                    <line x1="95" y1="195" x2="150" y2="105" stroke="#22C55E" strokeWidth="42" strokeLinecap="round" strokeOpacity="0.7"/>
+                    <circle cx="150" cy="105" r="12" fill="#229ED9"/>
+                    <circle cx="205" cy="195" r="12" fill="#FF8A3D"/>
+                  </g>
+                </svg>
             </div>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">BotlyHub</h1>
         </div>
-        <div className="flex items-center gap-3">
+
+        <div className="w-full md:w-auto md:flex-1 md:max-w-2xl order-3 md:order-2 cursor-pointer" onClick={() => navigate('/search')}>
+            <div className="relative flex items-center bg-white dark:bg-slate-900/40 backdrop-blur-2xl border border-black/5 dark:border-white/10 rounded-[28px] p-1.5 shadow-xl transition-all active:scale-[0.98] group">
+                <div className="ml-4 w-10 h-10 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-2xl text-slate-400 group-hover:text-blue-500 transition-colors">
+                    <Search size={20} />
+                </div>
+                <div className="w-full py-3 px-4 text-sm text-slate-400 font-bold uppercase tracking-widest opacity-60">{t('search_placeholder')}</div>
+            </div>
+        </div>
+
+        <div className="flex items-center gap-3 order-2 md:order-3">
             <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-emerald-600 dark:text-emerald-400 active:scale-90 transition-transform shadow-lg">
                 <DollarSign size={22} />
             </button>
@@ -204,27 +249,36 @@ const Home = () => {
         </div>
       </div>
 
-      <div className="relative mb-8 cursor-pointer" onClick={() => navigate('/search')}>
-        <div className="relative flex items-center bg-white dark:bg-slate-900/80 backdrop-blur-xl border border-black/5 dark:border-white/5 rounded-2xl p-1 shadow-2xl transition-all active:scale-[0.98]">
-            <Search className="ml-5 text-slate-400 w-5 h-5" />
-            <div className="w-full py-4 px-4 text-sm text-slate-400 font-medium">{t('search_placeholder')}</div>
-        </div>
-      </div>
-
       {isLoading ? (
           <div className="flex flex-col items-center justify-center py-24 gap-4"><Loader2 className="animate-spin text-blue-500" size={32} /></div>
       ) : (
           <>
             {announcements.length > 0 && (
                 <div className="mb-10">
-                    <div className="flex gap-4 overflow-x-auto no-scrollbar -mx-4 px-4 pb-2 snap-x">
+                    <div 
+                        ref={annScroll.ref}
+                        onMouseDown={annScroll.onMouseDown}
+                        onMouseUp={annScroll.onMouseUp}
+                        onMouseMove={annScroll.onMouseMove}
+                        onMouseLeave={annScroll.onMouseLeave}
+                        onContextMenu={annScroll.onContextMenu}
+                        className={`flex gap-4 overflow-x-auto no-scrollbar -mx-4 px-4 pb-2 snap-x ${annScroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+                    >
                         {announcements.map(ann => <PromoCard key={ann.id} ann={ann} onShowPopup={(a) => setSelectedAnn(a)} />)}
                     </div>
                 </div>
             )}
 
             <div className="mb-10">
-                <div className="flex gap-3 overflow-x-auto no-scrollbar -mx-4 px-4 pb-2 snap-x">
+                <div 
+                    ref={catScroll.ref}
+                    onMouseDown={catScroll.onMouseDown}
+                    onMouseUp={catScroll.onMouseUp}
+                    onMouseMove={catScroll.onMouseMove}
+                    onMouseLeave={catScroll.onMouseLeave}
+                    onContextMenu={catScroll.onContextMenu}
+                    className={`flex gap-3 overflow-x-auto no-scrollbar -mx-4 px-4 pb-2 snap-x ${catScroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+                >
                     {categories.map((cat) => (
                         <motion.button 
                             key={cat.id} 
@@ -251,11 +305,14 @@ const Home = () => {
             </div>
 
             <div className="space-y-6">
-                <h2 className="text-[10px] font-black text-slate-400 dark:text-slate-700 uppercase tracking-[0.4em] mb-4 px-2">
-                    MAĞAZA VİTRİNİ
-                </h2>
+                <div className="flex items-center justify-between mb-4 px-2">
+                    <h2 className="text-[10px] font-black text-slate-400 dark:text-slate-700 uppercase tracking-[0.4em]">
+                        MAĞAZA VİTRİNİ
+                    </h2>
+                    <FilterMenu />
+                </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {bots.length > 0 ? bots.map(bot => <BotCard key={bot.id} bot={bot} tonRate={tonRate} />) : <div className="col-span-full py-24 text-center text-slate-400 dark:text-slate-700 font-bold uppercase text-xs tracking-widest">Sonuç yok.</div>}
+                    {filteredBots.length > 0 ? filteredBots.map(bot => <BotCard key={bot.id} bot={bot} tonRate={tonRate} />) : <div className="col-span-full py-24 text-center text-slate-400 dark:text-slate-700 font-bold uppercase text-xs tracking-widest">Sonuç yok.</div>}
                 </div>
             </div>
           </>
@@ -282,6 +339,40 @@ const Home = () => {
             </div>
         </div>
       )}
+
+      <footer className="mt-12 pt-8 border-t border-black/5 dark:border-white/5 flex flex-col md:flex-row items-center justify-between gap-6 px-2 pb-8">
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 shrink-0">
+              <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+                <g transform="rotate(26 150 150) scale(1.1)">
+                  <line x1="150" y1="105" x2="95" y2="195" stroke="#229ED9" strokeWidth="42" strokeLinecap="round"/>
+                  <line x1="150" y1="105" x2="205" y2="195" stroke="#FF8A3D" strokeWidth="42" strokeLinecap="round"/>
+                  <line x1="95" y1="195" x2="150" y2="105" stroke="#22C55E" strokeWidth="42" strokeLinecap="round" strokeOpacity="0.7"/>
+                  <circle cx="150" cy="105" r="12" fill="#229ED9"/>
+                  <circle cx="205" cy="195" r="12" fill="#FF8A3D"/>
+                </g>
+              </svg>
+            </div>
+          </div>
+          <div className="flex items-center gap-4 text-slate-400 dark:text-slate-500">
+            <a href="https://t.me/botlyhub" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors"><Send size={18} /></a>
+            <a href="#" className="hover:text-pink-500 transition-colors"><Instagram size={18} /></a>
+            <a href="#" className="hover:text-red-500 transition-colors"><Youtube size={18} /></a>
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-6">
+          <a href="#" className="flex items-center gap-2 text-[#0098ea] text-[11px] font-black uppercase tracking-widest hover:opacity-80 transition-opacity">
+            <Link size={14} />
+            Hakkımızda
+          </a>
+          <a href="#" className="flex items-center gap-2 text-[#0098ea] text-[11px] font-black uppercase tracking-widest hover:opacity-80 transition-opacity">
+            <Link size={14} />
+            İletişim
+          </a>
+        </div>
+      </footer>
     </div>
   );
 };

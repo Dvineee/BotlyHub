@@ -17,11 +17,16 @@ import {
     Activity
 } from 'lucide-react';
 
+import { useTelegram } from '../hooks/useTelegram';
+import { useDraggableScroll } from '../hooks/useDraggableScroll';
+
 const UserPanel: React.FC = () => {
     const [activeSection, setActiveSection] = useState('dashboard');
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [user, setUser] = useState<any>(null);
     const navigate = useNavigate();
+    
+    const contentScroll = useDraggableScroll();
 
     useEffect(() => {
         const storedUser = localStorage.getItem('panel_user');
@@ -58,8 +63,23 @@ const UserPanel: React.FC = () => {
                     {/* Header */}
                     <div className="p-10">
                         <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-purple-600 rounded-[18px] flex items-center justify-center shadow-2xl shadow-purple-900/40">
-                                <Shield size={24} className="text-white" />
+                            <div className="w-12 h-12 shrink-0">
+                                <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-[0_0_15px_rgba(34,158,217,0.2)]">
+                                  <defs>
+                                    <linearGradient id="logo_grad_user" x1="0%" y1="0%" x2="100%" y2="100%">
+                                      <stop offset="0%" style={{stopColor:'#229ED9', stopOpacity:0.1}} />
+                                      <stop offset="100%" style={{stopColor:'#FF8A3D', stopOpacity:0.1}} />
+                                    </linearGradient>
+                                  </defs>
+                                  <circle cx="150" cy="150" r="135" fill="url(#logo_grad_user)" />
+                                  <g transform="rotate(26 150 150) scale(1.1)">
+                                    <line x1="150" y1="105" x2="95" y2="195" stroke="#229ED9" strokeWidth="42" strokeLinecap="round"/>
+                                    <line x1="150" y1="105" x2="205" y2="195" stroke="#FF8A3D" strokeWidth="42" strokeLinecap="round"/>
+                                    <line x1="95" y1="195" x2="150" y2="105" stroke="#22C55E" strokeWidth="42" strokeLinecap="round" strokeOpacity="0.7"/>
+                                    <circle cx="150" cy="105" r="12" fill="#229ED9"/>
+                                    <circle cx="205" cy="195" r="12" fill="#FF8A3D"/>
+                                  </g>
+                                </svg>
                             </div>
                             <div>
                                 <h1 className="text-2xl font-bold text-white tracking-tight">BotlyHub</h1>
@@ -160,7 +180,15 @@ const UserPanel: React.FC = () => {
                 </header>
 
                 {/* Content Area */}
-                <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+                <div 
+                    ref={contentScroll.ref}
+                    onMouseDown={contentScroll.onMouseDown}
+                    onMouseUp={contentScroll.onMouseUp}
+                    onMouseMove={contentScroll.onMouseMove}
+                    onMouseLeave={contentScroll.onMouseLeave}
+                    onContextMenu={contentScroll.onContextMenu}
+                    className={`flex-1 overflow-y-auto p-8 custom-scrollbar ${contentScroll.isDragging ? 'cursor-grabbing' : ''}`}
+                >
                     <div className="max-w-7xl mx-auto space-y-8">
                         {/* Welcome Section */}
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">

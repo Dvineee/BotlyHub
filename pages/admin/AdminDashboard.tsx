@@ -74,8 +74,23 @@ const AdminDashboard = () => {
       <aside className={`fixed inset-y-0 left-0 z-[70] w-72 bg-[#020617] border-r border-white/5 transition-transform duration-500 lg:relative lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="h-full flex flex-col p-8">
           <div className="flex items-center gap-4 mb-14">
-            <div className="w-12 h-12 bg-blue-600 rounded-[20px] flex items-center justify-center shadow-2xl shadow-blue-600/20 rotate-3">
-                <Database size={24} className="text-white"/>
+            <div className="w-12 h-12 shrink-0">
+                <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-[0_0_15px_rgba(34,158,217,0.2)]">
+                  <defs>
+                    <linearGradient id="logo_grad_admin" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style={{stopColor:'#229ED9', stopOpacity:0.1}} />
+                      <stop offset="100%" style={{stopColor:'#FF8A3D', stopOpacity:0.1}} />
+                    </linearGradient>
+                  </defs>
+                  <circle cx="150" cy="150" r="135" fill="url(#logo_grad_admin)" />
+                  <g transform="rotate(26 150 150) scale(1.1)">
+                    <line x1="150" y1="105" x2="95" y2="195" stroke="#229ED9" strokeWidth="42" strokeLinecap="round"/>
+                    <line x1="150" y1="105" x2="205" y2="195" stroke="#FF8A3D" strokeWidth="42" strokeLinecap="round"/>
+                    <line x1="95" y1="195" x2="150" y2="105" stroke="#22C55E" strokeWidth="42" strokeLinecap="round" strokeOpacity="0.7"/>
+                    <circle cx="150" cy="105" r="12" fill="#229ED9"/>
+                    <circle cx="205" cy="195" r="12" fill="#FF8A3D"/>
+                  </g>
+                </svg>
             </div>
             <div>
                 <h2 className="text-xl font-black text-white italic tracking-tighter uppercase leading-none">Botly<span className="text-blue-500">Hub</span></h2>
@@ -395,6 +410,31 @@ const BotManagement = () => {
                                                         <option value="games">Eğlence & Oyun</option>
                                                         <option value="productivity">Verimlilik & İş</option>
                                                     </select>
+                                                </div>
+                                                <div className="space-y-2 md:col-span-2">
+                                                    <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4">DESTEKLENEN DİLLER</label>
+                                                    <div className="flex flex-wrap gap-2 p-4 bg-slate-950 border border-white/5 rounded-[22px] lg:rounded-[28px]">
+                                                        {['🇬🇧', '🇷🇺', '🇮🇷', '🇮🇳', '🇪🇸', '🇹🇷'].map(lang => (
+                                                            <button
+                                                                key={lang}
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    const current = editingBot.languages || [];
+                                                                    const next = current.includes(lang) 
+                                                                        ? current.filter((l: string) => l !== lang)
+                                                                        : [...current, lang];
+                                                                    setEditingBot({ ...editingBot, languages: next });
+                                                                }}
+                                                                className={`px-4 py-2 rounded-xl text-[10px] font-black transition-all ${
+                                                                    (editingBot.languages || []).includes(lang)
+                                                                    ? 'bg-blue-600 text-white shadow-lg'
+                                                                    : 'bg-white/5 text-slate-500 hover:bg-white/10'
+                                                                }`}
+                                                            >
+                                                                {lang}
+                                                            </button>
+                                                        ))}
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div className="space-y-2">

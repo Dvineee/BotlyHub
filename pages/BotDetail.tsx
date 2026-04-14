@@ -15,6 +15,7 @@ import { DatabaseService } from '../services/DatabaseService';
 import PriceService from '../services/PriceService';
 import { useTranslation } from '../TranslationContext';
 import { GeminiService } from '../services/GeminiService';
+import { useDraggableScroll } from '../hooks/useDraggableScroll';
 
 const getLiveBotIcon = (bot: Bot) => {
     if (bot.bot_link) {
@@ -39,6 +40,8 @@ const BotDetail = () => {
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  
+  const screenshotScroll = useDraggableScroll();
   
   const fetchBotData = useCallback(async () => {
     if (!id) return;
@@ -195,55 +198,75 @@ const BotDetail = () => {
         </button>
       </nav>
 
-      {/* Hero Section */}
-      <div className="pt-24 px-6 flex items-start gap-6 mb-10">
-        <div className="relative shrink-0">
-            <img 
-              src={getLiveBotIcon(bot)} 
-              loading="lazy"
-              className="w-24 h-24 rounded-[32px] border border-black/10 dark:border-white/10 shadow-2xl object-cover bg-slate-200 dark:bg-slate-900" 
-              onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=1e293b&color=fff&bold=true`; }}
-            />
-            {isOwned && (
-                <div className="absolute -bottom-2 -right-2 bg-emerald-500 text-white p-1.5 rounded-xl border-2 border-slate-50 dark:border-[#020617]">
-                    <CheckCircle2 size={14} />
-                </div>
-            )}
-        </div>
-        <div className="flex-1 min-w-0 pt-1">
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight truncate mb-1">{bot.name}</h1>
-            <p className="text-purple-600 dark:text-purple-500 text-xs font-medium mb-3">{bot.category}</p>
-            <div className="flex flex-wrap gap-2">
-                <span className="bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 text-slate-500 dark:text-slate-400 text-[10px] font-bold px-3 py-1 rounded-xl uppercase">v4.2.0</span>
-                <span className="bg-purple-500/10 border border-purple-500/20 text-purple-600 dark:text-purple-400 text-[10px] font-bold px-3 py-1 rounded-xl uppercase flex items-center gap-1">
-                    <ShieldCheck size={12} /> Onaylı
-                </span>
-            </div>
-        </div>
-      </div>
-
-      {/* Stats Band */}
-      <div className="px-6 mb-10">
-          <div className="flex items-center justify-between bg-white dark:bg-slate-900/60 rounded-[32px] border border-black/5 dark:border-white/5 p-6 backdrop-blur-xl shadow-xl">
-              <div className="flex flex-col items-center flex-1 border-r border-black/5 dark:border-white/5">
-                  <span className="text-slate-900 dark:text-white font-bold text-base">4.8 <Star size={12} className="inline mb-1 fill-slate-900 dark:fill-white" /></span>
-                  <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">Puan</span>
-              </div>
-              <div className="flex flex-col items-center flex-1 border-r border-black/5 dark:border-white/5">
-                  <span className="text-slate-900 dark:text-white font-bold text-base">2.4K+</span>
-                  <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">Kullanıcı</span>
-              </div>
-              <div className="flex flex-col items-center flex-1">
-                  <span className="text-slate-900 dark:text-white font-bold text-base">Sınırsız</span>
-                  <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">Erişim</span>
+      {/* Hero & Stats Section */}
+      <div className="pt-24 px-6 flex flex-col md:flex-row md:items-center gap-6 mb-10">
+        <div className="flex items-start gap-6 flex-1">
+          <div className="relative shrink-0">
+              <img 
+                src={getLiveBotIcon(bot)} 
+                loading="lazy"
+                className="w-24 h-24 rounded-[32px] border border-black/10 dark:border-white/10 shadow-2xl object-cover bg-slate-200 dark:bg-slate-900" 
+                onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=1e293b&color=fff&bold=true`; }}
+              />
+              {isOwned && (
+                  <div className="absolute -bottom-2 -right-2 bg-emerald-500 text-white p-1.5 rounded-xl border-2 border-slate-50 dark:border-[#020617]">
+                      <CheckCircle2 size={14} />
+                  </div>
+              )}
+          </div>
+          <div className="flex-1 min-w-0 pt-1">
+              <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight truncate mb-1">{bot.name}</h1>
+              <p className="text-purple-600 dark:text-purple-500 text-xs font-medium mb-3">{bot.category}</p>
+              <div className="flex flex-wrap gap-2">
+                  <span className="bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 text-slate-500 dark:text-slate-400 text-[10px] font-bold px-3 py-1 rounded-xl uppercase">v4.2.0</span>
+                  <span className="bg-purple-500/10 border border-purple-500/20 text-purple-600 dark:text-purple-400 text-[10px] font-bold px-3 py-1 rounded-xl uppercase flex items-center gap-1">
+                      <ShieldCheck size={12} /> Onaylı
+                  </span>
               </div>
           </div>
+        </div>
+
+        <div className="w-full md:w-auto md:min-w-[320px]">
+            <div className="flex flex-col bg-white dark:bg-slate-900/60 rounded-[32px] border border-black/5 dark:border-white/5 backdrop-blur-xl shadow-xl overflow-hidden">
+                <div className="flex items-center justify-between p-6">
+                    <div className="flex flex-col items-center flex-1 border-r border-black/5 dark:border-white/5">
+                        <span className="text-slate-900 dark:text-white font-bold text-base">4.8 <Star size={12} className="inline mb-1 fill-slate-900 dark:fill-white" /></span>
+                        <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">Puan</span>
+                    </div>
+                    <div className="flex flex-col items-center flex-1 border-r border-black/5 dark:border-white/5">
+                        <span className="text-slate-900 dark:text-white font-bold text-base">2.4K+</span>
+                        <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">Kullanıcı</span>
+                    </div>
+                    <div className="flex flex-col items-center flex-1">
+                        <span className="text-slate-900 dark:text-white font-bold text-base">Sınırsız</span>
+                        <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">Erişim</span>
+                    </div>
+                </div>
+                {bot.languages && bot.languages.length > 0 && (
+                    <div className="px-6 py-3 border-t border-black/5 dark:border-white/5 flex items-center justify-start gap-3">
+                        {bot.languages.map((lang, idx) => (
+                            <span key={idx} className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-tighter italic">
+                                {lang}
+                            </span>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </div>
       </div>
 
       {/* Gallery Section */}
       <div className="mb-10">
           <h3 className="px-8 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-4">Ekran Görüntüleri</h3>
-          <div className="flex gap-4 overflow-x-auto no-scrollbar px-6 snap-x pb-4">
+          <div 
+            ref={screenshotScroll.ref}
+            onMouseDown={screenshotScroll.onMouseDown}
+            onMouseUp={screenshotScroll.onMouseUp}
+            onMouseMove={screenshotScroll.onMouseMove}
+            onMouseLeave={screenshotScroll.onMouseLeave}
+            onContextMenu={screenshotScroll.onContextMenu}
+            className={`flex gap-4 overflow-x-auto no-scrollbar px-6 snap-x pb-4 ${screenshotScroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+          >
               {bot.screenshots && bot.screenshots.length > 0 ? (
                   bot.screenshots.map((s, i) => (
                     <div key={i} className="min-w-[180px] h-[320px] rounded-[32px] bg-slate-200 dark:bg-slate-900 border border-black/5 dark:border-white/5 overflow-hidden snap-center shrink-0 shadow-xl">
@@ -264,47 +287,10 @@ const BotDetail = () => {
       <div className="px-6 mb-10">
           <div className="flex items-center justify-between mb-4 px-2">
             <h3 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Hakkında</h3>
-            <button 
-              onClick={handleAiAnalysis}
-              disabled={isAiLoading}
-              className="flex items-center gap-2 px-4 py-2 bg-purple-600/10 border border-purple-500/20 rounded-2xl text-purple-600 dark:text-purple-400 text-[10px] font-bold uppercase tracking-wider active:scale-95 transition-all disabled:opacity-50"
-            >
-              {isAiLoading ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} className="animate-pulse" />}
-              AI ANALİZİ
-            </button>
           </div>
           <div className="p-8 bg-white dark:bg-slate-900/60 rounded-[32px] border border-black/5 dark:border-white/5 text-sm text-slate-600 dark:text-slate-400 leading-relaxed shadow-lg">
               {bot.description}
           </div>
-
-          <AnimatePresence>
-            {aiAnalysis && (
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-4 p-6 bg-gradient-to-br from-blue-600/10 to-purple-600/10 border border-blue-500/20 rounded-[32px] relative overflow-hidden group"
-              >
-                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <Sparkles size={48} className="text-blue-400" />
-                </div>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20">
-                    <BotIcon size={16} className="text-white" />
-                  </div>
-                  <p className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest italic">Neden Bu Botu Seçmelisin?</p>
-                </div>
-                <div className="text-[11px] text-slate-700 dark:text-slate-300 leading-relaxed font-medium italic whitespace-pre-line relative z-10">
-                  {aiAnalysis}
-                </div>
-                <button 
-                  onClick={() => setAiAnalysis(null)}
-                  className="mt-4 text-[8px] font-black text-slate-500 uppercase tracking-widest hover:text-slate-900 dark:hover:text-white transition-colors"
-                >
-                  Kapat
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
       </div>
 
       {/* Key Features */}

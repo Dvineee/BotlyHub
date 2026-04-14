@@ -47,6 +47,9 @@ export interface Bot {
   screenshots: string[];
   isNew?: boolean;
   features?: string[];
+  views?: number;
+  is_official?: boolean;
+  languages?: string[];
 }
 
 export interface Promotion {

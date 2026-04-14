@@ -28,6 +28,8 @@ import UserPanelLogin from './pages/UserPanelLogin';
 import UserPanel from './pages/UserPanel';
 import ReferralPage from './pages/ReferralPage';
 
+import { FilterProvider } from './FilterContext';
+
 const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -173,26 +175,28 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
 export default function App() {
   return (
     <HashRouter>
-      <TelegramWrapper>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/search" element={<SearchPage />} />
-          <Route path="/bot/:id" element={<BotDetail />} />
-          <Route path="/payment/:id" element={<Payment />} />
-          <Route path="/settings" element={<ProfileSettings />} />
-          <Route path="/account-settings" element={<AccountSettings />} />
-          <Route path="/my-bots" element={<MyBots />} />
-          <Route path="/channels" element={<MyChannels />} />
-          <Route path="/premium" element={<Premium />} />
-          <Route path="/notifications" element={<Notifications />} />
-          <Route path="/earnings" element={<Earnings />} />
-          <Route path="/a/admin" element={<AdminLogin />} />
-          <Route path="/a/dashboard/*" element={<AdminDashboard />} />
-          <Route path="/u/login" element={<UserPanelLogin />} />
-          <Route path="/u/panel/*" element={<UserPanel />} />
-          <Route path="/referral" element={<ReferralPage />} />
-        </Routes>
-      </TelegramWrapper>
+      <FilterProvider>
+        <TelegramWrapper>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/bot/:id" element={<BotDetail />} />
+            <Route path="/payment/:id" element={<Payment />} />
+            <Route path="/settings" element={<ProfileSettings />} />
+            <Route path="/account-settings" element={<AccountSettings />} />
+            <Route path="/my-bots" element={<MyBots />} />
+            <Route path="/channels" element={<MyChannels />} />
+            <Route path="/premium" element={<Premium />} />
+            <Route path="/notifications" element={<Notifications />} />
+            <Route path="/earnings" element={<Earnings />} />
+            <Route path="/a/admin" element={<AdminLogin />} />
+            <Route path="/a/dashboard/*" element={<AdminDashboard />} />
+            <Route path="/u/login" element={<UserPanelLogin />} />
+            <Route path="/u/panel/*" element={<UserPanel />} />
+            <Route path="/referral" element={<ReferralPage />} />
+          </Routes>
+        </TelegramWrapper>
+      </FilterProvider>
     </HashRouter>
   );
 }

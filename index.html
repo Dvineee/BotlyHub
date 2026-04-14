@@ -27,29 +27,33 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        background-color: #020617;
-        color: white;
+        background-color: #fcf4ff;
+        color: #020617;
         z-index: 9999;
         transition: opacity 0.3s ease;
-      }
-      .spinner {
-        width: 40px;
-        height: 40px;
-        border: 4px solid rgba(255, 255, 255, 0.1);
-        border-left-color: #3b82f6;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin-bottom: 16px;
-      }
-      @keyframes spin {
-        to { transform: rotate(360deg); }
       }
     </style>
   </head>
   <body>
     <div id="loader">
-      <div class="spinner"></div>
-      <div style="font-size: 14px; opacity: 0.7; font-family: 'Inter', sans-serif;">BotlyHub V3 Yükleniyor...</div>
+      <svg width="120" height="120" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+        <g transform="rotate(26 150 150) scale(1.1)">
+          <line x1="150" y1="105" x2="95" y2="195" stroke="#229ED9" stroke-width="42" stroke-linecap="round" stroke-dasharray="300" stroke-dashoffset="300">
+            <animate attributeName="stroke-dashoffset" values="300;0;0;300" dur="2.4s" begin="0s" repeatCount="indefinite"/>
+          </line>
+          <line x1="150" y1="105" x2="205" y2="195" stroke="#FF8A3D" stroke-width="42" stroke-linecap="round" stroke-dasharray="300" stroke-dashoffset="300">
+            <animate attributeName="stroke-dashoffset" values="300;300;0;0;300" dur="2.4s" begin="0s" repeatCount="indefinite"/>
+          </line>
+          <line x1="95" y1="195" x2="150" y2="105" stroke="#22C55E" stroke-width="42" stroke-linecap="round" stroke-opacity="0.7" stroke-dasharray="300" stroke-dashoffset="300">
+            <animate attributeName="stroke-dashoffset" values="300;300;300;0;0;300" dur="2.4s" begin="0s" repeatCount="indefinite"/>
+          </line>
+          <circle cx="150" cy="103" r="12" fill="#229ED9">
+            <animate attributeName="r" values="12;15;12" dur="1.2s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="205" cy="195" r="12" fill="#FF8A3D"/>
+        </g>
+      </svg>
+      <div style="font-size: 14px; opacity: 0.7; font-family: 'Inter', sans-serif; margin-top: 20px; font-weight: 600; letter-spacing: 0.05em;">BotlyHub V3 Yükleniyor...</div>
     </div>
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>

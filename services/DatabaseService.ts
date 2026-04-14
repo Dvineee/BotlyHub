@@ -424,12 +424,19 @@ export class DatabaseService {
   // --- BOTS ---
   static async getBots(): Promise<Bot[]> {
     const { data } = await supabase.from('bots').select('*').order('id', { ascending: false });
-    return data || [];
+    return (data || []).map(bot => ({
+        ...bot,
+        languages: (bot.languages || (bot.name.toLowerCase().includes('botlyhub') ? ['🇬🇧', '🇹🇷'] : [])).map((l: string) => l === 'İng' ? '🇬🇧' : l)
+    }));
   }
 
   static async getBotById(id: string): Promise<Bot | null> {
     const { data } = await supabase.from('bots').select('*').eq('id', id).maybeSingle();
-    return data;
+    if (!data) return null;
+    return {
+        ...data,
+        languages: (data.languages || (data.name.toLowerCase().includes('botlyhub') ? ['🇬🇧', '🇹🇷'] : [])).map((l: string) => l === 'İng' ? '🇬🇧' : l)
+    };
   }
 
   static async saveBot(bot: any) {
@@ -442,7 +449,8 @@ export class DatabaseService {
         bot_link: bot.bot_link, 
         screenshots: bot.screenshots || [], 
         icon: bot.icon, 
-        is_premium: Boolean(bot.is_premium) 
+        is_premium: Boolean(bot.is_premium),
+        languages: bot.languages || []
     });
     if (error) throw error;
   }
