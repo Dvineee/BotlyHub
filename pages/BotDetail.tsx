@@ -42,6 +42,7 @@ const BotDetail = () => {
   const [isCopied, setIsCopied] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [userRating, setUserRating] = useState<number | null>(null);
+  const [hoverRating, setHoverRating] = useState<number | null>(null);
   const [isRating, setIsRating] = useState(false);
   
   const screenshotScroll = useDraggableScroll();
@@ -392,29 +393,74 @@ const BotDetail = () => {
 
       {/* Rating Section */}
       <div className="px-6 mb-10">
-          <div className="p-6 bg-white dark:bg-slate-900/60 rounded-[32px] border border-black/5 dark:border-white/5 shadow-lg">
-              <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest italic">Deneyiminizi Puanlayın</h3>
-                  {userRating && (
-                      <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-500/10 px-2 py-1 rounded-lg">Puanınız: {userRating}</span>
-                  )}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="relative p-8 bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl rounded-[40px] border border-black/5 dark:border-white/5 shadow-2xl overflow-hidden group"
+          >
+              {/* Decorative Background Glow */}
+              <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/10 blur-[80px] rounded-full group-hover:bg-blue-500/20 transition-colors duration-700"></div>
+              <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-purple-500/10 blur-[80px] rounded-full group-hover:bg-purple-500/20 transition-colors duration-700"></div>
+
+              <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-8">
+                      <div className="flex flex-col gap-1">
+                          <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em] italic">Deneyiminizi Puanlayın</h3>
+                          <p className="text-[9px] font-bold text-slate-400/60 dark:text-slate-500/60 uppercase tracking-widest">Geri bildiriminiz bizim için değerlidir</p>
+                      </div>
+                      {userRating && (
+                          <motion.div 
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-2xl"
+                          >
+                              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                              <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Puanınız: {userRating}</span>
+                          </motion.div>
+                      )}
+                  </div>
+
+                  <div className="flex items-center justify-center gap-4">
+                      {[1, 2, 3, 4, 5].map((star) => {
+                          const isActive = (hoverRating || userRating || 0) >= star;
+                          const isSelected = userRating === star;
+                          
+                          return (
+                              <motion.button
+                                  key={star}
+                                  onMouseEnter={() => setHoverRating(star)}
+                                  onMouseLeave={() => setHoverRating(null)}
+                                  onClick={() => { haptic('heavy'); handleRate(star); }}
+                                  disabled={isRating}
+                                  whileHover={{ scale: 1.2, rotate: 5 }}
+                                  whileTap={{ scale: 0.9 }}
+                                  className="relative p-2 transition-all"
+                              >
+                                  <Star 
+                                      size={36} 
+                                      className={`transition-all duration-300 ${
+                                          isActive 
+                                          ? 'fill-yellow-400 text-yellow-400 drop-shadow-[0_0_12px_rgba(250,204,21,0.4)]' 
+                                          : 'text-slate-200 dark:text-slate-800'
+                                      }`} 
+                                  />
+                                  {isSelected && (
+                                      <motion.div 
+                                        layoutId="star-glow"
+                                        className="absolute inset-0 bg-yellow-400/20 blur-xl rounded-full -z-10"
+                                      />
+                                  )}
+                              </motion.button>
+                          );
+                      })}
+                  </div>
+                  
+                  <div className="mt-8 flex justify-center">
+                      <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-800 to-transparent"></div>
+                  </div>
               </div>
-              <div className="flex items-center justify-center gap-3">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                      <button
-                          key={star}
-                          onClick={() => handleRate(star)}
-                          disabled={isRating}
-                          className="transition-all active:scale-90"
-                      >
-                          <Star 
-                              size={32} 
-                              className={`${(userRating || 0) >= star ? 'fill-yellow-400 text-yellow-400' : 'text-slate-200 dark:text-slate-800'}`} 
-                          />
-                      </button>
-                  ))}
-              </div>
-          </div>
+          </motion.div>
       </div>
 
       {/* Description */}
