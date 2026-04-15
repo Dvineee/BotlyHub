@@ -67,8 +67,8 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
             </div>
         )}
         <div className="relative z-10 flex flex-col h-full overflow-hidden">
-            <h3 className="text-white font-bold text-xl mb-1 tracking-tight leading-tight line-clamp-2 shrink-0">{ann.title}</h3>
-            <p className="text-white/80 text-[11px] leading-relaxed line-clamp-3 font-medium overflow-hidden">{ann.description}</p>
+            <h3 className="text-white font-bold text-xl mb-1 tracking-tight leading-tight line-clamp-2 shrink-0 whitespace-normal">{ann.title}</h3>
+            <p className="text-white/80 text-[11px] leading-relaxed line-clamp-3 font-medium overflow-hidden whitespace-normal">{ann.description}</p>
         </div>
         {!ann.bg_image_url && (
             <div className="absolute -right-6 -bottom-6 opacity-20 transform rotate-12 group-hover:scale-110 transition-transform pointer-events-none">
