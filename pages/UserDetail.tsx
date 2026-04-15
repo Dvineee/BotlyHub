@@ -38,7 +38,7 @@ const UserDetail = () => {
       {/* Profile Info */}
       <div className="flex flex-col items-center mt-12 mb-12">
         <div className="relative">
-             <div className="w-32 h-32 rounded-[40px] p-1 bg-gradient-to-tr from-purple-600 to-blue-500 shadow-2xl shadow-purple-900/20">
+             <div className="w-32 h-32 rounded-[40px] p-1 bg-gradient-to-tr from-[#0098ea] to-blue-500 shadow-2xl shadow-blue-900/20">
                 <img 
                     src={`https://picsum.photos/seed/${id || 'user'}/300`} 
                     alt="Profile" 
@@ -47,7 +47,7 @@ const UserDetail = () => {
              </div>
         </div>
         <h2 className="text-3xl font-bold text-slate-900 dark:text-white mt-6 tracking-tight">Cem Yılmaz</h2>
-        <p className="text-purple-600 dark:text-purple-400 text-sm font-bold uppercase tracking-widest mt-1">@cemyilmaz</p>
+        <p className="text-[#0098ea] dark:text-[#558df7] text-sm font-bold uppercase tracking-widest mt-1">@cemyilmaz</p>
         <p className="text-slate-400 dark:text-slate-500 text-[10px] font-bold uppercase tracking-widest mt-3 opacity-60">ID: 12345678 | Üyelik: 24.05.2023</p>
       </div>
 
@@ -68,7 +68,7 @@ const UserDetail = () => {
                 </div>
                 <div 
                     onClick={() => toggle('restrictPlatform')}
-                    className={`w-12 h-7 rounded-full relative cursor-pointer transition-all duration-300 ${restrictions.restrictPlatform ? 'bg-purple-600' : 'bg-slate-200 dark:bg-slate-800'}`}
+                    className={`w-12 h-7 rounded-full relative cursor-pointer transition-all duration-300 ${restrictions.restrictPlatform ? 'bg-[#0098ea] dark:bg-[#558df7]' : 'bg-slate-200 dark:bg-slate-800'}`}
                 >
                     <div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-all shadow-lg ${restrictions.restrictPlatform ? 'left-6' : 'left-1'}`}></div>
                 </div>
@@ -86,7 +86,7 @@ const UserDetail = () => {
                 </div>
                 <div 
                     onClick={() => toggle('restrictAds')}
-                    className={`w-12 h-7 rounded-full relative cursor-pointer transition-all duration-300 ${restrictions.restrictAds ? 'bg-purple-600' : 'bg-slate-200 dark:bg-slate-800'}`}
+                    className={`w-12 h-7 rounded-full relative cursor-pointer transition-all duration-300 ${restrictions.restrictAds ? 'bg-[#0098ea] dark:bg-[#558df7]' : 'bg-slate-200 dark:bg-slate-800'}`}
                 >
                     <div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-all shadow-lg ${restrictions.restrictAds ? 'left-6' : 'left-1'}`}></div>
                 </div>
@@ -94,7 +94,7 @@ const UserDetail = () => {
         </div>
 
         {/* Action Button */}
-        <button className="w-full bg-purple-600 hover:bg-purple-500 active:scale-95 transition-all text-white font-bold py-5 rounded-[24px] flex items-center justify-center gap-3 shadow-2xl shadow-purple-900/30 uppercase text-[11px] tracking-widest">
+        <button className="w-full bg-[#0098ea] dark:bg-[#558df7] hover:opacity-90 active:scale-95 transition-all text-white font-bold py-5 rounded-[24px] flex items-center justify-center gap-3 shadow-2xl shadow-blue-900/30 uppercase text-[11px] tracking-widest">
             <Bell size={20} />
             <span>Kullanıcıya Bildirim Gönder</span>
         </button>
@@ -121,7 +121,7 @@ const UserDetail = () => {
                 </div>
                 <div 
                     onClick={() => toggle('modBot')}
-                    className={`w-12 h-7 rounded-full relative cursor-pointer transition-all duration-300 ${restrictions.modBot ? 'bg-purple-600' : 'bg-slate-200 dark:bg-slate-800'}`}
+                    className={`w-12 h-7 rounded-full relative cursor-pointer transition-all duration-300 ${restrictions.modBot ? 'bg-[#0098ea] dark:bg-[#558df7]' : 'bg-slate-200 dark:bg-slate-800'}`}
                 >
                     <div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-all shadow-lg ${restrictions.modBot ? 'left-6' : 'left-1'}`}></div>
                 </div>
@@ -139,7 +139,7 @@ const UserDetail = () => {
                 </div>
                 <div 
                     onClick={() => toggle('analysisBot')}
-                    className={`w-12 h-7 rounded-full relative cursor-pointer transition-all duration-300 ${restrictions.analysisBot ? 'bg-purple-600' : 'bg-slate-200 dark:bg-slate-800'}`}
+                    className={`w-12 h-7 rounded-full relative cursor-pointer transition-all duration-300 ${restrictions.analysisBot ? 'bg-[#0098ea] dark:bg-[#558df7]' : 'bg-slate-200 dark:bg-slate-800'}`}
                 >
                     <div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-all shadow-lg ${restrictions.analysisBot ? 'left-6' : 'left-1'}`}></div>
                 </div>

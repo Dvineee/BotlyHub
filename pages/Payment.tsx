@@ -257,17 +257,17 @@ const Payment = () => {
             <button onClick={() => navigate(-1)} className="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-500 dark:text-slate-400 active:scale-90 transition-transform shadow-lg">
                 <ChevronLeft size={22} />
             </button>
-            <div className="flex items-center gap-2 px-4 py-2 bg-purple-600/10 border border-purple-500/20 rounded-full shadow-lg">
-                <ShieldCheck size={14} className="text-purple-600 dark:text-purple-500" />
-                <span className="text-[10px] font-bold text-purple-600 dark:text-purple-500 uppercase tracking-widest">Güvenli Ödeme</span>
+            <div className="flex items-center gap-2 px-4 py-2 bg-brand/10 dark:bg-brand-light/10 border border-brand/20 dark:border-brand-light/20 rounded-full shadow-lg">
+                <ShieldCheck size={14} className="text-brand dark:text-brand-light" />
+                <span className="text-[10px] font-bold text-brand dark:text-brand-light uppercase tracking-widest">Güvenli Ödeme</span>
             </div>
         </div>
 
         <div className="bg-white dark:bg-slate-900/40 rounded-[48px] p-10 border border-black/5 dark:border-white/5 mb-10 text-center relative overflow-hidden shadow-2xl backdrop-blur-xl">
-            <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600"></div>
+            <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-brand via-indigo-600 to-blue-600"></div>
             
             <div className="relative inline-block mb-8">
-                <div className="absolute inset-0 bg-purple-600/20 blur-[40px] rounded-full"></div>
+                <div className="absolute inset-0 bg-brand/20 dark:bg-brand-light/20 blur-[40px] rounded-full"></div>
                 <img 
                     src={targetBot ? (targetBot.icon || `https://ui-avatars.com/api/?name=${encodeURIComponent(targetBot.name)}&background=334155&color=fff`) : `https://ui-avatars.com/api/?name=${encodeURIComponent(plan?.name || 'P')}&background=1e293b&color=fff`} 
                     className="w-32 h-32 rounded-[32px] border-4 border-slate-100 dark:border-slate-800 shadow-2xl object-cover relative z-10 bg-slate-200 dark:bg-slate-900" 
@@ -280,7 +280,7 @@ const Payment = () => {
             
             <div className="bg-slate-50 dark:bg-slate-950/50 p-8 rounded-[32px] border border-black/5 dark:border-white/5 shadow-inner">
                 <div className="flex flex-col items-center">
-                    <Zap size={32} className="text-purple-600 dark:text-purple-500 mb-3" />
+                    <Zap size={32} className="text-brand dark:text-brand-light mb-3" />
                     <span className="text-[11px] text-slate-500 font-bold uppercase tracking-widest mb-1">Toplam Tutar</span>
                     <p className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">{prices.ton} TON</p>
                     <p className="text-[10px] text-slate-400 dark:text-slate-600 font-bold uppercase mt-2">veya {item.price} Yıldız</p>
@@ -292,7 +292,7 @@ const Payment = () => {
             <button 
                 onClick={payWithTON} 
                 disabled={isLoading}
-                className="w-full bg-purple-600 hover:bg-purple-500 py-6 rounded-[28px] text-white font-bold shadow-2xl shadow-purple-900/30 flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 uppercase tracking-widest text-xs"
+                className="w-full bg-brand dark:bg-brand-light hover:opacity-90 py-6 rounded-[28px] text-white font-bold shadow-2xl shadow-blue-900/30 flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 uppercase tracking-widest text-xs"
             >
                 {isLoading ? <Loader2 className="animate-spin" size={24} /> : <Wallet size={24} />}
                 TON ile Öde

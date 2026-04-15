@@ -67,10 +67,10 @@ const ReferralPage = () => {
             {/* Header */}
             <div className="flex items-center gap-5 mb-10 px-1">
                 <div className="w-12 h-12 bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full flex items-center justify-center shadow-lg">
-                    <Users className="text-purple-600 dark:text-purple-500" size={22} />
+                    <Users className="text-brand dark:text-brand-light" size={22} />
                 </div>
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Referans <span className="text-purple-600">Sistemi</span></h1>
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Referans <span className="text-brand dark:text-brand-light">Sistemi</span></h1>
                     <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Arkadaşlarını davet et, birlikte kazan!</p>
                 </div>
             </div>
@@ -94,14 +94,14 @@ const ReferralPage = () => {
             </div>
 
             {/* Referral Link Box */}
-            <div className="bg-purple-600/10 border border-purple-500/20 p-8 rounded-[40px] space-y-8 relative overflow-hidden shadow-2xl shadow-purple-900/10">
+            <div className="bg-brand/10 dark:bg-brand-light/10 border border-brand/20 dark:border-brand-light/20 p-8 rounded-[40px] space-y-8 relative overflow-hidden shadow-2xl shadow-blue-900/10">
                 <div className="absolute top-0 right-0 p-8 opacity-5">
                     <Gift size={140} />
                 </div>
                 
                 <div className="space-y-3 relative z-10">
                     <h3 className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-tight">Senin Davet Linkin</h3>
-                    <p className="text-[11px] font-medium text-purple-600 dark:text-purple-400/70 leading-relaxed uppercase">
+                    <p className="text-[11px] font-medium text-brand dark:text-brand-light/70 leading-relaxed uppercase">
                         Bu linki paylaşarak her yeni üye için {settings?.standard_reward} Hub Puanı, Premium üyeler için {settings?.premium_reward} Hub Puanı kazanabilirsin.
                     </p>
                 </div>
@@ -115,7 +115,7 @@ const ReferralPage = () => {
                         />
                         <button 
                             onClick={handleCopy}
-                            className="w-10 h-10 flex items-center justify-center bg-purple-600/10 hover:bg-purple-600/20 rounded-xl transition-all text-purple-600 dark:text-purple-500 shadow-lg"
+                            className="w-10 h-10 flex items-center justify-center bg-brand/10 dark:bg-brand-light/10 hover:bg-brand/20 dark:hover:bg-brand-light/20 rounded-xl transition-all text-brand dark:text-brand-light shadow-lg"
                         >
                             {copied ? <CheckCircle2 size={18} /> : <Copy size={18} />}
                         </button>
@@ -123,7 +123,7 @@ const ReferralPage = () => {
                     
                     <button 
                         onClick={handleShare}
-                        className="w-full py-5 bg-purple-600 hover:bg-purple-500 text-white font-bold text-[11px] uppercase tracking-widest rounded-[24px] transition-all flex items-center justify-center gap-3 shadow-2xl shadow-purple-900/30 active:scale-95"
+                        className="w-full py-5 bg-brand dark:bg-brand-light hover:opacity-90 text-white font-bold text-[11px] uppercase tracking-widest rounded-[24px] transition-all flex items-center justify-center gap-3 shadow-2xl shadow-blue-900/30 active:scale-95"
                     >
                         <Share2 size={18} />
                         HEMEN PAYLAŞ
@@ -134,14 +134,14 @@ const ReferralPage = () => {
             {/* Security Info */}
             <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-8 rounded-[32px] space-y-6 shadow-xl">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-purple-600/10 rounded-xl flex items-center justify-center">
-                        <ShieldCheck className="text-purple-600 dark:text-purple-500" size={20} />
+                    <div className="w-10 h-10 bg-brand/10 dark:bg-brand-light/10 rounded-xl flex items-center justify-center">
+                        <ShieldCheck className="text-brand dark:text-brand-light" size={20} />
                     </div>
                     <h4 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-tight">Nasıl Ödül Kazanılır?</h4>
                 </div>
                 <div className="space-y-4">
                     <div className="flex gap-4">
-                        <div className="w-1.5 h-1.5 mt-2 bg-purple-600 dark:bg-purple-500 rounded-full shadow-[0_0_10px_rgba(168,85,247,0.8)]" />
+                        <div className="w-1.5 h-1.5 mt-2 bg-brand dark:bg-brand-light rounded-full shadow-[0_0_10px_rgba(0,152,234,0.8)]" />
                         <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 leading-relaxed uppercase">
                             1. Davet linkini arkadaşınla paylaş.
                         </p>
@@ -153,7 +153,7 @@ const ReferralPage = () => {
                         </p>
                     </div>
                     <div className="flex gap-4">
-                        <div className="w-1.5 h-1.5 mt-2 bg-purple-600 dark:bg-purple-500 rounded-full shadow-[0_0_10px_rgba(168,85,247,0.8)]" />
+                        <div className="w-1.5 h-1.5 mt-2 bg-brand dark:bg-brand-light rounded-full shadow-[0_0_10px_rgba(0,152,234,0.8)]" />
                         <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 leading-relaxed uppercase">
                             3. Katılım sağlandığı an ödülün otomatik olarak cüzdanına yansır.
                         </p>
@@ -204,7 +204,7 @@ const ReferralPage = () => {
                                                 {ref.referred_user?.name || `Kullanıcı #${ref.referred_id.slice(-4)}`}
                                             </span>
                                             {ref.is_premium_referral && (
-                                                <span className="px-2.5 py-0.5 bg-purple-600/20 border border-purple-500/20 text-[8px] font-bold text-purple-600 dark:text-purple-400 rounded-full uppercase tracking-wider">PREMIUM</span>
+                                                <span className="px-2.5 py-0.5 bg-brand/20 dark:bg-brand-light/20 border border-brand/20 dark:border-brand-light/20 text-[8px] font-bold text-brand dark:text-brand-light rounded-full uppercase tracking-wider">PREMIUM</span>
                                             )}
                                         </div>
                                         <span className="text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase">

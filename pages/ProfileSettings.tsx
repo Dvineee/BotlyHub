@@ -46,8 +46,8 @@ const ProfileSettings = () => {
         className="flex items-center justify-between p-5 bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-900/60 transition-all cursor-pointer group first:rounded-t-[32px] last:rounded-b-[32px] border-b border-black/5 dark:border-white/5 last:border-0 active:scale-[0.98]"
     >
         <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-950 group-hover:bg-purple-600/10 flex items-center justify-center transition-all border border-black/5 dark:border-white/5 group-hover:border-purple-500/20 shadow-inner">
-                <Icon size={20} className="text-slate-500 dark:text-slate-400 group-hover:text-purple-500 transition-colors" />
+            <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-950 group-hover:bg-brand/10 dark:group-hover:bg-brand-light/10 flex items-center justify-center transition-all border border-black/5 dark:border-white/5 group-hover:border-brand/20 dark:group-hover:border-brand-light/20 shadow-inner">
+                <Icon size={20} className="text-slate-500 dark:text-slate-400 group-hover:text-brand dark:group-hover:text-brand-light transition-colors" />
             </div>
             <span className="font-bold text-[11px] text-slate-900 dark:text-white uppercase tracking-wider">{label}</span>
         </div>
@@ -78,8 +78,8 @@ const ProfileSettings = () => {
              <div className="flex-1 min-w-0">
                  <h2 className="font-bold text-xl text-slate-900 dark:text-white tracking-tight truncate mb-1">{displayName}</h2>
                  <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-3">{displayUsername}</p>
-                 <div className="inline-flex items-center gap-2 bg-purple-500/10 text-purple-600 dark:text-purple-400 px-4 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider border border-purple-500/20 shadow-lg shadow-purple-900/20">
-                    <Crown size={12} className="fill-purple-500/20" />
+                 <div className="inline-flex items-center gap-2 bg-brand/10 dark:bg-brand-light/10 text-brand dark:text-brand-light px-4 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider border border-brand/20 dark:border-brand-light/20 shadow-lg shadow-blue-900/20">
+                    <Crown size={12} className="fill-brand/20 dark:fill-brand-light/20" />
                     <span>{currentPlanName}</span>
                  </div>
              </div>

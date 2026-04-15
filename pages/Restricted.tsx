@@ -22,7 +22,7 @@ const Restricted = () => {
                     href="https://t.me/botlyhub_support" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-4 w-full py-6 bg-purple-600 rounded-[28px] text-white text-[11px] font-bold uppercase tracking-widest shadow-2xl shadow-purple-900/30 active:scale-95 transition-all"
+                    className="flex items-center justify-center gap-4 w-full py-6 bg-brand dark:bg-brand-light rounded-[28px] text-white text-[11px] font-bold uppercase tracking-widest shadow-2xl shadow-blue-900/30 active:scale-95 transition-all"
                 >
                     <MessageCircle size={20} />
                     Destekle İletişime Geç

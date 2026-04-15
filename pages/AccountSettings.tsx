@@ -84,7 +84,7 @@ const AccountSettings = () => {
   if (isLoading) {
       return (
         <div className="min-h-screen bg-slate-50 dark:bg-[#020617] flex items-center justify-center transition-colors duration-300">
-            <Loader2 className="animate-spin text-purple-600 dark:text-blue-500/50" size={28} />
+            <Loader2 className="animate-spin text-brand dark:text-brand-light" size={28} />
         </div>
       );
   }
@@ -104,15 +104,15 @@ const AccountSettings = () => {
           {/* Status Badge */}
           <div className="mb-12 text-center">
               <div className={`inline-flex items-center gap-2 px-6 py-3 rounded-[20px] mb-8 shadow-xl border animate-in slide-in-from-top-4 transition-all ${
-                  isVerified ? 'bg-emerald-500/5 border-emerald-500/10' : 'bg-purple-500/5 border-purple-500/10'
+                  isVerified ? 'bg-emerald-500/5 border-emerald-500/10' : 'bg-brand/5 border-brand/10'
               }`}>
                   {isVerified ? (
                       <><BadgeCheck size={18} className="text-emerald-600 dark:text-emerald-500" /><span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-500 uppercase tracking-widest">HESAP DOĞRULANDI</span></>
                   ) : (
-                      <><Fingerprint size={18} className="text-purple-600 dark:text-purple-500" /><span className="text-[11px] font-bold text-purple-600 dark:text-purple-500 uppercase tracking-widest">DOĞRULAMA BEKLİYOR</span></>
+                      <><Fingerprint size={18} className="text-brand dark:text-brand-light" /><span className="text-[11px] font-bold text-brand dark:text-brand-light uppercase tracking-widest">DOĞRULAMA BEKLİYOR</span></>
                   )}
               </div>
-              <h1 className="text-4xl font-bold text-slate-900 dark:text-white tracking-tight mb-4">Hesap <span className="text-purple-600">Kimliği</span></h1>
+              <h1 className="text-4xl font-bold text-slate-900 dark:text-white tracking-tight mb-4">Hesap <span className="text-brand dark:text-brand-light">Kimliği</span></h1>
               <p className="text-xs text-slate-500 leading-relaxed font-medium uppercase px-6">
                   Ödemelerinizi almak ve botlarınızı yönetmek için kimlik doğrulaması gereklidir.
               </p>
@@ -126,7 +126,7 @@ const AccountSettings = () => {
                     {isVerified && <Check size={16} className="text-emerald-600 dark:text-emerald-500" />}
                   </div>
                   <div className="relative group">
-                      <div className={`absolute left-6 top-1/2 -translate-y-1/2 transition-all duration-300 ${isVerified ? 'text-emerald-600 dark:text-emerald-500 scale-110' : 'text-slate-400 dark:text-slate-500 group-focus-within:text-purple-600 dark:group-focus-within:text-purple-500'}`}>
+                      <div className={`absolute left-6 top-1/2 -translate-y-1/2 transition-all duration-300 ${isVerified ? 'text-emerald-600 dark:text-emerald-500 scale-110' : 'text-slate-400 dark:text-slate-500 group-focus-within:text-brand dark:group-focus-within:text-brand-light'}`}>
                         {isVerified ? <ShieldCheck size={22} /> : <Mail size={22} />}
                       </div>
                       <input 
@@ -137,7 +137,7 @@ const AccountSettings = () => {
                         className={`w-full h-18 pl-16 pr-6 text-sm font-bold rounded-[28px] border transition-all uppercase tracking-widest shadow-xl ${
                             isVerified 
                             ? 'bg-slate-100 dark:bg-slate-950/50 border-emerald-500/20 text-emerald-600/70 dark:text-emerald-500/70 cursor-default' 
-                            : 'bg-white dark:bg-slate-900/30 border-black/5 dark:border-white/10 text-slate-900 dark:text-white focus:border-blue-500/40 focus:bg-white dark:focus:bg-slate-900/50 outline-none'
+                            : 'bg-white dark:bg-slate-900/30 border-black/5 dark:border-white/10 text-slate-900 dark:text-white focus:border-brand/40 focus:bg-white dark:focus:bg-slate-900/50 outline-none'
                         }`} 
                         placeholder="EMAIL@EXAMPLE.COM" 
                       />
@@ -170,7 +170,7 @@ const AccountSettings = () => {
                       <button 
                         onClick={handleSave} 
                         disabled={isSaving} 
-                        className="w-full h-20 bg-purple-600 hover:bg-purple-500 rounded-[32px] font-bold text-white flex flex-col items-center justify-center gap-1 shadow-2xl shadow-purple-900/30 active:scale-[0.97] transition-all disabled:opacity-50"
+                        className="w-full h-20 bg-brand dark:bg-brand-light hover:opacity-90 rounded-[32px] font-bold text-white flex flex-col items-center justify-center gap-1 shadow-2xl shadow-blue-900/30 active:scale-[0.97] transition-all disabled:opacity-50"
                       >
                         {isSaving ? <Loader2 className="animate-spin" size={24} /> : (
                             <>

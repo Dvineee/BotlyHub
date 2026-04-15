@@ -423,11 +423,25 @@ export class DatabaseService {
 
   // --- BOTS ---
   static async getBots(): Promise<Bot[]> {
-    const { data } = await supabase.from('bots').select('*').order('id', { ascending: false });
-    return (data || []).map(bot => ({
-        ...bot,
-        languages: (bot.languages || (bot.name.toLowerCase().includes('botlyhub') ? ['🇬🇧', '🇹🇷'] : [])).map((l: string) => l === 'İng' ? '🇬🇧' : l)
-    }));
+    const { data: bots } = await supabase.from('bots').select('*').order('id', { ascending: false });
+    const { data: ratings } = await supabase.from('bot_ratings').select('bot_id, rating');
+    const { data: userBots } = await supabase.from('user_bots').select('bot_id');
+
+    return (bots || []).map(bot => {
+        const botRatings = (ratings || []).filter(r => r.bot_id === bot.id);
+        const avgRating = botRatings.length > 0 
+            ? botRatings.reduce((acc, curr) => acc + curr.rating, 0) / botRatings.length 
+            : 0;
+        const userCount = (userBots || []).filter(ub => ub.bot_id === bot.id).length;
+
+        return {
+            ...bot,
+            languages: (bot.languages || (bot.name.toLowerCase().includes('botlyhub') ? ['🇬🇧', '🇹🇷'] : [])).map((l: string) => l === 'İng' ? '🇬🇧' : l),
+            rating: Number(avgRating.toFixed(1)),
+            rating_count: botRatings.length,
+            user_count: userCount
+        };
+    });
   }
 
   static async getBotById(id: string): Promise<Bot | null> {

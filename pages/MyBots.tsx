@@ -174,7 +174,7 @@ const MyBots = () => {
             </button>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Botlarım</h1>
         </div>
-        <button onClick={(e) => { e.stopPropagation(); navigate('/'); }} className="w-12 h-12 flex items-center justify-center bg-purple-600 rounded-full text-white active:scale-90 transition-transform shadow-lg shadow-purple-900/20">
+        <button onClick={(e) => { e.stopPropagation(); navigate('/'); }} className="w-12 h-12 flex items-center justify-center bg-brand dark:bg-brand-light rounded-full text-white active:scale-90 transition-transform shadow-lg shadow-blue-900/20">
             <ShoppingBag size={20} />
         </button>
       </div>
@@ -210,7 +210,7 @@ const MyBots = () => {
                                 onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
                              />
                              {bot.price > 0 && (
-                                 <div className="absolute -top-2 -left-2 bg-purple-600 text-white p-1.5 rounded-xl border-2 border-slate-50 dark:border-[#020617] shadow-xl">
+                                 <div className="absolute -top-2 -left-2 bg-brand dark:bg-brand-light text-white p-1.5 rounded-xl border-2 border-slate-50 dark:border-[#020617] shadow-xl">
                                      <Lock size={12} />
                                  </div>
                              )}
@@ -219,7 +219,7 @@ const MyBots = () => {
                          <div className="ml-5 flex-1 min-w-0">
                                 <h3 
                                     onClick={(e) => { e.stopPropagation(); navigate(`/bot/${bot.id}`); }}
-                                    className="font-bold text-lg text-slate-900 dark:text-white truncate cursor-pointer hover:text-purple-600 dark:hover:text-purple-400 transition-colors mb-1 tracking-tight"
+                                    className="font-bold text-lg text-slate-900 dark:text-white truncate cursor-pointer hover:text-brand dark:hover:text-brand-light transition-colors mb-1 tracking-tight"
                                 >
                                     {bot.name}
                                 </h3>
@@ -239,7 +239,7 @@ const MyBots = () => {
 
                                 <button 
                                     onClick={(e) => { e.stopPropagation(); handleStartBot(bot); }}
-                                    className="inline-flex items-center gap-2 self-start px-5 py-2.5 bg-purple-600/10 hover:bg-purple-600 text-purple-600 dark:text-purple-400 hover:text-white rounded-xl text-[10px] font-bold uppercase tracking-widest border border-purple-500/20 transition-all shadow-lg"
+                                    className="inline-flex items-center gap-2 self-start px-5 py-2.5 bg-brand/10 dark:bg-brand-light/10 hover:bg-brand dark:hover:bg-brand-light text-brand dark:text-brand-light hover:text-white rounded-xl text-[10px] font-bold uppercase tracking-widest border border-brand/20 dark:border-brand-light/20 transition-all shadow-lg"
                                 >
                                     <Send size={12} />
                                     <span>Başlat</span>
@@ -270,11 +270,11 @@ const MyBots = () => {
                                 <div 
                                     onClick={(e) => { e.stopPropagation(); toggleActiveStatus(bot.id); }}
                                     className={`cursor-pointer rounded-2xl px-4 h-full max-h-[64px] flex items-center gap-3 border transition-all active:scale-95 shadow-lg ${
-                                        bot.isActive ? 'bg-purple-500/10 border-purple-500/30' : 'bg-white dark:bg-slate-900/60 border-black/5 dark:border-white/5'
+                                        bot.isActive ? 'bg-brand/10 dark:bg-brand-light/10 border-brand/30 dark:border-brand-light/30' : 'bg-white dark:bg-slate-900/60 border-black/5 dark:border-white/5'
                                     }`}
                                 >
-                                    <Activity size={18} className={bot.isActive ? 'text-purple-600 dark:text-purple-400' : 'text-slate-400 dark:text-slate-500'} />
-                                    <span className={`text-[11px] font-bold uppercase tracking-tight ${bot.isActive ? 'text-purple-600 dark:text-purple-400' : 'text-slate-500 dark:text-slate-400'}`}>Bot Durumu</span>
+                                    <Activity size={18} className={bot.isActive ? 'text-brand dark:text-brand-light' : 'text-slate-400 dark:text-slate-500'} />
+                                    <span className={`text-[11px] font-bold uppercase tracking-tight ${bot.isActive ? 'text-brand dark:text-brand-light' : 'text-slate-500 dark:text-slate-400'}`}>Bot Durumu</span>
                                 </div>
 
                                 {bot.price === 0 ? (

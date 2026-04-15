@@ -168,7 +168,11 @@ span.text-\[10px\].font-black.text-slate-500.dark\:text-slate-400.uppercase.trac
 
 .group:hover .group-hover\:bg-blue-600 {
     --tw-bg-opacity: 1;
-    background-color: #24a1de !important;
+    background-color: #24a1de00 !important;
+}
+
+svg.lucide.lucide-chevron-right:focus {
+    color: #24a1de;
 }
 
 .h-40 {

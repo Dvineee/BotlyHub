@@ -37,7 +37,7 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = ({ bot, tonRate }) => {
                 onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
             />
             {bot.price > 0 && (
-                <div className="absolute -top-1.5 -right-1.5 w-7 h-7 bg-purple-600 rounded-xl flex items-center justify-center shadow-lg border-2 border-slate-50 dark:border-[#020617]">
+                <div className="absolute -top-1.5 -right-1.5 w-7 h-7 bg-brand dark:bg-brand-light rounded-xl flex items-center justify-center shadow-lg border-2 border-slate-50 dark:border-[#020617]">
                     <Zap size={12} fill="currentColor" className="text-white" />
                 </div>
             )}
@@ -49,9 +49,9 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = ({ bot, tonRate }) => {
                 {bot.price === 0 ? (
                     <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider bg-emerald-400/10 px-3 py-1 rounded-xl">Ücretsiz</span>
                 ) : (
-                    <div className="flex items-center gap-2 bg-purple-500/10 px-3 py-1 rounded-xl">
-                        <Zap size={10} className="text-purple-600 dark:text-purple-400" />
-                        <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider">{prices.ton} TON</span>
+                    <div className="flex items-center gap-2 bg-brand/10 dark:bg-brand-light/10 px-3 py-1 rounded-xl">
+                        <Zap size={10} className="text-brand dark:text-brand-light" />
+                        <span className="text-[10px] font-bold text-brand dark:text-brand-light uppercase tracking-wider">{prices.ton} TON</span>
                     </div>
                 )}
                 <div className="flex items-center gap-1.5 bg-yellow-500/10 px-3 py-1 rounded-xl border border-yellow-500/20">
@@ -194,11 +194,11 @@ const SearchPage = () => {
               }}
               className={`flex items-center gap-3 px-6 py-4 rounded-2xl border transition-all active:scale-95 shadow-lg whitespace-nowrap snap-center ${
                 activeCategory === cat.id 
-                ? 'bg-purple-600/10 border-purple-500/40 text-purple-600 dark:text-purple-400 ring-1 ring-purple-500/20' 
+                ? 'bg-brand/10 dark:bg-brand-light/10 border-brand/40 dark:border-brand-light/40 text-brand dark:text-brand-light ring-1 ring-brand/20 dark:ring-brand-light/20' 
                 : 'bg-white dark:bg-slate-900/60 border-black/5 dark:border-white/5 text-slate-500 dark:text-slate-400'
               }`}
             >
-              <cat.icon size={20} className={activeCategory === cat.id ? 'text-purple-600 dark:text-purple-400' : 'text-slate-400 dark:text-slate-300'} />
+              <cat.icon size={20} className={activeCategory === cat.id ? 'text-brand dark:text-brand-light' : 'text-slate-400 dark:text-slate-300'} />
               <span className="text-[11px] font-bold uppercase tracking-wider">{t(cat.label)}</span>
             </button>
           ))}

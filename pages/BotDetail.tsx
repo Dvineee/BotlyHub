@@ -260,10 +260,10 @@ const BotDetail = () => {
           </div>
           <div className="flex-1 min-w-0 pt-1">
               <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight truncate mb-1">{bot.name}</h1>
-              <p className="text-purple-600 dark:text-purple-500 text-xs font-medium mb-3">{bot.category}</p>
+              <p className="text-brand dark:text-brand-light text-xs font-medium mb-3">{bot.category}</p>
               <div className="flex flex-wrap gap-2 items-center">
                   <span className="bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 text-slate-500 dark:text-slate-400 text-[10px] font-bold px-3 py-1 rounded-xl uppercase">v4.2.0</span>
-                  <span className="bg-purple-500/10 border border-purple-500/20 text-purple-600 dark:text-purple-400 text-[10px] font-bold px-3 py-1 rounded-xl uppercase flex items-center gap-1">
+                  <span className="bg-brand/10 border border-brand/20 text-brand dark:text-brand-light text-[10px] font-bold px-3 py-1 rounded-xl uppercase flex items-center gap-1">
                       <ShieldCheck size={12} /> Onaylı
                   </span>
                   
@@ -275,7 +275,7 @@ const BotDetail = () => {
                                   setIsDropdownOpen(!isDropdownOpen);
                               }
                           }}
-                          className={`bg-[#0098ea] text-white text-[10px] font-black px-4 py-1.5 rounded-xl uppercase flex items-center gap-2 shadow-lg active:scale-95 transition-all ${!(bot.telegram_group || bot.website_url || bot.app_url || bot.social_url) ? 'opacity-50 cursor-default' : ''}`}
+                          className={`bg-brand dark:bg-brand-light text-white text-[10px] font-black px-4 py-1.5 rounded-xl uppercase flex items-center gap-2 shadow-lg active:scale-95 transition-all ${!(bot.telegram_group || bot.website_url || bot.app_url || bot.social_url) ? 'opacity-50 cursor-default' : ''}`}
                       >
                           OPEN <ChevronDown size={12} className={`transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
                       </button>
@@ -408,68 +408,70 @@ const BotDetail = () => {
       </div>
 
       {/* Rating Section */}
-      <div className="px-6 mb-10">
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="relative p-5 bg-white/5 dark:bg-slate-900/40 backdrop-blur-xl rounded-[32px] border border-black/5 dark:border-white/5 overflow-hidden group"
-          >
-              <div className="relative z-10">
-                  <div className="flex items-center justify-between mb-5">
-                      <div className="flex flex-col gap-0.5">
-                          <h3 className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] italic">Deneyimi Puanla</h3>
-                          <p className="text-[8px] font-bold text-slate-400/50 dark:text-slate-500/50 uppercase tracking-widest">Geri bildiriminiz değerlidir</p>
-                      </div>
-                      {userRating && (
-                          <motion.div 
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded-xl"
-                          >
-                              <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></div>
-                              <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Puanınız: {userRating}</span>
-                          </motion.div>
-                      )}
-                  </div>
-
-                  <div className="flex items-center justify-center gap-2">
-                      {[1, 2, 3, 4, 5].map((star) => {
-                          const isActive = (hoverRating || userRating || 0) >= star;
-                          const isSelected = userRating === star;
-                          
-                          return (
-                              <motion.button
-                                  key={star}
-                                  onMouseEnter={() => setHoverRating(star)}
-                                  onMouseLeave={() => setHoverRating(null)}
-                                  onClick={() => { console.log("Star clicked:", star); haptic('heavy'); handleRate(star); }}
-                                  disabled={isRating}
-                                  whileHover={{ scale: 1.1 }}
-                                  whileTap={{ scale: 0.9 }}
-                                  className="relative p-1.5 transition-all z-50"
+      {isOwned && (
+          <div className="px-6 mb-10">
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="relative p-5 bg-white/5 dark:bg-slate-900/40 backdrop-blur-xl rounded-[32px] border border-black/5 dark:border-white/5 overflow-hidden group"
+              >
+                  <div className="relative z-10">
+                      <div className="flex items-center justify-between mb-5">
+                          <div className="flex flex-col gap-0.5">
+                              <h3 className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] italic">Deneyimi Puanla</h3>
+                              <p className="text-[8px] font-bold text-slate-400/50 dark:text-slate-500/50 uppercase tracking-widest">Geri bildiriminiz değerlidir</p>
+                          </div>
+                          {userRating && (
+                              <motion.div 
+                                initial={{ scale: 0.9, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded-xl"
                               >
-                                  <Star 
-                                      size={28} 
-                                      className={`transition-all duration-300 ${
-                                          isActive 
-                                          ? 'fill-yellow-400 text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.3)]' 
-                                          : 'text-slate-200 dark:text-slate-800'
-                                      }`} 
-                                  />
-                                  {isSelected && (
-                                      <motion.div 
-                                        layoutId="star-glow"
-                                        className="absolute inset-0 bg-yellow-400/10 blur-lg rounded-full -z-10"
+                                  <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></div>
+                                  <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Puanınız: {userRating}</span>
+                              </motion.div>
+                          )}
+                      </div>
+
+                      <div className="flex items-center justify-center gap-2">
+                          {[1, 2, 3, 4, 5].map((star) => {
+                              const isActive = (hoverRating || userRating || 0) >= star;
+                              const isSelected = userRating === star;
+                              
+                              return (
+                                  <motion.button
+                                      key={star}
+                                      onMouseEnter={() => setHoverRating(star)}
+                                      onMouseLeave={() => setHoverRating(null)}
+                                      onClick={() => { console.log("Star clicked:", star); haptic('heavy'); handleRate(star); }}
+                                      disabled={isRating}
+                                      whileHover={{ scale: 1.1 }}
+                                      whileTap={{ scale: 0.9 }}
+                                      className="relative p-1.5 transition-all z-50"
+                                  >
+                                      <Star 
+                                          size={28} 
+                                          className={`transition-all duration-300 ${
+                                              isActive 
+                                              ? 'fill-yellow-400 text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.3)]' 
+                                              : 'text-slate-200 dark:text-slate-800'
+                                          }`} 
                                       />
-                                  )}
-                              </motion.button>
-                          );
-                      })}
+                                      {isSelected && (
+                                          <motion.div 
+                                            layoutId="star-glow"
+                                            className="absolute inset-0 bg-yellow-400/10 blur-lg rounded-full -z-10"
+                                          />
+                                      )}
+                                  </motion.button>
+                              );
+                          })}
+                      </div>
                   </div>
-              </div>
-          </motion.div>
-      </div>
+              </motion.div>
+          </div>
+      )}
 
       {/* Description */}
       <div className="px-6 mb-10">
@@ -492,7 +494,7 @@ const BotDetail = () => {
                   { icon: Cpu, label: 'AI Destekli', desc: 'Akıllı İşlem' }
               ].map((f, i) => (
                   <div key={i} className="p-5 bg-white dark:bg-slate-900/40 rounded-[28px] border border-black/5 dark:border-white/5 flex items-center gap-4 shadow-lg">
-                      <div className="w-10 h-10 rounded-2xl bg-slate-100 dark:bg-slate-950 flex items-center justify-center text-blue-600 dark:text-blue-500 border border-black/5 dark:border-white/5 shadow-inner">
+                      <div className="w-10 h-10 rounded-2xl bg-slate-100 dark:bg-slate-950 flex items-center justify-center text-brand dark:text-brand-light border border-black/5 dark:border-white/5 shadow-inner">
                           <f.icon size={18} />
                       </div>
                       <div>
@@ -554,7 +556,7 @@ const BotDetail = () => {
             >
               <div className="p-8 lg:p-10">
                 <div className="flex justify-between items-center mb-8">
-                  <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-2xl shadow-blue-600/20">
+                  <div className="w-12 h-12 bg-brand dark:bg-brand-light rounded-2xl flex items-center justify-center shadow-2xl shadow-blue-600/20">
                     <Sparkles className="text-white" size={24} />
                   </div>
                   <button onClick={() => setShowGuide(false)} className="p-2 text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors">
@@ -563,7 +565,7 @@ const BotDetail = () => {
                 </div>
 
                 <h2 className="text-2xl font-black text-slate-900 dark:text-white italic uppercase tracking-tighter leading-none mb-3">
-                  Tebrikler! <br/> <span className="text-blue-600">Botunuz Hazır</span>
+                  Tebrikler! <br/> <span className="text-brand dark:text-brand-light">Botunuz Hazır</span>
                 </h2>
                 <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-10 italic">
                   Botu kullanmaya başlamak için şu adımları izleyin:
@@ -577,7 +579,7 @@ const BotDetail = () => {
                     { icon: BarChart3, title: 'Kazanç İzle', desc: 'BotlyHub ana sayfasından kanal gelirlerinizi anlık takip edin.' }
                   ].map((step, i) => (
                     <div key={i} className="flex gap-5 group">
-                      <div className="w-10 h-10 shrink-0 bg-slate-100 dark:bg-white/5 rounded-xl flex items-center justify-center text-blue-600 dark:text-blue-500 border border-black/5 dark:border-white/5 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
+                      <div className="w-10 h-10 shrink-0 bg-slate-100 dark:bg-white/5 rounded-xl flex items-center justify-center text-brand dark:text-brand-light border border-black/5 dark:border-white/5 group-hover:bg-brand dark:group-hover:bg-brand-light group-hover:text-white transition-all duration-500">
                         <step.icon size={18} />
                       </div>
                       <div>
@@ -594,7 +596,7 @@ const BotDetail = () => {
                       setShowGuide(false);
                       handleAction();
                     }}
-                    className="w-full py-5 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-[24px] text-[10px] uppercase tracking-[0.4em] shadow-2xl shadow-blue-900/40 transition-all active:scale-95 flex items-center justify-center gap-3"
+                    className="w-full py-5 bg-brand dark:bg-brand-light hover:opacity-90 text-white font-black rounded-[24px] text-[10px] uppercase tracking-[0.4em] shadow-2xl shadow-blue-900/40 transition-all active:scale-95 flex items-center justify-center gap-3"
                   >
                     <Send size={16} /> ŞİMDİ BAŞLAT
                   </button>

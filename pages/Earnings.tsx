@@ -69,15 +69,15 @@ const Earnings = () => {
         </div>
 
         <div className="bg-white dark:bg-slate-900/40 p-1.5 rounded-[28px] flex mb-10 border border-black/5 dark:border-white/5 backdrop-blur-xl shadow-xl">
-            <button onClick={()=>setActiveTab('wallet')} className={`flex-1 py-3.5 rounded-[22px] text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab==='wallet'?'bg-purple-600 text-white shadow-lg shadow-purple-900/20':'text-slate-500 hover:bg-black/5 dark:hover:bg-white/5'}`}>Cüzdan Yönetimi</button>
-            <button onClick={()=>setActiveTab('revenue')} className={`flex-1 py-3.5 rounded-[22px] text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab==='revenue'?'bg-purple-600 text-white shadow-lg shadow-purple-900/20':'text-slate-500 hover:bg-black/5 dark:hover:bg-white/5'}`}>Performans Analitiği</button>
+            <button onClick={()=>setActiveTab('wallet')} className={`flex-1 py-3.5 rounded-[22px] text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab==='wallet'?'bg-brand dark:bg-brand-light text-white shadow-lg shadow-blue-900/20':'text-slate-500 hover:bg-black/5 dark:hover:bg-white/5'}`}>Cüzdan Yönetimi</button>
+            <button onClick={()=>setActiveTab('revenue')} className={`flex-1 py-3.5 rounded-[22px] text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab==='revenue'?'bg-brand dark:bg-brand-light text-white shadow-lg shadow-blue-900/20':'text-slate-500 hover:bg-black/5 dark:hover:bg-white/5'}`}>Performans Analitiği</button>
         </div>
 
         <div className="flex-1 overflow-y-auto no-scrollbar px-1">
             {activeTab === 'wallet' ? (
                 <div className="animate-in slide-in-from-bottom-4">
                     {/* ... wallet content ... */}
-                    <div className="bg-gradient-to-br from-purple-600 to-indigo-700 p-8 rounded-[44px] mb-8 relative overflow-hidden shadow-2xl shadow-purple-900/20">
+                    <div className="bg-gradient-to-br from-brand to-indigo-700 p-8 rounded-[44px] mb-8 relative overflow-hidden shadow-2xl shadow-blue-900/20">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-3xl"></div>
                         <div className="relative z-10">
                             <div className="flex justify-between items-start mb-10">
@@ -108,7 +108,7 @@ const Earnings = () => {
                             </h4>
                         </div>
                         <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-[32px] flex flex-col items-center gap-3 shadow-xl">
-                            <div className="w-10 h-10 bg-purple-500/10 rounded-xl flex items-center justify-center text-purple-600 dark:text-purple-500 shadow-inner"><PieChart size={20} /></div>
+                            <div className="w-10 h-10 bg-brand/10 dark:bg-brand-light/10 rounded-xl flex items-center justify-center text-brand dark:text-brand-light shadow-inner"><PieChart size={20} /></div>
                             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Bağlı Kanallar</p>
                             <h4 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight leading-none">
                                 {new Set(stats.map(s => s.channel_id)).size}
@@ -126,9 +126,9 @@ const Earnings = () => {
                     </div>
 
                     {tonWallet && (
-                        <div className="bg-white dark:bg-slate-900/60 border border-purple-500/20 rounded-[32px] p-6 animate-in zoom-in-95 shadow-xl">
+                        <div className="bg-white dark:bg-slate-900/60 border border-brand/20 dark:border-brand-light/20 rounded-[32px] p-6 animate-in zoom-in-95 shadow-xl">
                             <div className="flex items-center gap-4 mb-4">
-                                <div className="w-10 h-10 bg-purple-600/10 rounded-xl flex items-center justify-center text-purple-600 dark:text-purple-500 shadow-inner"><WalletIcon size={18} /></div>
+                                <div className="w-10 h-10 bg-brand/10 dark:bg-brand-light/10 rounded-xl flex items-center justify-center text-brand dark:text-brand-light shadow-inner"><WalletIcon size={18} /></div>
                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Bağlı Adres</p>
                             </div>
                             <p className="text-[11px] text-slate-900 dark:text-white font-bold break-all bg-slate-50 dark:bg-black/40 p-5 rounded-2xl border border-black/5 dark:border-white/5 leading-relaxed tracking-tight shadow-inner">
@@ -146,7 +146,7 @@ const Earnings = () => {
                             disabled={isLoading}
                             className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-xl text-slate-500 dark:text-slate-400 active:scale-90 transition-all disabled:opacity-30 shadow-lg"
                         >
-                            <RefreshCw size={18} className={isLoading ? 'animate-spin text-purple-600 dark:text-purple-500' : ''} />
+                            <RefreshCw size={18} className={isLoading ? 'animate-spin text-brand dark:text-brand-light' : ''} />
                         </button>
                     </div>
                     <div className="grid grid-cols-2 gap-4 mb-8">
@@ -156,7 +156,7 @@ const Earnings = () => {
                             <h4 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight leading-none">₺{totalRevenue.toFixed(2)}</h4>
                         </div>
                         <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-[32px] flex flex-col items-center gap-3 shadow-xl">
-                            <div className="w-10 h-10 bg-purple-500/10 rounded-xl flex items-center justify-center text-purple-600 dark:text-purple-500 shadow-inner"><TrendingUp size={20} /></div>
+                            <div className="w-10 h-10 bg-brand/10 dark:bg-brand-light/10 rounded-xl flex items-center justify-center text-brand dark:text-brand-light shadow-inner"><TrendingUp size={20} /></div>
                             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Toplam Etkileşim</p>
                             <h4 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight leading-none">{totalViews.toLocaleString()}</h4>
                         </div>
@@ -164,13 +164,13 @@ const Earnings = () => {
 
                     {isLoading ? (
                         <div className="flex flex-col items-center justify-center py-20 gap-4">
-                            <Loader2 className="animate-spin text-purple-600 dark:text-purple-500" size={32} />
+                            <Loader2 className="animate-spin text-brand dark:text-brand-light" size={32} />
                             <span className="text-[11px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest">Veriler Yükleniyor...</span>
                         </div>
                     ) : stats.length === 0 ? (
                         <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-[44px] p-10 flex flex-col items-center justify-center gap-8 relative overflow-hidden shadow-xl">
                             <div className="absolute top-0 right-0 p-8 opacity-5">
-                                <PieChart size={120} className="text-purple-600 dark:text-purple-500" />
+                                <PieChart size={120} className="text-brand dark:text-brand-light" />
                             </div>
                             <div className="w-24 h-24 bg-slate-50 dark:bg-slate-950 rounded-full flex items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 shadow-inner">
                                 <BarChart3 size={40} className="text-slate-300 dark:text-slate-800" />
@@ -189,7 +189,7 @@ const Earnings = () => {
                                 <div key={s.id} className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-[32px] space-y-4 group hover:bg-slate-50 dark:hover:bg-slate-900/60 transition-all shadow-xl">
                                     <div className="flex justify-between items-start">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-purple-600/10 rounded-2xl flex items-center justify-center text-purple-600 dark:text-purple-500 shadow-inner">
+                                            <div className="w-12 h-12 bg-brand/10 dark:bg-brand-light/10 rounded-2xl flex items-center justify-center text-brand dark:text-brand-light shadow-inner">
                                                 <Megaphone size={20} />
                                             </div>
                                             <div>
@@ -220,10 +220,10 @@ const Earnings = () => {
                         </div>
                     )}
 
-                    <div className="mt-8 flex items-center gap-4 p-6 bg-purple-600/5 border border-purple-500/10 rounded-[32px] shadow-lg">
-                        <div className="w-12 h-12 bg-purple-600/10 rounded-2xl flex items-center justify-center text-purple-600 dark:text-purple-500 shadow-inner"><Clock size={22}/></div>
+                    <div className="mt-8 flex items-center gap-4 p-6 bg-brand/5 dark:bg-brand-light/5 border border-brand/10 dark:border-brand-light/10 rounded-[32px] shadow-lg">
+                        <div className="w-12 h-12 bg-brand/10 dark:bg-brand-light/10 rounded-2xl flex items-center justify-center text-brand dark:text-brand-light shadow-inner"><Clock size={22}/></div>
                         <div>
-                            <p className="text-[11px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-widest mb-1">Ödeme ve Hakediş Döngüsü</p>
+                            <p className="text-[11px] font-bold text-brand dark:text-brand-light uppercase tracking-widest mb-1">Ödeme ve Hakediş Döngüsü</p>
                             <p className="text-xs text-slate-500 font-medium">Hakedişler her ayın 15'inde cüzdana aktarılır.</p>
                         </div>
                     </div>

@@ -48,7 +48,7 @@ const NavItem = ({ to, icon: Icon, label, active, onClick }: any) => {
     <Link 
       to={to} 
       onClick={onClick}
-      className={`flex items-center gap-4 px-6 py-4 rounded-[24px] transition-all duration-300 ${active ? 'bg-blue-600 text-white shadow-2xl shadow-blue-600/40' : 'text-slate-500 hover:bg-white/5 hover:text-white'}`}
+      className={`flex items-center gap-4 px-6 py-4 rounded-[24px] transition-all duration-300 ${active ? 'bg-brand text-white shadow-2xl shadow-brand/40' : 'text-slate-500 hover:bg-white/5 hover:text-white'}`}
     >
       <Icon size={18} />
       <span className="font-black text-[10px] uppercase tracking-[0.2em]">{label}</span>
@@ -85,7 +85,7 @@ const AdminDashboard = () => {
                 </svg>
             </div>
             <div>
-                <h2 className="text-xl font-black text-white italic tracking-tighter uppercase leading-none">Botly<span className="text-blue-500">Hub</span></h2>
+                <h2 className="text-xl font-black text-white italic tracking-tighter uppercase leading-none">Botly<span className="text-brand">Hub</span></h2>
                 <span className="text-[8px] font-black text-slate-700 uppercase tracking-[0.4em] mt-1.5 block">Kurumsal Konsol</span>
             </div>
           </div>
@@ -136,7 +136,7 @@ const AdminDashboard = () => {
                     scale: [1, 1.05, 1]
                   }}
                   transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                  className="w-10 h-10 lg:w-12 lg:h-12 rounded-xl lg:rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center font-black text-white italic text-xl shadow-xl shadow-blue-600/20"
+                  className="w-10 h-10 lg:w-12 lg:h-12 rounded-xl lg:rounded-2xl bg-gradient-to-br from-brand to-brand/80 flex items-center justify-center font-black text-white italic text-xl shadow-xl shadow-brand/20"
                >
                  A
                </motion.div>
@@ -167,8 +167,8 @@ const AdminDashboard = () => {
 
 const StatCard = ({ icon: Icon, label, value, color }: any) => {
     const colors: any = {
-        blue: 'text-blue-500 bg-blue-500/10 border-blue-500/20',
-        purple: 'text-purple-500 bg-purple-500/10 border-purple-500/20',
+        blue: 'text-brand bg-brand/10 border-brand/20',
+        purple: 'text-brand bg-brand/10 border-brand/20',
         emerald: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20',
         orange: 'text-orange-500 bg-orange-500/10 border-orange-500/20'
     };
@@ -185,13 +185,13 @@ const AdminInput = ({ label, value, onChange, type = "text", placeholder = "", i
     <div className="space-y-2 text-white group">
         <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 group-focus-within:text-blue-500 transition-colors italic">{label}</label>
         <div className="relative">
-            {Icon && <Icon className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-700 group-focus-within:text-blue-500 transition-colors" size={18} />}
+            {Icon && <Icon className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-700 group-focus-within:text-brand transition-colors" size={18} />}
             <input 
                 type={type} 
                 value={value} 
                 onChange={e => onChange(e.target.value)} 
                 placeholder={placeholder}
-                className={`w-full h-14 lg:h-18 bg-slate-950 border border-white/5 rounded-[22px] lg:rounded-[28px] ${Icon ? 'pl-14' : 'px-8'} pr-8 text-[11px] font-black text-white outline-none focus:border-blue-500 transition-all uppercase italic shadow-inner`} 
+                className={`w-full h-14 lg:h-18 bg-slate-950 border border-white/5 rounded-[22px] lg:rounded-[28px] ${Icon ? 'pl-14' : 'px-8'} pr-8 text-[11px] font-black text-white outline-none focus:border-brand transition-all uppercase italic shadow-inner`} 
             />
         </div>
     </div>
@@ -205,12 +205,12 @@ const HomeView = () => {
         DatabaseService.getAdminStats().then(s => { setStats(s); setIsLoading(false); }); 
     }, []);
 
-    if (isLoading) return <div className="flex justify-center py-24"><Loader2 className="animate-spin text-blue-500" size={32} /></div>;
+    if (isLoading) return <div className="flex justify-center py-24"><Loader2 className="animate-spin text-brand" size={32} /></div>;
 
     return (
         <div className="animate-in fade-in duration-700 space-y-12">
             <div className="flex flex-col gap-2">
-                <h1 className="text-4xl lg:text-5xl font-black text-white uppercase italic tracking-tighter leading-none">Kurumsal <span className="text-blue-500">Genel Bakış</span></h1>
+                <h1 className="text-4xl lg:text-5xl font-black text-white uppercase italic tracking-tighter leading-none">Kurumsal <span className="text-brand">Genel Bakış</span></h1>
                 <p className="text-[10px] font-black text-slate-700 uppercase tracking-[0.5em] italic">Platform büyüme ve performans metrikleri</p>
             </div>
 
@@ -300,12 +300,12 @@ const BotManagement = () => {
         <div className="space-y-12 animate-in fade-in">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div>
-                    <h2 className="text-3xl lg:text-4xl font-black text-white italic uppercase tracking-tighter leading-none">Market <span className="text-blue-500">Envanteri</span></h2>
+                    <h2 className="text-3xl lg:text-4xl font-black text-white italic uppercase tracking-tighter leading-none">Market <span className="text-brand">Envanteri</span></h2>
                     <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em] mt-2 italic">Platform envanterini profesyonelce yönetin</p>
                 </div>
                 <button 
                     onClick={openCreateModal}
-                    className="w-full md:w-auto bg-blue-600 hover:bg-blue-500 px-8 py-5 rounded-[24px] text-[10px] font-black uppercase tracking-[0.4em] shadow-2xl shadow-blue-900/40 transition-all active:scale-95 flex items-center justify-center gap-3"
+                    className="w-full md:w-auto bg-brand hover:opacity-90 px-8 py-5 rounded-[24px] text-[10px] font-black uppercase tracking-[0.4em] shadow-2xl shadow-brand/40 transition-all active:scale-95 flex items-center justify-center gap-3"
                 >
                     <Plus size={18} /> YENİ ÜRÜN TANIMLA
                 </button>
@@ -313,13 +313,13 @@ const BotManagement = () => {
 
             {isLoading ? (
                 <div className="flex flex-col items-center justify-center py-32 gap-4">
-                    <Loader2 className="animate-spin text-blue-500" size={40} />
+                    <Loader2 className="animate-spin text-brand" size={40} />
                     <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">Veriler Senkronize Ediliyor...</span>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                     {bots.map(b => (
-                        <div key={b.id} className="bg-slate-900/40 border border-white/5 rounded-[32px] lg:rounded-[56px] p-6 lg:p-10 flex flex-col gap-6 lg:gap-8 group hover:border-blue-500/30 transition-all relative overflow-hidden shadow-2xl backdrop-blur-sm">
+                        <div key={b.id} className="bg-slate-900/40 border border-white/5 rounded-[32px] lg:rounded-[56px] p-6 lg:p-10 flex flex-col gap-6 lg:gap-8 group hover:border-brand/30 transition-all relative overflow-hidden shadow-2xl backdrop-blur-sm">
                             <div className="flex justify-between items-start relative z-10">
                                 <div className="relative">
                                     <img 
@@ -327,16 +327,16 @@ const BotManagement = () => {
                                         className="w-14 h-14 lg:w-20 lg:h-20 rounded-[24px] lg:rounded-[32px] border border-white/10 shadow-2xl object-cover bg-slate-950 group-hover:rotate-6 group-hover:scale-105 transition-all" 
                                         onError={(e) => (e.target as any).src = `https://ui-avatars.com/api/?name=${b.name}`}
                                     />
-                                    {b.price > 0 && <div className="absolute -top-2 -right-2 w-6 h-6 lg:w-7 lg:h-7 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg border-4 border-[#020617]"><Zap size={10} fill="currentColor" /></div>}
+                                    {b.price > 0 && <div className="absolute -top-2 -right-2 w-6 h-6 lg:w-7 lg:h-7 bg-brand rounded-xl flex items-center justify-center shadow-lg border-4 border-[#020617]"><Zap size={10} fill="currentColor" /></div>}
                                 </div>
                                 <div className="flex gap-2">
                                     {b.is_official && (
-                                        <div className="px-3 py-1 bg-blue-500/10 border border-blue-500/20 rounded-lg flex items-center gap-1.5">
-                                            <ShieldCheck size={10} className="text-blue-500" />
-                                            <span className="text-[8px] font-black text-blue-500 uppercase tracking-widest">OFFICIAL</span>
+                                        <div className="px-3 py-1 bg-brand/10 border border-brand/20 rounded-lg flex items-center gap-1.5">
+                                            <ShieldCheck size={10} className="text-brand" />
+                                            <span className="text-[8px] font-black text-brand uppercase tracking-widest">OFFICIAL</span>
                                         </div>
                                     )}
-                                    <button onClick={() => { setEditingBot(b); setIsModalOpen(true); }} className="p-2.5 lg:p-3 bg-white/5 rounded-xl hover:bg-blue-600 text-slate-500 hover:text-white transition-all"><Edit3 size={16}/></button>
+                                    <button onClick={() => { setEditingBot(b); setIsModalOpen(true); }} className="p-2.5 lg:p-3 bg-white/5 rounded-xl hover:bg-brand text-slate-500 hover:text-white transition-all"><Edit3 size={16}/></button>
                                     <button onClick={async () => { if(confirm('Silsin mi?')) { await DatabaseService.deleteBot(b.id); await DatabaseService.logActivity('admin', 'bot_manage', 'bot_deleted', 'Bot Silindi', `${b.name} isimli bot sistemden silindi.`); load(); } }} className="p-2.5 lg:p-3 bg-white/5 rounded-xl text-red-500 hover:bg-red-500 hover:text-white transition-all"><Trash2 size={16}/></button>
                                 </div>
                             </div>
@@ -347,7 +347,7 @@ const BotManagement = () => {
                             </div>
 
                             <div className="flex items-center justify-between pt-4 lg:pt-6 border-t border-white/5 relative z-10">
-                                <p className="text-base lg:text-lg font-black uppercase text-blue-500 italic tracking-tighter leading-none">{b.price > 0 ? `${b.price} TL` : 'ÜCRETSİZ'}</p>
+                                <p className="text-base lg:text-lg font-black uppercase text-brand italic tracking-tighter leading-none">{b.price > 0 ? `${b.price} TL` : 'ÜCRETSİZ'}</p>
                                 <p className="text-base lg:text-lg font-black uppercase text-white italic tracking-tighter leading-none">{b.ownerCount || 0} <span className="text-[8px] text-slate-700">LİSANS</span></p>
                             </div>
                         </div>
@@ -366,11 +366,11 @@ const BotManagement = () => {
                         <div className="flex-1 flex flex-col overflow-hidden">
                             <div className="p-8 lg:p-12 pb-4 lg:pb-0 space-y-8">
                                 <div className="flex items-center gap-5">
-                                    <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-[20px] flex items-center justify-center shadow-xl rotate-3">
+                                    <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-brand to-brand/80 rounded-[20px] flex items-center justify-center shadow-xl rotate-3">
                                         <Cpu size={24} className="text-white"/>
                                     </div>
                                     <div>
-                                        <h3 className="text-2xl lg:text-3xl font-black uppercase italic tracking-tighter">Ürün <span className="text-blue-500">Atölyesi</span></h3>
+                                        <h3 className="text-2xl lg:text-3xl font-black uppercase italic tracking-tighter">Ürün <span className="text-brand">Atölyesi</span></h3>
                                         <p className="text-[9px] font-black text-slate-700 uppercase tracking-[0.4em] mt-1 italic">V3.5 MOTORU</p>
                                     </div>
                                 </div>
@@ -397,7 +397,7 @@ const BotManagement = () => {
                                                     <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4">SİSTEM ID</label>
                                                     <div className="relative group">
                                                         <input type="text" value={editingBot.id} readOnly className="w-full h-14 lg:h-18 bg-slate-950 border border-white/5 rounded-[22px] lg:rounded-[28px] px-8 text-[11px] font-black text-slate-600 outline-none uppercase italic" />
-                                                        <button type="button" onClick={copyId} className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-white/5 rounded-xl hover:bg-blue-600 text-slate-500 hover:text-white transition-all">
+                                                        <button type="button" onClick={copyId} className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-white/5 rounded-xl hover:bg-brand text-slate-500 hover:text-white transition-all">
                                                             {copiedId ? <Check size={14} /> : <Copy size={14} />}
                                                         </button>
                                                     </div>
@@ -406,7 +406,7 @@ const BotManagement = () => {
                                                 <AdminInput label="@KULLANICIADI" value={editingBot.bot_link} onChange={(v:any)=>setEditingBot({...editingBot, bot_link:v})} />
                                                 <div className="space-y-2">
                                                     <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4">KATEGORİ</label>
-                                                    <select value={editingBot.category} onChange={e => setEditingBot({...editingBot, category: e.target.value})} className="w-full h-14 lg:h-18 bg-slate-950 border border-white/5 rounded-[22px] lg:rounded-[28px] px-8 text-[11px] font-black text-white outline-none focus:border-blue-500 uppercase italic appearance-none">
+                                                    <select value={editingBot.category} onChange={e => setEditingBot({...editingBot, category: e.target.value})} className="w-full h-14 lg:h-18 bg-slate-950 border border-white/5 rounded-[22px] lg:rounded-[28px] px-8 text-[11px] font-black text-white outline-none focus:border-brand uppercase italic appearance-none">
                                                         <option value="utilities">Araçlar & Servisler</option>
                                                         <option value="finance">Finans & Ekonomi</option>
                                                         <option value="games">Eğlence & Oyun</option>
@@ -429,7 +429,7 @@ const BotManagement = () => {
                                                                 }}
                                                                 className={`px-4 py-2 rounded-xl text-[10px] font-black transition-all ${
                                                                     (editingBot.languages || []).includes(lang)
-                                                                    ? 'bg-blue-600 text-white shadow-lg'
+                                                                    ? 'bg-brand text-white shadow-lg'
                                                                     : 'bg-white/5 text-slate-500 hover:bg-white/10'
                                                                 }`}
                                                             >
@@ -447,7 +447,7 @@ const BotManagement = () => {
                                             </div>
                                             <div className="space-y-2">
                                                 <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4">MARKET AÇIKLAMASI</label>
-                                                <textarea value={editingBot.description} onChange={e => setEditingBot({...editingBot, description: e.target.value})} className="w-full bg-slate-950 border border-white/5 p-8 rounded-[36px] lg:rounded-[44px] text-[11px] font-black h-32 lg:h-40 outline-none text-slate-400 focus:border-blue-500/30 uppercase italic leading-relaxed" />
+                                                <textarea value={editingBot.description} onChange={e => setEditingBot({...editingBot, description: e.target.value})} className="w-full bg-slate-950 border border-white/5 p-8 rounded-[36px] lg:rounded-[44px] text-[11px] font-black h-32 lg:h-40 outline-none text-slate-400 focus:border-brand/30 uppercase italic leading-relaxed" />
                                             </div>
                                         </div>
                                     )}
@@ -457,7 +457,7 @@ const BotManagement = () => {
                                                 <AdminInput label="LİSANS TUTARI (TRY)" type="number" value={editingBot.price} onChange={(v:any)=>setEditingBot({...editingBot, price:v})} />
                                                 <div className="space-y-2">
                                                     <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4">PLATFORM STATÜSÜ</label>
-                                                    <button type="button" onClick={()=>setEditingBot({...editingBot, is_official: !editingBot.is_official})} className={`w-full h-14 lg:h-18 rounded-[22px] lg:rounded-[28px] flex items-center justify-center gap-3 transition-all font-black text-[10px] tracking-widest ${editingBot.is_official ? 'bg-blue-600 text-white shadow-xl shadow-blue-900/40' : 'bg-slate-950 text-slate-600 border border-white/5'}`}>
+                                                    <button type="button" onClick={()=>setEditingBot({...editingBot, is_official: !editingBot.is_official})} className={`w-full h-14 lg:h-18 rounded-[22px] lg:rounded-[28px] flex items-center justify-center gap-3 transition-all font-black text-[10px] tracking-widest ${editingBot.is_official ? 'bg-brand text-white shadow-xl shadow-brand/40' : 'bg-slate-950 text-slate-600 border border-white/5'}`}>
                                                         {editingBot.is_official ? 'OFFICIAL BOT' : 'STANDARD BOT'}
                                                     </button>
                                                 </div>
@@ -470,7 +470,7 @@ const BotManagement = () => {
                                                 <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4">VARLIKLAR (URL)</label>
                                                 <div className="flex gap-3">
                                                     <input type="text" id="scr_input" placeholder="https://cdn.example.com/..." className="flex-1 h-14 lg:h-16 bg-slate-950 border border-white/5 rounded-2xl px-6 text-[10px] text-white outline-none italic font-black" />
-                                                    <button type="button" onClick={() => { const inp = document.getElementById('scr_input') as HTMLInputElement; handleScreenshotAdd(inp.value); inp.value = ''; }} className="h-14 lg:h-16 px-8 bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl">EKLE</button>
+                                                    <button type="button" onClick={() => { const inp = document.getElementById('scr_input') as HTMLInputElement; handleScreenshotAdd(inp.value); inp.value = ''; }} className="h-14 lg:h-16 px-8 bg-brand text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl">EKLE</button>
                                                 </div>
                                                 <div className="flex gap-4 overflow-x-auto no-scrollbar pb-6 px-2">
                                                     {(editingBot.screenshots || []).map((url: string, idx: number) => (
@@ -486,7 +486,7 @@ const BotManagement = () => {
                                         </div>
                                     )}
                                     <div className="fixed lg:relative bottom-0 left-0 right-0 p-6 lg:p-0 bg-gradient-to-t from-[#020617] lg:from-transparent via-[#020617]/90 lg:via-transparent to-transparent z-[130]">
-                                        <button type="submit" className="w-full h-16 lg:h-24 bg-blue-600 text-white rounded-2xl lg:rounded-[32px] font-black text-[12px] uppercase tracking-[0.4em] shadow-2xl shadow-blue-900/40 transition-all border-b-8 border-blue-800 active:translate-y-1 active:border-b-4 flex items-center justify-center gap-4">
+                                        <button type="submit" className="w-full h-16 lg:h-24 bg-brand text-white rounded-2xl lg:rounded-[32px] font-black text-[12px] uppercase tracking-[0.4em] shadow-2xl shadow-brand/40 transition-all border-b-8 border-blue-800 active:translate-y-1 active:border-b-4 flex items-center justify-center gap-4">
                                             <Database size={20} /> SİSTEMİ GÜNCELLE
                                         </button>
                                     </div>

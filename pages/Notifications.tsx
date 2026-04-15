@@ -79,7 +79,7 @@ const Notifications = () => {
         </div>
         <button 
             onClick={markAllAsRead} 
-            className="w-12 h-12 flex items-center justify-center bg-purple-600/10 border border-purple-500/20 rounded-full text-purple-600 dark:text-purple-400 active:scale-90 transition-transform shadow-lg"
+            className="w-12 h-12 flex items-center justify-center bg-brand/10 dark:bg-brand-light/10 border border-brand/20 dark:border-brand-light/20 rounded-full text-brand dark:text-brand-light active:scale-90 transition-transform shadow-lg"
             title="Hepsini Oku"
         >
             <CheckCheck size={22} />
@@ -89,8 +89,8 @@ const Notifications = () => {
       {isLoading ? (
           <div className="flex flex-col items-center justify-center py-32 gap-5">
               <div className="relative">
-                  <div className="absolute inset-0 blur-2xl bg-blue-500/20 animate-pulse"></div>
-                  <Loader2 className="animate-spin text-blue-500 relative z-10" size={36} />
+                  <div className="absolute inset-0 blur-2xl bg-brand/20 dark:bg-brand-light/20 animate-pulse"></div>
+                  <Loader2 className="animate-spin text-brand dark:text-brand-light relative z-10" size={36} />
               </div>
               <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 dark:text-slate-800 italic">Senkronize Ediliyor</p>
           </div>
@@ -110,10 +110,10 @@ const Notifications = () => {
                     className={`p-6 rounded-[32px] border transition-all flex gap-5 relative overflow-hidden group cursor-pointer backdrop-blur-md ${
                         note.isRead 
                         ? 'bg-white/40 dark:bg-slate-950/40 border-black/5 dark:border-white/5 opacity-50' 
-                        : 'bg-white dark:bg-slate-900/60 border-blue-500/20 shadow-[0_10px_30px_rgba(0,0,0,0.05)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.3)]'
+                        : 'bg-white dark:bg-slate-900/60 border-brand/20 dark:border-brand-light/20 shadow-[0_10px_30px_rgba(0,0,0,0.05)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.3)]'
                     }`}
                   >
-                      {!note.isRead && <div className="absolute top-0 left-0 w-1.5 h-full bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.8)]"></div>}
+                      {!note.isRead && <div className="absolute top-0 left-0 w-1.5 h-full bg-brand dark:bg-brand-light shadow-[0_0_15px_rgba(0,152,234,0.8)]"></div>}
                       
                       <div className={`w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-inner border border-black/5 dark:border-white/5 transition-all group-active:scale-95 ${note.isRead ? 'bg-slate-100 dark:bg-slate-950' : 'bg-slate-50 dark:bg-slate-800'}`}>
                           {getIcon(note.type)}
@@ -141,7 +141,7 @@ const Notifications = () => {
                       </div>
                       
                       <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">{selectedNote.title}</h3>
-                      <p className="text-[10px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-widest mb-8">{selectedNote.type} LOG</p>
+                      <p className="text-[10px] font-bold text-brand dark:text-brand-light uppercase tracking-widest mb-8">{selectedNote.type} LOG</p>
                       
                       <div className="bg-slate-50 dark:bg-slate-950/50 p-6 rounded-[32px] border border-black/5 dark:border-white/5 mb-10 shadow-inner">
                           <p className="text-slate-600 dark:text-slate-400 text-xs leading-relaxed font-medium">{selectedNote.message}</p>
@@ -149,7 +149,7 @@ const Notifications = () => {
 
                       <button 
                         onClick={() => setSelectedNote(null)} 
-                        className="w-full py-4.5 bg-purple-600 text-white font-bold rounded-2xl text-[11px] uppercase tracking-widest active:scale-95 transition-all shadow-xl shadow-purple-900/20"
+                        className="w-full py-4.5 bg-brand dark:bg-brand-light text-white font-bold rounded-2xl text-[11px] uppercase tracking-widest active:scale-95 transition-all shadow-xl shadow-blue-900/20"
                       >
                         ANLADIM
                       </button>

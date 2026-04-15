@@ -36,8 +36,8 @@ const UserPanelLogin: React.FC = () => {
         <div className="min-h-screen bg-[#020617] flex items-center justify-center p-8 animate-in fade-in">
       <div className="w-full max-w-md space-y-10">
         <div className="text-center space-y-5">
-          <div className="w-24 h-24 bg-purple-600/10 rounded-[32px] flex items-center justify-center mx-auto border border-purple-500/20 shadow-2xl shadow-purple-900/20">
-            <ShieldCheck size={44} className="text-purple-500" />
+          <div className="w-24 h-24 bg-[#0098ea]/10 dark:bg-[#558df7]/10 rounded-[32px] flex items-center justify-center mx-auto border border-[#0098ea]/20 dark:border-[#558df7]/20 shadow-2xl shadow-blue-900/20">
+            <ShieldCheck size={44} className="text-[#0098ea] dark:text-[#558df7]" />
           </div>
           <div>
             <h1 className="text-3xl font-bold text-white tracking-tight">Kullanıcı Paneli</h1>
@@ -58,7 +58,7 @@ const UserPanelLogin: React.FC = () => {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Telegram kullanıcı adınız..."
-                  className="w-full h-16 bg-slate-950/50 border border-white/5 rounded-[24px] pl-14 pr-6 text-white text-sm font-bold outline-none focus:border-purple-500 transition-all shadow-inner"
+                  className="w-full h-16 bg-slate-950/50 border border-white/5 rounded-[24px] pl-14 pr-6 text-white text-sm font-bold outline-none focus:border-[#0098ea] dark:focus:border-[#558df7] transition-all shadow-inner"
                   required
                 />
               </div>
@@ -75,7 +75,7 @@ const UserPanelLogin: React.FC = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full h-16 bg-slate-950/50 border border-white/5 rounded-[24px] pl-14 pr-6 text-white text-sm font-bold outline-none focus:border-purple-500 transition-all shadow-inner"
+                  className="w-full h-16 bg-slate-950/50 border border-white/5 rounded-[24px] pl-14 pr-6 text-white text-sm font-bold outline-none focus:border-[#0098ea] dark:focus:border-[#558df7] transition-all shadow-inner"
                   required
                 />
               </div>
@@ -90,7 +90,7 @@ const UserPanelLogin: React.FC = () => {
             <button 
               type="submit"
               disabled={loading}
-              className="w-full h-16 bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white rounded-[24px] font-bold uppercase tracking-widest flex items-center justify-center gap-3 transition-all group shadow-2xl shadow-purple-900/30"
+              className="w-full h-16 bg-[#0098ea] dark:bg-[#558df7] hover:opacity-90 disabled:opacity-50 text-white rounded-[24px] font-bold uppercase tracking-widest flex items-center justify-center gap-3 transition-all group shadow-2xl shadow-blue-900/30"
             >
               {loading ? 'GİRİŞ YAPILIYOR...' : (
                 <>
