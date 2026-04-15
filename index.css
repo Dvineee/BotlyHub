@@ -437,3 +437,10 @@ p.text-\[10px\].text-slate-400.dark\:text-slate-500.font-medium.uppercase.tracki
 .dark\:bg-slate-800\/60:is(.dark *) {
    background-color: transparent; 
 }
+
+.transition-opacity {
+    opacity: 1;
+    transition-property: opacity;
+    transition-timing-function: cubic-bezier(.4, 0, .2, 1);
+    transition-duration: .15s;
+}
