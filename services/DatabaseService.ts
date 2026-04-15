@@ -479,18 +479,35 @@ export class DatabaseService {
   }
 
   static async rateBot(userId: string, botId: string, rating: number) {
-    const { error } = await supabase.from('bot_ratings').upsert({
-        user_id: userId,
-        bot_id: botId,
-        rating: rating,
-        created_at: new Date().toISOString()
-    }, { onConflict: 'user_id,bot_id' });
-    if (error) throw error;
+    try {
+        // Önce mevcut puanı kontrol etmeye gerek yok, upsert otomatik halleder
+        const { error } = await supabase.from('bot_ratings').upsert({
+            user_id: userId,
+            bot_id: botId,
+            rating: rating,
+            created_at: new Date().toISOString()
+        }, { 
+            onConflict: 'user_id,bot_id'
+        });
+        
+        if (error) {
+            console.error("Supabase Upsert Error:", error);
+            throw new Error(error.message);
+        }
+    } catch (e: any) {
+        console.error("rateBot Exception:", e);
+        throw e;
+    }
   }
 
   static async getUserBotRating(userId: string, botId: string): Promise<number | null> {
-    const { data } = await supabase.from('bot_ratings').select('rating').eq('user_id', userId).eq('bot_id', botId).maybeSingle();
-    return data?.rating || null;
+    try {
+        const { data } = await supabase.from('bot_ratings').select('rating').eq('user_id', userId).eq('bot_id', botId).maybeSingle();
+        return data?.rating || null;
+    } catch (e) {
+        console.warn("User rating fetch error:", e);
+        return null;
+    }
   }
 
   static async saveBot(bot: any) {
@@ -521,10 +538,17 @@ export class DatabaseService {
   static async getBotsWithStats(): Promise<any[]> {
     const { data: bots } = await supabase.from('bots').select('*').order('id', { ascending: false });
     const { data: userBots } = await supabase.from('user_bots').select('bot_id');
-    const { data: ratings } = await supabase.from('bot_ratings').select('bot_id, rating');
+    
+    let ratings: any[] = [];
+    try {
+        const { data: ratingsData } = await supabase.from('bot_ratings').select('bot_id, rating');
+        ratings = ratingsData || [];
+    } catch (e) {
+        console.warn("Could not fetch ratings, table might be missing:", e);
+    }
 
     return (bots || []).map(bot => {
-        const botRatings = (ratings || []).filter(r => r.bot_id === bot.id);
+        const botRatings = ratings.filter(r => r.bot_id === bot.id);
         const avgRating = botRatings.length > 0 
             ? botRatings.reduce((acc, curr) => acc + curr.rating, 0) / botRatings.length 
             : 0;
