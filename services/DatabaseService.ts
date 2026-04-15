@@ -433,10 +433,64 @@ export class DatabaseService {
   static async getBotById(id: string): Promise<Bot | null> {
     const { data } = await supabase.from('bots').select('*').eq('id', id).maybeSingle();
     if (!data) return null;
+    
+    let user_count = 0;
+    let rating = 0;
+    let rating_count = 0;
+
+    try {
+        const { count } = await supabase
+            .from('user_bots')
+            .select('*', { count: 'exact', head: true })
+            .eq('bot_id', id);
+        user_count = count || 0;
+
+        const { data: ratings } = await supabase
+            .from('bot_ratings')
+            .select('rating')
+            .eq('bot_id', id);
+        
+        if (ratings && ratings.length > 0) {
+            rating_count = ratings.length;
+            rating = ratings.reduce((acc, curr) => acc + curr.rating, 0) / rating_count;
+        }
+    } catch (e) {
+        console.warn("Stats fetch error (maybe table missing):", e);
+    }
+
     return {
         ...data,
-        languages: (data.languages || (data.name.toLowerCase().includes('botlyhub') ? ['🇬🇧', '🇹🇷'] : [])).map((l: string) => l === 'İng' ? '🇬🇧' : l)
+        languages: (data.languages || (data.name.toLowerCase().includes('botlyhub') ? ['🇬🇧', '🇹🇷'] : [])).map((l: string) => l === 'İng' ? '🇬🇧' : l),
+        user_count,
+        rating: Number(rating.toFixed(1)) || 0,
+        rating_count
     };
+  }
+
+  static async incrementBotView(botId: string) {
+    try {
+        const { data: bot } = await supabase.from('bots').select('views').eq('id', botId).single();
+        if (bot) {
+            await supabase.from('bots').update({ views: (bot.views || 0) + 1 }).eq('id', botId);
+        }
+    } catch (e) {
+        console.error("Increment view error:", e);
+    }
+  }
+
+  static async rateBot(userId: string, botId: string, rating: number) {
+    const { error } = await supabase.from('bot_ratings').upsert({
+        user_id: userId,
+        bot_id: botId,
+        rating: rating,
+        created_at: new Date().toISOString()
+    }, { onConflict: 'user_id,bot_id' });
+    if (error) throw error;
+  }
+
+  static async getUserBotRating(userId: string, botId: string): Promise<number | null> {
+    const { data } = await supabase.from('bot_ratings').select('rating').eq('user_id', userId).eq('bot_id', botId).maybeSingle();
+    return data?.rating || null;
   }
 
   static async saveBot(bot: any) {
@@ -467,10 +521,21 @@ export class DatabaseService {
   static async getBotsWithStats(): Promise<any[]> {
     const { data: bots } = await supabase.from('bots').select('*').order('id', { ascending: false });
     const { data: userBots } = await supabase.from('user_bots').select('bot_id');
-    return (bots || []).map(bot => ({ 
-        ...bot, 
-        ownerCount: (userBots || []).filter((ub: any) => ub.bot_id === bot.id).length 
-    }));
+    const { data: ratings } = await supabase.from('bot_ratings').select('bot_id, rating');
+
+    return (bots || []).map(bot => {
+        const botRatings = (ratings || []).filter(r => r.bot_id === bot.id);
+        const avgRating = botRatings.length > 0 
+            ? botRatings.reduce((acc, curr) => acc + curr.rating, 0) / botRatings.length 
+            : 0;
+
+        return { 
+            ...bot, 
+            ownerCount: (userBots || []).filter((ub: any) => ub.bot_id === bot.id).length,
+            rating: Number(avgRating.toFixed(1)),
+            ratingCount: botRatings.length
+        };
+    });
   }
 
   // --- USER BOTS ---

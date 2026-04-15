@@ -54,6 +54,9 @@ export interface Bot {
   website_url?: string;
   app_url?: string;
   social_url?: string;
+  rating?: number;
+  rating_count?: number;
+  user_count?: number;
 }
 
 export interface Promotion {

@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Search as SearchIcon, ChevronLeft, X, Zap, Loader2, Sparkles, Send, Bot as BotIcon } from 'lucide-react';
+import { Search as SearchIcon, ChevronLeft, X, Zap, Loader2, Sparkles, Send, Bot as BotIcon, Star } from 'lucide-react';
 import { Bot } from '../types';
 import { categories } from '../data';
 import { useTranslation } from '../TranslationContext';
@@ -54,6 +54,10 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = ({ bot, tonRate }) => {
                         <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider">{prices.ton} TON</span>
                     </div>
                 )}
+                <div className="flex items-center gap-1.5 bg-yellow-500/10 px-3 py-1 rounded-xl border border-yellow-500/20">
+                    <Star size={10} className="text-yellow-500 fill-yellow-500" />
+                    <span className="text-[10px] font-bold text-yellow-600 dark:text-yellow-400 uppercase tracking-wider">{bot.rating || '0.0'}</span>
+                </div>
                 {bot.languages && bot.languages.length > 0 && (
                     <div className="flex items-center gap-1.5">
                         {bot.languages.map((lang, idx) => (

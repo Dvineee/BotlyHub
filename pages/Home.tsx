@@ -114,6 +114,10 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonR
                         <span className="text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-tighter">{prices.ton} TON</span>
                     </div>
                 )}
+                <div className="flex items-center gap-1 px-2 py-1 bg-yellow-500/10 rounded-md border border-yellow-500/20">
+                    <Star size={10} className="text-yellow-500 fill-yellow-500" />
+                    <span className="text-[9px] font-black text-yellow-600 dark:text-yellow-400 uppercase tracking-tighter">{bot.rating || '0.0'}</span>
+                </div>
                 {bot.languages && bot.languages.length > 0 && (
                     <div className="flex items-center gap-1.5">
                         {bot.languages.map((lang, idx) => (

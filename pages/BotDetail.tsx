@@ -41,6 +41,8 @@ const BotDetail = () => {
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [userRating, setUserRating] = useState<number | null>(null);
+  const [isRating, setIsRating] = useState(false);
   
   const screenshotScroll = useDraggableScroll();
   
@@ -66,7 +68,16 @@ const BotDetail = () => {
 
   useEffect(() => {
     fetchBotData();
-  }, [fetchBotData]);
+    if (id) {
+        DatabaseService.incrementBotView(id);
+    }
+  }, [fetchBotData, id]);
+
+  useEffect(() => {
+    if (user?.id && id) {
+        DatabaseService.getUserBotRating(user.id.toString(), id).then(setUserRating);
+    }
+  }, [user?.id, id]);
 
   useEffect(() => {
     PriceService.getTonPrice().then(p => setTonRate(p.tonTry));
@@ -158,6 +169,21 @@ const BotDetail = () => {
         setIsCopied(true);
         notification('success');
         setTimeout(() => setIsCopied(false), 2000);
+    }
+  };
+
+  const handleRate = async (rating: number) => {
+    if (!user?.id || !id || isRating) return;
+    setIsRating(true);
+    try {
+        await DatabaseService.rateBot(user.id.toString(), id, rating);
+        setUserRating(rating);
+        fetchBotData();
+        notification('success');
+    } catch (e) {
+        console.error(e);
+    } finally {
+        setIsRating(false);
     }
   };
 
@@ -311,16 +337,16 @@ const BotDetail = () => {
             <div className="flex flex-col bg-white dark:bg-slate-900/60 rounded-[32px] border border-black/5 dark:border-white/5 backdrop-blur-xl shadow-xl overflow-hidden">
                 <div className="flex items-center justify-between p-6">
                     <div className="flex flex-col items-center flex-1 border-r border-black/5 dark:border-white/5">
-                        <span className="text-slate-900 dark:text-white font-bold text-base">4.8 <Star size={12} className="inline mb-1 fill-slate-900 dark:fill-white" /></span>
-                        <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">Puan</span>
+                        <span className="text-slate-900 dark:text-white font-bold text-base">{bot.rating || '0.0'} <Star size={12} className="inline mb-1 fill-slate-900 dark:fill-white" /></span>
+                        <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">{bot.rating_count || 0} Oy</span>
                     </div>
                     <div className="flex flex-col items-center flex-1 border-r border-black/5 dark:border-white/5">
-                        <span className="text-slate-900 dark:text-white font-bold text-base">2.4K+</span>
+                        <span className="text-slate-900 dark:text-white font-bold text-base">{bot.user_count && bot.user_count > 1000 ? `${(bot.user_count / 1000).toFixed(1)}K` : bot.user_count || 0}</span>
                         <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">Kullanıcı</span>
                     </div>
                     <div className="flex flex-col items-center flex-1">
-                        <span className="text-slate-900 dark:text-white font-bold text-base">Sınırsız</span>
-                        <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">Erişim</span>
+                        <span className="text-slate-900 dark:text-white font-bold text-base">{bot.views && bot.views > 1000 ? `${(bot.views / 1000).toFixed(1)}K` : bot.views || 0}</span>
+                        <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">Görüntüleme</span>
                     </div>
                 </div>
                 {bot.languages && bot.languages.length > 0 && (
@@ -361,6 +387,33 @@ const BotDetail = () => {
                     </div>
                   ))
               )}
+          </div>
+      </div>
+
+      {/* Rating Section */}
+      <div className="px-6 mb-10">
+          <div className="p-6 bg-white dark:bg-slate-900/60 rounded-[32px] border border-black/5 dark:border-white/5 shadow-lg">
+              <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest italic">Deneyiminizi Puanlayın</h3>
+                  {userRating && (
+                      <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-500/10 px-2 py-1 rounded-lg">Puanınız: {userRating}</span>
+                  )}
+              </div>
+              <div className="flex items-center justify-center gap-3">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                          key={star}
+                          onClick={() => handleRate(star)}
+                          disabled={isRating}
+                          className="transition-all active:scale-90"
+                      >
+                          <Star 
+                              size={32} 
+                              className={`${(userRating || 0) >= star ? 'fill-yellow-400 text-yellow-400' : 'text-slate-200 dark:text-slate-800'}`} 
+                          />
+                      </button>
+                  ))}
+              </div>
           </div>
       </div>
 
