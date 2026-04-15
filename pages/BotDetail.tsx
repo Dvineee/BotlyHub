@@ -174,15 +174,31 @@ const BotDetail = () => {
   };
 
   const handleRate = async (rating: number) => {
-    if (!user?.id || !id || isRating) return;
+    console.log("handleRate called with:", rating);
+    if (isRating) return;
+    
+    if (!user?.id) {
+        notification('error');
+        if (tg?.showAlert) tg.showAlert("Puan vermek için giriş yapmış olmalısınız.");
+        else alert("Puan vermek için giriş yapmış olmalısınız.");
+        return;
+    }
+
+    if (!id) return;
+
     setIsRating(true);
     try {
+        console.log("Saving rating to DB...");
         await DatabaseService.rateBot(user.id.toString(), id, rating);
+        console.log("Rating saved successfully");
         setUserRating(rating);
-        fetchBotData();
+        await fetchBotData();
         notification('success');
-    } catch (e) {
-        console.error(e);
+    } catch (e: any) {
+        console.error("Rating Error:", e);
+        notification('error');
+        if (tg?.showAlert) tg.showAlert(`Hata: ${e.message || 'Puan kaydedilemedi'}`);
+        else alert(`Hata: ${e.message || 'Puan kaydedilemedi'}`);
     } finally {
         setIsRating(false);
     }
@@ -400,8 +416,8 @@ const BotDetail = () => {
             className="relative p-8 bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl rounded-[40px] border border-black/5 dark:border-white/5 shadow-2xl overflow-hidden group"
           >
               {/* Decorative Background Glow */}
-              <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/10 blur-[80px] rounded-full group-hover:bg-blue-500/20 transition-colors duration-700"></div>
-              <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-purple-500/10 blur-[80px] rounded-full group-hover:bg-purple-500/20 transition-colors duration-700"></div>
+              <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/10 blur-[80px] rounded-full group-hover:bg-blue-500/20 transition-colors duration-700 pointer-events-none"></div>
+              <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-purple-500/10 blur-[80px] rounded-full group-hover:bg-purple-500/20 transition-colors duration-700 pointer-events-none"></div>
 
               <div className="relative z-10">
                   <div className="flex items-center justify-between mb-8">
@@ -431,11 +447,11 @@ const BotDetail = () => {
                                   key={star}
                                   onMouseEnter={() => setHoverRating(star)}
                                   onMouseLeave={() => setHoverRating(null)}
-                                  onClick={() => { haptic('heavy'); handleRate(star); }}
+                                  onClick={() => { console.log("Star clicked:", star); haptic('heavy'); handleRate(star); }}
                                   disabled={isRating}
                                   whileHover={{ scale: 1.2, rotate: 5 }}
                                   whileTap={{ scale: 0.9 }}
-                                  className="relative p-2 transition-all"
+                                  className="relative p-2 transition-all z-50"
                               >
                                   <Star 
                                       size={36} 
