@@ -2054,11 +2054,9 @@ const AnnouncementCenter = () => {
                                     <div className={`absolute inset-0 bg-gradient-to-br ${previewColors[editingAnn.color_scheme] || previewColors.purple} transition-all duration-700`}></div>
                                 )}
                                 
-                                <div className="relative z-10 flex flex-col h-full justify-between">
-                                    <div>
-                                        <h3 className="text-white font-black text-xl mb-1 tracking-tighter italic uppercase">{editingAnn.title || 'Başlık Yok'}</h3>
-                                        <p className="text-white/70 text-[9px] font-bold uppercase tracking-tight line-clamp-2">{editingAnn.description || 'Açıklama girilmedi.'}</p>
-                                    </div>
+                                <div className="relative z-10 flex flex-col h-full overflow-hidden">
+                                    <h3 className="text-white font-black text-xl mb-1 tracking-tighter italic uppercase leading-tight line-clamp-2 shrink-0">{editingAnn.title || 'Başlık Yok'}</h3>
+                                    <p className="text-white/70 text-[9px] font-bold uppercase tracking-tight line-clamp-3 overflow-hidden">{editingAnn.description || 'Açıklama girilmedi.'}</p>
                                 </div>
                                 {!editingAnn.bg_image_url && (
                                     <div className="absolute -right-6 -bottom-6 opacity-20 transform rotate-12 transition-all duration-700 group-hover:scale-125">
