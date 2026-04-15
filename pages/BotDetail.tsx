@@ -259,8 +259,8 @@ const BotDetail = () => {
               )}
           </div>
           <div className="flex-1 min-w-0 pt-1">
-              <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight truncate mb-1">{bot.name}</h1>
-              <p className="text-brand dark:text-brand-light text-xs font-medium mb-3">{bot.category}</p>
+              <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight truncate mb-1">{bot.name}</h1>
+              <p className="text-brand dark:text-brand-light text-[11px] font-semibold mb-3 uppercase tracking-wider">{bot.category}</p>
               <div className="flex flex-wrap gap-2 items-center">
                   <span className="bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 text-slate-500 dark:text-slate-400 text-[10px] font-bold px-3 py-1 rounded-xl uppercase">v4.2.0</span>
                   <span className="bg-brand/10 border border-brand/20 text-brand dark:text-brand-light text-[10px] font-bold px-3 py-1 rounded-xl uppercase flex items-center gap-1">
@@ -369,9 +369,9 @@ const BotDetail = () => {
                 {bot.languages && bot.languages.length > 0 && (
                     <div className="px-6 py-3 border-t border-black/5 dark:border-white/5 flex items-center justify-start gap-3">
                         {bot.languages.map((lang, idx) => (
-                            <span key={idx} className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-tighter italic">
-                                {lang}
-                            </span>
+                        <span key={idx} className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                            {lang}
+                        </span>
                         ))}
                     </div>
                 )}
@@ -419,8 +419,8 @@ const BotDetail = () => {
                   <div className="relative z-10">
                       <div className="flex items-center justify-between mb-5">
                           <div className="flex flex-col gap-0.5">
-                              <h3 className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] italic">Deneyimi Puanla</h3>
-                              <p className="text-[8px] font-bold text-slate-400/50 dark:text-slate-500/50 uppercase tracking-widest">Geri bildiriminiz değerlidir</p>
+                              <h3 className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Deneyimi Puanla</h3>
+                              <p className="text-[9px] font-medium text-slate-400/50 dark:text-slate-500/50 uppercase tracking-wider">Geri bildiriminiz değerlidir</p>
                           </div>
                           {userRating && (
                               <motion.div 

@@ -47,6 +47,7 @@
 
   h1, h2, h3, .title {
     font-family: 'Poppins', sans-serif;
+    letter-spacing: -0.02em;
   }
 
   p, span, input, button {
@@ -91,11 +92,11 @@ input, textarea, select {
 }
 
 .italic {
-  font-style: normal;
+  font-style: italic;
 }
 
 .font-black {
-  font-weight: 600;
+  font-weight: 900;
 }
 
 .tracking-tighter {
@@ -370,4 +371,36 @@ button.w-10.h-10.flex.items-center.justify-center.rounded-2xl.border.transition-
 
 .gap-2 {
     gap: 0.2rem;
+}
+
+button.flex.items-center.gap-3.px-\[1rem\].py-\[0\.7rem\].rounded-2xl.border.bg-white.dark\:bg-slate-900\/60.border-black\/5.dark\:border-white\/5.text-slate-900.dark\:text-white.hover\:border-purple-500\/30.transition-all.active\:scale-95.shadow-lg.whitespace-nowrap.snap-center {
+    box-shadow: none;
+    outline: rgb(184 194 208);
+}
+.px-\[1rem\] {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+.py-\[0\.7rem\] {
+    border-radius: 6px;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+.text-\[\#139fec\] {
+    width: 16px;
+    height: 16px;
+    --tw-text-opacity: 1;
+    color: rgb(19 159 236 / var(--tw-text-opacity, 1));
+}
+
+span.text-\[10px\].font-bold.text-slate-500.dark\:text-slate-400.uppercase.tracking-widest {
+    left: 0;
+    font-weight: 500;
+    float: left;
+    position: relative;
+    gap: 5px;
+    display: flex;
+    margin: 2px 0;
+    font-size: small;
+    padding: 0 3px 1px;
 }
