@@ -357,13 +357,13 @@ const BotManagement = () => {
 
             {isModalOpen && editingBot && (
                 <div className="fixed inset-0 z-[110] bg-black/95 flex items-end lg:items-center justify-center p-0 lg:p-8 backdrop-blur-3xl animate-in slide-in-from-bottom lg:fade-in">
-                    <div className="bg-[#020617] border-t lg:border border-white/10 rounded-t-[40px] lg:rounded-[64px] w-full max-w-7xl h-[94vh] lg:h-auto lg:max-h-[90vh] flex flex-col lg:flex-row overflow-hidden shadow-2xl relative">
+                    <div className="bg-[#020617] border-t lg:border border-white/10 rounded-t-[40px] lg:rounded-[64px] w-full max-w-7xl h-[94vh] lg:h-[90vh] flex flex-col lg:flex-row overflow-hidden shadow-2xl relative">
                         
                         <button onClick={() => setIsModalOpen(false)} className="absolute top-6 right-6 lg:top-8 lg:right-8 z-[120] p-3 lg:p-4 bg-white/5 rounded-2xl hover:bg-red-600 transition-all active:scale-90">
                             <X size={20} />
                         </button>
 
-                        <div className="flex-1 flex flex-col h-full overflow-hidden">
+                        <div className="flex-1 flex flex-col overflow-hidden">
                             <div className="p-8 lg:p-12 pb-4 lg:pb-0 space-y-8">
                                 <div className="flex items-center gap-5">
                                     <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-[20px] flex items-center justify-center shadow-xl rotate-3">
@@ -388,7 +388,7 @@ const BotManagement = () => {
                                 </div>
                             </div>
 
-                            <div className="flex-1 overflow-y-auto p-8 lg:p-12 space-y-8 no-scrollbar pb-32 lg:pb-12">
+                            <div className="flex-1 overflow-y-auto p-8 lg:p-12 space-y-8 pb-32 lg:pb-12">
                                 <form onSubmit={async (e) => { e.preventDefault(); await DatabaseService.saveBot(editingBot); await DatabaseService.logActivity('admin', 'bot_manage', 'bot_saved', 'Bot Kaydedildi', `${editingBot.name} isimli bot bilgileri güncellendi/oluşturuldu.`); setIsModalOpen(false); load(); }} className="space-y-8">
                                     {activeTab === 'info' && (
                                         <div className="space-y-8 animate-in slide-in-from-left-4">
@@ -645,7 +645,7 @@ const UserDetailModal = ({ user, onClose, onUpdate }: { user: User, onClose: () 
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto p-8 lg:p-12 no-scrollbar">
+                <div className="flex-1 overflow-y-auto p-8 lg:p-12">
                     {isLoading ? (
                         <div className="flex flex-col items-center justify-center py-20 gap-4">
                             <Loader2 className="animate-spin text-blue-500" size={32} />
@@ -1473,7 +1473,7 @@ const ActivityCenter = ({ filterType }: { filterType: 'admin' | 'user' }) => {
                             </button>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto p-8 lg:p-12 space-y-8 no-scrollbar">
+                        <div className="flex-1 overflow-y-auto p-8 lg:p-12 space-y-8">
                             <div className="space-y-6">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="bg-slate-950/50 border border-white/5 p-5 rounded-2xl space-y-1">
@@ -1839,13 +1839,13 @@ const AnnouncementCenter = () => {
 
             {isModalOpen && editingAnn && (
                 <div className="fixed inset-0 z-[110] bg-black/95 flex items-end lg:items-center justify-center p-0 lg:p-8 backdrop-blur-3xl animate-in slide-in-from-bottom lg:fade-in">
-                    <div className="bg-[#020617] border-t lg:border border-white/10 rounded-t-[40px] lg:rounded-[64px] w-full max-w-6xl h-[94vh] lg:h-auto lg:max-h-[90vh] flex flex-col lg:flex-row overflow-hidden shadow-2xl relative">
+                    <div className="bg-[#020617] border-t lg:border border-white/10 rounded-t-[40px] lg:rounded-[64px] w-full max-w-6xl h-[94vh] lg:h-[90vh] flex flex-col lg:flex-row overflow-hidden shadow-2xl relative">
                         
                         <button onClick={() => setIsModalOpen(false)} className="absolute top-6 right-6 lg:top-8 lg:right-8 z-[120] p-3 lg:p-4 bg-white/5 rounded-2xl hover:bg-red-600 transition-all active:scale-90">
                             <X size={20} />
                         </button>
 
-                        <div className="flex-1 flex flex-col h-full overflow-hidden">
+                        <div className="flex-1 flex flex-col overflow-hidden">
                             <div className="p-8 lg:p-12 pb-4 lg:pb-0 space-y-8">
                                 <div className="flex items-center gap-5">
                                     <div className={`w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br ${previewColors[editingAnn.color_scheme] || 'from-purple-600 to-indigo-600'} rounded-[20px] flex items-center justify-center shadow-xl rotate-3 transition-all duration-500`}>
@@ -1870,7 +1870,7 @@ const AnnouncementCenter = () => {
                                 </div>
                             </div>
 
-                            <div className="flex-1 overflow-y-auto p-8 lg:p-12 space-y-8 no-scrollbar pb-32 lg:pb-12">
+                            <div className="flex-1 overflow-y-auto p-8 lg:p-12 space-y-8 pb-32 lg:pb-12">
                                 <form onSubmit={handleSave} className="space-y-8">
                                     
                                     {activeTab === 'info' && (
@@ -2200,13 +2200,13 @@ const NotificationCenter = () => {
             {/* NOTIFICATION FORGE MODAL */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-[110] bg-black/95 flex items-end lg:items-center justify-center p-0 lg:p-8 backdrop-blur-3xl animate-in slide-in-from-bottom lg:fade-in">
-                    <div className="bg-[#020617] border-t lg:border border-white/10 rounded-t-[40px] lg:rounded-[64px] w-full max-w-6xl h-[94vh] lg:h-auto lg:max-h-[90vh] flex flex-col lg:flex-row overflow-hidden shadow-2xl relative">
+                    <div className="bg-[#020617] border-t lg:border border-white/10 rounded-t-[40px] lg:rounded-[64px] w-full max-w-6xl h-[94vh] lg:h-[90vh] flex flex-col lg:flex-row overflow-hidden shadow-2xl relative">
                         
                         <button onClick={() => setIsModalOpen(false)} className="absolute top-6 right-6 lg:top-8 lg:right-8 z-[120] p-3 lg:p-4 bg-white/5 rounded-2xl hover:bg-red-600 transition-all active:scale-90">
                             <X size={20} />
                         </button>
 
-                        <div className="flex-1 flex flex-col h-full overflow-hidden">
+                        <div className="flex-1 flex flex-col overflow-hidden">
                             <div className="p-8 lg:p-12 pb-4 lg:pb-0 space-y-8">
                                 <div className="flex items-center gap-5">
                                     <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-[20px] flex items-center justify-center shadow-xl rotate-3">
@@ -2219,7 +2219,7 @@ const NotificationCenter = () => {
                                 </div>
                             </div>
 
-                            <div className="flex-1 overflow-y-auto p-8 lg:p-12 space-y-8 no-scrollbar pb-32 lg:pb-12">
+                            <div className="flex-1 overflow-y-auto p-8 lg:p-12 space-y-8 pb-32 lg:pb-12">
                                 <form onSubmit={handleSend} className="space-y-8">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                         <div className="space-y-2">
@@ -2676,7 +2676,7 @@ const PromotionManagement = () => {
                         </button>
                         
                         {/* LEFT: Ad Composer Form */}
-                        <div className="flex-1 overflow-y-auto pr-2 no-scrollbar space-y-8">
+                        <div className="flex-1 overflow-y-auto pr-2 space-y-8">
                             <div>
                                 <h3 className="text-3xl font-black mb-2 uppercase italic tracking-tighter">Campaign <span className="text-emerald-500">Forge</span></h3>
                                 <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">Yayınlanacak reklamın içeriğini tasarlayın</p>
