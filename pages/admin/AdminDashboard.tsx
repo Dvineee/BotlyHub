@@ -2059,16 +2059,15 @@ const AnnouncementCenter = () => {
                                         <h3 className="text-white font-black text-xl mb-1 tracking-tighter italic uppercase">{editingAnn.title || 'Başlık Yok'}</h3>
                                         <p className="text-white/70 text-[9px] font-bold uppercase tracking-tight line-clamp-2">{editingAnn.description || 'Açıklama girilmedi.'}</p>
                                     </div>
-                                    <div className="bg-white/20 backdrop-blur-md text-white text-[8px] font-black py-2.5 px-6 rounded-xl w-fit border border-white/30 uppercase tracking-widest">
-                                        {editingAnn.button_text}
+                                </div>
+                                {!editingAnn.bg_image_url && (
+                                    <div className="absolute -right-6 -bottom-6 opacity-20 transform rotate-12 transition-all duration-700 group-hover:scale-125">
+                                        {editingAnn.icon_name === 'Megaphone' ? <Megaphone size={140} className="text-white" /> : 
+                                         editingAnn.icon_name === 'Sparkles' ? <Sparkles size={140} className="text-white" /> : 
+                                         editingAnn.icon_name === 'Zap' ? <Zap size={140} className="text-white" /> : 
+                                         <Star size={140} className="text-white" />}
                                     </div>
-                                </div>
-                                <div className="absolute -right-6 -bottom-6 opacity-20 transform rotate-12 transition-all duration-700 group-hover:scale-125">
-                                    {editingAnn.icon_name === 'Megaphone' ? <Megaphone size={140} className="text-white" /> : 
-                                     editingAnn.icon_name === 'Sparkles' ? <Sparkles size={140} className="text-white" /> : 
-                                     editingAnn.icon_name === 'Zap' ? <Zap size={140} className="text-white" /> : 
-                                     <Star size={140} className="text-white" />}
-                                </div>
+                                )}
                             </div>
 
                             <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mt-10 italic">Gerçek zamanlı görünüm simülasyonu</p>

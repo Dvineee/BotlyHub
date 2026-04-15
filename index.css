@@ -7,7 +7,7 @@
 
 @layer base {
   :root {
-    --bg-main: #020617;
+    --bg-main: #12172c;
     --text-main: #f8fafc;
     --card-bg: rgba(15, 23, 42, 0.4);
     --border-main: rgba(255, 255, 255, 0.05);
@@ -403,4 +403,37 @@ span.text-\[10px\].font-bold.text-slate-500.dark\:text-slate-400.uppercase.track
     margin: 2px 0;
     font-size: small;
     padding: 0 3px 1px;
+}
+
+.w-48 {
+    margin-left: -7px;
+    width: 7rem;
+}
+.py-3 {
+    padding-top: 0.2rem;
+    padding-bottom: 0.2rem;
+}
+
+.font-extrabold {
+    font-weight: 500;
+}
+.text-lg {
+    font-size: 1rem;
+    line-height: 1.75rem;
+}
+p.text-\[10px\].text-slate-400.dark\:text-slate-500.font-medium.uppercase.tracking-wider.truncate.mb-2 {
+    font-size: 12px;
+}
+.truncate {
+    text-transform: none !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dark\:bg-slate-900\/60:is(.dark *) {
+    background-color: #161b30;
+} 
+.dark\:bg-slate-800\/60:is(.dark *) {
+   background-color: transparent; 
 }

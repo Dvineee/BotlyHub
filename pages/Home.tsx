@@ -71,13 +71,12 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
                 <h3 className="text-white font-bold text-xl mb-1 tracking-tight">{ann.title}</h3>
                 <p className="text-white/80 text-[11px] max-w-[180px] leading-relaxed line-clamp-2 font-medium">{ann.description}</p>
             </div>
-            <div className="bg-white/20 backdrop-blur-md text-white text-[10px] font-bold py-2 px-5 rounded-xl w-fit border border-white/30 uppercase tracking-wider">
-                {ann.button_text || 'İncele'}
+        </div>
+        {!ann.bg_image_url && (
+            <div className="absolute -right-6 -bottom-6 opacity-20 transform rotate-12 group-hover:scale-110 transition-transform pointer-events-none">
+                {React.createElement(iconMap[ann.icon_name] || Megaphone, { size: 140, className: 'text-white' })}
             </div>
-        </div>
-        <div className="absolute -right-6 -bottom-6 opacity-20 transform rotate-12 group-hover:scale-110 transition-transform pointer-events-none">
-            {React.createElement(iconMap[ann.icon_name] || Megaphone, { size: 140, className: 'text-white' })}
-        </div>
+        )}
     </div>
   );
 });
