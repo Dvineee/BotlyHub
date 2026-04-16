@@ -326,7 +326,7 @@ img, video {
 h3.text-white.font-bold.text-xl.mb-1.tracking-tight {
     color: #fff;
     padding: 0 6px;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 1;
     text-shadow: 1px 2px 0 rgb(0 0 0);
     position: relative;
 }
@@ -433,7 +433,7 @@ p.text-\[10px\].text-slate-400.dark\:text-slate-500.font-medium.uppercase.tracki
     background-color: #161b30;
 } 
 .dark\:bg-slate-800\/60:is(.dark *) {
-   background-color: transparent; 
+    background-color: #1e293b00;
 }
 
 .transition-opacity {
@@ -447,5 +447,5 @@ p.text-\[10px\].text-slate-400.dark\:text-slate-500.font-medium.uppercase.tracki
     overflow: hidden;
     display: -webkit-box;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 1;
+    -webkit-line-clamp: 3;
 }
