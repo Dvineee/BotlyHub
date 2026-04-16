@@ -61,7 +61,7 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         whileHover={{ y: -4, transition: { duration: 0.2 } }}
-        className={`min-w-[320px] h-48 rounded-[32px] relative overflow-hidden shrink-0 cursor-pointer group snap-center border bg-white dark:bg-slate-900/40 ${ann.bg_image_url ? 'border-white/10' : scheme.split(' ').pop()} shadow-2xl flex flex-col`}
+        className={`w-80 h-48 rounded-[32px] relative overflow-hidden shrink-0 cursor-pointer group snap-center border bg-white dark:bg-slate-900/40 ${ann.bg_image_url ? 'border-white/10' : scheme.split(' ').pop()} shadow-2xl flex flex-col`}
         onClick={handleAction}
     >
         {ann.bg_image_url ? (
