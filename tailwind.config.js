@@ -16,6 +16,10 @@ export default {
           850: '#1e293b',
           950: '#020617', // Explicitly defined to match your app
         }
+      },
+      fontFamily: {
+        poppins: ['Poppins', 'sans-serif'],
+        inter: ['Inter', 'sans-serif'],
       }
     },
   },

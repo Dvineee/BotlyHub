@@ -28,16 +28,15 @@ const getLiveBotIcon = (bot: Bot) => {
 const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) => void }> = React.memo(({ ann, onShowPopup }) => {
   const navigate = useNavigate();
   const colors: Record<string, string> = {
-    purple: 'from-purple-600 to-indigo-600',
-    emerald: 'from-emerald-600 to-teal-600',
-    blue: 'from-blue-600 to-cyan-600',
-    orange: 'from-orange-500 to-red-600'
+    purple: 'from-purple-600/20 to-indigo-600/20 border-purple-500/30',
+    emerald: 'from-emerald-600/20 to-teal-600/20 border-emerald-500/30',
+    blue: 'from-blue-600/20 to-cyan-600/20 border-blue-500/30',
+    orange: 'from-orange-500/20 to-red-600/20 border-orange-500/30'
   };
 
   const handleAction = async (e: React.MouseEvent) => {
     e.stopPropagation();
     
-    // Tıklama Sayısını Artır
     try {
         await DatabaseService.incrementPromotionClick(ann.id);
     } catch (err) {
@@ -55,27 +54,62 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
     }
   };
 
+  const scheme = colors[ann.color_scheme] || colors.purple;
+
   return (
-    <div 
-        className={`min-w-[280px] h-40 ${ann.bg_image_url ? 'bg-slate-900' : `bg-gradient-to-br ${colors[ann.color_scheme] || colors.purple}`} p-6 rounded-[32px] relative overflow-hidden shadow-xl shrink-0 transition-all active:scale-[0.97] cursor-pointer group snap-center`}
+    <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        whileHover={{ y: -4, transition: { duration: 0.2 } }}
+        className={`min-w-[320px] h-48 rounded-[32px] relative overflow-hidden shrink-0 cursor-pointer group snap-center border bg-white dark:bg-slate-900/40 ${ann.bg_image_url ? 'border-white/10' : scheme.split(' ').pop()} shadow-2xl flex flex-col`}
         onClick={handleAction}
     >
-        {ann.bg_image_url && (
+        {ann.bg_image_url ? (
             <div className="absolute inset-0 z-0">
-                <img src={ann.bg_image_url} alt="" className="w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity" referrerPolicy="no-referrer" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                <img src={ann.bg_image_url} alt="" className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700" referrerPolicy="no-referrer" />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
             </div>
+        ) : (
+            <div className={`absolute inset-0 z-0 bg-gradient-to-br ${scheme.split(' ').slice(0, 2).join(' ')} opacity-50`}></div>
         )}
-        <div className="relative z-10 flex flex-col h-full overflow-hidden">
-            <h3 className="text-white font-bold text-xl mb-1 tracking-tight leading-tight line-clamp-2 shrink-0 whitespace-normal">{ann.title}</h3>
-            <p className="text-white/80 text-[11px] leading-relaxed line-clamp-3 font-medium overflow-hidden whitespace-normal">{ann.description}</p>
+        
+        <div className="relative z-10 flex flex-col h-full p-7">
+            <div className="flex items-center gap-2 mb-4">
+                <div className="px-2.5 py-1 rounded-full bg-blue-500/10 dark:bg-blue-400/10 border border-blue-500/20 dark:border-blue-400/20 flex items-center gap-1.5">
+                    <Sparkles size={10} className="text-blue-500" />
+                    <span className="text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.15em]">Sponsorlu</span>
+                </div>
+                {ann.tag && (
+                    <div className="px-2.5 py-1 rounded-full bg-slate-100 dark:bg-white/5 border border-black/5 dark:border-white/10">
+                        <span className="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.15em]">{ann.tag}</span>
+                    </div>
+                )}
+            </div>
+
+            <h3 className="text-slate-900 dark:text-white font-extrabold text-2xl mb-2 tracking-tight leading-[1.1] font-poppins line-clamp-2 max-w-[90%]">
+                {ann.title}
+            </h3>
+            
+            <p className="text-slate-500 dark:text-slate-400 text-[11px] leading-relaxed line-clamp-2 font-medium font-inter mt-auto max-w-[85%]">
+                {ann.description}
+            </p>
         </div>
-        {!ann.bg_image_url && (
-            <div className="absolute -right-6 -bottom-6 opacity-20 transform rotate-12 group-hover:scale-110 transition-transform pointer-events-none">
-                {React.createElement(iconMap[ann.icon_name] || Megaphone, { size: 140, className: 'text-white' })}
+
+        <div className="absolute top-7 right-7 opacity-20 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300 transform group-hover:-rotate-12 pointer-events-none">
+            <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-white/5 flex items-center justify-center border border-black/5 dark:border-white/10">
+                {React.createElement(iconMap[ann.icon_name] || Megaphone, { size: 24, className: 'text-slate-900 dark:text-white' })}
             </div>
-        )}
-    </div>
+        </div>
+
+        <div className="absolute bottom-7 right-7">
+            <div className="w-10 h-10 rounded-full bg-slate-900 dark:bg-white flex items-center justify-center text-white dark:text-slate-900 shadow-xl opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                <ChevronRight size={20} />
+            </div>
+        </div>
+
+        {/* Gloss effect overlay */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+    </motion.div>
   );
 });
 
@@ -331,7 +365,9 @@ const Home = () => {
                     <div className="w-16 h-16 bg-white/5 border border-white/5 rounded-3xl flex items-center justify-center mx-auto mb-6">
                         {React.createElement(iconMap[selectedAnn.icon_name] || Sparkles, { size: 28, className: 'text-blue-500' })}
                     </div>
-                    <h3 className="text-xl font-black text-white mb-2 tracking-tight uppercase italic">{selectedAnn.title}</h3>
+                    <h3 className="text-2xl font-extrabold text-white mb-3 tracking-tighter leading-[1.1] font-poppins drop-shadow-sm px-2">
+                        {selectedAnn.title}
+                    </h3>
                     <p className="text-slate-400 text-[11px] leading-relaxed font-bold uppercase mb-8 px-4 opacity-80 italic">{selectedAnn.content_detail || selectedAnn.description}</p>
                     
                     <button 
