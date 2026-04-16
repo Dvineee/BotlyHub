@@ -104,6 +104,7 @@ export interface Announcement {
   is_active: boolean;
   action_type: 'link' | 'popup';
   content_detail?: string;
+  tag?: string;
 }
 
 export interface ExtendedBot extends Bot {

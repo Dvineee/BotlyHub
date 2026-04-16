@@ -39,7 +39,15 @@ const Earnings = () => {
             DatabaseService.getUserWallet(user.id),
             PriceService.getTonPrice()
         ]);
-        setStats(statsData);
+        
+        // Sort stats by date (newest first)
+        const sortedStats = statsData.sort((a, b) => {
+            const dateA = new Date(a.promotion?.sent_at || a.promotion?.created_at || a.updated_at).getTime();
+            const dateB = new Date(b.promotion?.sent_at || b.promotion?.created_at || b.updated_at).getTime();
+            return dateB - dateA;
+        });
+        
+        setStats(sortedStats);
         setWallet(walletData);
         setTonRate(priceData.tonTry);
     } catch (e) {
