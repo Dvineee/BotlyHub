@@ -5,7 +5,7 @@ import * as Router from 'react-router-dom';
 import { TonConnectButton, useTonWallet, useTonAddress } from '@tonconnect/ui-react';
 import { useTranslation } from '../TranslationContext';
 import { useTelegram } from '../hooks/useTelegram';
-import { DatabaseService } from '../services/DatabaseService';
+import { DatabaseService, supabase } from '../services/DatabaseService';
 import PriceService from '../services/PriceService';
 import { PromotionChannelStats } from '../types';
 
@@ -29,6 +29,43 @@ const Earnings = () => {
         loadData();
     }
   }, [activeTab, user?.id]);
+
+  // Real-time Supabase Subscription for Instant Updates
+  useEffect(() => {
+    if (!user?.id || activeTab !== 'revenue') return;
+
+    // Listen for ANY change in promotion_channel_stats
+    // This allows instant updates when a view count increases
+    const channel = supabase
+        .channel('realtime-earnings')
+        .on(
+            'postgres_changes',
+            {
+                event: '*',
+                schema: 'public',
+                table: 'promotion_channel_stats'
+            },
+            () => {
+                // When any change happens, re-fetch stats immediately
+                // We use a light version of toggle to check for updates
+                DatabaseService.getPromotionChannelStats(user.id).then(statsData => {
+                    const sortedStats = [...statsData].sort((a, b) => {
+                        const getTimestamp = (item: any) => {
+                            const dateStr = item.promotion?.sent_at || item.promotion?.created_at || item.updated_at;
+                            return dateStr ? new Date(dateStr).getTime() : 0;
+                        };
+                        return getTimestamp(b) - getTimestamp(a);
+                    });
+                    setStats(sortedStats);
+                });
+            }
+        )
+        .subscribe();
+
+    return () => {
+        supabase.removeChannel(channel);
+    };
+  }, [user?.id, activeTab]);
 
   const loadData = async () => {
     if (!user?.id) return;
@@ -150,7 +187,13 @@ const Earnings = () => {
             ) : (
                 <div className="animate-in slide-in-from-bottom-4">
                     <div className="flex justify-between items-center mb-6 px-4">
-                        <p className="text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest">Genel Performans Göstergeleri</p>
+                        <div className="flex items-center gap-3">
+                            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest">Genel Performans Göstergeleri</p>
+                            <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full animate-pulse-slow">
+                                <div className="w-1 h-1 bg-emerald-500 rounded-full shadow-[0_0_5px_rgba(16,185,129,0.8)]"></div>
+                                <span className="text-[8px] font-black text-emerald-600 dark:text-emerald-500 uppercase tracking-tighter">Canlı</span>
+                            </div>
+                        </div>
                         <button 
                             onClick={loadStats} 
                             disabled={isLoading}
