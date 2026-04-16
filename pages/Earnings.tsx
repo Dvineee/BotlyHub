@@ -41,10 +41,12 @@ const Earnings = () => {
         ]);
         
         // Sort stats by date (newest first)
-        const sortedStats = statsData.sort((a, b) => {
-            const dateA = new Date(a.promotion?.sent_at || a.promotion?.created_at || a.updated_at).getTime();
-            const dateB = new Date(b.promotion?.sent_at || b.promotion?.created_at || b.updated_at).getTime();
-            return dateB - dateA;
+        const sortedStats = [...statsData].sort((a, b) => {
+            const getTimestamp = (item: any) => {
+                const dateStr = item.promotion?.sent_at || item.promotion?.created_at || item.updated_at;
+                return dateStr ? new Date(dateStr).getTime() : 0;
+            };
+            return getTimestamp(b) - getTimestamp(a);
         });
         
         setStats(sortedStats);
@@ -220,7 +222,7 @@ const Earnings = () => {
                                             <span className="text-[11px] font-bold uppercase tracking-wider">{s.views?.toLocaleString()} Görüntülenme</span>
                                         </div>
                                         <span className="text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase">
-                                            {new Date(s.promotion?.sent_at || s.promotion?.created_at || s.updated_at).toLocaleDateString()}
+                                            {new Date(s.promotion?.sent_at || s.promotion?.created_at || s.updated_at).toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                                         </span>
                                     </div>
                                 </div>
