@@ -28,7 +28,7 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = ({ bot, tonRate }) => {
   const prices = PriceService.convert(bot.price, tonRate);
   
   return (
-    <div onClick={() => navigate(`/bot/${bot.id}`)} className="flex items-center p-4 cursor-pointer group bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-900/80 rounded-[32px] transition-all border border-black/5 dark:border-white/5 mb-3 active:scale-[0.98] shadow-lg">
+    <div onClick={() => navigate(`/bot/${bot.id}`)} className="flex items-center p-4 cursor-pointer group bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-900/80 rounded-[32px] transition-all border border-black/5 dark:border-white/5 active:scale-[0.98] shadow-lg">
         <div className="relative shrink-0">
             <img 
                 src={getLiveBotIcon(bot)} 
@@ -214,7 +214,7 @@ const SearchPage = () => {
         {isLoading ? (
             <div className="flex justify-center py-24"><Loader2 className="animate-spin text-blue-500" /></div>
         ) : filteredBots.length > 0 ? (
-            <div className="animate-in slide-in-from-bottom-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-in slide-in-from-bottom-4">
                 {filteredBots.map(bot => <BotCard key={bot.id} bot={bot} tonRate={tonRate} />)}
             </div>
         ) : (

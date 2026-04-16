@@ -166,7 +166,9 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
       ) : isRestricted && !isAdminPath ? (
         <Restricted />
       ) : (
-        children
+        <div className={isPanelPath ? "w-full flex-1 flex flex-col" : "w-full max-w-7xl mx-auto flex-1 flex flex-col"}>
+          {children}
+        </div>
       )}
     </div>
   );

@@ -48,7 +48,7 @@ const Premium = () => {
       </div>
 
       {/* Plans Grid */}
-      <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
           {subscriptionPlans.map((plan) => {
               const isCurrent = currentPlanId === plan.id;
               const Icon = plan.icon;
@@ -74,7 +74,7 @@ const Premium = () => {
               return (
                   <div 
                     key={plan.id} 
-                    className={`relative bg-white dark:bg-slate-900/40 rounded-[32px] p-8 border ${borderColor} ${shadowColor} transition-all duration-300 ${plan.isPopular ? 'scale-[1.02] bg-white dark:bg-slate-900/60' : ''}`}
+                    className={`relative flex flex-col bg-white dark:bg-slate-900/40 rounded-[32px] p-8 border ${borderColor} ${shadowColor} transition-all duration-300 ${plan.isPopular ? 'md:scale-[1.05] z-10 bg-white dark:bg-slate-900/60' : ''}`}
                   >
                       {plan.isPopular && (
                           <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#0098ea] dark:bg-[#558df7] text-white text-[10px] font-bold px-4 py-1.5 rounded-full shadow-lg tracking-wider">
@@ -113,17 +113,19 @@ const Premium = () => {
                           ))}
                       </div>
 
-                      <button 
-                        onClick={() => handleSelectPlan(plan.id)}
-                        disabled={isCurrent}
-                        className={`w-full py-4.5 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all shadow-lg active:scale-95 ${
-                            isCurrent 
-                            ? 'bg-slate-200 dark:bg-slate-800/50 text-slate-400 dark:text-slate-500 cursor-default border border-black/5 dark:border-white/5' 
-                            : btnColor
-                        }`}
-                      >
-                          {isCurrent ? 'Mevcut Plan' : (plan.price === 0 ? 'Ücretsiz Başla' : 'Planı Seç')}
-                      </button>
+                      <div className="mt-auto">
+                        <button 
+                          onClick={() => handleSelectPlan(plan.id)}
+                          disabled={isCurrent}
+                          className={`w-full py-4 md:py-5 lg:py-6 rounded-2xl font-bold text-[10px] md:text-xs lg:text-sm uppercase tracking-widest transition-all shadow-lg active:scale-95 ${
+                              isCurrent 
+                              ? 'bg-slate-200 dark:bg-slate-800/50 text-slate-400 dark:text-slate-500 cursor-default border border-black/5 dark:border-white/5' 
+                              : btnColor
+                          }`}
+                        >
+                            {isCurrent ? 'Mevcut Plan' : (plan.price === 0 ? 'Ücretsiz Başla' : 'Planı Seç')}
+                        </button>
+                      </div>
                   </div>
               );
           })}
