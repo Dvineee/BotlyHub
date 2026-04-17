@@ -234,7 +234,7 @@ const MyBots = () => {
                                     </div>
                                 </div>
 
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-3">
                                     <button 
                                         onClick={(e) => { e.stopPropagation(); handleStartBot(bot); }}
                                         className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand/10 dark:bg-brand-light/10 hover:bg-brand dark:hover:bg-brand-light text-brand dark:text-brand-light hover:text-white rounded-xl text-[10px] font-bold uppercase tracking-widest border border-brand/20 dark:border-brand-light/20 transition-all shadow-lg"
@@ -244,7 +244,7 @@ const MyBots = () => {
                                     </button>
                                     <button 
                                         onClick={(e) => { e.stopPropagation(); setOpenSettingsId(bot.id); }}
-                                        className="w-10 h-10 flex items-center justify-center bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-xl border border-black/5 dark:border-white/5 transition-all shadow-lg"
+                                        className="w-10 h-10 flex items-center justify-center bg-slate-500/10 hover:bg-slate-500 text-slate-500 hover:text-white rounded-xl border border-slate-500/20 transition-all shadow-lg shrink-0"
                                     >
                                         <Settings size={16} />
                                     </button>

@@ -459,7 +459,7 @@ const BotDetail = () => {
           <div className="flex items-center justify-between mb-4 px-2">
             <h3 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Hakkında</h3>
           </div>
-          <div className="p-8 bg-white dark:bg-slate-900/60 rounded-[32px] border border-black/5 dark:border-white/5 text-sm text-slate-600 dark:text-slate-400 leading-relaxed shadow-lg">
+          <div className="p-[7px_12px] bg-white dark:bg-slate-900/60 rounded-[32px] border border-black/5 dark:border-white/5 text-sm text-slate-600 dark:text-slate-400 leading-[1.6] shadow-lg whitespace-pre-wrap">
               {bot.description}
           </div>
       </div>
