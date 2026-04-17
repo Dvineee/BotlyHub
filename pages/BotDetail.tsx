@@ -229,7 +229,7 @@ const BotDetail = () => {
               <img 
                 src={getLiveBotIcon(bot)} 
                 loading="lazy"
-                className="w-24 h-24 rounded-[32px] border border-black/10 dark:border-white/10 shadow-2xl object-cover bg-slate-200 dark:bg-slate-900" 
+                className="w-24 h-24 rounded-[32px] !p-0 border border-black/10 dark:border-white/10 shadow-2xl object-cover bg-slate-200 dark:bg-slate-900" 
                 onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=1e293b&color=fff&bold=true`; }}
               />
               {isOwned && (
