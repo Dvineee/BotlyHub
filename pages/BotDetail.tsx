@@ -44,8 +44,34 @@ const BotDetail = () => {
   const [userRating, setUserRating] = useState<number | null>(null);
   const [hoverRating, setHoverRating] = useState<number | null>(null);
   const [isRating, setIsRating] = useState(false);
+  const [dominantColor, setDominantColor] = useState('rgba(0,0,0,0.1)');
   
   const screenshotScroll = useDraggableScroll();
+
+  useEffect(() => {
+    if (!bot) return;
+    
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = getLiveBotIcon(bot);
+    
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d', { willReadFrequently: true });
+        if (!context) return;
+        
+        canvas.width = 1;
+        canvas.height = 1;
+        context.drawImage(img, 0, 0, 1, 1);
+        
+        const [r, g, b] = context.getImageData(0, 0, 1, 1).data;
+        setDominantColor(`rgba(${r}, ${g}, ${b}, 0.5)`);
+      } catch (e) {
+        console.warn("Could not extract dominant color:", e);
+      }
+    };
+  }, [bot]);
   
   const fetchBotData = useCallback(async () => {
     if (!id) return;
@@ -229,7 +255,8 @@ const BotDetail = () => {
               <img 
                 src={getLiveBotIcon(bot)} 
                 loading="lazy"
-                className="w-24 h-24 rounded-[32px] border border-black/10 dark:border-white/10 shadow-2xl object-cover bg-slate-200 dark:bg-slate-900" 
+                className="w-24 h-24 rounded-[32px] border border-black/10 dark:border-white/10 object-cover bg-slate-200 dark:bg-slate-900 transition-shadow duration-500" 
+                style={{ boxShadow: `${dominantColor} 0px 1px 13px 2px`, padding: '0px' }}
                 onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=1e293b&color=fff&bold=true`; }}
               />
               {isOwned && (
