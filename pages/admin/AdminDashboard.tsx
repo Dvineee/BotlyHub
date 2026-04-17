@@ -2067,9 +2067,11 @@ const AnnouncementCenter = () => {
                                 
                                 <div className="relative z-10 flex flex-col h-full overflow-hidden">
                                     <div className="flex items-center gap-2 mb-2">
-                                        <div className="px-2 py-0.5 rounded-full bg-white/20 border border-white/20 flex items-center gap-1">
-                                            <span className="text-[7px] font-black text-white uppercase tracking-wider">{editingAnn.badge_text || 'Sponsorlu'}</span>
-                                        </div>
+                                        {editingAnn.badge_text && (
+                                            <div className="px-2 py-0.5 rounded-full bg-white/20 border border-white/20 flex items-center gap-1">
+                                                <span className="text-[7px] font-black text-white uppercase tracking-wider">{editingAnn.badge_text}</span>
+                                            </div>
+                                        )}
                                         {editingAnn.tag && (
                                             <div className="px-2 py-0.5 rounded-full bg-white/10 border border-white/10">
                                                 <span className="text-[7px] font-black text-white/70 uppercase tracking-wider">{editingAnn.tag}</span>

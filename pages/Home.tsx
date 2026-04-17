@@ -76,10 +76,12 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
         
         <div className="relative z-10 flex flex-col h-full p-7">
             <div className="flex items-center gap-2 mb-4">
-                <div className="px-2.5 py-1 rounded-full bg-blue-500/10 dark:bg-blue-400/10 border border-blue-500/20 dark:border-blue-400/20 flex items-center gap-1.5">
-                    <Sparkles size={10} className="text-blue-500" />
-                    <span className="text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.15em]">{ann.badge_text || 'Sponsorlu'}</span>
-                </div>
+                {ann.badge_text && (
+                    <div className="px-2.5 py-1 rounded-full bg-blue-500/10 dark:bg-blue-400/10 border border-blue-500/20 dark:border-blue-400/20 flex items-center gap-1.5">
+                        <Sparkles size={10} className="text-blue-500" />
+                        <span className="text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.15em]">{ann.badge_text}</span>
+                    </div>
+                )}
                 {ann.tag && (
                     <div className="px-2.5 py-1 rounded-full bg-slate-100 dark:bg-white/5 border border-black/5 dark:border-white/10">
                         <span className="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.15em]">{ann.tag}</span>
