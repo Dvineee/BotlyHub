@@ -216,7 +216,7 @@ const MyBots = () => {
                          <div className="ml-5 flex-1 min-w-0">
                                 <h3 
                                     onClick={(e) => { e.stopPropagation(); navigate(`/bot/${bot.id}`); }}
-                                    className="font-bold text-base text-slate-900 dark:text-white truncate cursor-pointer hover:text-brand dark:hover:text-brand-light transition-colors mb-1 tracking-tight"
+                                    className="font-bold text-lg text-slate-900 dark:text-white truncate cursor-pointer hover:text-brand dark:hover:text-brand-light transition-colors mb-1 tracking-tight"
                                 >
                                     {bot.name}
                                 </h3>

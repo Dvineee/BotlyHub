@@ -87,7 +87,7 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
                 )}
             </div>
 
-            <h3 className="text-slate-900 dark:text-white font-extrabold text-2xl mb-2 tracking-tight leading-[1.1] font-poppins line-clamp-2 max-w-[90%]">
+            <h3 className="text-slate-900 dark:text-white font-extrabold text-2xl mb-2 tracking-tight leading-[1.1] font-poppins line-clamp-2 max-w-[90%] mt-[-14px]">
                 {ann.title}
             </h3>
             
@@ -131,7 +131,7 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonR
             {/* Removed Zap icon badge for paid bots */}
         </div>
         <div className="flex-1 ml-5 min-w-0 mr-3">
-            <h3 className="font-extrabold text-base text-slate-900 dark:text-slate-100 truncate tracking-tight uppercase leading-none mb-1.5">{bot.name}</h3>
+            <h3 className="font-extrabold text-lg text-slate-900 dark:text-slate-100 truncate tracking-tight uppercase leading-none mb-1.5">{bot.name}</h3>
             <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider truncate mb-2">{bot.description}</p>
             <div className="flex items-center gap-3">
                 {bot.price === 0 ? (
