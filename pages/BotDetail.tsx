@@ -543,86 +543,58 @@ const BotDetail = () => {
                       </AnimatePresence>
                   </button>
 
-                  {/* Open Dropdown - Sidebar version for large screens */}
-                  <div className="relative">
-                      <button 
-                        onClick={() => {
-                            if (bot.telegram_group || bot.website_url || bot.app_url || bot.social_url) {
-                                setIsSidebarDropdownOpen(!isSidebarDropdownOpen);
-                            }
-                        }}
-                        className={`h-20 w-full bg-brand dark:bg-brand-light rounded-[32px] flex items-center justify-center gap-4 text-white active:scale-95 transition-all shadow-xl ${!(bot.telegram_group || bot.website_url || bot.app_url || bot.social_url) ? 'opacity-50 cursor-default' : ''}`}
-                      >
-                          <span className="text-[11px] font-black uppercase tracking-[0.2em]">AÇ</span>
-                          <ChevronDown size={18} className={`transition-transform ${isSidebarDropdownOpen ? 'rotate-180' : ''}`} />
-                      </button>
-
-                      <AnimatePresence>
-                          {isSidebarDropdownOpen && (
-                              <>
-                                  <div className="fixed inset-0 z-[70]" onClick={() => setIsSidebarDropdownOpen(false)}></div>
-                                  <motion.div 
-                                      initial={{ opacity: 0, scale: 0.95 }}
-                                      animate={{ opacity: 1, scale: 1 }}
-                                      exit={{ opacity: 0, scale: 0.95 }}
-                                      className="absolute bottom-full left-0 mb-4 w-full bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-[32px] shadow-2xl z-[80] overflow-hidden"
-                                  >
-                                      <div className="p-3 space-y-1">
-                                          {bot.telegram_group && (
-                                              <button 
-                                                  onClick={() => {
-                                                      const url = bot.telegram_group!.startsWith('@') ? `https://t.me/${bot.telegram_group!.substring(1)}` : bot.telegram_group;
-                                                      window.open(url, '_blank');
-                                                      setIsSidebarDropdownOpen(false);
-                                                  }}
-                                                  className="w-full flex items-center gap-3 px-6 py-4 hover:bg-slate-50 dark:hover:bg-white/5 rounded-2xl transition-all text-left group"
-                                              >
-                                                  <Send size={16} className="text-blue-500 group-hover:scale-110 transition-transform" />
-                                                  <span className="text-[10px] font-black uppercase tracking-widest italic">Telegram Grup</span>
-                                              </button>
-                                          )}
-                                          {bot.website_url && (
-                                              <button 
-                                                  onClick={() => {
-                                                      window.open(bot.website_url, '_blank');
-                                                      setIsSidebarDropdownOpen(false);
-                                                  }}
-                                                  className="w-full flex items-center gap-3 px-6 py-4 hover:bg-slate-50 dark:hover:bg-white/5 rounded-2xl transition-all text-left group"
-                                              >
-                                                  <Globe size={16} className="text-emerald-500 group-hover:scale-110 transition-transform" />
-                                                  <span className="text-[10px] font-black uppercase tracking-widest italic">Web Site</span>
-                                              </button>
-                                          )}
-                                          {bot.app_url && (
-                                              <button 
-                                                  onClick={() => {
-                                                      window.open(bot.app_url, '_blank');
-                                                      setIsSidebarDropdownOpen(false);
-                                                  }}
-                                                  className="w-full flex items-center gap-3 px-6 py-4 hover:bg-slate-50 dark:hover:bg-white/5 rounded-2xl transition-all text-left group"
-                                              >
-                                                  <PlusCircle size={16} className="text-purple-500 group-hover:scale-110 transition-transform" />
-                                                  <span className="text-[10px] font-black uppercase tracking-widest italic">Uygulama / Bot</span>
-                                              </button>
-                                          )}
-                                          {bot.social_url && (
-                                              <button 
-                                                  onClick={() => {
-                                                      window.open(bot.social_url, '_blank');
-                                                      setIsSidebarDropdownOpen(false);
-                                                  }}
-                                                  className="w-full flex items-center gap-3 px-6 py-4 hover:bg-slate-50 dark:hover:bg-white/5 rounded-2xl transition-all text-left group"
-                                              >
-                                                  <Share2 size={16} className="text-blue-400 group-hover:scale-110 transition-transform" />
-                                                  <span className="text-[10px] font-black uppercase tracking-widest italic">Sosyal Medya</span>
-                                              </button>
-                                          )}
-                                      </div>
-                                  </motion.div>
-                              </>
+                  {/* Direct Link Buttons for Sidebar (PC/Large Screens) */}
+                  {(bot.telegram_group || bot.website_url || bot.app_url || bot.social_url) && (
+                      <div className="flex flex-col bg-white dark:bg-slate-900/40 rounded-[32px] border border-black/5 dark:border-white/5 p-3 space-y-1">
+                          {bot.telegram_group && (
+                              <button 
+                                  onClick={() => {
+                                      const url = bot.telegram_group!.startsWith('@') ? `https://t.me/${bot.telegram_group!.substring(1)}` : bot.telegram_group;
+                                      window.open(url, '_blank');
+                                  }}
+                                  className="w-full flex items-center gap-4 px-6 py-4.5 hover:bg-slate-50 dark:hover:bg-white/5 rounded-2xl transition-all text-left group"
+                              >
+                                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                      <Send size={18} className="text-blue-500" />
+                                  </div>
+                                  <span className="text-[10px] font-black uppercase tracking-widest italic text-slate-700 dark:text-slate-300">Telegram Grup</span>
+                              </button>
                           )}
-                      </AnimatePresence>
-                  </div>
+                          {bot.website_url && (
+                              <button 
+                                  onClick={() => window.open(bot.website_url, '_blank')}
+                                  className="w-full flex items-center gap-4 px-6 py-4.5 hover:bg-slate-50 dark:hover:bg-white/5 rounded-2xl transition-all text-left group"
+                              >
+                                  <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                      <Globe size={18} className="text-emerald-500" />
+                                  </div>
+                                  <span className="text-[10px] font-black uppercase tracking-widest italic text-slate-700 dark:text-slate-300">Web Site</span>
+                              </button>
+                          )}
+                          {bot.app_url && (
+                              <button 
+                                  onClick={() => window.open(bot.app_url, '_blank')}
+                                  className="w-full flex items-center gap-4 px-6 py-4.5 hover:bg-slate-50 dark:hover:bg-white/5 rounded-2xl transition-all text-left group"
+                              >
+                                  <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                      <PlusCircle size={18} className="text-purple-500" />
+                                  </div>
+                                  <span className="text-[10px] font-black uppercase tracking-widest italic text-slate-700 dark:text-slate-300">Uygulama / Bot</span>
+                              </button>
+                          )}
+                          {bot.social_url && (
+                              <button 
+                                  onClick={() => window.open(bot.social_url, '_blank')}
+                                  className="w-full flex items-center gap-4 px-6 py-4.5 hover:bg-slate-50 dark:hover:bg-white/5 rounded-2xl transition-all text-left group"
+                              >
+                                  <div className="w-10 h-10 rounded-xl bg-blue-400/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                      <Share2 size={18} className="text-blue-400" />
+                                  </div>
+                                  <span className="text-[10px] font-black uppercase tracking-widest italic text-slate-700 dark:text-slate-300">Sosyal Medya</span>
+                              </button>
+                          )}
+                      </div>
+                  )}
               </div>
           </aside>
         </div>
