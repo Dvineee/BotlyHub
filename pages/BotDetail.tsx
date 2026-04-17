@@ -545,7 +545,10 @@ const BotDetail = () => {
 
                   {/* Direct Link Buttons for Sidebar (PC/Large Screens) */}
                   {(bot.telegram_group || bot.website_url || bot.app_url || bot.social_url) && (
-                      <div className="flex flex-col bg-white dark:bg-slate-900/40 rounded-[32px] border border-black/5 dark:border-white/5 p-3 gap-[0.6em]">
+                      <div className="flex flex-col bg-white dark:bg-slate-900/40 rounded-[32px] border border-black/5 dark:border-white/5 p-4 pt-5 gap-[0.6em]">
+                          <div className="px-2 mb-1">
+                              <h4 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] italic">OFFICIAL LINKS</h4>
+                          </div>
                           {bot.telegram_group && (
                               <button 
                                   onClick={() => {
