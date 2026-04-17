@@ -459,14 +459,14 @@ const BotDetail = () => {
           <div className="flex items-center justify-between mb-4 px-2">
             <h3 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Hakkında</h3>
           </div>
-          <div className="p-[7px_12px] bg-white dark:bg-slate-900/60 rounded-[32px] border border-black/5 dark:border-white/5 text-sm text-slate-600 dark:text-slate-400 leading-[1.6] shadow-lg whitespace-pre-wrap">
+          <div className="p-4 bg-white dark:bg-slate-900/60 rounded-[32px] border border-black/5 dark:border-white/5 text-sm text-slate-600 dark:text-slate-400 leading-[1.6] shadow-lg whitespace-pre-wrap">
               {bot.description}
           </div>
       </div>
           </div>
 
           {/* Right Column (PC only) - Action bar moved here for large screens */}
-          <aside className="hidden lg:flex flex-col gap-8 pt-10 sticky top-10 h-fit pr-6 lg:pr-0">
+          <aside className="hidden lg:flex flex-col gap-4 pt-10 sticky top-10 h-fit pr-6 lg:pr-0">
               <div className="w-full">
                   <div className="flex flex-col bg-white dark:bg-slate-900/60 rounded-[32px] border border-black/5 dark:border-white/5 backdrop-blur-xl shadow-xl overflow-hidden">
                       <div className="flex items-center justify-between p-6">
@@ -510,7 +510,7 @@ const BotDetail = () => {
                       {isProcessing ? <Loader2 className="animate-spin" /> : (
                           isOwned ? <><Send size={20} /> BOTU BAŞLAT</> : (
                               bot.price === 0 ? <><PlusCircle size={20} /> ÜCRETSİZ EDİN</> : (
-                                  <div className="flex items-center gap-8">
+                                  <div className="flex items-center gap-4">
                                       <div className="text-left">
                                           <p className="text-[8px] font-black text-slate-400 dark:text-slate-500 mb-1 uppercase tracking-widest">LİSANS ÜCRETİ</p>
                                           <p className="text-lg font-black italic tracking-tighter">{prices.ton} TON</p>
@@ -525,7 +525,7 @@ const BotDetail = () => {
 
                   <button 
                     onClick={handleShare}
-                    className="h-20 w-full bg-white dark:bg-slate-900 rounded-[32px] border border-black/5 dark:border-white/10 flex items-center justify-center gap-4 text-slate-500 dark:text-slate-400 active:scale-95 transition-all shadow-xl relative"
+                    className="h-20 w-full bg-white dark:bg-slate-900 rounded-[32px] border border-black/5 dark:border-white/10 flex items-center justify-center gap-4 text-slate-500 dark:text-slate-400 active:scale-95 transition-all shadow-xl relative border-b-8 border-transparent"
                   >
                       <Share2 size={24} className={isCopied ? 'text-emerald-500' : ''} />
                       <span className="text-[11px] font-black uppercase tracking-[0.2em]">PAYLAŞ</span>
@@ -545,7 +545,7 @@ const BotDetail = () => {
 
                   {/* Direct Link Buttons for Sidebar (PC/Large Screens) */}
                   {(bot.telegram_group || bot.website_url || bot.app_url || bot.social_url) && (
-                      <div className="flex flex-col bg-white dark:bg-slate-900/40 rounded-[32px] border border-black/5 dark:border-white/5 p-3 space-y-1">
+                      <div className="flex flex-col bg-white dark:bg-slate-900/40 rounded-[32px] border border-black/5 dark:border-white/5 p-3 gap-[0.6em]">
                           {bot.telegram_group && (
                               <button 
                                   onClick={() => {
@@ -605,7 +605,7 @@ const BotDetail = () => {
           <div className="max-w-md mx-auto flex items-center gap-3">
               <button 
                 onClick={handleShare}
-                className="h-20 w-20 shrink-0 bg-white dark:bg-slate-900 rounded-[32px] border border-black/5 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 active:scale-95 transition-all shadow-2xl relative"
+                className="h-20 w-20 shrink-0 bg-white dark:bg-slate-900 rounded-[32px] border border-black/5 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 active:scale-95 transition-all shadow-2xl relative border-b-8 border-transparent"
               >
                   <Share2 size={24} className={isCopied ? 'text-emerald-500' : ''} />
                   <AnimatePresence>
@@ -634,7 +634,7 @@ const BotDetail = () => {
                   {isProcessing ? <Loader2 className="animate-spin" /> : (
                       isOwned ? <><Send size={20} /> BOTU BAŞLAT</> : (
                           bot.price === 0 ? <><PlusCircle size={20} /> ÜCRETSİZ EDİN</> : (
-                              <div className="flex items-center gap-8">
+                              <div className="flex items-center gap-4">
                                   <div className="text-left">
                                       <p className="text-[8px] font-black text-slate-400 dark:text-slate-500 mb-1 uppercase tracking-widest">LİSANS ÜCRETİ</p>
                                       <p className="text-lg font-black italic tracking-tighter">{prices.ton} TON</p>
