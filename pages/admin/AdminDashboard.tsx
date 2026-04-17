@@ -3,13 +3,13 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { 
-  LayoutDashboard, Users, Bot, LogOut, Menu, X, 
+  LayoutDashboard, Users, LogOut, Menu, X, 
   Loader2, Plus, Trash2, Megaphone, Send, Activity, 
   Wallet, Search, Database, Radio, Bell, Edit3, Image as ImageIcon,
   CheckCircle2, AlertTriangle, TrendingUp, BarChart3, RadioIcon, Sparkles, UserPlus,
   ShieldCheck, ShieldAlert, Globe, Zap, Clock, ExternalLink, Filter, PieChart, Layers, 
   Settings as SettingsIcon, History, Copy, Check, Eye, ChevronRight, Monitor, Smartphone, Cpu, Save, Key,
-  Info, Star, MousePointer2, Link2, AlertCircle, Shield, Calendar, Hash, Heart
+  Info, Star, MousePointer2, Link2, AlertCircle, Shield, Calendar, Hash, Heart, Gift, Bot as BotIcon
 } from 'lucide-react';
 import { DatabaseService } from '../../services/DatabaseService';
 import { GeminiService } from '../../services/GeminiService';
@@ -100,7 +100,7 @@ const AdminDashboard = () => {
             <NavItem to="/a/dashboard/referrals" icon={UserPlus} label="Referanslar" active={location.pathname.startsWith('/a/dashboard/referrals')} onClick={() => setSidebarOpen(false)} />
             
             <div className="pt-8 pb-3 px-6"><span className="text-[9px] font-black text-slate-600 uppercase tracking-widest italic">İçerik</span></div>
-            <NavItem to="/a/dashboard/bots" icon={Bot} label="Market Botları" active={location.pathname.startsWith('/a/dashboard/bots')} onClick={() => setSidebarOpen(false)} />
+            <NavItem to="/a/dashboard/bots" icon={BotIcon} label="Market Botları" active={location.pathname.startsWith('/a/dashboard/bots')} onClick={() => setSidebarOpen(false)} />
             <NavItem to="/a/dashboard/promotions" icon={RadioIcon} label="Tanıtım Motoru" active={location.pathname.startsWith('/a/dashboard/promotions')} onClick={() => setSidebarOpen(false)} />
             <NavItem to="/a/dashboard/announcements" icon={Megaphone} label="Duyuru Merkezi" active={location.pathname.startsWith('/a/dashboard/announcements')} onClick={() => setSidebarOpen(false)} />
             <NavItem to="/a/dashboard/notifications" icon={Bell} label="Bildirim Gönder" active={location.pathname.startsWith('/a/dashboard/notifications')} onClick={() => setSidebarOpen(false)} />
@@ -216,7 +216,7 @@ const HomeView = () => {
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8">
                 <StatCard icon={Users} label="Toplam Üye" value={stats.userCount} color="blue" />
-                <StatCard icon={Bot} label="Aktif Botlar" value={stats.botCount} color="purple" />
+                <StatCard icon={BotIcon} label="Aktif Botlar" value={stats.botCount} color="purple" />
                 <StatCard icon={BarChart3} label="Satış Adedi" value={stats.salesCount} color="orange" />
                 <StatCard icon={TrendingUp} label="Toplam Ciro" value={`₺${stats.totalRevenue.toLocaleString()}`} color="emerald" />
             </div>
@@ -629,7 +629,7 @@ const UserDetailModal = ({ user, onClose, onUpdate }: { user: User, onClose: () 
                     {[
                         { id: 'overview', label: 'GENEL BAKIŞ', icon: LayoutDashboard },
                         { id: 'channels', label: 'KANALLAR', icon: Radio },
-                        { id: 'bots', label: 'BOTLAR', icon: Bot },
+                        { id: 'bots', label: 'BOTLAR', icon: BotIcon },
                         { id: 'wallet', label: 'CÜZDAN', icon: Wallet },
                         { id: 'stats', label: 'İSTATİSTİK', icon: BarChart3 },
                         { id: 'logs', label: 'HAREKETLER', icon: History }
@@ -817,7 +817,7 @@ const UserDetailModal = ({ user, onClose, onUpdate }: { user: User, onClose: () 
                                 <div className="space-y-4">
                                     {bots.length === 0 ? (
                                         <div className="py-20 text-center bg-slate-950/30 rounded-[32px] border-2 border-dashed border-slate-900">
-                                            <Bot size={40} className="mx-auto text-slate-600 mb-4" />
+                                            <BotIcon size={40} className="mx-auto text-slate-600 mb-4" />
                                             <p className="text-slate-600 text-[10px] font-black uppercase tracking-widest">Henüz bot edinilmemiş</p>
                                         </div>
                                     ) : (
@@ -1748,6 +1748,7 @@ const AnnouncementCenter = () => {
             icon_name: 'Megaphone',
             color_scheme: 'purple',
             bg_image_url: '',
+            badge_text: 'Sponsorlu',
             is_active: true,
             action_type: 'link',
             content_detail: ''
@@ -1876,6 +1877,10 @@ const AnnouncementCenter = () => {
                                     {activeTab === 'info' && (
                                         <div className="space-y-8 animate-in slide-in-from-left-4">
                                             <AdminInput label="BAŞLIK" value={editingAnn.title} onChange={(v:any)=>setEditingAnn({...editingAnn, title:v})} />
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                                <AdminInput label="ROZET METNİ (SPONSORLU YERİNE)" value={editingAnn.badge_text} onChange={(v:any)=>setEditingAnn({...editingAnn, badge_text:v})} placeholder="Sponsorlu" />
+                                                <AdminInput label="ETİKET (OPSİYONEL)" value={editingAnn.tag} onChange={(v:any)=>setEditingAnn({...editingAnn, tag:v})} placeholder="YENİ / SICAK" />
+                                            </div>
                                             <div className="space-y-2">
                                                 <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">KISA AÇIKLAMA</label>
                                                 <input value={editingAnn.description} onChange={e => setEditingAnn({...editingAnn, description: e.target.value})} className="w-full h-14 lg:h-18 bg-slate-950 border border-white/5 rounded-[22px] lg:rounded-[28px] px-8 text-[11px] font-black text-white outline-none focus:border-blue-500 uppercase italic shadow-inner" />
@@ -1972,12 +1977,18 @@ const AnnouncementCenter = () => {
                                             {/* İkon Seçimi */}
                                             <div className="space-y-4">
                                                 <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">İKON TİPİ</label>
-                                                <div className="grid grid-cols-4 gap-4">
+                                                <div className="grid grid-cols-5 gap-4">
                                                     {[
                                                         { id: 'Megaphone', icon: Megaphone },
                                                         { id: 'Sparkles', icon: Sparkles },
                                                         { id: 'Zap', icon: Zap },
-                                                        { id: 'Star', icon: Star }
+                                                        { id: 'Star', icon: Star },
+                                                        { id: 'Gift', icon: Gift },
+                                                        { id: 'Info', icon: Info },
+                                                        { id: 'BotIcon', icon: BotIcon },
+                                                        { id: 'Heart', icon: Heart },
+                                                        { id: 'Bell', icon: Bell },
+                                                        { id: 'Shield', icon: Shield }
                                                     ].map(item => (
                                                         <button
                                                             key={item.id}
@@ -2055,6 +2066,16 @@ const AnnouncementCenter = () => {
                                 )}
                                 
                                 <div className="relative z-10 flex flex-col h-full overflow-hidden">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <div className="px-2 py-0.5 rounded-full bg-white/20 border border-white/20 flex items-center gap-1">
+                                            <span className="text-[7px] font-black text-white uppercase tracking-wider">{editingAnn.badge_text || 'Sponsorlu'}</span>
+                                        </div>
+                                        {editingAnn.tag && (
+                                            <div className="px-2 py-0.5 rounded-full bg-white/10 border border-white/10">
+                                                <span className="text-[7px] font-black text-white/70 uppercase tracking-wider">{editingAnn.tag}</span>
+                                            </div>
+                                        )}
+                                    </div>
                                     <h3 className="text-white font-black text-xl mb-1 tracking-tighter italic uppercase leading-tight line-clamp-2 shrink-0 whitespace-normal">{editingAnn.title || 'Başlık Yok'}</h3>
                                     <p className="text-white/70 text-[9px] font-bold uppercase tracking-tight line-clamp-3 overflow-hidden whitespace-normal">{editingAnn.description || 'Açıklama girilmedi.'}</p>
                                 </div>

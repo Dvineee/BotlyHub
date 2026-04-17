@@ -105,6 +105,7 @@ export interface Announcement {
   action_type: 'link' | 'popup';
   content_detail?: string;
   tag?: string;
+  badge_text?: string;
 }
 
 export interface ExtendedBot extends Bot {
