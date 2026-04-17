@@ -255,9 +255,9 @@ const BotDetail = () => {
                                   setIsDropdownOpen(!isDropdownOpen);
                               }
                           }}
-                          className={`bg-brand dark:bg-brand-light text-white text-[10px] font-black px-4 py-1.5 rounded-xl uppercase flex items-center gap-2 shadow-lg active:scale-95 transition-all ${!(bot.telegram_group || bot.website_url || bot.app_url || bot.social_url) ? 'opacity-50 cursor-default' : ''}`}
+                          className={`bg-brand dark:bg-brand-light text-white text-[10px] font-black px-4 py-1.5 rounded-xl uppercase flex items-center gap-2 active:scale-95 transition-all ${!(bot.telegram_group || bot.website_url || bot.app_url || bot.social_url) ? 'opacity-50 cursor-default' : ''}`}
                       >
-                          OPEN <ChevronDown size={12} className={`transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                          AÇ <ChevronDown size={12} className={`transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
                       </button>
                       
                       <AnimatePresence>
