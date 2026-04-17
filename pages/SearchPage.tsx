@@ -43,7 +43,7 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = ({ bot, tonRate }) => {
             )}
         </div>
         <div className="flex-1 ml-5 min-w-0">
-            <h3 className="font-bold text-lg text-slate-900 dark:text-white truncate tracking-tight mb-1">{bot.name}</h3>
+            <h3 className="font-bold text-base text-slate-900 dark:text-white truncate tracking-tight mb-1">{bot.name}</h3>
             <p className="text-[11px] text-slate-500 font-medium truncate mb-2">{bot.description}</p>
             <div className="flex items-center gap-3">
                 {bot.price === 0 ? (
