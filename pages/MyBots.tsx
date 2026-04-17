@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { ShoppingBag, TrendingUp, Bot, Send, Activity, Trash2, AlertTriangle, X, Loader2, Lock, Clock, Info } from 'lucide-react';
+import { ShoppingBag, TrendingUp, Bot, Send, Activity, Trash2, AlertTriangle, X, Loader2, Lock, Clock, Info, Settings } from 'lucide-react';
 import { UserBot, Bot as BotType } from '../types';
 import { DatabaseService } from '../services/DatabaseService';
 import { useTelegram } from '../hooks/useTelegram';
@@ -198,7 +198,7 @@ const MyBots = () => {
         ) : (
             bots.map((bot) => (
                 <div key={bot.id} className="group relative bg-white dark:bg-slate-900/40 rounded-[32px] border border-black/5 dark:border-white/5 overflow-hidden transition-all hover:bg-slate-50 dark:hover:bg-slate-900/60 shadow-xl">
-                    <div className="p-4 flex items-center pr-14 relative z-10">
+                    <div className="p-4 flex items-center relative z-10">
                          <div className="relative flex-shrink-0">
                              <img 
                                 src={getLiveBotIcon(bot)} 
@@ -234,22 +234,25 @@ const MyBots = () => {
                                     </div>
                                 </div>
 
-                                <button 
-                                    onClick={(e) => { e.stopPropagation(); handleStartBot(bot); }}
-                                    className="inline-flex items-center gap-2 self-start px-5 py-2.5 bg-brand/10 dark:bg-brand-light/10 hover:bg-brand dark:hover:bg-brand-light text-brand dark:text-brand-light hover:text-white rounded-xl text-[10px] font-bold uppercase tracking-widest border border-brand/20 dark:border-brand-light/20 transition-all shadow-lg"
-                                >
-                                    <Send size={12} />
-                                    <span>Başlat</span>
-                                </button>
+                                <div className="flex items-center gap-2">
+                                    <button 
+                                        onClick={(e) => { e.stopPropagation(); handleStartBot(bot); }}
+                                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand/10 dark:bg-brand-light/10 hover:bg-brand dark:hover:bg-brand-light text-brand dark:text-brand-light hover:text-white rounded-xl text-[10px] font-bold uppercase tracking-widest border border-brand/20 dark:border-brand-light/20 transition-all shadow-lg"
+                                    >
+                                        <Send size={12} />
+                                        <span>Başlat</span>
+                                    </button>
+                                    <button 
+                                        onClick={(e) => { e.stopPropagation(); setOpenSettingsId(bot.id); }}
+                                        className="w-10 h-10 flex items-center justify-center bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-xl border border-black/5 dark:border-white/5 transition-all shadow-lg"
+                                    >
+                                        <Settings size={16} />
+                                    </button>
+                                </div>
                          </div>
                     </div>
 
-                    <button 
-                        onClick={(e) => { e.stopPropagation(); setOpenSettingsId(bot.id); }}
-                        className="absolute right-0 top-0 bottom-0 w-10 bg-slate-100 dark:bg-slate-900/80 hover:bg-slate-200 dark:hover:bg-slate-800 border-l border-black/5 dark:border-white/5 flex flex-col items-center justify-center transition-all cursor-pointer z-20 group/btn"
-                    >
-                        <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 group-hover/btn:text-slate-600 dark:group-hover/btn:text-slate-300 -rotate-90 whitespace-nowrap tracking-widest uppercase">Yönet</span>
-                    </button>
+                    {/* Settings Sidebar Overlay */}
 
                     <div className={`absolute inset-0 z-30 transition-transform duration-300 ease-out flex items-center justify-center p-3 ${openSettingsId === bot.id ? 'translate-x-0' : 'translate-x-full'}`}>
                          <div className="absolute inset-0 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-xl"></div>
