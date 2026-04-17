@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ChevronLeft, Check } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { subscriptionPlans } from '../data';
 
@@ -28,9 +28,6 @@ const Premium = () => {
     <div className="min-h-screen bg-slate-50 dark:bg-[#020617] p-4 pt-10 pb-32 animate-in fade-in transition-colors duration-300">
       {/* Header */}
       <div className="flex items-center gap-5 mb-10 px-1">
-        <button onClick={() => navigate(-1)} className="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-500 dark:text-slate-400 active:scale-90 transition-transform shadow-lg">
-          <ChevronLeft size={22} />
-        </button>
         <div>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Premium Paketler</h1>
             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Üyelik Yönetimi</p>

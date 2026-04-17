@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { ChevronLeft, ShoppingBag, TrendingUp, Bot, Send, Activity, Trash2, AlertTriangle, X, Loader2, Lock, Clock, Info } from 'lucide-react';
+import { ShoppingBag, TrendingUp, Bot, Send, Activity, Trash2, AlertTriangle, X, Loader2, Lock, Clock, Info } from 'lucide-react';
 import { UserBot, Bot as BotType } from '../types';
 import { DatabaseService } from '../services/DatabaseService';
 import { useTelegram } from '../hooks/useTelegram';
@@ -169,9 +169,6 @@ const MyBots = () => {
     <div className="min-h-screen bg-slate-50 dark:bg-[#020617] p-4 pt-10 pb-32 animate-in fade-in transition-colors duration-300" onClick={() => setOpenSettingsId(null)}>
       <div className="flex items-center justify-between mb-8 px-1">
         <div className="flex items-center gap-4">
-            <button onClick={(e) => { e.stopPropagation(); navigate('/'); }} className="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-500 dark:text-slate-400 active:scale-90 transition-transform shadow-lg">
-                <ChevronLeft size={22} />
-            </button>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Botlarım</h1>
         </div>
         <button onClick={(e) => { e.stopPropagation(); navigate('/'); }} className="w-12 h-12 flex items-center justify-center bg-brand dark:bg-brand-light rounded-full text-white active:scale-90 transition-transform shadow-lg shadow-blue-900/20">

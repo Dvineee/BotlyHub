@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { 
-  ChevronLeft, Mail, Save, Loader2, CheckCircle2, 
+  Mail, Save, Loader2, CheckCircle2, 
   Lock, ShieldCheck, AlertCircle, ArrowRight, 
   Shield, BadgeCheck, Fingerprint, Info, Check
 } from 'lucide-react';
@@ -92,12 +92,8 @@ const AccountSettings = () => {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#020617] flex flex-col text-slate-900 dark:text-slate-200 animate-in fade-in pb-20 transition-colors duration-300">
       {/* Premium Header */}
-      <nav className="h-24 px-6 flex items-center justify-between border-b border-black/5 dark:border-white/5 bg-white/50 dark:bg-[#020617]/50 backdrop-blur-xl sticky top-0 z-50">
-        <button onClick={() => navigate('/settings')} className="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-500 dark:text-slate-400 active:scale-90 transition-transform shadow-lg">
-          <ChevronLeft size={22} />
-        </button>
+      <nav className="h-24 px-6 flex items-center justify-center border-b border-black/5 dark:border-white/5 bg-white/50 dark:bg-[#020617]/50 backdrop-blur-xl sticky top-0 z-50">
         <span className="text-[10px] font-bold tracking-widest text-slate-400 dark:text-white/40 uppercase">GÜVENLİK MERKEZİ</span>
-        <div className="w-12"></div>
       </nav>
 
       <div className="px-8 mt-12 max-w-lg mx-auto w-full">

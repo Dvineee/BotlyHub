@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, Bell, ShieldCheck, Wallet, Info, CheckCheck, Trash2, Bot, X, Loader2, Sparkles, Zap, Shield } from 'lucide-react';
+import { Bell, ShieldCheck, Wallet, Info, CheckCheck, Trash2, Bot, X, Loader2, Sparkles, Zap, Shield } from 'lucide-react';
 import * as Router from 'react-router-dom';
 import { Notification } from '../types';
 import { DatabaseService } from '../services/DatabaseService';
@@ -69,9 +69,6 @@ const Notifications = () => {
       {/* Premium Navigation Header */}
       <div className="flex items-center justify-between mb-12 px-1">
         <div className="flex items-center gap-5">
-            <button onClick={() => navigate('/settings')} className="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-500 dark:text-slate-400 active:scale-90 transition-transform shadow-lg">
-                <ChevronLeft size={22} />
-            </button>
             <div>
                 <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Inbox</h1>
                 <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Mesaj Merkezi</p>

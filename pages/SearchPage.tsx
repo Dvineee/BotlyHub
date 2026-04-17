@@ -146,7 +146,7 @@ const SearchPage = () => {
     <div className="min-h-screen bg-slate-50 dark:bg-[#020617] p-4 pt-10 pb-32 animate-in fade-in transition-colors duration-300">
       {/* Header & Search Box */}
       <div className="flex items-center gap-4 mb-8">
-        <button onClick={() => navigate('/')} className="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-500 dark:text-slate-400 active:scale-90 transition-transform shadow-lg">
+        <button onClick={() => navigate(-1)} className="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-500 dark:text-slate-400 active:scale-90 transition-transform shadow-lg shrink-0">
           <ChevronLeft size={22} />
         </button>
         <div className="relative flex-1">

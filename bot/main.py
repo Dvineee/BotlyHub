@@ -31,195 +31,158 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 UTCNOW = lambda: datetime.datetime.now(timezone.utc).isoformat()
 
 # =====================================================
-# 📊 GÖRÜNTÜLENME TARAMA FONKSİYONLARI
+# 📊 GÖRÜNTÜLENME TARAMA VE İSTATİSTİK MOTORU (V3)
 # =====================================================
+VIEW_REGEX = re.compile(r'class="tgme_widget_message_views">([^<]+)<')
+REACT_REGEX = re.compile(r'class="tgme_widget_message_reaction_count">([^<]+)<')
+
 def parse_views(views_str):
     if not views_str: return 0
-    views_str = views_str.upper().strip()
-    # Sayısal kısmı ve birimi (K, M) ayıkla (Örn: "1.2K", "500", "1,2M")
-    match = re.search(r'([\d\.,]+)\s*([KM]?)', views_str)
-    if not match:
-        # Eğer regex bulamazsa eski yöntemi dene (fallback)
-        try:
-            val_str = re.sub(r'[^\d\.,]', '', views_str).replace(',', '.')
-            return int(float(val_str))
-        except:
-            return 0
+    views_str = views_str.upper().replace(' ', '').replace(',', '.')
     
-    val_str = match.group(1).replace(',', '.')
-    unit = match.group(2)
+    # Sayısal kısmı ayıkla
+    match = re.search(r'([\d\.]+)', views_str)
+    if not match: return 0
     
     try:
-        val = float(val_str)
-        if unit == 'K':
-            return int(val * 1000)
-        if unit == 'M':
-            return int(val * 1000000)
+        val = float(match.group(1))
+        if 'K' in views_str: val *= 1000
+        elif 'M' in views_str: val *= 1000000
         return int(val)
     except:
         return 0
 
-async def get_telegram_stats(username, message_id):
+async def get_telegram_stats_fast(client: httpx.AsyncClient, username: str, message_id: int):
+    """Milisaniyelik hızda, Regex ve Anti-Cache ile veri çeker"""
     if not username or not message_id: return 0, 0
-    url = f"https://t.me/{username}/{message_id}?embed=1"
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-    }
-    async with httpx.AsyncClient(timeout=15.0, headers=headers) as client:
-        try:
-            resp = await client.get(url)
-            if resp.status_code == 200:
-                soup = BeautifulSoup(resp.text, 'html.parser')
-                
-                # Görüntülenme çek
-                views = 0
-                views_span = soup.find('span', class_='tgme_widget_message_views')
-                if not views_span:
-                    # Alternatif class'ları dene
-                    views_span = soup.find('span', class_=re.compile(r'.*views.*'))
-                
-                if views_span:
-                    views = parse_views(views_span.text)
-                
-                # Tepkileri çek
-                reactions = 0
-                reactions_div = soup.find('div', class_='tgme_widget_message_reactions')
-                if reactions_div:
-                    count_tags = reactions_div.find_all('span', class_='tgme_widget_message_reaction_count')
-                    reactions = sum(parse_views(t.text) for t in count_tags)
-                
+    
+    rnd = datetime.datetime.now().timestamp()
+    url = f"https://t.me/{username}/{message_id}?embed=1&_rnd={rnd}"
+    
+    try:
+        resp = await client.get(url, timeout=10.0)
+        if resp.status_code == 200:
+            html = resp.text
+            
+            # Görüntülenme verisi var mı kontrol et (Hız için Regex)
+            views_match = VIEW_REGEX.search(html)
+            if views_match:
+                views = parse_views(views_match.group(1))
+                reacts_matches = REACT_REGEX.findall(html)
+                reactions = sum(parse_views(r) for r in reacts_matches)
                 return views, reactions
-            else:
-                logger.warning(f"⚠️ Scrape HTTP {resp.status_code} ({username}/{message_id})")
-        except Exception as e:
-            logger.error(f"Scrape Error ({username}/{message_id}): {e}")
+            
+            # Eğer views yoksa ama sayfa geldiyse muhtemelen:
+            # 1. Mesaj silindi (404 ama bazen boş sayfa döner)
+            # 2. Kanal kısıtlı (Sensitive content)
+            # 3. Bot/Scraper engellendi
+            if "tgme_widget_message_error" in html or "unavailable" in html.lower():
+                logger.debug(f"⚠️ Mesaj ulaşılamaz (Kısıtlı/Silinmiş): {username}/{message_id}")
+            
+    except Exception as e:
+        logger.debug(f"Scrape failed for {username}/{message_id}: {e}")
+    
     return 0, 0
 
-async def update_views_loop():
-    """Arka planda reklam görüntülenmelerini ve tepkilerini güncelleyen döngü"""
-    logger.info("📊 İstatistik takip döngüsü başlatıldı")
-    while True:
+async def process_stat_update(client, promo_id, target_tg_id, source_username, source_msg_id, price_per_view, semaphore):
+    """Tek bir kanalın istatistiğini paralel olarak günceller"""
+    async with semaphore:
         try:
-            # Son 24 saatte gönderilmiş reklamları kontrol et
-            res = supabase.table("promotions") \
-                .select("*") \
-                .in_("status", ["sent", "sending"]) \
-                .execute()
+            views, reacts = await get_telegram_stats_fast(client, source_username, source_msg_id)
+            revenue = views * price_per_view
             
-            promos = res.data or []
-            for p in promos:
-                promo_id = p["id"]
-                price_per_view = float(p.get("price_per_view") or 0)
-                source_channel = p.get("source_channel")
-                source_msg_id = p.get("source_message_id")
-                message_map = p.get("message_map") or {}
+            # Veritabanına kaydet
+            await asyncio.to_thread(
+                lambda: supabase.table("promotion_channel_stats").upsert({
+                    "promotion_id": promo_id,
+                    "channel_id": str(target_tg_id),
+                    "views": views,
+                    "revenue": revenue,
+                    "updated_at": UTCNOW()
+                }, on_conflict="promotion_id,channel_id").execute()
+            )
+            return views, reacts
+        except Exception as e:
+            logger.error(f"❌ Kanal {target_tg_id} güncelleme hatası: {e}")
+            return 0, 0
+
+async def update_views_loop():
+    """V3: Paralel, Kilitlenmeyen ve Ultra-Hızlı İstatistik Döngüsü"""
+    logger.info("⚡ V3 İstatistik Takip Motoru Aktif")
+    
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    }
+    
+    async with httpx.AsyncClient(headers=headers, follow_redirects=True, limits=httpx.Limits(max_connections=100)) as client:
+        while True:
+            try:
+                # Aktif reklamları çek
+                res = await asyncio.to_thread(
+                    lambda: supabase.table("promotions").select("*").in_("status", ["sent", "sending"]).execute()
+                )
                 
-                total_views = 0
-                total_reactions = 0
-                
-                # 1. KANAL BAZLI İSTATİSTİKLER (Yeni Sistem: Ana Kanaldaki Unique Postları Tara)
-                if message_map:
-                    # Ana kanalın username'ini al
-                    source_username = p.get("source_username") # Önce promo'dan bak (varsa)
+                promos = res.data or []
+                for p in promos:
+                    promo_id = p["id"]
+                    price_per_view = float(p.get("price_per_view") or 0)
+                    message_map = p.get("message_map") or {}
+                    source_channel = p.get("source_channel")
+                    
+                    if not message_map: continue
+
+                    # Ana kanal username çöz
+                    source_username = p.get("source_username")
                     if not source_username:
-                        # Önce kanallar tablosundan bak (daha hızlı)
                         try:
-                            ch_res = supabase.table("channels").select("username").eq("telegram_id", str(source_channel)).execute()
+                            # 1. Kanallar tablosundan hızlıca bak
+                            ch_res = await asyncio.to_thread(
+                                lambda: supabase.table("channels").select("username, name").eq("telegram_id", str(source_channel)).execute()
+                            )
                             if ch_res.data and ch_res.data[0].get("username"):
                                 source_username = ch_res.data[0]["username"]
                         except: pass
-
+                        
                         if not source_username:
                             try:
-                                # Fallback: Eğer ID bilinen ana kanalsa direkt username kullan
-                                if str(source_channel) == "-1003826684282":
-                                    source_username = "BotlyHubAds"
-                                else:
-                                    source_chat = await bot.get_chat(source_channel)
-                                    source_username = source_chat.username
-                                    
-                                # Bulduysak promotions tablosuna kaydet (opsiyonel, hata verirse pas geç)
-                                # Not: source_username kolonu yoksa hata verebilir, bu yüzden pas geçiyoruz
-                                # if source_username:
-                                #     try:
-                                #         supabase.table("promotions").update({"source_username": source_username}).eq("id", promo_id).execute()
-                                #     except: pass
-                            except Exception as e:
-                                logger.error(f"⚠️ Ana kanal username alınamadı ({source_channel}): {e}")
-
-                    if source_username:
-                        for target_tg_id, source_msg_id in message_map.items():
-                            try:
-                                # Scraping'i ANA KANALDAN yapıyoruz
-                                views, reacts = await get_telegram_stats(source_username, source_msg_id)
-                                
-                                # Kanal bazlı istatistiği kaydet
-                                revenue = views * price_per_view
-                                supabase.table("promotion_channel_stats").upsert({
-                                    "promotion_id": promo_id,
-                                    "channel_id": str(target_tg_id),
-                                    "views": views,
-                                    "revenue": revenue,
-                                    "updated_at": UTCNOW()
-                                }, on_conflict="promotion_id,channel_id").execute()
-                                
-                                total_views += views
-                                total_reactions += reacts
-                                logger.info(f"📺 Kanal {target_tg_id} (Source ID: {source_msg_id}) -> {views} views")
-                            except Exception as e:
-                                logger.error(f"❌ Kanal istatistik hatası ({target_tg_id}): {e}")
-                    else:
-                        # Sadece bir kez uyaralım veya daha açıklayıcı olalım
-                        logger.warning(f"📊 [İSTATİSTİK ATLANDI] Ana kanal ({source_channel}) için kullanıcı adı bulunamadı. "
-                                       f"Kanal gizli (private) olabilir. İstatistiklerin çalışması için kanalın kamuya açık (public) "
-                                       f"olması ve bir @username'e sahip olması gerekir.")
-                        
-                        # Log to bot_logs for user visibility
-                        try:
-                            supabase.table("bot_logs").insert({
-                                "user_id": "system",
-                                "type": "warning",
-                                "action_key": f"stats_skip_{promo_id}",
-                                "title": "İstatistik Takibi Atlandı",
-                                "description": f"'{p['title']}' reklamı için ana kanal ({source_channel}) username bulunamadı. Kanal gizli olabilir.",
-                                "created_at": UTCNOW()
-                            }).execute()
-                        except: pass
-
-                # 2. ANA KANAL İSTATİSTİĞİ (Eğer message_map'te yoksa veya ek olarak)
-                if source_channel and source_msg_id and str(source_channel) not in message_map:
-                    try:
-                        username = str(source_channel).replace("@", "")
-                        if username.startswith("-"):
-                            try:
                                 chat = await bot.get_chat(source_channel)
-                                if chat.username: username = chat.username
-                            except: pass
+                                if chat.type not in ["channel", "supergroup"]:
+                                    logger.warning(f"⚠️ İSTATİSTİK HATASI: {source_channel} bir kanal değil ({chat.type}). Gruplarda görüntülenme takibi yapılamaz.")
+                                    continue
+                                
+                                if chat.username:
+                                    source_username = chat.username
+                                else:
+                                    logger.warning(f"⚠️ İSTATİSTİK HATASI: {source_channel} kanalı GİZLİ. Görüntülenme takibi için kanal KAMUYA AÇIK olmalıdır.")
+                            except Exception as e:
+                                logger.error(f"⚠️ Kanal bilgisi alınamadı ({source_channel}): {e}")
 
-                        if not username.startswith("-"):
-                            views, reacts = await get_telegram_stats(username, source_msg_id)
-                            total_views += views
-                            total_reactions += reacts
-                    except Exception as e:
-                        logger.error(f"❌ Ana kanal istatistik hatası: {e}")
-                
-                # 3. GENEL TOPLAMI GÜNCELLE
-                try:
-                    supabase.table("promotions").update({
-                        "total_views": total_views,
-                        "total_reactions": total_reactions,
-                        "views_updated_at": UTCNOW()
-                    }).eq("id", promo_id).execute()
+                    if not source_username:
+                        continue
+
+                    semaphore = asyncio.Semaphore(30)
+                    tasks = []
+                    for target_id, msg_id in message_map.items():
+                        tasks.append(process_stat_update(client, promo_id, target_id, source_username, msg_id, price_per_view, semaphore))
                     
-                    if total_views > 0:
-                        logger.info(f"📈 Reklam {promo_id} TOPLAM: {total_views} views")
-                except Exception as db_err:
-                    logger.error(f"❌ Stats Update DB Error: {db_err}")
+                    if tasks:
+                        results = await asyncio.gather(*tasks)
+                        total_views = sum(r[0] for r in results)
+                        total_reacts = sum(r[1] for r in results)
+                        
+                        await asyncio.to_thread(
+                            lambda: supabase.table("promotions").update({
+                                "total_views": total_views,
+                                "total_reactions": total_reacts,
+                                "views_updated_at": UTCNOW()
+                            }).eq("id", promo_id).execute()
+                        )
+                        logger.info(f"📈 [REALTIME] Promo {promo_id}: {total_views} views.")
 
-            await asyncio.sleep(60) # 1 dakikada bir güncelle
-        except Exception as e:
-            logger.error(f"❌ Stats Loop Error: {e}")
-            await asyncio.sleep(60)
+                await asyncio.sleep(8)
+            except Exception as e:
+                logger.error(f"❌ V3 Stats Loop Error: {e}")
+                await asyncio.sleep(10)
 
 # =====================================================
 # 🔥 1. REKLAM DAĞITIM MOTORU (KANAL LOCK SİSTEMİ)

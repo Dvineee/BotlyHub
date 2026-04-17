@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, Wallet, CheckCircle2, Loader2, ShieldCheck, Zap, AlertTriangle, ShieldAlert, Star } from 'lucide-react';
+import { Wallet, CheckCircle2, Loader2, ShieldCheck, Zap, AlertTriangle, ShieldAlert, Star } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { subscriptionPlans } from '../data';
 import { Bot } from '../types';
@@ -253,10 +253,7 @@ const Payment = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#020617] p-6 pt-10 pb-32 animate-in fade-in transition-colors duration-300">
-        <div className="flex items-center justify-between mb-10 px-1">
-            <button onClick={() => navigate(-1)} className="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-500 dark:text-slate-400 active:scale-90 transition-transform shadow-lg">
-                <ChevronLeft size={22} />
-            </button>
+        <div className="flex items-center justify-end mb-10 px-1">
             <div className="flex items-center gap-2 px-4 py-2 bg-brand/10 dark:bg-brand-light/10 border border-brand/20 dark:border-brand-light/20 rounded-full shadow-lg">
                 <ShieldCheck size={14} className="text-brand dark:text-brand-light" />
                 <span className="text-[10px] font-bold text-brand dark:text-brand-light uppercase tracking-widest">Güvenli Ödeme</span>

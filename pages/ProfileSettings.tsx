@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
-import { ChevronLeft, User, CreditCard, Bell, Globe, ChevronRight, Crown, Users, Sun, Moon } from 'lucide-react';
+import { User, CreditCard, Bell, Globe, ChevronRight, Crown, Users, Sun, Moon } from 'lucide-react';
 // Fixed: Use namespace import for react-router-dom to resolve "no exported member" errors
 import * as Router from 'react-router-dom';
 import { subscriptionPlans } from '../data';
@@ -61,9 +61,6 @@ const ProfileSettings = () => {
   return (
     <div className="min-h-screen p-6 pt-10 pb-32 bg-slate-50 dark:bg-slate-950 transition-colors animate-in fade-in">
          <div className="flex items-center gap-5 mb-10 px-1">
-            <button onClick={() => navigate('/')} className="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-500 dark:text-slate-400 active:scale-90 transition-transform shadow-lg">
-                <ChevronLeft size={22} />
-            </button>
             <div>
                 <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Profil Ayarları</h1>
                 <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">User Configuration v4</p>

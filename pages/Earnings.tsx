@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ArrowUpRight, ArrowDownLeft, BarChart3, Wallet as WalletIcon, TrendingUp, Zap, Clock, ShieldCheck, PieChart, Eye, Megaphone, Loader2, RefreshCw } from 'lucide-react';
+import { ArrowUpRight, ArrowDownLeft, BarChart3, Wallet as WalletIcon, TrendingUp, Zap, Clock, ShieldCheck, PieChart, Eye, Megaphone, Loader2, RefreshCw } from 'lucide-react';
 import * as Router from 'react-router-dom';
 import { TonConnectButton, useTonWallet, useTonAddress } from '@tonconnect/ui-react';
 import { useTranslation } from '../TranslationContext';
@@ -106,9 +106,6 @@ const Earnings = () => {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#020617] p-4 pt-10 pb-32 flex flex-col transition-colors animate-in fade-in duration-300">
         <div className="flex items-center gap-4 mb-10 px-1">
-            <button onClick={() => navigate('/')} className="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-500 dark:text-slate-400 active:scale-90 transition-transform shadow-lg">
-                <ChevronLeft size={22} />
-            </button>
             <div>
                 <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Finansal Özet</h1>
                 <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Finance Engine v3</p>

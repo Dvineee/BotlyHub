@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
-  ChevronLeft, Share2, Send, Loader2, ShieldCheck, 
+  Share2, Send, Loader2, ShieldCheck, 
   Bot as BotIcon, Zap, Shield, PlusCircle, X, 
   Maximize2, ChevronRight, ChevronDown, Eye, Lock, Unlock, AlertTriangle, 
   Sparkles, Star, Download, Info, CheckCircle2, Globe, Cpu,
@@ -219,32 +219,12 @@ const BotDetail = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-200 pb-40 animate-in fade-in transition-colors duration-300">
-      {/* Navbar */}
-      <nav className="fixed top-0 inset-x-0 h-16 z-[60] flex items-center justify-between px-6 bg-white/80 dark:bg-[#020617]/80 backdrop-blur-xl border-b border-black/5 dark:border-white/5">
-        <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-slate-500 dark:text-slate-400">
-            <ChevronLeft size={24} />
-        </button>
-        <span className="text-[10px] font-black tracking-[0.2em] text-slate-400 dark:text-white/20 uppercase italic">Uygulama Detayı</span>
-        <button onClick={handleShare} className="p-2 -mr-2 text-slate-500 dark:text-slate-400 active:scale-90 transition-transform relative">
-            <Share2 size={20} className={isCopied ? 'text-emerald-500' : ''} />
-            <AnimatePresence>
-                {isCopied && (
-                    <motion.span 
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0 }}
-                        className="absolute -bottom-8 right-0 text-[8px] font-black text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-md uppercase whitespace-nowrap"
-                    >
-                        Kopyalandı!
-                    </motion.span>
-                )}
-            </AnimatePresence>
-        </button>
-      </nav>
-
-      {/* Hero & Stats Section */}
-      <div className="pt-24 px-6 flex flex-col md:flex-row md:items-center gap-6 mb-10">
-        <div className="flex items-start gap-6 flex-1">
+      <div className="max-w-7xl mx-auto lg:px-10">
+        <div className="lg:grid lg:grid-cols-[1fr_320px] lg:gap-16 overflow-visible">
+          <div className="lg:col-start-1">
+            {/* Hero & Stats Section */}
+            <div className="pt-10 px-6 lg:px-0 flex flex-col md:flex-row md:items-center gap-6 mb-10">
+              <div className="flex items-start gap-6 flex-1">
           <div className="relative shrink-0">
               <img 
                 src={getLiveBotIcon(bot)} 
@@ -350,7 +330,7 @@ const BotDetail = () => {
           </div>
         </div>
 
-        <div className="w-full md:w-auto md:min-w-[320px]">
+        <div className="w-full md:w-auto md:min-w-[320px] lg:hidden">
             <div className="flex flex-col bg-white dark:bg-slate-900/60 rounded-[32px] border border-black/5 dark:border-white/5 backdrop-blur-xl shadow-xl overflow-hidden">
                 <div className="flex items-center justify-between p-6">
                     <div className="flex flex-col items-center flex-1 border-r border-black/5 dark:border-white/5">
@@ -368,6 +348,7 @@ const BotDetail = () => {
                 </div>
                 {bot.languages && bot.languages.length > 0 && (
                     <div className="px-6 py-3 border-t border-black/5 dark:border-white/5 flex items-center justify-start gap-3">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0 mr-[3px]"><path fill-rule="evenodd" clip-rule="evenodd" d="M5.5 2.5V2C5.5 1.17157 6.17157 0.5 7 0.5C7.82843 0.5 8.5 1.17157 8.5 2V2.5H9.9742C9.9901 2.49975 10.0061 2.49974 10.0221 2.5H12C12.8284 2.5 13.5 3.17157 13.5 4C13.5 4.82843 12.8284 5.5 12 5.5H11.2512C10.7379 7.82318 9.75127 9.98263 8.30067 11.9736C9.27943 12.9992 10.4353 13.9118 11.7719 14.7138C12.4823 15.14 12.7126 16.0614 12.2864 16.7717C11.8602 17.4821 10.9388 17.7125 10.2284 17.2862C8.75981 16.4051 7.46579 15.399 6.34922 14.2699C5.33326 15.3069 4.1736 16.2908 2.87186 17.2206C2.19774 17.7021 1.26091 17.546 0.7794 16.8719C0.297886 16.1977 0.454024 15.2609 1.12814 14.7794C2.38555 13.8813 3.48271 12.9379 4.42182 11.9481C3.69705 10.8985 3.09174 9.76779 2.60746 8.55709C2.29979 7.78791 2.67391 6.91496 3.44309 6.60729C4.21226 6.29961 5.08522 6.67374 5.39289 7.44291C5.67512 8.14848 6.00658 8.8209 6.38782 9.46053C7.19463 8.20649 7.78489 6.88692 8.16216 5.5H2C1.17157 5.5 0.5 4.82843 0.5 4C0.5 3.17157 1.17157 2.5 2 2.5H5.5ZM16.4912 16.5H18.5088L17.5 13.5856L16.4912 16.5ZM15.4527 19.5L14.4175 22.4907C14.1465 23.2735 13.2922 23.6885 12.5093 23.4175C11.7265 23.1465 11.3115 22.2922 11.5825 21.5093L16.0825 8.50933C16.5484 7.16356 18.4516 7.16356 18.9175 8.50933L23.4175 21.5093C23.6885 22.2922 23.2735 23.1465 22.4907 23.4175C21.7078 23.6885 20.8535 23.2735 20.5825 22.4907L19.5473 19.5H15.4527Z" fill="#758CA3"/></svg>
                         {bot.languages.map((lang, idx) => (
                         <span key={idx} className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
                             {lang}
@@ -482,37 +463,116 @@ const BotDetail = () => {
               {bot.description}
           </div>
       </div>
-
-      {/* Key Features */}
-      <div className="px-6 mb-12">
-          <h3 className="px-2 text-[10px] font-black text-slate-400 dark:text-slate-700 uppercase tracking-[0.4em] mb-6 italic">Temel Özellikler</h3>
-          <div className="grid grid-cols-2 gap-3">
-              {[
-                  { icon: Zap, label: 'Ultra Hızlı', desc: 'Anlık Tepki' },
-                  { icon: Shield, label: 'Güvenli', desc: 'Uçtan Uca' },
-                  { icon: Globe, label: 'Global', desc: '7/24 Aktif' },
-                  { icon: Cpu, label: 'AI Destekli', desc: 'Akıllı İşlem' }
-              ].map((f, i) => (
-                  <div key={i} className="p-5 bg-white dark:bg-slate-900/40 rounded-[28px] border border-black/5 dark:border-white/5 flex items-center gap-4 shadow-lg">
-                      <div className="w-10 h-10 rounded-2xl bg-slate-100 dark:bg-slate-950 flex items-center justify-center text-brand dark:text-brand-light border border-black/5 dark:border-white/5 shadow-inner">
-                          <f.icon size={18} />
-                      </div>
-                      <div>
-                          <p className="text-[10px] font-black text-slate-900 dark:text-white italic tracking-tight">{f.label}</p>
-                          <p className="text-[8px] text-slate-400 dark:text-slate-600 font-bold uppercase">{f.desc}</p>
-                      </div>
-                  </div>
-              ))}
           </div>
+
+          {/* Right Column (PC only) - Action bar moved here for large screens */}
+          <aside className="hidden lg:flex flex-col gap-8 pt-10 sticky top-10 h-fit pr-6 lg:pr-0">
+              <div className="w-full">
+                  <div className="flex flex-col bg-white dark:bg-slate-900/60 rounded-[32px] border border-black/5 dark:border-white/5 backdrop-blur-xl shadow-xl overflow-hidden">
+                      <div className="flex items-center justify-between p-6">
+                          <div className="flex flex-col items-center flex-1 border-r border-black/5 dark:border-white/5">
+                              <span className="text-slate-900 dark:text-white font-bold text-base">{bot.rating || '0.0'} <Star size={12} className="inline mb-1 fill-slate-900 dark:fill-white" /></span>
+                              <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">{bot.rating_count || 0} Oy</span>
+                          </div>
+                          <div className="flex flex-col items-center flex-1 border-r border-black/5 dark:border-white/5">
+                              <span className="text-slate-900 dark:text-white font-bold text-base">{bot.user_count && bot.user_count > 1000 ? `${(bot.user_count / 1000).toFixed(1)}K` : bot.user_count || 0}</span>
+                              <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">Kullanıcı</span>
+                          </div>
+                          <div className="flex flex-col items-center flex-1">
+                              <span className="text-slate-900 dark:text-white font-bold text-base">{bot.views && bot.views > 1000 ? `${(bot.views / 1000).toFixed(1)}K` : bot.views || 0}</span>
+                              <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">Görüntüleme</span>
+                          </div>
+                      </div>
+                      {bot.languages && bot.languages.length > 0 && (
+                          <div className="px-6 py-3 border-t border-black/5 dark:border-white/5 flex items-center justify-start gap-3">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0 mr-[3px]"><path fill-rule="evenodd" clip-rule="evenodd" d="M5.5 2.5V2C5.5 1.17157 6.17157 0.5 7 0.5C7.82843 0.5 8.5 1.17157 8.5 2V2.5H9.9742C9.9901 2.49975 10.0061 2.49974 10.0221 2.5H12C12.8284 2.5 13.5 3.17157 13.5 4C13.5 4.82843 12.8284 5.5 12 5.5H11.2512C10.7379 7.82318 9.75127 9.98263 8.30067 11.9736C9.27943 12.9992 10.4353 13.9118 11.7719 14.7138C12.4823 15.14 12.7126 16.0614 12.2864 16.7717C11.8602 17.4821 10.9388 17.7125 10.2284 17.2862C8.75981 16.4051 7.46579 15.399 6.34922 14.2699C5.33326 15.3069 4.1736 16.2908 2.87186 17.2206C2.19774 17.7021 1.26091 17.546 0.7794 16.8719C0.297886 16.1977 0.454024 15.2609 1.12814 14.7794C2.38555 13.8813 3.48271 12.9379 4.42182 11.9481C3.69705 10.8985 3.09174 9.76779 2.60746 8.55709C2.29979 7.78791 2.67391 6.91496 3.44309 6.60729C4.21226 6.29961 5.08522 6.67374 5.39289 7.44291C5.67512 8.14848 6.00658 8.8209 6.38782 9.46053C7.19463 8.20649 7.78489 6.88692 8.16216 5.5H2C1.17157 5.5 0.5 4.82843 0.5 4C0.5 3.17157 1.17157 2.5 2 2.5H5.5ZM16.4912 16.5H18.5088L17.5 13.5856L16.4912 16.5ZM15.4527 19.5L14.4175 22.4907C14.1465 23.2735 13.2922 23.6885 12.5093 23.4175C11.7265 23.1465 11.3115 22.2922 11.5825 21.5093L16.0825 8.50933C16.5484 7.16356 18.4516 7.16356 18.9175 8.50933L23.4175 21.5093C23.6885 22.2922 23.2735 23.1465 22.4907 23.4175C21.7078 23.6885 20.8535 23.2735 20.5825 22.4907L19.5473 19.5H15.4527Z" fill="#758CA3"/></svg>
+                              {bot.languages.map((lang, idx) => (
+                              <span key={idx} className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                                  {lang}
+                              </span>
+                              ))}
+                          </div>
+                      )}
+                  </div>
+              </div>
+
+              {/* Action Buttons for Sidebar */}
+              <div className="flex flex-col gap-4">
+                  <button 
+                    onClick={handleAction}
+                    disabled={isProcessing}
+                    className={`w-full h-20 rounded-[32px] text-[11px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 shadow-2xl border-b-8 ${
+                        isOwned 
+                        ? 'bg-emerald-600 text-white border-emerald-800' 
+                        : 'bg-slate-900 dark:bg-white text-white dark:text-slate-950 border-slate-700 dark:border-slate-300'
+                    }`}
+                  >
+                      {isProcessing ? <Loader2 className="animate-spin" /> : (
+                          isOwned ? <><Send size={20} /> BOTU BAŞLAT</> : (
+                              bot.price === 0 ? <><PlusCircle size={20} /> ÜCRETSİZ EDİN</> : (
+                                  <div className="flex items-center gap-8">
+                                      <div className="text-left">
+                                          <p className="text-[8px] font-black text-slate-400 dark:text-slate-500 mb-1 uppercase tracking-widest">LİSANS ÜCRETİ</p>
+                                          <p className="text-lg font-black italic tracking-tighter">{prices.ton} TON</p>
+                                      </div>
+                                      <div className="h-10 w-px bg-white/20 dark:bg-slate-200/20"></div>
+                                      <span className="flex items-center gap-2">SATIN AL <ChevronRight size={18} /></span>
+                                  </div>
+                              )
+                          )
+                      )}
+                  </button>
+
+                  <button 
+                    onClick={handleShare}
+                    className="h-20 w-full bg-white dark:bg-slate-900 rounded-[32px] border border-black/5 dark:border-white/10 flex items-center justify-center gap-4 text-slate-500 dark:text-slate-400 active:scale-95 transition-all shadow-xl relative"
+                  >
+                      <Share2 size={24} className={isCopied ? 'text-emerald-500' : ''} />
+                      <span className="text-[11px] font-black uppercase tracking-[0.2em]">PAYLAŞ</span>
+                      <AnimatePresence>
+                          {isCopied && (
+                              <motion.span 
+                                  initial={{ opacity: 0, y: -10 }}
+                                  animate={{ opacity: 1, y: -35 }}
+                                  exit={{ opacity: 0 }}
+                                  className="absolute left-1/2 -translate-x-1/2 text-[8px] font-black text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-md uppercase whitespace-nowrap"
+                              >
+                                  Kopyalandı!
+                              </motion.span>
+                          )}
+                      </AnimatePresence>
+                  </button>
+              </div>
+          </aside>
+        </div>
       </div>
 
       {/* Sticky Action Bar */}
-      <div className="fixed bottom-0 inset-x-0 p-6 z-[70] bg-gradient-to-t from-slate-50 dark:from-[#020617] via-slate-50 dark:via-[#020617]/95 to-transparent pb-10">
-          <div className="max-w-md mx-auto">
+      <div className="fixed bottom-0 inset-x-0 p-6 z-[70] bg-gradient-to-t from-slate-50 dark:from-[#020617] via-slate-50 dark:via-[#020617]/95 to-transparent pb-10 lg:hidden">
+          <div className="max-w-md mx-auto flex items-center gap-3">
+              <button 
+                onClick={handleShare}
+                className="h-20 w-20 shrink-0 bg-white dark:bg-slate-900 rounded-[32px] border border-black/5 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 active:scale-95 transition-all shadow-2xl relative"
+              >
+                  <Share2 size={24} className={isCopied ? 'text-emerald-500' : ''} />
+                  <AnimatePresence>
+                      {isCopied && (
+                          <motion.span 
+                              initial={{ opacity: 0, y: -20 }}
+                              animate={{ opacity: 1, y: -45 }}
+                              exit={{ opacity: 0 }}
+                              className="absolute left-1/2 -translate-x-1/2 text-[8px] font-black text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-md uppercase whitespace-nowrap"
+                          >
+                              Kopyalandı!
+                          </motion.span>
+                      )}
+                  </AnimatePresence>
+              </button>
+
               <button 
                 onClick={handleAction}
                 disabled={isProcessing}
-                className={`w-full h-20 rounded-[32px] text-[11px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 shadow-2xl border-b-8 ${
+                className={`flex-1 h-20 rounded-[32px] text-[11px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 shadow-2xl border-b-8 ${
                     isOwned 
                     ? 'bg-emerald-600 text-white border-emerald-800' 
                     : 'bg-slate-900 dark:bg-white text-white dark:text-slate-950 border-slate-700 dark:border-slate-300'
