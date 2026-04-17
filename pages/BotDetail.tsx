@@ -44,13 +44,25 @@ const BotDetail = () => {
   const [userRating, setUserRating] = useState<number | null>(null);
   const [hoverRating, setHoverRating] = useState<number | null>(null);
   const [isRating, setIsRating] = useState(false);
-  const [dominantColor, setDominantColor] = useState('rgba(59, 130, 246, 0.4)'); // Default brand blue shadow
+  const [dominantColor, setDominantColor] = useState('rgba(15, 23, 42, 0.4)'); // Default slate-900 shadow
   
   const screenshotScroll = useDraggableScroll();
 
   useEffect(() => {
     if (!bot) return;
     
+    // Set a fallback based on category to immediately show something better than black
+    const categories: Record<string, string> = {
+      'productivity': 'rgba(59, 130, 246, 0.5)',
+      'games': 'rgba(236, 72, 153, 0.5)',
+      'utilities': 'rgba(245, 158, 11, 0.5)',
+      'finance': 'rgba(16, 185, 129, 0.5)',
+      'music': 'rgba(139, 92, 246, 0.5)',
+      'moderation': 'rgba(100, 116, 139, 0.5)'
+    };
+    const fallback = categories[bot.category] || 'rgba(59, 130, 246, 0.5)';
+    setDominantColor(fallback);
+
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.src = getLiveBotIcon(bot);
@@ -65,20 +77,18 @@ const BotDetail = () => {
         canvas.height = 1;
         context.drawImage(img, 0, 0, 1, 1);
         
-        const [r, g, b] = context.getImageData(0, 0, 1, 1).data;
-        // If the color is too dark, we boost it, if failed (all 0), we use brand
-        if (r === 0 && g === 0 && b === 0) {
-          setDominantColor('rgba(59, 130, 246, 0.6)');
-        } else {
-          setDominantColor(`rgba(${r}, ${g}, ${b}, 0.7)`);
+        const data = context.getImageData(0, 0, 1, 1).data;
+        const [r, g, b] = data;
+        
+        // Ensure the color is not too dark or transparent
+        if (r < 20 && g < 20 && b < 20) {
+          // If very dark, stick with fallback or a slightly brighter version
+          return;
         }
+        setDominantColor(`rgba(${r}, ${g}, ${b}, 0.6)`);
       } catch (e) {
-        // Fallback for CORS restricted images
-        setDominantColor('rgba(59, 130, 246, 0.5)');
+        // Fallback for CORS restricted images is already handled by initial category set
       }
-    };
-    img.onerror = () => {
-      setDominantColor('rgba(59, 130, 246, 0.5)');
     };
   }, [bot]);
   
@@ -265,7 +275,11 @@ const BotDetail = () => {
                 src={getLiveBotIcon(bot)} 
                 loading="lazy"
                 className="w-24 h-24 rounded-[32px] border border-black/10 dark:border-white/10 object-cover bg-slate-200 dark:bg-slate-900 transition-all duration-500" 
-                style={{ boxShadow: `0px 1px 13px 2px ${dominantColor}`, padding: '0px' }}
+                style={{ 
+                  boxShadow: `0px 1px 18px 4px ${dominantColor}`, 
+                  padding: '0px',
+                  display: 'block'
+                }}
                 onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=1e293b&color=fff&bold=true`; }}
               />
               {isOwned && (
