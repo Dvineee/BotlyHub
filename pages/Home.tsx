@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Search, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, Send, Instagram, Youtube, Link } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Bot, Announcement, Notification } from '../types';
 import { categories } from '../data';
 import { useTranslation } from '../TranslationContext';
@@ -367,29 +367,102 @@ const Home = () => {
           </>
       )}
 
-      {selectedAnn && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-[#020617]/90 backdrop-blur-md animate-in" onClick={() => setSelectedAnn(null)}>
-            <div className="bg-slate-900 border border-white/10 w-full max-w-sm rounded-[36px] overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
-                <div className="p-8 text-center">
-                    <div className="w-16 h-16 bg-white/5 border border-white/5 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                        {React.createElement(iconMap[selectedAnn.icon_name] || Sparkles, { size: 28, className: 'text-blue-500' })}
-                    </div>
-                    <h3 className="text-2xl font-extrabold text-white mb-3 tracking-tighter leading-[1.1] font-poppins drop-shadow-sm px-2">
-                        {selectedAnn.title}
-                    </h3>
-                    <p className="text-slate-400 text-[11px] leading-relaxed font-bold uppercase mb-8 px-4 opacity-80 italic">{selectedAnn.content_detail || selectedAnn.description}</p>
+      {/* Enhanced Announcement Popup */}
+      <AnimatePresence>
+        {selectedAnn && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-[#020617]/80 backdrop-blur-xl" onClick={() => setSelectedAnn(null)}>
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="bg-white dark:bg-slate-900 border border-black/10 dark:border-white/10 w-full max-w-sm rounded-[44px] overflow-hidden shadow-[0_32px_64px_-12px_rgba(0,0,0,0.5)] relative" 
+              onClick={e => e.stopPropagation()}
+            >
+                {/* Header/Cover Section */}
+                <div className="relative h-44 overflow-hidden">
+                    {selectedAnn.bg_image_url ? (
+                        <>
+                            <img src={selectedAnn.bg_image_url} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-slate-900 via-transparent to-transparent"></div>
+                        </>
+                    ) : (
+                        <div className={`absolute inset-0 bg-gradient-to-br ${
+                            selectedAnn.color_scheme === 'purple' ? 'from-purple-600 to-indigo-700' :
+                            selectedAnn.color_scheme === 'emerald' ? 'from-emerald-600 to-teal-700' :
+                            selectedAnn.color_scheme === 'blue' ? 'from-blue-600 to-cyan-700' :
+                            'from-orange-500 to-red-600'
+                        } opacity-90`}>
+                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white/20 to-transparent"></div>
+                        </div>
+                    )}
                     
+                    {/* Close Button UI */}
                     <button 
-                        onClick={() => { haptic('heavy'); window.location.href = selectedAnn.button_link.startsWith('http') ? selectedAnn.button_link : `https://t.me/${selectedAnn.button_link.replace('@','')}`; setSelectedAnn(null); }} 
-                        className="w-full py-4.5 bg-blue-600 text-white font-black rounded-2xl text-[10px] uppercase tracking-[0.3em] active:scale-95 transition-all shadow-xl"
+                        onClick={() => setSelectedAnn(null)} 
+                        className="absolute top-6 right-6 p-2.5 bg-black/20 backdrop-blur-md rounded-2xl text-white/80 hover:bg-black/40 hover:text-white transition-all active:scale-90"
                     >
-                        {selectedAnn.button_text || 'Hemen Katıl'}
+                        <X size={18} />
                     </button>
-                    <button onClick={() => setSelectedAnn(null)} className="w-full py-4 text-slate-600 font-black text-[9px] uppercase tracking-widest mt-2">KAPAT</button>
+
+                    {/* Badge UI */}
+                    <div className="absolute bottom-6 left-8 flex items-center gap-2">
+                        {selectedAnn.badge_text && (
+                            <div className="px-3 py-1 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl">
+                                <span className="text-[10px] font-black text-white uppercase tracking-widest">{selectedAnn.badge_text}</span>
+                            </div>
+                        )}
+                        {selectedAnn.tag && (
+                            <div className="px-3 py-1 bg-brand border border-white/20 rounded-xl shadow-lg">
+                                <span className="text-[10px] font-black text-white uppercase tracking-widest">{selectedAnn.tag}</span>
+                            </div>
+                        )}
+                    </div>
                 </div>
-            </div>
-        </div>
-      )}
+
+                <div className="p-8 pt-2">
+                    <div className="flex items-center gap-4 mb-4">
+                        <div className="w-12 h-12 bg-slate-100 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-2xl flex items-center justify-center shrink-0">
+                            {React.createElement(iconMap[selectedAnn.icon_name] || Sparkles, { size: 22, className: 'text-brand dark:text-brand-light' })}
+                        </div>
+                        <h3 className="text-xl lg:text-2xl font-black text-slate-900 dark:text-white tracking-tight italic uppercase leading-none truncate pr-2">
+                            {selectedAnn.title}
+                        </h3>
+                    </div>
+
+                    <div className="bg-slate-50 dark:bg-black/20 rounded-3xl p-6 mb-8 border border-black/5 dark:border-white/5">
+                        <p className="text-slate-600 dark:text-slate-400 text-[12px] leading-relaxed font-bold uppercase italic opacity-80 whitespace-pre-wrap">
+                            {selectedAnn.content_detail || selectedAnn.description}
+                        </p>
+                    </div>
+                    
+                    <div className="space-y-3">
+                        <button 
+                            onClick={() => { 
+                                haptic('heavy'); 
+                                const link = selectedAnn.button_link;
+                                if (link.startsWith('@')) window.location.href = `https://t.me/${link.substring(1)}`;
+                                else if (link.startsWith('http')) window.location.href = link;
+                                else navigate(link);
+                                setSelectedAnn(null); 
+                            }} 
+                            className="w-full h-18 bg-brand dark:bg-brand-light text-white text-[11px] font-black rounded-3xl uppercase tracking-[0.2em] shadow-xl shadow-brand/20 active:translate-y-1 transition-all flex items-center justify-center gap-3 group"
+                        >
+                            {selectedAnn.button_text || 'ŞİMDİ KEŞFET'} 
+                            <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                        </button>
+                        
+                        <button 
+                            onClick={() => setSelectedAnn(null)} 
+                            className="w-full py-4 text-slate-400 dark:text-slate-500 font-black text-[9px] uppercase tracking-[0.2em] hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                        >
+                            Belki Daha Sonra
+                        </button>
+                    </div>
+                </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       <footer className="mt-12 pt-8 border-t border-black/5 dark:border-white/5 flex flex-col md:flex-row items-center justify-between gap-6 px-2 pb-8">
         <div className="flex items-center gap-6">
