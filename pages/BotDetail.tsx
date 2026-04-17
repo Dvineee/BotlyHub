@@ -44,7 +44,7 @@ const BotDetail = () => {
   const [userRating, setUserRating] = useState<number | null>(null);
   const [hoverRating, setHoverRating] = useState<number | null>(null);
   const [isRating, setIsRating] = useState(false);
-  const [dominantColor, setDominantColor] = useState('rgba(0,0,0,0.1)');
+  const [dominantColor, setDominantColor] = useState('rgba(59, 130, 246, 0.4)'); // Default brand blue shadow
   
   const screenshotScroll = useDraggableScroll();
 
@@ -66,10 +66,19 @@ const BotDetail = () => {
         context.drawImage(img, 0, 0, 1, 1);
         
         const [r, g, b] = context.getImageData(0, 0, 1, 1).data;
-        setDominantColor(`rgba(${r}, ${g}, ${b}, 0.5)`);
+        // If the color is too dark, we boost it, if failed (all 0), we use brand
+        if (r === 0 && g === 0 && b === 0) {
+          setDominantColor('rgba(59, 130, 246, 0.6)');
+        } else {
+          setDominantColor(`rgba(${r}, ${g}, ${b}, 0.7)`);
+        }
       } catch (e) {
-        console.warn("Could not extract dominant color:", e);
+        // Fallback for CORS restricted images
+        setDominantColor('rgba(59, 130, 246, 0.5)');
       }
+    };
+    img.onerror = () => {
+      setDominantColor('rgba(59, 130, 246, 0.5)');
     };
   }, [bot]);
   
@@ -255,8 +264,8 @@ const BotDetail = () => {
               <img 
                 src={getLiveBotIcon(bot)} 
                 loading="lazy"
-                className="w-24 h-24 rounded-[32px] border border-black/10 dark:border-white/10 object-cover bg-slate-200 dark:bg-slate-900 transition-shadow duration-500" 
-                style={{ boxShadow: `${dominantColor} 0px 1px 13px 2px`, padding: '0px' }}
+                className="w-24 h-24 rounded-[32px] border border-black/10 dark:border-white/10 object-cover bg-slate-200 dark:bg-slate-900 transition-all duration-500" 
+                style={{ boxShadow: `0px 1px 13px 2px ${dominantColor}`, padding: '0px' }}
                 onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=1e293b&color=fff&bold=true`; }}
               />
               {isOwned && (
