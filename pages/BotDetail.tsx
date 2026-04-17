@@ -552,10 +552,10 @@ const BotDetail = () => {
                                       const url = bot.telegram_group!.startsWith('@') ? `https://t.me/${bot.telegram_group!.substring(1)}` : bot.telegram_group;
                                       window.open(url, '_blank');
                                   }}
-                                  className="w-full flex items-center gap-4 px-6 py-4.5 hover:bg-slate-50 dark:hover:bg-white/5 rounded-2xl transition-all text-left group"
+                                  className="w-full flex items-center gap-4 pl-2 pr-6 py-4.5 hover:bg-slate-50 dark:hover:bg-transparent rounded-2xl transition-all text-left group"
                               >
-                                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                      <Send size={18} className="text-blue-500" />
+                                  <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                      <Send size={16} className="text-blue-500" />
                                   </div>
                                   <span className="text-[10px] font-black uppercase tracking-widest italic text-slate-700 dark:text-slate-300">Telegram Grup</span>
                               </button>
@@ -563,10 +563,10 @@ const BotDetail = () => {
                           {bot.website_url && (
                               <button 
                                   onClick={() => window.open(bot.website_url, '_blank')}
-                                  className="w-full flex items-center gap-4 px-6 py-4.5 hover:bg-slate-50 dark:hover:bg-white/5 rounded-2xl transition-all text-left group"
+                                  className="w-full flex items-center gap-4 pl-2 pr-6 py-4.5 hover:bg-slate-50 dark:hover:bg-transparent rounded-2xl transition-all text-left group"
                               >
-                                  <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                      <Globe size={18} className="text-emerald-500" />
+                                  <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                      <Globe size={16} className="text-emerald-500" />
                                   </div>
                                   <span className="text-[10px] font-black uppercase tracking-widest italic text-slate-700 dark:text-slate-300">Web Site</span>
                               </button>
@@ -574,10 +574,10 @@ const BotDetail = () => {
                           {bot.app_url && (
                               <button 
                                   onClick={() => window.open(bot.app_url, '_blank')}
-                                  className="w-full flex items-center gap-4 px-6 py-4.5 hover:bg-slate-50 dark:hover:bg-white/5 rounded-2xl transition-all text-left group"
+                                  className="w-full flex items-center gap-4 pl-2 pr-6 py-4.5 hover:bg-slate-50 dark:hover:bg-transparent rounded-2xl transition-all text-left group"
                               >
-                                  <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                      <PlusCircle size={18} className="text-purple-500" />
+                                  <div className="w-8 h-8 rounded-xl bg-purple-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                      <PlusCircle size={16} className="text-purple-500" />
                                   </div>
                                   <span className="text-[10px] font-black uppercase tracking-widest italic text-slate-700 dark:text-slate-300">Uygulama / Bot</span>
                               </button>
@@ -585,10 +585,10 @@ const BotDetail = () => {
                           {bot.social_url && (
                               <button 
                                   onClick={() => window.open(bot.social_url, '_blank')}
-                                  className="w-full flex items-center gap-4 px-6 py-4.5 hover:bg-slate-50 dark:hover:bg-white/5 rounded-2xl transition-all text-left group"
+                                  className="w-full flex items-center gap-4 pl-2 pr-6 py-4.5 hover:bg-slate-50 dark:hover:bg-transparent rounded-2xl transition-all text-left group"
                               >
-                                  <div className="w-10 h-10 rounded-xl bg-blue-400/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                      <Share2 size={18} className="text-blue-400" />
+                                  <div className="w-8 h-8 rounded-xl bg-blue-400/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                      <Share2 size={16} className="text-blue-400" />
                                   </div>
                                   <span className="text-[10px] font-black uppercase tracking-widest italic text-slate-700 dark:text-slate-300">Sosyal Medya</span>
                               </button>
