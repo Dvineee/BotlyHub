@@ -17,6 +17,20 @@ export function useTelegram() {
     }, []);
 
     const user = useMemo(() => tg?.initDataUnsafe?.user, []);
+    const [webUser, setWebUser] = useState<any>(() => {
+        try {
+            const saved = localStorage.getItem('web_user');
+            return saved ? JSON.parse(saved) : null;
+        } catch { return null; }
+    });
+
+    const setWebAuthUser = useCallback((u: any) => {
+        setWebUser(u);
+        if (u) localStorage.setItem('web_user', JSON.stringify(u));
+        else localStorage.removeItem('web_user');
+    }, []);
+
+    const isTelegram = useMemo(() => !!window.Telegram?.WebApp?.initData, []);
     const queryId = useMemo(() => tg?.initDataUnsafe?.query_id, []);
     const platform = useMemo(() => tg?.platform, []);
     const isExpanded = useMemo(() => tg?.isExpanded, []);
@@ -59,7 +73,10 @@ export function useTelegram() {
 
     return useMemo(() => ({
         tg,
-        user,
+        user: user || webUser,
+        webUser,
+        setWebAuthUser,
+        isTelegram,
         queryId,
         platform,
         isExpanded,
