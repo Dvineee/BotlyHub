@@ -63,8 +63,8 @@ const UserPanel: React.FC = () => {
                     {/* Header */}
                     <div className="p-10">
                         <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 shrink-0">
-                                <img src="/logo.svg" alt="BotlyHub Logo" className="w-full h-full drop-shadow-[0_0_15px_rgba(34,158,217,0.2)]" />
+                            <div className="shrink-0">
+                                <img src="/logo.svg" alt="BotlyHub Logo" style={{ width: '2.5em', height: 'auto' }} className="drop-shadow-[0_0_15px_rgba(34,158,217,0.2)]" />
                             </div>
                             <div>
                                 <h1 className="text-2xl font-bold text-white tracking-tight">BotlyHub</h1>

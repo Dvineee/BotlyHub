@@ -74,8 +74,8 @@ const AdminDashboard = () => {
       <aside className={`fixed inset-y-0 left-0 z-[70] w-72 bg-[#020617] border-r border-white/5 transition-transform duration-500 lg:relative lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="h-full flex flex-col p-8">
           <div className="flex items-center gap-4 mb-14">
-            <div className="w-12 h-12 shrink-0">
-                <img src="/logo.svg" alt="BotlyHub Logo" className="w-full h-full drop-shadow-[0_0_15px_rgba(34,158,217,0.2)]" />
+            <div className="shrink-0">
+                <img src="/logo.svg" alt="BotlyHub Logo" style={{ width: '2.5em', height: 'auto' }} className="drop-shadow-[0_0_15px_rgba(34,158,217,0.2)]" />
             </div>
             <div>
                 <h2 className="text-xl font-black text-white italic tracking-tighter uppercase leading-none">Botly<span className="text-brand">Hub</span></h2>

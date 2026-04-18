@@ -272,8 +272,8 @@ const Home = () => {
     <div className="p-4 pt-10 min-h-screen bg-slate-50 dark:bg-slate-950 pb-32 font-sans text-slate-900 dark:text-slate-200 animate-in transition-colors duration-300">
         <div className="flex flex-wrap md:flex-nowrap items-center justify-between mb-8 px-1 gap-y-6 md:gap-x-6">
         <div className="flex items-center gap-3 order-1">
-            <div className="w-12 h-12 shrink-0">
-                <img src="/logo.svg" alt="BotlyHub Logo" className="w-full h-full drop-shadow-[0_0_15px_rgba(34,158,217,0.2)]" />
+            <div className="shrink-0">
+                <img src="/logo.svg" alt="BotlyHub Logo" style={{ width: '2.5em', height: 'auto' }} className="drop-shadow-[0_0_15px_rgba(34,158,217,0.2)]" />
             </div>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">BotlyHub</h1>
         </div>
@@ -503,8 +503,8 @@ const Home = () => {
       <footer className="mt-12 pt-8 border-t border-black/5 dark:border-white/5 flex flex-col md:flex-row items-center justify-between gap-6 px-2 pb-8">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 shrink-0">
-              <img src="/logo.svg" alt="Logo" className="w-full h-full" />
+            <div className="shrink-0 text-slate-400 dark:text-slate-500">
+              <img src="/logo.svg" alt="Logo" style={{ width: '2.5em', height: 'auto' }} />
             </div>
           </div>
           <div className="flex items-center gap-4 text-slate-400 dark:text-slate-500">
