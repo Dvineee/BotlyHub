@@ -271,10 +271,10 @@ svg.lucide.lucide-chevron-right:focus {
 
 @media (max-width: 640px) {
     .h-20 {
-        height: 70px !important;
+        height: 60px !important;
     }
     .w-20 {
-        width: 70px !important;
+        width: 60px !important;
     }
 }
 

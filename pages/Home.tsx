@@ -150,10 +150,28 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonR
                 {bot.languages && bot.languages.length > 0 && (
                     <div className="flex items-center gap-1.5">
                         {bot.languages.map((lang, idx) => (
-                            <span key={idx} className="text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-tighter opacity-80">
+                            <span 
+                                key={idx} 
+                                className={`
+                                    text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-tighter opacity-80
+                                    ${idx === 3 ? '!hidden !md:inline-block' : ''}
+                                    ${idx >= 4 ? '!hidden !lg:inline-block' : ''}
+                                `}
+                            >
                                 {lang}
                             </span>
                         ))}
+                        {/* Plus SVG indicators for mobile/tablet truncation */}
+                        {bot.languages.length > 3 && (
+                            <span className="!inline-flex !md:hidden text-slate-400 dark:text-slate-500 opacity-80 items-center">
+                                <svg width="6" height="6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            </span>
+                        )}
+                        {bot.languages.length > 4 && (
+                            <span className="!hidden !md:inline-flex !lg:hidden text-slate-400 dark:text-slate-500 opacity-80 items-center">
+                                <svg width="6" height="6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            </span>
+                        )}
                     </div>
                 )}
             </div>

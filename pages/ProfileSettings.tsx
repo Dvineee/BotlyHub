@@ -6,6 +6,8 @@ import * as Router from 'react-router-dom';
 import { subscriptionPlans } from '../data';
 import { useTelegram } from '../hooks/useTelegram';
 import { useTheme } from '../ThemeContext';
+import { useTranslation } from '../TranslationContext';
+import { AnimatePresence, motion } from 'motion/react';
 
 const { useNavigate } = Router as any;
 
@@ -13,8 +15,23 @@ const ProfileSettings = () => {
   const navigate = useNavigate();
   const { user } = useTelegram();
   const { theme, toggleTheme } = useTheme();
+  const { language, setLanguage } = useTranslation();
   const [currentPlanName, setCurrentPlanName] = useState('Başlangıç');
   const [version, setVersion] = useState<string | null>(null);
+  const [showLanguagePicker, setShowLanguagePicker] = useState(false);
+
+  const languages = [
+    { code: 'en', label: 'English (EN)', flag: '🇬🇧' },
+    { code: 'ru', label: 'Russian (RU)', flag: '🇷🇺' },
+    { code: 'fa', label: 'Persian / Farsi (FA)', flag: '🇮🇷' },
+    { code: 'tr', label: 'Turkish (TR)', flag: '🇹🇷' },
+    { code: 'uk', label: 'Ukrainian (UK)', flag: '🇺🇦' },
+    { code: 'es', label: 'Spanish (ES)', flag: '🇪🇸' },
+    { code: 'hi', label: 'Hindi (HI)', flag: '🇮🇳' },
+    { code: 'ar', label: 'Arabic (AR)', flag: '🇸🇦' },
+  ];
+
+  const currentLangLabel = languages.find(l => l.code === language)?.label || 'Turkish (TR)';
 
   useEffect(() => {
       const planId = localStorage.getItem('userPlan');
@@ -115,8 +132,70 @@ const ProfileSettings = () => {
                 value={theme === 'dark' ? 'Karanlık' : 'Aydınlık'} 
                 onClick={toggleTheme}
             />
-            <MenuItem icon={Globe} label="Dil Seçimi" value="Türkçe" />
+            <MenuItem 
+                icon={Globe} 
+                label="Dil Seçimi" 
+                value={currentLangLabel} 
+                onClick={() => setShowLanguagePicker(true)}
+            />
         </div>
+
+        {/* Language Picker Modal */}
+        <AnimatePresence>
+            {showLanguagePicker && (
+                <div className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center p-0 sm:p-6">
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setShowLanguagePicker(false)}
+                        className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"
+                    />
+                    <motion.div 
+                        initial={{ y: "100%" }}
+                        animate={{ y: 0 }}
+                        exit={{ y: "100%" }}
+                        transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                        className="relative w-full max-w-sm bg-white dark:bg-slate-900 rounded-t-[40px] sm:rounded-[40px] overflow-hidden shadow-2xl border-t sm:border border-black/10 dark:border-white/10"
+                    >
+                        <div className="p-8">
+                            <div className="flex justify-between items-center mb-8">
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight uppercase tracking-widest">Dil Seçiniz</h3>
+                                <button onClick={() => setShowLanguagePicker(false)} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-500">
+                                    <Globe size={20} />
+                                </button>
+                            </div>
+                            <div className="space-y-2 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                                {languages.map((lang) => (
+                                    <button
+                                        key={lang.code}
+                                        onClick={() => {
+                                            setLanguage(lang.code as any);
+                                            setShowLanguagePicker(false);
+                                        }}
+                                        className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all ${
+                                            language === lang.code 
+                                            ? 'bg-brand/10 border-brand/20 border' 
+                                            : 'hover:bg-slate-50 dark:hover:bg-white/5 border border-transparent'
+                                        }`}
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <span className="text-2xl">{lang.flag}</span>
+                                            <span className={`text-sm font-bold ${language === lang.code ? 'text-brand dark:text-brand-light' : 'text-slate-600 dark:text-slate-400'}`}>
+                                                {lang.label}
+                                            </span>
+                                        </div>
+                                        {language === lang.code && (
+                                            <div className="w-2 h-2 rounded-full bg-brand animate-pulse" />
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </motion.div>
+                </div>
+            )}
+        </AnimatePresence>
 
         {version && (
             <div className="mt-12 text-center opacity-20">
