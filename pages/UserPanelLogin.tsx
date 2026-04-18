@@ -41,7 +41,7 @@ const UserPanelLogin: React.FC = () => {
               src="/logo.svg" 
               alt="BotlyHub Logo" 
               style={{ width: '4rem', height: 'auto', display: 'block' }} 
-              className="drop-shadow-[0_0_20px_rgba(47,136,255,0.4)] mx-auto" 
+              className=" mx-auto" 
             />
           </div>
           <div>
@@ -50,7 +50,7 @@ const UserPanelLogin: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-slate-900/40 border border-white/5 p-10 rounded-[48px] backdrop-blur-xl space-y-8 shadow-2xl">
+        <div className="bg-slate-900/40 border border-white/5 p-10 rounded-[48px] backdrop-blur-xl space-y-8 ">
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-3">
               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-2">Kullanıcı Adı</label>
@@ -63,7 +63,7 @@ const UserPanelLogin: React.FC = () => {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Telegram kullanıcı adınız..."
-                  className="w-full h-16 bg-slate-950/50 border border-white/5 rounded-[24px] pl-14 pr-6 text-white text-sm font-bold outline-none focus:border-brand transition-all shadow-inner"
+                  className="w-full h-16 bg-slate-950/50 border border-white/5 rounded-[24px] pl-14 pr-6 text-white text-sm font-bold outline-none focus:border-brand transition-all "
                   required
                 />
               </div>
@@ -80,7 +80,7 @@ const UserPanelLogin: React.FC = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full h-16 bg-slate-950/50 border border-white/5 rounded-[24px] pl-14 pr-6 text-white text-sm font-bold outline-none focus:border-brand transition-all shadow-inner"
+                  className="w-full h-16 bg-slate-950/50 border border-white/5 rounded-[24px] pl-14 pr-6 text-white text-sm font-bold outline-none focus:border-brand transition-all "
                   required
                 />
               </div>
@@ -95,7 +95,7 @@ const UserPanelLogin: React.FC = () => {
             <button 
               type="submit"
               disabled={loading}
-              className="w-full h-16 bg-brand hover:opacity-90 disabled:opacity-50 text-white rounded-[24px] font-bold uppercase tracking-widest flex items-center justify-center gap-3 transition-all group shadow-2xl shadow-brand/30"
+              className="w-full h-16 bg-brand hover:opacity-90 disabled:opacity-50 text-white rounded-[24px] font-bold uppercase tracking-widest flex items-center justify-center gap-3 transition-all group  "
             >
               {loading ? 'GİRİŞ YAPILIYOR...' : (
                 <>

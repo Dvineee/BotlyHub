@@ -76,7 +76,7 @@ const Notifications = () => {
         </div>
         <button 
             onClick={markAllAsRead} 
-            className="w-12 h-12 flex items-center justify-center bg-brand/10 dark:bg-brand-light/10 border border-brand/20 dark:border-brand-light/20 rounded-full text-brand dark:text-brand-light active:scale-90 transition-transform shadow-lg"
+            className="w-12 h-12 flex items-center justify-center bg-brand/10 dark:bg-brand-light/10 border border-brand/20 dark:border-brand-light/20 rounded-full text-brand dark:text-brand-light active:scale-90 transition-transform "
             title="Hepsini Oku"
         >
             <CheckCheck size={22} />
@@ -93,7 +93,7 @@ const Notifications = () => {
           </div>
       ) : notifications.length === 0 ? (
           <div className="py-32 text-center animate-in zoom-in-95">
-              <div className="w-24 h-24 bg-white dark:bg-slate-900/40 rounded-[40px] border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center mx-auto mb-8 shadow-inner">
+              <div className="w-24 h-24 bg-white dark:bg-slate-900/40 rounded-[40px] border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center mx-auto mb-8 ">
                 <Bell size={36} className="text-slate-300 dark:text-slate-800" />
               </div>
               <p className="text-slate-400 dark:text-slate-600 font-black uppercase text-xs tracking-[0.3em] italic">Henüz bir kayıt yok</p>
@@ -107,12 +107,12 @@ const Notifications = () => {
                     className={`p-6 rounded-[32px] border transition-all flex gap-5 relative overflow-hidden group cursor-pointer backdrop-blur-md ${
                         note.isRead 
                         ? 'bg-white/40 dark:bg-slate-950/40 border-black/5 dark:border-white/5 opacity-50' 
-                        : 'bg-white dark:bg-slate-900/60 border-brand/20 dark:border-brand-light/20 shadow-[0_10px_30px_rgba(0,0,0,0.05)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.3)]'
+                        : 'bg-white dark:bg-slate-900/60 border-brand/20 dark:border-brand-light/20  dark:'
                     }`}
                   >
-                      {!note.isRead && <div className="absolute top-0 left-0 w-1.5 h-full bg-brand dark:bg-brand-light shadow-[0_0_15px_rgba(0,152,234,0.8)]"></div>}
+                      {!note.isRead && <div className="absolute top-0 left-0 w-1.5 h-full bg-brand dark:bg-brand-light "></div>}
                       
-                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-inner border border-black/5 dark:border-white/5 transition-all group-active:scale-95 ${note.isRead ? 'bg-slate-100 dark:bg-slate-950' : 'bg-slate-50 dark:bg-slate-800'}`}>
+                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0  border border-black/5 dark:border-white/5 transition-all group-active:scale-95 ${note.isRead ? 'bg-slate-100 dark:bg-slate-950' : 'bg-slate-50 dark:bg-slate-800'}`}>
                           {getIcon(note.type)}
                       </div>
                       
@@ -131,22 +131,22 @@ const Notifications = () => {
       {/* SADELEŞTİRİLMİŞ BİLDİRİM DETAY MODALI */}
       {selectedNote && (
           <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-slate-950/80 dark:bg-[#020617]/90 backdrop-blur-md animate-in fade-in" onClick={() => setSelectedNote(null)}>
-              <div className="bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 w-full max-w-sm rounded-[40px] overflow-hidden shadow-2xl animate-in zoom-in-95" onClick={e => e.stopPropagation()}>
+              <div className="bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 w-full max-w-sm rounded-[40px] overflow-hidden  animate-in zoom-in-95" onClick={e => e.stopPropagation()}>
                   <div className="p-8 text-center">
-                      <div className="w-20 h-20 bg-slate-50 dark:bg-slate-800 border border-black/5 dark:border-white/5 rounded-[24px] flex items-center justify-center mx-auto mb-6 shadow-inner">
+                      <div className="w-20 h-20 bg-slate-50 dark:bg-slate-800 border border-black/5 dark:border-white/5 rounded-[24px] flex items-center justify-center mx-auto mb-6 ">
                         {getIcon(selectedNote.type)}
                       </div>
                       
                       <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">{selectedNote.title}</h3>
                       <p className="text-[10px] font-bold text-brand dark:text-brand-light uppercase tracking-widest mb-8">{selectedNote.type} LOG</p>
                       
-                      <div className="bg-slate-50 dark:bg-slate-950/50 p-6 rounded-[32px] border border-black/5 dark:border-white/5 mb-10 shadow-inner">
+                      <div className="bg-slate-50 dark:bg-slate-950/50 p-6 rounded-[32px] border border-black/5 dark:border-white/5 mb-10 ">
                           <p className="text-slate-600 dark:text-slate-400 text-xs leading-relaxed font-medium">{selectedNote.message}</p>
                       </div>
 
                       <button 
                         onClick={() => setSelectedNote(null)} 
-                        className="w-full py-4.5 bg-brand dark:bg-brand-light text-white font-bold rounded-2xl text-[11px] uppercase tracking-widest active:scale-95 transition-all shadow-xl shadow-blue-900/20"
+                        className="w-full py-4.5 bg-brand dark:bg-brand-light text-white font-bold rounded-2xl text-[11px] uppercase tracking-widest active:scale-95 transition-all  "
                       >
                         ANLADIM
                       </button>

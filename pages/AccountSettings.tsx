@@ -99,7 +99,7 @@ const AccountSettings = () => {
       <div className="px-8 mt-12 max-w-lg mx-auto w-full">
           {/* Status Badge */}
           <div className="mb-12 text-center">
-              <div className={`inline-flex items-center gap-2 px-6 py-3 rounded-[20px] mb-8 shadow-xl border animate-in slide-in-from-top-4 transition-all ${
+              <div className={`inline-flex items-center gap-2 px-6 py-3 rounded-[20px] mb-8  border animate-in slide-in-from-top-4 transition-all ${
                   isVerified ? 'bg-emerald-500/5 border-emerald-500/10' : 'bg-brand/5 border-brand/10'
               }`}>
                   {isVerified ? (
@@ -130,7 +130,7 @@ const AccountSettings = () => {
                         value={formData.email} 
                         readOnly={isVerified}
                         onChange={e => setFormData({...formData, email: e.target.value})} 
-                        className={`w-full h-18 pl-16 pr-6 text-sm font-bold rounded-[28px] border transition-all uppercase tracking-widest shadow-xl ${
+                        className={`w-full h-18 pl-16 pr-6 text-sm font-bold rounded-[28px] border transition-all uppercase tracking-widest  ${
                             isVerified 
                             ? 'bg-slate-100 dark:bg-slate-950/50 border-emerald-500/20 text-emerald-600/70 dark:text-emerald-500/70 cursor-default' 
                             : 'bg-white dark:bg-slate-900/30 border-black/5 dark:border-white/10 text-slate-900 dark:text-white focus:border-brand/40 focus:bg-white dark:focus:bg-slate-900/50 outline-none'
@@ -141,7 +141,7 @@ const AccountSettings = () => {
               </div>
 
               {errorMsg && (
-                  <div className="p-6 bg-red-500/5 border border-red-500/10 rounded-[32px] flex items-center gap-4 animate-in shake shadow-lg">
+                  <div className="p-6 bg-red-500/5 border border-red-500/10 rounded-[32px] flex items-center gap-4 animate-in shake ">
                       <AlertCircle className="text-red-600 dark:text-red-500 shrink-0" size={22} />
                       <p className="text-red-600 dark:text-red-400 text-[11px] font-bold uppercase tracking-tight">{errorMsg}</p>
                   </div>
@@ -149,15 +149,15 @@ const AccountSettings = () => {
 
               <div className="pt-6">
                   {isVerified ? (
-                      <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-[44px] p-10 text-center animate-in zoom-in-95 shadow-xl">
-                          <div className="w-20 h-20 bg-emerald-500/10 border border-emerald-500/20 rounded-[28px] flex items-center justify-center mx-auto mb-6 shadow-inner">
+                      <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-[44px] p-10 text-center animate-in zoom-in-95 ">
+                          <div className="w-20 h-20 bg-emerald-500/10 border border-emerald-500/20 rounded-[28px] flex items-center justify-center mx-auto mb-6 ">
                               <ShieldCheck className="text-emerald-600 dark:text-emerald-500" size={36} />
                           </div>
                           <h4 className="text-slate-900 dark:text-white font-bold text-lg mb-2 uppercase tracking-tight">KİMLİK ONAYLANDI</h4>
                           <p className="text-[11px] text-slate-500 font-bold uppercase mb-8">Tüm platform özellikleri aktif edildi.</p>
                           <button 
                             onClick={() => navigate('/settings')}
-                            className="w-full h-16 bg-slate-900 dark:bg-slate-950 hover:bg-slate-800 dark:hover:bg-slate-900 text-white font-bold rounded-[24px] text-[11px] uppercase tracking-widest transition-all flex items-center justify-center gap-3 active:scale-95 border border-black/5 dark:border-white/5 shadow-lg"
+                            className="w-full h-16 bg-slate-900 dark:bg-slate-950 hover:bg-slate-800 dark:hover:bg-slate-900 text-white font-bold rounded-[24px] text-[11px] uppercase tracking-widest transition-all flex items-center justify-center gap-3 active:scale-95 border border-black/5 dark:border-white/5 "
                           >
                             AYARLARA DÖN <ArrowRight size={16}/>
                           </button>
@@ -166,7 +166,7 @@ const AccountSettings = () => {
                       <button 
                         onClick={handleSave} 
                         disabled={isSaving} 
-                        className="w-full h-20 bg-brand dark:bg-brand-light hover:opacity-90 rounded-[32px] font-bold text-white flex flex-col items-center justify-center gap-1 shadow-2xl shadow-blue-900/30 active:scale-[0.97] transition-all disabled:opacity-50"
+                        className="w-full h-20 bg-brand dark:bg-brand-light hover:opacity-90 rounded-[32px] font-bold text-white flex flex-col items-center justify-center gap-1   active:scale-[0.97] transition-all disabled:opacity-50"
                       >
                         {isSaving ? <Loader2 className="animate-spin" size={24} /> : (
                             <>

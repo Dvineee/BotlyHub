@@ -8,7 +8,7 @@ const Restricted = () => {
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-[#020617] flex flex-col items-center justify-center p-10 text-center animate-in fade-in transition-colors duration-300">
-            <div className="w-28 h-28 bg-red-600/10 dark:bg-red-500/10 rounded-[44px] flex items-center justify-center text-red-600 dark:text-red-500 mb-10 animate-pulse border border-red-500/20 shadow-2xl shadow-red-900/20">
+            <div className="w-28 h-28 bg-red-600/10 dark:bg-red-500/10 rounded-[44px] flex items-center justify-center text-red-600 dark:text-red-500 mb-10 animate-pulse border border-red-500/20  ">
                 <ShieldAlert size={56} />
             </div>
             
@@ -22,7 +22,7 @@ const Restricted = () => {
                     href="https://t.me/botlyhub_support" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-4 w-full py-6 bg-brand dark:bg-brand-light rounded-[28px] text-white text-[11px] font-bold uppercase tracking-widest shadow-2xl shadow-blue-900/30 active:scale-95 transition-all"
+                    className="flex items-center justify-center gap-4 w-full py-6 bg-brand dark:bg-brand-light rounded-[28px] text-white text-[11px] font-bold uppercase tracking-widest   active:scale-95 transition-all"
                 >
                     <MessageCircle size={20} />
                     Destekle İletişime Geç
@@ -30,7 +30,7 @@ const Restricted = () => {
                 
                 <button 
                     onClick={() => window.location.reload()}
-                    className="flex items-center justify-center gap-4 w-full py-6 bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-[28px] text-slate-500 dark:text-slate-400 text-[11px] font-bold uppercase tracking-widest active:scale-95 transition-all shadow-lg"
+                    className="flex items-center justify-center gap-4 w-full py-6 bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-[28px] text-slate-500 dark:text-slate-400 text-[11px] font-bold uppercase tracking-widest active:scale-95 transition-all "
                 >
                     Tekrar Dene
                 </button>

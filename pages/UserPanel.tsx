@@ -68,7 +68,7 @@ const UserPanel: React.FC = () => {
                                     src="/logo.svg" 
                                     alt="BotlyHub Logo" 
                                     style={{ width: '2.5rem', height: 'auto', display: 'block' }} 
-                                    className="drop-shadow-[0_0_15px_rgba(47,136,255,0.3)]" 
+                                    className="" 
                                 />
                             </div>
                             <div>
@@ -94,7 +94,7 @@ const UserPanel: React.FC = () => {
                                             className={`
                                                 w-full flex items-center justify-between px-5 py-4 rounded-[20px] transition-all group
                                                 ${activeSection === item.id 
-                                                    ? 'bg-purple-600 text-white shadow-2xl shadow-purple-900/40' 
+                                                    ? 'bg-purple-600 text-white  ' 
                                                     : 'hover:bg-white/5 text-slate-400 hover:text-white'}
                                             `}
                                         >
@@ -114,7 +114,7 @@ const UserPanel: React.FC = () => {
                     <div className="p-6 border-t border-white/5">
                         <div className="bg-slate-950/50 rounded-[24px] p-5 mb-5 border border-white/5">
                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-slate-800 rounded-[18px] flex items-center justify-center font-bold text-sm text-white uppercase border border-white/5 shadow-inner">
+                                <div className="w-12 h-12 bg-slate-800 rounded-[18px] flex items-center justify-center font-bold text-sm text-white uppercase border border-white/5 ">
                                     {user.username?.substring(0, 2)}
                                 </div>
                                 <div className="flex-1 min-w-0">

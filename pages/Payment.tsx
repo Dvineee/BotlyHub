@@ -223,7 +223,7 @@ const Payment = () => {
             <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white dark:bg-slate-900/60 rounded-[44px] border border-black/5 dark:border-white/10 overflow-hidden shadow-2xl relative mb-8"
+                className="bg-white dark:bg-slate-900/60 rounded-[44px] border border-black/5 dark:border-white/10 overflow-hidden  relative mb-8"
             >
                 <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-br from-brand via-brand/50 to-indigo-600 opacity-20 dark:opacity-40"></div>
                 <div className="relative pt-12 pb-10 px-8 text-center flex flex-col items-center">
@@ -231,7 +231,7 @@ const Payment = () => {
                         <div className="absolute inset-0 bg-brand/20 dark:bg-brand-light/20 blur-[30px] rounded-full scale-125"></div>
                         <img 
                             src={targetBot ? getLiveBotIcon(targetBot) : `https://ui-avatars.com/api/?name=${encodeURIComponent(plan?.name || 'P')}&background=1e293b&color=fff&bold=true`} 
-                            className="w-24 h-24 rounded-[32px] border-4 border-white dark:border-slate-800 shadow-2xl relative z-10 bg-slate-100 dark:bg-slate-900 object-cover" 
+                            className="w-24 h-24 rounded-[32px] border-4 border-white dark:border-slate-800  relative z-10 bg-slate-100 dark:bg-slate-900 object-cover" 
                             referrerPolicy="no-referrer"
                             onError={(e) => {
                                 if (targetBot) {
@@ -275,7 +275,7 @@ const Payment = () => {
                     transition={{ delay: 0.1 }}
                     onClick={payWithTON} 
                     disabled={isLoading}
-                    className="w-full group relative overflow-hidden bg-brand dark:bg-brand-light p-6 rounded-[32px] flex items-center justify-between active:scale-[0.98] transition-all disabled:opacity-50 shadow-xl shadow-brand/20"
+                    className="w-full group relative overflow-hidden bg-brand dark:bg-brand-light p-6 rounded-[32px] flex items-center justify-between active:scale-[0.98] transition-all disabled:opacity-50  "
                 >
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                     <div className="flex items-center gap-4 relative z-10">
@@ -296,7 +296,7 @@ const Payment = () => {
                     transition={{ delay: 0.2 }}
                     onClick={payWithStars} 
                     disabled={isLoading}
-                    className="w-full group relative overflow-hidden bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 p-6 rounded-[32px] flex items-center justify-between active:scale-[0.98] transition-all disabled:opacity-50 shadow-lg"
+                    className="w-full group relative overflow-hidden bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 p-6 rounded-[32px] flex items-center justify-between active:scale-[0.98] transition-all disabled:opacity-50 "
                 >
                     <div className="flex items-center gap-4 relative z-10">
                         <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500">

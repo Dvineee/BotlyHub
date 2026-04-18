@@ -33,7 +33,7 @@ const UserList = () => {
     <div className="p-6 pt-10 pb-32 bg-slate-50 dark:bg-[#020617] min-h-screen animate-in fade-in transition-colors duration-300">
       <div className="flex justify-between items-center mb-10 px-1">
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Kullanıcılar</h1>
-        <button className="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-500 dark:text-slate-400 active:scale-90 transition-transform shadow-lg">
+        <button className="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-500 dark:text-slate-400 active:scale-90 transition-transform ">
             <Plus size={22} />
         </button>
       </div>
@@ -44,10 +44,10 @@ const UserList = () => {
           <input 
             type="text" 
             placeholder="Kullanıcı ara..." 
-            className="w-full bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-[24px] py-5 pl-14 pr-6 text-[11px] font-bold uppercase tracking-widest focus:outline-none focus:border-purple-500/50 focus:bg-white dark:focus:bg-slate-900/60 transition-all placeholder:text-slate-300 dark:placeholder:text-slate-700 shadow-inner text-slate-900 dark:text-white"
+            className="w-full bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-[24px] py-5 pl-14 pr-6 text-[11px] font-bold uppercase tracking-widest focus:outline-none focus:border-purple-500/50 focus:bg-white dark:focus:bg-slate-900/60 transition-all placeholder:text-slate-300 dark:placeholder:text-slate-700  text-slate-900 dark:text-white"
           />
         </div>
-        <button className="w-14 h-14 flex items-center justify-center bg-white dark:bg-slate-900/40 rounded-[24px] border border-black/5 dark:border-white/5 text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-slate-300 transition-all shadow-lg">
+        <button className="w-14 h-14 flex items-center justify-center bg-white dark:bg-slate-900/40 rounded-[24px] border border-black/5 dark:border-white/5 text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-slate-300 transition-all ">
             <SlidersHorizontal size={20} />
         </button>
       </div>
@@ -57,9 +57,9 @@ const UserList = () => {
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className={`px-6 py-3.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all duration-300 whitespace-nowrap shadow-lg ${
+            className={`px-6 py-3.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all duration-300 whitespace-nowrap  ${
               filter === f 
-              ? 'bg-purple-600 text-white shadow-purple-900/40 scale-105' 
+              ? 'bg-purple-600 text-white  scale-105' 
               : 'bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-slate-300'
             }`}
           >
@@ -73,18 +73,18 @@ const UserList = () => {
           <div 
             key={user.id} 
             onClick={() => navigate(`/users/${user.id}`)}
-            className="flex items-center justify-between p-5 rounded-[32px] bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 hover:border-purple-500/30 dark:hover:border-purple-500/30 hover:bg-slate-50 dark:hover:bg-slate-900/60 transition-all cursor-pointer group shadow-xl"
+            className="flex items-center justify-between p-5 rounded-[32px] bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 hover:border-purple-500/30 dark:hover:border-purple-500/30 hover:bg-slate-50 dark:hover:bg-slate-900/60 transition-all cursor-pointer group "
           >
             <div className="flex items-center gap-5">
               <div className="relative">
                 <img 
                     src={user.avatar} 
                     alt={user.name} 
-                    className="w-14 h-14 rounded-[20px] object-cover border border-black/5 dark:border-white/10 group-hover:scale-105 transition-transform shadow-lg" 
+                    className="w-14 h-14 rounded-[20px] object-cover border border-black/5 dark:border-white/10 group-hover:scale-105 transition-transform " 
                     referrerPolicy="no-referrer"
                 />
                 {user.status === 'Active' && (
-                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 border-4 border-white dark:border-slate-950 rounded-full shadow-lg"></div>
+                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 border-4 border-white dark:border-slate-950 rounded-full "></div>
                 )}
               </div>
               <div className="space-y-1">

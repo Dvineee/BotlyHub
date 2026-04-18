@@ -10,15 +10,15 @@ const Maintenance = () => {
 
       <div className="max-w-md w-full text-center relative z-10">
         <div className="relative inline-block mb-12">
-            <div className="w-32 h-32 bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-[48px] flex items-center justify-center shadow-2xl backdrop-blur-xl">
+            <div className="w-32 h-32 bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-[48px] flex items-center justify-center  backdrop-blur-xl">
                 <img 
                     src="/logo.svg" 
                     alt="BotlyHub Logo" 
                     style={{ width: '4.5rem', height: 'auto', display: 'block' }} 
-                    className="drop-shadow-[0_0_20px_rgba(47,136,255,0.4)] animate-pulse" 
+                    className=" animate-pulse" 
                 />
             </div>
-            <div className="absolute -bottom-2 -right-2 bg-brand p-4 rounded-[20px] shadow-2xl border-4 border-slate-50 dark:border-[#020617]">
+            <div className="absolute -bottom-2 -right-2 bg-brand p-4 rounded-[20px]  border-4 border-slate-50 dark:border-[#020617]">
                 <ShieldAlert size={24} className="text-white" />
             </div>
         </div>
@@ -29,8 +29,8 @@ const Maintenance = () => {
         </p>
 
         <div className="space-y-4 max-w-sm mx-auto">
-            <div className="bg-white dark:bg-slate-900/40 backdrop-blur-xl border border-black/5 dark:border-white/5 p-6 rounded-[32px] flex items-center gap-5 text-left shadow-xl">
-                <div className="w-14 h-14 bg-purple-600/10 dark:bg-purple-500/10 rounded-[20px] flex items-center justify-center text-purple-600 dark:text-purple-500 shadow-inner border border-purple-500/10">
+            <div className="bg-white dark:bg-slate-900/40 backdrop-blur-xl border border-black/5 dark:border-white/5 p-6 rounded-[32px] flex items-center gap-5 text-left ">
+                <div className="w-14 h-14 bg-purple-600/10 dark:bg-purple-500/10 rounded-[20px] flex items-center justify-center text-purple-600 dark:text-purple-500  border border-purple-500/10">
                     <Cpu size={28} />
                 </div>
                 <div>

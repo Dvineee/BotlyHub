@@ -52,18 +52,18 @@ const Premium = () => {
 
               // Color mapping for dynamic styles
               let borderColor = 'border-black/5 dark:border-white/5';
-              let shadowColor = 'shadow-xl';
+              let Color = '';
               let btnColor = 'bg-slate-900 dark:bg-slate-800 text-white';
               let iconColor = 'text-slate-500 dark:text-slate-400';
               
               if (plan.color === 'blue') {
                   borderColor = 'border-brand/20 dark:border-brand-light/20';
-                  shadowColor = 'shadow-xl shadow-brand/10';
+                  Color = ' ';
                   btnColor = 'bg-brand dark:bg-brand-light hover:opacity-90 text-white';
                   iconColor = 'text-brand dark:text-brand-light';
               } else if (plan.color === 'yellow') {
                   borderColor = 'border-yellow-500/30';
-                  shadowColor = 'shadow-xl shadow-yellow-900/10';
+                  Color = ' ';
                   btnColor = 'bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white';
                   iconColor = 'text-yellow-600 dark:text-yellow-400';
               }
@@ -71,16 +71,16 @@ const Premium = () => {
               return (
                   <div 
                     key={plan.id} 
-                    className={`relative flex flex-col bg-white dark:bg-slate-900/40 rounded-[32px] p-8 border ${borderColor} ${shadowColor} transition-all duration-300 ${plan.isPopular ? 'md:scale-[1.05] z-10 bg-white dark:bg-slate-900/60' : ''}`}
+                    className={`relative flex flex-col bg-white dark:bg-slate-900/40 rounded-[32px] p-8 border ${borderColor} ${Color} transition-all duration-300 ${plan.isPopular ? 'md:scale-[1.05] z-10 bg-white dark:bg-slate-900/60' : ''}`}
                   >
                       {plan.isPopular && (
-                          <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand dark:bg-brand-light text-white text-[10px] font-bold px-4 py-1.5 rounded-full shadow-lg tracking-wider">
+                          <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand dark:bg-brand-light text-white text-[10px] font-bold px-4 py-1.5 rounded-full  tracking-wider">
                               EN POPÜLER
                           </div>
                       )}
 
                       <div className="flex justify-between items-start mb-6">
-                          <div className={`w-14 h-14 rounded-2xl bg-slate-50 dark:bg-slate-950 flex items-center justify-center border border-black/5 dark:border-white/5 shadow-inner ${iconColor}`}>
+                          <div className={`w-14 h-14 rounded-2xl bg-slate-50 dark:bg-slate-950 flex items-center justify-center border border-black/5 dark:border-white/5  ${iconColor}`}>
                               <Icon size={28} />
                           </div>
                           <div className="text-right">
@@ -114,7 +114,7 @@ const Premium = () => {
                         <button 
                           onClick={() => handleSelectPlan(plan.id)}
                           disabled={isCurrent}
-                          className={`w-full py-4 md:py-5 lg:py-6 rounded-2xl font-bold text-[10px] md:text-xs lg:text-sm uppercase tracking-widest transition-all shadow-lg active:scale-95 ${
+                          className={`w-full py-4 md:py-5 lg:py-6 rounded-2xl font-bold text-[10px] md:text-xs lg:text-sm uppercase tracking-widest transition-all  active:scale-95 ${
                               isCurrent 
                               ? 'bg-slate-200 dark:bg-slate-800/50 text-slate-400 dark:text-slate-500 cursor-default border border-black/5 dark:border-white/5' 
                               : btnColor

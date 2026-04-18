@@ -245,13 +245,13 @@ const BotDetail = () => {
         <div className="flex items-center justify-between mb-8 pt-6 gap-3 md:gap-6">
             <div className="flex items-center gap-2 shrink-0">
                 <div className="shrink-0 cursor-pointer" onClick={() => navigate('/')}>
-                    <img src="/logo.svg" alt="BotlyHub Logo" style={{ width: '2.5rem', height: 'auto', display: 'block' }} className="drop-shadow-[0_0_15px_rgba(47,136,255,0.3)]" />
+                    <img src="/logo.svg" alt="BotlyHub Logo" style={{ width: '2.5rem', height: 'auto', display: 'block' }} className="" />
                 </div>
                 <h1 className="hidden sm:block text-2xl font-bold text-slate-900 dark:text-white tracking-tight cursor-pointer" onClick={() => navigate('/')}>BotlyHub</h1>
             </div>
 
             <div className="flex-1 max-w-2xl cursor-pointer" onClick={() => navigate('/search')}>
-                <div className="relative flex items-center bg-white dark:bg-slate-900/40 backdrop-blur-2xl border border-black/5 dark:border-white/10 rounded-[28px] p-1.5 shadow-xl transition-all active:scale-[0.98] group">
+                <div className="relative flex items-center bg-white dark:bg-slate-900/40 backdrop-blur-2xl border border-black/5 dark:border-white/10 rounded-[28px] p-1.5 transition-all active:scale-[0.98] group">
                     <div className="ml-2 md:ml-4 w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-2xl text-slate-400 group-hover:text-blue-500 transition-colors">
                         <Search size={18} />
                     </div>
@@ -285,13 +285,13 @@ const BotDetail = () => {
                             >
                                 <LayoutGrid size={20} />
                                 {unreadCount > 0 && (
-                                    <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[8px] font-black text-white flex items-center justify-center px-1 badge-pop shadow-xl">
+                                    <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[8px] font-black text-white flex items-center justify-center px-1 badge-pop">
                                         {unreadCount > 9 ? '9+' : unreadCount}
                                     </div>
                                 )}
                             </button>
                             {isMenuOpen && (
-                                <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-[32px] shadow-2xl overflow-hidden z-[100] animate-in py-2 backdrop-blur-2xl">
+                                <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-[32px] overflow-hidden z-[100] animate-in py-2 backdrop-blur-2xl">
                                     {[
                                         { path: '/', icon: Store, color: 'text-blue-500 dark:text-blue-400', label: 'market' },
                                         { path: '/settings', icon: UserIcon, color: 'text-purple-500 dark:text-purple-400', label: 'profile' },
@@ -302,7 +302,7 @@ const BotDetail = () => {
                                         <button key={i} onClick={() => { navigate(item.path); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-black/5 dark:hover:bg-white/5 text-left border-b border-black/5 dark:border-white/5 last:border-0 relative">
                                             <item.icon size={18} className={item.color} /> 
                                             <span className="text-[11px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300">{t(item.label)}</span>
-                                            {item.badge && <div className="absolute right-6 w-2.5 h-2.5 bg-red-600 rounded-full shadow-[0_0_8px_rgba(220,38,38,0.6)]"></div>}
+                                            {item.badge && <div className="absolute right-6 w-2.5 h-2.5 bg-red-600 rounded-full"></div>}
                                         </button>
                                     ))}
                                 </div>
@@ -326,7 +326,7 @@ const BotDetail = () => {
               <img 
                 src={getLiveBotIcon(bot)} 
                 loading="lazy"
-                className="w-24 h-24 rounded-[32px] !p-0 border border-black/10 dark:border-white/10 shadow-2xl object-cover bg-slate-200 dark:bg-slate-900" 
+                className="w-24 h-24 rounded-[32px] !p-0 border border-black/10 dark:border-white/10 object-cover bg-slate-200 dark:bg-slate-900" 
                 onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=1e293b&color=fff&bold=true`; }}
               />
               {isOwned && (
@@ -372,7 +372,7 @@ const BotDetail = () => {
                                       initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                       animate={{ opacity: 1, y: 0, scale: 1 }}
                                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                      className="absolute left-0 mt-2 w-48 bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-2xl shadow-2xl z-[80] overflow-hidden"
+                                      className="absolute left-0 mt-2 w-48 bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-2xl z-[80] overflow-hidden"
                                   >
                                       <div className="p-2 space-y-1">
                                           {bot.telegram_group && (
@@ -435,7 +435,7 @@ const BotDetail = () => {
         </div>
 
         <div className="w-full md:w-auto md:min-w-[320px] lg:hidden">
-            <div className="flex flex-col bg-white dark:bg-slate-900/60 rounded-[32px] border border-black/5 dark:border-white/5 backdrop-blur-xl shadow-xl overflow-hidden">
+            <div className="flex flex-col bg-white dark:bg-slate-900/60 rounded-[32px] border border-black/5 dark:border-white/5 backdrop-blur-xl  overflow-hidden">
                 <div className="flex items-center justify-between p-6">
                     <div className="flex flex-col items-center flex-1 border-r border-black/5 dark:border-white/5">
                         <span className="text-slate-900 dark:text-white font-bold text-base">{bot.rating || '0.0'} <Star size={12} className="inline mb-1 fill-slate-900 dark:fill-white" /></span>
@@ -478,7 +478,7 @@ const BotDetail = () => {
           >
               {bot.screenshots && bot.screenshots.length > 0 ? (
                   bot.screenshots.map((s, i) => (
-                    <div key={i} className="min-w-[180px] h-[320px] rounded-[32px] bg-slate-200 dark:bg-slate-900 border border-black/5 dark:border-white/5 overflow-hidden snap-center shrink-0 shadow-xl">
+                    <div key={i} className="min-w-[180px] h-[320px] rounded-[32px] bg-slate-200 dark:bg-slate-900 border border-black/5 dark:border-white/5 overflow-hidden snap-center shrink-0">
                         <img src={s} loading="lazy" className="w-full h-full object-cover" />
                     </div>
                   ))
@@ -538,7 +538,7 @@ const BotDetail = () => {
                                           size={28} 
                                           className={`transition-all duration-300 ${
                                               isActive 
-                                              ? 'fill-yellow-400 text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.3)]' 
+                                              ? 'fill-yellow-400 text-yellow-400 ' 
                                               : 'text-slate-200 dark:text-slate-800'
                                           }`} 
                                       />
@@ -562,7 +562,7 @@ const BotDetail = () => {
           <div className="flex items-center justify-between mb-4 px-2">
             <h3 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Hakkında</h3>
           </div>
-          <div className="p-4 bg-white dark:bg-slate-900/60 rounded-[32px] border border-black/5 dark:border-white/5 text-sm text-slate-600 dark:text-slate-400 leading-[1.6] shadow-lg whitespace-pre-wrap">
+          <div className="p-4 bg-white dark:bg-slate-900/60 rounded-[32px] border border-black/5 dark:border-white/5 text-sm text-slate-600 dark:text-slate-400 leading-[1.6] whitespace-pre-wrap">
               {bot.description}
           </div>
       </div>
@@ -636,7 +636,7 @@ const BotDetail = () => {
           {/* Right Column (PC only) - Action bar moved here for large screens */}
           <aside className="hidden lg:flex flex-col gap-4 pt-10 sticky top-10 h-fit pr-6 lg:pr-0">
               <div className="w-full">
-                  <div className="flex flex-col bg-white dark:bg-slate-900/60 rounded-[32px] border border-black/5 dark:border-white/5 backdrop-blur-xl shadow-xl overflow-hidden">
+                  <div className="flex flex-col bg-white dark:bg-slate-900/60 rounded-[32px] border border-black/5 dark:border-white/5 backdrop-blur-xl overflow-hidden">
                       <div className="flex items-center justify-between p-6">
                           <div className="flex flex-col items-center flex-1 border-r border-black/5 dark:border-white/5">
                               <span className="text-slate-900 dark:text-white font-bold text-base">{bot.rating || '0.0'} <Star size={12} className="inline mb-1 fill-slate-900 dark:fill-white" /></span>
@@ -669,7 +669,7 @@ const BotDetail = () => {
                   <button 
                     onClick={handleAction}
                     disabled={isProcessing}
-                    className={`w-full h-20 rounded-[32px] text-[11px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 shadow-2xl border-b-8 ${
+                    className={`w-full h-20 rounded-[32px] text-[11px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 border-b-8 ${
                         isOwned 
                         ? 'bg-emerald-600 text-white border-emerald-800' 
                         : 'bg-slate-900 dark:bg-white text-white dark:text-slate-950 border-slate-700 dark:border-slate-300'
@@ -693,7 +693,7 @@ const BotDetail = () => {
 
                   <button 
                     onClick={handleShare}
-                    className="h-20 w-full bg-white dark:bg-slate-900 rounded-[32px] border border-black/5 dark:border-white/10 flex items-center justify-center gap-4 text-slate-500 dark:text-slate-400 active:scale-95 transition-all shadow-xl relative border-b-8 border-transparent"
+                    className="h-20 w-full bg-white dark:bg-slate-900 rounded-[32px] border border-black/5 dark:border-white/10 flex items-center justify-center gap-4 text-slate-500 dark:text-slate-400 active:scale-95 transition-all relative border-b-8 border-transparent"
                   >
                       <Share2 size={24} className={isCopied ? 'text-emerald-500' : ''} />
                       <span className="text-[11px] font-black uppercase tracking-[0.2em]">PAYLAŞ</span>
@@ -776,7 +776,7 @@ const BotDetail = () => {
           <div className="max-w-md mx-auto flex items-center gap-3">
               <button 
                 onClick={handleShare}
-                className="h-20 w-20 shrink-0 bg-white dark:bg-slate-900 rounded-[32px] border border-black/5 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 active:scale-95 transition-all shadow-2xl relative border-b-8 border-transparent"
+                className="h-20 w-20 shrink-0 bg-white dark:bg-slate-900 rounded-[32px] border border-black/5 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 active:scale-95 transition-all relative border-b-8 border-transparent"
               >
                   <Share2 size={24} className={isCopied ? 'text-emerald-500' : ''} />
                   <AnimatePresence>
@@ -796,7 +796,7 @@ const BotDetail = () => {
               <button 
                 onClick={handleAction}
                 disabled={isProcessing}
-                className={`flex-1 h-20 rounded-[32px] text-[11px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 shadow-2xl border-b-8 ${
+                className={`flex-1 h-20 rounded-[32px] text-[11px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 border-b-8 ${
                     isOwned 
                     ? 'bg-emerald-600 text-white border-emerald-800' 
                     : 'bg-slate-900 dark:bg-white text-white dark:text-slate-950 border-slate-700 dark:border-slate-300'
@@ -836,11 +836,11 @@ const BotDetail = () => {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-sm bg-white dark:bg-slate-900 border border-black/10 dark:border-white/10 rounded-[44px] overflow-hidden shadow-2xl"
+              className="relative w-full max-w-sm bg-white dark:bg-slate-900 border border-black/10 dark:border-white/10 rounded-[44px] overflow-hidden"
             >
               <div className="p-8 lg:p-10">
                 <div className="flex justify-between items-center mb-8">
-                  <div className="w-12 h-12 bg-brand dark:bg-brand-light rounded-2xl flex items-center justify-center shadow-2xl shadow-blue-600/20">
+                  <div className="w-12 h-12 bg-brand dark:bg-brand-light rounded-2xl flex items-center justify-center uppercase tracking-widest text-[11px] font-bold text-white">
                     <Sparkles className="text-white" size={24} />
                   </div>
                   <button onClick={() => setShowGuide(false)} className="p-2 text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors">
@@ -880,7 +880,7 @@ const BotDetail = () => {
                       setShowGuide(false);
                       handleAction();
                     }}
-                    className="w-full py-5 bg-brand dark:bg-brand-light hover:opacity-90 text-white font-black rounded-[24px] text-[10px] uppercase tracking-[0.4em] shadow-2xl shadow-blue-900/40 transition-all active:scale-95 flex items-center justify-center gap-3"
+                    className="w-full py-5 bg-brand dark:bg-brand-light hover:opacity-90 text-white font-black rounded-[24px] text-[10px] uppercase tracking-[0.4em] transition-all active:scale-95 flex items-center justify-center gap-3"
                   >
                     <Send size={16} /> ŞİMDİ BAŞLAT
                   </button>

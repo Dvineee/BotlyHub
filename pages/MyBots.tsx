@@ -171,7 +171,7 @@ const MyBots = () => {
         <div className="flex items-center gap-4">
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Botlarım</h1>
         </div>
-        <button onClick={(e) => { e.stopPropagation(); navigate('/'); }} className="w-12 h-12 flex items-center justify-center bg-brand dark:bg-brand-light rounded-full text-white active:scale-90 transition-transform shadow-lg shadow-blue-900/20">
+        <button onClick={(e) => { e.stopPropagation(); navigate('/'); }} className="w-12 h-12 flex items-center justify-center bg-brand dark:bg-brand-light rounded-full text-white active:scale-90 transition-transform  ">
             <ShoppingBag size={20} />
         </button>
       </div>
@@ -188,8 +188,8 @@ const MyBots = () => {
         {isLoading ? (
             <div className="flex justify-center py-20"><Loader2 className="animate-spin text-blue-500" /></div>
         ) : bots.length === 0 ? (
-             <div className="flex flex-col items-center justify-center py-16 text-slate-500 bg-white dark:bg-slate-900/30 rounded-3xl border border-black/5 dark:border-slate-800/50 border-dashed shadow-lg">
-                <div className="w-20 h-20 bg-slate-100 dark:bg-slate-900 rounded-full flex items-center justify-center mb-4 shadow-inner">
+             <div className="flex flex-col items-center justify-center py-16 text-slate-500 bg-white dark:bg-slate-900/30 rounded-3xl border border-black/5 dark:border-slate-800/50 border-dashed ">
+                <div className="w-20 h-20 bg-slate-100 dark:bg-slate-900 rounded-full flex items-center justify-center mb-4 ">
                     <Bot size={40} className="opacity-40" />
                 </div>
                 <p className="font-medium text-slate-600 dark:text-slate-300">Henüz bir botunuz yok.</p>
@@ -197,17 +197,17 @@ const MyBots = () => {
             </div>
         ) : (
             bots.map((bot) => (
-                <div key={bot.id} className="group relative bg-white dark:bg-slate-900/40 rounded-[32px] border border-black/5 dark:border-white/5 overflow-hidden transition-all hover:bg-slate-50 dark:hover:bg-slate-900/60 shadow-xl">
+                <div key={bot.id} className="group relative bg-white dark:bg-slate-900/40 rounded-[32px] border border-black/5 dark:border-white/5 overflow-hidden transition-all hover:bg-slate-50 dark:hover:bg-slate-900/60 ">
                     <div className="p-4 flex items-center relative z-10">
                          <div className="relative flex-shrink-0">
                              <img 
                                 src={getLiveBotIcon(bot)} 
                                 alt={bot.name} 
-                                className="w-24 h-24 rounded-[24px] object-cover bg-slate-200 dark:bg-slate-800 border border-black/5 dark:border-white/5 shadow-lg" 
+                                className="w-24 h-24 rounded-[24px] object-cover bg-slate-200 dark:bg-slate-800 border border-black/5 dark:border-white/5 " 
                                 onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
                              />
                              {bot.price > 0 && (
-                                 <div className="absolute -top-2 -left-2 bg-brand dark:bg-brand-light text-white p-1.5 rounded-xl border-2 border-slate-50 dark:border-slate-950 shadow-xl">
+                                 <div className="absolute -top-2 -left-2 bg-brand dark:bg-brand-light text-white p-1.5 rounded-xl border-2 border-slate-50 dark:border-slate-950 ">
                                      <Lock size={12} />
                                  </div>
                              )}
@@ -223,7 +223,7 @@ const MyBots = () => {
                                 
                                 <div className="flex items-center gap-3 mb-3">
                                     <div className="flex items-center gap-1.5">
-                                        <div className={`w-2 h-2 rounded-full ${bot.isActive ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-slate-400 dark:bg-slate-500'}`}></div>
+                                        <div className={`w-2 h-2 rounded-full ${bot.isActive ? 'bg-emerald-500 ' : 'bg-slate-400 dark:bg-slate-500'}`}></div>
                                         <span className={`text-[10px] font-bold uppercase tracking-wider ${bot.isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'}`}>
                                             {bot.isActive ? 'Aktif' : 'Pasif'}
                                         </span>
@@ -237,14 +237,14 @@ const MyBots = () => {
                                 <div className="flex items-center gap-3">
                                     <button 
                                         onClick={(e) => { e.stopPropagation(); handleStartBot(bot); }}
-                                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand/10 dark:bg-brand-light/10 hover:bg-brand dark:hover:bg-brand-light text-brand dark:text-brand-light hover:text-white rounded-xl text-[10px] font-bold uppercase tracking-widest border border-brand/20 dark:border-brand-light/20 transition-all shadow-lg"
+                                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand/10 dark:bg-brand-light/10 hover:bg-brand dark:hover:bg-brand-light text-brand dark:text-brand-light hover:text-white rounded-xl text-[10px] font-bold uppercase tracking-widest border border-brand/20 dark:border-brand-light/20 transition-all "
                                     >
                                         <Send size={12} />
                                         <span>Başlat</span>
                                     </button>
                                     <button 
                                         onClick={(e) => { e.stopPropagation(); setOpenSettingsId(bot.id); }}
-                                        className="w-10 h-10 flex items-center justify-center bg-slate-500/10 hover:bg-slate-500 text-slate-500 hover:text-white rounded-xl border border-slate-500/20 transition-all shadow-lg shrink-0"
+                                        className="w-10 h-10 flex items-center justify-center bg-slate-500/10 hover:bg-slate-500 text-slate-500 hover:text-white rounded-xl border border-slate-500/20 transition-all  shrink-0"
                                     >
                                         <Settings size={16} />
                                     </button>
@@ -263,7 +263,7 @@ const MyBots = () => {
                                         {bot.price > 0 ? (
                                             <div 
                                                 onClick={(e) => { e.stopPropagation(); toggleAdRevenue(bot.id); }}
-                                                className={`cursor-pointer rounded-2xl px-4 h-full max-h-[64px] flex items-center gap-3 border transition-all active:scale-95 shadow-lg ${
+                                                className={`cursor-pointer rounded-2xl px-4 h-full max-h-[64px] flex items-center gap-3 border transition-all active:scale-95  ${
                                                     bot.revenueEnabled ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-white dark:bg-slate-900/60 border-black/5 dark:border-white/5'
                                                 }`}
                                             >
@@ -279,7 +279,7 @@ const MyBots = () => {
 
                                         <div 
                                             onClick={(e) => { e.stopPropagation(); toggleActiveStatus(bot.id); }}
-                                            className={`cursor-pointer rounded-2xl px-4 h-full max-h-[64px] flex items-center gap-3 border transition-all active:scale-95 shadow-lg ${
+                                            className={`cursor-pointer rounded-2xl px-4 h-full max-h-[64px] flex items-center gap-3 border transition-all active:scale-95  ${
                                                 bot.isActive ? 'bg-brand/10 dark:bg-brand-light/10 border-brand/30 dark:border-brand-light/30' : 'bg-white dark:bg-slate-900/60 border-black/5 dark:border-white/5'
                                             }`}
                                         >
@@ -291,14 +291,14 @@ const MyBots = () => {
 
                                 <div 
                                     onClick={(e) => { e.stopPropagation(); handleDeleteClick(bot); }}
-                                    className={`cursor-pointer rounded-2xl px-4 h-full max-h-[64px] flex items-center justify-center gap-3 border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 transition-all active:scale-95 shadow-lg ${bot.is_official ? 'col-start-2 row-start-2' : ''}`}
+                                    className={`cursor-pointer rounded-2xl px-4 h-full max-h-[64px] flex items-center justify-center gap-3 border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 transition-all active:scale-95  ${bot.is_official ? 'col-start-2 row-start-2' : ''}`}
                                 >
                                     <Trash2 size={18} className="text-red-500" />
                                     <span className="text-[11px] font-bold uppercase text-red-500">Kaldır</span>
                                 </div>
 
                                 {bot.is_official && bot.price > 0 && (
-                                    <div className="rounded-2xl px-4 h-full max-h-[64px] flex flex-col items-center justify-center bg-slate-100 dark:bg-slate-950 border border-black/5 dark:border-white/5 opacity-60 col-start-2 row-start-2 text-center shadow-inner">
+                                    <div className="rounded-2xl px-4 h-full max-h-[64px] flex flex-col items-center justify-center bg-slate-100 dark:bg-slate-950 border border-black/5 dark:border-white/5 opacity-60 col-start-2 row-start-2 text-center ">
                                         <Lock size={14} className="text-slate-400 dark:text-slate-500 mb-1" />
                                         <span className="text-[9px] font-bold uppercase text-slate-400 dark:text-slate-500 tracking-widest">Kilitli</span>
                                     </div>
@@ -312,7 +312,7 @@ const MyBots = () => {
 
       {showDeleteModal && botToDelete && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 animate-in fade-in" onClick={() => !isDeleting && setShowDeleteModal(false)}>
-              <div className="bg-white dark:bg-slate-900 border border-black/5 dark:border-slate-800 p-8 rounded-3xl w-full max-w-sm text-center shadow-2xl relative" onClick={e => e.stopPropagation()}>
+              <div className="bg-white dark:bg-slate-900 border border-black/5 dark:border-slate-800 p-8 rounded-3xl w-full max-w-sm text-center  relative" onClick={e => e.stopPropagation()}>
                   {!isDeleting && <button onClick={() => setShowDeleteModal(false)} className="absolute top-4 right-4 text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white"><X size={20} /></button>}
                   <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/20">
                       {isDeleting ? <Loader2 className="animate-spin text-red-500" size={32} /> : <AlertTriangle size={32} className="text-red-500" />}
@@ -324,7 +324,7 @@ const MyBots = () => {
                   {!isDeleting && (
                     <div className="flex gap-3">
                         <button onClick={() => setShowDeleteModal(false)} className="flex-1 py-4 rounded-xl text-slate-400 dark:text-slate-500 font-black text-[10px] uppercase tracking-widest hover:bg-slate-100 dark:hover:bg-slate-800">Vazgeç</button>
-                        <button onClick={confirmDelete} className="flex-1 py-4 rounded-xl bg-red-600 hover:bg-red-500 text-white font-black text-[10px] uppercase tracking-widest shadow-xl shadow-red-900/20">Evet, Kaldır</button>
+                        <button onClick={confirmDelete} className="flex-1 py-4 rounded-xl bg-red-600 hover:bg-red-500 text-white font-black text-[10px] uppercase tracking-widest  ">Evet, Kaldır</button>
                     </div>
                   )}
               </div>

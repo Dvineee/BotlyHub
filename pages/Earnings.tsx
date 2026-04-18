@@ -112,20 +112,20 @@ const Earnings = () => {
             </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900/40 p-1.5 rounded-[28px] flex mb-10 border border-black/5 dark:border-white/5 backdrop-blur-xl shadow-xl">
-            <button onClick={()=>setActiveTab('wallet')} className={`flex-1 py-3.5 rounded-[22px] text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab==='wallet'?'bg-brand dark:bg-brand-light text-white shadow-lg shadow-blue-900/20':'text-slate-500 hover:bg-black/5 dark:hover:bg-white/5'}`}>Cüzdan Yönetimi</button>
-            <button onClick={()=>setActiveTab('revenue')} className={`flex-1 py-3.5 rounded-[22px] text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab==='revenue'?'bg-brand dark:bg-brand-light text-white shadow-lg shadow-blue-900/20':'text-slate-500 hover:bg-black/5 dark:hover:bg-white/5'}`}>Performans Analitiği</button>
+        <div className="bg-white dark:bg-slate-900/40 p-1.5 rounded-[28px] flex mb-10 border border-black/5 dark:border-white/5 backdrop-blur-xl ">
+            <button onClick={()=>setActiveTab('wallet')} className={`flex-1 py-3.5 rounded-[22px] text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab==='wallet'?'bg-brand dark:bg-brand-light text-white  ':'text-slate-500 hover:bg-black/5 dark:hover:bg-white/5'}`}>Cüzdan Yönetimi</button>
+            <button onClick={()=>setActiveTab('revenue')} className={`flex-1 py-3.5 rounded-[22px] text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab==='revenue'?'bg-brand dark:bg-brand-light text-white  ':'text-slate-500 hover:bg-black/5 dark:hover:bg-white/5'}`}>Performans Analitiği</button>
         </div>
 
         <div className="flex-1 overflow-y-auto no-scrollbar px-1">
             {activeTab === 'wallet' ? (
                 <div className="animate-in slide-in-from-bottom-4">
                     {/* ... wallet content ... */}
-                    <div className="bg-gradient-to-br from-brand to-indigo-700 p-8 rounded-[44px] mb-8 relative overflow-hidden shadow-2xl shadow-blue-900/20">
+                    <div className="bg-gradient-to-br from-brand to-indigo-700 p-8 rounded-[44px] mb-8 relative overflow-hidden  ">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-3xl"></div>
                         <div className="relative z-10">
                             <div className="flex justify-between items-start mb-10">
-                                <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/30 shadow-lg">
+                                <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/30 ">
                                     <Zap size={24} className="text-white" />
                                 </div>
                                 <div className="flex items-center gap-2 bg-black/20 px-3 py-1.5 rounded-xl border border-white/10 backdrop-blur-sm">
@@ -144,15 +144,15 @@ const Earnings = () => {
                     </div>
 
                     <div className="grid grid-cols-2 gap-4 mb-8">
-                        <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-[32px] flex flex-col items-center gap-3 shadow-xl">
-                            <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-500 shadow-inner"><TrendingUp size={20} /></div>
+                        <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-[32px] flex flex-col items-center gap-3 ">
+                            <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-500 "><TrendingUp size={20} /></div>
                             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Kümülatif Kazanç</p>
                             <h4 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight leading-none">
                                 ₺{wallet ? wallet.total_earned.toLocaleString() : '0.00'}
                             </h4>
                         </div>
-                        <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-[32px] flex flex-col items-center gap-3 shadow-xl">
-                            <div className="w-10 h-10 bg-brand/10 dark:bg-brand-light/10 rounded-xl flex items-center justify-center text-brand dark:text-brand-light shadow-inner"><PieChart size={20} /></div>
+                        <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-[32px] flex flex-col items-center gap-3 ">
+                            <div className="w-10 h-10 bg-brand/10 dark:bg-brand-light/10 rounded-xl flex items-center justify-center text-brand dark:text-brand-light "><PieChart size={20} /></div>
                             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Bağlı Kanallar</p>
                             <h4 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight leading-none">
                                 {new Set(stats.map(s => s.channel_id)).size}
@@ -160,7 +160,7 @@ const Earnings = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-[40px] p-8 text-center backdrop-blur-md mb-8 shadow-xl">
+                    <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-[40px] p-8 text-center backdrop-blur-md mb-8 ">
                         <p className="text-slate-500 text-[11px] font-bold uppercase tracking-wider mb-8 leading-relaxed px-4">
                             Ödemelerinizi almak ve lisans işlemleri yapmak için cüzdanınızı bağlayın.
                         </p>
@@ -170,12 +170,12 @@ const Earnings = () => {
                     </div>
 
                     {tonWallet && (
-                        <div className="bg-white dark:bg-slate-900/60 border border-brand/20 dark:border-brand-light/20 rounded-[32px] p-6 animate-in zoom-in-95 shadow-xl">
+                        <div className="bg-white dark:bg-slate-900/60 border border-brand/20 dark:border-brand-light/20 rounded-[32px] p-6 animate-in zoom-in-95 ">
                             <div className="flex items-center gap-4 mb-4">
-                                <div className="w-10 h-10 bg-brand/10 dark:bg-brand-light/10 rounded-xl flex items-center justify-center text-brand dark:text-brand-light shadow-inner"><WalletIcon size={18} /></div>
+                                <div className="w-10 h-10 bg-brand/10 dark:bg-brand-light/10 rounded-xl flex items-center justify-center text-brand dark:text-brand-light "><WalletIcon size={18} /></div>
                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Bağlı Adres</p>
                             </div>
-                            <p className="text-[11px] text-slate-900 dark:text-white font-bold break-all bg-slate-50 dark:bg-black/40 p-5 rounded-2xl border border-black/5 dark:border-white/5 leading-relaxed tracking-tight shadow-inner">
+                            <p className="text-[11px] text-slate-900 dark:text-white font-bold break-all bg-slate-50 dark:bg-black/40 p-5 rounded-2xl border border-black/5 dark:border-white/5 leading-relaxed tracking-tight ">
                                 {userFriendlyAddress}
                             </p>
                         </div>
@@ -187,26 +187,26 @@ const Earnings = () => {
                         <div className="flex items-center gap-3">
                             <p className="text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest">Genel Performans Göstergeleri</p>
                             <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full animate-pulse-slow">
-                                <div className="w-1 h-1 bg-emerald-500 rounded-full shadow-[0_0_5px_rgba(16,185,129,0.8)]"></div>
+                                <div className="w-1 h-1 bg-emerald-500 rounded-full "></div>
                                 <span className="text-[8px] font-black text-emerald-600 dark:text-emerald-500 uppercase tracking-tighter">Canlı</span>
                             </div>
                         </div>
                         <button 
                             onClick={loadStats} 
                             disabled={isLoading}
-                            className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-xl text-slate-500 dark:text-slate-400 active:scale-90 transition-all disabled:opacity-30 shadow-lg"
+                            className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-xl text-slate-500 dark:text-slate-400 active:scale-90 transition-all disabled:opacity-30 "
                         >
                             <RefreshCw size={18} className={isLoading ? 'animate-spin text-brand dark:text-brand-light' : ''} />
                         </button>
                     </div>
                     <div className="grid grid-cols-2 gap-4 mb-8">
-                        <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-[32px] flex flex-col items-center gap-3 shadow-xl">
-                            <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-500 shadow-inner"><ArrowUpRight size={20} /></div>
+                        <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-[32px] flex flex-col items-center gap-3 ">
+                            <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-500 "><ArrowUpRight size={20} /></div>
                             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Kümülatif Kazanç</p>
                             <h4 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight leading-none">₺{totalRevenue.toFixed(2)}</h4>
                         </div>
-                        <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-[32px] flex flex-col items-center gap-3 shadow-xl">
-                            <div className="w-10 h-10 bg-brand/10 dark:bg-brand-light/10 rounded-xl flex items-center justify-center text-brand dark:text-brand-light shadow-inner"><TrendingUp size={20} /></div>
+                        <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-[32px] flex flex-col items-center gap-3 ">
+                            <div className="w-10 h-10 bg-brand/10 dark:bg-brand-light/10 rounded-xl flex items-center justify-center text-brand dark:text-brand-light "><TrendingUp size={20} /></div>
                             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Toplam Etkileşim</p>
                             <h4 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight leading-none">{totalViews.toLocaleString()}</h4>
                         </div>
@@ -218,11 +218,11 @@ const Earnings = () => {
                             <span className="text-[11px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest">Veriler Yükleniyor...</span>
                         </div>
                     ) : stats.length === 0 ? (
-                        <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-[44px] p-10 flex flex-col items-center justify-center gap-8 relative overflow-hidden shadow-xl">
+                        <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-[44px] p-10 flex flex-col items-center justify-center gap-8 relative overflow-hidden ">
                             <div className="absolute top-0 right-0 p-8 opacity-5">
                                 <PieChart size={120} className="text-brand dark:text-brand-light" />
                             </div>
-                            <div className="w-24 h-24 bg-slate-50 dark:bg-slate-950 rounded-full flex items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 shadow-inner">
+                            <div className="w-24 h-24 bg-slate-50 dark:bg-slate-950 rounded-full flex items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 ">
                                 <BarChart3 size={40} className="text-slate-300 dark:text-slate-800" />
                             </div>
                             <div className="text-center">
@@ -236,10 +236,10 @@ const Earnings = () => {
                         <div className="space-y-4">
                             <p className="text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest mb-4 ml-4">Kanal Bazlı Yayın Raporu</p>
                             {stats.map(s => (
-                                <div key={s.id} className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-[32px] space-y-4 group hover:bg-slate-50 dark:hover:bg-slate-900/60 transition-all shadow-xl">
+                                <div key={s.id} className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-[32px] space-y-4 group hover:bg-slate-50 dark:hover:bg-slate-900/60 transition-all ">
                                     <div className="flex justify-between items-start">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-brand/10 dark:bg-brand-light/10 rounded-2xl flex items-center justify-center text-brand dark:text-brand-light shadow-inner">
+                                            <div className="w-12 h-12 bg-brand/10 dark:bg-brand-light/10 rounded-2xl flex items-center justify-center text-brand dark:text-brand-light ">
                                                 <Megaphone size={20} />
                                             </div>
                                             <div>
@@ -270,8 +270,8 @@ const Earnings = () => {
                         </div>
                     )}
 
-                    <div className="mt-8 flex items-center gap-4 p-6 bg-brand/5 dark:bg-brand-light/5 border border-brand/10 dark:border-brand-light/10 rounded-[32px] shadow-lg">
-                        <div className="w-12 h-12 bg-brand/10 dark:bg-brand-light/10 rounded-2xl flex items-center justify-center text-brand dark:text-brand-light shadow-inner"><Clock size={22}/></div>
+                    <div className="mt-8 flex items-center gap-4 p-6 bg-brand/5 dark:bg-brand-light/5 border border-brand/10 dark:border-brand-light/10 rounded-[32px] ">
+                        <div className="w-12 h-12 bg-brand/10 dark:bg-brand-light/10 rounded-2xl flex items-center justify-center text-brand dark:text-brand-light "><Clock size={22}/></div>
                         <div>
                             <p className="text-[11px] font-bold text-brand dark:text-brand-light uppercase tracking-widest mb-1">Ödeme ve Hakediş Döngüsü</p>
                             <p className="text-xs text-slate-500 font-medium">Hakedişler her ayın 15'inde cüzdana aktarılır.</p>

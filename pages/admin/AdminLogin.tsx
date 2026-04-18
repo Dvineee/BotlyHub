@@ -51,7 +51,7 @@ const AdminLogin = () => {
             initial={{ scale: 0.8, rotate: -10 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-            className="w-24 h-24 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[32px] flex items-center justify-center mx-auto mb-8 shadow-[0_20px_50px_rgba(37,99,235,0.3)] relative group"
+            className="w-24 h-24 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[32px] flex items-center justify-center mx-auto mb-8  relative group"
           >
             <Shield size={48} className="text-white relative z-10" />
             <div className="absolute inset-0 bg-white/20 rounded-[32px] blur-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -74,7 +74,7 @@ const AdminLogin = () => {
         >
           <form 
             onSubmit={handleLogin} 
-            className="bg-slate-900/50 backdrop-blur-2xl border border-white/5 p-10 rounded-[48px] shadow-2xl relative overflow-hidden"
+            className="bg-slate-900/50 backdrop-blur-2xl border border-white/5 p-10 rounded-[48px]  relative overflow-hidden"
           >
             <AnimatePresence mode="wait">
               {error && (
@@ -124,7 +124,7 @@ const AdminLogin = () => {
               <button 
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-16 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-800 text-white font-black text-xs uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-blue-900/20 transition-all active:scale-95 flex items-center justify-center gap-3 group relative overflow-hidden"
+                className="w-full h-16 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-800 text-white font-black text-xs uppercase tracking-[0.2em] rounded-2xl   transition-all active:scale-95 flex items-center justify-center gap-3 group relative overflow-hidden"
               >
                 {isLoading ? (
                   <motion.div 

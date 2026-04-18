@@ -45,16 +45,16 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = ({ bot, tonRate }) => {
   const prices = PriceService.convert(bot.price, tonRate);
   
   return (
-    <div onClick={() => navigate(`/bot/${bot.id}`)} className="flex items-center p-4 cursor-pointer group bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-900/80 rounded-[32px] transition-all border border-black/5 dark:border-white/5 active:scale-[0.98] shadow-lg">
+    <div onClick={() => navigate(`/bot/${bot.id}`)} className="flex items-center p-4 cursor-pointer group bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-900/80 rounded-[32px] transition-all border border-black/5 dark:border-white/5 active:scale-[0.98] ">
         <div className="relative shrink-0">
             <img 
                 src={getLiveBotIcon(bot)} 
                 alt={bot.name} 
-                className="w-20 h-20 rounded-[24px] object-cover bg-slate-200 dark:bg-slate-900 shadow-xl border border-black/5 dark:border-white/5 group-hover:scale-105 transition-transform" 
+                className="w-20 h-20 rounded-[24px] object-cover bg-slate-200 dark:bg-slate-900  border border-black/5 dark:border-white/5 group-hover:scale-105 transition-transform" 
                 onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
             />
             {bot.price > 0 && (
-                <div className="absolute -top-1.5 -right-1.5 w-7 h-7 bg-brand dark:bg-brand-light rounded-xl flex items-center justify-center shadow-lg border-2 border-slate-50 dark:border-slate-950">
+                <div className="absolute -top-1.5 -right-1.5 w-7 h-7 bg-brand dark:bg-brand-light rounded-xl flex items-center justify-center  border-2 border-slate-50 dark:border-slate-950">
                     <Zap size={12} fill="currentColor" className="text-white" />
                 </div>
             )}
@@ -193,7 +193,7 @@ const SearchPage = () => {
           <ChevronLeft size={22} />
         </button>
         <div className="relative flex-1">
-          <div className="relative flex items-center bg-white dark:bg-slate-900/40 backdrop-blur-2xl border border-black/5 dark:border-white/10 rounded-[28px] p-1.5 shadow-xl ring-2 ring-transparent focus-within:ring-blue-500/30 transition-all group">
+          <div className="relative flex items-center bg-white dark:bg-slate-900/40 backdrop-blur-2xl border border-black/5 dark:border-white/10 rounded-[28px] p-1.5  ring-2 ring-transparent focus-within:ring-blue-500/30 transition-all group">
             <div className="ml-4 w-10 h-10 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-2xl text-slate-400 group-focus-within:text-blue-500 transition-colors">
               <SearchIcon size={20} />
             </div>
@@ -235,7 +235,7 @@ const SearchPage = () => {
                     DatabaseService.logActivity(user.id.toString(), 'system', 'search_category', 'Kategori Filtresi', `Arama motorunda '${t(cat.label)}' kategorisi filtrelendi.`);
                 }
               }}
-              className={`flex items-center gap-3 px-6 py-4 rounded-2xl border transition-all active:scale-95 shadow-lg whitespace-nowrap snap-center ${
+              className={`flex items-center gap-3 px-6 py-4 rounded-2xl border transition-all active:scale-95  whitespace-nowrap snap-center ${
                 activeCategory === cat.id 
                 ? 'bg-brand/10 dark:bg-brand-light/10 border-brand/40 dark:border-brand-light/40 text-brand dark:text-brand-light ring-1 ring-brand/20 dark:ring-brand-light/20' 
                 : 'bg-white dark:bg-slate-900/60 border-black/5 dark:border-white/5 text-slate-500 dark:text-slate-400'

@@ -166,7 +166,7 @@ span.text-\[10px\].font-black.text-slate-500.dark\:text-slate-400.uppercase.trac
   margin-bottom: 0.5rem;
 }
 
-.shadow-lg {
+. {
     box-shadow: 3px 3px 0 0 #7478892b;
     cursor: pointer;
     line-height: 1.428571;
@@ -176,7 +176,7 @@ span.text-\[10px\].font-black.text-slate-500.dark\:text-slate-400.uppercase.trac
     font-weight: 600;
 }
 
-.shadow-xl {
+. {
     --tw-shadow: none;
     --tw-shadow-colored: 0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);
     box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
@@ -363,7 +363,7 @@ h3.text-white.font-bold.text-xl.mb-1.tracking-tight {
     position: relative;
 }
 
-input.w-full.h-18.pl-16.pr-6.text-sm.font-bold.rounded-\[28px\].border.transition-all.uppercase.tracking-widest.shadow-xl.bg-white.dark\:bg-slate-900\/30.border-black\/5.dark\:border-white\/10.text-slate-900.dark\:text-white.focus\:border-blue-500\/40.focus\:bg-white.dark\:focus\:bg-slate-900\/50.outline-none {
+input.w-full.h-18.pl-16.pr-6.text-sm.font-bold.rounded-\[28px\].border.transition-all.uppercase.tracking-widest.\:bg-slate-900\/30.border-black\/5.dark\:border-white\/10.text-slate-900.dark\:text-white.focus\:border-blue-500\/40.focus\:bg-white.dark\:focus\:bg-slate-900\/50.outline-none {
     height: 45px;
 }
 
@@ -380,7 +380,7 @@ input.w-full.h-18.pl-16.pr-6.text-sm.font-bold.rounded-\[28px\].border.transitio
     border-color: rgb(30 41 59 / 0.5) !important;
 }
 
-button.w-10.h-10.flex.items-center.justify-center.rounded-2xl.border.transition-all.active\:scale-90.shadow-lg.bg-white.dark\:bg-slate-900\/80.border-black\/5.dark\:border-white\/5.text-slate-500.dark\:text-slate-400 {
+button.w-10.h-10.flex.items-center.justify-center.rounded-2xl.border.transition-all.active\:scale-90.\:bg-slate-900\/80.border-black\/5.dark\:border-white\/5.text-slate-500.dark\:text-slate-400 {
     box-shadow: none;
     background: #faffff00;
 }
@@ -400,7 +400,7 @@ button.w-10.h-10.flex.items-center.justify-center.rounded-2xl.border.transition-
     gap: 0.2rem;
 }
 
-button.flex.items-center.gap-3.px-\[1rem\].py-\[0\.7rem\].rounded-2xl.border.bg-white.dark\:bg-slate-900\/60.border-black\/5.dark\:border-white\/5.text-slate-900.dark\:text-white.hover\:border-purple-500\/30.transition-all.active\:scale-95.shadow-lg.whitespace-nowrap.snap-center {
+button.flex.items-center.gap-3.px-\[1rem\].py-\[0.7rem\].rounded-2xl.border.bg-white.dark:bg-slate-900\/60.border-black\/5.dark:border-white\/5.text-slate-900.dark:text-white.hover:border-purple-500\/30.transition-all.active:scale-95 {
     box-shadow: none;
     outline: rgb(184 194 208);
 }

@@ -48,7 +48,7 @@ const NavItem = ({ to, icon: Icon, label, active, onClick }: any) => {
     <Link 
       to={to} 
       onClick={onClick}
-      className={`flex items-center gap-4 px-6 py-4 rounded-[24px] transition-all duration-300 ${active ? 'bg-brand text-white shadow-2xl shadow-brand/40' : 'text-slate-500 hover:bg-white/5 hover:text-white'}`}
+      className={`flex items-center gap-4 px-6 py-4 rounded-[24px] transition-all duration-300 ${active ? 'bg-brand text-white  ' : 'text-slate-500 hover:bg-white/5 hover:text-white'}`}
     >
       <Icon size={18} />
       <span className="font-black text-[10px] uppercase tracking-[0.2em]">{label}</span>
@@ -79,7 +79,7 @@ const AdminDashboard = () => {
                     src="/logo.svg" 
                     alt="BotlyHub Logo" 
                     style={{ width: '2.5rem', height: 'auto', display: 'block' }} 
-                    className="drop-shadow-[0_0_15px_rgba(47,136,255,0.3)]" 
+                    className="" 
                 />
             </div>
             <div>
@@ -121,7 +121,7 @@ const AdminDashboard = () => {
            
            <div className="flex items-center gap-4 lg:gap-8 ml-auto">
               <div className="hidden sm:flex items-center gap-3 bg-white/5 px-4 py-2 rounded-xl border border-white/5">
-                 <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
+                 <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse "></div>
                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">CANLI SİSTEM</span>
               </div>
               <motion.div 
@@ -134,7 +134,7 @@ const AdminDashboard = () => {
                     scale: [1, 1.05, 1]
                   }}
                   transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                  className="w-10 h-10 lg:w-12 lg:h-12 rounded-xl lg:rounded-2xl bg-gradient-to-br from-brand to-brand/80 flex items-center justify-center font-black text-white italic text-xl shadow-xl shadow-brand/20"
+                  className="w-10 h-10 lg:w-12 lg:h-12 rounded-xl lg:rounded-2xl bg-gradient-to-br from-brand to-brand/80 flex items-center justify-center font-black text-white italic text-xl  "
                >
                  A
                </motion.div>
@@ -172,7 +172,7 @@ const StatCard = ({ icon: Icon, label, value, color }: any) => {
     };
     return (
         <div className="bg-slate-900/40 border border-white/5 p-6 lg:p-10 rounded-[32px] lg:rounded-[48px] hover:border-white/10 transition-all group overflow-hidden">
-            <div className={`w-10 h-10 lg:w-14 lg:h-14 ${colors[color]} rounded-[18px] lg:rounded-[20px] border flex items-center justify-center mb-4 lg:mb-8 shadow-xl group-hover:scale-110 transition-all`}><Icon size={24} /></div>
+            <div className={`w-10 h-10 lg:w-14 lg:h-14 ${colors[color]} rounded-[18px] lg:rounded-[20px] border flex items-center justify-center mb-4 lg:mb-8  group-hover:scale-110 transition-all`}><Icon size={24} /></div>
             <p className="text-[8px] lg:text-[10px] font-black text-slate-600 uppercase tracking-widest mb-1">{label}</p>
             <h3 className="text-xl lg:text-3xl font-black text-white tracking-tighter italic leading-none">{typeof value === 'number' ? value.toLocaleString() : value}</h3>
         </div>
@@ -189,7 +189,7 @@ const AdminInput = ({ label, value, onChange, type = "text", placeholder = "", i
                 value={value} 
                 onChange={e => onChange(e.target.value)} 
                 placeholder={placeholder}
-                className={`w-full h-14 lg:h-18 bg-slate-950 border border-white/5 rounded-[22px] lg:rounded-[28px] ${Icon ? 'pl-14' : 'px-8'} pr-8 text-[11px] font-black text-white outline-none focus:border-brand transition-all uppercase italic shadow-inner`} 
+                className={`w-full h-14 lg:h-18 bg-slate-950 border border-white/5 rounded-[22px] lg:rounded-[28px] ${Icon ? 'pl-14' : 'px-8'} pr-8 text-[11px] font-black text-white outline-none focus:border-brand transition-all uppercase italic `} 
             />
         </div>
     </div>
@@ -220,7 +220,7 @@ const HomeView = () => {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-                <div className="lg:col-span-2 bg-slate-900/40 border border-white/5 p-8 lg:p-12 rounded-[40px] lg:rounded-[56px] shadow-2xl relative overflow-hidden group">
+                <div className="lg:col-span-2 bg-slate-900/40 border border-white/5 p-8 lg:p-12 rounded-[40px] lg:rounded-[56px]  relative overflow-hidden group">
                     <h3 className="text-base lg:text-xl font-black italic uppercase tracking-tight mb-8">Büyüme Hızı (Haftalık)</h3>
                     <div className="h-32 lg:h-48 flex items-end gap-2 lg:gap-3 px-2">
                         {[40, 70, 45, 90, 65, 80, 100].map((h, i) => (
@@ -303,7 +303,7 @@ const BotManagement = () => {
                 </div>
                 <button 
                     onClick={openCreateModal}
-                    className="w-full md:w-auto bg-brand hover:opacity-90 px-8 py-5 rounded-[24px] text-[10px] font-black uppercase tracking-[0.4em] shadow-2xl shadow-brand/40 transition-all active:scale-95 flex items-center justify-center gap-3"
+                    className="w-full md:w-auto bg-brand hover:opacity-90 px-8 py-5 rounded-[24px] text-[10px] font-black uppercase tracking-[0.4em]   transition-all active:scale-95 flex items-center justify-center gap-3"
                 >
                     <Plus size={18} /> YENİ ÜRÜN TANIMLA
                 </button>
@@ -317,15 +317,15 @@ const BotManagement = () => {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                     {bots.map(b => (
-                        <div key={b.id} className="bg-slate-900/40 border border-white/5 rounded-[32px] lg:rounded-[56px] p-6 lg:p-10 flex flex-col gap-6 lg:gap-8 group hover:border-brand/30 transition-all relative overflow-hidden shadow-2xl backdrop-blur-sm">
+                        <div key={b.id} className="bg-slate-900/40 border border-white/5 rounded-[32px] lg:rounded-[56px] p-6 lg:p-10 flex flex-col gap-6 lg:gap-8 group hover:border-brand/30 transition-all relative overflow-hidden  backdrop-blur-sm">
                             <div className="flex justify-between items-start relative z-10">
                                 <div className="relative">
                                     <img 
                                         src={getLiveBotIcon(b.bot_link)} 
-                                        className="w-14 h-14 lg:w-20 lg:h-20 rounded-[24px] lg:rounded-[32px] border border-white/10 shadow-2xl object-cover bg-slate-950 group-hover:rotate-6 group-hover:scale-105 transition-all" 
+                                        className="w-14 h-14 lg:w-20 lg:h-20 rounded-[24px] lg:rounded-[32px] border border-white/10  object-cover bg-slate-950 group-hover:rotate-6 group-hover:scale-105 transition-all" 
                                         onError={(e) => (e.target as any).src = `https://ui-avatars.com/api/?name=${b.name}`}
                                     />
-                                    {b.price > 0 && <div className="absolute -top-2 -right-2 w-6 h-6 lg:w-7 lg:h-7 bg-brand rounded-xl flex items-center justify-center shadow-lg border-4 border-[#020617]"><Zap size={10} fill="currentColor" /></div>}
+                                    {b.price > 0 && <div className="absolute -top-2 -right-2 w-6 h-6 lg:w-7 lg:h-7 bg-brand rounded-xl flex items-center justify-center  border-4 border-[#020617]"><Zap size={10} fill="currentColor" /></div>}
                                 </div>
                                 <div className="flex gap-2">
                                     {b.is_official && (
@@ -355,7 +355,7 @@ const BotManagement = () => {
 
             {isModalOpen && editingBot && (
                 <div className="fixed inset-0 z-[110] bg-black/95 flex items-end lg:items-center justify-center p-0 lg:p-8 backdrop-blur-3xl animate-in slide-in-from-bottom lg:fade-in">
-                    <div className="bg-[#020617] border-t lg:border border-white/10 rounded-t-[40px] lg:rounded-[64px] w-full max-w-7xl h-[94vh] lg:h-[90vh] flex flex-col lg:flex-row overflow-hidden shadow-2xl relative">
+                    <div className="bg-[#020617] border-t lg:border border-white/10 rounded-t-[40px] lg:rounded-[64px] w-full max-w-7xl h-[94vh] lg:h-[90vh] flex flex-col lg:flex-row overflow-hidden  relative">
                         
                         <button onClick={() => setIsModalOpen(false)} className="absolute top-6 right-6 lg:top-8 lg:right-8 z-[120] p-3 lg:p-4 bg-white/5 rounded-2xl hover:bg-red-600 transition-all active:scale-90">
                             <X size={20} />
@@ -364,7 +364,7 @@ const BotManagement = () => {
                         <div className="flex-1 flex flex-col overflow-hidden">
                             <div className="p-8 lg:p-12 pb-4 lg:pb-0 space-y-8">
                                 <div className="flex items-center gap-5">
-                                    <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-brand to-brand/80 rounded-[20px] flex items-center justify-center shadow-xl rotate-3">
+                                    <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-brand to-brand/80 rounded-[20px] flex items-center justify-center  rotate-3">
                                         <Cpu size={24} className="text-white"/>
                                     </div>
                                     <div>
@@ -378,7 +378,7 @@ const BotManagement = () => {
                                         <button 
                                             key={tab}
                                             onClick={() => setActiveTab(tab as any)}
-                                            className={`flex-1 py-3 lg:py-4 rounded-[20px] lg:rounded-[22px] text-[9px] font-black uppercase tracking-widest transition-all ${activeTab === tab ? 'bg-blue-600 text-white shadow-xl shadow-blue-900/40' : 'text-slate-500 hover:bg-white/5'}`}
+                                            className={`flex-1 py-3 lg:py-4 rounded-[20px] lg:rounded-[22px] text-[9px] font-black uppercase tracking-widest transition-all ${activeTab === tab ? 'bg-blue-600 text-white  ' : 'text-slate-500 hover:bg-white/5'}`}
                                         >
                                             {tab === 'info' ? 'DETAY' : tab === 'pricing' ? 'LİSANS' : 'GALERİ'}
                                         </button>
@@ -427,7 +427,7 @@ const BotManagement = () => {
                                                                 }}
                                                                 className={`px-4 py-2 rounded-xl text-[10px] font-black transition-all ${
                                                                     (editingBot.languages || []).includes(lang)
-                                                                    ? 'bg-brand text-white shadow-lg'
+                                                                    ? 'bg-brand text-white '
                                                                     : 'bg-white/5 text-slate-500 hover:bg-white/10'
                                                                 }`}
                                                             >
@@ -455,7 +455,7 @@ const BotManagement = () => {
                                                 <AdminInput label="LİSANS TUTARI (TRY)" type="number" value={editingBot.price} onChange={(v:any)=>setEditingBot({...editingBot, price:v})} />
                                                 <div className="space-y-2">
                                                     <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4">PLATFORM STATÜSÜ</label>
-                                                    <button type="button" onClick={()=>setEditingBot({...editingBot, is_official: !editingBot.is_official})} className={`w-full h-14 lg:h-18 rounded-[22px] lg:rounded-[28px] flex items-center justify-center gap-3 transition-all font-black text-[10px] tracking-widest ${editingBot.is_official ? 'bg-brand text-white shadow-xl shadow-brand/40' : 'bg-slate-950 text-slate-600 border border-white/5'}`}>
+                                                    <button type="button" onClick={()=>setEditingBot({...editingBot, is_official: !editingBot.is_official})} className={`w-full h-14 lg:h-18 rounded-[22px] lg:rounded-[28px] flex items-center justify-center gap-3 transition-all font-black text-[10px] tracking-widest ${editingBot.is_official ? 'bg-brand text-white  ' : 'bg-slate-950 text-slate-600 border border-white/5'}`}>
                                                         {editingBot.is_official ? 'BİZE AİT (OFFICIAL)' : 'HARİCİ (EXTERNAL)'}
                                                     </button>
                                                 </div>
@@ -468,11 +468,11 @@ const BotManagement = () => {
                                                 <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4">VARLIKLAR (URL)</label>
                                                 <div className="flex gap-3">
                                                     <input type="text" id="scr_input" placeholder="https://cdn.example.com/..." className="flex-1 h-14 lg:h-16 bg-slate-950 border border-white/5 rounded-2xl px-6 text-[10px] text-white outline-none italic font-black" />
-                                                    <button type="button" onClick={() => { const inp = document.getElementById('scr_input') as HTMLInputElement; handleScreenshotAdd(inp.value); inp.value = ''; }} className="h-14 lg:h-16 px-8 bg-brand text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl">EKLE</button>
+                                                    <button type="button" onClick={() => { const inp = document.getElementById('scr_input') as HTMLInputElement; handleScreenshotAdd(inp.value); inp.value = ''; }} className="h-14 lg:h-16 px-8 bg-brand text-white rounded-2xl font-black text-[10px] uppercase tracking-widest ">EKLE</button>
                                                 </div>
                                                 <div className="flex gap-4 overflow-x-auto no-scrollbar pb-6 px-2">
                                                     {(editingBot.screenshots || []).map((url: string, idx: number) => (
-                                                        <div key={idx} className="relative w-28 lg:w-32 h-44 lg:h-52 shrink-0 bg-slate-950 rounded-2xl lg:rounded-[28px] border border-white/5 overflow-hidden group shadow-2xl">
+                                                        <div key={idx} className="relative w-28 lg:w-32 h-44 lg:h-52 shrink-0 bg-slate-950 rounded-2xl lg:rounded-[28px] border border-white/5 overflow-hidden group ">
                                                             <img src={url} className="w-full h-full object-cover transition-all group-hover:scale-110" />
                                                             <div className="absolute inset-0 bg-red-600/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all cursor-pointer" onClick={() => removeScreenshot(idx)}>
                                                                 <Trash2 size={24} className="text-white" />
@@ -484,7 +484,7 @@ const BotManagement = () => {
                                         </div>
                                     )}
                                     <div className="fixed lg:relative bottom-0 left-0 right-0 p-6 lg:p-0 bg-gradient-to-t from-[#020617] lg:from-transparent via-[#020617]/90 lg:via-transparent to-transparent z-[130]">
-                                        <button type="submit" className="w-full h-16 lg:h-24 bg-brand text-white rounded-2xl lg:rounded-[32px] font-black text-[12px] uppercase tracking-[0.4em] shadow-2xl shadow-brand/40 transition-all border-b-8 border-blue-800 active:translate-y-1 active:border-b-4 flex items-center justify-center gap-4">
+                                        <button type="submit" className="w-full h-16 lg:h-24 bg-brand text-white rounded-2xl lg:rounded-[32px] font-black text-[12px] uppercase tracking-[0.4em]   transition-all border-b-8 border-blue-800 active:translate-y-1 active:border-b-4 flex items-center justify-center gap-4">
                                             <Database size={20} /> SİSTEMİ GÜNCELLE
                                         </button>
                                     </div>
@@ -577,12 +577,12 @@ const UserDetailModal = ({ user, onClose, onUpdate }: { user: User, onClose: () 
     return (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 lg:p-10">
             <div className="absolute inset-0 bg-[#020617]/95 backdrop-blur-xl" onClick={onClose}></div>
-            <div className="relative w-full max-w-5xl bg-slate-900 border border-white/10 rounded-[44px] lg:rounded-[64px] overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-300">
+            <div className="relative w-full max-w-5xl bg-slate-900 border border-white/10 rounded-[44px] lg:rounded-[64px] overflow-hidden  flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-300">
                 {/* Header */}
                 <div className="p-8 lg:p-12 border-b border-white/5 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                     <div className="flex items-center gap-6">
                         <div className="relative">
-                            <img src={user.avatar} className="w-16 h-16 lg:w-24 lg:h-24 rounded-[24px] lg:rounded-[32px] object-cover border border-white/10 shadow-2xl" />
+                            <img src={user.avatar} className="w-16 h-16 lg:w-24 lg:h-24 rounded-[24px] lg:rounded-[32px] object-cover border border-white/10 " />
                             <div className={`absolute -bottom-2 -right-2 w-6 h-6 lg:w-8 lg:h-8 rounded-full border-4 border-slate-900 flex items-center justify-center ${user.status === 'Active' ? 'bg-emerald-500' : 'bg-slate-500'}`}>
                                 <CheckCircle2 size={12} className="text-white" />
                             </div>
@@ -788,7 +788,7 @@ const UserDetailModal = ({ user, onClose, onUpdate }: { user: User, onClose: () 
                                         channels.map(channel => (
                                             <div key={channel.id} className="bg-slate-950/50 border border-white/5 p-6 rounded-[28px] flex items-center justify-between group hover:border-white/10 transition-all">
                                                 <div className="flex items-center gap-5">
-                                                    <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-blue-500 shadow-inner">
+                                                    <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-blue-500 ">
                                                         <Radio size={20} />
                                                     </div>
                                                     <div>
@@ -822,7 +822,7 @@ const UserDetailModal = ({ user, onClose, onUpdate }: { user: User, onClose: () 
                                         bots.map(bot => (
                                             <div key={bot.id} className="bg-slate-950/50 border border-white/5 p-6 rounded-[28px] flex flex-col lg:flex-row lg:items-center justify-between gap-6 group hover:border-white/10 transition-all">
                                                 <div className="flex items-center gap-5">
-                                                    <img src={bot.icon || getLiveBotIcon(bot.bot_link)} className="w-14 h-14 rounded-2xl object-cover border border-white/5 shadow-xl" />
+                                                    <img src={bot.icon || getLiveBotIcon(bot.bot_link)} className="w-14 h-14 rounded-2xl object-cover border border-white/5 " />
                                                     <div>
                                                         <h4 className="text-sm font-black text-white uppercase italic tracking-tight">{bot.name}</h4>
                                                         <div className="flex items-center gap-3 mt-1">
@@ -926,7 +926,7 @@ const UserDetailModal = ({ user, onClose, onUpdate }: { user: User, onClose: () 
                                                 }
                                             }}
                                             disabled={isSavingWallet}
-                                            className="px-10 py-5 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-800 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-2xl shadow-blue-900/40 transition-all flex items-center gap-3"
+                                            className="px-10 py-5 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-800 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest   transition-all flex items-center gap-3"
                                         >
                                             {isSavingWallet ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
                                             DEĞİŞİKLİKLERİ KAYDET
@@ -1007,8 +1007,8 @@ const UserDetailModal = ({ user, onClose, onUpdate }: { user: User, onClose: () 
                                             {logs.map(log => (
                                                 <div key={log.id} className="relative group">
                                                     <div className="absolute -left-8 top-2 w-4 h-4 bg-[#020617] border-2 border-slate-800 rounded-full z-10 group-hover:border-blue-500 transition-colors"></div>
-                                                    <div className="bg-slate-950/50 border border-white/5 p-5 rounded-2xl flex items-center gap-4 group-hover:border-white/10 transition-all shadow-lg">
-                                                        <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-slate-500 shadow-inner group-hover:text-blue-500 transition-colors">
+                                                    <div className="bg-slate-950/50 border border-white/5 p-5 rounded-2xl flex items-center gap-4 group-hover:border-white/10 transition-all ">
+                                                        <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-slate-500  group-hover:text-blue-500 transition-colors">
                                                             <Activity size={16} />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
@@ -1065,7 +1065,7 @@ const UserManagement = () => {
                     <input type="text" placeholder="Üye ara..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full h-14 bg-slate-900 border border-white/5 rounded-2xl py-4 pl-14 pr-6 text-[10px] outline-none focus:border-blue-500 text-white font-black italic uppercase" />
                 </div>
             </div>
-            <div className="bg-slate-900/40 border border-white/5 rounded-[44px] overflow-hidden shadow-2xl">
+            <div className="bg-slate-900/40 border border-white/5 rounded-[44px] overflow-hidden ">
                 {/* Desktop Table */}
                 <div className="hidden lg:block overflow-x-auto">
                     <table className="w-full text-left">
@@ -1128,7 +1128,7 @@ const UserManagement = () => {
                         <div key={u.id} className="p-6 space-y-4 hover:bg-white/5 transition-all">
                             <div className="flex justify-between items-start">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center font-black text-white italic text-lg shadow-lg">
+                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center font-black text-white italic text-lg ">
                                         {u.username?.[0]?.toUpperCase() || 'U'}
                                     </div>
                                     <div>
@@ -1244,10 +1244,10 @@ const SettingsManager = () => {
                         <button 
                             onClick={toggleMaintenance}
                             disabled={isSaving}
-                            className={`w-full py-6 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 shadow-2xl ${
+                            className={`w-full py-6 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3  ${
                                 settings?.maintenanceMode 
-                                ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-900/20' 
-                                : 'bg-red-600 hover:bg-red-500 text-white shadow-red-900/20'
+                                ? 'bg-emerald-600 hover:bg-emerald-500 text-white ' 
+                                : 'bg-red-600 hover:bg-red-500 text-white '
                             }`}
                         >
                             {isSaving ? <Loader2 size={16} className="animate-spin" /> : (settings?.maintenanceMode ? <Check size={16} /> : <AlertTriangle size={16} />)}
@@ -1295,7 +1295,7 @@ const SettingsManager = () => {
                                 }
                             }}
                             disabled={isSaving}
-                            className="w-full h-16 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-2xl text-[10px] uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-3 shadow-xl shadow-blue-900/20"
+                            className="w-full h-16 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-2xl text-[10px] uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-3  "
                         >
                             {isSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                             AYARLARI KAYDET
@@ -1377,7 +1377,7 @@ const ActivityCenter = ({ filterType }: { filterType: 'admin' | 'user' }) => {
                             placeholder="KULLANICI ID VEYA İŞLEM ARA..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full sm:w-80 h-14 bg-slate-950 border border-white/5 rounded-[22px] pl-14 pr-8 text-[11px] font-black text-white outline-none focus:border-blue-500 transition-all uppercase italic shadow-inner"
+                            className="w-full sm:w-80 h-14 bg-slate-950 border border-white/5 rounded-[22px] pl-14 pr-8 text-[11px] font-black text-white outline-none focus:border-blue-500 transition-all uppercase italic "
                         />
                     </div>
                     
@@ -1388,7 +1388,7 @@ const ActivityCenter = ({ filterType }: { filterType: 'admin' | 'user' }) => {
                                 onClick={() => setActiveTypeFilter(t)}
                                 className={`px-6 h-14 rounded-[22px] text-[9px] font-black uppercase tracking-widest transition-all whitespace-nowrap border ${
                                     activeTypeFilter === t 
-                                    ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-600/20' 
+                                    ? 'bg-blue-600 border-blue-500 text-white  ' 
                                     : 'bg-slate-900/40 border-white/5 text-slate-500 hover:border-white/10'
                                 }`}
                             >
@@ -1418,7 +1418,7 @@ const ActivityCenter = ({ filterType }: { filterType: 'admin' | 'user' }) => {
                             onClick={() => setSelectedLog(log)}
                             className="bg-slate-900/40 border border-white/5 p-6 lg:p-8 rounded-[32px] lg:rounded-[40px] flex items-center gap-6 group hover:border-white/10 transition-all relative overflow-hidden cursor-pointer active:scale-[0.99]"
                         >
-                            <div className={`w-12 h-12 shrink-0 bg-white/5 rounded-2xl flex items-center justify-center ${typeColors[log.type] || 'text-white'} shadow-inner`}><Activity size={20} /></div>
+                            <div className={`w-12 h-12 shrink-0 bg-white/5 rounded-2xl flex items-center justify-center ${typeColors[log.type] || 'text-white'} `}><Activity size={20} /></div>
                             <div className="flex-1 min-w-0">
                                 <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-1 gap-2">
                                     <div className="flex items-center gap-3">
@@ -1454,7 +1454,7 @@ const ActivityCenter = ({ filterType }: { filterType: 'admin' | 'user' }) => {
                     <motion.div 
                         initial={{ opacity: 0, scale: 0.9, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
-                        className="relative w-full max-w-2xl bg-slate-900 border border-white/10 rounded-[40px] lg:rounded-[56px] overflow-hidden shadow-2xl flex flex-col max-h-[85vh]"
+                        className="relative w-full max-w-2xl bg-slate-900 border border-white/10 rounded-[40px] lg:rounded-[56px] overflow-hidden  flex flex-col max-h-[85vh]"
                     >
                         <div className="p-8 lg:p-12 border-b border-white/5 flex items-center justify-between">
                             <div className="flex items-center gap-5">
@@ -1578,7 +1578,7 @@ const SalesManagement = () => {
                         onClick={() => setFilter(f as any)}
                         className={`px-6 h-12 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all border ${
                             filter === f 
-                            ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-600/20' 
+                            ? 'bg-blue-600 border-blue-500 text-white  ' 
                             : 'bg-slate-900/40 border-white/5 text-slate-500 hover:border-white/10'
                         }`}
                     >
@@ -1587,7 +1587,7 @@ const SalesManagement = () => {
                 ))}
             </div>
 
-            <div className="bg-slate-900/40 border border-white/5 rounded-[44px] overflow-hidden shadow-2xl">
+            <div className="bg-slate-900/40 border border-white/5 rounded-[44px] overflow-hidden ">
                 {isLoading ? (
                     <div className="flex flex-col items-center justify-center py-32 gap-4">
                         <Loader2 className="animate-spin text-blue-500" size={40} />
@@ -1789,7 +1789,7 @@ const AnnouncementCenter = () => {
                 </div>
                 <button 
                     onClick={openCreateModal}
-                    className="w-full md:w-auto bg-blue-600 hover:bg-blue-500 px-8 py-5 rounded-[24px] text-[10px] font-black uppercase tracking-[0.4em] shadow-2xl shadow-blue-900/40 transition-all active:scale-95 flex items-center justify-center gap-3"
+                    className="w-full md:w-auto bg-blue-600 hover:bg-blue-500 px-8 py-5 rounded-[24px] text-[10px] font-black uppercase tracking-[0.4em]   transition-all active:scale-95 flex items-center justify-center gap-3"
                 >
                     <Plus size={18} /> YENİ DUYURU OLUŞTUR
                 </button>
@@ -1800,7 +1800,7 @@ const AnnouncementCenter = () => {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                     {anns.map(a => (
-                        <div key={a.id} className="bg-slate-900/40 border border-white/5 rounded-[44px] p-8 lg:p-10 flex flex-col gap-6 group hover:border-blue-500/30 transition-all relative overflow-hidden shadow-2xl backdrop-blur-sm">
+                        <div key={a.id} className="bg-slate-900/40 border border-white/5 rounded-[44px] p-8 lg:p-10 flex flex-col gap-6 group hover:border-blue-500/30 transition-all relative overflow-hidden  backdrop-blur-sm">
                             {a.bg_image_url && (
                                 <div className="absolute inset-0 z-0">
                                     <img src={a.bg_image_url} alt="" className="w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity" referrerPolicy="no-referrer" />
@@ -1808,7 +1808,7 @@ const AnnouncementCenter = () => {
                                 </div>
                             )}
                             <div className="flex justify-between items-start relative z-10">
-                                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-xl border border-white/5 ${a.is_active ? (a.bg_image_url ? 'bg-white/10 text-white backdrop-blur-md' : `bg-gradient-to-br ${previewColors[a.color_scheme] || 'bg-blue-600'} text-white`) : 'bg-slate-800 text-slate-600'}`}>
+                                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center  border border-white/5 ${a.is_active ? (a.bg_image_url ? 'bg-white/10 text-white backdrop-blur-md' : `bg-gradient-to-br ${previewColors[a.color_scheme] || 'bg-blue-600'} text-white`) : 'bg-slate-800 text-slate-600'}`}>
                                     {a.icon_name === 'Megaphone' ? <Megaphone size={24}/> : a.icon_name === 'Sparkles' ? <Sparkles size={24}/> : a.icon_name === 'Zap' ? <Zap size={24}/> : <Star size={24}/>}
                                 </div>
                                 <div className="flex gap-2">
@@ -1838,7 +1838,7 @@ const AnnouncementCenter = () => {
 
             {isModalOpen && editingAnn && (
                 <div className="fixed inset-0 z-[110] bg-black/95 flex items-end lg:items-center justify-center p-0 lg:p-8 backdrop-blur-3xl animate-in slide-in-from-bottom lg:fade-in">
-                    <div className="bg-[#020617] border-t lg:border border-white/10 rounded-t-[40px] lg:rounded-[64px] w-full max-w-6xl h-[94vh] lg:h-[90vh] flex flex-col lg:flex-row overflow-hidden shadow-2xl relative">
+                    <div className="bg-[#020617] border-t lg:border border-white/10 rounded-t-[40px] lg:rounded-[64px] w-full max-w-6xl h-[94vh] lg:h-[90vh] flex flex-col lg:flex-row overflow-hidden  relative">
                         
                         <button onClick={() => setIsModalOpen(false)} className="absolute top-6 right-6 lg:top-8 lg:right-8 z-[120] p-3 lg:p-4 bg-white/5 rounded-2xl hover:bg-red-600 transition-all active:scale-90">
                             <X size={20} />
@@ -1847,7 +1847,7 @@ const AnnouncementCenter = () => {
                         <div className="flex-1 flex flex-col overflow-hidden">
                             <div className="p-8 lg:p-12 pb-4 lg:pb-0 space-y-8">
                                 <div className="flex items-center gap-5">
-                                    <div className={`w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br ${previewColors[editingAnn.color_scheme] || 'from-purple-600 to-indigo-600'} rounded-[20px] flex items-center justify-center shadow-xl rotate-3 transition-all duration-500`}>
+                                    <div className={`w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br ${previewColors[editingAnn.color_scheme] || 'from-purple-600 to-indigo-600'} rounded-[20px] flex items-center justify-center  rotate-3 transition-all duration-500`}>
                                         <Megaphone size={24} className="text-white"/>
                                     </div>
                                     <div>
@@ -1861,7 +1861,7 @@ const AnnouncementCenter = () => {
                                         <button 
                                             key={tab}
                                             onClick={() => setActiveTab(tab as any)}
-                                            className={`flex-1 py-3 lg:py-4 rounded-[20px] lg:rounded-[22px] text-[9px] font-black uppercase tracking-widest transition-all ${activeTab === tab ? 'bg-blue-600 text-white shadow-xl shadow-blue-900/40' : 'text-slate-500 hover:bg-white/5'}`}
+                                            className={`flex-1 py-3 lg:py-4 rounded-[20px] lg:rounded-[22px] text-[9px] font-black uppercase tracking-widest transition-all ${activeTab === tab ? 'bg-blue-600 text-white  ' : 'text-slate-500 hover:bg-white/5'}`}
                                         >
                                             {tab === 'info' ? 'İÇERİK' : tab === 'style' ? 'GÖRÜNÜM' : 'EYLEM'}
                                         </button>
@@ -1881,7 +1881,7 @@ const AnnouncementCenter = () => {
                                             </div>
                                             <div className="space-y-2">
                                                 <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">KISA AÇIKLAMA</label>
-                                                <input value={editingAnn.description} onChange={e => setEditingAnn({...editingAnn, description: e.target.value})} className="w-full h-14 lg:h-18 bg-slate-950 border border-white/5 rounded-[22px] lg:rounded-[28px] px-8 text-[11px] font-black text-white outline-none focus:border-blue-500 uppercase italic shadow-inner" />
+                                                <input value={editingAnn.description} onChange={e => setEditingAnn({...editingAnn, description: e.target.value})} className="w-full h-14 lg:h-18 bg-slate-950 border border-white/5 rounded-[22px] lg:rounded-[28px] px-8 text-[11px] font-black text-white outline-none focus:border-blue-500 uppercase italic " />
                                             </div>
                                             <div className="space-y-2">
                                                 <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">DETAYLI İÇERİK (POPUP)</label>
@@ -1899,14 +1899,14 @@ const AnnouncementCenter = () => {
                                                     <button 
                                                         type="button"
                                                         onClick={() => setEditingAnn({ ...editingAnn, bg_image_url: '' })}
-                                                        className={`flex-1 py-3 rounded-[20px] text-[9px] font-black uppercase tracking-widest transition-all ${!editingAnn.bg_image_url ? 'bg-blue-600 text-white shadow-xl' : 'text-slate-500 hover:bg-white/5'}`}
+                                                        className={`flex-1 py-3 rounded-[20px] text-[9px] font-black uppercase tracking-widest transition-all ${!editingAnn.bg_image_url ? 'bg-blue-600 text-white ' : 'text-slate-500 hover:bg-white/5'}`}
                                                     >
                                                         RENK ŞEMASI
                                                     </button>
                                                     <button 
                                                         type="button"
                                                         onClick={() => setEditingAnn({ ...editingAnn, bg_image_url: editingAnn.bg_image_url || 'https://' })}
-                                                        className={`flex-1 py-3 rounded-[20px] text-[9px] font-black uppercase tracking-widest transition-all ${editingAnn.bg_image_url ? 'bg-blue-600 text-white shadow-xl' : 'text-slate-500 hover:bg-white/5'}`}
+                                                        className={`flex-1 py-3 rounded-[20px] text-[9px] font-black uppercase tracking-widest transition-all ${editingAnn.bg_image_url ? 'bg-blue-600 text-white ' : 'text-slate-500 hover:bg-white/5'}`}
                                                     >
                                                         PNG GÖRSEL
                                                     </button>
@@ -1936,10 +1936,10 @@ const AnnouncementCenter = () => {
                                                             >
                                                                 <div className={`absolute inset-0 bg-gradient-to-br ${scheme.class} opacity-80 group-hover:opacity-100 transition-opacity`}></div>
                                                                 <div className="absolute inset-0 flex items-center justify-center">
-                                                                    <span className="text-[8px] font-black text-white uppercase tracking-tighter drop-shadow-lg">{scheme.label}</span>
+                                                                    <span className="text-[8px] font-black text-white uppercase tracking-tighter ">{scheme.label}</span>
                                                                 </div>
                                                                 {editingAnn.color_scheme === scheme.id && (
-                                                                    <div className="absolute top-2 right-2 bg-blue-600 text-white rounded-full p-1 shadow-xl">
+                                                                    <div className="absolute top-2 right-2 bg-blue-600 text-white rounded-full p-1 ">
                                                                         <Check size={8} />
                                                                     </div>
                                                                 )}
@@ -1994,7 +1994,7 @@ const AnnouncementCenter = () => {
                                                             onClick={() => setEditingAnn({ ...editingAnn, icon_name: item.id })}
                                                             className={`h-16 rounded-2xl flex items-center justify-center transition-all border ${
                                                                 editingAnn.icon_name === item.id 
-                                                                ? 'bg-blue-600 border-blue-500 text-white shadow-xl shadow-blue-900/40' 
+                                                                ? 'bg-blue-600 border-blue-500 text-white  ' 
                                                                 : 'bg-slate-950 border-white/5 text-slate-600 hover:text-slate-400'
                                                             }`}
                                                         >
@@ -2019,7 +2019,7 @@ const AnnouncementCenter = () => {
                                                                 key={type}
                                                                 type="button" 
                                                                 onClick={()=>setEditingAnn({...editingAnn, action_type: type})} 
-                                                                className={`flex-1 h-14 rounded-2xl font-black text-[10px] uppercase transition-all ${editingAnn.action_type === type ? 'bg-blue-600 text-white shadow-xl' : 'bg-slate-950 text-slate-700 border border-white/5'}`}
+                                                                className={`flex-1 h-14 rounded-2xl font-black text-[10px] uppercase transition-all ${editingAnn.action_type === type ? 'bg-blue-600 text-white ' : 'bg-slate-950 text-slate-700 border border-white/5'}`}
                                                             >
                                                                 {type === 'link' ? 'DIŞ BAĞLANTI' : 'İÇ POPUP'}
                                                             </button>
@@ -2028,7 +2028,7 @@ const AnnouncementCenter = () => {
                                                 </div>
                                                 <div className="space-y-2">
                                                     <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">DURUM</label>
-                                                    <button type="button" onClick={()=>setEditingAnn({...editingAnn, is_active: !editingAnn.is_active})} className={`w-full h-14 rounded-2xl flex items-center justify-center gap-3 transition-all font-black text-[10px] tracking-widest ${editingAnn.is_active ? 'bg-emerald-600 text-white shadow-xl shadow-emerald-900/40' : 'bg-red-950/20 text-red-500 border border-red-500/20'}`}>
+                                                    <button type="button" onClick={()=>setEditingAnn({...editingAnn, is_active: !editingAnn.is_active})} className={`w-full h-14 rounded-2xl flex items-center justify-center gap-3 transition-all font-black text-[10px] tracking-widest ${editingAnn.is_active ? 'bg-emerald-600 text-white  ' : 'bg-red-950/20 text-red-500 border border-red-500/20'}`}>
                                                         {editingAnn.is_active ? 'YAYINDA' : 'DURDURULDU'}
                                                     </button>
                                                 </div>
@@ -2037,7 +2037,7 @@ const AnnouncementCenter = () => {
                                     )}
 
                                     <div className="fixed lg:relative bottom-0 left-0 right-0 p-6 lg:p-0 bg-gradient-to-t from-[#020617] lg:from-transparent via-[#020617]/90 lg:via-transparent to-transparent z-[130]">
-                                        <button type="submit" className="w-full h-16 lg:h-24 bg-blue-600 text-white rounded-2xl lg:rounded-[32px] font-black text-[12px] uppercase tracking-[0.4em] shadow-2xl shadow-blue-900/40 transition-all border-b-8 border-blue-800 active:translate-y-1 active:border-b-4 flex items-center justify-center gap-4">
+                                        <button type="submit" className="w-full h-16 lg:h-24 bg-blue-600 text-white rounded-2xl lg:rounded-[32px] font-black text-[12px] uppercase tracking-[0.4em]   transition-all border-b-8 border-blue-800 active:translate-y-1 active:border-b-4 flex items-center justify-center gap-4">
                                             <Send size={20} /> DUYURUYU YAYINLA
                                         </button>
                                     </div>
@@ -2052,7 +2052,7 @@ const AnnouncementCenter = () => {
                                 <h4 className="text-xl font-black text-white italic tracking-widest opacity-20 uppercase">Display Simulator</h4>
                             </div>
 
-                            <div className="w-full max-w-[320px] h-44 rounded-[40px] transition-all duration-700 p-8 relative overflow-hidden shadow-2xl transform hover:rotate-2 group">
+                            <div className="w-full max-w-[320px] h-44 rounded-[40px] transition-all duration-700 p-8 relative overflow-hidden  transform hover:rotate-2 group">
                                 {/* Dinamik Arkaplan */}
                                 {editingAnn.bg_image_url ? (
                                     <div className="absolute inset-0 z-0">
@@ -2144,13 +2144,13 @@ const NotificationCenter = () => {
                 </div>
                 <button 
                     onClick={() => { setNewNote({ title: '', message: '', type: 'system', target_type: 'global', user_id: '' }); setIsModalOpen(true); }}
-                    className="w-full md:w-auto bg-blue-600 hover:bg-blue-500 px-8 py-5 rounded-[24px] text-[10px] font-black uppercase tracking-[0.4em] shadow-2xl shadow-blue-900/40 transition-all active:scale-95 flex items-center justify-center gap-3"
+                    className="w-full md:w-auto bg-blue-600 hover:bg-blue-500 px-8 py-5 rounded-[24px] text-[10px] font-black uppercase tracking-[0.4em]   transition-all active:scale-95 flex items-center justify-center gap-3"
                 >
                     <Plus size={18} /> YENİ BİLDİRİM TETİKLE
                 </button>
             </div>
 
-            <div className="bg-slate-900/40 border border-white/5 rounded-[44px] overflow-hidden shadow-2xl">
+            <div className="bg-slate-900/40 border border-white/5 rounded-[44px] overflow-hidden ">
                 <div className="hidden lg:block overflow-x-auto">
                     <table className="w-full text-left">
                         <thead className="bg-white/5 text-[9px] uppercase tracking-[0.4em] text-slate-700 font-black">
@@ -2218,7 +2218,7 @@ const NotificationCenter = () => {
             {/* NOTIFICATION FORGE MODAL */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-[110] bg-black/95 flex items-end lg:items-center justify-center p-0 lg:p-8 backdrop-blur-3xl animate-in slide-in-from-bottom lg:fade-in">
-                    <div className="bg-[#020617] border-t lg:border border-white/10 rounded-t-[40px] lg:rounded-[64px] w-full max-w-6xl h-[94vh] lg:h-[90vh] flex flex-col lg:flex-row overflow-hidden shadow-2xl relative">
+                    <div className="bg-[#020617] border-t lg:border border-white/10 rounded-t-[40px] lg:rounded-[64px] w-full max-w-6xl h-[94vh] lg:h-[90vh] flex flex-col lg:flex-row overflow-hidden  relative">
                         
                         <button onClick={() => setIsModalOpen(false)} className="absolute top-6 right-6 lg:top-8 lg:right-8 z-[120] p-3 lg:p-4 bg-white/5 rounded-2xl hover:bg-red-600 transition-all active:scale-90">
                             <X size={20} />
@@ -2227,7 +2227,7 @@ const NotificationCenter = () => {
                         <div className="flex-1 flex flex-col overflow-hidden">
                             <div className="p-8 lg:p-12 pb-4 lg:pb-0 space-y-8">
                                 <div className="flex items-center gap-5">
-                                    <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-[20px] flex items-center justify-center shadow-xl rotate-3">
+                                    <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-[20px] flex items-center justify-center  rotate-3">
                                         <Bell size={24} className="text-white"/>
                                     </div>
                                     <div>
@@ -2244,7 +2244,7 @@ const NotificationCenter = () => {
                                             <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">BİLDİRİM TİPİ</label>
                                             <div className="flex gap-2">
                                                 {['system', 'payment', 'security', 'bot'].map(t => (
-                                                    <button key={t} type="button" onClick={()=>setNewNote({...newNote, type: t})} className={`flex-1 py-4 rounded-2xl text-[8px] font-black uppercase tracking-widest transition-all ${newNote.type === t ? 'bg-blue-600 text-white shadow-xl shadow-blue-900/40' : 'bg-slate-950 text-slate-600 border border-white/5'}`}>{t}</button>
+                                                    <button key={t} type="button" onClick={()=>setNewNote({...newNote, type: t})} className={`flex-1 py-4 rounded-2xl text-[8px] font-black uppercase tracking-widest transition-all ${newNote.type === t ? 'bg-blue-600 text-white  ' : 'bg-slate-950 text-slate-600 border border-white/5'}`}>{t}</button>
                                                 ))}
                                             </div>
                                         </div>
@@ -2252,7 +2252,7 @@ const NotificationCenter = () => {
                                             <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">HEDEF KİTLE</label>
                                             <div className="flex gap-2">
                                                 {['global', 'user'].map(t => (
-                                                    <button key={t} type="button" onClick={()=>setNewNote({...newNote, target_type: t})} className={`flex-1 py-4 rounded-2xl text-[8px] font-black uppercase tracking-widest transition-all ${newNote.target_type === t ? 'bg-blue-600 text-white shadow-xl' : 'bg-slate-950 text-slate-600 border border-white/5'}`}>{t === 'global' ? 'HERKESE' : 'SPESİFİK'}</button>
+                                                    <button key={t} type="button" onClick={()=>setNewNote({...newNote, target_type: t})} className={`flex-1 py-4 rounded-2xl text-[8px] font-black uppercase tracking-widest transition-all ${newNote.target_type === t ? 'bg-blue-600 text-white ' : 'bg-slate-950 text-slate-600 border border-white/5'}`}>{t === 'global' ? 'HERKESE' : 'SPESİFİK'}</button>
                                                 ))}
                                             </div>
                                         </div>
@@ -2266,11 +2266,11 @@ const NotificationCenter = () => {
                                     
                                     <div className="space-y-2">
                                         <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">BİLDİRİM MESAJI</label>
-                                        <textarea value={newNote.message} onChange={e => setNewNote({...newNote, message: e.target.value})} className="w-full bg-slate-950 border border-white/5 p-8 rounded-[36px] lg:rounded-[44px] text-[11px] font-black h-32 lg:h-40 outline-none text-slate-400 focus:border-blue-500/30 uppercase italic leading-relaxed shadow-inner" />
+                                        <textarea value={newNote.message} onChange={e => setNewNote({...newNote, message: e.target.value})} className="w-full bg-slate-950 border border-white/5 p-8 rounded-[36px] lg:rounded-[44px] text-[11px] font-black h-32 lg:h-40 outline-none text-slate-400 focus:border-blue-500/30 uppercase italic leading-relaxed " />
                                     </div>
 
                                     <div className="fixed lg:relative bottom-0 left-0 right-0 p-6 lg:p-0 bg-gradient-to-t from-[#020617] lg:from-transparent via-[#020617]/90 lg:via-transparent to-transparent z-[130]">
-                                        <button type="submit" className="w-full h-16 lg:h-24 bg-blue-600 text-white rounded-2xl lg:rounded-[32px] font-black text-[12px] uppercase tracking-[0.4em] shadow-2xl shadow-blue-900/40 transition-all border-b-8 border-blue-800 active:translate-y-1 active:border-b-4 flex items-center justify-center gap-4">
+                                        <button type="submit" className="w-full h-16 lg:h-24 bg-blue-600 text-white rounded-2xl lg:rounded-[32px] font-black text-[12px] uppercase tracking-[0.4em]   transition-all border-b-8 border-blue-800 active:translate-y-1 active:border-b-4 flex items-center justify-center gap-4">
                                             <Send size={20} /> BİLDİRİMİ TETİKLE
                                         </button>
                                     </div>
@@ -2286,10 +2286,10 @@ const NotificationCenter = () => {
                             </div>
 
                             <div className="w-full max-w-[340px] perspective-1000 group">
-                                <div className="bg-slate-900/80 border border-white/10 rounded-[56px] p-8 shadow-[0_50px_100px_rgba(0,0,0,0.5)] transition-all duration-700 hover:rotate-1 hover:scale-105 backdrop-blur-md relative overflow-hidden">
-                                    <div className="absolute top-0 left-0 w-1.5 h-full bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.8)]"></div>
+                                <div className="bg-slate-900/80 border border-white/10 rounded-[56px] p-8  transition-all duration-700 hover:rotate-1 hover:scale-105 backdrop-blur-md relative overflow-hidden">
+                                    <div className="absolute top-0 left-0 w-1.5 h-full bg-blue-600 "></div>
                                     <div className="flex gap-5 mb-6 relative z-10">
-                                        <div className="w-14 h-14 bg-slate-950 rounded-2xl border border-white/5 flex items-center justify-center text-blue-500 shadow-inner">
+                                        <div className="w-14 h-14 bg-slate-950 rounded-2xl border border-white/5 flex items-center justify-center text-blue-500 ">
                                             {newNote.type === 'payment' ? <Wallet size={24}/> : <Bell size={24}/>}
                                         </div>
                                         <div className="flex-1 min-w-0">
@@ -2473,7 +2473,7 @@ const PromotionManagement = () => {
                 <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
                     <button 
                         onClick={openAIModal} 
-                        className="w-full md:w-auto bg-blue-600 hover:bg-blue-500 px-8 py-5 rounded-[28px] text-[11px] font-black uppercase tracking-widest shadow-2xl active:scale-95 border-b-4 border-blue-900 transition-all flex items-center justify-center gap-3"
+                        className="w-full md:w-auto bg-blue-600 hover:bg-blue-500 px-8 py-5 rounded-[28px] text-[11px] font-black uppercase tracking-widest  active:scale-95 border-b-4 border-blue-900 transition-all flex items-center justify-center gap-3"
                     >
                         <Sparkles size={18} /> AI İLE OLUŞTUR
                     </button>
@@ -2494,7 +2494,7 @@ const PromotionManagement = () => {
                             }); 
                             setIsModalOpen(true); 
                         }} 
-                        className="w-full md:w-auto bg-emerald-600 hover:bg-emerald-500 px-8 py-5 rounded-[28px] text-[11px] font-black uppercase tracking-widest shadow-2xl active:scale-95 border-b-4 border-emerald-900 transition-all flex items-center justify-center gap-3"
+                        className="w-full md:w-auto bg-emerald-600 hover:bg-emerald-500 px-8 py-5 rounded-[28px] text-[11px] font-black uppercase tracking-widest  active:scale-95 border-b-4 border-emerald-900 transition-all flex items-center justify-center gap-3"
                     >
                         <Plus size={18} /> MANUEL OLUŞTUR
                     </button>
@@ -2514,7 +2514,7 @@ const PromotionManagement = () => {
             ) : (
                 <div className="grid grid-cols-1 gap-6">
                     {promos.map(p => (
-                        <div key={p.id} className="bg-slate-900/40 border border-white/5 rounded-[48px] p-6 lg:p-10 flex flex-col lg:flex-row items-center justify-between group shadow-2xl hover:border-blue-500/20 transition-all gap-8">
+                        <div key={p.id} className="bg-slate-900/40 border border-white/5 rounded-[48px] p-6 lg:p-10 flex flex-col lg:flex-row items-center justify-between group  hover:border-blue-500/20 transition-all gap-8">
                             <div className="flex-1 min-w-0 text-center lg:text-left w-full">
                                 <div className="flex items-center justify-center lg:justify-start gap-3 mb-6">
                                     {getStatusBadge(p.status)}
@@ -2552,8 +2552,8 @@ const PromotionManagement = () => {
                                         updatingId === p.id 
                                         ? 'bg-slate-800 text-slate-600 opacity-50' 
                                         : p.status === 'sending' 
-                                          ? 'bg-orange-500/10 text-orange-500 border border-orange-500/20 shadow-lg' 
-                                          : 'bg-blue-600 text-white shadow-xl shadow-blue-900/40 hover:bg-blue-500'
+                                          ? 'bg-orange-500/10 text-orange-500 border border-orange-500/20 ' 
+                                          : 'bg-blue-600 text-white   hover:bg-blue-500'
                                     }`}
                                 >
                                     {updatingId === p.id ? (
@@ -2568,13 +2568,13 @@ const PromotionManagement = () => {
                                 <div className="flex gap-3 flex-1 lg:flex-none">
                                     <button 
                                         onClick={() => { setEditingPromo(p); setIsModalOpen(true); }}
-                                        className="flex-1 lg:flex-none p-5 bg-white/5 rounded-2xl text-blue-400 hover:bg-blue-600 hover:text-white transition-all shadow-xl flex items-center justify-center"
+                                        className="flex-1 lg:flex-none p-5 bg-white/5 rounded-2xl text-blue-400 hover:bg-blue-600 hover:text-white transition-all  flex items-center justify-center"
                                     >
                                         <Edit3 size={20}/>
                                     </button>
                                     <button 
                                         onClick={async () => { if(confirm('Bu kampanya silinsin mi?')) { await DatabaseService.deletePromotion(p.id); await DatabaseService.logActivity('admin', 'bot_manage', 'promotion_deleted', 'Tanıtım Silindi', `${p.title} kampanyası silindi.`); load(); } }} 
-                                        className="flex-1 lg:flex-none p-5 bg-white/5 rounded-2xl text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-xl flex items-center justify-center"
+                                        className="flex-1 lg:flex-none p-5 bg-white/5 rounded-2xl text-red-500 hover:bg-red-500 hover:text-white transition-all  flex items-center justify-center"
                                     >
                                         <Trash2 size={20}/>
                                     </button>
@@ -2587,7 +2587,7 @@ const PromotionManagement = () => {
 
             {isAIModalOpen && (
                 <div className="fixed inset-0 z-[120] bg-black/95 flex items-center justify-center p-6 backdrop-blur-xl animate-in fade-in">
-                    <div className="bg-[#020617] p-10 lg:p-16 rounded-[64px] w-full max-w-3xl border border-white/10 shadow-2xl relative">
+                    <div className="bg-[#020617] p-10 lg:p-16 rounded-[64px] w-full max-w-3xl border border-white/10  relative">
                         <button onClick={() => setIsAIModalOpen(false)} className="absolute top-8 right-8 p-4 bg-white/5 rounded-2xl text-slate-500 hover:text-white transition-all">
                             <X size={24}/>
                         </button>
@@ -2663,7 +2663,7 @@ const PromotionManagement = () => {
                                 <button 
                                     disabled={isGenerating || !aiPrompt.trim()}
                                     onClick={generateAIAd}
-                                    className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:hover:bg-blue-600 px-10 py-6 rounded-[32px] text-sm font-black uppercase tracking-[0.2em] shadow-2xl active:scale-95 transition-all flex items-center justify-center gap-4"
+                                    className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:hover:bg-blue-600 px-10 py-6 rounded-[32px] text-sm font-black uppercase tracking-[0.2em]  active:scale-95 transition-all flex items-center justify-center gap-4"
                                 >
                                     {isGenerating ? (
                                         <>
@@ -2688,7 +2688,7 @@ const PromotionManagement = () => {
 
             {isModalOpen && editingPromo && (
                 <div className="fixed inset-0 z-[110] bg-black/98 flex items-center justify-center p-0 lg:p-6 backdrop-blur-3xl animate-in fade-in">
-                    <div className="bg-[#020617] p-8 lg:p-14 rounded-t-[40px] lg:rounded-[64px] w-full max-w-7xl h-[94vh] lg:h-[90vh] overflow-hidden border-t lg:border border-white/10 shadow-2xl relative flex flex-col lg:flex-row gap-12">
+                    <div className="bg-[#020617] p-8 lg:p-14 rounded-t-[40px] lg:rounded-[64px] w-full max-w-7xl h-[94vh] lg:h-[90vh] overflow-hidden border-t lg:border border-white/10  relative flex flex-col lg:flex-row gap-12">
                         <button onClick={() => setIsModalOpen(false)} className="absolute top-8 right-8 p-4 bg-white/5 rounded-2xl text-slate-500 hover:text-white z-50 transition-all">
                             <X size={24}/>
                         </button>
@@ -2754,7 +2754,7 @@ const PromotionManagement = () => {
                                     </div>
                                 </div>
 
-                                <button type="submit" className="w-full h-20 bg-blue-600 hover:bg-blue-500 rounded-[32px] font-black text-[12px] uppercase tracking-[0.4em] shadow-2xl border-b-8 border-blue-900 transition-all active:translate-y-1 active:border-b-4">KAMPANYAYI SİSTEME KAYDET</button>
+                                <button type="submit" className="w-full h-20 bg-blue-600 hover:bg-blue-500 rounded-[32px] font-black text-[12px] uppercase tracking-[0.4em]  border-b-8 border-blue-900 transition-all active:translate-y-1 active:border-b-4">KAMPANYAYI SİSTEME KAYDET</button>
                             </form>
                         </div>
 
@@ -2768,7 +2768,7 @@ const PromotionManagement = () => {
                             </div>
 
                             {/* Telegram Message UI */}
-                            <div className="w-full bg-[#020617] border border-white/10 rounded-[40px] overflow-hidden shadow-[0_50px_100px_rgba(0,0,0,0.6)] animate-in zoom-in-95">
+                            <div className="w-full bg-[#020617] border border-white/10 rounded-[40px] overflow-hidden  animate-in zoom-in-95">
                                 {editingPromo.image_url && editingPromo.image_url.startsWith('http') ? (
                                     <img src={editingPromo.image_url} className="w-full h-48 object-cover border-b border-white/5" onError={(e)=>(e.target as any).src=''} />
                                 ) : (
@@ -2858,7 +2858,7 @@ const ReferralManagement = () => {
                 </div>
                 <button 
                     onClick={() => setIsSettingsModalOpen(true)}
-                    className="w-full md:w-auto bg-blue-600 hover:bg-blue-500 px-8 py-5 rounded-[24px] text-[10px] font-black uppercase tracking-[0.4em] shadow-2xl shadow-blue-900/40 transition-all active:scale-95 flex items-center justify-center gap-3"
+                    className="w-full md:w-auto bg-blue-600 hover:bg-blue-500 px-8 py-5 rounded-[24px] text-[10px] font-black uppercase tracking-[0.4em]   transition-all active:scale-95 flex items-center justify-center gap-3"
                 >
                     <SettingsIcon size={18} /> SİSTEM AYARLARI
                 </button>
@@ -2878,7 +2878,7 @@ const ReferralManagement = () => {
                         onClick={() => setFilter(f as any)}
                         className={`px-6 h-12 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all border ${
                             filter === f 
-                            ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-600/20' 
+                            ? 'bg-blue-600 border-blue-500 text-white  ' 
                             : 'bg-slate-900/40 border-white/5 text-slate-500 hover:border-white/10'
                         }`}
                     >
@@ -2887,7 +2887,7 @@ const ReferralManagement = () => {
                 ))}
             </div>
 
-            <div className="bg-slate-900/40 border border-white/5 rounded-[44px] overflow-hidden shadow-2xl">
+            <div className="bg-slate-900/40 border border-white/5 rounded-[44px] overflow-hidden ">
                 {/* Desktop Table */}
                 <div className="hidden lg:block overflow-x-auto">
                     <table className="w-full text-left">
@@ -2990,7 +2990,7 @@ const ReferralManagement = () => {
                             {r.status === 'pending' && (
                                 <button 
                                     onClick={() => handleConfirm(r.id)}
-                                    className="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl text-[9px] font-black uppercase tracking-[0.2em] transition-all shadow-lg shadow-emerald-900/20"
+                                    className="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl text-[9px] font-black uppercase tracking-[0.2em] transition-all  "
                                 >
                                     REFERANSI ONAYLA
                                 </button>
@@ -3002,14 +3002,14 @@ const ReferralManagement = () => {
 
             {isSettingsModalOpen && settings && (
                 <div className="fixed inset-0 z-[110] bg-black/95 flex items-center justify-center p-4 lg:p-8 backdrop-blur-3xl animate-in fade-in">
-                    <div className="bg-[#020617] border border-white/10 rounded-[40px] lg:rounded-[64px] w-full max-w-2xl overflow-hidden shadow-2xl relative">
+                    <div className="bg-[#020617] border border-white/10 rounded-[40px] lg:rounded-[64px] w-full max-w-2xl overflow-hidden  relative">
                         <button onClick={() => setIsSettingsModalOpen(false)} className="absolute top-6 right-6 p-3 bg-white/5 rounded-2xl hover:bg-red-600 transition-all">
                             <X size={20} />
                         </button>
                         
                         <div className="p-8 lg:p-12 space-y-8">
                             <div className="flex items-center gap-5">
-                                <div className="w-12 h-12 bg-blue-600 rounded-[20px] flex items-center justify-center shadow-xl">
+                                <div className="w-12 h-12 bg-blue-600 rounded-[20px] flex items-center justify-center ">
                                     <SettingsIcon size={24} className="text-white"/>
                                 </div>
                                 <div>
@@ -3043,7 +3043,7 @@ const ReferralManagement = () => {
                                     </button>
                                 </div>
 
-                                <button type="submit" className="w-full h-16 bg-blue-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-[0.4em] shadow-2xl border-b-4 border-blue-800 active:translate-y-1 active:border-b-0 transition-all">
+                                <button type="submit" className="w-full h-16 bg-blue-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-[0.4em]  border-b-4 border-blue-800 active:translate-y-1 active:border-b-0 transition-all">
                                     AYARLARI KAYDET
                                 </button>
                             </form>

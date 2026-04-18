@@ -80,7 +80,7 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         whileHover={{ y: -4, transition: { duration: 0.2 } }}
-        className={`w-80 h-48 rounded-[32px] relative overflow-hidden shrink-0 cursor-pointer group snap-center border bg-white dark:bg-slate-900/40 ${ann.bg_image_url ? 'border-white/10' : scheme.split(' ').pop()} shadow-2xl flex flex-col`}
+        className={`w-80 h-48 rounded-[32px] relative overflow-hidden shrink-0 cursor-pointer group snap-center border bg-white dark:bg-slate-900/40 ${ann.bg_image_url ? 'border-white/10' : scheme.split(' ').pop()} flex flex-col`}
         onClick={handleAction}
     >
         {ann.bg_image_url ? (
@@ -133,7 +133,7 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonR
   const prices = useMemo(() => PriceService.convert(bot.price, tonRate), [bot.price, tonRate]);
   
   return (
-    <div onClick={() => navigate(`/bot/${bot.id}`)} className="flex items-center p-5 cursor-pointer group bg-white dark:bg-transparent hover:bg-slate-100 dark:hover:bg-slate-900/60 rounded-[32px] transition-all border border-black/5 dark:border-transparent hover:border-slate-200 dark:hover:border-slate-800/50 active:bg-slate-200 dark:active:bg-slate-900 shadow-xl">
+    <div onClick={() => navigate(`/bot/${bot.id}`)} className="flex items-center p-5 cursor-pointer group bg-white dark:bg-transparent hover:bg-slate-100 dark:hover:bg-slate-900/60 rounded-[32px] transition-all border border-black/5 dark:border-transparent hover:border-slate-200 dark:hover:border-slate-800/50 active:bg-slate-200 dark:active:bg-slate-900">
         <div className="relative shrink-0">
             <img 
                 src={getLiveBotIcon(bot)} 
@@ -268,13 +268,13 @@ const Home = () => {
         <div className="flex flex-wrap md:flex-nowrap items-center justify-between mb-8 px-1 gap-y-6 md:gap-x-6">
         <div className="flex items-center gap-3 order-1">
             <div className="shrink-0">
-                <img src="/logo.svg" alt="BotlyHub Logo" style={{ width: '2.5rem', height: 'auto', display: 'block' }} className="drop-shadow-[0_0_15px_rgba(47,136,255,0.3)]" />
+                <img src="/logo.svg" alt="BotlyHub Logo" style={{ width: '2.5rem', height: 'auto', display: 'block' }} className="" />
             </div>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">BotlyHub</h1>
         </div>
 
         <div className="w-full md:w-auto md:flex-1 md:max-w-2xl order-3 md:order-2 cursor-pointer" onClick={() => navigate('/search')}>
-            <div className="relative flex items-center bg-white dark:bg-slate-900/40 backdrop-blur-2xl border border-black/5 dark:border-white/10 rounded-[28px] p-1.5 shadow-xl transition-all active:scale-[0.98] group">
+            <div className="relative flex items-center bg-white dark:bg-slate-900/40 backdrop-blur-2xl border border-black/5 dark:border-white/10 rounded-[28px] p-1.5 transition-all active:scale-[0.98] group">
                 <div className="ml-4 w-10 h-10 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-2xl text-slate-400 group-hover:text-blue-500 transition-colors">
                     <Search size={20} />
                 </div>
@@ -306,13 +306,13 @@ const Home = () => {
                         >
                             <LayoutGrid size={22} />
                             {unreadCount > 0 && (
-                                <div className="absolute -top-1 -right-1 min-w-[20px] h-[20px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[9px] font-black text-white flex items-center justify-center px-1 badge-pop shadow-xl">
+                                <div className="absolute -top-1 -right-1 min-w-[20px] h-[20px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[9px] font-black text-white flex items-center justify-center px-1 badge-pop">
                                     {unreadCount > 9 ? '9+' : unreadCount}
                                 </div>
                             )}
                         </button>
                         {isMenuOpen && (
-                            <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-[32px] shadow-2xl overflow-hidden z-[100] animate-in py-2 backdrop-blur-2xl">
+                            <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-[32px] overflow-hidden z-[100] animate-in py-2 backdrop-blur-2xl">
                                 {[
                                     { path: '/', icon: Store, color: 'text-blue-500 dark:text-blue-400', label: 'market' },
                                     { path: '/settings', icon: User, color: 'text-purple-500 dark:text-purple-400', label: 'profile' },
@@ -323,7 +323,7 @@ const Home = () => {
                                     <button key={i} onClick={() => { navigate(item.path); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-black/5 dark:hover:bg-white/5 text-left border-b border-black/5 dark:border-white/5 last:border-0 relative">
                                         <item.icon size={18} className={item.color} /> 
                                         <span className="text-[11px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300">{t(item.label)}</span>
-                                        {item.badge && <div className="absolute right-6 w-2.5 h-2.5 bg-red-600 rounded-full shadow-[0_0_8px_rgba(220,38,38,0.6)]"></div>}
+                                        {item.badge && <div className="absolute right-6 w-2.5 h-2.5 bg-red-600 rounded-full"></div>}
                                     </button>
                                 ))}
                             </div>
@@ -373,14 +373,14 @@ const Home = () => {
                             key={cat.id} 
                             whileHover="hover"
                             onClick={() => { haptic('light'); navigate(`/search?category=${cat.id}`); }}
-                            className="flex items-center gap-3 px-[1rem] py-[0.7rem] rounded-2xl border bg-white dark:bg-slate-900/60 border-black/5 dark:border-white/5 text-slate-900 dark:text-white hover:border-purple-500/30 transition-all active:scale-95 shadow-lg whitespace-nowrap snap-center"
+                            className="flex items-center gap-3 px-[1rem] py-[0.7rem] rounded-2xl border bg-white dark:bg-slate-900/60 border-black/5 dark:border-white/5 text-slate-900 dark:text-white hover:border-purple-500/30 transition-all active:scale-95 whitespace-nowrap snap-center"
                         >
                             <motion.div
                                 variants={{
                                     hover: { 
                                         scale: 1.2, 
                                         rotate: [0, -10, 10, -10, 0],
-                                        filter: "drop-shadow(0 0 8px rgba(19, 159, 236, 0.6))"
+                                        filter: "none"
                                     }
                                 }}
                                 transition={{ duration: 0.4 }}
@@ -415,7 +415,7 @@ const Home = () => {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-white dark:bg-slate-900 border border-black/10 dark:border-white/10 w-full max-w-sm rounded-[44px] overflow-hidden shadow-[0_32px_64px_-12px_rgba(0,0,0,0.5)] relative" 
+              className="bg-white dark:bg-slate-900 border border-black/10 dark:border-white/10 w-full max-w-sm rounded-[44px] overflow-hidden relative" 
               onClick={e => e.stopPropagation()}
             >
                 {/* Header/Cover Section */}
@@ -452,7 +452,7 @@ const Home = () => {
                             </div>
                         )}
                         {selectedAnn.tag && (
-                            <div className="px-3 py-1 bg-brand border border-white/20 rounded-xl shadow-lg">
+                            <div className="px-3 py-1 bg-brand border border-white/20 rounded-xl">
                                 <span className="text-[10px] font-black text-white uppercase tracking-widest">{selectedAnn.tag}</span>
                             </div>
                         )}
@@ -485,7 +485,7 @@ const Home = () => {
                                 else navigate(link);
                                 setSelectedAnn(null); 
                             }} 
-                            className="w-full h-18 bg-brand dark:bg-brand-light text-white text-[11px] font-black rounded-3xl uppercase tracking-[0.2em] shadow-xl shadow-brand/20 active:translate-y-1 transition-all flex items-center justify-center gap-3 group"
+                            className="w-full h-18 bg-brand dark:bg-brand-light text-white text-[11px] font-black rounded-3xl uppercase tracking-[0.2em] active:translate-y-1 transition-all flex items-center justify-center gap-3 group"
                         >
                             {selectedAnn.button_text || 'ŞİMDİ KEŞFET'} 
                             <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
