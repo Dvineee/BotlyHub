@@ -60,7 +60,14 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = ({ bot, tonRate }) => {
             )}
         </div>
         <div className="flex-1 ml-5 min-w-0">
-            <h3 className="font-bold text-lg text-slate-900 dark:text-white truncate tracking-tight mb-1">{bot.name}</h3>
+            <h3 className="font-bold text-lg text-slate-900 dark:text-white truncate tracking-tight mb-1 flex items-center gap-1.5">
+                {bot.name}
+                {bot.is_official && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 text-[#139fec] shrink-0">
+                        <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                )}
+            </h3>
             <p className="text-[11px] text-slate-500 font-medium truncate mb-2">{bot.description}</p>
             <div className="flex items-center gap-3">
                 {bot.price === 0 ? (

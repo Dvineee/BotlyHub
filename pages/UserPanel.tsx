@@ -64,14 +64,7 @@ const UserPanel: React.FC = () => {
                     <div className="p-10">
                         <div className="flex items-center gap-4">
                             <div className="w-12 h-12 shrink-0">
-                                <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-[0_0_15px_rgba(34,158,217,0.2)]">
-                                  <g transform="rotate(26 150 150)">
-                                    <polygon points="150,85 225,195 75,195" fill="#229ED9" opacity="0.9"/>
-                                    <line x1="150" y1="85" x2="225" y2="195" stroke="#FF8A3D" strokeWidth="38" strokeLinecap="round" strokeOpacity="0.85"/>
-                                    <line x1="75" y1="195" x2="150" y2="85" stroke="#22C55E" strokeWidth="38" strokeLinecap="round" strokeOpacity="0.85"/>
-                                    <line x1="225" y1="195" x2="75" y2="195" stroke="#229ED9" strokeWidth="38" strokeLinecap="round" strokeOpacity="0.85"/>
-                                  </g>
-                                </svg>
+                                <img src="/logo.png" alt="BotlyHub Logo" className="w-full h-full drop-shadow-[0_0_15px_rgba(34,158,217,0.2)]" />
                             </div>
                             <div>
                                 <h1 className="text-2xl font-bold text-white tracking-tight">BotlyHub</h1>

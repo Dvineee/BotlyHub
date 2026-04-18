@@ -153,7 +153,7 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonR
             <h3 className="font-extrabold text-lg text-slate-900 dark:text-slate-100 truncate tracking-tight uppercase leading-none mb-1.5 flex items-center gap-1.5">
                 {bot.name}
                 {bot.is_official && (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 text-[#139fec] shrink-0">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 text-[#139fec] shrink-0">
                         <polyline points="20 6 9 17 4 12" />
                     </svg>
                 )}
@@ -273,14 +273,7 @@ const Home = () => {
         <div className="flex flex-wrap md:flex-nowrap items-center justify-between mb-8 px-1 gap-y-6 md:gap-x-6">
         <div className="flex items-center gap-3 order-1">
             <div className="w-12 h-12 shrink-0">
-                <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-[0_0_15px_rgba(34,158,217,0.2)]">
-                  <g transform="rotate(26 150 150)">
-                    <polygon points="150,85 225,195 75,195" fill="#229ED9" opacity="0.9"/>
-                    <line x1="150" y1="85" x2="225" y2="195" stroke="#FF8A3D" strokeWidth="38" strokeLinecap="round" strokeOpacity="0.85"/>
-                    <line x1="75" y1="195" x2="150" y2="85" stroke="#22C55E" strokeWidth="38" strokeLinecap="round" strokeOpacity="0.85"/>
-                    <line x1="225" y1="195" x2="75" y2="195" stroke="#229ED9" strokeWidth="38" strokeLinecap="round" strokeOpacity="0.85"/>
-                  </g>
-                </svg>
+                <img src="/logo.png" alt="BotlyHub Logo" className="w-full h-full drop-shadow-[0_0_15px_rgba(34,158,217,0.2)]" />
             </div>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">BotlyHub</h1>
         </div>
@@ -511,14 +504,7 @@ const Home = () => {
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 shrink-0">
-              <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-                <g transform="rotate(26 150 150)">
-                  <polygon points="150,85 225,195 75,195" fill="#229ED9" opacity="0.9"/>
-                  <line x1="150" y1="85" x2="225" y2="195" stroke="#FF8A3D" strokeWidth="38" strokeLinecap="round" strokeOpacity="0.85"/>
-                  <line x1="75" y1="195" x2="150" y2="85" stroke="#22C55E" strokeWidth="38" strokeLinecap="round" strokeOpacity="0.85"/>
-                  <line x1="225" y1="195" x2="75" y2="195" stroke="#229ED9" strokeWidth="38" strokeLinecap="round" strokeOpacity="0.85"/>
-                </g>
-              </svg>
+              <img src="/logo.png" alt="Logo" className="w-full h-full" />
             </div>
           </div>
           <div className="flex items-center gap-4 text-slate-400 dark:text-slate-500">
