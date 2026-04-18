@@ -273,7 +273,7 @@ const Home = () => {
         <div className="flex flex-wrap md:flex-nowrap items-center justify-between mb-8 px-1 gap-y-6 md:gap-x-6">
         <div className="flex items-center gap-3 order-1">
             <div className="w-12 h-12 shrink-0">
-                <img src="/logo.png" alt="BotlyHub Logo" className="w-full h-full drop-shadow-[0_0_15px_rgba(34,158,217,0.2)]" />
+                <img src="/logo.svg" alt="BotlyHub Logo" className="w-full h-full drop-shadow-[0_0_15px_rgba(34,158,217,0.2)]" />
             </div>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">BotlyHub</h1>
         </div>
@@ -504,7 +504,7 @@ const Home = () => {
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 shrink-0">
-              <img src="/logo.png" alt="Logo" className="w-full h-full" />
+              <img src="/logo.svg" alt="Logo" className="w-full h-full" />
             </div>
           </div>
           <div className="flex items-center gap-4 text-slate-400 dark:text-slate-500">

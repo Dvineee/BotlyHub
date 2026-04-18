@@ -64,7 +64,7 @@ const UserPanel: React.FC = () => {
                     <div className="p-10">
                         <div className="flex items-center gap-4">
                             <div className="w-12 h-12 shrink-0">
-                                <img src="/logo.png" alt="BotlyHub Logo" className="w-full h-full drop-shadow-[0_0_15px_rgba(34,158,217,0.2)]" />
+                                <img src="/logo.svg" alt="BotlyHub Logo" className="w-full h-full drop-shadow-[0_0_15px_rgba(34,158,217,0.2)]" />
                             </div>
                             <div>
                                 <h1 className="text-2xl font-bold text-white tracking-tight">BotlyHub</h1>
