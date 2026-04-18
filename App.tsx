@@ -27,6 +27,7 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import UserPanelLogin from './pages/UserPanelLogin';
 import UserPanel from './pages/UserPanel';
 import ReferralPage from './pages/ReferralPage';
+import Footer from './components/Footer';
 
 import { FilterProvider } from './FilterContext';
 
@@ -168,6 +169,7 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
       ) : (
         <div className={isPanelPath ? "w-full flex-1 flex flex-col" : "w-full max-w-7xl mx-auto flex-1 flex flex-col"}>
           {children}
+          {!isPanelPath && !isMaintenance && !isRestricted && <Footer />}
         </div>
       )}
     </div>

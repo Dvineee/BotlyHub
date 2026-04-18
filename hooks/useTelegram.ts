@@ -87,5 +87,5 @@ export function useTelegram() {
         notification,
         openLink,
         isReady
-    }), [isReady, user, queryId, platform, isExpanded, themeParams, onClose, onToggleButton, haptic, notification, openLink]);
+    }), [isReady, user, webUser, setWebAuthUser, isTelegram, queryId, platform, isExpanded, themeParams, onClose, onToggleButton, haptic, notification, openLink]);
 }

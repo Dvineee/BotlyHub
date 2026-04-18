@@ -5,17 +5,21 @@ import {
   Bot as BotIcon, Zap, Shield, PlusCircle, X, 
   Maximize2, ChevronRight, ChevronDown, Eye, Lock, Unlock, AlertTriangle, 
   Sparkles, Star, Download, Info, CheckCircle2, Globe, Cpu,
-  Play, UserPlus, MessageSquare, BarChart3, MousePointer2
+  Play, UserPlus, MessageSquare, BarChart3, MousePointer2,
+  Search, LayoutGrid, Store, User as UserIcon, Megaphone, Bell, Instagram, Youtube, Link
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Bot, Channel, User } from '../types';
+import { Bot, Channel, User, Notification } from '../types';
 import { useTelegram } from '../hooks/useTelegram';
 import { DatabaseService } from '../services/DatabaseService';
 import PriceService from '../services/PriceService';
 import { useTranslation } from '../TranslationContext';
 import { GeminiService } from '../services/GeminiService';
 import { useDraggableScroll } from '../hooks/useDraggableScroll';
+import { useTheme } from '../ThemeContext';
+import { TelegramLoginWidget } from '../components/TelegramLoginWidget';
+import { useRef } from 'react';
 
 const getLiveBotIcon = (bot: Bot) => {
     if (bot.bot_link) {
@@ -28,8 +32,9 @@ const getLiveBotIcon = (bot: Bot) => {
 const BotDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { haptic, user, notification, tg } = useTelegram();
+  const { haptic, user, notification, tg, isTelegram, setWebAuthUser } = useTelegram();
   const { t } = useTranslation();
+  const { toggleTheme, theme } = useTheme();
   
   const [bot, setBot] = useState<Bot | null>(null);
   const [isOwned, setIsOwned] = useState(false);
@@ -45,6 +50,10 @@ const BotDetail = () => {
   const [userRating, setUserRating] = useState<number | null>(null);
   const [hoverRating, setHoverRating] = useState<number | null>(null);
   const [isRating, setIsRating] = useState(false);
+  const [openAccordion, setOpenAccordion] = useState<string | null>(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const menuRef = useRef<HTMLDivElement>(null);
   
   const screenshotScroll = useDraggableScroll();
   
@@ -63,6 +72,12 @@ const BotDetail = () => {
             if (data) {
                 await DatabaseService.logActivity(userId, 'system', 'bot_view', 'Bot İnceleme', `${data.name} botu detayları görüntülendi.`);
             }
+
+            // Get notifications for unread count
+            DatabaseService.getNotifications(userId).then(notes => {
+                const unread = notes.filter(n => !n.isRead).length;
+                setUnreadCount(unread);
+            });
         }
     } catch (e) { console.error(e); }
     finally { setIsLoading(false); }
@@ -73,6 +88,11 @@ const BotDetail = () => {
     if (id) {
         DatabaseService.incrementBotView(id);
     }
+    const handleClickOutside = (event: MouseEvent) => {
+        if (menuRef.current && !menuRef.current.contains(event.target as Node)) setIsMenuOpen(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [fetchBotData, id]);
 
   useEffect(() => {
@@ -220,7 +240,83 @@ const BotDetail = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 pb-40 animate-in fade-in transition-colors duration-300">
-      <div className="max-w-7xl mx-auto lg:px-10">
+      <div className="max-w-7xl mx-auto px-4 md:px-10">
+        {/* Responsive Header */}
+        <div className="flex items-center justify-between mb-8 pt-6 gap-3 md:gap-6">
+            <div className="flex items-center gap-2 shrink-0">
+                <div className="shrink-0 cursor-pointer" onClick={() => navigate('/')}>
+                    <img src="/logo.svg" alt="BotlyHub Logo" style={{ width: '2.5rem', height: 'auto', display: 'block' }} className="drop-shadow-[0_0_15px_rgba(47,136,255,0.3)]" />
+                </div>
+                <h1 className="hidden sm:block text-2xl font-bold text-slate-900 dark:text-white tracking-tight cursor-pointer" onClick={() => navigate('/')}>BotlyHub</h1>
+            </div>
+
+            <div className="flex-1 max-w-2xl cursor-pointer" onClick={() => navigate('/search')}>
+                <div className="relative flex items-center bg-white dark:bg-slate-900/40 backdrop-blur-2xl border border-black/5 dark:border-white/10 rounded-[28px] p-1.5 shadow-xl transition-all active:scale-[0.98] group">
+                    <div className="ml-2 md:ml-4 w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-2xl text-slate-400 group-hover:text-blue-500 transition-colors">
+                        <Search size={18} />
+                    </div>
+                    <div className="w-full py-2 md:py-3 px-3 md:px-4 text-[10px] md:text-sm text-slate-400 font-bold uppercase tracking-widest opacity-60 truncate">
+                        {t('search_placeholder')}
+                    </div>
+                </div>
+            </div>
+
+            <div className="flex items-center gap-2 md:gap-3 shrink-0">
+                <button 
+                    onClick={() => { haptic('light'); toggleTheme(); }} 
+                    className="hidden md:flex w-12 h-12 items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-900 dark:text-white active:scale-90 transition-transform"
+                >
+                    <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2.20001C12.4418 2.20001 12.8 2.55818 12.8 3.00001V4.00001C12.8 4.44184 12.4418 4.80001 12 4.80001C11.5581 4.80001 11.2 4.44184 11.2 4.00001V3.00001C11.2 2.55818 11.5581 2.20001 12 2.20001ZM5.03427 5.03433C5.34668 4.72191 5.85322 4.72191 6.16564 5.03433L6.86564 5.73433C7.17806 6.04675 7.17806 6.55328 6.86564 6.8657C6.55322 7.17812 6.04669 7.17812 5.73427 6.8657L5.03427 6.1657C4.72185 5.85328 4.72185 5.34675 5.03427 5.03433ZM18.9656 5.03433C19.2781 5.34675 19.2781 5.85328 18.9656 6.1657L18.2656 6.8657C17.9532 7.17812 17.4467 7.17812 17.1343 6.8657C16.8218 6.55328 16.8218 6.04675 17.1343 5.73433L17.8343 5.03433C18.1467 4.72191 18.6532 4.72191 18.9656 5.03433ZM12 8.80001C10.2326 8.80001 8.79995 10.2327 8.79995 12C8.79995 13.7673 10.2326 15.2 12 15.2C13.7673 15.2 15.2 13.7673 15.2 12C15.2 10.2327 13.7673 8.80001 12 8.80001ZM7.19995 12C7.19995 9.34905 9.34898 7.20001 12 7.20001C14.6509 7.20001 16.8 9.34905 16.8 12C16.8 14.651 14.6509 16.8 12 16.8C9.34898 16.8 7.19995 14.651 7.19995 12ZM2.19995 12C2.19995 11.5582 2.55812 11.2 2.99995 11.2H3.99995C4.44178 11.2 4.79995 11.5582 4.79995 12C4.79995 12.4418 4.44178 12.8 3.99995 12.8H2.99995C2.55812 12.8 2.19995 12.4418 2.19995 12ZM19.2 12C19.2 11.5582 19.5581 11.2 20 11.2H21C21.4418 11.2 21.7999 11.5582 21.7999 12C21.7999 12.4418 21.4418 12.8 21 12.8H20C19.5581 12.8 19.2 12.4418 19.2 12ZM6.86564 17.1343C7.17806 17.4467 7.17806 17.9533 6.86564 18.2657L6.16564 18.9657C5.85322 19.2781 5.34668 19.2781 5.03427 18.9657C4.72185 18.6533 4.72185 18.1467 5.03427 17.8343L5.73427 17.1343C6.04669 16.8219 6.55322 16.8219 6.86564 17.1343ZM17.1343 17.1343C17.4467 16.8219 17.9532 16.8219 18.2656 17.1343L18.9656 17.8343C19.2781 18.1467 19.2781 18.6533 18.9656 18.9657C18.6532 19.2781 18.1467 19.2781 17.8343 18.9657L17.1343 18.2657C16.8218 17.9533 16.8218 17.4467 17.1343 17.1343ZM12 19.2C12.4418 19.2 12.8 19.5582 12.8 20V21C12.8 21.4418 12.4418 21.8 12 21.8C11.5581 21.8 11.2 21.4418 11.2 21V20C11.2 19.5582 11.5581 19.2 12 19.2Z " fill="currentColor"></path>
+                    </svg>
+                </button>
+
+                {user ? (
+                    <>
+                        <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="hidden sm:flex w-10 h-10 md:w-12 md:h-12 items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-900 dark:text-white active:scale-90 transition-transform">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M5.54845 3.77673C3.55195 3.77673 1.93347 5.39521 1.93347 7.39171V16.6083C1.93347 18.6048 3.55195 20.2233 5.54845 20.2233H18.4517C20.4482 20.2233 22.0667 18.6048 22.0667 16.6083V8.31337V7.39171C22.0667 5.39521 20.4482 3.77673 18.4517 3.77673H5.54845ZM3.63347 7.39171C3.63347 6.3341 4.49084 5.47673 5.54845 5.47673H18.4517C19.5093 5.47673 20.3667 6.3341 20.3667 7.39171V8.31337V8.38503H17.53C15.5335 8.38503 13.915 10.0035 13.915 12C13.915 13.9965 15.5335 15.615 17.53 15.615H20.3667V16.6083C20.3667 17.6659 19.5093 18.5233 18.4517 18.5233H5.54845C4.49084 18.5233 3.63347 17.6659 3.63347 16.6083V7.39171ZM20.3667 13.915V10.085H17.53C16.4724 10.085 15.615 10.9424 15.615 12C15.615 13.0576 16.4724 13.915 17.53 13.915H20.3667Z" fill="currentColor"/>
+                            </svg>
+                        </button>
+                        <div className="relative" ref={menuRef}>
+                            <button 
+                              onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
+                              className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-900 dark:text-white active:scale-90 transition-transform relative"
+                            >
+                                <LayoutGrid size={20} />
+                                {unreadCount > 0 && (
+                                    <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[8px] font-black text-white flex items-center justify-center px-1 badge-pop shadow-xl">
+                                        {unreadCount > 9 ? '9+' : unreadCount}
+                                    </div>
+                                )}
+                            </button>
+                            {isMenuOpen && (
+                                <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-[32px] shadow-2xl overflow-hidden z-[100] animate-in py-2 backdrop-blur-2xl">
+                                    {[
+                                        { path: '/', icon: Store, color: 'text-blue-500 dark:text-blue-400', label: 'market' },
+                                        { path: '/settings', icon: UserIcon, color: 'text-purple-500 dark:text-purple-400', label: 'profile' },
+                                        { path: '/my-bots', icon: BotIcon, color: 'text-emerald-500 dark:text-emerald-400', label: 'my_bots' },
+                                        { path: '/channels', icon: Megaphone, color: 'text-orange-500 dark:text-orange-400', label: 'my_channels' },
+                                        { path: '/notifications', icon: Bell, color: 'text-blue-600 dark:text-blue-500', label: 'notifications', badge: unreadCount > 0 }
+                                    ].map((item, i) => (
+                                        <button key={i} onClick={() => { navigate(item.path); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-black/5 dark:hover:bg-white/5 text-left border-b border-black/5 dark:border-white/5 last:border-0 relative">
+                                            <item.icon size={18} className={item.color} /> 
+                                            <span className="text-[11px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300">{t(item.label)}</span>
+                                            {item.badge && <div className="absolute right-6 w-2.5 h-2.5 bg-red-600 rounded-full shadow-[0_0_8px_rgba(220,38,38,0.6)]"></div>}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </>
+                ) : (
+                    <div className="flex items-center">
+                        <TelegramLoginWidget botUsername="BotlyHubBOT" onAuth={(user) => setWebAuthUser(user)} />
+                    </div>
+                )}
+            </div>
+        </div>
+
         <div className="lg:grid lg:grid-cols-[1fr_320px] lg:gap-16 overflow-visible">
           <div className="lg:col-start-1">
             {/* Hero & Stats Section */}
@@ -469,6 +565,71 @@ const BotDetail = () => {
           <div className="p-4 bg-white dark:bg-slate-900/60 rounded-[32px] border border-black/5 dark:border-white/5 text-sm text-slate-600 dark:text-slate-400 leading-[1.6] shadow-lg whitespace-pre-wrap">
               {bot.description}
           </div>
+      </div>
+
+      {/* Accordions */}
+      <div className="px-6 mb-10 space-y-4">
+        {/* Accordion 1 */}
+        <div className="bg-white dark:bg-slate-900/60 rounded-[8px] border border-black/5 dark:border-white/5 overflow-hidden transition-all duration-300">
+          <button 
+            onClick={() => { haptic('light'); setOpenAccordion(openAccordion === 'why' ? null : 'why'); }}
+            className="w-full flex items-center justify-between p-[14px] text-left group"
+          >
+            <span className="text-xs font-black uppercase tracking-[0.1em] text-slate-700 dark:text-slate-300 group-hover:text-blue-500 transition-colors italic">Neden BotlyHub?</span>
+            <motion.div
+              animate={{ rotate: openAccordion === 'why' ? 180 : 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            >
+              <ChevronDown size={18} className="text-slate-400" />
+            </motion.div>
+          </button>
+          <AnimatePresence>
+            {openAccordion === 'why' && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.3, ease: 'easeInOut' }}
+              >
+                <div className="px-6 pb-6 text-[12px] leading-relaxed text-slate-500 dark:text-slate-400 font-medium">
+                  BotlyHub, en güvenilir ve onaylanmış Telegram botlarını tek bir çatı altında toplayarak size hem güvenlik hem de çeşitlilik sunar. 
+                  Yapay zeka destekli analizlerimiz ve kullanıcı yorumlarımızla en iyi deneyimi yaşamanızı sağlıyoruz.
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Accordion 2 */}
+        <div className="bg-white dark:bg-slate-900/60 rounded-[8px] border border-black/5 dark:border-white/5 overflow-hidden transition-all duration-300">
+          <button 
+            onClick={() => { haptic('light'); setOpenAccordion(openAccordion === 'how' ? null : 'how'); }}
+            className="w-full flex items-center justify-between p-[14px] text-left group"
+          >
+            <span className="text-xs font-black uppercase tracking-[0.1em] text-slate-700 dark:text-slate-300 group-hover:text-blue-500 transition-colors italic">Nasıl Çalışır?</span>
+            <motion.div
+              animate={{ rotate: openAccordion === 'how' ? 180 : 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            >
+              <ChevronDown size={18} className="text-slate-400" />
+            </motion.div>
+          </button>
+          <AnimatePresence>
+            {openAccordion === 'how' && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.3, ease: 'easeInOut' }}
+              >
+                <div className="px-6 pb-6 text-[12px] leading-relaxed text-slate-500 dark:text-slate-400 font-medium">
+                  İhtiyacınız olan botu seçin, detaylarını inceleyin ve "Botu Başlat" butonuna tıklayarak saniyeler içinde kullanmaya başlayın. 
+                  Eğer ücretli bir lisan gerekiyorsa, TON cüzdanınızla hızlıca ödeme yapıp ömür boyu erişim sağlayabilirsiniz.
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
           </div>
 
