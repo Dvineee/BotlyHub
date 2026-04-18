@@ -91,7 +91,7 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
             <div className={`absolute inset-0 z-0 bg-gradient-to-br ${scheme.split(' ').slice(0, 2).join(' ')} opacity-50`}></div>
         )}
         
-        <div className="relative z-10 flex flex-col h-full p-7">
+        <div className="relative z-10 flex flex-col h-full p-2">
             <div className="flex items-center gap-2 mb-4">
                 {ann.badge_text && (
                     <div className="px-2.5 py-1 rounded-full bg-blue-500/10 dark:bg-blue-400/10 border border-blue-500/20 dark:border-blue-400/20 flex items-center gap-1.5">
@@ -110,7 +110,7 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
                 {ann.title}
             </h3>
             
-            <p className="text-slate-500 dark:text-slate-400 text-[11px] leading-relaxed line-clamp-2 font-medium font-inter mt-auto max-w-[85%]">
+            <p className="text-slate-500 dark:text-slate-400 text-[13px] leading-relaxed line-clamp-2 font-medium font-inter mt-auto max-w-full bg-[#12172c8c] p-[6px] rounded-[18px] border border-[#12172c]">
                 {ann.description}
             </p>
         </div>
