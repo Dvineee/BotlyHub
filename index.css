@@ -195,7 +195,7 @@ span.text-\[10px\].font-black.text-slate-500.dark\:text-slate-400.uppercase.trac
 }
 
 svg.lucide.lucide-chevron-right:focus {
-    color: #24a1de;
+    color: #2F88FF;
 }
 
 .h-40 {
@@ -227,7 +227,7 @@ svg.lucide.lucide-chevron-right:focus {
 .bg-slate-900 {
     color: #ffffff;
     --tw-bg-opacity: 1;
-    background-color: #0098ea;
+    background-color: #2F88FF;
 }
 
 .bg-slate-100 {
@@ -417,7 +417,7 @@ button.flex.items-center.gap-3.px-\[1rem\].py-\[0\.7rem\].rounded-2xl.border.bg-
     width: 16px;
     height: 16px;
     --tw-text-opacity: 1;
-    color: rgb(19 159 236 / var(--tw-text-opacity, 1));
+    color: #2F88FF;
 }
 
 span.text-\[10px\].font-bold.text-slate-500.dark\:text-slate-400.uppercase.tracking-widest {
@@ -512,7 +512,7 @@ button.w-full.flex.items-center.gap-3.px-4.py-3.hover\:bg-slate-50.dark\:hover\:
 
 .border-blue-500 {
     box-shadow: none !important;
-    color: #139fec !important;
+    color: #2F88FF !important;
     background-color: #ffffff00 !important;
     --tw-border-opacity: 1;
 }

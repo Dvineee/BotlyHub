@@ -11,14 +11,19 @@ const Maintenance = () => {
       <div className="max-w-md w-full text-center relative z-10">
         <div className="relative inline-block mb-12">
             <div className="w-32 h-32 bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-[48px] flex items-center justify-center shadow-2xl backdrop-blur-xl">
-                <Settings size={64} className="text-purple-600 dark:text-purple-500 animate-[spin_8s_linear_infinite]" />
+                <img 
+                    src="/logo.svg" 
+                    alt="BotlyHub Logo" 
+                    style={{ width: '4.5rem', height: 'auto', display: 'block' }} 
+                    className="drop-shadow-[0_0_20px_rgba(47,136,255,0.4)] animate-pulse" 
+                />
             </div>
-            <div className="absolute -bottom-2 -right-2 bg-purple-600 p-4 rounded-[20px] shadow-2xl border-4 border-slate-50 dark:border-[#020617]">
+            <div className="absolute -bottom-2 -right-2 bg-brand p-4 rounded-[20px] shadow-2xl border-4 border-slate-50 dark:border-[#020617]">
                 <ShieldAlert size={24} className="text-white" />
             </div>
         </div>
 
-        <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-6 tracking-tight">Sistem <span className="text-purple-600">Bakımda</span></h1>
+        <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-6 tracking-tight">Sistem <span className="text-brand">Bakımda</span></h1>
         <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-12 px-6 font-medium">
             Sizlere daha hızlı ve stabil bir deneyim sunmak için sistemimizi kısa süreliğine bakıma aldık. Çok yakında buradayız!
         </p>

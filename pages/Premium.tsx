@@ -37,7 +37,7 @@ const Premium = () => {
       {/* Hero */}
       <div className="text-center mb-12 px-4">
           <h2 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
-              Limitleri <span className="text-[#0098ea] dark:text-[#558df7]">Kaldırın</span>
+              Limitleri <span className="text-brand dark:text-brand-light">Kaldırın</span>
           </h2>
           <p className="text-slate-500 text-xs mt-3 max-w-xs mx-auto font-medium leading-relaxed">
               Daha düşük komisyon oranları ve özel özelliklerle gelirinizi artırın.
@@ -57,10 +57,10 @@ const Premium = () => {
               let iconColor = 'text-slate-500 dark:text-slate-400';
               
               if (plan.color === 'blue') {
-                  borderColor = 'border-[#0098ea]/20 dark:border-[#558df7]/20';
-                  shadowColor = 'shadow-xl shadow-blue-900/10';
-                  btnColor = 'bg-[#0098ea] dark:bg-[#558df7] hover:opacity-90 text-white';
-                  iconColor = 'text-[#0098ea] dark:text-[#558df7]';
+                  borderColor = 'border-brand/20 dark:border-brand-light/20';
+                  shadowColor = 'shadow-xl shadow-brand/10';
+                  btnColor = 'bg-brand dark:bg-brand-light hover:opacity-90 text-white';
+                  iconColor = 'text-brand dark:text-brand-light';
               } else if (plan.color === 'yellow') {
                   borderColor = 'border-yellow-500/30';
                   shadowColor = 'shadow-xl shadow-yellow-900/10';
@@ -74,7 +74,7 @@ const Premium = () => {
                     className={`relative flex flex-col bg-white dark:bg-slate-900/40 rounded-[32px] p-8 border ${borderColor} ${shadowColor} transition-all duration-300 ${plan.isPopular ? 'md:scale-[1.05] z-10 bg-white dark:bg-slate-900/60' : ''}`}
                   >
                       {plan.isPopular && (
-                          <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#0098ea] dark:bg-[#558df7] text-white text-[10px] font-bold px-4 py-1.5 rounded-full shadow-lg tracking-wider">
+                          <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand dark:bg-brand-light text-white text-[10px] font-bold px-4 py-1.5 rounded-full shadow-lg tracking-wider">
                               EN POPÜLER
                           </div>
                       )}
@@ -102,7 +102,7 @@ const Premium = () => {
                       <div className="space-y-4 mb-10">
                           {plan.features.map((feature, idx) => (
                               <div key={idx} className="flex items-center gap-3">
-                                  <div className={`w-5 h-5 rounded-full flex items-center justify-center ${plan.color === 'yellow' ? 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-500' : 'bg-[#0098ea]/10 dark:bg-[#558df7]/10 text-[#0098ea] dark:text-[#558df7]'}`}>
+                                  <div className={`w-5 h-5 rounded-full flex items-center justify-center ${plan.color === 'yellow' ? 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-500' : 'bg-brand/10 dark:bg-brand-light/10 text-brand dark:text-brand-light'}`}>
                                     <Check size={12} strokeWidth={3} />
                                   </div>
                                   <span className="text-[13px] text-slate-600 dark:text-slate-300 font-medium">{feature}</span>

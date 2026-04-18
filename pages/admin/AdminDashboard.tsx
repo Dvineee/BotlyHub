@@ -75,7 +75,12 @@ const AdminDashboard = () => {
         <div className="h-full flex flex-col p-8">
           <div className="flex items-center gap-4 mb-14">
             <div className="shrink-0">
-                <img src="/logo.svg" alt="BotlyHub Logo" style={{ width: '2.5em', height: 'auto' }} className="drop-shadow-[0_0_15px_rgba(34,158,217,0.2)]" />
+                <img 
+                    src="/logo.svg" 
+                    alt="BotlyHub Logo" 
+                    style={{ width: '2.5rem', height: 'auto', display: 'block' }} 
+                    className="drop-shadow-[0_0_15px_rgba(47,136,255,0.3)]" 
+                />
             </div>
             <div>
                 <h2 className="text-xl font-black text-white italic tracking-tighter uppercase leading-none">Botly<span className="text-brand">Hub</span></h2>
