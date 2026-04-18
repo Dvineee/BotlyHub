@@ -243,7 +243,7 @@ const BotDetail = () => {
               <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight truncate mb-1 flex items-center gap-2">
                   {bot.name}
                   {bot.is_official && (
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-[#139fec] shrink-0">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="w-[11px] h-[11px] text-[#139fec] shrink-0">
                           <polyline points="20 6 9 17 4 12" />
                       </svg>
                   )}

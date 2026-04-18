@@ -121,12 +121,6 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
             </div>
         </div>
 
-        <div className="absolute bottom-7 right-7">
-            <div className="w-10 h-10 rounded-full bg-slate-900 dark:bg-white flex items-center justify-center text-white dark:text-slate-900 shadow-xl opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                <ChevronRight size={20} />
-            </div>
-        </div>
-
         {/* Gloss effect overlay */}
         <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
     </motion.div>
@@ -153,7 +147,7 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonR
             <h3 className="font-extrabold text-lg text-slate-900 dark:text-slate-100 truncate tracking-tight uppercase leading-none mb-1.5 flex items-center gap-1.5">
                 {bot.name}
                 {bot.is_official && (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 text-[#139fec] shrink-0">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="w-[11px] h-[11px] text-[#139fec] shrink-0">
                         <polyline points="20 6 9 17 4 12" />
                     </svg>
                 )}
