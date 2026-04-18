@@ -458,7 +458,7 @@ const BotManagement = () => {
                                                 <div className="space-y-2">
                                                     <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4">PLATFORM STATÜSÜ</label>
                                                     <button type="button" onClick={()=>setEditingBot({...editingBot, is_official: !editingBot.is_official})} className={`w-full h-14 lg:h-18 rounded-[22px] lg:rounded-[28px] flex items-center justify-center gap-3 transition-all font-black text-[10px] tracking-widest ${editingBot.is_official ? 'bg-brand text-white shadow-xl shadow-brand/40' : 'bg-slate-950 text-slate-600 border border-white/5'}`}>
-                                                        {editingBot.is_official ? 'OFFICIAL BOT' : 'STANDARD BOT'}
+                                                        {editingBot.is_official ? 'BİZE AİT (OFFICIAL)' : 'HARİCİ (EXTERNAL)'}
                                                     </button>
                                                 </div>
                                             </div>

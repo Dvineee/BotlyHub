@@ -256,36 +256,48 @@ const MyBots = () => {
 
                     <div className={`absolute inset-0 z-30 transition-transform duration-300 ease-out flex items-center justify-center p-3 ${openSettingsId === bot.id ? 'translate-x-0' : 'translate-x-full'}`}>
                          <div className="absolute inset-0 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-xl"></div>
-                         <div className="w-full h-full grid grid-cols-2 grid-rows-2 gap-3 relative z-40 content-center justify-center">
-                                <div 
-                                    onClick={(e) => { e.stopPropagation(); toggleAdRevenue(bot.id); }}
-                                    className={`cursor-pointer rounded-2xl px-4 h-full max-h-[64px] flex items-center gap-3 border transition-all active:scale-95 shadow-lg ${
-                                        bot.revenueEnabled ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-white dark:bg-slate-900/60 border-black/5 dark:border-white/5'
-                                    }`}
-                                >
-                                    <TrendingUp size={18} className={bot.revenueEnabled ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'} />
-                                    <span className={`text-[11px] font-bold uppercase tracking-tight ${bot.revenueEnabled ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'}`}>Gelir Modu</span>
-                                </div>
+                         <div className={`w-full h-full grid gap-3 relative z-40 content-center justify-center ${bot.is_official ? 'grid-cols-2 grid-rows-2' : 'grid-cols-1'}`}>
+                                {bot.is_official && (
+                                    <>
+                                        {/* Ücretsiz botlarda gelir durumu kontrol edilmeyecek (buton olmayacak) */}
+                                        {bot.price > 0 ? (
+                                            <div 
+                                                onClick={(e) => { e.stopPropagation(); toggleAdRevenue(bot.id); }}
+                                                className={`cursor-pointer rounded-2xl px-4 h-full max-h-[64px] flex items-center gap-3 border transition-all active:scale-95 shadow-lg ${
+                                                    bot.revenueEnabled ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-white dark:bg-slate-900/60 border-black/5 dark:border-white/5'
+                                                }`}
+                                            >
+                                                <TrendingUp size={18} className={bot.revenueEnabled ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'} />
+                                                <span className={`text-[11px] font-bold uppercase tracking-tight ${bot.revenueEnabled ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'}`}>Gelir Modu</span>
+                                            </div>
+                                        ) : (
+                                            <div className="rounded-2xl px-4 h-full max-h-[64px] flex flex-col items-center justify-center bg-slate-100 dark:bg-slate-950/40 border border-black/5 dark:border-white/5 opacity-40 text-center">
+                                                <Lock size={14} className="text-slate-400 dark:text-slate-500 mb-1" />
+                                                <span className="text-[8px] font-bold uppercase text-slate-400 dark:text-slate-500 tracking-widest">Ücretsiz</span>
+                                            </div>
+                                        )}
+
+                                        <div 
+                                            onClick={(e) => { e.stopPropagation(); toggleActiveStatus(bot.id); }}
+                                            className={`cursor-pointer rounded-2xl px-4 h-full max-h-[64px] flex items-center gap-3 border transition-all active:scale-95 shadow-lg ${
+                                                bot.isActive ? 'bg-brand/10 dark:bg-brand-light/10 border-brand/30 dark:border-brand-light/30' : 'bg-white dark:bg-slate-900/60 border-black/5 dark:border-white/5'
+                                            }`}
+                                        >
+                                            <Activity size={18} className={bot.isActive ? 'text-brand dark:text-brand-light' : 'text-slate-400 dark:text-slate-500'} />
+                                            <span className={`text-[11px] font-bold uppercase tracking-tight ${bot.isActive ? 'text-brand dark:text-brand-light' : 'text-slate-500 dark:text-slate-400'}`}>Bot Durumu</span>
+                                        </div>
+                                    </>
+                                )}
 
                                 <div 
-                                    onClick={(e) => { e.stopPropagation(); toggleActiveStatus(bot.id); }}
-                                    className={`cursor-pointer rounded-2xl px-4 h-full max-h-[64px] flex items-center gap-3 border transition-all active:scale-95 shadow-lg ${
-                                        bot.isActive ? 'bg-brand/10 dark:bg-brand-light/10 border-brand/30 dark:border-brand-light/30' : 'bg-white dark:bg-slate-900/60 border-black/5 dark:border-white/5'
-                                    }`}
+                                    onClick={(e) => { e.stopPropagation(); handleDeleteClick(bot); }}
+                                    className={`cursor-pointer rounded-2xl px-4 h-full max-h-[64px] flex items-center justify-center gap-3 border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 transition-all active:scale-95 shadow-lg ${bot.is_official ? 'col-start-2 row-start-2' : ''}`}
                                 >
-                                    <Activity size={18} className={bot.isActive ? 'text-brand dark:text-brand-light' : 'text-slate-400 dark:text-slate-500'} />
-                                    <span className={`text-[11px] font-bold uppercase tracking-tight ${bot.isActive ? 'text-brand dark:text-brand-light' : 'text-slate-500 dark:text-slate-400'}`}>Bot Durumu</span>
+                                    <Trash2 size={18} className="text-red-500" />
+                                    <span className="text-[11px] font-bold uppercase text-red-500">Kaldır</span>
                                 </div>
 
-                                {bot.price === 0 ? (
-                                    <div 
-                                        onClick={(e) => { e.stopPropagation(); handleDeleteClick(bot); }}
-                                        className="cursor-pointer rounded-2xl px-4 h-full max-h-[64px] flex items-center justify-center gap-3 border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 transition-all active:scale-95 col-start-2 row-start-2 shadow-lg"
-                                    >
-                                        <Trash2 size={18} className="text-red-500" />
-                                        <span className="text-[11px] font-bold uppercase text-red-500">Kaldır</span>
-                                    </div>
-                                ) : (
+                                {bot.is_official && bot.price > 0 && (
                                     <div className="rounded-2xl px-4 h-full max-h-[64px] flex flex-col items-center justify-center bg-slate-100 dark:bg-slate-950 border border-black/5 dark:border-white/5 opacity-60 col-start-2 row-start-2 text-center shadow-inner">
                                         <Lock size={14} className="text-slate-400 dark:text-slate-500 mb-1" />
                                         <span className="text-[9px] font-bold uppercase text-slate-400 dark:text-slate-500 tracking-widest">Kilitli</span>
