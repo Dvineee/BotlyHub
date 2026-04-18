@@ -38,7 +38,7 @@ const Payment = () => {
     }
     
     if (tg) {
-        tg.setHeaderColor('#020617');
+        tg.setHeaderColor('#12172c');
     }
 
     const testBackend = async () => {
@@ -199,12 +199,12 @@ const Payment = () => {
       }
   };
 
-  if (!item) return <div className="min-h-screen bg-white dark:bg-[#020617] flex items-center justify-center"><Loader2 className="animate-spin text-brand" size={40} /></div>;
+  if (!item) return <div className="min-h-screen bg-white dark:bg-slate-950 flex items-center justify-center"><Loader2 className="animate-spin text-brand" size={40} /></div>;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-200 transition-colors duration-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 transition-colors duration-300">
         {/* Header Navigation */}
-        <header className="fixed top-0 inset-x-0 h-16 bg-white/80 dark:bg-[#020617]/80 backdrop-blur-xl z-50 border-b border-black/5 dark:border-white/5 px-6 flex items-center justify-between">
+        <header className="fixed top-0 inset-x-0 h-16 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl z-50 border-b border-black/5 dark:border-white/5 px-6 flex items-center justify-between">
             <button 
                 onClick={() => navigate(-1)}
                 className="w-10 h-10 rounded-2xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-600 dark:text-slate-400 active:scale-90 transition-all"

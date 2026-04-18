@@ -166,7 +166,7 @@ const MyBots = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#020617] p-4 pt-10 pb-32 animate-in fade-in transition-colors duration-300" onClick={() => setOpenSettingsId(null)}>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 pt-10 pb-32 animate-in fade-in transition-colors duration-300" onClick={() => setOpenSettingsId(null)}>
       <div className="flex items-center justify-between mb-8 px-1">
         <div className="flex items-center gap-4">
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Botlarım</h1>
@@ -207,7 +207,7 @@ const MyBots = () => {
                                 onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
                              />
                              {bot.price > 0 && (
-                                 <div className="absolute -top-2 -left-2 bg-brand dark:bg-brand-light text-white p-1.5 rounded-xl border-2 border-slate-50 dark:border-[#020617] shadow-xl">
+                                 <div className="absolute -top-2 -left-2 bg-brand dark:bg-brand-light text-white p-1.5 rounded-xl border-2 border-slate-50 dark:border-slate-950 shadow-xl">
                                      <Lock size={12} />
                                  </div>
                              )}

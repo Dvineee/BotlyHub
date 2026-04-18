@@ -23,9 +23,9 @@ const UserDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#020617] text-slate-600 dark:text-slate-200 animate-in fade-in pb-32 transition-colors duration-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-200 animate-in fade-in pb-32 transition-colors duration-300">
       {/* Header */}
-      <div className="p-6 flex items-center justify-between sticky top-0 bg-slate-50/80 dark:bg-[#020617]/80 backdrop-blur-xl z-50 border-b border-black/5 dark:border-white/5">
+      <div className="p-6 flex items-center justify-between sticky top-0 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl z-50 border-b border-black/5 dark:border-white/5">
         <h1 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Kullanıcı Detayları</h1>
         <button className="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-500 dark:text-slate-400 active:scale-90 transition-transform shadow-lg">
             <X size={22} />

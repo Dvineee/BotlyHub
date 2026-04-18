@@ -83,16 +83,16 @@ const AccountSettings = () => {
 
   if (isLoading) {
       return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#020617] flex items-center justify-center transition-colors duration-300">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center transition-colors duration-300">
             <Loader2 className="animate-spin text-brand dark:text-brand-light" size={28} />
         </div>
       );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#020617] flex flex-col text-slate-900 dark:text-slate-200 animate-in fade-in pb-20 transition-colors duration-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col text-slate-900 dark:text-slate-200 animate-in fade-in pb-20 transition-colors duration-300">
       {/* Premium Header */}
-      <nav className="h-24 px-6 flex items-center justify-center border-b border-black/5 dark:border-white/5 bg-white/50 dark:bg-[#020617]/50 backdrop-blur-xl sticky top-0 z-50">
+      <nav className="h-24 px-6 flex items-center justify-center border-b border-black/5 dark:border-white/5 bg-white/50 dark:bg-slate-950/50 backdrop-blur-xl sticky top-0 z-50">
         <span className="text-[10px] font-bold tracking-widest text-slate-400 dark:text-white/40 uppercase">GÜVENLİK MERKEZİ</span>
       </nav>
 

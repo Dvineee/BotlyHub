@@ -37,7 +37,7 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = ({ bot, tonRate }) => {
                 onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
             />
             {bot.price > 0 && (
-                <div className="absolute -top-1.5 -right-1.5 w-7 h-7 bg-brand dark:bg-brand-light rounded-xl flex items-center justify-center shadow-lg border-2 border-slate-50 dark:border-[#020617]">
+                <div className="absolute -top-1.5 -right-1.5 w-7 h-7 bg-brand dark:bg-brand-light rounded-xl flex items-center justify-center shadow-lg border-2 border-slate-50 dark:border-slate-950">
                     <Zap size={12} fill="currentColor" className="text-white" />
                 </div>
             )}
@@ -143,7 +143,7 @@ const SearchPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#020617] p-4 pt-10 pb-32 animate-in fade-in transition-colors duration-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 pt-10 pb-32 animate-in fade-in transition-colors duration-300">
       {/* Header & Search Box */}
       <div className="flex items-center gap-4 mb-8">
         <button onClick={() => navigate(-1)} className="w-12 h-12 flex items-center justify-center text-slate-500 dark:text-slate-400 active:scale-90 transition-transform shrink-0">

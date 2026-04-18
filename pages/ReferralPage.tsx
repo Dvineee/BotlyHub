@@ -63,7 +63,7 @@ const ReferralPage = () => {
     }
 
     return (
-        <div className="p-6 space-y-8 pb-32 bg-slate-50 dark:bg-[#020617] min-h-screen animate-in fade-in transition-colors duration-300">
+        <div className="p-6 space-y-8 pb-32 bg-slate-50 dark:bg-slate-950 min-h-screen animate-in fade-in transition-colors duration-300">
             {/* Header */}
             <div className="flex items-center gap-5 mb-10 px-1">
                 <div className="w-12 h-12 bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full flex items-center justify-center shadow-lg">

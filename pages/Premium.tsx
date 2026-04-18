@@ -25,7 +25,7 @@ const Premium = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#020617] p-4 pt-10 pb-32 animate-in fade-in transition-colors duration-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 pt-10 pb-32 animate-in fade-in transition-colors duration-300">
       {/* Header */}
       <div className="flex items-center gap-5 mb-10 px-1">
         <div>

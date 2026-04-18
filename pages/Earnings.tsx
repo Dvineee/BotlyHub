@@ -104,7 +104,7 @@ const Earnings = () => {
   const totalViews = stats.reduce((acc, curr) => acc + (curr.views || 0), 0);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#020617] p-4 pt-10 pb-32 flex flex-col transition-colors animate-in fade-in duration-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 pt-10 pb-32 flex flex-col transition-colors animate-in fade-in duration-300">
         <div className="flex items-center gap-4 mb-10 px-1">
             <div>
                 <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Finansal Özet</h1>

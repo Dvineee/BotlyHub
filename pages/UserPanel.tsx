@@ -53,7 +53,7 @@ const UserPanel: React.FC = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-[#020617] flex overflow-hidden">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex overflow-hidden">
             {/* Sidebar */}
             <aside className={`
                 fixed lg:static inset-y-0 left-0 z-50 w-80 bg-slate-900/80 backdrop-blur-2xl border-r border-white/5 transition-transform duration-300

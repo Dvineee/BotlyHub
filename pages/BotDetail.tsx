@@ -211,7 +211,7 @@ const BotDetail = () => {
   }, [bot, tonRate]);
 
   if (isLoading) return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#020617] flex items-center justify-center">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
         <Loader2 className="animate-spin text-blue-500/50" size={32} />
     </div>
   );
@@ -219,7 +219,7 @@ const BotDetail = () => {
   if (!bot) return null;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-200 pb-40 animate-in fade-in transition-colors duration-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 pb-40 animate-in fade-in transition-colors duration-300">
       <div className="max-w-7xl mx-auto lg:px-10">
         <div className="lg:grid lg:grid-cols-[1fr_320px] lg:gap-16 overflow-visible">
           <div className="lg:col-start-1">
@@ -234,13 +234,20 @@ const BotDetail = () => {
                 onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=1e293b&color=fff&bold=true`; }}
               />
               {isOwned && (
-                  <div className="absolute -bottom-2 -right-2 bg-emerald-500 text-white p-1.5 rounded-xl border-2 border-slate-50 dark:border-[#020617]">
+                  <div className="absolute -bottom-2 -right-2 bg-emerald-500 text-white p-1.5 rounded-xl border-2 border-slate-50 dark:border-slate-950">
                       <CheckCircle2 size={14} />
                   </div>
               )}
           </div>
           <div className="flex-1 min-w-0 pt-1">
-              <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight truncate mb-1">{bot.name}</h1>
+              <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight truncate mb-1 flex items-center gap-2">
+                  {bot.name}
+                  {bot.is_official && (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#139fec] shrink-0">
+                          <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                  )}
+              </h1>
               <p className="text-brand dark:text-brand-light text-[11px] font-semibold mb-3 uppercase tracking-wider">{bot.category}</p>
               <div className="flex flex-wrap gap-2 items-center">
                   <span className="bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 text-slate-500 dark:text-slate-400 text-[10px] font-bold px-3 py-1 rounded-xl uppercase">v4.2.0</span>

@@ -136,7 +136,9 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonR
             <h3 className="font-extrabold text-lg text-slate-900 dark:text-slate-100 truncate tracking-tight uppercase leading-none mb-1.5 flex items-center gap-1.5">
                 {bot.name}
                 {bot.is_official && (
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#139fec] fill-[#139fec]/10 shrink-0" />
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 text-[#139fec] shrink-0">
+                        <polyline points="20 6 9 17 4 12" />
+                    </svg>
                 )}
             </h3>
             <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider truncate mb-2">{bot.description}</p>
@@ -295,7 +297,7 @@ const Home = () => {
                 >
                     <LayoutGrid size={22} />
                     {unreadCount > 0 && (
-                        <div className="absolute -top-1 -right-1 min-w-[20px] h-[20px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-[#020617] text-[9px] font-black text-white flex items-center justify-center px-1 badge-pop shadow-xl">
+                        <div className="absolute -top-1 -right-1 min-w-[20px] h-[20px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[9px] font-black text-white flex items-center justify-center px-1 badge-pop shadow-xl">
                             {unreadCount > 9 ? '9+' : unreadCount}
                         </div>
                     )}
@@ -393,7 +395,7 @@ const Home = () => {
       {/* Enhanced Announcement Popup */}
       <AnimatePresence>
         {selectedAnn && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-[#020617]/80 backdrop-blur-xl" onClick={() => setSelectedAnn(null)}>
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-xl" onClick={() => setSelectedAnn(null)}>
             <motion.div 
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}

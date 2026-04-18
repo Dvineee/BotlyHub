@@ -65,7 +65,7 @@ const Notifications = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#020617] p-4 pt-10 pb-32 animate-in fade-in transition-colors duration-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 pt-10 pb-32 animate-in fade-in transition-colors duration-300">
       {/* Premium Navigation Header */}
       <div className="flex items-center justify-between mb-12 px-1">
         <div className="flex items-center gap-5">
