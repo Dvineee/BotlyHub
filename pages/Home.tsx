@@ -26,6 +26,23 @@ const getLiveBotIcon = (bot: Bot) => {
     return bot.icon || `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=random&color=fff`;
 };
 
+const getLangLabel = (lang: string) => {
+    const mapping: Record<string, string> = {
+        '🇹🇷': 'TR',
+        '🇬🇧': 'EN',
+        '🇺🇸': 'EN',
+        '🇷🇺': 'RU',
+        '🇮🇷': 'FA',
+        '🇺🇦': 'UA',
+        '🇪🇸': 'ES',
+        '🇮🇳': 'HI',
+        '🇸🇦': 'AR',
+        '🇫🇷': 'FR',
+        '🇩🇪': 'DE'
+    };
+    return mapping[lang] || lang;
+};
+
 const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) => void }> = React.memo(({ ann, onShowPopup }) => {
   const navigate = useNavigate();
   const colors: Record<string, string> = {
@@ -165,7 +182,8 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonR
                                     ${idx >= 4 ? '!hidden !lg:inline-block' : ''}
                                 `}
                             >
-                                {lang}
+                                <span className="md:hidden">{getLangLabel(lang)}</span>
+                                <span className="hidden md:inline">{lang}</span>
                             </span>
                         ))}
                         {/* Plus SVG indicators for mobile/tablet truncation */}
