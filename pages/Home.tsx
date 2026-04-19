@@ -135,41 +135,49 @@ const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = ({ bots }) => {
     const [activeType, setActiveType] = useState<'latest' | 'official' | 'featured'>('latest');
 
     const featuredBots = useMemo(() => {
-        return bots.filter(b => b.promoted_type === activeType);
+        // En son eklenenler: If type is latest, show those flagged OR just the latest bots
+        if (activeType === 'latest') {
+            const flagged = bots.filter(b => b.promoted_type === 'latest');
+            if (flagged.length > 0) return flagged;
+            // Fallback: Show last 10 added bots
+            return [...bots].sort((a, b) => Number(b.id) - Number(a.id)).slice(0, 10);
+        }
+        // Orjinal: Show official bots
+        if (activeType === 'official') {
+            const flagged = bots.filter(b => b.promoted_type === 'official');
+            if (flagged.length > 0) return flagged;
+            return bots.filter(b => b.is_official).sort((a, b) => Number(a.id) - Number(b.id));
+        }
+        // Market Özel: Show featured bots
+        return bots.filter(b => b.promoted_type === 'featured');
     }, [bots, activeType]);
 
     const types = [
         { id: 'latest', label: 'en son eklenenler' },
         { id: 'official', label: 'orjinal' },
-        { id: 'featured', label: 'öne çıkarılanlar' }
+        { id: 'featured', label: 'market özel' }
     ];
 
-    useEffect(() => {
-        if (bots.length > 0 && !bots.some(b => b.promoted_type === activeType)) {
-            const firstAvailable = types.find(t => bots.some(b => b.promoted_type === t.id));
-            if (firstAvailable) setActiveType(firstAvailable.id as any);
-        }
-    }, [bots, activeType]);
-
-    if (!bots.some(b => b.promoted_type && b.promoted_type !== 'none')) return null;
+    if (bots.length === 0) return null;
 
     return (
-        <div className="mb-10 flex flex-col md:flex-row items-center gap-6 bg-white dark:bg-slate-900/40 p-6 rounded-[40px] border border-black/5 dark:border-white/10 relative overflow-hidden group">
-            <div className="flex flex-col shrink-0 min-w-[160px] md:border-r border-black/5 dark:border-white/5 md:pr-6 h-full justify-center">
-                <div className="flex items-center gap-2 mb-1">
-                    <h2 className="text-xl font-black text-slate-900 dark:text-white uppercase italic tracking-tighter leading-tight">
-                        {activeType === 'latest' ? 'en son eklenenler' : activeType === 'official' ? 'botly orjinal' : 'öne çıkanlar'}
+        <div className="mb-10 flex flex-col md:flex-row items-center gap-6 bg-white dark:bg-slate-900/40 p-6 rounded-[32px] md:rounded-[48px] border border-black/5 dark:border-white/5 relative overflow-hidden group shadow-sm">
+            {/* Header Info */}
+            <div className="flex flex-col shrink-0 min-w-[180px] md:border-r border-black/5 dark:border-white/5 md:pr-6 h-full justify-center">
+                <div className="flex items-center gap-1.5 mb-0.5">
+                    <h2 className="text-[17px] font-black text-slate-900 dark:text-white lowercase tracking-tight leading-none">
+                        {types.find(t => t.id === activeType)?.label}
                     </h2>
                     <div className="text-slate-400">
-                        <Info size={14} />
+                        <Info size={16} />
                     </div>
                 </div>
-                <div className="flex flex-col gap-1">
-                    {types.map(t => bots.some(b => b.promoted_type === t.id) && t.id !== activeType && (
+                <div className="flex flex-col">
+                    {types.map(t => t.id !== activeType && (
                         <button 
                             key={t.id}
                             onClick={() => setActiveType(t.id as any)}
-                            className="text-[11px] font-bold text-blue-500 uppercase tracking-widest hover:underline text-left"
+                            className="text-[14px] font-medium text-blue-500 lowercase hover:underline text-left transition-all"
                         >
                             {t.label}
                         </button>
@@ -177,6 +185,7 @@ const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = ({ bots }) => {
                 </div>
             </div>
 
+            {/* Slider Content */}
             <div className="relative flex-1 w-full overflow-hidden">
                 <div 
                     ref={scroll.ref}
@@ -185,29 +194,32 @@ const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = ({ bots }) => {
                     onMouseMove={scroll.onMouseMove}
                     onMouseLeave={scroll.onMouseLeave}
                     onContextMenu={scroll.onContextMenu}
-                    className={`flex items-center gap-8 overflow-x-auto no-scrollbar py-2 h-24 ${scroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+                    className={`flex items-start gap-10 overflow-x-auto no-scrollbar py-2 ${scroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
                 >
-                    <AnimatePresence mode="wait">
+                    <AnimatePresence mode="popLayout">
                         {featuredBots.map((bot) => (
                             <motion.div
                                 key={bot.id}
-                                initial={{ opacity: 0, x: 20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: -20 }}
+                                layout
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.9 }}
                                 onClick={() => navigate(`/bot/${bot.id}`)}
-                                className="flex flex-col items-center gap-3 shrink-0 cursor-pointer group/item snap-center w-24"
+                                className="flex flex-col items-center gap-2 shrink-0 cursor-pointer group/item w-20"
                             >
                                 <div className="relative">
-                                    <div className="absolute inset-0 bg-blue-500/20 blur-xl rounded-full opacity-0 group-hover/item:opacity-100 transition-opacity"></div>
-                                    <img 
-                                        src={getLiveBotIcon(bot)} 
-                                        className="w-16 h-16 rounded-full border-2 border-white dark:border-slate-800 shadow-xl object-cover relative z-10 group-hover/item:scale-110 transition-transform"
-                                        onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
-                                        referrerPolicy="no-referrer"
-                                    />
+                                    <div className="absolute inset-0 bg-blue-500/10 blur-xl rounded-full opacity-0 group-hover/item:opacity-100 transition-opacity"></div>
+                                    <div className="w-16 h-16 rounded-full p-[2px] bg-gradient-to-tr from-black/5 to-black/10 dark:from-white/5 dark:to-white/10 group-hover/item:from-blue-500/50 group-hover/item:to-brand/50 transition-all">
+                                        <img 
+                                            src={getLiveBotIcon(bot)} 
+                                            className="w-full h-full rounded-full border border-black/5 dark:border-white/10 shadow-lg object-cover bg-white dark:bg-slate-800"
+                                            onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
+                                            referrerPolicy="no-referrer"
+                                        />
+                                    </div>
                                 </div>
                                 <div className="flex flex-col items-center text-center">
-                                    <span className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-tighter truncate w-full group-hover/item:text-blue-500 transition-colors">
+                                    <span className="text-[12px] font-bold text-slate-800 dark:text-slate-200 tracking-tight leading-tight line-clamp-2 w-full group-hover/item:text-blue-500 transition-colors">
                                         {bot.name}
                                     </span>
                                 </div>
@@ -216,10 +228,11 @@ const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = ({ bots }) => {
                     </AnimatePresence>
                 </div>
 
-                <div className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                {/* Right Navigation Arrow */}
+                <div className="hidden lg:flex absolute right-0 top-[28px] items-center justify-center pointer-events-none">
                     <button 
-                        onClick={(e) => { e.stopPropagation(); scroll.ref.current?.scrollBy({ left: 200, behavior: 'smooth' }); }}
-                        className="w-10 h-10 bg-white/20 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-brand transition-all shadow-lg active:scale-95"
+                        onClick={(e) => { e.stopPropagation(); scroll.ref.current?.scrollBy({ left: 300, behavior: 'smooth' }); }}
+                        className="w-10 h-10 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border border-black/5 dark:border-white/10 rounded-full flex items-center justify-center text-slate-400 hover:text-brand hover:border-brand transition-all shadow-md pointer-events-auto active:scale-95"
                     >
                         <ChevronRight size={20} />
                     </button>

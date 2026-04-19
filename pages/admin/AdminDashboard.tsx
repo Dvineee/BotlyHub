@@ -333,6 +333,17 @@ const BotManagement = () => {
                                             <span className="text-[8px] font-black text-brand uppercase tracking-widest">OFFICIAL</span>
                                         </div>
                                     )}
+                                    <button 
+                                        onClick={async () => {
+                                            const nextType = b.promoted_type === 'featured' ? 'none' : 'featured';
+                                            await DatabaseService.saveBot({ ...b, promoted_type: nextType });
+                                            load();
+                                        }}
+                                        className={`p-2.5 lg:p-3 rounded-xl transition-all ${b.promoted_type === 'featured' ? 'bg-amber-500 text-white' : 'bg-white/5 text-slate-500 hover:bg-amber-500/20 hover:text-amber-500'}`}
+                                        title="Öne Çıkar"
+                                    >
+                                        <Star size={16} fill={b.promoted_type === 'featured' ? "currentColor" : "none"} />
+                                    </button>
                                     <button onClick={() => { setEditingBot(b); setIsModalOpen(true); }} className="p-2.5 lg:p-3 bg-white/5 rounded-xl hover:bg-brand text-slate-500 hover:text-white transition-all"><Edit3 size={16}/></button>
                                     <button onClick={async () => { if(confirm('Silsin mi?')) { await DatabaseService.deleteBot(b.id); await DatabaseService.logActivity('admin', 'bot_manage', 'bot_deleted', 'Bot Silindi', `${b.name} isimli bot sistemden silindi.`); load(); } }} className="p-2.5 lg:p-3 bg-white/5 rounded-xl text-red-500 hover:bg-red-500 hover:text-white transition-all"><Trash2 size={16}/></button>
                                 </div>
