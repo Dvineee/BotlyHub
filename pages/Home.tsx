@@ -158,13 +158,22 @@ const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = ({ bots }) => {
         { id: 'featured', label: 'market özel' }
     ];
 
+    const cycleType = () => {
+        const currentIndex = types.findIndex(t => t.id === activeType);
+        const nextIndex = (currentIndex + 1) % types.length;
+        setActiveType(types[nextIndex].id as any);
+    };
+
     if (bots.length === 0) return null;
 
     return (
         <div className="mb-10 flex flex-col md:flex-row items-center gap-6 bg-[#ffffff] dark:bg-[#1e293b] px-[10px] py-4 rounded-lg border border-black/5 dark:border-white/5 relative overflow-hidden group">
             {/* Header Info */}
-            <div className="flex flex-col shrink-0 min-w-[180px] md:border-r border-black/5 dark:border-white/5 md:pr-6 h-full justify-center">
-                <div className="flex items-center gap-1.5 mb-0.5">
+            <div className="flex flex-col shrink-0 min-w-full md:min-w-[180px] md:border-r border-black/5 dark:border-white/5 md:pr-6 h-full justify-center">
+                <div 
+                    className="flex items-center gap-1.5 mb-0.5 cursor-pointer md:cursor-default"
+                    onClick={() => { if (window.innerWidth < 768) cycleType(); }}
+                >
                     <h2 className="text-[17px] font-black text-slate-900 dark:text-white lowercase tracking-tight leading-none">
                         {types.find(t => t.id === activeType)?.label}
                     </h2>
@@ -172,7 +181,7 @@ const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = ({ bots }) => {
                         <Info size={16} />
                     </div>
                 </div>
-                <div className="flex flex-col">
+                <div className="hidden md:flex flex-col">
                     {types.map(t => t.id !== activeType && (
                         <button 
                             key={t.id}
