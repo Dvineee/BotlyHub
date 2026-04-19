@@ -163,7 +163,11 @@ span.text-\[10px\].font-black.text-slate-500.dark\:text-slate-400.uppercase.trac
 }
 
 .mb-10 {
-  margin-bottom: 0.5rem;
+  margin-bottom: 01rem;
+}
+
+.bot-card {
+    padding: 6px !important;
 }
 
 . {
