@@ -516,7 +516,7 @@ const BotDetail = () => {
                     <motion.div 
                       key={i} 
                       whileHover={{ scale: 1.02 }}
-                      className="min-w-[180px] h-[320px] rounded-[32px] bg-slate-200 dark:bg-slate-900 border border-black/5 dark:border-white/5 overflow-hidden snap-center shrink-0 cursor-zoom-in group relative"
+                      className="w-[180px] h-[320px] md:w-[260px] md:h-[460px] rounded-[32px] bg-slate-200 dark:bg-slate-900 border border-black/5 dark:border-white/5 overflow-hidden snap-center shrink-0 cursor-zoom-in group relative"
                       onClick={() => openLightbox(i)}
                     >
                         <img src={s} loading="lazy" className="w-full h-full object-cover" />
@@ -527,7 +527,7 @@ const BotDetail = () => {
                   ))
               ) : (
                   [1,2,3].map(i => (
-                    <div key={i} className="min-w-[180px] h-[320px] rounded-[32px] bg-slate-100 dark:bg-slate-900/50 border border-black/5 dark:border-white/5 overflow-hidden snap-center shrink-0 flex items-center justify-center">
+                    <div key={i} className="w-[180px] h-[320px] md:w-[260px] md:h-[460px] rounded-[32px] bg-slate-100 dark:bg-slate-900/50 border border-black/5 dark:border-white/5 overflow-hidden snap-center shrink-0 flex items-center justify-center">
                         <ImageIcon className="text-slate-300 dark:text-slate-800" size={32} />
                     </div>
                   ))
