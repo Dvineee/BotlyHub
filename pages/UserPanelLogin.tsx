@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Key, User, ArrowRight, ShieldCheck } from 'lucide-react';
 import { DatabaseService } from '../services/DatabaseService';
+import Logo from '../components/Logo';
 
 const UserPanelLogin: React.FC = () => {
     const [username, setUsername] = useState('');
@@ -37,9 +38,7 @@ const UserPanelLogin: React.FC = () => {
       <div className="w-full max-w-md space-y-10">
         <div className="text-center space-y-5">
           <div className="shrink-0 flex justify-center">
-            <img 
-              src="/logo.svg" 
-              alt="BotlyHub Logo" 
+            <Logo 
               style={{ width: '4rem', height: 'auto', display: 'block' }} 
               className=" mx-auto" 
             />

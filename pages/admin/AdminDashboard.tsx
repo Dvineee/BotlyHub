@@ -15,6 +15,7 @@ import { DatabaseService } from '../../services/DatabaseService';
 import { GeminiService } from '../../services/GeminiService';
 import { GoogleGenAI, Type } from "@google/genai";
 import { User, Bot as BotType, Announcement, Promotion, ActivityLog, Notification, Referral, ReferralSettings } from '../../types';
+import Logo from '../../components/Logo';
 
 const getLiveBotIcon = (botLink: string) => {
     if (!botLink || botLink === '@') return "https://ui-avatars.com/api/?name=Bot&background=1e293b&color=fff";
@@ -75,9 +76,7 @@ const AdminDashboard = () => {
         <div className="h-full flex flex-col p-8">
           <div className="flex items-center gap-4 mb-14">
             <div className="shrink-0">
-                <img 
-                    src="/logo.svg" 
-                    alt="BotlyHub Logo" 
+                <Logo 
                     style={{ width: '2.5rem', height: 'auto', display: 'block' }} 
                     className="" 
                 />

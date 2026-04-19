@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
   Share2, Send, Loader2, ShieldCheck, 
   Bot as BotIcon, Zap, Shield, PlusCircle, X, 
-  Maximize2, ChevronRight, ChevronDown, Eye, Lock, Unlock, AlertTriangle, 
+  Maximize2, ChevronRight, ChevronLeft, ChevronDown, Eye, Lock, Unlock, AlertTriangle, 
   Sparkles, Star, Download, Info, CheckCircle2, Globe, Cpu,
   Play, UserPlus, MessageSquare, BarChart3, MousePointer2,
   Search, LayoutGrid, Store, User as UserIcon, Megaphone, Bell, Instagram, Youtube, Link
@@ -19,6 +19,7 @@ import { GeminiService } from '../services/GeminiService';
 import { useDraggableScroll } from '../hooks/useDraggableScroll';
 import { useTheme } from '../ThemeContext';
 import { TelegramLoginWidget } from '../components/TelegramLoginWidget';
+import Logo from '../components/Logo';
 import { useRef } from 'react';
 
 const getLiveBotIcon = (bot: Bot) => {
@@ -50,9 +51,10 @@ const BotDetail = () => {
   const [userRating, setUserRating] = useState<number | null>(null);
   const [hoverRating, setHoverRating] = useState<number | null>(null);
   const [isRating, setIsRating] = useState(false);
-  const [openAccordion, setOpenAccordion] = useState<string | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const menuRef = useRef<HTMLDivElement>(null);
   
   const screenshotScroll = useDraggableScroll();
@@ -91,9 +93,43 @@ const BotDetail = () => {
     const handleClickOutside = (event: MouseEvent) => {
         if (menuRef.current && !menuRef.current.contains(event.target as Node)) setIsMenuOpen(false);
     };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowRight') nextImage(null as any);
+      if (e.key === 'ArrowLeft') prevImage(null as any);
+    };
+
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, [fetchBotData, id]);
+
+  const openLightbox = (index: number) => {
+    setCurrentImageIndex(index);
+    setIsLightboxOpen(true);
+    document.body.style.overflow = 'hidden';
+  };
+
+  const closeLightbox = () => {
+    setIsLightboxOpen(false);
+    document.body.style.overflow = 'auto';
+  };
+
+  const nextImage = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    if (!bot?.screenshots) return;
+    setCurrentImageIndex((prev) => (prev + 1) % bot.screenshots!.length);
+  };
+
+  const prevImage = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    if (!bot?.screenshots) return;
+    setCurrentImageIndex((prev) => (prev - 1 + bot.screenshots!.length) % bot.screenshots!.length);
+  };
 
   useEffect(() => {
     if (user?.id && id) {
@@ -245,7 +281,7 @@ const BotDetail = () => {
         <div className="flex items-center justify-between mb-8 pt-6 gap-3 md:gap-6">
             <div className="flex items-center gap-2 shrink-0">
                 <div className="shrink-0 cursor-pointer" onClick={() => navigate('/')}>
-                    <img src="/logo.svg" alt="BotlyHub Logo" style={{ width: '2.5rem', height: 'auto', display: 'block' }} className="" />
+                    <Logo style={{ width: '2.5rem', height: 'auto', display: 'block' }} className="" />
                 </div>
                 <h1 className="hidden sm:block text-2xl font-bold text-slate-900 dark:text-white tracking-tight cursor-pointer" onClick={() => navigate('/')}>BotlyHub</h1>
             </div>
@@ -466,7 +502,6 @@ const BotDetail = () => {
 
       {/* Gallery Section */}
       <div className="mb-10">
-          <h3 className="px-8 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-4">Ekran Görüntüleri</h3>
           <div 
             ref={screenshotScroll.ref}
             onMouseDown={screenshotScroll.onMouseDown}
@@ -478,9 +513,17 @@ const BotDetail = () => {
           >
               {bot.screenshots && bot.screenshots.length > 0 ? (
                   bot.screenshots.map((s, i) => (
-                    <div key={i} className="min-w-[180px] h-[320px] rounded-[32px] bg-slate-200 dark:bg-slate-900 border border-black/5 dark:border-white/5 overflow-hidden snap-center shrink-0">
+                    <motion.div 
+                      key={i} 
+                      whileHover={{ scale: 1.02 }}
+                      className="min-w-[180px] h-[320px] rounded-[32px] bg-slate-200 dark:bg-slate-900 border border-black/5 dark:border-white/5 overflow-hidden snap-center shrink-0 cursor-zoom-in group relative"
+                      onClick={() => openLightbox(i)}
+                    >
                         <img src={s} loading="lazy" className="w-full h-full object-cover" />
-                    </div>
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                            <Maximize2 size={24} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                    </motion.div>
                   ))
               ) : (
                   [1,2,3].map(i => (
@@ -567,70 +610,6 @@ const BotDetail = () => {
           </div>
       </div>
 
-      {/* Accordions */}
-      <div className="px-6 mb-10 space-y-4">
-        {/* Accordion 1 */}
-        <div className="bg-white dark:bg-slate-900/60 rounded-[8px] border border-black/5 dark:border-white/5 overflow-hidden transition-all duration-300">
-          <button 
-            onClick={() => { haptic('light'); setOpenAccordion(openAccordion === 'why' ? null : 'why'); }}
-            className="w-full flex items-center justify-between p-[14px] text-left group"
-          >
-            <span className="text-xs font-black uppercase tracking-[0.1em] text-slate-700 dark:text-slate-300 group-hover:text-blue-500 transition-colors italic">Neden BotlyHub?</span>
-            <motion.div
-              animate={{ rotate: openAccordion === 'why' ? 180 : 0 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-            >
-              <ChevronDown size={18} className="text-slate-400" />
-            </motion.div>
-          </button>
-          <AnimatePresence>
-            {openAccordion === 'why' && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.3, ease: 'easeInOut' }}
-              >
-                <div className="px-6 pb-6 text-[12px] leading-relaxed text-slate-500 dark:text-slate-400 font-medium">
-                  BotlyHub, en güvenilir ve onaylanmış Telegram botlarını tek bir çatı altında toplayarak size hem güvenlik hem de çeşitlilik sunar. 
-                  Yapay zeka destekli analizlerimiz ve kullanıcı yorumlarımızla en iyi deneyimi yaşamanızı sağlıyoruz.
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
-        {/* Accordion 2 */}
-        <div className="bg-white dark:bg-slate-900/60 rounded-[8px] border border-black/5 dark:border-white/5 overflow-hidden transition-all duration-300">
-          <button 
-            onClick={() => { haptic('light'); setOpenAccordion(openAccordion === 'how' ? null : 'how'); }}
-            className="w-full flex items-center justify-between p-[14px] text-left group"
-          >
-            <span className="text-xs font-black uppercase tracking-[0.1em] text-slate-700 dark:text-slate-300 group-hover:text-blue-500 transition-colors italic">Nasıl Çalışır?</span>
-            <motion.div
-              animate={{ rotate: openAccordion === 'how' ? 180 : 0 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-            >
-              <ChevronDown size={18} className="text-slate-400" />
-            </motion.div>
-          </button>
-          <AnimatePresence>
-            {openAccordion === 'how' && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.3, ease: 'easeInOut' }}
-              >
-                <div className="px-6 pb-6 text-[12px] leading-relaxed text-slate-500 dark:text-slate-400 font-medium">
-                  İhtiyacınız olan botu seçin, detaylarını inceleyin ve "Botu Başlat" butonuna tıklayarak saniyeler içinde kullanmaya başlayın. 
-                  Eğer ücretli bir lisan gerekiyorsa, TON cüzdanınızla hızlıca ödeme yapıp ömür boyu erişim sağlayabilirsiniz.
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </div>
           </div>
 
           {/* Right Column (PC only) - Action bar moved here for large screens */}
@@ -894,6 +873,76 @@ const BotDetail = () => {
               </div>
             </motion.div>
           </div>
+        )}
+      </AnimatePresence>
+
+      {/* Screenshot Lightbox */}
+      <AnimatePresence>
+        {isLightboxOpen && bot?.screenshots && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[500] flex items-center justify-center bg-black/95 backdrop-blur-3xl px-4 md:px-0"
+            onClick={closeLightbox}
+          >
+            <div className="absolute top-8 right-8 flex items-center gap-4">
+              <span className="text-white/40 text-[10px] font-black uppercase tracking-[0.2em] hidden md:block">
+                Ekran Görüntüsü {currentImageIndex + 1} / {bot.screenshots.length}
+              </span>
+              <button 
+                onClick={closeLightbox}
+                className="w-12 h-12 bg-white/10 hover:bg-white/20 text-white rounded-full flex items-center justify-center transition-colors"
+                aria-label="Kapat"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <button 
+              onClick={prevImage}
+              className="absolute left-4 md:left-8 w-12 h-12 md:w-16 md:h-16 bg-white/10 hover:bg-white/20 text-white rounded-full flex items-center justify-center transition-all z-10 active:scale-90"
+              aria-label="Önceki"
+            >
+              <ChevronLeft size={32} />
+            </button>
+
+            <motion.div 
+              key={currentImageIndex}
+              initial={{ opacity: 0, scale: 0.9, x: 20 }}
+              animate={{ opacity: 1, scale: 1, x: 0 }}
+              exit={{ opacity: 0, scale: 0.9, x: -20 }}
+              className="relative w-full max-w-4xl h-[70vh] md:h-[80vh] flex items-center justify-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <img 
+                src={bot.screenshots[currentImageIndex]} 
+                alt={`Ekran Görüntüsü ${currentImageIndex + 1}`}
+                className="max-w-full max-h-full object-contain rounded-2xl md:rounded-[40px] shadow-2xl"
+              />
+            </motion.div>
+
+            <button 
+              onClick={nextImage}
+              className="absolute right-4 md:right-8 w-12 h-12 md:w-16 md:h-16 bg-white/10 hover:bg-white/20 text-white rounded-full flex items-center justify-center transition-all z-10 active:scale-90"
+              aria-label="Sonraki"
+            >
+              <ChevronRight size={32} />
+            </button>
+
+            {/* Thumbnails preview for large screens */}
+            <div className="absolute bottom-10 left-10 right-10 flex justify-center gap-3 overflow-x-auto no-scrollbar py-4 hidden md:flex">
+              {bot.screenshots.map((s, idx) => (
+                <button 
+                  key={idx}
+                  onClick={(e) => { e.stopPropagation(); setCurrentImageIndex(idx); }}
+                  className={`w-12 h-20 rounded-xl overflow-hidden border-2 transition-all shrink-0 ${currentImageIndex === idx ? 'border-brand scale-110' : 'border-white/10 opacity-40 hover:opacity-100'}`}
+                >
+                  <img src={s} className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>

@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Settings, ShieldAlert, Cpu, Sparkles } from 'lucide-react';
+import Logo from '../components/Logo';
 
 const Maintenance = () => {
   return (
@@ -11,9 +12,7 @@ const Maintenance = () => {
       <div className="max-w-md w-full text-center relative z-10">
         <div className="relative inline-block mb-12">
             <div className="w-32 h-32 bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-[48px] flex items-center justify-center  backdrop-blur-xl">
-                <img 
-                    src="/logo.svg" 
-                    alt="BotlyHub Logo" 
+                <Logo 
                     style={{ width: '4.5rem', height: 'auto', display: 'block' }} 
                     className=" animate-pulse" 
                 />

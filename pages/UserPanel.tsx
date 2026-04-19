@@ -19,6 +19,7 @@ import {
 
 import { useTelegram } from '../hooks/useTelegram';
 import { useDraggableScroll } from '../hooks/useDraggableScroll';
+import Logo from '../components/Logo';
 
 const UserPanel: React.FC = () => {
     const [activeSection, setActiveSection] = useState('dashboard');
@@ -64,9 +65,7 @@ const UserPanel: React.FC = () => {
                     <div className="p-10">
                         <div className="flex items-center gap-4">
                             <div className="shrink-0">
-                                <img 
-                                    src="/logo.svg" 
-                                    alt="BotlyHub Logo" 
+                                <Logo 
                                     style={{ width: '2.5rem', height: 'auto', display: 'block' }} 
                                     className="" 
                                 />

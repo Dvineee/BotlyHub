@@ -14,6 +14,7 @@ import { useFilter } from '../FilterContext';
 import { FilterMenu } from '../components/FilterMenu';
 import { useTheme } from '../ThemeContext';
 import { TelegramLoginWidget } from '../components/TelegramLoginWidget';
+import Logo from '../components/Logo';
 
 const iconMap: Record<string, any> = {
   Sparkles, Megaphone, Zap, Gift, Star, Info, BotIcon, Heart, Bell, Shield
@@ -268,7 +269,7 @@ const Home = () => {
         <div className="flex flex-wrap md:flex-nowrap items-center justify-between mb-8 px-1 gap-y-6 md:gap-x-6">
         <div className="flex items-center gap-3 order-1">
             <div className="shrink-0">
-                <img src="/logo.svg" alt="BotlyHub Logo" style={{ width: '2.5rem', height: 'auto', display: 'block' }} className="" />
+                <Logo style={{ width: '2.5rem', height: 'auto', display: 'block' }} className="" />
             </div>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">BotlyHub</h1>
         </div>
