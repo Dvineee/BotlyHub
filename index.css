@@ -537,3 +537,7 @@ html:not(.dark) .group:hover .lucide-chevron-right {
     padding-left: 0.5rem;
     padding-right: 0.5rem;
 }
+
+.max-w-4xl {
+    max-width: initial;
+}
