@@ -49,6 +49,7 @@ export interface Bot {
   features?: string[];
   views?: number;
   is_official?: boolean;
+  promoted_type?: 'latest' | 'official' | 'featured' | 'none';
   languages?: string[];
   telegram_group?: string;
   website_url?: string;

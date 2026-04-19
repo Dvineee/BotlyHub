@@ -129,6 +129,106 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
   );
 });
 
+const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = ({ bots }) => {
+    const navigate = useNavigate();
+    const scroll = useDraggableScroll();
+    const [activeType, setActiveType] = useState<'latest' | 'official' | 'featured'>('latest');
+
+    const featuredBots = useMemo(() => {
+        return bots.filter(b => b.promoted_type === activeType);
+    }, [bots, activeType]);
+
+    const types = [
+        { id: 'latest', label: 'en son eklenenler' },
+        { id: 'official', label: 'orjinal' },
+        { id: 'featured', label: 'öne çıkarılanlar' }
+    ];
+
+    useEffect(() => {
+        if (bots.length > 0 && !bots.some(b => b.promoted_type === activeType)) {
+            const firstAvailable = types.find(t => bots.some(b => b.promoted_type === t.id));
+            if (firstAvailable) setActiveType(firstAvailable.id as any);
+        }
+    }, [bots, activeType]);
+
+    if (!bots.some(b => b.promoted_type && b.promoted_type !== 'none')) return null;
+
+    return (
+        <div className="mb-10 flex flex-col md:flex-row items-center gap-6 bg-white dark:bg-slate-900/40 p-6 rounded-[40px] border border-black/5 dark:border-white/10 relative overflow-hidden group">
+            <div className="flex flex-col shrink-0 min-w-[160px] md:border-r border-black/5 dark:border-white/5 md:pr-6 h-full justify-center">
+                <div className="flex items-center gap-2 mb-1">
+                    <h2 className="text-xl font-black text-slate-900 dark:text-white uppercase italic tracking-tighter leading-tight">
+                        {activeType === 'latest' ? 'en son eklenenler' : activeType === 'official' ? 'botly orjinal' : 'öne çıkanlar'}
+                    </h2>
+                    <div className="text-slate-400">
+                        <Info size={14} />
+                    </div>
+                </div>
+                <div className="flex flex-col gap-1">
+                    {types.map(t => bots.some(b => b.promoted_type === t.id) && t.id !== activeType && (
+                        <button 
+                            key={t.id}
+                            onClick={() => setActiveType(t.id as any)}
+                            className="text-[11px] font-bold text-blue-500 uppercase tracking-widest hover:underline text-left"
+                        >
+                            {t.label}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            <div className="relative flex-1 w-full overflow-hidden">
+                <div 
+                    ref={scroll.ref}
+                    onMouseDown={scroll.onMouseDown}
+                    onMouseUp={scroll.onMouseUp}
+                    onMouseMove={scroll.onMouseMove}
+                    onMouseLeave={scroll.onMouseLeave}
+                    onContextMenu={scroll.onContextMenu}
+                    className={`flex items-center gap-8 overflow-x-auto no-scrollbar py-2 h-24 ${scroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+                >
+                    <AnimatePresence mode="wait">
+                        {featuredBots.map((bot) => (
+                            <motion.div
+                                key={bot.id}
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -20 }}
+                                onClick={() => navigate(`/bot/${bot.id}`)}
+                                className="flex flex-col items-center gap-3 shrink-0 cursor-pointer group/item snap-center w-24"
+                            >
+                                <div className="relative">
+                                    <div className="absolute inset-0 bg-blue-500/20 blur-xl rounded-full opacity-0 group-hover/item:opacity-100 transition-opacity"></div>
+                                    <img 
+                                        src={getLiveBotIcon(bot)} 
+                                        className="w-16 h-16 rounded-full border-2 border-white dark:border-slate-800 shadow-xl object-cover relative z-10 group-hover/item:scale-110 transition-transform"
+                                        onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
+                                        referrerPolicy="no-referrer"
+                                    />
+                                </div>
+                                <div className="flex flex-col items-center text-center">
+                                    <span className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-tighter truncate w-full group-hover/item:text-blue-500 transition-colors">
+                                        {bot.name}
+                                    </span>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
+                </div>
+
+                <div className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button 
+                        onClick={(e) => { e.stopPropagation(); scroll.ref.current?.scrollBy({ left: 200, behavior: 'smooth' }); }}
+                        className="w-10 h-10 bg-white/20 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-brand transition-all shadow-lg active:scale-95"
+                    >
+                        <ChevronRight size={20} />
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonRate }) => {
   const navigate = useNavigate();
   const prices = useMemo(() => PriceService.convert(bot.price, tonRate), [bot.price, tonRate]);
@@ -393,6 +493,8 @@ const Home = () => {
                     ))}
                 </div>
             </div>
+
+            <FeaturedBotsSlider bots={bots} />
 
             <div className="space-y-6">
                 <div className="flex items-center justify-between mb-4 px-2">

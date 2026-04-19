@@ -458,6 +458,30 @@ const BotManagement = () => {
                                                         {editingBot.is_official ? 'BİZE AİT (OFFICIAL)' : 'HARİCİ (EXTERNAL)'}
                                                     </button>
                                                 </div>
+                                                <div className="space-y-2 md:col-span-2">
+                                                    <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4">ANA SAYFA VİTRİN SEÇENEĞİ</label>
+                                                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 bg-slate-950 p-3 rounded-[28px] border border-white/5">
+                                                        {[
+                                                            { id: 'none', label: 'YOK' },
+                                                            { id: 'latest', label: 'EN SON EKLENENLER' },
+                                                            { id: 'official', label: 'ORJİNAL' },
+                                                            { id: 'featured', label: 'ÖNE ÇIKARILANLAR' }
+                                                        ].map(opt => (
+                                                            <button
+                                                                key={opt.id}
+                                                                type="button"
+                                                                onClick={() => setEditingBot({ ...editingBot, promoted_type: opt.id })}
+                                                                className={`py-4 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all ${
+                                                                    (editingBot.promoted_type || 'none') === opt.id
+                                                                    ? 'bg-brand text-white '
+                                                                    : 'bg-white/5 text-slate-500 hover:bg-white/10'
+                                                                }`}
+                                                            >
+                                                                {opt.label}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     )}

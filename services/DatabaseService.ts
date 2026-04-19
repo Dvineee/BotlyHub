@@ -535,6 +535,7 @@ export class DatabaseService {
         screenshots: bot.screenshots || [], 
         icon: bot.icon, 
         is_official: Boolean(bot.is_official),
+        promoted_type: bot.promoted_type || 'none',
         languages: bot.languages || [],
         telegram_group: bot.telegram_group || null,
         website_url: bot.website_url || null,
