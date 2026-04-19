@@ -167,7 +167,7 @@ const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = ({ bots }) => {
     if (bots.length === 0) return null;
 
     return (
-        <div className="mb-10 flex flex-col md:flex-row items-center gap-6 bg-[#ffffff] dark:bg-[#1e293b] px-[10px] py-4 rounded-lg border border-black/5 dark:border-white/5 relative overflow-hidden group">
+        <div className="mb-10 flex flex-col md:flex-row items-center !gap-[0.3rem] bg-[#ffffff] dark:bg-[#1e293b] px-[10px] !pt-[0.3rem] !pb-0 rounded-lg border border-black/5 dark:border-white/5 relative overflow-hidden group !shadow-none">
             {/* Header Info */}
             <div className="flex flex-col shrink-0 min-w-full md:min-w-[180px] md:border-r border-black/5 dark:border-white/5 md:pr-6 h-full justify-center">
                 <div 
@@ -218,7 +218,7 @@ const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = ({ bots }) => {
                             >
                                 <div className="relative">
                                     <div className="absolute inset-0 bg-blue-500/10 blur-xl rounded-full opacity-0 group-hover/item:opacity-100 transition-opacity"></div>
-                                    <div className="w-16 h-16 rounded-full p-[2px] bg-gradient-to-tr from-black/5 to-black/10 dark:from-white/5 dark:to-white/10 group-hover/item:from-blue-500/50 group-hover/item:to-brand/50 transition-all">
+                                    <div className="w-[58px] h-[58px] rounded-full p-[2px] bg-gradient-to-tr from-black/5 to-black/10 dark:from-white/5 dark:to-white/10 group-hover/item:from-blue-500/50 group-hover/item:to-brand/50 transition-all">
                                         <img 
                                             src={getLiveBotIcon(bot)} 
                                             className="w-full h-full rounded-full border border-black/5 dark:border-white/10 shadow-lg object-cover bg-white dark:bg-slate-800"
