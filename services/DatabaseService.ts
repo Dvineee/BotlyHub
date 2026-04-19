@@ -525,15 +525,19 @@ export class DatabaseService {
   }
 
   static async saveBot(bot: any) {
-    const { error } = await supabase.from('bots').upsert({ 
+    if (!bot.id) throw new Error("Bot ID eksik. Lütfen sayfayı yenileyip tekrar deneyin.");
+    if (!bot.name) throw new Error("Bot ismi boş bırakılamaz.");
+    if (!bot.bot_link) throw new Error("Kullanıcı adı (@) boş bırakılamaz.");
+
+    const payload = { 
         id: bot.id, 
         name: bot.name, 
-        description: bot.description, 
-        price: Number(bot.price), 
-        category: bot.category, 
+        description: bot.description || '', 
+        price: Number(bot.price) || 0, 
+        category: bot.category || 'utilities', 
         bot_link: bot.bot_link, 
         screenshots: bot.screenshots || [], 
-        icon: bot.icon, 
+        icon: bot.icon || '', 
         is_official: Boolean(bot.is_official),
         promoted_type: bot.promoted_type || 'none',
         languages: bot.languages || [],
@@ -541,8 +545,13 @@ export class DatabaseService {
         website_url: bot.website_url || null,
         app_url: bot.app_url || null,
         social_url: bot.social_url || null
-    });
-    if (error) throw error;
+    };
+
+    const { error } = await supabase.from('bots').upsert(payload, { onConflict: 'id' });
+    if (error) {
+        console.error("Supabase upsert error:", error);
+        throw error;
+    }
   }
 
   static async deleteBot(id: string) {

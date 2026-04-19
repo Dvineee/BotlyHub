@@ -246,6 +246,7 @@ const BotManagement = () => {
     const [editingBot, setEditingBot] = useState<any>(null);
     const [copiedId, setCopiedId] = useState(false);
     const [activeTab, setActiveTab] = useState<'info' | 'media' | 'pricing'>('info');
+    const [isSaving, setIsSaving] = useState(false);
 
     const load = useCallback(async () => {
         setIsLoading(true);
@@ -269,7 +270,9 @@ const BotManagement = () => {
             telegram_group: '',
             website_url: '',
             app_url: '',
-            social_url: ''
+            social_url: '',
+            promoted_type: 'none',
+            languages: ['🇹🇷']
         });
         setIsModalOpen(true);
         setActiveTab('info');
@@ -344,7 +347,11 @@ const BotManagement = () => {
                                     >
                                         <Star size={16} fill={b.promoted_type === 'featured' ? "currentColor" : "none"} />
                                     </button>
-                                    <button onClick={() => { setEditingBot(b); setIsModalOpen(true); }} className="p-2.5 lg:p-3 bg-white/5 rounded-xl hover:bg-brand text-slate-500 hover:text-white transition-all"><Edit3 size={16}/></button>
+                                    <button onClick={() => { setEditingBot({
+                                        promoted_type: 'none',
+                                        languages: [],
+                                        ...b
+                                    }); setIsModalOpen(true); }} className="p-2.5 lg:p-3 bg-white/5 rounded-xl hover:bg-brand text-slate-500 hover:text-white transition-all"><Edit3 size={16}/></button>
                                     <button onClick={async () => { if(confirm('Silsin mi?')) { await DatabaseService.deleteBot(b.id); await DatabaseService.logActivity('admin', 'bot_manage', 'bot_deleted', 'Bot Silindi', `${b.name} isimli bot sistemden silindi.`); load(); } }} className="p-2.5 lg:p-3 bg-white/5 rounded-xl text-red-500 hover:bg-red-500 hover:text-white transition-all"><Trash2 size={16}/></button>
                                 </div>
                             </div>
@@ -397,7 +404,21 @@ const BotManagement = () => {
                             </div>
 
                             <div className="flex-1 overflow-y-auto p-8 lg:p-12 space-y-8 pb-32 lg:pb-12">
-                                <form onSubmit={async (e) => { e.preventDefault(); await DatabaseService.saveBot(editingBot); await DatabaseService.logActivity('admin', 'bot_manage', 'bot_saved', 'Bot Kaydedildi', `${editingBot.name} isimli bot bilgileri güncellendi/oluşturuldu.`); setIsModalOpen(false); load(); }} className="space-y-8">
+                                <form onSubmit={async (e) => { 
+                                    e.preventDefault(); 
+                                    setIsSaving(true);
+                                    try {
+                                        await DatabaseService.saveBot(editingBot); 
+                                        await DatabaseService.logActivity('admin', 'bot_manage', 'bot_saved', 'Bot Kaydedildi', `${editingBot.name} isimli bot bilgileri güncellendi/oluşturuldu.`); 
+                                        setIsModalOpen(false); 
+                                        load(); 
+                                    } catch (err: any) {
+                                        console.error("Bot save error:", err);
+                                        alert("Bot kaydedilemedi: " + (err.message || "Bilinmeyen hata"));
+                                    } finally {
+                                        setIsSaving(false);
+                                    }
+                                }} className="space-y-8">
                                     {activeTab === 'info' && (
                                         <div className="space-y-8 animate-in slide-in-from-left-4">
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
@@ -518,8 +539,16 @@ const BotManagement = () => {
                                         </div>
                                     )}
                                     <div className="fixed lg:relative bottom-0 left-0 right-0 p-6 lg:p-0 bg-gradient-to-t from-[#020617] lg:from-transparent via-[#020617]/90 lg:via-transparent to-transparent z-[130]">
-                                        <button type="submit" className="w-full h-16 lg:h-24 bg-brand text-white rounded-2xl lg:rounded-[32px] font-black text-[12px] uppercase tracking-[0.4em]   transition-all border-b-8 border-blue-800 active:translate-y-1 active:border-b-4 flex items-center justify-center gap-4">
-                                            <Database size={20} /> SİSTEMİ GÜNCELLE
+                                        <button 
+                                            type="submit" 
+                                            disabled={isSaving}
+                                            className="w-full h-16 lg:h-24 bg-brand text-white rounded-2xl lg:rounded-[32px] font-black text-[12px] uppercase tracking-[0.4em] transition-all border-b-8 border-blue-800 disabled:opacity-50 disabled:cursor-not-allowed active:translate-y-1 active:border-b-4 flex items-center justify-center gap-4"
+                                        >
+                                            {isSaving? (
+                                                <><Loader2 className="animate-spin" size={20} /> İŞLENİYOR...</>
+                                            ) : (
+                                                <><Database size={20} /> SİSTEMİ GÜNCELLE</>
+                                            )}
                                         </button>
                                     </div>
                                 </form>
