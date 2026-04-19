@@ -161,7 +161,7 @@ const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = ({ bots }) => {
     if (bots.length === 0) return null;
 
     return (
-        <div className="mb-10 flex flex-col md:flex-row items-center gap-6 bg-white dark:bg-slate-900/40 p-6 rounded-[32px] md:rounded-[48px] border border-black/5 dark:border-white/5 relative overflow-hidden group shadow-sm">
+        <div className="mb-10 flex flex-col md:flex-row items-center gap-6 bg-[#ffffff] dark:bg-[#1e293b] px-[10px] py-4 rounded-lg border border-black/5 dark:border-white/5 relative overflow-hidden group">
             {/* Header Info */}
             <div className="flex flex-col shrink-0 min-w-[180px] md:border-r border-black/5 dark:border-white/5 md:pr-6 h-full justify-center">
                 <div className="flex items-center gap-1.5 mb-0.5">
