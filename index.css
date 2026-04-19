@@ -532,3 +532,8 @@ html:not(.dark) .group:hover .lucide-chevron-right {
     opacity: 1;
     transition-duration: 700ms;
 }
+
+.px-6 {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
