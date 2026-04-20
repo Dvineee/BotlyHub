@@ -15,6 +15,7 @@ import { DatabaseService } from '../../services/DatabaseService';
 import { GeminiService } from '../../services/GeminiService';
 import { GoogleGenAI, Type } from "@google/genai";
 import { User, Bot as BotType, Announcement, Promotion, ActivityLog, Notification, Referral, ReferralSettings } from '../../types';
+import { categories } from '../../data';
 import Logo from '../../components/Logo';
 
 const getLiveBotIcon = (botLink: string) => {
@@ -436,10 +437,31 @@ const BotManagement = () => {
                                                 <div className="space-y-2">
                                                     <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4">KATEGORİ</label>
                                                     <select value={editingBot.category} onChange={e => setEditingBot({...editingBot, category: e.target.value})} className="w-full h-14 lg:h-18 bg-slate-950 border border-white/5 rounded-[22px] lg:rounded-[28px] px-8 text-[11px] font-black text-white outline-none focus:border-brand uppercase italic appearance-none">
-                                                        <option value="utilities">Araçlar & Servisler</option>
-                                                        <option value="finance">Finans & Ekonomi</option>
-                                                        <option value="games">Eğlence & Oyun</option>
-                                                        <option value="productivity">Verimlilik & İş</option>
+                                                        {categories.filter(c => c.id !== 'all').map(cat => {
+                                                            const labelMap: Record<string, string> = {
+                                                                'cat_apps': 'Apps',
+                                                                'cat_games': 'Oyun',
+                                                                'cat_finance': 'Finans',
+                                                                'cat_moderation': 'Moderasyon',
+                                                                'cat_utilities': 'Araçlar',
+                                                                'cat_ai_services': 'AI Hizmetleri',
+                                                                'cat_communication': 'İletişim',
+                                                                'cat_productivity': 'Üretkenlik',
+                                                                'cat_music': 'Müzik',
+                                                                'cat_crypto': 'Kripto',
+                                                                'cat_telegram_platform': 'Telegram Platformu',
+                                                                'cat_bloggers': 'Yöneticiler ve Bloggerlar İçin',
+                                                                'cat_shopping': 'Alışveriş ve Hizmetler',
+                                                                'cat_security': 'Güvenlik ve Koruma',
+                                                                'cat_education': 'Eğitim',
+                                                                'cat_content': 'İçerik'
+                                                            };
+                                                            return (
+                                                                <option key={cat.id} value={cat.id}>
+                                                                    {labelMap[cat.label] || cat.label}
+                                                                </option>
+                                                            );
+                                                        })}
                                                     </select>
                                                 </div>
                                                 <div className="space-y-2 md:col-span-2">

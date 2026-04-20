@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Search, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, Send, Instagram, Youtube, Link, CheckCircle2 } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, Send, Instagram, Youtube, Link, CheckCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Bot, Announcement, Notification } from '../types';
@@ -133,6 +133,29 @@ const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = ({ bots }) => {
     const navigate = useNavigate();
     const scroll = useDraggableScroll();
     const [activeType, setActiveType] = useState<'latest' | 'official' | 'featured'>('latest');
+    const [scrollState, setScrollState] = useState({ left: false, right: true });
+
+    const checkScroll = useCallback(() => {
+        const el = scroll.ref.current;
+        if (el) {
+            const canScrollLeft = el.scrollLeft > 5;
+            const canScrollRight = el.scrollLeft < (el.scrollWidth - el.clientWidth - 5);
+            setScrollState({ left: canScrollLeft, right: canScrollRight });
+        }
+    }, [scroll.ref]);
+
+    useEffect(() => {
+        const el = scroll.ref.current;
+        if (el) {
+            el.addEventListener('scroll', checkScroll);
+            checkScroll(); // Initial check
+            window.addEventListener('resize', checkScroll);
+            return () => {
+                el.removeEventListener('scroll', checkScroll);
+                window.removeEventListener('resize', checkScroll);
+            };
+        }
+    }, [checkScroll, scroll.ref, activeType]);
 
     const featuredBots = useMemo(() => {
         // En son eklenenler: If type is latest, show those flagged OR just the latest bots
@@ -167,7 +190,7 @@ const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = ({ bots }) => {
     if (bots.length === 0) return null;
 
     return (
-        <div className="mb-10 flex flex-col md:flex-row items-center !gap-[0.3rem] bg-[#ffffff] dark:bg-[#1e293b] px-[10px] !pt-[0.3rem] !pb-0 rounded-lg border border-black/5 dark:border-white/5 relative overflow-hidden group !shadow-none">
+        <div className="mb-10 flex flex-col md:flex-row items-center !gap-[0.3rem] bg-[#ffffff] dark:bg-[#1e293b] px-4 md:px-[10px] !pt-[0.3rem] !pb-0 -mx-4 md:mx-0 rounded-none md:rounded-lg border-y md:border border-black/5 dark:border-white/5 relative overflow-hidden group !shadow-none">
             {/* Header Info */}
             <div className="flex flex-col shrink-0 min-w-full md:min-w-[180px] md:border-r border-black/5 dark:border-white/5 md:pr-6 h-full justify-center">
                 <div 
@@ -196,6 +219,44 @@ const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = ({ bots }) => {
 
             {/* Slider Content */}
             <div className="relative flex-1 w-full overflow-hidden">
+                {/* Left Blur & Button */}
+                <AnimatePresence>
+                    {scrollState.left && (
+                        <motion.div 
+                            initial={{ opacity: 0 }} 
+                            animate={{ opacity: 1 }} 
+                            exit={{ opacity: 0 }}
+                            className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[#ffffff] dark:from-[#1e293b] via-[#ffffff]/80 dark:via-[#1e293b]/80 to-transparent z-40 pointer-events-none flex items-center pl-2"
+                        >
+                            <button 
+                                onClick={(e) => { e.stopPropagation(); scroll.ref.current?.scrollBy({ left: -300, behavior: 'smooth' }); }}
+                                className="hidden md:flex w-8 h-8 bg-white dark:bg-slate-800 border border-black/5 dark:border-white/10 rounded-full items-center justify-center text-slate-400 hover:text-brand transition-all shadow-lg pointer-events-auto active:scale-95"
+                            >
+                                <ChevronLeft size={16} />
+                            </button>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* Right Blur & Button */}
+                <AnimatePresence>
+                    {scrollState.right && (
+                        <motion.div 
+                            initial={{ opacity: 0 }} 
+                            animate={{ opacity: 1 }} 
+                            exit={{ opacity: 0 }}
+                            className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#ffffff] dark:from-[#1e293b] via-[#ffffff]/80 dark:via-[#1e293b]/80 to-transparent z-40 pointer-events-none flex items-center justify-end pr-2"
+                        >
+                            <button 
+                                onClick={(e) => { e.stopPropagation(); scroll.ref.current?.scrollBy({ left: 300, behavior: 'smooth' }); }}
+                                className="hidden md:flex w-8 h-8 bg-white dark:bg-slate-800 border border-black/5 dark:border-white/10 rounded-full items-center justify-center text-slate-400 hover:text-brand transition-all shadow-lg pointer-events-auto active:scale-95"
+                            >
+                                <ChevronRight size={16} />
+                            </button>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
                 <div 
                     ref={scroll.ref}
                     onMouseDown={scroll.onMouseDown}
@@ -228,23 +289,13 @@ const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = ({ bots }) => {
                                     </div>
                                 </div>
                                 <div className="flex flex-col items-center text-center">
-                                    <span className="text-[12px] font-bold text-slate-800 dark:text-slate-200 tracking-tight leading-tight line-clamp-2 w-full group-hover/item:text-blue-500 transition-colors">
-                                        {bot.name}
+                                    <span className="text-[12px] font-bold text-slate-800 dark:text-slate-200 tracking-tight leading-tight whitespace-nowrap overflow-hidden text-ellipsis w-full group-hover/item:text-blue-500 transition-colors">
+                                        {bot.name.length > 9 ? bot.name.substring(0, 9) + '...' : bot.name}
                                     </span>
                                 </div>
                             </motion.div>
                         ))}
                     </AnimatePresence>
-                </div>
-
-                {/* Right Navigation Arrow */}
-                <div className="hidden lg:flex absolute right-0 top-[28px] items-center justify-center pointer-events-none">
-                    <button 
-                        onClick={(e) => { e.stopPropagation(); scroll.ref.current?.scrollBy({ left: 300, behavior: 'smooth' }); }}
-                        className="w-10 h-10 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border border-black/5 dark:border-white/10 rounded-full flex items-center justify-center text-slate-400 hover:text-brand hover:border-brand transition-all shadow-md pointer-events-auto active:scale-95"
-                    >
-                        <ChevronRight size={20} />
-                    </button>
                 </div>
             </div>
         </div>

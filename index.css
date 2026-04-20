@@ -100,6 +100,10 @@ input, textarea, select {
   gap: 0.65rem;
 }
 
+.gap-10 {
+  gap: 1.8rem;
+}
+
 .italic {
   font-style: italic;
 }
