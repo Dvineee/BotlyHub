@@ -76,6 +76,10 @@
     font-weight: 400;
   }
 
+  .font-bold {
+    font-weight: 400 !important;
+  }
+
   #root {
     display: flex;
     flex-direction: column;
