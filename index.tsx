@@ -67,10 +67,8 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 
 const rootElement = document.getElementById('root');
 if (rootElement) {
-  const currentOrigin = window.location.origin;
-  const manifestUrl = currentOrigin.includes('botlyhub.vercel.app') 
-    ? 'https://botlyhub.vercel.app/tonconnect-manifest.json'
-    : `${currentOrigin}/tonconnect-manifest.json`;
+  const currentOrigin = typeof window !== 'undefined' ? window.location.origin.replace(/\/$/, "") : "";
+  const manifestUrl = `${currentOrigin}/tonconnect-manifest.json`;
   const root = createRoot(rootElement);
 
   root.render(

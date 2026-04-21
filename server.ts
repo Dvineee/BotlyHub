@@ -90,19 +90,28 @@ async function startServer() {
 
   // --- DYNAMIC TON CONNECT MANIFEST ---
   app.get("/tonconnect-manifest.json", (req, res) => {
-    const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+    // Force CORS for manifest specifically
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Content-Type', 'application/json');
+
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
     const host = req.headers['x-forwarded-host'] || req.get('host');
     
-    // Prefer the user's specific Vercel URL if requested from there, else use dynamic origin
+    // Safety check for origin
     let origin = `${protocol}://${host}`;
     if (host && typeof host === 'string' && (host.includes('botlyhub.vercel.app') || req.get('Origin')?.includes('botlyhub.vercel.app'))) {
         origin = 'https://botlyhub.vercel.app';
     }
+
+    // Ensure origin does not have trailing slash
+    origin = origin.replace(/\/$/, "");
     
     res.json({
       url: origin,
       name: "BotlyHub V3",
-      iconUrl: `${origin}/favicon.ico`,
+      iconUrl: `${origin}/logo.svg`, // Changed from favicon.ico to logo.svg
       termsOfServiceUrl: `${origin}/terms`,
       privacyPolicyUrl: `${origin}/privacy`
     });

@@ -1,7 +1,7 @@
 {
   "url": "https://botlyhub.vercel.app",
   "name": "BotlyHub V3",
-  "iconUrl": "https://botlyhub.vercel.app/favicon.ico",
+  "iconUrl": "https://botlyhub.vercel.app/logo.svg",
   "termsOfServiceUrl": "https://botlyhub.vercel.app/terms",
   "privacyPolicyUrl": "https://botlyhub.vercel.app/privacy"
 }
