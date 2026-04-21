@@ -114,11 +114,11 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
                 )}
             </div>
 
-            <h3 className="text-slate-900 dark:text-white font-extrabold text-2xl mb-2 tracking-tight leading-[1.1] font-poppins line-clamp-2 max-w-[90%] mt-[-14px]">
+            <h3 className="text-slate-900 dark:text-white font-extrabold text-2xl mb-2 tracking-tight leading-[1.1] font-rubik line-clamp-2 max-w-[90%] mt-[-14px]">
                 {ann.title}
             </h3>
             
-            <p className="text-slate-500 dark:text-slate-400 text-[13px] leading-relaxed line-clamp-2 font-medium font-inter mt-auto max-w-full bg-[#12172c8c] p-[6px] rounded-[18px] border border-[#12172c]">
+            <p className="text-slate-500 dark:text-slate-400 text-[13px] leading-relaxed line-clamp-2 font-medium font-rubik mt-auto max-w-full bg-[#12172c8c] p-[6px] rounded-[18px] border border-[#12172c]">
                 {ann.description}
             </p>
         </div>
@@ -565,7 +565,9 @@ const Home = () => {
                                 }}
                                 transition={{ duration: 0.4 }}
                             >
-                                <cat.icon size={20} className="text-[#139fec]" />
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-[#139fec]">
+                                    <path fillRule="evenodd" clipRule="evenodd" d="M5.68798 6.4931C6.08736 6.18072 6.58459 6 7.11535 6H16.8848C17.4156 6 17.9128 6.18072 18.3122 6.4931C18.7116 6.80553 19.0114 7.24835 19.1446 7.77198L20.7208 13.9686C20.9063 14.6976 21.0001 15.4473 21.0001 16.2C21.0001 16.6999 20.8002 17.1494 20.4766 17.4756C20.1531 17.8017 19.7109 18 19.2223 18C18.7338 18 18.2915 17.8017 17.968 17.4756C17.7139 17.2194 17.2946 16.5645 16.8918 15.8595C16.3033 15.5294 16.536 15.2202 16.4157 14.9932C16.3557 14.8799 16.3076 14.7876 16.2748 14.7242L16.2376 14.6517L16.2283 14.6335L16.2261 14.6293L16.2257 14.6284H16.2257L15.9481 14.08H15.3335H8.66679H8.0541L7.77591 14.6258L7.72738 14.7196C7.69493 14.782 7.64733 14.8726 7.5877 14.9841L5.68798 6.4931Z" fill="currentColor" />
+                                </svg>
                             </motion.div>
                             <span className="text-[11px] font-bold uppercase tracking-wider">{t(cat.label)}</span>
                         </motion.button>

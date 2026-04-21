@@ -18,8 +18,9 @@ export default {
         }
       },
       fontFamily: {
-        poppins: ['Poppins', 'sans-serif'],
-        inter: ['Inter', 'sans-serif'],
+        poppins: ['Rubik', 'sans-serif'],
+        inter: ['Rubik', 'sans-serif'],
+        rubik: ['Rubik', 'sans-serif'],
       }
     },
   },
