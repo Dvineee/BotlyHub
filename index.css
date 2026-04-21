@@ -1,18 +1,24 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap');
 
 @font-face{
-  font-family:'RubikTonscan';
-  src:url('https://tonscan.org/font-rubik-latin-400.d9951962.woff2') format('woff2');
+  font-family:'RubikFix';
+  src:url('https://fonts.gstatic.com/s/rubik/v28/iJWKBXyIfDnIV7nBrXyw023e.woff2') format('woff2');
   font-weight:400;
-  font-style:normal;
 }
 
 @font-face{
-  font-family:'RubikTonscan';
-  src:url('https://tonscan.org/font-rubik-latin-500.d9951962.woff2') format('woff2');
+  font-family:'RubikFix';
+  src:url('https://fonts.gstatic.com/s/rubik/v28/iJWKBXyIfDnIV7nFrXyw023e.woff2') format('woff2');
   font-weight:500;
-  font-style:normal;
+}
+
+*,
+*::before,
+*::after{
+  font-family:'RubikFix', sans-serif !important;
+  -webkit-font-smoothing:antialiased !important;
+  -moz-osx-font-smoothing:grayscale !important;
+  text-rendering:optimizeLegibility !important;
 }
 
 @tailwind base;
@@ -46,14 +52,10 @@
   body {
     background-color: var(--bg-main);
     color: var(--text-main);
-    font-family: 'RubikTonscan', sans-serif;
     font-size: 14px;
     font-weight: 500;
     line-height: 20px;
     letter-spacing: -0.15px;
-    @apply antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
     margin: 0;
     padding: 0;
     min-height: 100vh;
@@ -66,13 +68,11 @@
   }
 
   h1, h2, h3, .title {
-    font-family: 'RubikTonscan', sans-serif;
     font-weight: 500;
     letter-spacing: -0.02em;
   }
 
   p, span, div, input, button {
-    font-family: 'RubikTonscan', sans-serif;
     font-weight: 400;
   }
 
