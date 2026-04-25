@@ -201,28 +201,32 @@ const UserPanel: React.FC = () => {
                                 { label: 'Aylık Kazanç', value: '₺1,250', icon: TrendingUp, color: 'emerald' },
                                 { label: 'Toplam Etkileşim', value: '45.2K', icon: Activity, color: 'orange' },
                             ].map((stat, i) => (
-                                <div key={i} className="bg-slate-900/40 border border-white/5 p-6 rounded-[32px] backdrop-blur-xl group hover:border-purple-500/20 transition-all">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <div className={`w-12 h-12 bg-${stat.color}-500/10 rounded-2xl flex items-center justify-center text-${stat.color}-500`}>
-                                            <stat.icon size={24} />
-                                        </div>
-                                        <span className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Son 30 Gün</span>
-                                    </div>
-                                    <p className="text-3xl font-bold text-white tracking-tight mb-1">{stat.value}</p>
-                                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{stat.label}</p>
-                                </div>
+                                <div key={i} className="bg-slate-900/40 border border-white/5 p-8 rounded-[44px] backdrop-blur-xl group hover:border-purple-500/20 transition-all fancy-glass-card relative overflow-hidden">
+                                     <div className={`absolute top-0 right-0 w-24 h-24 bg-${stat.color}-500/5 blur-3xl -mr-12 -mt-12 rounded-full`} />
+                                     <div className="flex items-center justify-between mb-6 relative z-10">
+                                         <div className={`w-14 h-14 bg-${stat.color}-500/10 rounded-[24px] flex items-center justify-center text-${stat.color}-400 border border-${stat.color}-500/10`}>
+                                             <stat.icon size={26} />
+                                         </div>
+                                         <div className="px-3 py-1 bg-white/5 rounded-full border border-white/5">
+                                             <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">LIVE</span>
+                                         </div>
+                                     </div>
+                                     <p className="text-4xl font-black text-white tracking-tighter mb-2 italic translate-y-0 group-hover:-translate-y-1 transition-transform duration-500">{stat.value}</p>
+                                     <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">{stat.label}</p>
+                                 </div>
                             ))}
                         </div>
 
                         {/* Placeholder for sections */}
-                        <div className="bg-slate-900/40 border border-white/5 rounded-[48px] p-12 flex flex-col items-center justify-center text-center space-y-6 min-h-[400px]">
-                            <div className="w-20 h-20 bg-white/5 rounded-[32px] flex items-center justify-center text-slate-700">
-                                <LayoutDashboard size={40} />
+                        <div className="bg-slate-900/40 border border-white/5 rounded-[64px] p-20 flex flex-col items-center justify-center text-center space-y-8 min-h-[500px] fancy-glass-card relative overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-purple-500/5" />
+                            <div className="w-24 h-24 bg-white/5 rounded-[40px] flex items-center justify-center text-slate-700 relative z-10 border border-white/5 animate-pulse">
+                                <LayoutDashboard size={48} />
                             </div>
-                            <div>
-                                <h3 className="text-xl font-bold text-white tracking-tight uppercase tracking-widest">Bölüm Hazırlanıyor</h3>
-                                <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mt-2 max-w-xs mx-auto leading-relaxed">
-                                    {activeSection.toUpperCase()} bölümü şu anda geliştirme aşamasındadır. Yakında burada daha fazla özellik göreceksiniz.
+                            <div className="relative z-10 max-w-md">
+                                <h3 className="text-2xl font-black text-white tracking-tighter uppercase italic tracking-widest">Sistem Konfigüre Ediliyor</h3>
+                                <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mt-3 leading-relaxed opacity-60">
+                                    {activeSection.toUpperCase()} modülü şu anda çekirdek sistem ile senkronize ediliyor. Yakında burada gerçek zamanlı veriler göreceksiniz.
                                 </p>
                             </div>
                         </div>

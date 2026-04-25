@@ -1,6 +1,7 @@
 import './polyfills';
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { HelmetProvider } from 'react-helmet-async';
 import App from './App';
 import { TranslationProvider } from './TranslationContext';
 import { ThemeProvider } from './ThemeContext';
@@ -73,13 +74,15 @@ if (rootElement) {
 
   root.render(
     <ErrorBoundary>
-      <TonConnectUIProvider manifestUrl={manifestUrl}>
-        <ThemeProvider>
-          <TranslationProvider>
-            <App />
-          </TranslationProvider>
-        </ThemeProvider>
-      </TonConnectUIProvider>
+      <HelmetProvider>
+        <TonConnectUIProvider manifestUrl={manifestUrl}>
+          <ThemeProvider>
+            <TranslationProvider>
+              <App />
+            </TranslationProvider>
+          </ThemeProvider>
+        </TonConnectUIProvider>
+      </HelmetProvider>
     </ErrorBoundary>
   );
 }

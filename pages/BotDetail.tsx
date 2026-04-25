@@ -6,7 +6,7 @@ import {
   Maximize2, ChevronRight, ChevronLeft, ChevronDown, Eye, Lock, Unlock, AlertTriangle, 
   Sparkles, Star, Download, Info, CheckCircle2, Globe, Cpu,
   Play, UserPlus, MessageSquare, BarChart3, MousePointer2,
-  Search, LayoutGrid, Store, User as UserIcon, Megaphone, Bell, Instagram, Youtube, Link
+  Search, LayoutGrid, Store, User as UserIcon, Megaphone, Bell, Instagram, Youtube, Link, Flag
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -21,6 +21,7 @@ import { useTheme } from '../ThemeContext';
 import { TelegramLoginWidget } from '../components/TelegramLoginWidget';
 import Logo from '../components/Logo';
 import { useRef } from 'react';
+import { SEO } from '../components/SEO';
 
 const getLiveBotIcon = (bot: Bot) => {
     if (bot.bot_link) {
@@ -275,6 +276,12 @@ const BotDetail = () => {
   if (!bot) return null;
 
   return (
+    <>
+    <SEO 
+        title={bot.name} 
+        description={bot.description}
+        ogImage={bot.icon || undefined}
+    />
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 pb-40 animate-in fade-in transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 md:px-10">
         {/* Responsive Header */}
@@ -320,7 +327,7 @@ const BotDetail = () => {
                               className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-900 dark:text-white active:scale-90 transition-transform relative"
                             >
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path fillRule="evenodd" clipRule="evenodd" d="M2.73689 3.03524C3.26971 2.88993 3.81945 3.20406 3.96477 3.73689L6.32167 12.3789C6.57586 13.3109 6.64452 13.4926 6.73615 13.6112C6.84307 13.7497 6.98444 13.8577 7.14615 13.9244C7.28473 13.9816 7.4781 14 8.44415 14H15.6936C16.6083 14 16.7908 13.9832 16.9245 13.9306C17.0803 13.8693 17.2182 13.7699 17.3256 13.6415C17.4178 13.5313 17.4914 13.3635 17.7807 12.4957L19.3493 7.78974C19.4738 7.41638 19.545 7.19979 19.5826 7.0407L19.5878 7.01787L19.5645 7.0156C19.4017 7.00096 19.1737 7.00001 18.7801 7.00001H7.50001C6.94772 7.00001 6.50001 6.55229 6.50001 6.00001C6.50001 5.44772 6.94772 5.00001 7.50001 5.00001H18.7801L18.8186 5C19.1601 4.99997 19.48 4.99994 19.7436 5.02364C20.0221 5.04867 20.3657 5.10817 20.6881 5.3138C21.1187 5.58847 21.428 6.01752 21.5524 6.51293C21.6455 6.8838 21.5933 7.22861 21.529 7.5007C21.4681 7.7582 21.3669 8.06169 21.2589 8.38562L21.2589 8.38566L21.2467 8.4222L19.678 13.1282L19.6323 13.2658C19.4171 13.9146 19.2283 14.4839 18.8598 14.9245C18.5376 15.3098 18.1239 15.608 17.6565 15.7918C17.122 16.0021 16.5221 16.0012 15.8386 16.0002L15.6936 16H8.44415L8.29042 16.0002C7.57008 16.0013 6.93844 16.0023 6.38325 15.7732C5.89813 15.573 5.47402 15.2491 5.15324 14.8337C4.78613 14.3584 4.62089 13.7487 4.43244 13.0535L4.39215 12.9051L2.03524 4.26312C1.88993 3.7303 2.20406 3.18056 2.73689 3.03524ZM9 19.5C9 20.3284 8.32843 21 7.5 21C6.67157 21 6 20.3284 6 19.5C6 18.6716 6.67157 18 7.5 18C8.32843 18 9 18.6716 9 19.5ZM16.5 21C17.3284 21 18 20.3284 18 19.5C18 18.6716 17.3284 18 16.5 18C15.6716 18 15 18.6716 15 19.5C15 20.3284 15.6716 21 16.5 21Z" fill="currentColor"></path>
+                                    <path d="M4 7H20M4 12H20M4 17H20" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
                                 </svg>
                                 {unreadCount > 0 && (
                                     <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[8px] font-black text-white flex items-center justify-center px-1 badge-pop">
@@ -473,7 +480,7 @@ const BotDetail = () => {
         </div>
 
         <div className="w-full md:w-auto md:min-w-[320px] lg:hidden">
-            <div className="flex flex-col bg-white dark:bg-slate-900/60 rounded-[32px] border border-black/5 dark:border-white/5 backdrop-blur-xl  overflow-hidden">
+            <div className="flex flex-col bg-white dark:bg-slate-900/60 rounded-[32px] border border-black/5 dark:border-white/5 backdrop-blur-xl overflow-hidden fancy-glass-card">
                 <div className="flex items-center justify-between p-6">
                     <div className="flex flex-col items-center flex-1 border-r border-black/5 dark:border-white/5">
                         <span className="text-slate-900 dark:text-white font-bold text-base">{bot.rating || '0.0'} <Star size={12} className="inline mb-1 fill-slate-900 dark:fill-white" /></span>
@@ -617,7 +624,7 @@ const BotDetail = () => {
           {/* Right Column (PC only) - Action bar moved here for large screens */}
           <aside className="hidden lg:flex flex-col gap-4 pt-10 sticky top-10 h-fit pr-6 lg:pr-0">
               <div className="w-full">
-                  <div className="flex flex-col bg-white dark:bg-slate-900/60 rounded-[32px] border border-black/5 dark:border-white/5 backdrop-blur-xl overflow-hidden">
+                  <div className="flex flex-col bg-white dark:bg-slate-900/60 rounded-[32px] border border-black/5 dark:border-white/5 backdrop-blur-xl overflow-hidden fancy-glass-card">
                       <div className="flex items-center justify-between p-6">
                           <div className="flex flex-col items-center flex-1 border-r border-black/5 dark:border-white/5">
                               <span className="text-slate-900 dark:text-white font-bold text-base">{bot.rating || '0.0'} <Star size={12} className="inline mb-1 fill-slate-900 dark:fill-white" /></span>
@@ -672,29 +679,38 @@ const BotDetail = () => {
                       )}
                   </button>
 
-                  <button 
-                    onClick={handleShare}
-                    className="h-20 w-full bg-white dark:bg-slate-900 rounded-[32px] border border-black/5 dark:border-white/10 flex items-center justify-center gap-4 text-slate-500 dark:text-slate-400 active:scale-95 transition-all relative border-b-8 border-transparent"
-                  >
-                      <Share2 size={24} className={isCopied ? 'text-emerald-500' : ''} />
-                      <span className="text-[11px] font-black uppercase tracking-[0.2em]">PAYLAŞ</span>
-                      <AnimatePresence>
-                          {isCopied && (
-                              <motion.span 
-                                  initial={{ opacity: 0, y: -10 }}
-                                  animate={{ opacity: 1, y: -35 }}
-                                  exit={{ opacity: 0 }}
-                                  className="absolute left-1/2 -translate-x-1/2 text-[8px] font-black text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-md uppercase whitespace-nowrap"
-                              >
-                                  Kopyalandı!
-                              </motion.span>
-                          )}
-                      </AnimatePresence>
-                  </button>
+                  <div className="flex gap-3">
+                      <button 
+                        onClick={handleShare}
+                        className="h-20 flex-1 bg-white dark:bg-slate-900 rounded-[32px] border border-black/5 dark:border-white/10 flex items-center justify-center gap-3 text-slate-500 dark:text-slate-400 active:scale-95 transition-all relative border-b-8 border-transparent"
+                      >
+                          <Share2 size={20} className={isCopied ? 'text-emerald-500' : ''} />
+                          <span className="text-[10px] font-black uppercase tracking-[0.2em]">PAYLAŞ</span>
+                          <AnimatePresence>
+                              {isCopied && (
+                                  <motion.span 
+                                      initial={{ opacity: 0, y: -10 }}
+                                      animate={{ opacity: 1, y: -35 }}
+                                      exit={{ opacity: 0 }}
+                                      className="absolute left-1/2 -translate-x-1/2 text-[8px] font-black text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-md uppercase whitespace-nowrap"
+                                  >
+                                      Kopyalandı!
+                                  </motion.span>
+                              )}
+                          </AnimatePresence>
+                      </button>
+
+                      <button 
+                        onClick={() => { haptic('medium'); notification('warning'); /* Future Report logic */ }}
+                        className="h-20 w-20 shrink-0 bg-white dark:bg-slate-900 rounded-[32px] border border-black/5 dark:border-white/10 flex items-center justify-center text-slate-400 hover:text-red-500 active:scale-95 transition-all border-b-8 border-transparent"
+                      >
+                          <Flag size={20} />
+                      </button>
+                  </div>
 
                   {/* Direct Link Buttons for Sidebar (PC/Large Screens) */}
                   {(bot.telegram_group || bot.website_url || bot.app_url || bot.social_url) && (
-                      <div className="flex flex-col bg-white dark:bg-slate-900/40 rounded-[32px] border border-black/5 dark:border-white/5 p-4 pt-5 gap-[0.6em]">
+                      <div className="flex flex-col bg-white dark:bg-slate-900/40 rounded-[32px] border border-black/5 dark:border-white/5 p-4 pt-5 gap-[0.6em] official-links-box">
                           <div className="px-2 mb-1">
                               <h4 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">OFFICIAL LINKS</h4>
                           </div>
@@ -772,6 +788,13 @@ const BotDetail = () => {
                           </motion.span>
                       )}
                   </AnimatePresence>
+              </button>
+
+              <button 
+                onClick={() => { haptic('medium'); notification('warning'); /* Future Report logic */ }}
+                className="h-20 w-20 shrink-0 bg-white dark:bg-slate-900 rounded-[32px] border border-black/5 dark:border-white/10 flex items-center justify-center text-slate-400 hover:text-red-500 active:scale-95 transition-all border-b-8 border-transparent"
+              >
+                  <Flag size={24} />
               </button>
 
               <button 
@@ -948,6 +971,7 @@ const BotDetail = () => {
         )}
       </AnimatePresence>
     </div>
+    </>
   );
 };
 

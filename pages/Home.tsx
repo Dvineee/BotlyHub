@@ -15,6 +15,7 @@ import { FilterMenu } from '../components/FilterMenu';
 import { useTheme } from '../ThemeContext';
 import { TelegramLoginWidget } from '../components/TelegramLoginWidget';
 import Logo from '../components/Logo';
+import { SEO } from '../components/SEO';
 
 const iconMap: Record<string, any> = {
   Sparkles, Megaphone, Zap, Gift, Star, Info, BotIcon, Heart, Bell, Shield
@@ -80,62 +81,70 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
     <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        whileHover={{ y: -4, transition: { duration: 0.2 } }}
-        className={`w-80 h-48 rounded-[32px] relative overflow-hidden shrink-0 cursor-pointer group snap-center border bg-white dark:bg-slate-900/40 ${ann.bg_image_url ? 'border-white/10' : scheme.split(' ').pop()} flex flex-col`}
+        className="w-[340px] h-32 rounded-[32px] relative overflow-hidden shrink-0 cursor-pointer group snap-center border bg-white dark:bg-slate-900 border-black/5 dark:border-white/5 flex items-stretch"
         onClick={handleAction}
     >
-        {ann.bg_image_url ? (
-            <div className="absolute inset-0 z-0">
-                <img src={ann.bg_image_url} alt="" className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700" referrerPolicy="no-referrer" />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
-            </div>
-        ) : (
-            <div className={`absolute inset-0 z-0 bg-gradient-to-br ${scheme.split(' ').slice(0, 2).join(' ')} opacity-50`}></div>
-        )}
-        
-        <div className="relative z-10 flex flex-col h-full p-2">
-            <div className="flex items-center gap-2 mb-4">
-                {ann.badge_text && (
-                    ann.badge_text === 'Sponsorlu' ? (
-                        <div className="sponsored-badge flex items-center">
-                            <span>{ann.badge_text}</span>
-                        </div>
-                    ) : (
-                        <div className="px-2.5 py-1 rounded-full bg-blue-500/10 dark:bg-blue-400/10 border border-blue-500/20 dark:border-blue-400/20 flex items-center gap-1.5">
-                            <Sparkles size={10} className="text-blue-500" />
-                            <span className="text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.15em]">{ann.badge_text}</span>
-                        </div>
-                    )
+        {/* Left Side: Visual */}
+        <div className="w-28 h-full shrink-0 relative overflow-hidden border-r border-black/5 dark:border-white/5 bg-slate-100 dark:bg-slate-800">
+            {ann.bg_image_url ? (
+                <>
+                    <img src={ann.bg_image_url} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" referrerPolicy="no-referrer" />
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
+                </>
+            ) : (
+                <div className={`absolute inset-0 bg-gradient-to-br ${scheme.split(' ').slice(0, 2).join(' ')} opacity-60`}></div>
+            )}
+            
+            {ann.icon_name !== 'None' && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md border border-white/20 flex items-center justify-center text-white shadow-lg transform group-hover:scale-110 transition-transform">
+                        {React.createElement(iconMap[ann.icon_name] || Megaphone, { size: 22 })}
+                    </div>
+                </div>
+            )}
+        </div>
+
+        {/* Right Side: Content */}
+        <div className="flex-1 p-4 flex flex-col justify-center min-w-0">
+            <div className="flex items-center gap-1.5 mb-2">
+                {ann.badge_text && ann.badge_text.toLowerCase() !== 'sponsorlu' && (
+                    <div className="px-2 py-0.5 rounded-full bg-blue-500/10 dark:bg-blue-400/10 border border-blue-500/20 dark:border-blue-400/20 flex items-center gap-1 scale-[0.8] origin-left">
+                        <Sparkles size={8} className="text-blue-500" />
+                        <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest leading-none">{ann.badge_text}</span>
+                    </div>
                 )}
                 {ann.tag && (
-                    <div className="px-2.5 py-1 rounded-full bg-slate-100 dark:bg-white/5 border border-black/5 dark:border-white/10">
-                        <span className="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.15em]">{ann.tag}</span>
+                    <div className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-white/5 border border-black/5 dark:border-white/10 scale-[0.8] origin-left">
+                        <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest leading-none">{ann.tag}</span>
                     </div>
                 )}
             </div>
 
-            <h3 className="text-slate-900 dark:text-white font-extrabold text-2xl mb-2 tracking-tight leading-[1.1] font-poppins line-clamp-2 max-w-[90%] mt-[-14px]">
+            <h3 className="text-slate-900 dark:text-white font-extrabold text-sm mb-1 tracking-tight leading-tight line-clamp-1 truncate pr-2">
                 {ann.title}
             </h3>
             
-            <p className="text-slate-500 dark:text-slate-400 text-[13px] leading-relaxed line-clamp-2 font-medium font-inter mt-auto max-w-full bg-[#12172c8c] p-[6px] rounded-[18px] border border-[#12172c]">
+            <p className="text-slate-500 dark:text-slate-400 text-[11px] leading-tight line-clamp-2 font-medium opacity-80">
                 {ann.description}
             </p>
         </div>
 
-        <div className="absolute top-7 right-7 opacity-20 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300 transform group-hover:-rotate-12 pointer-events-none">
-            <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-white/5 flex items-center justify-center border border-black/5 dark:border-white/10">
-                {React.createElement(iconMap[ann.icon_name] || Megaphone, { size: 24, className: 'text-slate-900 dark:text-white' })}
+        {/* Absolute Sponsored Badge */}
+        {ann.badge_text && ann.badge_text.toLowerCase() === 'sponsorlu' && (
+            <div className="absolute top-2 right-2 z-20 origin-right scale-[0.7]">
+                <div className="sponsored-badge flex items-center px-3 py-1 rounded-full shadow-lg">
+                    <span>{ann.badge_text}</span>
+                </div>
             </div>
-        </div>
+        )}
 
-        {/* Gloss effect overlay */}
+        {/* Gloss effect */}
         <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
     </motion.div>
   );
 });
 
-const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = ({ bots }) => {
+const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = React.memo(({ bots }) => {
     const navigate = useNavigate();
     const scroll = useDraggableScroll();
     const [activeType, setActiveType] = useState<'latest' | 'official' | 'featured'>('latest');
@@ -270,19 +279,16 @@ const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = ({ bots }) => {
                     onMouseMove={scroll.onMouseMove}
                     onMouseLeave={scroll.onMouseLeave}
                     onContextMenu={scroll.onContextMenu}
-                    className={`flex items-start gap-10 overflow-x-auto no-scrollbar py-2 ${scroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+                    className={`flex items-start gap-10 overflow-x-auto no-scrollbar py-2 transform-gpu will-change-transform ${scroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
                 >
-                    <AnimatePresence mode="popLayout">
-                        {featuredBots.map((bot) => (
-                            <motion.div
-                                key={bot.id}
-                                layout
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.9 }}
-                                onClick={() => navigate(`/bot/${bot.id}`)}
-                                className="flex flex-col items-center gap-2 shrink-0 cursor-pointer group/item w-20"
-                            >
+                    {featuredBots.map((bot) => (
+                        <motion.div
+                            key={bot.id}
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            onClick={() => navigate(`/bot/${bot.id}`)}
+                            className="flex flex-col items-center gap-2 shrink-0 cursor-pointer group/item w-20"
+                        >
                                 <div className="relative">
                                     <div className="absolute inset-0 bg-blue-500/10 blur-xl rounded-full opacity-0 group-hover/item:opacity-100 transition-opacity"></div>
                                     <div className="w-[58px] h-[58px] rounded-full p-[2px] bg-gradient-to-tr from-black/5 to-black/10 dark:from-white/5 dark:to-white/10 group-hover/item:from-blue-500/50 group-hover/item:to-brand/50 transition-all">
@@ -301,19 +307,18 @@ const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = ({ bots }) => {
                                 </div>
                             </motion.div>
                         ))}
-                    </AnimatePresence>
                 </div>
             </div>
         </div>
     );
-};
+});
 
 const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonRate }) => {
   const navigate = useNavigate();
   const prices = useMemo(() => PriceService.convert(bot.price, tonRate), [bot.price, tonRate]);
   
   return (
-    <div onClick={() => navigate(`/bot/${bot.id}`)} className="flex items-center p-6 bot-card cursor-pointer group bg-white dark:bg-transparent hover:bg-slate-100 dark:hover:bg-slate-900/60 rounded-[32px] transition-all border border-black/5 dark:border-transparent hover:border-slate-200 dark:hover:border-slate-800/50 active:bg-slate-200 dark:active:bg-slate-900">
+    <div onClick={() => navigate(`/bot/${bot.id}`)} className="flex items-center p-6 bot-card cursor-pointer group bg-white dark:bg-transparent hover:bg-slate-100 dark:hover:bg-slate-900/60 rounded-[32px] transition-all border border-black/5 dark:border-transparent hover:border-slate-200 dark:hover:border-slate-800/50 active:bg-slate-200 dark:active:bg-slate-900 transform-gpu">
         <div className="relative shrink-0">
             <img 
                 src={getLiveBotIcon(bot)} 
@@ -444,6 +449,11 @@ const Home = () => {
   }, [loadData]);
 
   return (
+    <>
+    <SEO 
+        title="Telegram Bot ve Kanalları - Keşfet, Tanıt ve Yönet" 
+        description="BotlyHub V3, Telegram ekosistemindeki en iyi botları ve kanalları bulabileceğiniz, kendi botlarınızı tanıtabileceğiniz ve yönetebileceğiniz kapsamlı bir platformdur."
+    />
     <div className="p-4 pt-10 min-h-screen bg-slate-50 dark:bg-slate-950 pb-32 font-sans text-slate-900 dark:text-slate-200 animate-in transition-colors duration-300">
         <div className="flex flex-wrap md:flex-nowrap items-center justify-between mb-8 px-1 gap-y-6 md:gap-x-6">
         <div className="flex items-center gap-3 order-1">
@@ -485,7 +495,7 @@ const Home = () => {
                           className="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-900 dark:text-white active:scale-90 transition-transform relative"
                         >
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path fillRule="evenodd" clipRule="evenodd" d="M2.73689 3.03524C3.26971 2.88993 3.81945 3.20406 3.96477 3.73689L6.32167 12.3789C6.57586 13.3109 6.64452 13.4926 6.73615 13.6112C6.84307 13.7497 6.98444 13.8577 7.14615 13.9244C7.28473 13.9816 7.4781 14 8.44415 14H15.6936C16.6083 14 16.7908 13.9832 16.9245 13.9306C17.0803 13.8693 17.2182 13.7699 17.3256 13.6415C17.4178 13.5313 17.4914 13.3635 17.7807 12.4957L19.3493 7.78974C19.4738 7.41638 19.545 7.19979 19.5826 7.0407L19.5878 7.01787L19.5645 7.0156C19.4017 7.00096 19.1737 7.00001 18.7801 7.00001H7.50001C6.94772 7.00001 6.50001 6.55229 6.50001 6.00001C6.50001 5.44772 6.94772 5.00001 7.50001 5.00001H18.7801L18.8186 5C19.1601 4.99997 19.48 4.99994 19.7436 5.02364C20.0221 5.04867 20.3657 5.10817 20.6881 5.3138C21.1187 5.58847 21.428 6.01752 21.5524 6.51293C21.6455 6.8838 21.5933 7.22861 21.529 7.5007C21.4681 7.7582 21.3669 8.06169 21.2589 8.38562L21.2589 8.38566L21.2467 8.4222L19.678 13.1282L19.6323 13.2658C19.4171 13.9146 19.2283 14.4839 18.8598 14.9245C18.5376 15.3098 18.1239 15.608 17.6565 15.7918C17.122 16.0021 16.5221 16.0012 15.8386 16.0002L15.6936 16H8.44415L8.29042 16.0002C7.57008 16.0013 6.93844 16.0023 6.38325 15.7732C5.89813 15.573 5.47402 15.2491 5.15324 14.8337C4.78613 14.3584 4.62089 13.7487 4.43244 13.0535L4.39215 12.9051L2.03524 4.26312C1.88993 3.7303 2.20406 3.18056 2.73689 3.03524ZM9 19.5C9 20.3284 8.32843 21 7.5 21C6.67157 21 6 20.3284 6 19.5C6 18.6716 6.67157 18 7.5 18C8.32843 18 9 18.6716 9 19.5ZM16.5 21C17.3284 21 18 20.3284 18 19.5C18 18.6716 17.3284 18 16.5 18C15.6716 18 15 18.6716 15 19.5C15 20.3284 15.6716 21 16.5 21Z" fill="currentColor"></path>
+                                <path d="M4 7H20M4 12H20M4 17H20" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>
                             {unreadCount > 0 && (
                                 <div className="absolute -top-1 -right-1 min-w-[20px] h-[20px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[9px] font-black text-white flex items-center justify-center px-1 badge-pop">
@@ -526,17 +536,11 @@ const Home = () => {
           <>
             {announcements.length > 0 && (
                 <div className="mb-10">
-                    <div 
-                        ref={annScroll.ref}
-                        onMouseDown={annScroll.onMouseDown}
-                        onMouseUp={annScroll.onMouseUp}
-                        onMouseMove={annScroll.onMouseMove}
-                        onMouseLeave={annScroll.onMouseLeave}
-                        onContextMenu={annScroll.onContextMenu}
-                        className={`flex gap-4 overflow-x-auto no-scrollbar -mx-4 px-4 pb-2 snap-x ${annScroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
-                    >
-                        {announcements.map(ann => <PromoCard key={ann.id} ann={ann} onShowPopup={(a) => setSelectedAnn(a)} />)}
-                    </div>
+                    <AnnouncementsCarousel 
+                        announcements={announcements} 
+                        scroll={annScroll} 
+                        onShowPopup={(a) => setSelectedAnn(a)} 
+                    />
                 </div>
             )}
 
@@ -548,7 +552,7 @@ const Home = () => {
                     onMouseMove={catScroll.onMouseMove}
                     onMouseLeave={catScroll.onMouseLeave}
                     onContextMenu={catScroll.onContextMenu}
-                    className={`flex gap-3 overflow-x-auto no-scrollbar -mx-4 px-4 pb-2 snap-x ${catScroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+                    className={`flex gap-3 overflow-x-auto no-scrollbar -mx-4 px-4 pb-2 snap-x transform-gpu ${catScroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
                 >
                     {categories.map((cat) => (
                         <motion.button 
@@ -560,14 +564,12 @@ const Home = () => {
                             <motion.div
                                 variants={{
                                     hover: { 
-                                        scale: 1.2, 
-                                        rotate: [0, -10, 10, -10, 0],
-                                        filter: "none"
+                                        scale: 1.1,
                                     }
                                 }}
-                                transition={{ duration: 0.4 }}
+                                transition={{ duration: 0.2 }}
                             >
-                                <cat.icon size={20} className="text-[#139fec]" />
+                                <cat.icon size={18} className="text-[#a5afc3]" />
                             </motion.div>
                             <span className="text-[11px] font-bold uppercase tracking-wider">{t(cat.label)}</span>
                         </motion.button>
@@ -631,9 +633,15 @@ const Home = () => {
                     {/* Badge UI */}
                     <div className="absolute bottom-6 left-8 flex items-center gap-2">
                         {selectedAnn.badge_text && (
-                            <div className="px-3 py-1 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl">
-                                <span className="text-[10px] font-black text-white uppercase tracking-widest">{selectedAnn.badge_text}</span>
-                            </div>
+                            selectedAnn.badge_text.toLowerCase() === 'sponsorlu' ? (
+                                <div className="sponsored-badge flex items-center px-3 py-1 rounded-full shadow-lg">
+                                    <span className="text-[10px] font-black text-white uppercase tracking-widest">{selectedAnn.badge_text}</span>
+                                </div>
+                            ) : (
+                                <div className="px-3 py-1 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl">
+                                    <span className="text-[10px] font-black text-white uppercase tracking-widest">{selectedAnn.badge_text}</span>
+                                </div>
+                            )
                         )}
                         {selectedAnn.tag && (
                             <div className="px-3 py-1 bg-brand border border-white/20 rounded-xl">
@@ -645,9 +653,11 @@ const Home = () => {
 
                 <div className="p-8 pt-2">
                     <div className="flex items-center gap-4 mb-4">
-                        <div className="w-12 h-12 bg-slate-100 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-2xl flex items-center justify-center shrink-0">
-                            {React.createElement(iconMap[selectedAnn.icon_name] || Sparkles, { size: 22, className: 'text-brand dark:text-brand-light' })}
-                        </div>
+                        {selectedAnn.icon_name !== 'None' && (
+                            <div className="w-12 h-12 bg-slate-100 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-2xl flex items-center justify-center shrink-0">
+                                {React.createElement(iconMap[selectedAnn.icon_name] || Sparkles, { size: 22, className: 'text-brand dark:text-brand-light' })}
+                            </div>
+                        )}
                         <h3 className="text-xl lg:text-2xl font-black text-slate-900 dark:text-white tracking-tight italic uppercase leading-none truncate pr-2">
                             {selectedAnn.title}
                         </h3>
@@ -688,7 +698,95 @@ const Home = () => {
         )}
       </AnimatePresence>
     </div>
+    </>
   );
 };
+
+const AnnouncementsCarousel: React.FC<{ 
+    announcements: Announcement[], 
+    scroll: any, 
+    onShowPopup: (ann: Announcement) => void 
+}> = React.memo(({ announcements, scroll, onShowPopup }) => {
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [progress, setProgress] = useState(0);
+
+    useEffect(() => {
+        if (announcements.length <= 1) return;
+
+        const interval = setInterval(() => {
+            setProgress(prev => {
+                if (scroll.isDragging) return 0;
+                if (prev >= 100) {
+                    setCurrentIndex(current => {
+                        const next = (current + 1) % announcements.length;
+                        if (scroll.ref.current) {
+                            const cardWidth = 340;
+                            const gap = 16;
+                            const scrollLeft = next * (cardWidth + gap);
+                            scroll.ref.current.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+                        }
+                        return next;
+                    });
+                    return 0;
+                }
+                return prev + 1;
+            });
+        }, 50);
+
+        return () => clearInterval(interval);
+    }, [announcements.length, currentIndex, scroll.ref, scroll.isDragging]);
+
+    const handleScroll = useCallback(() => {
+        if (scroll.ref.current) {
+            const cardWidth = 340;
+            const gap = 16;
+            const index = Math.round(scroll.ref.current.scrollLeft / (cardWidth + gap));
+            if (index !== currentIndex) {
+                setCurrentIndex(index);
+                setProgress(0);
+            }
+        }
+    }, [currentIndex, scroll.ref]);
+
+    useEffect(() => {
+        const el = scroll.ref.current;
+        if (el) {
+            el.addEventListener('scroll', handleScroll);
+            return () => el.removeEventListener('scroll', handleScroll);
+        }
+    }, [handleScroll, scroll.ref]);
+
+    return (
+        <>
+            <div 
+                ref={scroll.ref}
+                onMouseDown={scroll.onMouseDown}
+                onMouseUp={scroll.onMouseUp}
+                onMouseMove={scroll.onMouseMove}
+                onMouseLeave={scroll.onMouseLeave}
+                onContextMenu={scroll.onContextMenu}
+                className={`flex gap-4 overflow-x-auto no-scrollbar -mx-4 px-4 pb-2 snap-x snap-mandatory ${scroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+            >
+                {announcements.map(ann => <PromoCard key={ann.id} ann={ann} onShowPopup={onShowPopup} />)}
+            </div>
+            {announcements.length > 1 && (
+                <div className="flex justify-center gap-1.5 mt-3">
+                    {announcements.map((_, i) => (
+                        <div key={i} className="w-8 h-1 bg-black/5 dark:bg-white/10 rounded-full overflow-hidden">
+                            <motion.div 
+                                className="h-full bg-blue-500"
+                                initial={{ width: 0 }}
+                                animate={{ 
+                                    width: i === currentIndex ? `${progress}%` : (i < currentIndex ? '100%' : '0%') 
+                                }}
+                                transition={{ duration: 0.1 }}
+                            />
+                        </div>
+                    ))}
+                </div>
+            )}
+        </>
+    );
+});
 
 export default Home;

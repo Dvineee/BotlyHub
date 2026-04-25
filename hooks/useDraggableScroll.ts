@@ -21,8 +21,6 @@ export const useDraggableScroll = () => {
         setStartY(e.pageY - ref.current.offsetTop);
         setScrollLeft(ref.current.scrollLeft);
         setScrollTop(ref.current.scrollTop);
-        
-        document.body.style.userSelect = 'none';
     }, []);
 
     const onContextMenu = useCallback((e: React.MouseEvent) => {
@@ -33,7 +31,6 @@ export const useDraggableScroll = () => {
 
     const onMouseUp = useCallback((e: React.MouseEvent) => {
         setIsDragging(false);
-        document.body.style.userSelect = '';
         
         // If we moved significantly, prevent the click event from triggering
         if (hasMoved) {
@@ -50,11 +47,21 @@ export const useDraggableScroll = () => {
         const walkX = (x - startX) * 2;
         const walkY = (y - startY) * 2;
         
-        if (Math.abs(x - startX) > 5 || Math.abs(y - startY) > 5) {
+        const diffX = Math.abs(x - startX);
+        const diffY = Math.abs(y - startY);
+
+        if (diffX > 5 || diffY > 5) {
             setHasMoved(true);
-            e.preventDefault();
-            ref.current.scrollLeft = scrollLeft - walkX;
-            ref.current.scrollTop = scrollTop - walkY;
+            
+            // Only prevent default if we're moving more horizontally than vertically
+            // This allows the browser to handle vertical scrolling if that's the intent
+            if (diffX > diffY) {
+                e.preventDefault();
+                ref.current.scrollLeft = scrollLeft - walkX;
+            } else {
+                // If it's a vertical move, we stop dragging to let the browser scroll
+                setIsDragging(false);
+            }
         }
     }, [isDragging, startX, startY, scrollLeft, scrollTop]);
 

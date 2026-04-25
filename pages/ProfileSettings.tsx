@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
-import { User, CreditCard, Bell, Globe, ChevronRight, Crown, Users, Sun, Moon } from 'lucide-react';
+import { User, CreditCard, Bell, Globe, ChevronRight, Crown, Users, Sun, Moon, Settings } from 'lucide-react';
 // Fixed: Use namespace import for react-router-dom to resolve "no exported member" errors
 import * as Router from 'react-router-dom';
 import { subscriptionPlans } from '../data';
@@ -77,67 +77,97 @@ const ProfileSettings = () => {
 
   return (
     <div className="min-h-screen p-6 pt-10 pb-32 bg-slate-50 dark:bg-slate-950 transition-colors animate-in fade-in">
-         <div className="flex items-center gap-5 mb-10 px-1">
+         <div className="flex items-center justify-between mb-10 px-1">
             <div>
-                <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Profil Ayarları</h1>
-                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">User Configuration v4</p>
+                <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter italic uppercase">Profil Ayarları</h1>
+                <p className="text-[10px] font-black text-brand dark:text-brand-light uppercase tracking-[0.3em] mt-1">CONFIG v4.2.0</p>
+            </div>
+            <div className="w-12 h-12 bg-white dark:bg-slate-900 rounded-2xl flex items-center justify-center border border-black/5 dark:border-white/5 text-slate-400">
+                <Settings size={20} />
             </div>
         </div>
 
         {/* Profile Card */}
-        <div className="flex items-center gap-5 mb-10 p-6 bg-white dark:bg-slate-900/40 rounded-[32px] border border-black/5 dark:border-white/5 backdrop-blur-xl ">
-             <div className="w-20 h-20 rounded-[24px] bg-slate-100 dark:bg-slate-950 flex items-center justify-center overflow-hidden border border-black/10 dark:border-white/10 ">
-                 <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover" loading="lazy" />
-             </div>
-             <div className="flex-1 min-w-0">
-                 <h2 className="font-bold text-xl text-slate-900 dark:text-white tracking-tight truncate mb-1">{displayName}</h2>
-                 <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-3">{displayUsername}</p>
-                 <div className="inline-flex items-center gap-2 bg-brand/10 dark:bg-brand-light/10 text-brand dark:text-brand-light px-4 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider border border-brand/20 dark:border-brand-light/20  ">
-                    <Crown size={12} className="fill-brand/20 dark:fill-brand-light/20" />
-                    <span>{currentPlanName}</span>
-                 </div>
+        <div className="relative mb-10 p-8 bg-white dark:bg-slate-900/40 rounded-[44px] border border-black/5 dark:border-white/5 backdrop-blur-xl overflow-hidden fancy-glass-card group">
+             <div className="absolute top-0 right-0 w-32 h-32 bg-brand/5 dark:bg-brand-light/5 blur-3xl -mr-16 -mt-16 rounded-full group-hover:bg-brand/10 transition-colors duration-700" />
+             
+             <div className="relative z-10 flex items-center gap-6">
+                <div className="relative">
+                    <div className="w-24 h-24 rounded-[32px] p-1 bg-gradient-to-tr from-brand to-brand-light">
+                        <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover rounded-[28px] border-4 border-white dark:border-slate-900" loading="lazy" />
+                    </div>
+                    <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-emerald-500 rounded-xl border-4 border-white dark:border-slate-900 flex items-center justify-center">
+                        <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                    </div>
+                </div>
+                
+                <div className="flex-1 min-w-0">
+                    <h2 className="font-black text-2xl text-slate-900 dark:text-white tracking-tighter truncate uppercase italic leading-none mb-2">{displayName}</h2>
+                    <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-4">{displayUsername}</p>
+                    
+                    <div className="inline-flex items-center gap-2 bg-brand/10 dark:bg-brand-light/10 text-brand dark:text-brand-light px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border border-brand/20 dark:border-brand-light/20 shadow-sm animate-pulse">
+                        <Crown size={12} className="fill-brand/20 dark:fill-brand-light/20" />
+                        <span>{currentPlanName} LİSANSI</span>
+                    </div>
+                </div>
              </div>
         </div>
 
-        <h3 className="text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest mb-4 ml-4">Hesap Yönetimi</h3>
-        <div className="mb-8 rounded-[32px] border border-black/5 dark:border-white/5 bg-white dark:bg-slate-900/20 overflow-hidden ">
-            <MenuItem 
-                icon={User} 
-                label="Hesap Bilgileri" 
-                onClick={() => navigate('/account-settings')}
-            />
-            <MenuItem 
-                icon={CreditCard} 
-                label="Abonelik Yönetimi" 
-                value={currentPlanName} 
-                onClick={() => navigate('/premium')}
-            />
-            <MenuItem 
-                icon={Users} 
-                label="Referans Sistemi" 
-                onClick={() => navigate('/referral')}
-            />
+        <div className="space-y-4 mb-8">
+            <div className="flex items-center justify-between px-4">
+                <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-[0.3em]">HESAP YÖNETİMİ</h3>
+                <div className="w-8 h-px bg-slate-200 dark:bg-slate-900" />
+            </div>
+            
+            <div className="rounded-[40px] border border-black/5 dark:border-white/5 bg-white dark:bg-slate-900/20 overflow-hidden fancy-glass-card">
+                <div className="p-2 space-y-1">
+                    <MenuItem 
+                        icon={User} 
+                        label="Hesap Bilgileri" 
+                        onClick={() => navigate('/account-settings')}
+                    />
+                    <MenuItem 
+                        icon={CreditCard} 
+                        label="Abonelik Yönetimi" 
+                        value={currentPlanName} 
+                        onClick={() => navigate('/premium')}
+                    />
+                    <MenuItem 
+                        icon={Users} 
+                        label="Referans Sistemi" 
+                        onClick={() => navigate('/referral')}
+                    />
+                </div>
+            </div>
         </div>
 
-        <h3 className="text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest mb-4 ml-4">Uygulama Tercihleri</h3>
-        <div className="mb-8 rounded-[32px] border border-black/5 dark:border-white/5 bg-white dark:bg-slate-900/20 overflow-hidden ">
-            <MenuItem 
-                icon={Bell} 
-                label="Bildirimler" 
-                onClick={() => navigate('/notifications')}
-            />
-            <MenuItem 
-                icon={theme === 'dark' ? Moon : Sun} 
-                label="Görünüm Modu" 
-                value={theme === 'dark' ? 'Karanlık' : 'Aydınlık'} 
-                onClick={toggleTheme}
-            />
-            <MenuItem 
-                icon={Globe} 
-                label="Dil Seçimi" 
-                value={currentLangLabel} 
-                onClick={() => setShowLanguagePicker(true)}
-            />
+        <div className="space-y-4 mb-8">
+            <div className="flex items-center justify-between px-4">
+                <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-[0.3em]">UYGULAMA TERCIHLERI</h3>
+                <div className="w-8 h-px bg-slate-200 dark:bg-slate-900" />
+            </div>
+            
+            <div className="rounded-[40px] border border-black/5 dark:border-white/5 bg-white dark:bg-slate-900/20 overflow-hidden fancy-glass-card">
+                <div className="p-2 space-y-1">
+                    <MenuItem 
+                        icon={Bell} 
+                        label="Bildirimler" 
+                        onClick={() => navigate('/notifications')}
+                    />
+                    <MenuItem 
+                        icon={theme === 'dark' ? Moon : Sun} 
+                        label="Görünüm Modu" 
+                        value={theme === 'dark' ? 'Karanlık' : 'Aydınlık'} 
+                        onClick={toggleTheme}
+                    />
+                    <MenuItem 
+                        icon={Globe} 
+                        label="Dil Seçimi" 
+                        value={currentLangLabel} 
+                        onClick={() => setShowLanguagePicker(true)}
+                    />
+                </div>
+            </div>
         </div>
 
         {/* Language Picker Modal */}

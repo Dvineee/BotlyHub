@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Mail, Save, Loader2, CheckCircle2, 
   Lock, ShieldCheck, AlertCircle, ArrowRight, 
-  Shield, BadgeCheck, Fingerprint, Info, Check
+  Shield, BadgeCheck, Fingerprint, Info, Check, ChevronLeft
 } from 'lucide-react';
 import * as Router from 'react-router-dom';
 import { useTelegram } from '../hooks/useTelegram';
@@ -91,26 +91,36 @@ const AccountSettings = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col text-slate-900 dark:text-slate-200 animate-in fade-in pb-20 transition-colors duration-300">
-      {/* Premium Header */}
-      <nav className="h-24 px-6 flex items-center justify-center border-b border-black/5 dark:border-white/5 bg-white/50 dark:bg-slate-950/50 backdrop-blur-xl sticky top-0 z-50">
-        <span className="text-[10px] font-bold tracking-widest text-slate-400 dark:text-white/40 uppercase">GÜVENLİK MERKEZİ</span>
-      </nav>
+      {/* Header */}
+      <div className="p-4 flex items-center justify-between sticky top-0 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl z-50 border-b border-black/5 dark:border-white/5">
+        <div className="flex items-center gap-3">
+            <button onClick={() => navigate(-1)} className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-2xl text-slate-500 dark:text-slate-400 active:scale-90 transition-transform ">
+                <ChevronLeft size={20} />
+            </button>
+            <h1 className="text-[14px] font-black text-slate-900 dark:text-white uppercase tracking-tight">Hesap Ayarları</h1>
+        </div>
+        <div className="flex items-center gap-2">
+            <div className="px-3 py-1.5 bg-brand/10 border border-brand/20 rounded-xl">
+                 <Shield className="text-brand dark:text-brand-light" size={12} />
+            </div>
+        </div>
+      </div>
 
-      <div className="px-8 mt-12 max-w-lg mx-auto w-full">
+      <div className="px-6 mt-10 max-w-lg mx-auto w-full">
           {/* Status Badge */}
-          <div className="mb-12 text-center">
-              <div className={`inline-flex items-center gap-2 px-6 py-3 rounded-[20px] mb-8  border animate-in slide-in-from-top-4 transition-all ${
-                  isVerified ? 'bg-emerald-500/5 border-emerald-500/10' : 'bg-brand/5 border-brand/10'
+          <div className="text-center mb-10">
+              <div className={`inline-flex items-center gap-3 px-6 py-3 rounded-[24px] mb-8 border animate-in slide-in-from-top-4 transition-all shadow-sm ${
+                  isVerified ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-brand/5 border-brand/20'
               }`}>
                   {isVerified ? (
-                      <><BadgeCheck size={18} className="text-emerald-600 dark:text-emerald-500" /><span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-500 uppercase tracking-widest">HESAP DOĞRULANDI</span></>
+                      <><BadgeCheck size={18} className="text-emerald-500" /><span className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em]">HESAP DOĞRULANDI</span></>
                   ) : (
-                      <><Fingerprint size={18} className="text-brand dark:text-brand-light" /><span className="text-[11px] font-bold text-brand dark:text-brand-light uppercase tracking-widest">DOĞRULAMA BEKLİYOR</span></>
+                      <><Fingerprint size={18} className="text-brand dark:text-brand-light" /><span className="text-[10px] font-black text-brand dark:text-brand-light uppercase tracking-[0.2em]">ONAY BEKLİYOR</span></>
                   )}
               </div>
-              <h1 className="text-4xl font-bold text-slate-900 dark:text-white tracking-tight mb-4">Hesap <span className="text-brand dark:text-brand-light">Kimliği</span></h1>
-              <p className="text-xs text-slate-500 leading-relaxed font-medium uppercase px-6">
-                  Ödemelerinizi almak ve botlarınızı yönetmek için kimlik doğrulaması gereklidir.
+              <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter uppercase italic leading-none mb-3">Hesap <span className="text-brand dark:text-brand-light">Kimliği</span></h1>
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-[0.2em] px-10">
+                  Botlarınızın kontrolü ve finansal işlemleriniz için kimliğinizi doğrulayın.
               </p>
           </div>
 
@@ -118,61 +128,62 @@ const AccountSettings = () => {
           <div className="space-y-10">
               <div className="space-y-4">
                   <div className="flex justify-between items-center px-4">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">E-POSTA ADRESİ</label>
-                    {isVerified && <Check size={16} className="text-emerald-600 dark:text-emerald-500" />}
+                    <label className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest">E-POSTA ADRESİ</label>
+                    {isVerified && <CheckCircle2 size={16} className="text-emerald-500" />}
                   </div>
                   <div className="relative group">
-                      <div className={`absolute left-6 top-1/2 -translate-y-1/2 transition-all duration-300 ${isVerified ? 'text-emerald-600 dark:text-emerald-500 scale-110' : 'text-slate-400 dark:text-slate-500 group-focus-within:text-brand dark:group-focus-within:text-brand-light'}`}>
-                        {isVerified ? <ShieldCheck size={22} /> : <Mail size={22} />}
+                      <div className={`absolute left-6 top-1/2 -translate-y-1/2 transition-all duration-500 z-10 ${isVerified ? 'text-emerald-500 scale-110' : 'text-slate-400 group-focus-within:text-brand dark:group-focus-within:text-brand-light'}`}>
+                        {isVerified ? <ShieldCheck size={24} /> : <Mail size={24} />}
                       </div>
                       <input 
                         type="email" 
                         value={formData.email} 
                         readOnly={isVerified}
                         onChange={e => setFormData({...formData, email: e.target.value})} 
-                        className={`w-full h-18 pl-16 pr-6 text-sm font-bold rounded-[28px] border transition-all uppercase tracking-widest  ${
+                        className={`w-full h-20 pl-16 pr-6 text-sm font-black rounded-[32px] border transition-all uppercase tracking-[0.2em] shadow-sm  ${
                             isVerified 
-                            ? 'bg-slate-100 dark:bg-slate-950/50 border-emerald-500/20 text-emerald-600/70 dark:text-emerald-500/70 cursor-default' 
-                            : 'bg-white dark:bg-slate-900/30 border-black/5 dark:border-white/10 text-slate-900 dark:text-white focus:border-brand/40 focus:bg-white dark:focus:bg-slate-900/50 outline-none'
+                            ? 'bg-slate-100 dark:bg-slate-950/50 border-emerald-500/20 text-emerald-500/70 cursor-default' 
+                            : 'bg-white dark:bg-slate-900/30 border-black/5 dark:border-white/10 text-slate-900 dark:text-white focus:border-brand/40 focus:ring-4 focus:ring-brand/5 outline-none'
                         }`} 
-                        placeholder="EMAIL@EXAMPLE.COM" 
+                        placeholder="EMAIL@DOMAIN.COM" 
                       />
                   </div>
               </div>
 
               {errorMsg && (
-                  <div className="p-6 bg-red-500/5 border border-red-500/10 rounded-[32px] flex items-center gap-4 animate-in shake ">
-                      <AlertCircle className="text-red-600 dark:text-red-500 shrink-0" size={22} />
-                      <p className="text-red-600 dark:text-red-400 text-[11px] font-bold uppercase tracking-tight">{errorMsg}</p>
+                  <div className="p-6 bg-red-400/5 border border-red-400/10 rounded-[32px] flex items-center gap-4 animate-in shake ">
+                      <AlertCircle className="text-red-500 shrink-0" size={24} />
+                      <p className="text-red-500 text-[11px] font-black uppercase tracking-tight italic">{errorMsg}</p>
                   </div>
               )}
 
               <div className="pt-6">
                   {isVerified ? (
-                      <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-[44px] p-10 text-center animate-in zoom-in-95 ">
-                          <div className="w-20 h-20 bg-emerald-500/10 border border-emerald-500/20 rounded-[28px] flex items-center justify-center mx-auto mb-6 ">
-                              <ShieldCheck className="text-emerald-600 dark:text-emerald-500" size={36} />
+                      <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-[44px] p-10 text-center animate-in zoom-in-95 backdrop-blur-xl fancy-glass-card">
+                          <div className="w-24 h-24 bg-emerald-500/10 border border-emerald-500/20 rounded-[32px] flex items-center justify-center mx-auto mb-8 shadow-sm">
+                              <ShieldCheck className="text-emerald-500" size={44} />
                           </div>
-                          <h4 className="text-slate-900 dark:text-white font-bold text-lg mb-2 uppercase tracking-tight">KİMLİK ONAYLANDI</h4>
-                          <p className="text-[11px] text-slate-500 font-bold uppercase mb-8">Tüm platform özellikleri aktif edildi.</p>
+                          <h4 className="text-slate-900 dark:text-white font-black text-xl mb-2 uppercase tracking-tighter italic">KİMLİK ONAYLANDI</h4>
+                          <p className="text-[10px] text-slate-400 dark:text-slate-600 font-black uppercase tracking-widest leading-relaxed mb-8">Pro hesabınız ile tüm yönetim araçlarına <br/>erişiminiz sağlandı.</p>
                           <button 
                             onClick={() => navigate('/settings')}
-                            className="w-full h-16 bg-slate-900 dark:bg-slate-950 hover:bg-slate-800 dark:hover:bg-slate-900 text-white font-bold rounded-[24px] text-[11px] uppercase tracking-widest transition-all flex items-center justify-center gap-3 active:scale-95 border border-black/5 dark:border-white/5 "
+                            className="w-full h-18 bg-slate-900 dark:bg-slate-950 hover:opacity-90 text-white font-black rounded-[28px] text-[11px] uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-3 active:scale-95 border border-black/5 dark:border-white/10  "
                           >
-                            AYARLARA DÖN <ArrowRight size={16}/>
+                            AYARLARA DÖN <ArrowRight size={18}/>
                           </button>
                       </div>
                   ) : (
                       <button 
                         onClick={handleSave} 
                         disabled={isSaving} 
-                        className="w-full h-20 bg-brand dark:bg-brand-light hover:opacity-90 rounded-[32px] font-bold text-white flex flex-col items-center justify-center gap-1   active:scale-[0.97] transition-all disabled:opacity-50"
+                        className="w-full h-24 bg-brand dark:bg-brand-light hover:shadow-lg hover:shadow-brand/20 rounded-[36px] font-black text-white flex flex-col items-center justify-center gap-1 active:scale-[0.97] transition-all disabled:opacity-50 border-b-8 border-brand-dark dark:border-brand-light/20 relative group overflow-hidden"
                       >
-                        {isSaving ? <Loader2 className="animate-spin" size={24} /> : (
-                            <>
-                                <span className="text-[12px] uppercase tracking-widest">VERİLERİ DOĞRULA</span>
-                                <span className="text-[9px] opacity-60 uppercase tracking-widest font-bold">GÜVENLİ ONAY</span>
-                            </>
+                        <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+                        {isSaving ? <Loader2 className="animate-spin relative z-10" size={28} /> : (
+                            <div className="relative z-10 flex flex-col items-center">
+                                <span className="text-[13px] uppercase tracking-[0.3em] italic">VERİLERİ DOĞRULA</span>
+                                <span className="text-[9px] opacity-60 uppercase tracking-[0.2em] font-black mt-1">GÜVENLİ ONAY SİSTEMİ</span>
+                            </div>
                         )}
                       </button>
                   )}
@@ -180,11 +191,14 @@ const AccountSettings = () => {
           </div>
       </div>
 
-      <div className="mt-auto pt-20 flex flex-col items-center gap-4 opacity-20">
-          <div className="h-[1px] w-12 bg-slate-300 dark:bg-slate-800"></div>
-          <div className="flex items-center gap-3">
-              <Shield size={14} className="text-slate-400 dark:text-slate-500" />
-              <p className="text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.4em] italic">BOTLYHUB V3 SECURITY INFRASTRUCTURE</p>
+      <div className="mt-auto pt-24 pb-12 flex flex-col items-center gap-5 opacity-30">
+          <div className="h-[2px] w-16 bg-slate-200 dark:bg-slate-800 rounded-full"></div>
+          <div className="flex flex-col items-center gap-2">
+              <div className="flex items-center gap-3">
+                  <Shield size={16} className="text-slate-400 dark:text-slate-500" />
+                  <p className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.5em] italic">BOTLYHUB V3 SECURITY</p>
+              </div>
+              <p className="text-[7px] font-black text-slate-300 dark:text-slate-700 uppercase tracking-[0.2em]">End-to-End Encryption Enabled</p>
           </div>
       </div>
     </div>

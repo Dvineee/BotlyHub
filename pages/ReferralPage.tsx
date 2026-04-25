@@ -65,159 +65,165 @@ const ReferralPage = () => {
     return (
         <div className="p-6 space-y-8 pb-32 bg-slate-50 dark:bg-slate-950 min-h-screen animate-in fade-in transition-colors duration-300">
             {/* Header */}
-            <div className="flex items-center gap-5 mb-10 px-1">
-                <div className="w-12 h-12 bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full flex items-center justify-center ">
-                    <Users className="text-brand dark:text-brand-light" size={22} />
+            <div className="flex items-center justify-between mb-10 px-1">
+                <div className="flex items-center gap-5">
+                    <div className="w-14 h-14 bg-white dark:bg-slate-900 rounded-[22px] border border-black/5 dark:border-white/5 flex items-center justify-center shadow-sm">
+                        <Users className="text-brand dark:text-brand-light" size={24} />
+                    </div>
+                    <div>
+                        <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter uppercase italic leading-none">Referans <span className="text-brand dark:text-brand-light">Sistemi</span></h1>
+                        <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em] mt-1.5">HUB NETWORK v4.2.0</p>
+                    </div>
                 </div>
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Referans <span className="text-brand dark:text-brand-light">Sistemi</span></h1>
-                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Arkadaşlarını davet et, birlikte kazan!</p>
+                <div className="w-10 h-10 bg-brand/10 border border-brand/20 rounded-2xl flex items-center justify-center text-brand dark:text-brand-light animate-bounce">
+                    <Gift size={18} />
                 </div>
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-[32px] space-y-1 ">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Toplam Davet</span>
-                    <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">{stats?.total || 0}</span>
-                        <span className="text-[11px] font-bold text-slate-500 uppercase">Kişi</span>
+            <div className="grid grid-cols-2 gap-5">
+                <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-8 rounded-[44px] space-y-2 fancy-glass-card group overflow-hidden relative">
+                    <div className="absolute top-0 right-0 w-16 h-16 bg-slate-500/5 blur-2xl -mr-8 -mt-8 rounded-full" />
+                    <span className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-[0.2em] relative z-10">TOPLAM DAVET</span>
+                    <div className="flex items-baseline gap-2 relative z-10">
+                        <span className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter italic group-hover:scale-110 transition-transform duration-500">{stats?.total || 0}</span>
+                        <span className="text-[11px] font-black text-slate-400 uppercase italic">KİŞİ</span>
                     </div>
                 </div>
-                <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-[32px] space-y-1 ">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Toplam Kazanç</span>
-                    <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-bold text-emerald-600 dark:text-emerald-500 tracking-tight">{stats?.earnings || 0}</span>
-                        <span className="text-[11px] font-bold text-emerald-600/50 dark:text-emerald-500/50 uppercase tracking-tight">HP</span>
+                <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-8 rounded-[44px] space-y-2 fancy-glass-card group overflow-hidden relative">
+                    <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-500/5 blur-2xl -mr-8 -mt-8 rounded-full" />
+                    <span className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-[0.2em] relative z-10">TOPLAM KAZANÇ</span>
+                    <div className="flex items-baseline gap-2 relative z-10">
+                        <span className="text-4xl font-black text-emerald-500 tracking-tighter italic group-hover:scale-110 transition-transform duration-500">{stats?.earnings || 0}</span>
+                        <span className="text-[11px] font-black text-emerald-500/50 uppercase italic">HP</span>
                     </div>
                 </div>
             </div>
 
             {/* Referral Link Box */}
-            <div className="bg-brand/10 dark:bg-brand-light/10 border border-brand/20 dark:border-brand-light/20 p-8 rounded-[40px] space-y-8 relative overflow-hidden  ">
-                <div className="absolute top-0 right-0 p-8 opacity-5">
-                    <Gift size={140} />
+            <div className="bg-brand/10 dark:bg-brand-light/5 border border-brand/20 dark:border-brand-light/20 p-10 rounded-[48px] space-y-10 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-10 opacity-5 group-hover:scale-125 transition-transform duration-1000">
+                    <Gift size={200} />
                 </div>
+                <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-brand/5 blur-[100px] rounded-full" />
                 
-                <div className="space-y-3 relative z-10">
-                    <h3 className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-tight">Senin Davet Linkin</h3>
-                    <p className="text-[11px] font-medium text-brand dark:text-brand-light/70 leading-relaxed uppercase">
-                        Bu linki paylaşarak her yeni üye için {settings?.standard_reward} Hub Puanı, Premium üyeler için {settings?.premium_reward} Hub Puanı kazanabilirsin.
+                <div className="space-y-4 relative z-10 text-center md:text-left">
+                    <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic leading-none">SENİN ÖZEL DAVET LİNKİN</h3>
+                    <p className="text-[10px] font-black text-brand dark:text-brand-light/70 leading-relaxed uppercase tracking-widest max-w-sm px-4 md:px-0">
+                        Linkingi paylaş, her yeni üye için <span className="text-brand-dark dark:text-white bg-brand/10 px-2 rounded-lg">{settings?.standard_reward} HP</span> kazanma şansı yakala.
                     </p>
                 </div>
 
-                <div className="flex flex-col gap-4 relative z-10">
-                    <div className="flex items-center gap-3 bg-white/50 dark:bg-slate-950/50 border border-black/5 dark:border-white/5 p-5 rounded-[24px] ">
+                <div className="flex flex-col gap-5 relative z-10">
+                    <div className="flex items-center gap-4 bg-white/50 dark:bg-slate-950/50 border border-black/5 dark:border-white/5 p-2 pr-6 rounded-[32px] group-focus-within:border-brand/40 transition-all shadow-sm">
+                        <div className="w-14 h-14 bg-white dark:bg-slate-900 rounded-[24px] flex items-center justify-center text-slate-400 group-hover:text-brand transition-colors">
+                            <ExternalLink size={20} />
+                        </div>
                         <input 
                             readOnly 
                             value={referralLink}
-                            className="bg-transparent border-none outline-none text-[11px] font-bold text-slate-600 dark:text-slate-300 flex-1 truncate"
+                            className="bg-transparent border-none outline-none text-[11px] font-black text-slate-600 dark:text-slate-300 flex-1 truncate uppercase tracking-widest"
                         />
                         <button 
                             onClick={handleCopy}
-                            className="w-10 h-10 flex items-center justify-center bg-brand/10 dark:bg-brand-light/10 hover:bg-brand/20 dark:hover:bg-brand-light/20 rounded-xl transition-all text-brand dark:text-brand-light "
+                            className="w-12 h-12 flex items-center justify-center bg-brand/10 dark:bg-brand-light/10 hover:bg-brand/20 dark:hover:bg-brand-light/20 rounded-2xl transition-all text-brand dark:text-brand-light group active:scale-90"
                         >
-                            {copied ? <CheckCircle2 size={18} /> : <Copy size={18} />}
+                            {copied ? <CheckCircle2 size={20} className="animate-in zoom-in" /> : <Copy size={20} />}
                         </button>
                     </div>
                     
                     <button 
                         onClick={handleShare}
-                        className="w-full py-5 bg-brand dark:bg-brand-light hover:opacity-90 text-white font-bold text-[11px] uppercase tracking-widest rounded-[24px] transition-all flex items-center justify-center gap-3   active:scale-95"
+                        className="w-full py-6 bg-brand dark:bg-brand-light hover:shadow-lg hover:shadow-brand/20 text-white font-black text-[12px] uppercase tracking-[0.3em] rounded-[32px] transition-all flex items-center justify-center gap-4 active:scale-95 border-b-8 border-brand-dark dark:border-brand-light/20 group relative overflow-hidden"
                     >
-                        <Share2 size={18} />
-                        HEMEN PAYLAŞ
+                        <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+                        <Share2 size={20} className="relative z-10" />
+                        <span className="relative z-10 italic">ARKADAŞINI DAVET ET</span>
                     </button>
                 </div>
             </div>
 
             {/* Security Info */}
-            <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-8 rounded-[32px] space-y-6 ">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-brand/10 dark:bg-brand-light/10 rounded-xl flex items-center justify-center">
-                        <ShieldCheck className="text-brand dark:text-brand-light" size={20} />
+            <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-10 rounded-[44px] space-y-8 fancy-glass-card">
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-emerald-500/10 dark:bg-emerald-500/5 rounded-[20px] flex items-center justify-center">
+                        <ShieldCheck className="text-emerald-500" size={24} />
                     </div>
-                    <h4 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-tight">Nasıl Ödül Kazanılır?</h4>
+                    <h4 className="text-[15px] font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">NASIL ÖDÜL KAZANILIR?</h4>
                 </div>
-                <div className="space-y-4">
-                    <div className="flex gap-4">
-                        <div className="w-1.5 h-1.5 mt-2 bg-brand dark:bg-brand-light rounded-full " />
-                        <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 leading-relaxed uppercase">
-                            1. Davet linkini arkadaşınla paylaş.
-                        </p>
-                    </div>
-                    <div className="flex gap-4">
-                        <div className="w-1.5 h-1.5 mt-2 bg-emerald-600 dark:bg-emerald-500 rounded-full " />
-                        <p className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 leading-relaxed uppercase">
-                            2. Arkadaşın botu başlattıktan sonra <span className="underline">resmi grubumuza</span> katılmalı.
-                        </p>
-                    </div>
-                    <div className="flex gap-4">
-                        <div className="w-1.5 h-1.5 mt-2 bg-brand dark:bg-brand-light rounded-full " />
-                        <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 leading-relaxed uppercase">
-                            3. Katılım sağlandığı an ödülün otomatik olarak cüzdanına yansır.
-                        </p>
-                    </div>
+                <div className="space-y-6">
+                    {[
+                        { step: '01', text: 'Davet linkini sosyal medyada veya arkadaşınla paylaş.', color: 'brand' },
+                        { step: '02', text: 'Arkadaşın botu başlattıktan sonra resmi grubumuza katılmalı.', color: 'emerald' },
+                        { step: '03', text: 'Grup katılımı sağlandığı an ödülün otomatik yansır.', color: 'brand' }
+                    ].map((item, i) => (
+                        <div key={i} className="flex gap-5 items-center group">
+                            <span className={`text-[20px] font-black text-${item.color}-500 opacity-20 group-hover:opacity-100 transition-opacity italic`}>{item.step}</span>
+                            <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 leading-relaxed uppercase tracking-widest">{item.text}</p>
+                        </div>
+                    ))}
                 </div>
             </div>
 
             {/* Referral List */}
-            <div className="space-y-5">
-                <div className="flex items-center justify-between px-2">
-                    <h3 className="text-[11px] font-bold text-slate-900 dark:text-white uppercase tracking-widest">Davet Durumları</h3>
-                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase">
-                        <Clock size={12} />
-                        <span>OTOMATİK ONAY AKTİF</span>
+            <div className="space-y-6">
+                <div className="flex items-center justify-between px-4">
+                    <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-[0.4em]">DAVET DURUMLARI</h3>
+                    <div className="flex items-center gap-2 text-[9px] font-black text-brand uppercase tracking-widest bg-brand/5 px-3 py-1 rounded-lg border border-brand/10">
+                        <div className="w-1 h-1 bg-brand rounded-full animate-pulse" />
+                        <span>OTOMATİK ONAY SİSTEMİ</span>
                     </div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-3">
                     {referrals.length === 0 ? (
-                        <div className="py-16 text-center bg-white dark:bg-slate-900/20 border border-dashed border-black/5 dark:border-white/10 rounded-[40px] ">
-                            <Users className="mx-auto text-slate-200 dark:text-slate-800 mb-4" size={40} />
-                            <p className="text-[11px] font-bold text-slate-300 dark:text-slate-700 uppercase tracking-widest">Henüz kimseyi davet etmedin</p>
+                        <div className="py-20 text-center bg-white dark:bg-slate-900/20 border border-dashed border-black/5 dark:border-white/10 rounded-[48px] fancy-glass-card">
+                            <Users className="mx-auto text-slate-100 dark:text-slate-800 mb-6" size={56} />
+                            <p className="text-[11px] font-black text-slate-300 dark:text-slate-700 uppercase tracking-[0.3em] italic">Henüz bir veri girişi bulunamadı</p>
                         </div>
                     ) : (
                         referrals.map((ref) => (
-                            <div key={ref.id} className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-[32px] flex items-center justify-between ">
+                            <div key={ref.id} className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-5 rounded-[36px] flex items-center justify-between fancy-glass-card group hover:border-brand/20 transition-all">
                                 <div className="flex items-center gap-5">
                                     {ref.referred_user?.avatar ? (
                                         <div className="relative">
-                                            <img 
-                                                src={ref.referred_user.avatar} 
-                                                alt={ref.referred_user.name} 
-                                                className="w-12 h-12 rounded-[18px] object-cover border border-black/5 dark:border-white/10 "
-                                                referrerPolicy="no-referrer"
-                                            />
-                                            <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-slate-50 dark:border-slate-950 flex items-center justify-center  ${ref.status === 'confirmed' ? 'bg-emerald-500 text-white' : ref.status === 'pending' ? 'bg-orange-500 text-white' : 'bg-red-500 text-white'}`}>
+                                            <div className="w-14 h-14 rounded-[22px] p-0.5 bg-gradient-to-tr from-slate-200 to-slate-100 dark:from-slate-800 dark:to-slate-700">
+                                                <img 
+                                                    src={ref.referred_user.avatar} 
+                                                    alt={ref.referred_user.name} 
+                                                    className="w-full h-full rounded-[20px] object-cover"
+                                                    referrerPolicy="no-referrer"
+                                                />
+                                            </div>
+                                            <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-xl border-2 border-slate-50 dark:border-slate-950 flex items-center justify-center shadow-lg ${ref.status === 'confirmed' ? 'bg-emerald-500 text-white' : ref.status === 'pending' ? 'bg-orange-500 text-white' : 'bg-red-500 text-white'}`}>
                                                 {ref.status === 'confirmed' ? <CheckCircle2 size={12} /> : ref.status === 'pending' ? <Clock size={12} /> : <XCircle size={12} />}
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className={`w-12 h-12 rounded-[18px] flex items-center justify-center border  ${ref.status === 'confirmed' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-500' : ref.status === 'pending' ? 'bg-orange-500/10 border-orange-500/20 text-orange-600 dark:text-orange-500' : 'bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-500'}`}>
-                                            {ref.status === 'confirmed' ? <CheckCircle2 size={22} /> : ref.status === 'pending' ? <Clock size={22} /> : <XCircle size={22} />}
+                                        <div className={`w-14 h-14 rounded-[22px] flex items-center justify-center border ${ref.status === 'confirmed' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : ref.status === 'pending' ? 'bg-orange-500/10 border-orange-500/20 text-orange-500' : 'bg-red-500/10 border-red-500/20 text-red-500'}`}>
+                                            {ref.status === 'confirmed' ? <CheckCircle2 size={24} /> : ref.status === 'pending' ? <Clock size={24} /> : <XCircle size={24} />}
                                         </div>
                                     )}
                                     <div className="space-y-1">
                                         <div className="flex items-center gap-3">
-                                            <span className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">
-                                                {ref.referred_user?.name || `Kullanıcı #${ref.referred_id.slice(-4)}`}
+                                            <span className="text-[15px] font-black text-slate-900 dark:text-white tracking-tighter uppercase italic">
+                                                {ref.referred_user?.name || `USR-${ref.referred_id.slice(-4).toUpperCase()}`}
                                             </span>
                                             {ref.is_premium_referral && (
-                                                <span className="px-2.5 py-0.5 bg-brand/20 dark:bg-brand-light/20 border border-brand/20 dark:border-brand-light/20 text-[8px] font-bold text-brand dark:text-brand-light rounded-full uppercase tracking-wider">PREMIUM</span>
+                                                <div className="px-2 py-0.5 bg-brand/10 border border-brand/20 text-[7px] font-black text-brand rounded-md uppercase tracking-widest italic animate-pulse">PRO</div>
                                             )}
                                         </div>
-                                        <span className="text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase">
-                                            {ref.status === 'pending' ? 'Grup Katılımı Bekleniyor' : new Date(ref.created_at).toLocaleDateString('tr-TR')}
+                                        <span className="text-[9px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest">
+                                            {ref.status === 'pending' ? 'AĞA BAĞLANMASI BEKLENİYOR' : new Date(ref.created_at).toLocaleDateString('tr-TR')}
                                         </span>
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <span className={`text-sm font-bold tracking-tight ${ref.status === 'confirmed' ? 'text-emerald-600 dark:text-emerald-500' : 'text-slate-400 dark:text-slate-600'}`}>
+                                    <span className={`text-[16px] font-black tracking-tighter italic ${ref.status === 'confirmed' ? 'text-emerald-500' : 'text-slate-400'}`}>
                                         +{ref.reward_amount} HP
                                     </span>
-                                    <p className={`text-[9px] font-bold uppercase tracking-wider mt-0.5 ${ref.status === 'confirmed' ? 'text-emerald-600/50 dark:text-emerald-500/50' : 'text-orange-600/50 dark:text-orange-500/50'}`}>
-                                        {ref.status === 'confirmed' ? 'TAMAMLANDI' : ref.status === 'pending' ? 'BEKLEMEDE' : 'REDDEDİLDİ'}
+                                    <p className={`text-[8px] font-black uppercase tracking-[0.2em] mt-1 ${ref.status === 'confirmed' ? 'text-emerald-500/50' : 'text-orange-500/50'}`}>
+                                        {ref.status === 'confirmed' ? 'DİSİPLİNE EDİLDİ' : ref.status === 'pending' ? 'BEKLEYİŞTE' : 'İHRAÇ EDİLDİ'}
                                     </p>
                                 </div>
                             </div>

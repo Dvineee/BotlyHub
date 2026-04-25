@@ -3,6 +3,7 @@ import React from 'react';
 import { Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { subscriptionPlans } from '../data';
+import { SEO } from '../components/SEO';
 
 const Premium = () => {
   const navigate = useNavigate();
@@ -25,6 +26,11 @@ const Premium = () => {
   };
 
   return (
+    <>
+    <SEO 
+        title="Premium Paketler" 
+        description="BotlyHub Premium üyelikleri ile limitleri kaldırın, daha düşük komisyon oranlarından ve özel ayrıcalıklardan yararlanın."
+    />
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 pt-10 pb-32 animate-in fade-in transition-colors duration-300">
       {/* Header */}
       <div className="flex items-center gap-5 mb-10 px-1">
@@ -128,6 +134,7 @@ const Premium = () => {
           })}
       </div>
     </div>
+    </>
   );
 };
 

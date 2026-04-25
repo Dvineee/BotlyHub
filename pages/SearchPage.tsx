@@ -14,6 +14,7 @@ import { useFilter } from '../FilterContext';
 import { FilterMenu } from '../components/FilterMenu';
 
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { SEO } from '../components/SEO';
 
 const getLiveBotIcon = (bot: Bot) => {
     if (bot.bot_link) {
@@ -186,6 +187,11 @@ const SearchPage = () => {
   };
 
   return (
+    <>
+    <SEO 
+        title="Bot ve Kanal Ara" 
+        description="BotlyHub üzerinde dilediğiniz Telegram botunu veya kanalını arayarak keşfedin."
+    />
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 pt-10 pb-32 animate-in fade-in transition-colors duration-300">
       {/* Header & Search Box */}
       <div className="flex items-center gap-4 mb-8">
@@ -241,7 +247,7 @@ const SearchPage = () => {
                 : 'bg-white dark:bg-slate-900/60 border-black/5 dark:border-white/5 text-slate-500 dark:text-slate-400'
               }`}
             >
-              <cat.icon size={20} className={activeCategory === cat.id ? 'text-brand dark:text-brand-light' : 'text-slate-400 dark:text-slate-300'} />
+              <cat.icon size={18} className={activeCategory === cat.id ? 'text-brand dark:text-brand-light' : 'text-[#a5afc3]'} />
               <span className="text-[11px] font-bold uppercase tracking-wider">{t(cat.label)}</span>
             </button>
           ))}
@@ -267,6 +273,7 @@ const SearchPage = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

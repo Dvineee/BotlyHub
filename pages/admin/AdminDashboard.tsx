@@ -1828,7 +1828,7 @@ const AnnouncementCenter = () => {
             description: '',
             button_text: 'İNCELE',
             button_link: '',
-            icon_name: 'Megaphone',
+            icon_name: 'None',
             color_scheme: 'purple',
             bg_image_url: '',
             badge_text: 'Sponsorlu',
@@ -1894,7 +1894,7 @@ const AnnouncementCenter = () => {
                             )}
                             <div className="flex justify-between items-start relative z-10">
                                 <div className={`w-14 h-14 rounded-2xl flex items-center justify-center  border border-white/5 ${a.is_active ? (a.bg_image_url ? 'bg-white/10 text-white backdrop-blur-md' : `bg-gradient-to-br ${previewColors[a.color_scheme] || 'bg-blue-600'} text-white`) : 'bg-slate-800 text-slate-600'}`}>
-                                    {a.icon_name === 'Megaphone' ? <Megaphone size={24}/> : a.icon_name === 'Sparkles' ? <Sparkles size={24}/> : a.icon_name === 'Zap' ? <Zap size={24}/> : <Star size={24}/>}
+                                    {a.icon_name === 'None' ? null : (a.icon_name === 'Megaphone' ? <Megaphone size={24}/> : a.icon_name === 'Sparkles' ? <Sparkles size={24}/> : a.icon_name === 'Zap' ? <Zap size={24}/> : <Star size={24}/>)}
                                 </div>
                                 <div className="flex gap-2">
                                     <button onClick={() => { setEditingAnn(a); setIsModalOpen(true); }} className="p-3 bg-white/5 rounded-xl hover:bg-blue-600 text-slate-500 hover:text-white transition-all"><Edit3 size={18}/></button>
@@ -1933,7 +1933,9 @@ const AnnouncementCenter = () => {
                             <div className="p-8 lg:p-12 pb-4 lg:pb-0 space-y-8">
                                 <div className="flex items-center gap-5">
                                     <div className={`w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br ${previewColors[editingAnn.color_scheme] || 'from-purple-600 to-indigo-600'} rounded-[20px] flex items-center justify-center  rotate-3 transition-all duration-500`}>
-                                        <Megaphone size={24} className="text-white"/>
+                                        {editingAnn.icon_name !== 'None' && React.createElement(({ 
+                                            Megaphone, Sparkles, Zap, Star, Gift, Info, BotIcon, Heart, Bell, Shield 
+                                        } as any)[editingAnn.icon_name] || Megaphone, { size: 24, className: "text-white" })}
                                     </div>
                                     <div>
                                         <h3 className="text-2xl lg:text-3xl font-black uppercase italic tracking-tighter">Broadcast <span className="text-blue-500">Forge</span></h3>
@@ -2062,6 +2064,7 @@ const AnnouncementCenter = () => {
                                                 <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">İKON TİPİ</label>
                                                 <div className="grid grid-cols-5 gap-4">
                                                     {[
+                                                        { id: 'None', icon: X },
                                                         { id: 'Megaphone', icon: Megaphone },
                                                         { id: 'Sparkles', icon: Sparkles },
                                                         { id: 'Zap', icon: Zap },
@@ -2166,10 +2169,9 @@ const AnnouncementCenter = () => {
                                 </div>
                                 {!editingAnn.bg_image_url && (
                                     <div className="absolute -right-6 -bottom-6 opacity-20 transform rotate-12 transition-all duration-700 group-hover:scale-125">
-                                        {editingAnn.icon_name === 'Megaphone' ? <Megaphone size={140} className="text-white" /> : 
-                                         editingAnn.icon_name === 'Sparkles' ? <Sparkles size={140} className="text-white" /> : 
-                                         editingAnn.icon_name === 'Zap' ? <Zap size={140} className="text-white" /> : 
-                                         <Star size={140} className="text-white" />}
+                                        {editingAnn.icon_name === 'None' ? null : React.createElement(({ 
+                                            Megaphone, Sparkles, Zap, Star, Gift, Info, BotIcon, Heart, Bell, Shield 
+                                        } as any)[editingAnn.icon_name] || Megaphone, { size: 140, className: "text-white" })}
                                     </div>
                                 )}
                             </div>
