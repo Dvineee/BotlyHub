@@ -201,7 +201,7 @@ const UserPanel: React.FC = () => {
                                 { label: 'Aylık Kazanç', value: '₺1,250', icon: TrendingUp, color: 'emerald' },
                                 { label: 'Toplam Etkileşim', value: '45.2K', icon: Activity, color: 'orange' },
                             ].map((stat, i) => (
-                                <div key={i} className="bg-slate-900/40 border border-white/5 p-8 rounded-[44px] backdrop-blur-xl group hover:border-purple-500/20 transition-all fancy-glass-card relative overflow-hidden">
+                                <div key={i} className="bg-slate-900/40 border border-white/5 p-8 rounded-[44px] backdrop-blur-xl group hover:border-purple-500/20 transition-all fancy-glass-card stats-card-bg relative overflow-hidden">
                                      <div className={`absolute top-0 right-0 w-24 h-24 bg-${stat.color}-500/5 blur-3xl -mr-12 -mt-12 rounded-full`} />
                                      <div className="flex items-center justify-between mb-6 relative z-10">
                                          <div className={`w-14 h-14 bg-${stat.color}-500/10 rounded-[24px] flex items-center justify-center text-${stat.color}-400 border border-${stat.color}-500/10`}>

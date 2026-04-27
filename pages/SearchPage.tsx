@@ -156,7 +156,7 @@ const SearchPage = () => {
   const filteredBots = bots.filter(bot => {
     const matchesQuery = bot.name.toLowerCase().includes(query.toLowerCase()) || 
                          bot.description.toLowerCase().includes(query.toLowerCase());
-    const matchesCategory = activeCategory === 'all' || bot.category === activeCategory;
+    const matchesCategory = activeCategory === 'all' || (Array.isArray(bot.category) ? bot.category.includes(activeCategory) : bot.category === activeCategory);
     
     let matchesFilter = true;
     if (activeFilter === 'paid') matchesFilter = bot.price > 0;

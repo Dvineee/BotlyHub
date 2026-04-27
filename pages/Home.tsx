@@ -13,9 +13,9 @@ import { useDraggableScroll } from '../hooks/useDraggableScroll';
 import { useFilter } from '../FilterContext';
 import { FilterMenu } from '../components/FilterMenu';
 import { useTheme } from '../ThemeContext';
-import { TelegramLoginWidget } from '../components/TelegramLoginWidget';
 import Logo from '../components/Logo';
 import { SEO } from '../components/SEO';
+import LoginModal from '../components/LoginModal';
 
 const iconMap: Record<string, any> = {
   Sparkles, Megaphone, Zap, Gift, Star, Info, BotIcon, Heart, Bell, Shield
@@ -394,6 +394,7 @@ const Home = () => {
   const { user, haptic, isTelegram, setWebAuthUser } = useTelegram();
   const { toggleTheme, theme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [bots, setBots] = useState<Bot[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -524,7 +525,17 @@ const Home = () => {
                 </>
             ) : (
                 <div className="flex items-center">
-                    <TelegramLoginWidget botUsername="BotlyHubBOT" onAuth={(user) => setWebAuthUser(user)} />
+                    <button 
+                        onClick={() => { haptic('light'); setIsLoginModalOpen(true); }}
+                        className="px-6 h-12 bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-900 dark:text-white text-[11px] font-black uppercase tracking-[0.2em] hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-95"
+                    >
+                        Giriş Yap
+                    </button>
+                    <LoginModal 
+                        isOpen={isLoginModalOpen} 
+                        onClose={() => setIsLoginModalOpen(false)} 
+                        onAuth={(user) => setWebAuthUser(user)} 
+                    />
                 </div>
             )}
         </div>
@@ -559,7 +570,7 @@ const Home = () => {
                             key={cat.id} 
                             whileHover="hover"
                             onClick={() => { haptic('light'); navigate(`/search?category=${cat.id}`); }}
-                            className="flex items-center gap-3 px-[1rem] py-[0.7rem] rounded-2xl border bg-white dark:bg-slate-900/60 border-black/5 dark:border-white/5 text-slate-900 dark:text-white hover:border-purple-500/30 transition-all active:scale-95 whitespace-nowrap snap-center"
+                            className="flex items-center gap-3 px-4 py-3 rounded-2xl border bg-white dark:bg-slate-900/60 border-black/5 dark:border-white/5 text-slate-900 dark:text-white hover:border-purple-500/30 transition-all active:scale-95 whitespace-nowrap snap-center"
                         >
                             <motion.div
                                 variants={{

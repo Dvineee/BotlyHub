@@ -163,9 +163,9 @@ export const categories = [
 ];
 
 export const mockBots: ExtendedBot[] = [
-  { id: '1', name: 'Task Master', description: 'Günlük görevlerinizi ve iş akışınızı yönetin.', price: 29.99, icon: 'https://picsum.photos/seed/task/200', category: 'productivity', isNew: true, bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
-  { id: '2', name: 'GameBot Pro', description: 'Topluluk içi oyun sunucusu yönetimi.', price: 0, icon: 'https://picsum.photos/seed/game/200', category: 'games', bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
-  { id: '10', name: 'StockBot', description: 'Borsa ve hisse senedi teknik analizi.', price: 120.00, icon: 'https://picsum.photos/seed/stock/200', category: 'finance', bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
+  { id: '1', name: 'Task Master', description: 'Günlük görevlerinizi ve iş akışınızı yönetin.', price: 29.99, icon: 'https://picsum.photos/seed/task/200', category: ['productivity'], isNew: true, bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
+  { id: '2', name: 'GameBot Pro', description: 'Topluluk içi oyun sunucusu yönetimi.', price: 0, icon: 'https://picsum.photos/seed/game/200', category: ['games'], bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
+  { id: '10', name: 'StockBot', description: 'Borsa ve hisse senedi teknik analizi.', price: 120.00, icon: 'https://picsum.photos/seed/stock/200', category: ['finance'], bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
 ];
 
 export const subscriptionPlans: SubscriptionPlan[] = [

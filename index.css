@@ -146,7 +146,11 @@ input, textarea, select {
     padding: 4px !important;
 }
 
-.dark .fancy-glass-card {
+.stats-card-bg {
+    /* Base style for light mode if needed, otherwise empty */
+}
+
+.dark .stats-card-bg {
     background-image: linear-gradient(#12172c00, #1e293b) !important;
 }
 
@@ -428,7 +432,7 @@ h3.text-white.font-bold.text-xl.mb-1.tracking-tight {
     position: relative;
 }
 
-input.w-full.h-18.pl-16.pr-6.text-sm.font-bold.rounded-\[28px\].border.transition-all.uppercase.tracking-widest.\:bg-slate-900\/30.border-black\/5.dark\:border-white\/10.text-slate-900.dark\:text-white.focus\:border-blue-500\/40.focus\:bg-white.dark\:focus\:bg-slate-900\/50.outline-none {
+input.search-input {
     height: 45px;
 }
 
@@ -465,21 +469,21 @@ button.w-10.h-10.flex.items-center.justify-center.rounded-2xl.border.transition-
     gap: 0.2rem;
 }
 
-button.flex.items-center.gap-3.px-\[1rem\].py-\[0.7rem\].rounded-2xl.border.bg-white.dark:bg-slate-900\/60.border-black\/5.dark:border-white\/5.text-slate-900.dark:text-white.hover:border-purple-500\/30.transition-all.active:scale-95 {
+button.category-btn {
     box-shadow: none;
     outline: rgb(184 194 208);
 }
-.px-\[1rem\] {
+.px-content {
     padding-left: 0.5rem;
     padding-right: 0.5rem;
 }
-.py-\[0\.7rem\] {
+.py-content {
     background: none;
     border-radius: 6px;
     padding-top: .5rem;
     padding-bottom: .5rem;
 }
-.text-\[\#139fec\] {
+.text-brand-color {
     width: 16px;
     height: 16px;
     --tw-text-opacity: 1;
@@ -614,4 +618,13 @@ html:not(.dark) .group:hover .lucide-chevron-right {
 
 .flex.items-center.justify-center.gap-2 {
     margin-bottom: 0.7rem;
+}
+
+.p-1 {
+    padding: 0rem;
+}
+
+.from-brand {
+    --tw-gradient-to: rgb(47 136 255 / 0) var(--tw-gradient-to-position);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }

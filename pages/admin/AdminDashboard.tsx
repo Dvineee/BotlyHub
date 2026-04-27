@@ -171,7 +171,7 @@ const StatCard = ({ icon: Icon, label, value, color }: any) => {
         orange: 'text-orange-500 bg-orange-500/10 border-orange-500/20'
     };
     return (
-        <div className="bg-slate-900/40 border border-white/5 p-6 lg:p-10 rounded-[32px] lg:rounded-[48px] hover:border-white/10 transition-all group overflow-hidden">
+        <div className="bg-slate-900/40 border border-white/5 p-6 lg:p-10 rounded-[32px] lg:rounded-[48px] hover:border-white/10 transition-all group overflow-hidden stats-card-bg">
             <div className={`w-10 h-10 lg:w-14 lg:h-14 ${colors[color]} rounded-[18px] lg:rounded-[20px] border flex items-center justify-center mb-4 lg:mb-8  group-hover:scale-110 transition-all`}><Icon size={24} /></div>
             <p className="text-[8px] lg:text-[10px] font-black text-slate-600 uppercase tracking-widest mb-1">{label}</p>
             <h3 className="text-xl lg:text-3xl font-black text-white tracking-tighter italic leading-none">{typeof value === 'number' ? value.toLocaleString() : value}</h3>
@@ -263,7 +263,7 @@ const BotManagement = () => {
             name: '',
             description: '',
             price: 0,
-            category: 'utilities',
+            category: ['utilities'],
             bot_link: '@',
             icon: '',
             screenshots: [],
@@ -349,9 +349,10 @@ const BotManagement = () => {
                                         <Star size={16} fill={b.promoted_type === 'featured' ? "currentColor" : "none"} />
                                     </button>
                                     <button onClick={() => { setEditingBot({
-                                        promoted_type: 'none',
-                                        languages: [],
-                                        ...b
+                                        ...b,
+                                        promoted_type: b.promoted_type || 'none',
+                                        languages: b.languages || [],
+                                        category: Array.isArray(b.category) ? b.category : (b.category ? [b.category] : ['utilities'])
                                     }); setIsModalOpen(true); }} className="p-2.5 lg:p-3 bg-white/5 rounded-xl hover:bg-brand text-slate-500 hover:text-white transition-all"><Edit3 size={16}/></button>
                                     <button onClick={async () => { if(confirm('Silsin mi?')) { await DatabaseService.deleteBot(b.id); await DatabaseService.logActivity('admin', 'bot_manage', 'bot_deleted', 'Bot Silindi', `${b.name} isimli bot sistemden silindi.`); load(); } }} className="p-2.5 lg:p-3 bg-white/5 rounded-xl text-red-500 hover:bg-red-500 hover:text-white transition-all"><Trash2 size={16}/></button>
                                 </div>
@@ -434,10 +435,11 @@ const BotManagement = () => {
                                                 </div>
                                                 <AdminInput label="BOT İSMİ" value={editingBot.name} onChange={(v:any)=>setEditingBot({...editingBot, name:v})} />
                                                 <AdminInput label="@KULLANICIADI" value={editingBot.bot_link} onChange={(v:any)=>setEditingBot({...editingBot, bot_link:v})} />
-                                                <div className="space-y-2">
-                                                    <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4">KATEGORİ</label>
-                                                    <select value={editingBot.category} onChange={e => setEditingBot({...editingBot, category: e.target.value})} className="w-full h-14 lg:h-18 bg-slate-950 border border-white/5 rounded-[22px] lg:rounded-[28px] px-8 text-[11px] font-black text-white outline-none focus:border-brand uppercase italic appearance-none">
+                                                <div className="space-y-4 md:col-span-2">
+                                                    <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4">KATEGORİLER (BİRDEN FAZLA SEÇİLEBİLİR)</label>
+                                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-6 bg-slate-950 border border-white/5 rounded-[28px] lg:rounded-[36px]">
                                                         {categories.filter(c => c.id !== 'all').map(cat => {
+                                                            const isSelected = (editingBot.category || []).includes(cat.id);
                                                             const labelMap: Record<string, string> = {
                                                                 'cat_apps': 'Apps',
                                                                 'cat_games': 'Oyun',
@@ -450,19 +452,31 @@ const BotManagement = () => {
                                                                 'cat_music': 'Müzik',
                                                                 'cat_crypto': 'Kripto',
                                                                 'cat_telegram_platform': 'Telegram Platformu',
-                                                                'cat_bloggers': 'Yöneticiler ve Bloggerlar İçin',
-                                                                'cat_shopping': 'Alışveriş ve Hizmetler',
-                                                                'cat_security': 'Güvenlik ve Koruma',
+                                                                'cat_bloggers': 'Bloggerlar',
+                                                                'cat_shopping': 'Alışveriş',
+                                                                'cat_security': 'Güvenlik',
                                                                 'cat_education': 'Eğitim',
                                                                 'cat_content': 'İçerik'
                                                             };
                                                             return (
-                                                                <option key={cat.id} value={cat.id}>
-                                                                    {labelMap[cat.label] || cat.label}
-                                                                </option>
+                                                                <button
+                                                                    key={cat.id}
+                                                                    type="button"
+                                                                    onClick={() => {
+                                                                        const current = Array.isArray(editingBot.category) ? editingBot.category : [editingBot.category || 'utilities'];
+                                                                        const next = isSelected 
+                                                                            ? current.filter((id: string) => id !== cat.id)
+                                                                            : [...current, cat.id];
+                                                                        setEditingBot({ ...editingBot, category: next });
+                                                                    }}
+                                                                    className={`flex items-center gap-3 px-5 py-4 rounded-2xl text-[9px] font-black tracking-widest transition-all border ${isSelected ? 'bg-brand border-brand text-white ' : 'bg-white/5 border-white/5 text-slate-500 hover:bg-white/10'}`}
+                                                                >
+                                                                    <cat.icon size={16} className={isSelected ? 'text-white' : 'text-slate-600'} />
+                                                                    <span className="uppercase italic truncate">{labelMap[cat.label] || cat.label.replace('cat_', '')}</span>
+                                                                </button>
                                                             );
                                                         })}
-                                                    </select>
+                                                    </div>
                                                 </div>
                                                 <div className="space-y-2 md:col-span-2">
                                                     <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4">DESTEKLENEN DİLLER</label>

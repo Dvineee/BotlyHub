@@ -15,7 +15,7 @@ export class GeminiService {
     const ai = this.getAI();
     
     const botContext = availableBots.map(bot => 
-      `Name: ${bot.name}, Category: ${bot.category}, Description: ${bot.description}, Price: ${bot.price} TRY`
+      `Name: ${bot.name}, Category: ${Array.isArray(bot.category) ? bot.category.join(", ") : bot.category}, Description: ${bot.description}, Price: ${bot.price} TRY`
     ).join("\n");
 
     const prompt = `
@@ -55,7 +55,7 @@ export class GeminiService {
       Sen BotlyHub platformunun AI asistanısın. 
       Aşağıdaki botu analiz et ve kullanıcının neden bu botu seçmesi gerektiğini etkileyici bir dille anlat.
       Bot Adı: ${bot.name}
-      Kategori: ${bot.category}
+      Kategori: ${Array.isArray(bot.category) ? bot.category.join(", ") : bot.category}
       Açıklama: ${bot.description}
       
       Yanıtın:

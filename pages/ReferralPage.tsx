@@ -82,7 +82,7 @@ const ReferralPage = () => {
 
             {/* Stats Grid */}
             <div className="grid grid-cols-2 gap-5">
-                <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-8 rounded-[44px] space-y-2 fancy-glass-card group overflow-hidden relative">
+                <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-8 rounded-[44px] space-y-2 fancy-glass-card stats-card-bg group overflow-hidden relative">
                     <div className="absolute top-0 right-0 w-16 h-16 bg-slate-500/5 blur-2xl -mr-8 -mt-8 rounded-full" />
                     <span className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-[0.2em] relative z-10">TOPLAM DAVET</span>
                     <div className="flex items-baseline gap-2 relative z-10">
@@ -90,7 +90,7 @@ const ReferralPage = () => {
                         <span className="text-[11px] font-black text-slate-400 uppercase italic">KİŞİ</span>
                     </div>
                 </div>
-                <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-8 rounded-[44px] space-y-2 fancy-glass-card group overflow-hidden relative">
+                <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-8 rounded-[44px] space-y-2 fancy-glass-card stats-card-bg group overflow-hidden relative">
                     <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-500/5 blur-2xl -mr-8 -mt-8 rounded-full" />
                     <span className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-[0.2em] relative z-10">TOPLAM KAZANÇ</span>
                     <div className="flex items-baseline gap-2 relative z-10">

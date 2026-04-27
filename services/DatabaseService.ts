@@ -436,6 +436,7 @@ export class DatabaseService {
 
         return {
             ...bot,
+            category: Array.isArray(bot.category) ? bot.category : (bot.category ? [bot.category] : ['utilities']),
             languages: (bot.languages || (bot.name.toLowerCase().includes('botlyhub') ? ['🇬🇧', '🇹🇷'] : [])).map((l: string) => l === 'İng' ? '🇬🇧' : l),
             rating: Number(avgRating.toFixed(1)),
             rating_count: botRatings.length,
@@ -474,6 +475,7 @@ export class DatabaseService {
 
     return {
         ...data,
+        category: Array.isArray(data.category) ? data.category : (data.category ? [data.category] : ['utilities']),
         languages: (data.languages || (data.name.toLowerCase().includes('botlyhub') ? ['🇬🇧', '🇹🇷'] : [])).map((l: string) => l === 'İng' ? '🇬🇧' : l),
         user_count,
         rating: Number(rating.toFixed(1)) || 0,
@@ -534,7 +536,7 @@ export class DatabaseService {
         name: bot.name, 
         description: bot.description || '', 
         price: Number(bot.price) || 0, 
-        category: bot.category || 'utilities', 
+        category: Array.isArray(bot.category) ? bot.category : [bot.category || 'utilities'], 
         bot_link: bot.bot_link, 
         screenshots: bot.screenshots || [], 
         icon: bot.icon || '', 
@@ -579,6 +581,7 @@ export class DatabaseService {
 
         return { 
             ...bot, 
+            category: Array.isArray(bot.category) ? bot.category : (bot.category ? [bot.category] : ['utilities']),
             ownerCount: (userBots || []).filter((ub: any) => ub.bot_id === bot.id).length,
             rating: Number(avgRating.toFixed(1)),
             ratingCount: botRatings.length

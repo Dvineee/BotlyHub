@@ -42,7 +42,7 @@ export interface Bot {
   description: string;
   icon: string;
   price: number;
-  category: string;
+  category: string[];
   bot_link: string;
   screenshots: string[];
   isNew?: boolean;

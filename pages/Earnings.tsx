@@ -144,14 +144,14 @@ const Earnings = () => {
                     </div>
 
                     <div className="grid grid-cols-2 gap-4 mb-8">
-                        <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-[32px] flex flex-col items-center gap-3 ">
+                        <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-[32px] flex flex-col items-center gap-3 stats-card-bg">
                             <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-500 "><TrendingUp size={20} /></div>
                             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Kümülatif Kazanç</p>
                             <h4 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight leading-none">
                                 ₺{wallet ? wallet.total_earned.toLocaleString() : '0.00'}
                             </h4>
                         </div>
-                        <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-[32px] flex flex-col items-center gap-3 ">
+                        <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-[32px] flex flex-col items-center gap-3 stats-card-bg">
                             <div className="w-10 h-10 bg-brand/10 dark:bg-brand-light/10 rounded-xl flex items-center justify-center text-brand dark:text-brand-light "><PieChart size={20} /></div>
                             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Bağlı Kanallar</p>
                             <h4 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight leading-none">
@@ -200,12 +200,12 @@ const Earnings = () => {
                         </button>
                     </div>
                     <div className="grid grid-cols-2 gap-4 mb-8">
-                        <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-[32px] flex flex-col items-center gap-3 ">
+                        <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-[32px] flex flex-col items-center gap-3 stats-card-bg">
                             <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-500 "><ArrowUpRight size={20} /></div>
                             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Kümülatif Kazanç</p>
                             <h4 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight leading-none">₺{totalRevenue.toFixed(2)}</h4>
                         </div>
-                        <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-[32px] flex flex-col items-center gap-3 ">
+                        <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-[32px] flex flex-col items-center gap-3 stats-card-bg">
                             <div className="w-10 h-10 bg-brand/10 dark:bg-brand-light/10 rounded-xl flex items-center justify-center text-brand dark:text-brand-light "><TrendingUp size={20} /></div>
                             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Toplam Etkileşim</p>
                             <h4 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight leading-none">{totalViews.toLocaleString()}</h4>

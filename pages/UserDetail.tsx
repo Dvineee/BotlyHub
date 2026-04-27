@@ -63,11 +63,11 @@ const UserDetail = () => {
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4 w-full mt-10">
-                    <div className="p-4 bg-slate-50/50 dark:bg-slate-950/40 rounded-[24px] border border-black/5 dark:border-white/5 text-center">
+                    <div className="p-4 bg-slate-50/50 dark:bg-slate-950/40 rounded-[24px] border border-black/5 dark:border-white/5 text-center stats-card-bg">
                         <p className="text-[8px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest mb-1">ID NUMARASI</p>
                         <p className="text-xs font-black text-slate-600 dark:text-slate-300 tabular-nums">#{id || '882103'}</p>
                     </div>
-                    <div className="p-4 bg-slate-50/50 dark:bg-slate-950/40 rounded-[24px] border border-black/5 dark:border-white/5 text-center">
+                    <div className="p-4 bg-slate-50/50 dark:bg-slate-950/40 rounded-[24px] border border-black/5 dark:border-white/5 text-center stats-card-bg">
                         <p className="text-[8px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest mb-1">KATILIM TARİHİ</p>
                         <p className="text-xs font-black text-slate-600 dark:text-slate-300 tabular-nums">24.05.2023</p>
                     </div>

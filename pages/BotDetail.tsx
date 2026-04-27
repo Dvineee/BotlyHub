@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
   Share2, Send, Loader2, ShieldCheck, 
   Bot as BotIcon, Zap, Shield, PlusCircle, X, 
-  Maximize2, ChevronRight, ChevronLeft, ChevronDown, Eye, Lock, Unlock, AlertTriangle, 
+  Maximize2, ChevronRight, ChevronLeft, ChevronDown, Eye, Lock, Unlock, AlertTriangle, Edit3,
   Sparkles, Star, Download, Info, CheckCircle2, Globe, Cpu,
   Play, UserPlus, MessageSquare, BarChart3, MousePointer2,
   Search, LayoutGrid, Store, User as UserIcon, Megaphone, Bell, Instagram, Youtube, Link, Flag
@@ -11,6 +11,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Bot, Channel, User, Notification } from '../types';
+import { categories } from '../data';
 import { useTelegram } from '../hooks/useTelegram';
 import { DatabaseService } from '../services/DatabaseService';
 import PriceService from '../services/PriceService';
@@ -18,10 +19,10 @@ import { useTranslation } from '../TranslationContext';
 import { GeminiService } from '../services/GeminiService';
 import { useDraggableScroll } from '../hooks/useDraggableScroll';
 import { useTheme } from '../ThemeContext';
-import { TelegramLoginWidget } from '../components/TelegramLoginWidget';
 import Logo from '../components/Logo';
 import { useRef } from 'react';
 import { SEO } from '../components/SEO';
+import LoginModal from '../components/LoginModal';
 
 const getLiveBotIcon = (bot: Bot) => {
     if (bot.bot_link) {
@@ -53,6 +54,7 @@ const BotDetail = () => {
   const [hoverRating, setHoverRating] = useState<number | null>(null);
   const [isRating, setIsRating] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -356,7 +358,17 @@ const BotDetail = () => {
                     </>
                 ) : (
                     <div className="flex items-center">
-                        <TelegramLoginWidget botUsername="BotlyHubBOT" onAuth={(user) => setWebAuthUser(user)} />
+                        <button 
+                            onClick={() => { haptic('light'); setIsLoginModalOpen(true); }}
+                            className="px-6 h-10 md:h-12 bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-900 dark:text-white text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-95"
+                        >
+                            Giriş Yap
+                        </button>
+                        <LoginModal 
+                            isOpen={isLoginModalOpen} 
+                            onClose={() => setIsLoginModalOpen(false)} 
+                            onAuth={(user) => setWebAuthUser(user)} 
+                        />
                     </div>
                 )}
             </div>
@@ -388,8 +400,26 @@ const BotDetail = () => {
                           <polyline points="20 6 9 17 4 12" />
                       </svg>
                   )}
+                  {DatabaseService.isAdminLoggedIn() && (
+                      <button 
+                          onClick={() => navigate('/a/dashboard/bots')}
+                          className="p-1.5 bg-brand text-white rounded-lg active:scale-90 transition-transform ml-2"
+                          title="Admin Panelinde Düzenle"
+                      >
+                          <Edit3 size={12} />
+                      </button>
+                  )}
               </h1>
-              <p className="text-brand dark:text-brand-light text-[11px] font-semibold mb-3 uppercase tracking-wider">{bot.category}</p>
+              <div className="flex flex-wrap gap-2 mb-3">
+                  {(Array.isArray(bot.category) ? bot.category : [bot.category]).map(catId => {
+                      const cat = categories.find(c => c.id === catId);
+                      return (
+                          <span key={catId} className="text-brand dark:text-brand-light text-[10px] font-bold uppercase tracking-wider border border-brand/20 px-2.5 py-1 rounded-xl bg-brand/5">
+                              {cat ? t(cat.label) : catId}
+                          </span>
+                      );
+                  })}
+              </div>
               <div className="flex flex-wrap gap-2 items-center">
                   <span className="bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 text-slate-500 dark:text-slate-400 text-[10px] font-bold px-3 py-1 rounded-xl uppercase">v4.2.0</span>
                   <span className="bg-brand/10 border border-brand/20 text-brand dark:text-brand-light text-[10px] font-bold px-3 py-1 rounded-xl uppercase flex items-center gap-1">
@@ -480,7 +510,7 @@ const BotDetail = () => {
         </div>
 
         <div className="w-full md:w-auto md:min-w-[320px] lg:hidden">
-            <div className="flex flex-col bg-white dark:bg-slate-900/60 rounded-[32px] border border-black/5 dark:border-white/5 backdrop-blur-xl overflow-hidden fancy-glass-card">
+            <div className="flex flex-col bg-white dark:bg-slate-900/60 rounded-[32px] border border-black/5 dark:border-white/5 backdrop-blur-xl overflow-hidden fancy-glass-card stats-card-bg">
                 <div className="flex items-center justify-between p-6">
                     <div className="flex flex-col items-center flex-1 border-r border-black/5 dark:border-white/5">
                         <span className="text-slate-900 dark:text-white font-bold text-base">{bot.rating || '0.0'} <Star size={12} className="inline mb-1 fill-slate-900 dark:fill-white" /></span>
@@ -624,7 +654,7 @@ const BotDetail = () => {
           {/* Right Column (PC only) - Action bar moved here for large screens */}
           <aside className="hidden lg:flex flex-col gap-4 pt-10 sticky top-10 h-fit pr-6 lg:pr-0">
               <div className="w-full">
-                  <div className="flex flex-col bg-white dark:bg-slate-900/60 rounded-[32px] border border-black/5 dark:border-white/5 backdrop-blur-xl overflow-hidden fancy-glass-card">
+                  <div className="flex flex-col bg-white dark:bg-slate-900/60 rounded-[32px] border border-black/5 dark:border-white/5 backdrop-blur-xl overflow-hidden fancy-glass-card stats-card-bg">
                       <div className="flex items-center justify-between p-6">
                           <div className="flex flex-col items-center flex-1 border-r border-black/5 dark:border-white/5">
                               <span className="text-slate-900 dark:text-white font-bold text-base">{bot.rating || '0.0'} <Star size={12} className="inline mb-1 fill-slate-900 dark:fill-white" /></span>
