@@ -422,6 +422,23 @@ export class DatabaseService {
   }
 
   // --- BOTS ---
+  static parseCategory(cat: any): string[] {
+    if (Array.isArray(cat)) return cat;
+    if (typeof cat !== 'string') return ['utilities'];
+    
+    // Check if it's a JSON stringified array
+    if (cat.startsWith('[') && cat.endsWith(']')) {
+      try {
+        const parsed = JSON.parse(cat);
+        if (Array.isArray(parsed)) return parsed;
+      } catch (e) {
+        // Fall through to comma split
+      }
+    }
+    
+    return cat.split(',').map((s: string) => s.trim()).filter(Boolean);
+  }
+
   static async getBots(): Promise<Bot[]> {
     const { data: bots } = await supabase.from('bots').select('*').order('id', { ascending: false });
     const { data: ratings } = await supabase.from('bot_ratings').select('bot_id, rating');
@@ -436,7 +453,7 @@ export class DatabaseService {
 
         return {
             ...bot,
-            category: Array.isArray(bot.category) ? bot.category : (bot.category ? [bot.category] : ['utilities']),
+            category: this.parseCategory(bot.category),
             languages: (bot.languages || (bot.name.toLowerCase().includes('botlyhub') ? ['🇬🇧', '🇹🇷'] : [])).map((l: string) => l === 'İng' ? '🇬🇧' : l),
             rating: Number(avgRating.toFixed(1)),
             rating_count: botRatings.length,
@@ -475,7 +492,7 @@ export class DatabaseService {
 
     return {
         ...data,
-        category: Array.isArray(data.category) ? data.category : (data.category ? [data.category] : ['utilities']),
+        category: this.parseCategory(data.category),
         languages: (data.languages || (data.name.toLowerCase().includes('botlyhub') ? ['🇬🇧', '🇹🇷'] : [])).map((l: string) => l === 'İng' ? '🇬🇧' : l),
         user_count,
         rating: Number(rating.toFixed(1)) || 0,
@@ -536,7 +553,7 @@ export class DatabaseService {
         name: bot.name, 
         description: bot.description || '', 
         price: Number(bot.price) || 0, 
-        category: Array.isArray(bot.category) ? bot.category : [bot.category || 'utilities'], 
+        category: JSON.stringify(Array.isArray(bot.category) ? bot.category : [bot.category || 'utilities']), 
         bot_link: bot.bot_link, 
         screenshots: bot.screenshots || [], 
         icon: bot.icon || '', 
@@ -581,7 +598,7 @@ export class DatabaseService {
 
         return { 
             ...bot, 
-            category: Array.isArray(bot.category) ? bot.category : (bot.category ? [bot.category] : ['utilities']),
+            category: this.parseCategory(bot.category),
             ownerCount: (userBots || []).filter((ub: any) => ub.bot_id === bot.id).length,
             rating: Number(avgRating.toFixed(1)),
             ratingCount: botRatings.length
@@ -624,6 +641,7 @@ export class DatabaseService {
 
           return { 
               ...botData, 
+              category: this.parseCategory(botData.category),
               expiryDate: ub.expiry_date || ub.expiryDate, 
               ownership_id: ub.id, 
               is_premium: ub.is_premium, 
