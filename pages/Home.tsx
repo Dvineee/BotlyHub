@@ -652,7 +652,7 @@ const Home = () => {
                                     )}
                                 </div>
                                 
-                                <div className="relative -mx-4 px-4">
+                                <div className="relative -mx-4 px-4 overflow-hidden">
                                     <div className="flex gap-3 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory pb-4">
                                         {botChunks.map((chunk, chunkIdx) => (
                                             <div key={chunkIdx} className="flex flex-col gap-3 min-w-[88vw] sm:min-w-[400px] snap-center first:pl-2">
@@ -664,7 +664,6 @@ const Home = () => {
                                             </div>
                                         ))}
                                     </div>
-                                    <div className="absolute top-0 right-0 bottom-4 w-12 bg-gradient-to-l from-slate-50 dark:from-[#020617] to-transparent pointer-events-none z-10 sm:hidden" />
                                 </div>
                             </div>
                         );
