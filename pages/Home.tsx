@@ -358,7 +358,7 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonR
                             <span 
                                 key={idx} 
                                 className={`
-                                    text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-tighter opacity-80
+                                    text-[6px] md:text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-tighter opacity-80
                                     ${idx === 3 ? '!hidden !md:inline-block' : ''}
                                     ${idx >= 4 ? '!hidden !lg:inline-block' : ''}
                                 `}
