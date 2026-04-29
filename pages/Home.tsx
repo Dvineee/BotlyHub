@@ -449,6 +449,17 @@ const Home = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [loadData]);
 
+  const categorizedBots = useMemo(() => {
+    const result: Record<string, Bot[]> = {};
+    categories.filter(c => c.id !== 'all').forEach(cat => {
+        const botsInCat = bots.filter(b => Array.isArray(b.category) ? b.category.includes(cat.id) : b.category === cat.id);
+        if (botsInCat.length > 0) {
+            result[cat.id] = botsInCat.slice(0, 9);
+        }
+    });
+    return result;
+  }, [bots]);
+
   return (
     <>
     <SEO 
@@ -555,48 +566,77 @@ const Home = () => {
                 </div>
             )}
 
-            <div className="flex flex-col lg:flex-row gap-8 lg:gap-16">
-                {/* Categories Sidebar/Section */}
-                <aside className="w-full lg:w-72 shrink-0">
-                    <div className="flex flex-col gap-[16px] md:gap-[32px] md:p-[12px]">
-                        <div className="flex items-center justify-between">
-                            <h2 className="text-[10px] font-black text-slate-400 dark:text-slate-700 uppercase tracking-[0.4em]">
-                                {t('categories')}
-                            </h2>
-                        </div>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:flex lg:flex-col gap-3 md:gap-4">
-                                {categories.map((cat) => (
-                                    <button 
-                                        key={cat.id} 
-                                        onClick={() => { haptic('light'); navigate(`/search?category=${cat.id}`); }}
-                                        className="flex items-center gap-3 p-4 rounded-[20px] bg-white dark:bg-slate-900/60 border border-black/5 dark:border-white/5 text-slate-900 dark:text-white hover:border-brand/30 hover:bg-slate-50 dark:hover:bg-slate-900 transition-all active:scale-[0.98] group"
-                                    >
-                                        <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                            <cat.icon size={16} className="text-[#a5afc3]" />
-                                        </div>
-                                        <span className="text-[11px] font-black uppercase tracking-tight truncate">{t(cat.label)}</span>
-                                    </button>
-                                ))}
+            <div className="mb-10">
+                <div 
+                    ref={catScroll.ref}
+                    onMouseDown={catScroll.onMouseDown}
+                    onMouseUp={catScroll.onMouseUp}
+                    onMouseMove={catScroll.onMouseMove}
+                    onMouseLeave={catScroll.onMouseLeave}
+                    onContextMenu={catScroll.onContextMenu}
+                    className={`flex gap-3 overflow-x-auto no-scrollbar -mx-4 px-4 pb-2 snap-x transform-gpu ${catScroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+                >
+                    {categories.map((cat) => (
+                        <motion.button 
+                            key={cat.id} 
+                            whileHover="hover"
+                            onClick={() => { haptic('light'); navigate(`/search?category=${cat.id}`); }}
+                            className="flex items-center gap-3 px-4 py-3 rounded-2xl border bg-white dark:bg-slate-900/60 border-black/5 dark:border-white/5 text-slate-900 dark:text-white hover:border-purple-500/30 transition-all active:scale-95 whitespace-nowrap snap-center"
+                        >
+                            <motion.div
+                                variants={{
+                                    hover: { 
+                                        scale: 1.1,
+                                    }
+                                }}
+                                transition={{ duration: 0.2 }}
+                            >
+                                <cat.icon size={18} className="text-[#a5afc3]" />
+                            </motion.div>
+                            <span className="text-[11px] font-bold uppercase tracking-wider">{t(cat.label)}</span>
+                        </motion.button>
+                    ))}
+                </div>
+            </div>
+
+            <FeaturedBotsSlider bots={bots} />
+
+            {activeFilter === 'all' && Object.entries(categorizedBots).map(([catId, catBots]) => {
+                const category = categories.find(c => c.id === catId);
+                if (!category) return null;
+                return (
+                    <div key={catId} className="mb-10 space-y-6">
+                        <div className="flex items-center justify-between px-2">
+                            <div className="flex items-center gap-3">
+                                <category.icon size={18} className="text-brand" />
+                                <h2 className="text-[10px] font-black text-slate-400 dark:text-slate-700 uppercase tracking-[0.4em]">
+                                    {t(category.label)}
+                                </h2>
                             </div>
+                            <button 
+                                onClick={() => navigate(`/search?category=${catId}`)}
+                                className="text-[10px] font-black text-brand uppercase tracking-widest hover:opacity-80 transition-opacity"
+                            >
+                                TÜMÜNÜ GÖR
+                            </button>
                         </div>
-                    </aside>
-
-                {/* Main Content Area */}
-                <main className="flex-1 min-w-0">
-                    <FeaturedBotsSlider bots={bots} />
-
-                    <div className="space-y-6">
-                        <div className="flex items-center justify-between mb-4 px-2">
-                            <h2 className="text-[10px] font-black text-slate-400 dark:text-slate-700 uppercase tracking-[0.4em]">
-                                MAĞAZA VİTRİNİ
-                            </h2>
-                            <FilterMenu />
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {filteredBots.length > 0 ? filteredBots.map(bot => <BotCard key={bot.id} bot={bot} tonRate={tonRate} />) : <div className="col-span-full py-24 text-center text-slate-400 dark:text-slate-700 font-bold uppercase text-xs tracking-widest">Sonuç yok.</div>}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {catBots.map(bot => <BotCard key={bot.id} bot={bot} tonRate={tonRate} />)}
                         </div>
                     </div>
-                </main>
+                );
+            })}
+
+            <div className="space-y-6">
+                <div className="flex items-center justify-between mb-4 px-2">
+                    <h2 className="text-[10px] font-black text-slate-400 dark:text-slate-700 uppercase tracking-[0.4em]">
+                        MAĞAZA VİTRİNİ
+                    </h2>
+                    <FilterMenu />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {filteredBots.length > 0 ? filteredBots.map(bot => <BotCard key={bot.id} bot={bot} tonRate={tonRate} />) : <div className="col-span-full py-24 text-center text-slate-400 dark:text-slate-700 font-bold uppercase text-xs tracking-widest">Sonuç yok.</div>}
+                </div>
             </div>
           </>
       )}

@@ -221,61 +221,56 @@ const SearchPage = () => {
         <FilterMenu />
       </div>
 
-      {/* Categories Layout Container */}
-      <div className="flex flex-col lg:flex-row gap-8 lg:gap-16">
-        {/* Categories Section */}
-        <aside className="w-full lg:w-72 shrink-0">
-          <div className="flex flex-col gap-[16px] md:gap-[32px] md:p-[12px]">
-            <div className="flex items-center justify-between">
-                <h2 className="text-[10px] font-black text-slate-400 dark:text-slate-700 uppercase tracking-[0.4em]">
-                    Kategoriler
-                </h2>
-            </div>
-            
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:flex lg:flex-col gap-3 md:gap-4">
-              {categories.map((cat) => (
-                <button 
-                  key={cat.id} 
-                  onClick={() => {
-                    setActiveCategory(cat.id);
-                    if (user?.id) {
-                        DatabaseService.logActivity(user.id.toString(), 'system', 'search_category', 'Kategori Filtresi', `Arama motorunda '${t(cat.label)}' kategorisi filtrelendi.`);
-                    }
-                  }}
-                  className={`flex items-center gap-3 p-4 rounded-[20px] border transition-all active:scale-[0.98] group whitespace-nowrap ${
-                    activeCategory === cat.id 
-                    ? 'bg-brand/10 dark:bg-brand-light/10 border-brand/40 dark:border-brand-light/40 text-brand dark:text-brand-light ring-1 ring-brand/20 dark:ring-brand-light/20' 
-                    : 'bg-white dark:bg-slate-900/60 border-black/5 dark:border-white/5 text-slate-500 dark:text-slate-400 hover:border-brand/30 hover:bg-slate-50 dark:hover:bg-slate-900 shadow-sm'
-                  }`}
-                >
-                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 ${activeCategory === cat.id ? 'bg-brand/20 dark:bg-brand-light/20' : 'bg-slate-100 dark:bg-slate-800'}`}>
-                    <cat.icon size={16} className={activeCategory === cat.id ? 'text-brand dark:text-brand-light' : 'text-[#a5afc3]'} />
-                  </div>
-                  <span className="text-[11px] font-black uppercase tracking-tight truncate">{t(cat.label)}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </aside>
+      {/* Categories Horizontal Scroll */}
+      <div className="mb-10">
+        <div 
+            ref={catScroll.ref}
+            onMouseDown={catScroll.onMouseDown}
+            onMouseUp={catScroll.onMouseUp}
+            onMouseMove={catScroll.onMouseMove}
+            onMouseLeave={catScroll.onMouseLeave}
+            onContextMenu={catScroll.onContextMenu}
+            className={`flex gap-3 overflow-x-auto no-scrollbar -mx-4 px-4 pb-2 snap-x ${catScroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+        >
+          {categories.map((cat) => (
+            <button 
+              key={cat.id} 
+              onClick={() => {
+                setActiveCategory(cat.id);
+                if (user?.id) {
+                    DatabaseService.logActivity(user.id.toString(), 'system', 'search_category', 'Kategori Filtresi', `Arama motorunda '${t(cat.label)}' kategorisi filtrelendi.`);
+                }
+              }}
+              className={`flex items-center gap-3 px-6 py-4 rounded-2xl border transition-all active:scale-95  whitespace-nowrap snap-center ${
+                activeCategory === cat.id 
+                ? 'bg-brand/10 dark:bg-brand-light/10 border-brand/40 dark:border-brand-light/40 text-brand dark:text-brand-light ring-1 ring-brand/20 dark:ring-brand-light/20' 
+                : 'bg-white dark:bg-slate-900/60 border-black/5 dark:border-white/5 text-slate-500 dark:text-slate-400'
+              }`}
+            >
+              <cat.icon size={18} className={activeCategory === cat.id ? 'text-brand dark:text-brand-light' : 'text-[#a5afc3]'} />
+              <span className="text-[11px] font-bold uppercase tracking-wider">{t(cat.label)}</span>
+            </button>
+          ))}
+        </div>
+      </div>
 
-        {/* Results Section */}
-        <main className="flex-1 min-w-0">
-          <div className="flex justify-between items-center mb-6 px-2">
-              <h2 className="text-[10px] font-black text-slate-400 dark:text-slate-700 uppercase tracking-[0.4em]">Sonuçlar ({filteredBots.length})</h2>
-          </div>
+      {/* Results */}
+      <div className="space-y-1">
+        <div className="flex justify-between items-center mb-6 px-2">
+            <h2 className="text-[10px] font-black text-slate-400 dark:text-slate-700 uppercase tracking-[0.4em]">Sonuçlar ({filteredBots.length})</h2>
+        </div>
 
-          {isLoading ? (
-              <div className="flex justify-center py-24"><Loader2 className="animate-spin text-blue-500" /></div>
-          ) : filteredBots.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-in slide-in-from-bottom-4">
-                  {filteredBots.map(bot => <BotCard key={bot.id} bot={bot} tonRate={tonRate} />)}
-              </div>
-          ) : (
-              <div className="py-24 text-center">
-                  <p className="text-slate-500 font-bold uppercase text-xs tracking-widest">Kriterlere uygun bot bulunamadı.</p>
-              </div>
-          )}
-        </main>
+        {isLoading ? (
+            <div className="flex justify-center py-24"><Loader2 className="animate-spin text-blue-500" /></div>
+        ) : filteredBots.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-in slide-in-from-bottom-4">
+                {filteredBots.map(bot => <BotCard key={bot.id} bot={bot} tonRate={tonRate} />)}
+            </div>
+        ) : (
+            <div className="py-24 text-center">
+                <p className="text-slate-500 font-bold uppercase text-xs tracking-widest">Kriterlere uygun bot bulunamadı.</p>
+            </div>
+        )}
       </div>
     </div>
     </>
