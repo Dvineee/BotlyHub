@@ -480,12 +480,17 @@ const Home = () => {
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">BotlyHub</h1>
         </div>
 
-        <div className="w-full md:w-auto md:flex-1 md:max-w-2xl order-3 md:order-2 cursor-pointer" onClick={() => navigate('/search')}>
-            <div className="relative flex items-center bg-white dark:bg-slate-900/40 backdrop-blur-2xl border border-black/5 dark:border-white/10 rounded-[28px] p-1.5 transition-all active:scale-[0.98] group">
-                <div className="ml-4 w-10 h-10 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-2xl text-slate-400 group-hover:text-blue-500 transition-colors">
-                    <Search size={20} />
+        <div className="w-full md:w-auto md:flex-1 md:max-w-2xl order-3 md:order-2 flex items-center gap-3">
+            <div className="flex-1 cursor-pointer" onClick={() => navigate('/search')}>
+                <div className="relative flex items-center bg-white dark:bg-slate-900/40 backdrop-blur-2xl border border-black/5 dark:border-white/10 rounded-[28px] p-1.5 transition-all active:scale-[0.98] group">
+                    <div className="ml-4 w-10 h-10 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-2xl text-slate-400 group-hover:text-blue-500 transition-colors">
+                        <Search size={20} />
+                    </div>
+                    <div className="w-full py-3 px-4 text-sm text-slate-400 font-bold uppercase tracking-widest opacity-60">{t('search_placeholder')}</div>
                 </div>
-                <div className="w-full py-3 px-4 text-sm text-slate-400 font-bold uppercase tracking-widest opacity-60">{t('search_placeholder')}</div>
+            </div>
+            <div className="shrink-0">
+                <FilterMenu />
             </div>
         </div>
 
@@ -562,7 +567,7 @@ const Home = () => {
       ) : (
           <>
             {announcements.length > 0 && (
-                <div className="mb-8">
+                <div className="mb-10">
                     <AnnouncementsCarousel 
                         announcements={announcements} 
                         scroll={annScroll} 
@@ -570,16 +575,6 @@ const Home = () => {
                     />
                 </div>
             )}
-
-            <div className="mb-6 px-2 flex items-center justify-between">
-                <div className="flex flex-col">
-                    <h2 className="text-[10px] font-black text-slate-400 dark:text-slate-700 uppercase tracking-[0.4em] mb-1">
-                        Market Filtreleri
-                    </h2>
-                    <p className="text-[9px] font-bold text-slate-400/60 uppercase italic tracking-widest">Keşfetmeye Hemen Başla</p>
-                </div>
-                <FilterMenu />
-            </div>
 
             <div className="mb-10">
                 <div 
