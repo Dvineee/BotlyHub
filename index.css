@@ -633,3 +633,13 @@ html:not(.dark) .group:hover .lucide-chevron-right {
     --tw-gradient-to: rgb(47 136 255 / 0) var(--tw-gradient-to-position);
     --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
+
+.mr-3 {
+    margin-right: 0.5rem;
+}
+.ml-5 {
+    margin-left: 0.95rem;
+}
+.first\:pl-2:first-child {
+    padding-left: 0rem;
+}
