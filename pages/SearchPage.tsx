@@ -77,7 +77,7 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = ({ bot, tonRate }) => {
                 ) : (
                     <div className="flex items-center gap-2 bg-brand/10 dark:bg-brand-light/10 px-3 py-1 rounded-xl">
                         <Zap size={10} className="text-brand dark:text-brand-light" />
-                        <span className="text-[10px] font-bold text-brand dark:text-brand-light uppercase tracking-wider">{prices.ton} TON</span>
+                        <span className="text-[10px] font-bold text-brand dark:text-brand-light uppercase tracking-wider">{Number(prices.ton).toFixed(1)} TON</span>
                     </div>
                 )}
                 <div className="flex items-center gap-1.5 bg-yellow-500/10 px-3 py-1 rounded-xl border border-yellow-500/20">
