@@ -328,6 +328,11 @@ svg.lucide.lucide-chevron-right:focus {
     color: rgb(191 196 203);
 }
 
+.text-slate-400 {
+    --tw-text-opacity: 1;
+    color: rgb(117 124 134);
+}
+
 .w-20 {
     border-radius: 18px !important;
     width: 5.2rem;

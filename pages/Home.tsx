@@ -633,16 +633,23 @@ const Home = () => {
                         return (
                             <div key={catId} className="mb-10 space-y-4">
                                 <div 
-                                    className="flex items-center gap-2 px-2 cursor-pointer group"
+                                    className="flex flex-col gap-1 px-2 cursor-pointer group"
                                     onClick={() => navigate(`/search?category=${catId}`)}
                                 >
-                                    <h2 className="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight uppercase">
-                                        {t(category.label)}
-                                    </h2>
-                                    <span className="text-sm font-bold text-slate-400 dark:text-slate-600 ml-1">
-                                        {data.total}
-                                    </span>
-                                    <ChevronRight size={16} className="text-slate-300 dark:text-slate-700 group-hover:translate-x-1 transition-transform" />
+                                    <div className="flex items-center gap-2">
+                                        <h2 className="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight uppercase">
+                                            {t(category.label)}
+                                        </h2>
+                                        <span className="text-sm font-bold text-slate-400 dark:text-slate-600 ml-1">
+                                            {data.total}
+                                        </span>
+                                        <ChevronRight size={16} className="text-slate-300 dark:text-slate-700 group-hover:translate-x-1 transition-transform" />
+                                    </div>
+                                    {category.desc && (
+                                        <p className="hidden sm:block text-[0.86rem] text-slate-400 dark:text-slate-600 font-normal leading-relaxed max-w-[95%]">
+                                            {t(category.desc)}
+                                        </p>
+                                    )}
                                 </div>
                                 
                                 <div className="relative -mx-4 px-4 overflow-hidden">
