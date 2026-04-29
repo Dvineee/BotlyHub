@@ -316,6 +316,16 @@ const BotDetail = () => {
                     </svg>
                 </button>
 
+                {DatabaseService.isAdminLoggedIn() && (
+                    <button 
+                        onClick={() => navigate(`/a/dashboard/bots`)}
+                        className="flex w-12 h-12 items-center justify-center bg-brand border border-brand/20 rounded-full text-white active:scale-90 transition-transform shadow-lg shadow-blue-500/20"
+                        title="Yönet"
+                    >
+                        <Edit3 size={18} />
+                    </button>
+                )}
+
                 {user ? (
                     <>
                         <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="hidden sm:flex w-10 h-10 md:w-12 md:h-12 items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-900 dark:text-white active:scale-90 transition-transform">

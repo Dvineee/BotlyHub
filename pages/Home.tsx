@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Search, ChevronLeft, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, Send, Instagram, Youtube, Link, CheckCircle2 } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, ShieldCheck, TrendingUp, Radio, Send, Instagram, Youtube, Link, CheckCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Bot, Announcement, Notification } from '../types';
@@ -313,10 +313,46 @@ const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = React.memo(({ bots }) => {
     );
 });
 
-const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonRate }) => {
+const BotCard: React.FC<{ bot: Bot, tonRate: number, isVertical?: boolean }> = React.memo(({ bot, tonRate, isVertical = false }) => {
   const navigate = useNavigate();
   const prices = useMemo(() => PriceService.convert(bot.price, tonRate), [bot.price, tonRate]);
   
+  if (isVertical) {
+    return (
+        <div 
+            onClick={() => navigate(`/bot/${bot.id}`)} 
+            className="flex flex-col p-4 bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-[24px] hover:border-brand/30 transition-all group cursor-pointer active:scale-[0.98] h-full"
+        >
+            <div className="relative mb-4">
+                <img 
+                    src={getLiveBotIcon(bot)} 
+                    alt={bot.name} 
+                    className="w-full aspect-square rounded-[20px] object-cover bg-slate-100 dark:bg-slate-800 border border-black/5 dark:border-white/5 group-hover:scale-[1.02] transition-transform"
+                    onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
+                />
+            </div>
+            <div className="flex-1 min-w-0">
+                <h3 className="font-black text-xs text-slate-900 dark:text-white truncate uppercase tracking-tight mb-1 flex items-center gap-1">
+                    {bot.name}
+                    {bot.is_official && <ShieldCheck size={10} className="text-brand shrink-0" />}
+                </h3>
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest line-clamp-1 mb-3 opacity-60">
+                    {bot.description}
+                </p>
+                <div className="flex items-center justify-between mt-auto">
+                    <span className={`text-[9px] font-black uppercase tracking-tighter ${bot.price === 0 ? 'text-emerald-500' : 'text-brand'}`}>
+                        {bot.price === 0 ? 'Ücretsiz' : `${prices.ton} TON`}
+                    </span>
+                    <div className="flex items-center gap-1 opacity-60">
+                        <Star size={10} className="text-yellow-500 fill-yellow-500" />
+                        <span className="text-[9px] font-black text-slate-600 dark:text-slate-400">{bot.rating || '0.0'}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+  }
+
   return (
     <div onClick={() => navigate(`/bot/${bot.id}`)} className="flex items-center p-6 bot-card cursor-pointer group bg-white dark:bg-transparent hover:bg-slate-100 dark:hover:bg-slate-900/60 rounded-[32px] transition-all border border-black/5 dark:border-transparent hover:border-slate-200 dark:hover:border-slate-800/50 active:bg-slate-200 dark:active:bg-slate-900 transform-gpu">
         <div className="relative shrink-0">
@@ -386,6 +422,74 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonR
         </div>
     </div>
   );
+});
+
+const CategorySection: React.FC<{ category: any, bots: Bot[], tonRate: number }> = React.memo(({ category, bots, tonRate }) => {
+    const navigate = useNavigate();
+    const { t } = useTranslation();
+    const { haptic } = useTelegram();
+    const scroll = useDraggableScroll();
+
+    const categoryBots = useMemo(() => {
+        return bots
+            .filter(bot => (Array.isArray(bot.category) ? bot.category : [bot.category]).includes(category.id))
+            .sort((a, b) => (b.views || 0) - (a.views || 0))
+            .slice(0, 9);
+    }, [bots, category.id]);
+
+    if (categoryBots.length === 0) return null;
+
+    return (
+        <section className="mb-12 last:mb-0">
+            <div className="flex items-center justify-between mb-6 px-2">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-brand/10 rounded-2xl flex items-center justify-center text-brand shadow-sm">
+                        <category.icon size={20} />
+                    </div>
+                    <div>
+                        <h2 className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-[0.4em] mb-0.5">PLATFORM</h2>
+                        <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-tighter italic leading-none">{t(category.label)}</h3>
+                    </div>
+                </div>
+                <button 
+                    onClick={() => { haptic('light'); navigate(`/search?category=${category.id}`); }}
+                    className="flex items-center gap-2 group"
+                >
+                    <span className="text-[10px] font-black text-brand uppercase tracking-widest group-hover:tracking-[0.15em] transition-all">TÜMÜ <span className="opacity-40">{categoryBots.length <= 9 ? '' : `(${categoryBots.length})`}</span></span>
+                    <ChevronRight size={14} className="text-brand group-hover:translate-x-0.5 transition-transform" />
+                </button>
+            </div>
+
+            <div 
+                ref={scroll.ref}
+                onMouseDown={scroll.onMouseDown}
+                onMouseUp={scroll.onMouseUp}
+                onMouseMove={scroll.onMouseMove}
+                onMouseLeave={scroll.onMouseLeave}
+                onContextMenu={scroll.onContextMenu}
+                className={`flex gap-4 overflow-x-auto no-scrollbar -mx-4 px-4 pb-2 snap-x transform-gpu touch-pan-x ${scroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+            >
+                {categoryBots.map(bot => (
+                    <div key={bot.id} className="w-[160px] md:w-[200px] shrink-0 snap-center">
+                        <BotCard bot={bot} tonRate={tonRate} isVertical />
+                    </div>
+                ))}
+                
+                {/* View All Card at the end */}
+                <div 
+                    onClick={() => navigate(`/search?category=${category.id}`)}
+                    className="w-[160px] md:w-[200px] shrink-0 snap-center flex flex-col items-center justify-center bg-brand/5 border border-brand/20 rounded-[24px] cursor-pointer group active:scale-[0.98] transition-all"
+                >
+                    <div className="w-12 h-12 rounded-full bg-brand/20 flex items-center justify-center text-brand mb-4 group-hover:scale-110 transition-transform">
+                        <ChevronRight size={24} />
+                    </div>
+                    <span className="text-[10px] font-black text-brand uppercase tracking-widest text-center px-4">
+                        TÜM {t(category.label)} BOTLARINI GÖR
+                    </span>
+                </div>
+            </div>
+        </section>
+    );
 });
 
 const Home = () => {
@@ -590,16 +694,39 @@ const Home = () => {
 
             <FeaturedBotsSlider bots={bots} />
 
-            <div className="space-y-6">
-                <div className="flex items-center justify-between mb-4 px-2">
-                    <h2 className="text-[10px] font-black text-slate-400 dark:text-slate-700 uppercase tracking-[0.4em]">
-                        MAĞAZA VİTRİNİ
-                    </h2>
+            <div className="space-y-12">
+                <div className="flex items-center justify-between px-2">
+                    <button 
+                        onClick={() => { haptic('light'); navigate('/referral'); }} 
+                        className="flex items-center gap-2.5 group cursor-pointer"
+                    >
+                        <div className="w-8 h-8 bg-brand/10 rounded-xl flex items-center justify-center text-brand transition-all group-hover:scale-110 group-active:scale-95 shadow-sm">
+                            <Send size={14} className="group-hover:rotate-12 transition-transform" />
+                        </div>
+                        <span className="text-[10px] font-black text-brand uppercase tracking-[0.3em] group-hover:tracking-[0.4em] transition-all">
+                            SİSTEME BAŞVURU YAP
+                        </span>
+                    </button>
                     <FilterMenu />
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {filteredBots.length > 0 ? filteredBots.map(bot => <BotCard key={bot.id} bot={bot} tonRate={tonRate} />) : <div className="col-span-full py-24 text-center text-slate-400 dark:text-slate-700 font-bold uppercase text-xs tracking-widest">Sonuç yok.</div>}
-                </div>
+
+                {activeFilter === 'all' || !activeFilter ? (
+                    <div className="space-y-4">
+                        {categories.map((cat) => (
+                            <CategorySection key={cat.id} category={cat} bots={bots} tonRate={tonRate} />
+                        ))}
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {filteredBots.length > 0 ? (
+                            filteredBots.map(bot => <BotCard key={bot.id} bot={bot} tonRate={tonRate} />)
+                        ) : (
+                            <div className="col-span-full py-24 text-center text-slate-400 dark:text-slate-700 font-bold uppercase text-xs tracking-widest">
+                                Sonuç yok.
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
           </>
       )}

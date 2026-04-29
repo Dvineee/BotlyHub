@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { useNavigate, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { useNavigate, Routes, Route, Link, useLocation, useSearchParams } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { 
   LayoutDashboard, Users, LogOut, Menu, X, 
@@ -248,6 +248,9 @@ const BotManagement = () => {
     const [copiedId, setCopiedId] = useState(false);
     const [activeTab, setActiveTab] = useState<'info' | 'media' | 'pricing'>('info');
     const [isSaving, setIsSaving] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [saveSuccess, setSaveSuccess] = useState(false);
+    const [searchParams, setSearchParams] = useSearchParams();
 
     const load = useCallback(async () => {
         setIsLoading(true);
@@ -256,6 +259,23 @@ const BotManagement = () => {
     }, []);
 
     useEffect(() => { load(); }, [load]);
+
+    useEffect(() => {
+        const editId = searchParams.get('edit');
+        if (editId && bots.length > 0) {
+            const bot = bots.find(b => b.id === editId);
+            if (bot) {
+                setEditingBot({
+                    ...bot,
+                    promoted_type: bot.promoted_type || 'none',
+                    languages: bot.languages || [],
+                    category: Array.isArray(bot.category) ? bot.category : (bot.category ? [bot.category] : ['utilities'])
+                });
+                setIsModalOpen(true);
+                setSearchParams({}, { replace: true });
+            }
+        }
+    }, [searchParams, bots, setSearchParams]);
 
     const openCreateModal = () => {
         setEditingBot({
@@ -297,6 +317,12 @@ const BotManagement = () => {
         setEditingBot({ ...editingBot, screenshots: next });
     };
 
+    const filteredBots = (bots || []).filter(b => 
+        (b.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+        (b.bot_link || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (b.id || '').toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     return (
         <div className="space-y-12 animate-in fade-in">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
@@ -304,12 +330,31 @@ const BotManagement = () => {
                     <h2 className="text-3xl lg:text-4xl font-black text-white italic uppercase tracking-tighter leading-none">Market <span className="text-brand">Envanteri</span></h2>
                     <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em] mt-2 italic">Platform envanterini profesyonelce yönetin</p>
                 </div>
-                <button 
-                    onClick={openCreateModal}
-                    className="w-full md:w-auto bg-brand hover:opacity-90 px-8 py-5 rounded-[24px] text-[10px] font-black uppercase tracking-[0.4em]   transition-all active:scale-95 flex items-center justify-center gap-3"
-                >
-                    <Plus size={18} /> YENİ ÜRÜN TANIMLA
-                </button>
+                <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+                    <div className="relative group">
+                        <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-brand transition-colors" size={18} />
+                        <input 
+                            type="text" 
+                            placeholder="BOT ARA (İSİM, @, ID)..." 
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full md:w-80 h-16 bg-slate-900 border border-white/5 rounded-[24px] pl-16 pr-8 text-[10px] font-black uppercase tracking-widest text-white outline-none focus:border-brand transition-all"
+                        />
+                    </div>
+                    <button 
+                        onClick={openCreateModal}
+                        className="bg-brand hover:opacity-90 px-8 py-5 rounded-[24px] text-[10px] font-black uppercase tracking-[0.4em] transition-all active:scale-95 flex items-center justify-center gap-3"
+                    >
+                        <Plus size={18} /> YENİ ÜRÜN TANIMLA
+                    </button>
+                    <button 
+                        onClick={load}
+                        className="p-5 bg-white/5 hover:bg-white/10 rounded-[24px] text-slate-400 transition-all active:scale-95 flex items-center justify-center"
+                        title="Yenile"
+                    >
+                        <History size={18} />
+                    </button>
+                </div>
             </div>
 
             {isLoading ? (
@@ -319,8 +364,20 @@ const BotManagement = () => {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-                    {bots.map(b => (
-                        <div key={b.id} className="bg-slate-900/40 border border-white/5 rounded-[32px] lg:rounded-[56px] p-6 lg:p-10 flex flex-col gap-6 lg:gap-8 group hover:border-brand/30 transition-all relative overflow-hidden  backdrop-blur-sm">
+                    {filteredBots.map(b => (
+                        <div 
+                            key={b.id} 
+                            onClick={() => {
+                                setEditingBot({
+                                    ...b,
+                                    promoted_type: b.promoted_type || 'none',
+                                    languages: b.languages || [],
+                                    category: Array.isArray(b.category) ? b.category : (b.category ? [b.category] : ['utilities'])
+                                });
+                                setIsModalOpen(true);
+                            }}
+                            className="bg-slate-900/40 border border-white/5 rounded-[32px] lg:rounded-[56px] p-6 lg:p-10 flex flex-col gap-6 lg:gap-8 group hover:border-brand/40 transition-all relative overflow-hidden backdrop-blur-sm cursor-pointer"
+                        >
                             <div className="flex justify-between items-start relative z-10">
                                 <div className="relative">
                                     <img 
@@ -330,7 +387,7 @@ const BotManagement = () => {
                                     />
                                     {b.price > 0 && <div className="absolute -top-2 -right-2 w-6 h-6 lg:w-7 lg:h-7 bg-brand rounded-xl flex items-center justify-center  border-4 border-[#020617]"><Zap size={10} fill="currentColor" /></div>}
                                 </div>
-                                <div className="flex gap-2">
+                                <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
                                     {b.is_official && (
                                         <div className="px-3 py-1 bg-brand/10 border border-brand/20 rounded-lg flex items-center gap-1.5">
                                             <ShieldCheck size={10} className="text-brand" />
@@ -338,7 +395,8 @@ const BotManagement = () => {
                                         </div>
                                     )}
                                     <button 
-                                        onClick={async () => {
+                                        onClick={async (e) => {
+                                            e.stopPropagation();
                                             const nextType = b.promoted_type === 'featured' ? 'none' : 'featured';
                                             await DatabaseService.saveBot({ ...b, promoted_type: nextType });
                                             load();
@@ -348,24 +406,56 @@ const BotManagement = () => {
                                     >
                                         <Star size={16} fill={b.promoted_type === 'featured' ? "currentColor" : "none"} />
                                     </button>
-                                    <button onClick={() => { setEditingBot({
-                                        ...b,
-                                        promoted_type: b.promoted_type || 'none',
-                                        languages: b.languages || [],
-                                        category: Array.isArray(b.category) ? b.category : (b.category ? [b.category] : ['utilities'])
-                                    }); setIsModalOpen(true); }} className="p-2.5 lg:p-3 bg-white/5 rounded-xl hover:bg-brand text-slate-500 hover:text-white transition-all"><Edit3 size={16}/></button>
-                                    <button onClick={async () => { if(confirm('Silsin mi?')) { await DatabaseService.deleteBot(b.id); await DatabaseService.logActivity('admin', 'bot_manage', 'bot_deleted', 'Bot Silindi', `${b.name} isimli bot sistemden silindi.`); load(); } }} className="p-2.5 lg:p-3 bg-white/5 rounded-xl text-red-500 hover:bg-red-500 hover:text-white transition-all"><Trash2 size={16}/></button>
+                                    <button 
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setEditingBot({
+                                                ...b,
+                                                promoted_type: b.promoted_type || 'none',
+                                                languages: b.languages || [],
+                                                category: Array.isArray(b.category) ? b.category : (b.category ? [b.category] : ['utilities'])
+                                            });
+                                            setIsModalOpen(true);
+                                        }} 
+                                        className="p-2.5 lg:p-3 bg-white/5 rounded-xl hover:bg-brand text-slate-500 hover:text-white transition-all shadow-xl"
+                                    >
+                                        <Edit3 size={16}/>
+                                    </button>
+                                    <button 
+                                        onClick={async (e) => { 
+                                            e.stopPropagation();
+                                            if(confirm(`'${b.name}' Silsin mi?`)) { 
+                                                await DatabaseService.deleteBot(b.id); 
+                                                await DatabaseService.logActivity('admin', 'bot_manage', 'bot_deleted', 'Bot Silindi', `${b.name} isimli bot sistemden silindi.`); 
+                                                load(); 
+                                            } 
+                                        }} 
+                                        className="p-2.5 lg:p-3 bg-white/5 rounded-xl text-red-500 hover:bg-red-500 hover:text-white transition-all"
+                                    >
+                                        <Trash2 size={16}/>
+                                    </button>
                                 </div>
                             </div>
 
                             <div className="relative z-10">
-                                <h4 className="text-lg lg:text-2xl font-black text-white italic uppercase tracking-tighter truncate leading-none mb-2 lg:mb-3">{b.name}</h4>
+                                <h4 className="text-lg lg:text-2xl font-black text-white italic uppercase tracking-tighter truncate leading-none mb-2 lg:mb-3 group-hover:text-brand transition-colors">{b.name}</h4>
                                 <p className="text-[9px] lg:text-[10px] text-slate-600 line-clamp-2 leading-relaxed font-bold uppercase italic h-8 lg:h-10">{b.description}</p>
                             </div>
 
                             <div className="flex items-center justify-between pt-4 lg:pt-6 border-t border-white/5 relative z-10">
-                                <p className="text-base lg:text-lg font-black uppercase text-brand italic tracking-tighter leading-none">{b.price > 0 ? `${b.price} TL` : 'ÜCRETSİZ'}</p>
-                                <p className="text-base lg:text-lg font-black uppercase text-white italic tracking-tighter leading-none">{b.ownerCount || 0} <span className="text-[8px] text-slate-700">LİSANS</span></p>
+                                <div>
+                                    <p className="text-[8px] font-black text-slate-700 uppercase tracking-widest mb-1">FİYATLANDIRMA</p>
+                                    <p className="text-base lg:text-lg font-black uppercase text-brand italic tracking-tighter leading-none">{b.price > 0 ? `${b.price} TL` : 'ÜCRETSİZ'}</p>
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-[8px] font-black text-slate-700 uppercase tracking-widest mb-1">AKTİF PANEL</p>
+                                    <p className="text-base lg:text-lg font-black uppercase text-white italic tracking-tighter leading-none">{b.ownerCount || 0} <span className="text-[8px] text-slate-700">LİSANS</span></p>
+                                </div>
+                            </div>
+
+                            <div className="absolute inset-x-0 bottom-0 py-4 bg-brand text-white text-center translate-y-full group-hover:translate-y-0 transition-transform duration-300 flex items-center justify-center gap-3">
+                                <Edit3 size={14} />
+                                <span className="text-[9px] font-black uppercase tracking-[0.3em]">BOTU DÜZENLE</span>
                             </div>
                         </div>
                     ))}
@@ -411,9 +501,16 @@ const BotManagement = () => {
                                     setIsSaving(true);
                                     try {
                                         await DatabaseService.saveBot(editingBot); 
-                                        await DatabaseService.logActivity('admin', 'bot_manage', 'bot_saved', 'Bot Kaydedildi', `${editingBot.name} isimli bot bilgileri güncellendi/oluşturuldu.`); 
-                                        setIsModalOpen(false); 
-                                        load(); 
+                                        setSaveSuccess(true);
+                                        setTimeout(() => setSaveSuccess(false), 3000);
+                                        
+                                        // Non-blocking log
+                                        DatabaseService.logActivity('admin', 'bot_manage', 'bot_saved', 'Bot Kaydedildi', `${editingBot.name} isimli bot bilgileri güncellendi/oluşturuldu.`).catch(console.error);
+                                        
+                                        setTimeout(() => {
+                                            setIsModalOpen(false); 
+                                            load(); 
+                                        }, 1000);
                                     } catch (err: any) {
                                         console.error("Bot save error:", err);
                                         alert("Bot kaydedilemedi: " + (err.message || "Bilinmeyen hata"));
@@ -582,6 +679,8 @@ const BotManagement = () => {
                                         >
                                             {isSaving? (
                                                 <><Loader2 className="animate-spin" size={20} /> İŞLENİYOR...</>
+                                            ) : saveSuccess ? (
+                                                <><CheckCircle2 size={20} className="text-emerald-400" /> SİSTEME İŞLENDİ!</>
                                             ) : (
                                                 <><Database size={20} /> SİSTEMİ GÜNCELLE</>
                                             )}
