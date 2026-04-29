@@ -318,13 +318,13 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonR
   const prices = useMemo(() => PriceService.convert(bot.price, tonRate), [bot.price, tonRate]);
   
   return (
-    <div onClick={() => navigate(`/bot/${bot.id}`)} className="flex items-center p-6 bot-card cursor-pointer group bg-white dark:bg-transparent hover:bg-slate-100 dark:hover:bg-slate-900/60 rounded-[32px] transition-all border border-black/5 dark:border-transparent hover:border-slate-200 dark:hover:border-slate-800/50 active:bg-slate-200 dark:active:bg-slate-900 transform-gpu">
+    <div onClick={() => navigate(`/bot/${bot.id}`)} className="flex items-center p-4 sm:p-6 bot-card cursor-pointer group bg-white dark:bg-transparent hover:bg-slate-100 dark:hover:bg-slate-900/60 rounded-[32px] transition-all border border-black/5 dark:border-transparent hover:border-slate-200 dark:hover:border-slate-800/50 active:bg-slate-200 dark:active:bg-slate-900 transform-gpu">
         <div className="relative shrink-0">
             <img 
                 src={getLiveBotIcon(bot)} 
                 alt={bot.name} 
                 loading="lazy"
-                className="w-20 h-20 rounded-[28px] object-cover bg-slate-200 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 group-hover:scale-105 transition-transform" 
+                className="w-16 h-16 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[28px] object-cover bg-slate-200 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 group-hover:scale-105 transition-transform" 
                 onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
             />
             {/* Removed Zap icon badge for paid bots */}
@@ -652,18 +652,19 @@ const Home = () => {
                                     )}
                                 </div>
                                 
-                                <div className="relative -mx-4 px-4 overflow-hidden">
-                                    <div className="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory pb-4">
+                                <div className="relative -mx-4 px-4">
+                                    <div className="flex gap-3 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory pb-4">
                                         {botChunks.map((chunk, chunkIdx) => (
-                                            <div key={chunkIdx} className="flex flex-col gap-3 min-w-full md:min-w-[400px] snap-center">
+                                            <div key={chunkIdx} className="flex flex-col gap-3 min-w-[88vw] sm:min-w-[400px] snap-center first:pl-2">
                                                 {chunk.map(bot => (
-                                                    <div key={bot.id} className="w-full">
+                                                    <div key={bot.id} className="w-full h-full">
                                                         <BotCard bot={bot} tonRate={tonRate} />
                                                     </div>
                                                 ))}
                                             </div>
                                         ))}
                                     </div>
+                                    <div className="absolute top-0 right-0 bottom-4 w-12 bg-gradient-to-l from-slate-50 dark:from-[#020617] to-transparent pointer-events-none z-10 sm:hidden" />
                                 </div>
                             </div>
                         );
