@@ -244,7 +244,15 @@ const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = React.memo(({ bots }) => {
                             className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[#ffffff] dark:from-[#1e293b] via-[#ffffff]/80 dark:via-[#1e293b]/80 to-transparent z-40 pointer-events-none flex items-center pl-2"
                         >
                             <button 
-                                onClick={(e) => { e.stopPropagation(); scroll.ref.current?.scrollBy({ left: -300, behavior: 'smooth' }); }}
+                                onClick={(e) => { 
+                                    e.stopPropagation(); 
+                                    const el = scroll.ref.current;
+                                    if (el) {
+                                        const cardWidth = window.innerWidth < 768 ? 320 : 400;
+                                        const gap = 12;
+                                        el.scrollBy({ left: -(cardWidth + gap), behavior: 'smooth' }); 
+                                    }
+                                }}
                                 className="hidden md:flex w-8 h-8 bg-white dark:bg-slate-800 border border-black/5 dark:border-white/10 rounded-full items-center justify-center text-slate-400 hover:text-brand transition-all shadow-lg pointer-events-auto active:scale-95"
                             >
                                 <ChevronLeft size={16} />
@@ -263,7 +271,15 @@ const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = React.memo(({ bots }) => {
                             className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#ffffff] dark:from-[#1e293b] via-[#ffffff]/80 dark:via-[#1e293b]/80 to-transparent z-40 pointer-events-none flex items-center justify-end pr-2"
                         >
                             <button 
-                                onClick={(e) => { e.stopPropagation(); scroll.ref.current?.scrollBy({ left: 300, behavior: 'smooth' }); }}
+                                onClick={(e) => { 
+                                    e.stopPropagation(); 
+                                    const el = scroll.ref.current;
+                                    if (el) {
+                                        const cardWidth = window.innerWidth < 768 ? 320 : 400;
+                                        const gap = 12;
+                                        el.scrollBy({ left: (cardWidth + gap), behavior: 'smooth' }); 
+                                    }
+                                }}
                                 className="hidden md:flex w-8 h-8 bg-white dark:bg-slate-800 border border-black/5 dark:border-white/10 rounded-full items-center justify-center text-slate-400 hover:text-brand transition-all shadow-lg pointer-events-auto active:scale-95"
                             >
                                 <ChevronRight size={16} />
@@ -845,8 +861,88 @@ const AnnouncementsCarousel: React.FC<{
         }
     }, [handleScroll, scroll.ref]);
 
+    const [scrollState, setScrollState] = useState({ left: false, right: true });
+
+    const checkScroll = useCallback(() => {
+        const el = scroll.ref.current;
+        if (el) {
+            const canScrollLeft = el.scrollLeft > 5;
+            const canScrollRight = el.scrollLeft < (el.scrollWidth - el.clientWidth - 5);
+            setScrollState({ left: canScrollLeft, right: canScrollRight });
+        }
+    }, [scroll.ref]);
+
+    useEffect(() => {
+        const el = scroll.ref.current;
+        if (el) {
+            el.addEventListener('scroll', checkScroll);
+            checkScroll();
+            window.addEventListener('resize', checkScroll);
+            return () => {
+                el.removeEventListener('scroll', checkScroll);
+                window.removeEventListener('resize', checkScroll);
+            };
+        }
+    }, [checkScroll, scroll.ref, announcements]);
+
     return (
-        <>
+        <div className="relative group/ann">
+            {announcements.length > 1 && (
+                <>
+                    <AnimatePresence>
+                        {scrollState.left && (
+                            <motion.div 
+                                initial={{ opacity: 0 }} 
+                                animate={{ opacity: 1 }} 
+                                exit={{ opacity: 0 }}
+                                className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-slate-50 dark:from-[#0f172a] via-slate-50/80 dark:via-[#0f172a]/80 to-transparent z-40 pointer-events-none hidden md:flex items-center pl-2"
+                            >
+                                <button 
+                                    onClick={(e) => { 
+                                        e.stopPropagation(); 
+                                        const el = scroll.ref.current;
+                                        if (el) {
+                                            const cardWidth = 340;
+                                            const gap = 16;
+                                            el.scrollBy({ left: -(cardWidth + gap), behavior: 'smooth' }); 
+                                        }
+                                    }}
+                                    className="w-10 h-10 bg-white dark:bg-slate-800 border border-black/5 dark:border-white/10 rounded-full flex items-center justify-center text-slate-400 hover:text-brand transition-all shadow-xl pointer-events-auto active:scale-95"
+                                >
+                                    <ChevronLeft size={20} />
+                                </button>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
+                    <AnimatePresence>
+                        {scrollState.right && (
+                            <motion.div 
+                                initial={{ opacity: 0 }} 
+                                animate={{ opacity: 1 }} 
+                                exit={{ opacity: 0 }}
+                                className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-slate-50 dark:from-[#0f172a] via-slate-50/80 dark:via-[#0f172a]/80 to-transparent z-40 pointer-events-none hidden md:flex items-center justify-end pr-2"
+                            >
+                                <button 
+                                    onClick={(e) => { 
+                                        e.stopPropagation(); 
+                                        const el = scroll.ref.current;
+                                        if (el) {
+                                            const cardWidth = 340;
+                                            const gap = 16;
+                                            el.scrollBy({ left: (cardWidth + gap), behavior: 'smooth' }); 
+                                        }
+                                    }}
+                                    className="w-10 h-10 bg-white dark:bg-slate-800 border border-black/5 dark:border-white/10 rounded-full flex items-center justify-center text-slate-400 hover:text-brand transition-all shadow-xl pointer-events-auto active:scale-95"
+                                >
+                                    <ChevronRight size={20} />
+                                </button>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </>
+            )}
+
             <div 
                 ref={scroll.ref}
                 onMouseDown={scroll.onMouseDown}
@@ -874,7 +970,7 @@ const AnnouncementsCarousel: React.FC<{
                     ))}
                 </div>
             )}
-        </>
+        </div>
     );
 });
 
