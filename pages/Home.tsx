@@ -450,15 +450,20 @@ const Home = () => {
   }, [loadData]);
 
   const categorizedBots = useMemo(() => {
-    const result: Record<string, Bot[]> = {};
+    const result: Record<string, { bots: Bot[], total: number }> = {};
+    const baseBots = filteredBots; // Use filtered bots instead of all bots
+
     categories.filter(c => c.id !== 'all').forEach(cat => {
-        const botsInCat = bots.filter(b => Array.isArray(b.category) ? b.category.includes(cat.id) : b.category === cat.id);
+        const botsInCat = baseBots.filter(b => Array.isArray(b.category) ? b.category.includes(cat.id) : b.category === cat.id);
         if (botsInCat.length > 0) {
-            result[cat.id] = botsInCat.slice(0, 9);
+            result[cat.id] = {
+                bots: botsInCat.slice(0, 9),
+                total: botsInCat.length
+            };
         }
     });
     return result;
-  }, [bots]);
+  }, [filteredBots]);
 
   return (
     <>
@@ -557,7 +562,7 @@ const Home = () => {
       ) : (
           <>
             {announcements.length > 0 && (
-                <div className="mb-10">
+                <div className="mb-8">
                     <AnnouncementsCarousel 
                         announcements={announcements} 
                         scroll={annScroll} 
@@ -565,6 +570,16 @@ const Home = () => {
                     />
                 </div>
             )}
+
+            <div className="mb-6 px-2 flex items-center justify-between">
+                <div className="flex flex-col">
+                    <h2 className="text-[10px] font-black text-slate-400 dark:text-slate-700 uppercase tracking-[0.4em] mb-1">
+                        Market Filtreleri
+                    </h2>
+                    <p className="text-[9px] font-bold text-slate-400/60 uppercase italic tracking-widest">Keşfetmeye Hemen Başla</p>
+                </div>
+                <FilterMenu />
+            </div>
 
             <div className="mb-10">
                 <div 
@@ -601,38 +616,69 @@ const Home = () => {
 
             <FeaturedBotsSlider bots={bots} />
 
-            {activeFilter === 'all' && Object.entries(categorizedBots).map(([catId, catBots]) => {
-                const category = categories.find(c => c.id === catId);
-                if (!category) return null;
-                return (
-                    <div key={catId} className="mb-10 space-y-6">
-                        <div className="flex items-center justify-between px-2">
-                            <div className="flex items-center gap-3">
-                                <category.icon size={18} className="text-brand" />
-                                <h2 className="text-[10px] font-black text-slate-400 dark:text-slate-700 uppercase tracking-[0.4em]">
-                                    {t(category.label)}
-                                </h2>
+            <AnimatePresence mode="wait">
+                <motion.div 
+                    key={activeFilter}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                >
+                    {Object.entries(categorizedBots).map(([catId, data]) => {
+                        const category = categories.find(c => c.id === catId);
+                        if (!category) return null;
+                        
+                        // Group bots in chunks of 3 for vertical columns in horizontal scroll
+                        const botChunks = [];
+                        for (let i = 0; i < data.bots.length; i += 3) {
+                            botChunks.push(data.bots.slice(i, i + 3));
+                        }
+
+                        return (
+                            <div key={catId} className="mb-10 space-y-4">
+                                <div 
+                                    className="flex items-center gap-2 px-2 cursor-pointer group"
+                                    onClick={() => navigate(`/search?category=${catId}`)}
+                                >
+                                    <h2 className="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight uppercase">
+                                        {t(category.label)}
+                                    </h2>
+                                    <span className="text-sm font-bold text-slate-400 dark:text-slate-600 ml-1">
+                                        {data.total}
+                                    </span>
+                                    <ChevronRight size={16} className="text-slate-300 dark:text-slate-700 group-hover:translate-x-1 transition-transform" />
+                                </div>
+                                
+                                <div className="relative -mx-4 px-4 overflow-hidden">
+                                    <div className="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory pb-4">
+                                        {botChunks.map((chunk, chunkIdx) => (
+                                            <div key={chunkIdx} className="flex flex-col gap-3 min-w-full md:min-w-[400px] snap-center">
+                                                {chunk.map(bot => (
+                                                    <div key={bot.id} className="w-full">
+                                                        <BotCard bot={bot} tonRate={tonRate} />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
                             </div>
-                            <button 
-                                onClick={() => navigate(`/search?category=${catId}`)}
-                                className="text-[10px] font-black text-brand uppercase tracking-widest hover:opacity-80 transition-opacity"
-                            >
-                                TÜMÜNÜ GÖR
-                            </button>
+                        );
+                    })}
+
+                    {Object.keys(categorizedBots).length === 0 && (
+                        <div className="py-24 text-center text-slate-400 dark:text-slate-700 font-bold uppercase text-xs tracking-widest animate-in fade-in zoom-in duration-500">
+                             BU KATEGORİDE Kİ BOTLAR HENÜZ EKLENMEDİ.
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {catBots.map(bot => <BotCard key={bot.id} bot={bot} tonRate={tonRate} />)}
-                        </div>
-                    </div>
-                );
-            })}
+                    )}
+                </motion.div>
+            </AnimatePresence>
 
             <div className="space-y-6">
                 <div className="flex items-center justify-between mb-4 px-2">
                     <h2 className="text-[10px] font-black text-slate-400 dark:text-slate-700 uppercase tracking-[0.4em]">
                         MAĞAZA VİTRİNİ
                     </h2>
-                    <FilterMenu />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {filteredBots.length > 0 ? filteredBots.map(bot => <BotCard key={bot.id} bot={bot} tonRate={tonRate} />) : <div className="col-span-full py-24 text-center text-slate-400 dark:text-slate-700 font-bold uppercase text-xs tracking-widest">Sonuç yok.</div>}
