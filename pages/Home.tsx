@@ -81,7 +81,7 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
     <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-[340px] h-32 rounded-[32px] relative overflow-hidden shrink-0 cursor-pointer group snap-center border bg-white dark:bg-slate-900 border-black/5 dark:border-white/5 flex items-stretch"
+        className="w-[calc(100vw-32px)] sm:w-[340px] h-32 rounded-[32px] relative overflow-hidden shrink-0 cursor-pointer group snap-center border bg-white dark:bg-slate-900 border-black/5 dark:border-white/5 flex items-stretch"
         onClick={handleAction}
     >
         {/* Left Side: Visual */}
@@ -324,7 +324,7 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonR
                 src={getLiveBotIcon(bot)} 
                 alt={bot.name} 
                 loading="lazy"
-                className="w-16 h-16 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[28px] object-cover bg-slate-200 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 group-hover:scale-105 transition-transform" 
+                className="w-[4.4rem] h-[4.4rem] sm:w-[5.5rem] sm:h-[5.5rem] rounded-[22px] sm:rounded-[28px] object-cover bg-slate-200 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 group-hover:scale-105 transition-transform" 
                 onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
             />
             {/* Removed Zap icon badge for paid bots */}
@@ -389,6 +389,55 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonR
   );
 });
 
+const AddProjectBanner: React.FC<{ className?: string }> = ({ className = "" }) => {
+    const navigate = useNavigate();
+    
+    return (
+        <div 
+            className={`h-32 rounded-[32px] bg-[#0066ff] p-6 flex flex-col justify-between relative overflow-hidden group cursor-pointer active:scale-[0.98] transition-all ${className}`}
+            onClick={() => navigate('/settings')}
+        >
+            {/* Background Sharp Diagonal Split */}
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 opacity-90"></div>
+            <div 
+                className="absolute top-0 right-0 bottom-0 w-[60%] bg-[#0ea5e9] transform skew-x-[-20deg] translate-x-[20%] transition-transform duration-700 group-hover:translate-x-[15%]"
+                style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%, 15% 100%)' }}
+            ></div>
+            
+            {/* Subtle Diagonal Pattern Overlay */}
+            <div className="absolute inset-0 opacity-[0.05] pointer-events-none" 
+                 style={{ backgroundImage: 'linear-gradient(45deg, #fff 25%, transparent 25%, transparent 50%, #fff 50%, #fff 75%, transparent 75%, transparent)', backgroundSize: '20px 20px' }}>
+            </div>
+
+            {/* Background SVG Asset */}
+            <div className="absolute -right-6 -bottom-6 w-48 h-48 opacity-10 pointer-events-none transform rotate-12 group-hover:scale-110 group-hover:rotate-0 transition-transform duration-1000">
+                <svg width="100%" height="100%" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g transform="rotate(204 24 25)">
+                        <path d="M23.4365 26.5357L17.5199 39.224C16.1195 42.2273 12.5496 43.5266 9.54633 42.1262V42.1262C6.54309 40.7257 5.24376 37.1558 6.6442 34.1526L18.373 9" fill="#FFFFFF" stroke="white" strokeWidth="2" strokeLinecap="round"></path>
+                        <path d="M41.3541 34.1527L29.5208 8.7761C28.1203 5.77286 24.5505 4.47352 21.5472 5.87396C18.544 7.27439 17.2447 10.8443 18.6451 13.8475L30.4784 39.2241C31.8788 42.2274 35.4487 43.5267 38.452 42.1263C41.4552 40.7258 42.7545 37.156 41.3541 34.1527Z" fill="white" stroke="white" strokeWidth="2"></path>
+                        <circle cx="25" cy="38" r="6" fill="white" stroke="white" strokeWidth="2"></circle>
+                    </g>
+                </svg>
+            </div>
+            
+            <div className="relative z-10">
+                <h3 className="text-white font-extrabold text-lg sm:text-xl md:text-[22px] tracking-tight leading-tight mb-1 max-w-[90%]">
+                    Binlerce güvenilir Bot tek bir ecosistem
+                </h3>
+                <p className="text-white/90 text-[11px] md:text-[13px] font-medium tracking-normal">
+                    Projeni ekle ve bu ekosistemde yerini al
+                </p>
+            </div>
+            
+            <div className="relative z-10 self-start">
+                <div className="bg-[#f8fafc] text-[#0066ff] px-5 py-2 rounded-xl text-[12px] font-bold shadow-md group-hover:shadow-lg group-hover:bg-white transition-all">
+                    Proje Ekle
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const Home = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -427,7 +476,9 @@ const Home = () => {
     ]);
     
     setBots(botData);
-    if (annData.length > 0) setAnnouncements(annData.filter(a => a.is_active));
+    if (annData.length > 0) {
+        setAnnouncements(annData.filter(a => a.is_active));
+    }
     setIsLoading(false);
 
     // Fiyat ve bildirimleri arka planda çek
@@ -568,12 +619,16 @@ const Home = () => {
       ) : (
           <>
             {announcements.length > 0 && (
-                <div className="mb-10">
-                    <AnnouncementsCarousel 
-                        announcements={announcements} 
-                        scroll={annScroll} 
-                        onShowPopup={(a) => setSelectedAnn(a)} 
-                    />
+                <div className="mb-10 flex flex-col sm:flex-row justify-center gap-4">
+                    <div className="w-full sm:w-[340px] shrink-0">
+                        <AnnouncementsCarousel 
+                            announcements={announcements} 
+                            scroll={annScroll} 
+                            onShowPopup={(a) => setSelectedAnn(a)} 
+                        />
+                    </div>
+                    {/* PC & Tablet: Show banner next to announcement */}
+                    <AddProjectBanner className="hidden sm:flex sm:w-[340px] shrink-0" />
                 </div>
             )}
 
@@ -620,7 +675,7 @@ const Home = () => {
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.3 }}
                 >
-                    {Object.entries(categorizedBots).map(([catId, data]) => {
+                    {Object.entries(categorizedBots).map(([catId, data], index) => {
                         const category = categories.find(c => c.id === catId);
                         if (!category) return null;
                         
@@ -631,41 +686,47 @@ const Home = () => {
                         }
 
                         return (
-                            <div key={catId} className="mb-10 space-y-4">
-                                <div 
-                                    className="flex flex-col gap-1 px-2 cursor-pointer group"
-                                    onClick={() => navigate(`/search?category=${catId}`)}
-                                >
-                                    <div className="flex items-center gap-2">
-                                        <h2 className="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight uppercase">
-                                            {t(category.label)}
-                                        </h2>
-                                        <span className="text-sm font-bold text-slate-400 dark:text-slate-600 ml-1">
-                                            {data.total}
-                                        </span>
-                                        <ChevronRight size={16} className="text-slate-300 dark:text-slate-700 group-hover:translate-x-1 transition-transform" />
+                            <React.Fragment key={catId}>
+                                <div className="mt-10 mb-10 space-y-4">
+                                    <div 
+                                        className="flex flex-col gap-1 px-2 cursor-pointer group"
+                                        onClick={() => navigate(`/search?category=${catId}`)}
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <h2 className="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight uppercase">
+                                                {t(category.label)}
+                                            </h2>
+                                            <span className="text-sm font-bold text-slate-400 dark:text-slate-600 ml-1">
+                                                {data.total}
+                                            </span>
+                                            <ChevronRight size={16} className="text-slate-300 dark:text-slate-700 group-hover:translate-x-1 transition-transform" />
+                                        </div>
+                                        {category.desc && (
+                                            <p className="hidden sm:block text-[0.86rem] text-slate-400 dark:text-slate-600 font-normal leading-relaxed max-w-[95%]">
+                                                {t(category.desc)}
+                                            </p>
+                                        )}
                                     </div>
-                                    {category.desc && (
-                                        <p className="hidden sm:block text-[0.86rem] text-slate-400 dark:text-slate-600 font-normal leading-relaxed max-w-[95%]">
-                                            {t(category.desc)}
-                                        </p>
-                                    )}
-                                </div>
-                                
-                                <div className="relative -mx-4 px-4 overflow-hidden">
-                                    <div className="flex gap-3 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory pb-4">
-                                        {botChunks.map((chunk, chunkIdx) => (
-                                            <div key={chunkIdx} className="flex flex-col gap-3 min-w-[88vw] sm:min-w-[400px] snap-center first:pl-2">
-                                                {chunk.map(bot => (
-                                                    <div key={bot.id} className="w-full h-full">
-                                                        <BotCard bot={bot} tonRate={tonRate} />
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        ))}
+                                    
+                                    <div className="relative -mx-4 px-4 overflow-hidden">
+                                        <div className="flex gap-3 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory pb-4">
+                                            {botChunks.map((chunk, chunkIdx) => (
+                                                <div key={chunkIdx} className="flex flex-col gap-3 min-w-[88vw] sm:min-w-[400px] snap-center first:pl-2">
+                                                    {chunk.map(bot => (
+                                                        <div key={bot.id} className="w-full h-full">
+                                                            <BotCard bot={bot} tonRate={tonRate} />
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                                {/* Mobile: Show banner after the first category */}
+                                {index === 0 && (
+                                    <AddProjectBanner className="flex sm:hidden mb-10" />
+                                )}
+                            </React.Fragment>
                         );
                     })}
 
@@ -817,7 +878,8 @@ const AnnouncementsCarousel: React.FC<{
                     setCurrentIndex(current => {
                         const next = (current + 1) % announcements.length;
                         if (scroll.ref.current) {
-                            const cardWidth = 340;
+                            const containerWidth = scroll.ref.current.offsetWidth;
+                            const cardWidth = window.innerWidth < 640 ? containerWidth - 32 : 340;
                             const gap = 16;
                             const scrollLeft = next * (cardWidth + gap);
                             scroll.ref.current.scrollTo({ left: scrollLeft, behavior: 'smooth' });
@@ -835,7 +897,8 @@ const AnnouncementsCarousel: React.FC<{
 
     const handleScroll = useCallback(() => {
         if (scroll.ref.current) {
-            const cardWidth = 340;
+            const containerWidth = scroll.ref.current.offsetWidth;
+            const cardWidth = window.innerWidth < 640 ? containerWidth - 32 : 340;
             const gap = 16;
             const index = Math.round(scroll.ref.current.scrollLeft / (cardWidth + gap));
             if (index !== currentIndex) {
@@ -854,7 +917,23 @@ const AnnouncementsCarousel: React.FC<{
     }, [handleScroll, scroll.ref]);
 
     return (
-        <>
+        <div className="relative">
+            {announcements.length > 1 && (
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex justify-center gap-1.5 z-20">
+                    {announcements.map((_, i) => (
+                        <div key={i} className="w-6 h-1 bg-white/20 dark:bg-black/30 backdrop-blur-sm rounded-full overflow-hidden border border-white/10">
+                            <motion.div 
+                                className="h-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"
+                                initial={{ width: 0 }}
+                                animate={{ 
+                                    width: i === currentIndex ? `${progress}%` : (i < currentIndex ? '100%' : '0%') 
+                                }}
+                                transition={{ duration:  0.1 }}
+                            />
+                        </div>
+                    ))}
+                </div>
+            )}
             <div 
                 ref={scroll.ref}
                 onMouseDown={scroll.onMouseDown}
@@ -862,27 +941,11 @@ const AnnouncementsCarousel: React.FC<{
                 onMouseMove={scroll.onMouseMove}
                 onMouseLeave={scroll.onMouseLeave}
                 onContextMenu={scroll.onContextMenu}
-                className={`flex gap-4 overflow-x-auto no-scrollbar -mx-4 px-4 pb-2 snap-x snap-mandatory ${scroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+                className={`flex gap-4 overflow-x-auto no-scrollbar sm:mx-0 sm:px-0 -mx-4 px-4 pb-2 snap-x snap-mandatory ${scroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
             >
                 {announcements.map(ann => <PromoCard key={ann.id} ann={ann} onShowPopup={onShowPopup} />)}
             </div>
-            {announcements.length > 1 && (
-                <div className="flex justify-center gap-1.5 mt-3">
-                    {announcements.map((_, i) => (
-                        <div key={i} className="w-8 h-1 bg-black/5 dark:bg-white/10 rounded-full overflow-hidden">
-                            <motion.div 
-                                className="h-full bg-blue-500"
-                                initial={{ width: 0 }}
-                                animate={{ 
-                                    width: i === currentIndex ? `${progress}%` : (i < currentIndex ? '100%' : '0%') 
-                                }}
-                                transition={{ duration: 0.1 }}
-                            />
-                        </div>
-                    ))}
-                </div>
-            )}
-        </>
+        </div>
     );
 });
 

@@ -633,3 +633,22 @@ html:not(.dark) .group:hover .lucide-chevron-right {
 .first\:pl-2:first-child {
     padding-left: 0rem;
 }
+
+.space-y-8 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-y-reverse: 0;
+    margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
+    margin-bottom: calc(2rem * var(--tw-space-y-reverse));
+}
+
+@media (min-width: 640px) {
+    .sm\:p-12 {
+        padding: 2rem !important;
+    }
+    .sm\:flex {
+        margin-top: 6px;
+        display: flex;
+    }
+    .sm\:rounded-\[28px\] {
+        border-radius: 22px; 
+    }
+}
