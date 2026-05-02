@@ -61,13 +61,13 @@ export const FilterMenu: React.FC = () => {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => { haptic('light'); setIsOpen(!isOpen); }}
-        className={`w-10 h-10 flex items-center justify-center rounded-2xl border transition-all active:scale-90  ${
+        className={`w-12 h-12 flex items-center justify-center rounded-2xl border transition-all active:scale-90  ${
           isOpen || activeFilter !== 'all'
             ? 'bg-blue-600 border-blue-500 text-white'
             : 'bg-white dark:bg-slate-900/80 border-black/5 dark:border-white/5 text-slate-500 dark:text-slate-400'
         }`}
       >
-        <FilterIcon size={18} />
+        <FilterIcon size={20} />
       </button>
 
       <AnimatePresence>
@@ -76,7 +76,7 @@ export const FilterMenu: React.FC = () => {
             initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            className="absolute right-0 mt-3 w-56 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-[28px]  overflow-hidden z-[100] py-2 backdrop-blur-2xl"
+            className="absolute right-0 mt-3 w-56 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-[28px] sm:rounded-[22px] overflow-hidden z-[100] py-2 backdrop-blur-2xl"
           >
             <div className="px-5 py-2 border-b border-black/5 dark:border-white/5 flex items-center justify-between">
               <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Filtrele</span>

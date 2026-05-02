@@ -22,7 +22,7 @@ const Restricted = () => {
                     href="https://t.me/botlyhub_support" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-4 w-full py-6 bg-brand dark:bg-brand-light rounded-[28px] text-white text-[11px] font-bold uppercase tracking-widest   active:scale-95 transition-all"
+                    className="flex items-center justify-center gap-4 w-full py-6 bg-brand dark:bg-brand-light rounded-[28px] sm:rounded-[22px] text-white text-[11px] font-bold uppercase tracking-widest   active:scale-95 transition-all"
                 >
                     <MessageCircle size={20} />
                     Destekle İletişime Geç
@@ -30,7 +30,7 @@ const Restricted = () => {
                 
                 <button 
                     onClick={() => window.location.reload()}
-                    className="flex items-center justify-center gap-4 w-full py-6 bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-[28px] text-slate-500 dark:text-slate-400 text-[11px] font-bold uppercase tracking-widest active:scale-95 transition-all "
+                    className="flex items-center justify-center gap-4 w-full py-6 bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-[28px] sm:rounded-[22px] text-slate-500 dark:text-slate-400 text-[11px] font-bold uppercase tracking-widest active:scale-95 transition-all "
                 >
                     Tekrar Dene
                 </button>

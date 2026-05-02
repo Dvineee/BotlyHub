@@ -167,6 +167,7 @@ const MyBots = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 pt-10 pb-32 animate-in fade-in transition-colors duration-300" onClick={() => setOpenSettingsId(null)}>
+      <div className="max-w-7xl mx-auto">
       <div className="flex items-center justify-between mb-8 px-1">
         <div className="flex items-center gap-4">
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Botlarım</h1>
@@ -330,6 +331,7 @@ const MyBots = () => {
               </div>
           </div>
       )}
+      </div>
     </div>
   );
 };

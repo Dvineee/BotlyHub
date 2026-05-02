@@ -649,6 +649,6 @@ html:not(.dark) .group:hover .lucide-chevron-right {
         display: flex;
     }
     .sm\:rounded-\[28px\] {
-        border-radius: 22px; 
+        border-radius: 22px;
     }
 }

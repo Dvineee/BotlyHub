@@ -80,7 +80,7 @@ const UserDetail = () => {
       <div className="px-6 space-y-10 max-w-lg mx-auto">
         
         {/* Action Button */}
-        <button className="w-full bg-brand dark:bg-brand-light hover:shadow-lg hover:shadow-brand/20 active:scale-95 transition-all text-white font-black py-6 rounded-[28px] flex items-center justify-center gap-4 uppercase text-[11px] tracking-[0.3em] border-b-8 border-brand-dark dark:border-brand-light/20 relative group overflow-hidden">
+        <button className="w-full bg-brand dark:bg-brand-light hover:shadow-lg hover:shadow-brand/20 active:scale-95 transition-all text-white font-black py-6 rounded-[28px] sm:rounded-[22px] flex items-center justify-center gap-4 uppercase text-[11px] tracking-[0.3em] border-b-8 border-brand-dark dark:border-brand-light/20 relative group overflow-hidden">
             <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
             <Bell size={20} className="relative z-10" />
             <span className="relative z-10">Bildirim Gönder</span>
@@ -88,7 +88,7 @@ const UserDetail = () => {
 
         {/* Tab Switcher */}
         <div>
-            <div className="bg-slate-100 dark:bg-slate-900/60 p-1.5 rounded-[28px] flex border border-black/5 dark:border-white/5 mb-6">
+            <div className="bg-slate-100 dark:bg-slate-900/60 p-1.5 rounded-[28px] sm:rounded-[22px] flex border border-black/5 dark:border-white/5 mb-6">
                 <button className="flex-1 py-4 text-[11px] font-black bg-white dark:bg-slate-800 rounded-[22px] text-slate-900 dark:text-white uppercase tracking-widest shadow-sm">Botlar</button>
                 <button className="flex-1 py-4 text-[11px] font-black text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-300 uppercase tracking-widest transition-colors">Kanallar</button>
             </div>

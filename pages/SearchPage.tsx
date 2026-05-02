@@ -194,13 +194,14 @@ const SearchPage = () => {
         description="BotlyHub üzerinde dilediğiniz Telegram botunu veya kanalını arayarak keşfedin."
     />
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 pt-10 pb-32 animate-in fade-in transition-colors duration-300">
-      {/* Header & Search Box */}
+      <div className="max-w-7xl mx-auto">
+        {/* Header & Search Box */}
       <div className="flex items-center gap-4 mb-8">
         <button onClick={() => navigate(-1)} className="w-12 h-12 flex items-center justify-center text-slate-500 dark:text-slate-400 active:scale-90 transition-transform shrink-0">
           <ChevronLeft size={22} />
         </button>
         <div className="relative flex-1">
-          <div className="relative flex items-center bg-white dark:bg-slate-900/40 backdrop-blur-2xl border border-black/5 dark:border-white/10 rounded-[28px] p-1.5  ring-2 ring-transparent focus-within:ring-blue-500/30 transition-all group">
+          <div className="relative flex items-center bg-white dark:bg-slate-900/40 backdrop-blur-2xl border border-black/5 dark:border-white/10 rounded-[28px] sm:rounded-[22px] p-1.5  ring-2 ring-transparent focus-within:ring-blue-500/30 transition-all group">
             <div className="ml-4 w-10 h-10 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-2xl text-slate-400 group-focus-within:text-blue-500 transition-colors">
               <SearchIcon size={20} />
             </div>
@@ -272,6 +273,7 @@ const SearchPage = () => {
                 <p className="text-slate-500 font-bold uppercase text-xs tracking-widest">Kriterlere uygun bot bulunamadı.</p>
             </div>
         )}
+      </div>
       </div>
     </div>
     </>

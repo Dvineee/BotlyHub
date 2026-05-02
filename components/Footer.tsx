@@ -14,7 +14,7 @@ const Footer: React.FC = () => {
       {/* Accordions */}
       <div className="w-full space-y-4 max-w-4xl mx-auto">
         {/* Accordion 1 */}
-        <div className="bg-white dark:bg-slate-900/60 rounded-[8px] border border-black/5 dark:border-white/5 overflow-hidden transition-all duration-300">
+        <div className="bg-white dark:bg-slate-900/60 rounded-2xl border border-black/5 dark:border-white/5 overflow-hidden transition-all duration-300">
           <button 
             onClick={() => { haptic('light'); setOpenAccordion(openAccordion === 'why' ? null : 'why'); }}
             className="w-full flex items-center justify-between p-[14px] text-left group"
@@ -45,7 +45,7 @@ const Footer: React.FC = () => {
         </div>
 
         {/* Accordion 2 */}
-        <div className="bg-white dark:bg-slate-900/60 rounded-[8px] border border-black/5 dark:border-white/5 overflow-hidden transition-all duration-300">
+        <div className="bg-white dark:bg-slate-900/60 rounded-2xl border border-black/5 dark:border-white/5 overflow-hidden transition-all duration-300">
           <button 
             onClick={() => { haptic('light'); setOpenAccordion(openAccordion === 'how' ? null : 'how'); }}
             className="w-full flex items-center justify-between p-[14px] text-left group"

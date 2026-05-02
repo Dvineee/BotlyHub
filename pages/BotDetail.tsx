@@ -6,7 +6,8 @@ import {
   Maximize2, ChevronRight, ChevronLeft, ChevronDown, Eye, Lock, Unlock, AlertTriangle, Edit3,
   Sparkles, Star, Download, Info, CheckCircle2, Globe, Cpu,
   Play, UserPlus, MessageSquare, BarChart3, MousePointer2,
-  Search, LayoutGrid, Store, User as UserIcon, Megaphone, Bell, Instagram, Youtube, Link, Flag
+  Search, LayoutGrid, Store, User as UserIcon, Megaphone, Bell, Instagram, Youtube, Link, Flag,
+  Sun, Moon, Wallet, Menu
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -296,11 +297,11 @@ const BotDetail = () => {
             </div>
 
             <div className="flex-1 max-w-2xl cursor-pointer" onClick={() => navigate('/search')}>
-                <div className="relative flex items-center bg-white dark:bg-slate-900/40 backdrop-blur-2xl border border-black/5 dark:border-white/10 rounded-[28px] p-1.5 transition-all active:scale-[0.98] group">
-                    <div className="ml-2 md:ml-4 w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-2xl text-slate-400 group-hover:text-blue-500 transition-colors">
-                        <Search size={18} />
+                <div className="relative flex items-center bg-white dark:bg-slate-900/40 backdrop-blur-2xl border border-black/5 dark:border-white/10 rounded-[28px] sm:rounded-[22px] p-1 md:p-1.5 transition-all active:scale-[0.98] group">
+                    <div className="ml-3 md:ml-4 w-10 h-10 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-2xl text-slate-400 group-hover:text-blue-500 transition-colors">
+                        <Search size={20} />
                     </div>
-                    <div className="w-full py-2 md:py-3 px-3 md:px-4 text-[10px] md:text-sm text-slate-400 font-bold uppercase tracking-widest opacity-60 truncate">
+                    <div className="w-full py-2.5 md:py-3 px-4 text-[13px] md:text-sm text-slate-400 font-bold uppercase tracking-widest opacity-60 truncate">
                         {t('search_placeholder')}
                     </div>
                 </div>
@@ -309,17 +310,19 @@ const BotDetail = () => {
             <div className="flex items-center gap-2 md:gap-3 shrink-0">
                 <button 
                     onClick={() => { haptic('light'); toggleTheme(); }} 
-                    className="hidden md:flex w-12 h-12 items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-900 dark:text-white active:scale-90 transition-transform"
+                    className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-2xl text-slate-500 dark:text-slate-400 active:scale-90 transition-all "
                 >
-                    <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path fillRule="evenodd" clipRule="evenodd" d="M12 2.20001C12.4418 2.20001 12.8 2.55818 12.8 3.00001V4.00001C12.8 4.44184 12.4418 4.80001 12 4.80001C11.5581 4.80001 11.2 4.44184 11.2 4.00001V3.00001C11.2 2.55818 11.5581 2.20001 12 2.20001ZM5.03427 5.03433C5.34668 4.72191 5.85322 4.72191 6.16564 5.03433L6.86564 5.73433C7.17806 6.04675 7.17806 6.55328 6.86564 6.8657C6.55322 7.17812 6.04669 7.17812 5.73427 6.8657L5.03427 6.1657C4.72185 5.85328 4.72185 5.34675 5.03427 5.03433ZM18.9656 5.03433C19.2781 5.34675 19.2781 5.85328 18.9656 6.1657L18.2656 6.8657C17.9532 7.17812 17.4467 7.17812 17.1343 6.8657C16.8218 6.55328 16.8218 6.04675 17.1343 5.73433L17.8343 5.03433C18.1467 4.72191 18.6532 4.72191 18.9656 5.03433ZM12 8.80001C10.2326 8.80001 8.79995 10.2327 8.79995 12C8.79995 13.7673 10.2326 15.2 12 15.2C13.7673 15.2 15.2 13.7673 15.2 12C15.2 10.2327 13.7673 8.80001 12 8.80001ZM7.19995 12C7.19995 9.34905 9.34898 7.20001 12 7.20001C14.6509 7.20001 16.8 9.34905 16.8 12C16.8 14.651 14.6509 16.8 12 16.8C9.34898 16.8 7.19995 14.651 7.19995 12ZM2.19995 12C2.19995 11.5582 2.55812 11.2 2.99995 11.2H3.99995C4.44178 11.2 4.79995 11.5582 4.79995 12C4.79995 12.4418 4.44178 12.8 3.99995 12.8H2.99995C2.55812 12.8 2.19995 12.4418 2.19995 12ZM19.2 12C19.2 11.5582 19.5581 11.2 20 11.2H21C21.4418 11.2 21.7999 11.5582 21.7999 12C21.7999 12.4418 21.4418 12.8 21 12.8H20C19.5581 12.8 19.2 12.4418 19.2 12ZM6.86564 17.1343C7.17806 17.4467 7.17806 17.9533 6.86564 18.2657L6.16564 18.9657C5.85322 19.2781 5.34668 19.2781 5.03427 18.9657C4.72185 18.6533 4.72185 18.1467 5.03427 17.8343L5.73427 17.1343C6.04669 16.8219 6.55322 16.8219 6.86564 17.1343ZM17.1343 17.1343C17.4467 16.8219 17.9532 16.8219 18.2656 17.1343L18.9656 17.8343C19.2781 18.1467 19.2781 18.6533 18.9656 18.9657C18.6532 19.2781 18.1467 19.2781 17.8343 18.9657L17.1343 18.2657C16.8218 17.9533 16.8218 17.4467 17.1343 17.1343ZM12 19.2C12.4418 19.2 12.8 19.5582 12.8 20V21C12.8 21.4418 12.4418 21.8 12 21.8C11.5581 21.8 11.2 21.4418 11.2 21V20C11.2 19.5582 11.5581 19.2 12 19.2Z " fill="currentColor"></path>
-                    </svg>
+                    {theme === 'dark' ? (
+                        <Sun size={20} />
+                    ) : (
+                        <Moon size={20} />
+                    )}
                 </button>
 
                 {DatabaseService.isAdminLoggedIn() && (
                     <button 
                         onClick={() => navigate(`/a/dashboard/bots`)}
-                        className="flex w-12 h-12 items-center justify-center bg-brand border border-brand/20 rounded-full text-white active:scale-90 transition-transform shadow-lg shadow-blue-500/20"
+                        className="flex w-10 h-10 md:w-12 md:h-12 items-center justify-center bg-brand border border-brand/20 rounded-2xl text-white active:scale-95 transition-transform shadow-lg shadow-blue-500/20"
                         title="Yönet"
                     >
                         <Edit3 size={18} />
@@ -328,19 +331,15 @@ const BotDetail = () => {
 
                 {user ? (
                     <>
-                        <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="hidden sm:flex w-10 h-10 md:w-12 md:h-12 items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-900 dark:text-white active:scale-90 transition-transform">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path fillRule="evenodd" clipRule="evenodd" d="M5.54845 3.77673C3.55195 3.77673 1.93347 5.39521 1.93347 7.39171V16.6083C1.93347 18.6048 3.55195 20.2233 5.54845 20.2233H18.4517C20.4482 20.2233 22.0667 18.6048 22.0667 16.6083V8.31337V7.39171C22.0667 5.39521 20.4482 3.77673 18.4517 3.77673H5.54845ZM3.63347 7.39171C3.63347 6.3341 4.49084 5.47673 5.54845 5.47673H18.4517C19.5093 5.47673 20.3667 6.3341 20.3667 7.39171V8.31337V8.38503H17.53C15.5335 8.38503 13.915 10.0035 13.915 12C13.915 13.9965 15.5335 15.615 17.53 15.615H20.3667V16.6083C20.3667 17.6659 19.5093 18.5233 18.4517 18.5233H5.54845C4.49084 18.5233 3.63347 17.6659 3.63347 16.6083V7.39171ZM20.3667 13.915V10.085H17.53C16.4724 10.085 15.615 10.9424 15.615 12C15.615 13.0576 16.4724 13.915 17.53 13.915H20.3667Z" fill="currentColor"/>
-                            </svg>
+                        <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="hidden sm:flex w-10 h-10 md:w-12 md:h-12 items-center justify-center bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-2xl text-slate-500 dark:text-slate-400 active:scale-90 transition-all">
+                            <Wallet size={20} />
                         </button>
                         <div className="relative" ref={menuRef}>
                             <button 
                               onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
-                              className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-900 dark:text-white active:scale-90 transition-transform relative"
+                              className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-2xl text-slate-500 dark:text-slate-400 active:scale-90 transition-all relative"
                             >
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M4 7H20M4 12H20M4 17H20" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                                </svg>
+                                <Menu size={20} className="md:w-[22px] md:h-[22px]" strokeWidth={2.5} />
                                 {unreadCount > 0 && (
                                     <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[8px] font-black text-white flex items-center justify-center px-1 badge-pop">
                                         {unreadCount > 9 ? '9+' : unreadCount}
@@ -367,20 +366,18 @@ const BotDetail = () => {
                         </div>
                     </>
                 ) : (
-                    <div className="flex items-center">
-                        <button 
-                            onClick={() => { haptic('light'); setIsLoginModalOpen(true); }}
-                            className="px-6 h-10 md:h-12 bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-900 dark:text-white text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-95"
-                        >
-                            Giriş Yap
-                        </button>
-                        <LoginModal 
-                            isOpen={isLoginModalOpen} 
-                            onClose={() => setIsLoginModalOpen(false)} 
-                            onAuth={(user) => setWebAuthUser(user)} 
-                        />
-                    </div>
+                    <button 
+                        onClick={() => { haptic('light'); setIsLoginModalOpen(true); }}
+                        className="px-6 h-10 md:h-12 bg-blue-500 hover:bg-blue-600 text-white text-[12px] md:text-[14px] font-bold rounded-[16px] md:rounded-[18px] transition-all active:scale-95 flex items-center justify-center whitespace-nowrap shadow-lg shadow-blue-500/25"
+                    >
+                        Giriş yap
+                    </button>
                 )}
+                <LoginModal 
+                    isOpen={isLoginModalOpen} 
+                    onClose={() => setIsLoginModalOpen(false)} 
+                    onAuth={(user) => setWebAuthUser(user)} 
+                />
             </div>
         </div>
 

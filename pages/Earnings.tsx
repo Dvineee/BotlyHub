@@ -105,14 +105,15 @@ const Earnings = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 pt-10 pb-32 flex flex-col transition-colors animate-in fade-in duration-300">
-        <div className="flex items-center gap-4 mb-10 px-1">
+        <div className="max-w-7xl mx-auto w-full">
+            <div className="flex items-center gap-4 mb-10 px-1">
             <div>
                 <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Finansal Özet</h1>
                 <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Finance Engine v3</p>
             </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900/40 p-1.5 rounded-[28px] flex mb-10 border border-black/5 dark:border-white/5 backdrop-blur-xl ">
+        <div className="bg-white dark:bg-slate-900/40 p-1.5 rounded-[28px] sm:rounded-[22px] flex mb-10 border border-black/5 dark:border-white/5 backdrop-blur-xl ">
             <button onClick={()=>setActiveTab('wallet')} className={`flex-1 py-3.5 rounded-[22px] text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab==='wallet'?'bg-brand dark:bg-brand-light text-white  ':'text-slate-500 hover:bg-black/5 dark:hover:bg-white/5'}`}>Cüzdan Yönetimi</button>
             <button onClick={()=>setActiveTab('revenue')} className={`flex-1 py-3.5 rounded-[22px] text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab==='revenue'?'bg-brand dark:bg-brand-light text-white  ':'text-slate-500 hover:bg-black/5 dark:hover:bg-white/5'}`}>Performans Analitiği</button>
         </div>
@@ -280,6 +281,7 @@ const Earnings = () => {
                 </div>
             )}
         </div>
+      </div>
     </div>
   );
 };

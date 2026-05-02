@@ -77,7 +77,8 @@ const ProfileSettings = () => {
 
   return (
     <div className="min-h-screen p-6 pt-10 pb-32 bg-slate-50 dark:bg-slate-950 transition-colors animate-in fade-in">
-         <div className="flex items-center justify-between mb-10 px-1">
+        <div className="max-w-7xl mx-auto">
+             <div className="flex items-center justify-between mb-10 px-1">
             <div>
                 <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter italic uppercase">Profil Ayarları</h1>
                 <p className="text-[10px] font-black text-brand dark:text-brand-light uppercase tracking-[0.3em] mt-1">CONFIG v4.2.0</p>
@@ -233,6 +234,7 @@ const ProfileSettings = () => {
             </div>
         )}
     </div>
+  </div>
   );
 };
 

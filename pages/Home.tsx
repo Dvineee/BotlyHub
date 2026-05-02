@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Search, ChevronLeft, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, Send, Instagram, Youtube, Link, CheckCircle2 } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, Send, Instagram, Youtube, Link, CheckCircle2, ChevronDown, Sun, Moon, Wallet, Menu } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Bot, Announcement, Notification } from '../types';
@@ -48,15 +48,11 @@ const getLangLabel = (lang: string) => {
 
 const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) => void }> = React.memo(({ ann, onShowPopup }) => {
   const navigate = useNavigate();
-  const colors: Record<string, string> = {
-    purple: 'from-purple-600/20 to-indigo-600/20 border-purple-500/30',
-    emerald: 'from-emerald-600/20 to-teal-600/20 border-emerald-500/30',
-    blue: 'from-blue-600/20 to-cyan-600/20 border-blue-500/30',
-    orange: 'from-orange-500/20 to-red-600/20 border-orange-500/30'
-  };
+  const { haptic } = useTelegram();
 
   const handleAction = async (e: React.MouseEvent) => {
     e.stopPropagation();
+    haptic('light');
     
     try {
         await DatabaseService.incrementPromotionClick(ann.id);
@@ -75,70 +71,59 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
     }
   };
 
-  const scheme = colors[ann.color_scheme] || colors.purple;
-
   return (
     <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-[calc(100vw-32px)] sm:w-[340px] h-32 rounded-[32px] relative overflow-hidden shrink-0 cursor-pointer group snap-center border bg-white dark:bg-slate-900 border-black/5 dark:border-white/5 flex items-stretch"
+        className="w-[calc(100vw-32px)] sm:w-[480px] h-[128px] rounded-[24px] relative bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 flex items-center p-3 gap-4 shrink-0 snap-center overflow-hidden cursor-pointer group"
         onClick={handleAction}
     >
-        {/* Left Side: Visual */}
-        <div className="w-28 h-full shrink-0 relative overflow-hidden border-r border-black/5 dark:border-white/5 bg-slate-100 dark:bg-slate-800">
-            {ann.bg_image_url ? (
-                <>
-                    <img src={ann.bg_image_url} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" referrerPolicy="no-referrer" />
-                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
-                </>
-            ) : (
-                <div className={`absolute inset-0 bg-gradient-to-br ${scheme.split(' ').slice(0, 2).join(' ')} opacity-60`}></div>
-            )}
-            
-            {ann.icon_name !== 'None' && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md border border-white/20 flex items-center justify-center text-white shadow-lg transform group-hover:scale-110 transition-transform">
-                        {React.createElement(iconMap[ann.icon_name] || Megaphone, { size: 22 })}
+        {/* Left Side: Thumbnail with decorative dots */}
+        <div className="w-[104px] h-[104px] rounded-[20px] overflow-hidden relative shrink-0 bg-slate-100 dark:bg-slate-800">
+            <img 
+                src={ann.bg_image_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(ann.title)}&background=random&color=fff`} 
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                referrerPolicy="no-referrer"
+                onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(ann.title)}&background=random&color=fff&size=256`; }}
+            />
+            {/* Decorative dots/bar at bottom of image matching the user screenshot */}
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1 z-10 scale-[0.8] opacity-80">
+                <div className="w-2 h-2 rounded-full bg-white/40"></div>
+                <div className="w-2 h-2 rounded-full bg-white"></div>
+                <div className="w-12 h-1 bg-white/20 rounded-full overflow-hidden relative">
+                    <div className="absolute left-0 top-0 h-full w-[85%] bg-sky-400"></div>
+                </div>
+            </div>
+            <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors"></div>
+        </div>
+        
+        {/* Right Side: Content */}
+        <div className="flex-1 min-w-0 pr-1 flex flex-col justify-start h-full py-0">
+            <div className="flex items-center justify-between mb-1.5 gap-2">
+                <div className="flex items-center gap-2 min-w-0">
+                    <h3 className="text-slate-900 dark:text-white font-bold text-[18px] tracking-tight truncate leading-tight">
+                        {ann.title}
+                    </h3>
+                    {/* Coral BOT badge with bullet and chevron */}
+                    <div className="flex items-center gap-1.5 px-1.5 py-0 rounded-md bg-[#ff7b63] shrink-0">
+                        <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></div>
+                        <span className="text-[9px] font-semibold text-white uppercase tracking-wider">BOT</span>
+                        <ChevronRight size={10} className="text-white" />
                     </div>
                 </div>
-            )}
-        </div>
-
-        {/* Right Side: Content */}
-        <div className="flex-1 p-4 flex flex-col justify-center min-w-0">
-            <div className="flex items-center gap-1.5 mb-2">
-                {ann.badge_text && ann.badge_text.toLowerCase() !== 'sponsorlu' && (
-                    <div className="px-2 py-0.5 rounded-full bg-blue-500/10 dark:bg-blue-400/10 border border-blue-500/20 dark:border-blue-400/20 flex items-center gap-1 scale-[0.8] origin-left">
-                        <Sparkles size={8} className="text-blue-500" />
-                        <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest leading-none">{ann.badge_text}</span>
-                    </div>
-                )}
-                {ann.tag && (
-                    <div className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-white/5 border border-black/5 dark:border-white/10 scale-[0.8] origin-left">
-                        <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest leading-none">{ann.tag}</span>
-                    </div>
-                )}
+                {/* Grey sponsor badge with megaphone */}
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-xl shrink-0 border border-black/5 dark:border-white/5">
+                    <Megaphone size={14} className="text-slate-900 dark:text-white fill-current" />
+                    <span className="text-[12px] font-extrabold text-slate-900 dark:text-white lowercase">sponsor</span>
+                </div>
             </div>
-
-            <h3 className="text-slate-900 dark:text-white font-extrabold text-sm mb-1 tracking-tight leading-tight line-clamp-1 truncate pr-2">
-                {ann.title}
-            </h3>
             
-            <p className="text-slate-500 dark:text-slate-400 text-[11px] leading-tight line-clamp-2 font-medium opacity-80">
+            <p className="text-slate-400 dark:text-slate-500 text-[13.5px] leading-[1.3] line-clamp-3 font-medium opacity-90">
                 {ann.description}
             </p>
         </div>
 
-        {/* Absolute Sponsored Badge */}
-        {ann.badge_text && ann.badge_text.toLowerCase() === 'sponsorlu' && (
-            <div className="absolute top-2 right-2 z-20 origin-right scale-[0.7]">
-                <div className="sponsored-badge flex items-center px-3 py-1 rounded-full shadow-lg">
-                    <span>{ann.badge_text}</span>
-                </div>
-            </div>
-        )}
-
-        {/* Gloss effect */}
+        {/* Gloss effect overlay */}
         <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
     </motion.div>
   );
@@ -324,7 +309,7 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonR
                 src={getLiveBotIcon(bot)} 
                 alt={bot.name} 
                 loading="lazy"
-                className="w-[4.4rem] h-[4.4rem] sm:w-[5.5rem] sm:h-[5.5rem] rounded-[22px] sm:rounded-[28px] object-cover bg-slate-200 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 group-hover:scale-105 transition-transform" 
+                className="w-[4.4rem] h-[4.4rem] sm:w-[5.5rem] sm:h-[5.5rem] rounded-[28px] sm:rounded-[22px] object-cover bg-slate-200 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 group-hover:scale-105 transition-transform" 
                 onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
             />
             {/* Removed Zap icon badge for paid bots */}
@@ -430,11 +415,233 @@ const AddProjectBanner: React.FC<{ className?: string }> = ({ className = "" }) 
             </div>
             
             <div className="relative z-10 self-start">
-                <div className="bg-[#f8fafc] text-[#0066ff] px-5 py-2 rounded-xl text-[12px] font-bold shadow-md group-hover:shadow-lg group-hover:bg-white transition-all">
+                <div className="bg-[#f8fafc] text-[#0066ff] px-5 py-2.5 rounded-2xl text-[12px] font-bold shadow-md group-hover:shadow-lg group-hover:bg-white transition-all active:scale-95">
                     Proje Ekle
                 </div>
             </div>
         </div>
+    );
+};
+
+const NavMenu = () => {
+    const { t } = useTranslation();
+    const navigate = useNavigate();
+    const { haptic } = useTelegram();
+    const [openMenu, setOpenMenu] = useState<string | null>(null);
+    const [mobileModal, setMobileModal] = useState<string | null>(null);
+    const menuRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+                setOpenMenu(null);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const botsCategories = categories.filter(c => c.id !== 'apps' && c.id !== 'all');
+    const appsCategories = categories.filter(c => c.id === 'apps');
+
+    const handleCategoryClick = (catId: string) => {
+        haptic('light');
+        navigate(`/search?category=${catId}`);
+        setOpenMenu(null);
+        setMobileModal(null);
+    };
+
+    return (
+        <>
+        <div className="sticky top-0 z-[80] bg-white dark:bg-slate-950/90 backdrop-blur-xl border-b border-[#f7f7f7] dark:border-white/5 w-full flex justify-center py-4" ref={menuRef}>
+            <div className="flex items-center gap-10 md:gap-14">
+                {/* Bots Dropdown */}
+                <div className="relative md:static">
+                    <button 
+                        onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('bots'); }}
+                        onClick={() => {
+                            if (window.innerWidth < 768) {
+                                haptic('light');
+                                setMobileModal('bots');
+                            } else {
+                                setOpenMenu(openMenu === 'bots' ? null : 'bots');
+                            }
+                        }}
+                        className="flex items-center gap-2 text-[14px] font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all py-2 grow-0"
+                    >
+                        Bots <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'bots' ? 'rotate-180' : ''}`} />
+                    </button>
+                    
+                    {/* Desktop Mega Menu for Bots */}
+                    <AnimatePresence>
+                        {openMenu === 'bots' && (
+                            <motion.div 
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.2 }}
+                                className="hidden md:block absolute left-0 right-0 top-full bg-white dark:bg-slate-950/95 backdrop-blur-xl border-b border-black/5 dark:border-white/10 shadow-2xl z-[100] py-10"
+                                onMouseLeave={() => setOpenMenu(null)}
+                            >
+                                <div className="max-w-7xl mx-auto px-6">
+                                    <div className="grid grid-cols-4 lg:grid-cols-5 gap-x-8 gap-y-6">
+                                        {botsCategories.map(cat => (
+                                            <button 
+                                                key={cat.id}
+                                                onClick={() => handleCategoryClick(cat.id)}
+                                                className="flex items-center gap-4 p-3 hover:bg-slate-50 dark:hover:bg-white/5 rounded-2xl transition-all group border border-transparent hover:border-black/5"
+                                            >
+                                                <div className="w-12 h-12 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-xl shrink-0 group-hover:scale-110 transition-transform">
+                                                    <cat.icon size={24} className="text-slate-500 dark:text-slate-400 group-hover:text-blue-500" />
+                                                </div>
+                                                <div className="flex flex-col items-start overflow-hidden">
+                                                    <span className="text-[12px] font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 group-hover:text-blue-500 transition-colors truncate w-full text-left">{t(cat.label)}</span>
+                                                    {cat.desc && <span className="text-[10px] text-slate-400 dark:text-slate-500 truncate w-full text-left font-medium">{t(cat.desc)}</span>}
+                                                </div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+
+                {/* Apps Dropdown */}
+                <div className="relative md:static">
+                    <button 
+                        onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('apps'); }}
+                        onClick={() => {
+                            if (window.innerWidth < 768) {
+                                haptic('light');
+                                setMobileModal('apps');
+                            } else {
+                                setOpenMenu(openMenu === 'apps' ? null : 'apps');
+                            }
+                        }}
+                        className="flex items-center gap-2 text-[14px] font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all py-2 grow-0"
+                    >
+                        Apps <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'apps' ? 'rotate-180' : ''}`} />
+                    </button>
+                    
+                    {/* Desktop Mega Menu for Apps */}
+                    <AnimatePresence>
+                        {openMenu === 'apps' && (
+                            <motion.div 
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.2 }}
+                                className="hidden md:block absolute left-0 right-0 top-full bg-white dark:bg-slate-950/95 backdrop-blur-xl border-b border-black/5 dark:border-white/10 shadow-2xl z-[100] py-10"
+                                onMouseLeave={() => setOpenMenu(null)}
+                            >
+                                <div className="max-w-7xl mx-auto px-6">
+                                    <div className="flex justify-center">
+                                        {appsCategories.length > 0 ? (
+                                            <div className="grid grid-cols-2 gap-8">
+                                                {appsCategories.map(cat => (
+                                                    <button 
+                                                        key={cat.id}
+                                                        onClick={() => handleCategoryClick(cat.id)}
+                                                        className="flex items-center gap-6 p-6 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[2.5rem] transition-all group border border-transparent hover:border-black/5 w-[320px]"
+                                                    >
+                                                        <div className="w-16 h-16 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-[1.5rem] shrink-0 group-hover:scale-110 transition-transform">
+                                                            <cat.icon size={32} className="text-slate-500 dark:text-slate-400 group-hover:text-blue-500" />
+                                                        </div>
+                                                        <div className="flex flex-col items-start text-left">
+                                                            <span className="text-base font-black uppercase tracking-widest text-slate-800 dark:text-slate-200 group-hover:text-blue-500 transition-colors">{t(cat.label)}</span>
+                                                            <span className="text-[11px] text-slate-400 dark:text-slate-500 font-bold uppercase mt-1">Platform Uygulamaları</span>
+                                                        </div>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <div className="py-10 text-center">
+                                                <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                    <Zap size={28} className="text-yellow-500" />
+                                                </div>
+                                                <p className="text-sm font-black text-slate-400 uppercase tracking-[0.3em]">{t('coming_soon') || 'Pek Yakında'}</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+
+                {/* Blog Link */}
+                <button 
+                    onClick={() => { haptic('light'); }}
+                    className="text-[14px] font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all py-2"
+                >
+                    Blog
+                </button>
+            </div>
+        </div>
+
+        {/* Mobile Modal for Categories */}
+        <AnimatePresence>
+            {mobileModal && (
+                <div className="fixed inset-0 z-[200] flex items-end justify-center p-0 md:hidden">
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setMobileModal(null)}
+                        className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"
+                    />
+                    <motion.div 
+                        initial={{ y: "100%" }}
+                        animate={{ y: 0 }}
+                        exit={{ y: "100%" }}
+                        transition={{ type: "spring", damping: 30, stiffness: 300 }}
+                        className="relative w-full bg-white dark:bg-slate-900 rounded-t-[40px] overflow-hidden pt-4 pb-12 px-6 border-t border-black/10 dark:border-white/10"
+                    >
+                        {/* Drag Handle */}
+                        <div className="w-12 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full mx-auto mb-8" />
+                        
+                        <div className="flex justify-between items-center mb-8 px-2">
+                            <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-widest uppercase italic">
+                                {mobileModal === 'bots' ? 'BOTS KATEGORİ' : 'APPS KATEGORİ'}
+                            </h3>
+                            <button onClick={() => setMobileModal(null)} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-500 active:scale-90">
+                                <X size={20} />
+                            </button>
+                        </div>
+                        
+                        <div className="space-y-2 max-h-[60vh] overflow-y-auto pr-1">
+                            {(mobileModal === 'bots' ? botsCategories : appsCategories).length > 0 ? (mobileModal === 'bots' ? botsCategories : appsCategories).map((cat) => (
+                                <button
+                                    key={cat.id}
+                                    onClick={() => handleCategoryClick(cat.id)}
+                                    className="w-full flex items-center gap-4 p-4 hover:bg-slate-50 dark:hover:bg-white/5 active:bg-slate-100 dark:active:bg-white/10 rounded-3xl transition-all border border-black/[0.03] dark:border-white/[0.03]"
+                                >
+                                    <div className="w-12 h-12 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-2xl shrink-0 shadow-sm">
+                                        <cat.icon size={22} className="text-slate-500 dark:text-slate-400 group-hover:text-blue-500" />
+                                    </div>
+                                    <div className="flex flex-col items-start">
+                                        <span className="text-sm font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+                                            {t(cat.label)}
+                                        </span>
+                                        {cat.desc && <span className="text-[10px] text-slate-400 dark:text-slate-600 font-bold uppercase tracking-tight line-clamp-1">{t(cat.desc)}</span>}
+                                    </div>
+                                    <ChevronRight size={16} className="ml-auto text-slate-300 dark:text-slate-700" />
+                                </button>
+                            )) : (
+                                <div className="py-20 text-center">
+                                    <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <Zap size={28} className="text-yellow-500" />
+                                    </div>
+                                    <p className="text-sm font-black text-slate-400 uppercase tracking-[0.3em]">{t('coming_soon') || 'Pek Yakında'}</p>
+                                </div>
+                            )}
+                        </div>
+                    </motion.div>
+                </div>
+            )}
+        </AnimatePresence>
+        </>
     );
 };
 
@@ -455,7 +662,6 @@ const Home = () => {
   const { activeFilter } = useFilter();
   
   const annScroll = useDraggableScroll();
-  const catScroll = useDraggableScroll();
 
   const filteredBots = useMemo(() => {
     let result = [...bots];
@@ -518,154 +724,126 @@ const Home = () => {
   }, [filteredBots]);
 
   return (
-    <>
-    <SEO 
-        title="Telegram Bot ve Kanalları - Keşfet, Tanıt ve Yönet" 
-        description="BotlyHub V3, Telegram ekosistemindeki en iyi botları ve kanalları bulabileceğiniz, kendi botlarınızı tanıtabileceğiniz ve yönetebileceğiniz kapsamlı bir platformdur."
-    />
-    <div className="p-4 pt-10 min-h-screen bg-slate-50 dark:bg-slate-950 pb-32 font-sans text-slate-900 dark:text-slate-200 animate-in transition-colors duration-300">
-        <div className="flex flex-wrap md:flex-nowrap items-center justify-between mb-8 px-1 gap-y-6 md:gap-x-6">
-        <div className="flex items-center gap-3 order-1">
-            <div className="shrink-0">
-                <Logo style={{ width: '2.5rem', height: 'auto', display: 'block' }} className="" />
-            </div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">BotlyHub</h1>
-        </div>
+    <div className="min-h-screen bg-white dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-200 animate-in transition-colors duration-300">
+      <SEO 
+          title="Telegram Bot ve Kanalları - Keşfet, Tanıt ve Yönet" 
+          description="BotlyHub V3, Telegram ekosistemindeki en iyi botları ve kanalları bulabileceğiniz, kendi botlarınızı tanıtabileceğiniz ve yönetebileceğiniz kapsamlı bir platformdur."
+      />
+      {/* Top Section */}
+      <div className="bg-[#00000008] dark:bg-slate-900/10 w-full pt-10 pb-4 shadow-[inset_0_-1px_0_0_rgba(0,0,0,0.03)]">
+          <div className="max-w-7xl mx-auto px-4">
+              <div className="flex flex-wrap md:flex-nowrap items-center justify-between mb-8 px-1 gap-y-6 md:gap-x-6">
+                  <div className="flex items-center gap-3 order-1">
+                      <div className="shrink-0">
+                          <Logo style={{ width: '2.5rem', height: 'auto', display: 'block' }} className="" />
+                      </div>
+                      <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">BotlyHub</h1>
+                  </div>
 
-        <div className="w-full md:w-auto md:flex-1 md:max-w-2xl order-3 md:order-2 flex items-center gap-3">
-            <div className="flex-1 cursor-pointer" onClick={() => navigate('/search')}>
-                <div className="relative flex items-center bg-white dark:bg-slate-900/40 backdrop-blur-2xl border border-black/5 dark:border-white/10 rounded-[28px] p-1.5 transition-all active:scale-[0.98] group">
-                    <div className="ml-4 w-10 h-10 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-2xl text-slate-400 group-hover:text-blue-500 transition-colors">
-                        <Search size={20} />
-                    </div>
-                    <div className="w-full py-3 px-4 text-sm text-slate-400 font-bold uppercase tracking-widest opacity-60">{t('search_placeholder')}</div>
-                </div>
-            </div>
-            <div className="shrink-0">
-                <FilterMenu />
-            </div>
-        </div>
+                  <div className="w-full md:w-auto md:flex-1 md:max-w-2xl order-3 md:order-2 flex items-center gap-2 md:gap-3">
+                      <div className="flex-1 cursor-pointer" onClick={() => navigate('/search')}>
+                          <div className="relative flex items-center bg-white dark:bg-slate-900/40 backdrop-blur-2xl border border-black/5 dark:border-white/10 rounded-[28px] sm:rounded-[22px] p-1 md:p-1.5 transition-all active:scale-[0.98] group">
+                              <div className="ml-3 md:ml-4 w-10 h-10 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-2xl text-slate-400 group-hover:text-blue-500 transition-colors">
+                                  <Search size={20} />
+                              </div>
+                              <div className="w-full py-2.5 md:py-3 px-4 text-[13px] md:text-sm text-slate-400 font-bold uppercase tracking-widest opacity-60 truncate">{t('search_placeholder')}</div>
+                          </div>
+                      </div>
+                      <div className="shrink-0">
+                          <FilterMenu />
+                      </div>
+                  </div>
 
-        <div className="flex items-center gap-3 order-2 md:order-3">
-            <button 
-                onClick={() => { haptic('light'); toggleTheme(); }} 
-                className="hidden md:flex w-12 h-12 items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-900 dark:text-white active:scale-90 transition-transform"
-            >
-                <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path fillRule="evenodd" clipRule="evenodd" d="M12 2.20001C12.4418 2.20001 12.8 2.55818 12.8 3.00001V4.00001C12.8 4.44184 12.4418 4.80001 12 4.80001C11.5581 4.80001 11.2 4.44184 11.2 4.00001V3.00001C11.2 2.55818 11.5581 2.20001 12 2.20001ZM5.03427 5.03433C5.34668 4.72191 5.85322 4.72191 6.16564 5.03433L6.86564 5.73433C7.17806 6.04675 7.17806 6.55328 6.86564 6.8657C6.55322 7.17812 6.04669 7.17812 5.73427 6.8657L5.03427 6.1657C4.72185 5.85328 4.72185 5.34675 5.03427 5.03433ZM18.9656 5.03433C19.2781 5.34675 19.2781 5.85328 18.9656 6.1657L18.2656 6.8657C17.9532 7.17812 17.4467 7.17812 17.1343 6.8657C16.8218 6.55328 16.8218 6.04675 17.1343 5.73433L17.8343 5.03433C18.1467 4.72191 18.6532 4.72191 18.9656 5.03433ZM12 8.80001C10.2326 8.80001 8.79995 10.2327 8.79995 12C8.79995 13.7673 10.2326 15.2 12 15.2C13.7673 15.2 15.2 13.7673 15.2 12C15.2 10.2327 13.7673 8.80001 12 8.80001ZM7.19995 12C7.19995 9.34905 9.34898 7.20001 12 7.20001C14.6509 7.20001 16.8 9.34905 16.8 12C16.8 14.651 14.6509 16.8 12 16.8C9.34898 16.8 7.19995 14.651 7.19995 12ZM2.19995 12C2.19995 11.5582 2.55812 11.2 2.99995 11.2H3.99995C4.44178 11.2 4.79995 11.5582 4.79995 12C4.79995 12.4418 4.44178 12.8 3.99995 12.8H2.99995C2.55812 12.8 2.19995 12.4418 2.19995 12ZM19.2 12C19.2 11.5582 19.5581 11.2 20 11.2H21C21.4418 11.2 21.7999 11.5582 21.7999 12C21.7999 12.4418 21.4418 12.8 21 12.8H20C19.5581 12.8 19.2 12.4418 19.2 12ZM6.86564 17.1343C7.17806 17.4467 7.17806 17.9533 6.86564 18.2657L6.16564 18.9657C5.85322 19.2781 5.34668 19.2781 5.03427 18.9657C4.72185 18.6533 4.72185 18.1467 5.03427 17.8343L5.73427 17.1343C6.04669 16.8219 6.55322 16.8219 6.86564 17.1343ZM17.1343 17.1343C17.4467 16.8219 17.9532 16.8219 18.2656 17.1343L18.9656 17.8343C19.2781 18.1467 19.2781 18.6533 18.9656 18.9657C18.6532 19.2781 18.1467 19.2781 17.8343 18.9657L17.1343 18.2657C16.8218 17.9533 16.8218 17.4467 17.1343 17.1343ZM12 19.2C12.4418 19.2 12.8 19.5582 12.8 20V21C12.8 21.4418 12.4418 21.8 12 21.8C11.5581 21.8 11.2 21.4418 11.2 21V20C11.2 19.5582 11.5581 19.2 12 19.2Z " fill="currentColor"></path>
-                </svg>
-            </button>
+                  <div className="flex items-center gap-2 md:gap-3 order-2 md:order-3">
+                      <button 
+                          onClick={() => { haptic('light'); toggleTheme(); }} 
+                          className="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-900 dark:text-white active:scale-95 transition-transform"
+                      >
+                          {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+                      </button>
 
-            {user ? (
-                <>
-                    <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-900 dark:text-white active:scale-90 transition-transform">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path fillRule="evenodd" clipRule="evenodd" d="M5.54845 3.77673C3.55195 3.77673 1.93347 5.39521 1.93347 7.39171V16.6083C1.93347 18.6048 3.55195 20.2233 5.54845 20.2233H18.4517C20.4482 20.2233 22.0667 18.6048 22.0667 16.6083V8.31337V7.39171C22.0667 5.39521 20.4482 3.77673 18.4517 3.77673H5.54845ZM3.63347 7.39171C3.63347 6.3341 4.49084 5.47673 5.54845 5.47673H18.4517C19.5093 5.47673 20.3667 6.3341 20.3667 7.39171V8.31337V8.38503H17.53C15.5335 8.38503 13.915 10.0035 13.915 12C13.915 13.9965 15.5335 15.615 17.53 15.615H20.3667V16.6083C20.3667 17.6659 19.5093 18.5233 18.4517 18.5233H5.54845C4.49084 18.5233 3.63347 17.6659 3.63347 16.6083V7.39171ZM20.3667 13.915V10.085H17.53C16.4724 10.085 15.615 10.9424 15.615 12C15.615 13.0576 16.4724 13.915 17.53 13.915H20.3667Z" fill="currentColor"/>
-                        </svg>
-                    </button>
-                    <div className="relative" ref={menuRef}>
-                        <button 
-                          onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
-                          className="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-900 dark:text-white active:scale-90 transition-transform relative"
-                        >
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M4 7H20M4 12H20M4 17H20" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                            {unreadCount > 0 && (
-                                <div className="absolute -top-1 -right-1 min-w-[20px] h-[20px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[9px] font-black text-white flex items-center justify-center px-1 badge-pop">
-                                    {unreadCount > 9 ? '9+' : unreadCount}
-                                </div>
-                            )}
-                        </button>
-                        {isMenuOpen && (
-                            <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-[32px] overflow-hidden z-[100] animate-in py-2 backdrop-blur-2xl">
-                                {[
-                                    { path: '/', icon: Store, color: 'text-blue-500 dark:text-blue-400', label: 'market' },
-                                    { path: '/settings', icon: User, color: 'text-purple-500 dark:text-purple-400', label: 'profile' },
-                                    { path: '/my-bots', icon: BotIcon, color: 'text-emerald-500 dark:text-emerald-400', label: 'my_bots' },
-                                    { path: '/channels', icon: Megaphone, color: 'text-orange-500 dark:text-orange-400', label: 'my_channels' },
-                                    { path: '/notifications', icon: Bell, color: 'text-blue-600 dark:text-blue-500', label: 'notifications', badge: unreadCount > 0 }
-                                ].map((item, i) => (
-                                    <button key={i} onClick={() => { navigate(item.path); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-black/5 dark:hover:bg-white/5 text-left border-b border-black/5 dark:border-white/5 last:border-0 relative">
-                                        <item.icon size={18} className={item.color} /> 
-                                        <span className="text-[11px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300">{t(item.label)}</span>
-                                        {item.badge && <div className="absolute right-6 w-2.5 h-2.5 bg-red-600 rounded-full"></div>}
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                </>
-            ) : (
-                <div className="flex items-center">
-                    <button 
-                        onClick={() => { haptic('light'); setIsLoginModalOpen(true); }}
-                        className="px-6 h-12 bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-900 dark:text-white text-[11px] font-black uppercase tracking-[0.2em] hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-95"
-                    >
-                        Giriş Yap
-                    </button>
-                    <LoginModal 
-                        isOpen={isLoginModalOpen} 
-                        onClose={() => setIsLoginModalOpen(false)} 
-                        onAuth={(user) => setWebAuthUser(user)} 
-                    />
-                </div>
-            )}
-        </div>
+                      {user ? (
+                          <>
+                              <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="hidden sm:flex w-12 h-12 items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-900 dark:text-white active:scale-95 transition-transform">
+                                  <Wallet size={20} />
+                              </button>
+                              <div className="relative" ref={menuRef}>
+                                  <button 
+                                    onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
+                                    className="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-900 dark:text-white active:scale-95 transition-transform relative"
+                                  >
+                                      <Menu size={22} strokeWidth={2.5} />
+                                      {unreadCount > 0 && (
+                                          <div className="absolute -top-1 -right-1 min-w-[20px] h-[20px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[9px] font-black text-white flex items-center justify-center px-1 badge-pop">
+                                              {unreadCount > 9 ? '9+' : unreadCount}
+                                          </div>
+                                      )}
+                                  </button>
+                                  {isMenuOpen && (
+                                      <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-[32px] overflow-hidden z-[100] animate-in py-2 backdrop-blur-2xl">
+                                          {[
+                                              { path: '/', icon: Store, color: 'text-blue-500 dark:text-blue-400', label: 'market' },
+                                              { path: '/settings', icon: User, color: 'text-purple-500 dark:text-purple-400', label: 'profile' },
+                                              { path: '/my-bots', icon: BotIcon, color: 'text-emerald-500 dark:text-emerald-400', label: 'my_bots' },
+                                              { path: '/channels', icon: Megaphone, color: 'text-orange-500 dark:text-orange-400', label: 'my_channels' },
+                                              { path: '/notifications', icon: Bell, color: 'text-blue-600 dark:text-blue-500', label: 'notifications', badge: unreadCount > 0 }
+                                          ].map((item, i) => (
+                                              <button key={i} onClick={() => { navigate(item.path); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-black/5 dark:hover:bg-white/5 text-left border-b border-black/5 dark:border-white/5 last:border-0 relative">
+                                                  <item.icon size={18} className={item.color} /> 
+                                                  <span className="text-[11px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300">{t(item.label)}</span>
+                                                  {item.badge && <div className="absolute right-6 w-2.5 h-2.5 bg-red-600 rounded-full"></div>}
+                                              </button>
+                                          ))}
+                                      </div>
+                                  )}
+                              </div>
+                          </>
+                      ) : (
+                          <button 
+                              onClick={() => { haptic('light'); setIsLoginModalOpen(true); }}
+                              className="px-6 md:px-8 h-12 bg-blue-500 hover:bg-blue-600 text-white text-[14px] md:text-[15px] font-bold rounded-[16px] md:rounded-[18px] transition-all active:scale-95 flex items-center justify-center whitespace-nowrap shadow-lg shadow-blue-500/25"
+                          >
+                              Giriş yap
+                          </button>
+                      )}
+                      <LoginModal 
+                          isOpen={isLoginModalOpen} 
+                          onClose={() => setIsLoginModalOpen(false)} 
+                          onAuth={(user) => setWebAuthUser(user)} 
+                      />
+                  </div>
+              </div>
+          </div>
       </div>
+      {!isLoading && <NavMenu />}
 
       {isLoading ? (
           <div className="flex flex-col items-center justify-center py-24 gap-4"><Loader2 className="animate-spin text-blue-500" size={32} /></div>
       ) : (
           <>
             {announcements.length > 0 && (
-                <div className="mb-10 flex flex-col sm:flex-row justify-center gap-4">
-                    <div className="w-full sm:w-[340px] shrink-0">
+                <div className="mb-10 flex flex-col lg:flex-row justify-center gap-6 mt-6">
+                    <div className="w-full lg:w-[480px] shrink-0">
                         <AnnouncementsCarousel 
                             announcements={announcements} 
                             scroll={annScroll} 
                             onShowPopup={(a) => setSelectedAnn(a)} 
                         />
                     </div>
-                    {/* PC & Tablet: Show banner next to announcement */}
-                    <AddProjectBanner className="hidden sm:flex sm:w-[340px] shrink-0" />
+                    {/* PC & Tablet: Show banner next to announcement on larger screens */}
+                    <AddProjectBanner className="hidden lg:flex lg:w-[480px] shrink-0 h-[128px]" />
                 </div>
             )}
 
-            <div className="mb-10">
-                <div 
-                    ref={catScroll.ref}
-                    onMouseDown={catScroll.onMouseDown}
-                    onMouseUp={catScroll.onMouseUp}
-                    onMouseMove={catScroll.onMouseMove}
-                    onMouseLeave={catScroll.onMouseLeave}
-                    onContextMenu={catScroll.onContextMenu}
-                    className={`flex gap-3 overflow-x-auto no-scrollbar -mx-4 px-4 pb-2 snap-x transform-gpu ${catScroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
-                >
-                    {categories.map((cat) => (
-                        <motion.button 
-                            key={cat.id} 
-                            whileHover="hover"
-                            onClick={() => { haptic('light'); navigate(`/search?category=${cat.id}`); }}
-                            className="flex items-center gap-3 px-4 py-3 rounded-2xl border bg-white dark:bg-slate-900/60 border-black/5 dark:border-white/5 text-slate-900 dark:text-white hover:border-purple-500/30 transition-all active:scale-95 whitespace-nowrap snap-center"
-                        >
-                            <motion.div
-                                variants={{
-                                    hover: { 
-                                        scale: 1.1,
-                                    }
-                                }}
-                                transition={{ duration: 0.2 }}
-                            >
-                                <cat.icon size={18} className="text-[#a5afc3]" />
-                            </motion.div>
-                            <span className="text-[11px] font-bold uppercase tracking-wider">{t(cat.label)}</span>
-                        </motion.button>
-                    ))}
-                </div>
-            </div>
+            </>
+        )}
 
-            <FeaturedBotsSlider bots={bots} />
+      {/* Bottom Section */}
+      <div className="bg-white dark:bg-slate-950 w-full pt-10 pb-32 shadow-[0_-1px_0_0_rgba(0,0,0,0.015)]">
+          <div className="max-w-7xl mx-auto px-4">
+              {!isLoading && (
+                  <>
+                      <FeaturedBotsSlider bots={bots} />
 
             <AnimatePresence mode="wait">
                 <motion.div 
@@ -749,9 +927,10 @@ const Home = () => {
                 </div>
             </div>
           </>
-      )}
+        )}
+        </div>
+      </div>
 
-      {/* Enhanced Announcement Popup */}
       <AnimatePresence>
         {selectedAnn && (
           <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-xl" onClick={() => setSelectedAnn(null)}>
@@ -762,7 +941,6 @@ const Home = () => {
               className="bg-white dark:bg-slate-900 border border-black/10 dark:border-white/10 w-full max-w-sm rounded-[44px] overflow-hidden relative" 
               onClick={e => e.stopPropagation()}
             >
-                {/* Header/Cover Section */}
                 <div className="relative h-44 overflow-hidden">
                     {selectedAnn.bg_image_url ? (
                         <>
@@ -780,7 +958,6 @@ const Home = () => {
                         </div>
                     )}
                     
-                    {/* Close Button UI */}
                     <button 
                         onClick={() => setSelectedAnn(null)} 
                         className="absolute top-6 right-6 p-2.5 bg-black/20 backdrop-blur-md rounded-2xl text-white/80 hover:bg-black/40 hover:text-white transition-all active:scale-90"
@@ -788,7 +965,6 @@ const Home = () => {
                         <X size={18} />
                     </button>
 
-                    {/* Badge UI */}
                     <div className="absolute bottom-6 left-8 flex items-center gap-2">
                         {selectedAnn.badge_text && (
                             selectedAnn.badge_text.toLowerCase() === 'sponsorlu' ? (
@@ -856,7 +1032,6 @@ const Home = () => {
         )}
       </AnimatePresence>
     </div>
-    </>
   );
 };
 
@@ -879,7 +1054,7 @@ const AnnouncementsCarousel: React.FC<{
                         const next = (current + 1) % announcements.length;
                         if (scroll.ref.current) {
                             const containerWidth = scroll.ref.current.offsetWidth;
-                            const cardWidth = window.innerWidth < 640 ? containerWidth - 32 : 340;
+                            const cardWidth = window.innerWidth < 1024 ? containerWidth - 32 : 480;
                             const gap = 16;
                             const scrollLeft = next * (cardWidth + gap);
                             scroll.ref.current.scrollTo({ left: scrollLeft, behavior: 'smooth' });
@@ -898,7 +1073,7 @@ const AnnouncementsCarousel: React.FC<{
     const handleScroll = useCallback(() => {
         if (scroll.ref.current) {
             const containerWidth = scroll.ref.current.offsetWidth;
-            const cardWidth = window.innerWidth < 640 ? containerWidth - 32 : 340;
+            const cardWidth = window.innerWidth < 1024 ? containerWidth - 32 : 480;
             const gap = 16;
             const index = Math.round(scroll.ref.current.scrollLeft / (cardWidth + gap));
             if (index !== currentIndex) {

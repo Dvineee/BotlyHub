@@ -167,7 +167,7 @@ const AccountSettings = () => {
                           <p className="text-[10px] text-slate-400 dark:text-slate-600 font-black uppercase tracking-widest leading-relaxed mb-8">Pro hesabınız ile tüm yönetim araçlarına <br/>erişiminiz sağlandı.</p>
                           <button 
                             onClick={() => navigate('/settings')}
-                            className="w-full h-18 bg-slate-900 dark:bg-slate-950 hover:opacity-90 text-white font-black rounded-[28px] text-[11px] uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-3 active:scale-95 border border-black/5 dark:border-white/10  "
+                            className="w-full h-18 bg-slate-900 dark:bg-slate-950 hover:opacity-90 text-white font-black rounded-[28px] sm:rounded-[22px] text-[11px] uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-3 active:scale-95 border border-black/5 dark:border-white/10  "
                           >
                             AYARLARA DÖN <ArrowRight size={18}/>
                           </button>
