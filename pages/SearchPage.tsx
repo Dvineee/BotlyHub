@@ -213,12 +213,14 @@ const SearchPage = () => {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 pt-6 md:pt-10 pb-32 animate-in fade-in transition-colors duration-300">
       <div className="max-w-7xl mx-auto">
         {/* Header & Search Box */}
-      <div className="flex flex-wrap items-center gap-3 md:gap-4 mb-8">
-        <button onClick={() => navigate(-1)} className="order-1 w-10 h-10 flex items-center justify-center text-slate-500 dark:text-slate-400 active:scale-90 transition-transform shrink-0">
-          <ChevronLeft size={22} />
-        </button>
+      <div className="flex flex-wrap md:flex-nowrap items-center gap-3 md:gap-4 mb-8 justify-between">
+        <div className="order-1 md:w-48 shrink-0 flex items-center">
+          <button onClick={() => navigate(-1)} className="w-10 h-10 flex items-center justify-center text-slate-500 dark:text-slate-400 active:scale-90 transition-transform shrink-0">
+            <ChevronLeft size={22} />
+          </button>
+        </div>
 
-        <div className="order-2 md:order-3 flex ml-auto items-center gap-3">
+        <div className="order-2 md:order-3 flex ml-auto items-center gap-3 md:w-48 justify-end shrink-0">
             <button 
                 onClick={() => { haptic('light'); toggleTheme(); }} 
                 className="w-10 h-10 flex items-center justify-center text-slate-900 dark:text-white active:scale-95 transition-transform"
@@ -272,7 +274,7 @@ const SearchPage = () => {
             )}
         </div>
 
-        <div className="order-3 md:order-2 w-full md:flex-1 flex items-center gap-3">
+        <div className="order-3 md:order-2 w-full md:flex-1 md:max-w-4xl flex items-center gap-3">
           <div className="relative flex-1">
             <div className="relative flex items-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl p-0.5 md:p-1 ring-2 ring-transparent focus-within:ring-blue-500/30 transition-all group">
               <div className="ml-2 md:ml-3 w-8 h-8 flex items-center justify-center text-slate-400 group-focus-within:text-blue-500 transition-colors">

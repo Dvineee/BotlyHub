@@ -385,7 +385,7 @@ svg.lucide.lucide-chevron-right:focus {
 }
 
 .mt-8 {
-    margin-top: 0.5rem;
+    margin-top: 1rem;
 }
 
 .mb-10 {
@@ -393,7 +393,7 @@ svg.lucide.lucide-chevron-right:focus {
 }
 
 .pt-10 {
-    padding-top: 1.5rem;
+    padding-top: 1.1rem;
 }
 
 .bg-slate-50 {
@@ -687,4 +687,8 @@ html:not(.dark) .group:hover .lucide-chevron-right {
     .sm\:rounded-\[28px\] {
         border-radius: 22px;
     }
+}
+
+.pb-4 {
+    padding-bottom: 0rem !important;
 }

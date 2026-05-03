@@ -75,7 +75,7 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
     <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-[calc(100vw-32px)] sm:w-[480px] h-[128px] rounded-[32px] relative bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 flex items-center p-3 gap-4 shrink-0 snap-center overflow-hidden cursor-pointer group promo-card"
+        className="w-[calc(100vw-48px)] sm:w-full h-[128px] rounded-[32px] relative bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 flex items-center p-3 gap-4 shrink-0 snap-center overflow-hidden cursor-pointer group promo-card"
         onClick={handleAction}
     >
         {/* Left Side: Thumbnail with decorative dots */}
@@ -473,16 +473,18 @@ const NavMenu = ({
     return (
         <>
         <div className="sticky top-0 z-[80] bg-white dark:bg-slate-950/90 backdrop-blur-xl border-b border-[#f7f7f7] dark:border-white/5 w-full py-2.5 md:py-4 transition-all" ref={internalMenuRef}>
-            <div className={`max-w-7xl mx-auto px-4 flex items-center ${isScrolled ? 'md:justify-between justify-center' : 'justify-center'}`}>
+            <div className="max-w-7xl mx-auto px-4 flex items-center justify-center md:justify-between">
                 {/* Logo shown only when scrolled (optional, but makes it a real header) */}
-                {isScrolled && (
-                    <div className="hidden md:flex items-center gap-3 shrink-0 cursor-pointer" onClick={() => navigate('/')}>
+                {isScrolled ? (
+                    <div className="hidden md:flex items-center gap-3 w-48 shrink-0 cursor-pointer" onClick={() => navigate('/')}>
                         <Logo style={{ width: '1.8rem', height: 'auto' }} />
                         <span className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">BotlyHub</span>
                     </div>
+                ) : (
+                    <div className="hidden md:block w-48 shrink-0"></div>
                 )}
 
-                <div className={`flex items-center gap-8 md:gap-14 ${isScrolled ? 'md:mx-0 mx-auto' : 'mx-auto'}`}>
+                <div className="flex items-center gap-8 md:gap-14 mx-auto">
                 {/* Bots Dropdown */}
                 <div className="relative md:static">
                     <button 
@@ -608,14 +610,15 @@ const NavMenu = ({
             </div>
 
             {/* Profile buttons on the right when scrolled - Hidden on mobile as per user's "tablet and larger" requirement */}
-            <AnimatePresence>
-                {isScrolled && (
-                    <motion.div 
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 20 }}
-                        className="hidden md:flex items-center gap-2 md:gap-3"
-                    >
+            <div className="hidden md:flex items-center justify-end w-48 shrink-0">
+                <AnimatePresence>
+                    {isScrolled && (
+                        <motion.div 
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 20 }}
+                            className="flex items-center gap-2 md:gap-3"
+                        >
                         <button 
                             onClick={() => { haptic('light'); toggleTheme(); }} 
                             className="w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl text-slate-900 dark:text-white active:scale-95 transition-transform"
@@ -670,7 +673,7 @@ const NavMenu = ({
                     </motion.div>
                 )}
             </AnimatePresence>
-        </div></div>
+        </div></div></div>
 
         {/* Mobile Modal for Categories */}
         <AnimatePresence>
@@ -844,14 +847,14 @@ const Home = () => {
       <div className="bg-[#00000008] dark:bg-slate-900/10 w-full pt-6 md:pt-10 pb-4 shadow-[inset_0_-1px_0_0_rgba(0,0,0,0.03)]">
           <div className="max-w-7xl mx-auto px-4">
               <div className="flex flex-wrap md:flex-nowrap items-center justify-between mb-8 px-1 gap-y-6 md:gap-x-6">
-                  <div className="flex items-center gap-3 order-1">
+                  <div className="flex items-center gap-3 order-1 md:w-48 shrink-0">
                       <div className="shrink-0">
                           <Logo style={{ width: '2.5rem', height: 'auto', display: 'block' }} className="" />
                       </div>
                       <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">BotlyHub</h1>
                   </div>
 
-                  <div className="w-full md:w-auto md:flex-1 md:max-w-2xl order-3 md:order-2 flex items-center gap-2 md:gap-3">
+                  <div className="w-full md:flex-1 md:max-w-2xl order-3 md:order-2 flex items-center gap-2 md:gap-3">
                       <div className="flex-1 cursor-pointer" onClick={() => navigate('/search')}>
                           <div className="relative flex items-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl p-0.5 md:p-1 transition-all active:scale-[0.98] group">
                               <div className="ml-2 md:ml-3 w-8 h-8 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
@@ -865,7 +868,7 @@ const Home = () => {
                       </div>
                   </div>
 
-                  <div className="flex items-center gap-2 md:gap-3 order-2 md:order-3">
+                  <div className="flex items-center gap-2 md:gap-3 order-2 md:order-3 md:w-48 justify-end ml-auto shrink-0">
                       <button 
                           onClick={() => { haptic('light'); toggleTheme(); }} 
                           className="w-10 h-10 flex items-center justify-center text-slate-900 dark:text-white active:scale-95 transition-transform"
@@ -949,7 +952,7 @@ const Home = () => {
           <>
             {announcements.length > 0 && (
                 <div className="mb-10 flex flex-col lg:flex-row justify-center items-center gap-6 mt-8 max-w-7xl mx-auto px-4 w-full">
-                    <div className="w-full lg:w-[480px] shrink-0 h-[128px]">
+                    <div className="w-full sm:max-w-[480px] lg:w-[480px] shrink-0 h-[128px] overflow-hidden">
                         <AnnouncementsCarousel 
                             announcements={announcements} 
                             scroll={annScroll} 
@@ -1064,7 +1067,7 @@ const Home = () => {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-white dark:bg-slate-900 border border-black/10 dark:border-white/10 w-full max-w-sm rounded-[44px] overflow-hidden relative" 
+              className="bg-white dark:bg-slate-900 border border-black/10 dark:border-white/10 w-[min(calc(100vw-32px),384px)] rounded-[44px] overflow-hidden relative" 
               onClick={e => e.stopPropagation()}
             >
                 <div className="relative h-44 overflow-hidden">
@@ -1180,7 +1183,8 @@ const AnnouncementsCarousel: React.FC<{
                         const next = (current + 1) % announcements.length;
                         if (scroll.ref.current) {
                             const containerWidth = scroll.ref.current.offsetWidth;
-                            const cardWidth = window.innerWidth < 1024 ? containerWidth - 32 : 480;
+                            const firstCard = scroll.ref.current.firstElementChild as HTMLElement;
+                            const cardWidth = firstCard?.offsetWidth || containerWidth;
                             const gap = 16;
                             const scrollLeft = next * (cardWidth + gap);
                             scroll.ref.current.scrollTo({ left: scrollLeft, behavior: 'smooth' });
@@ -1199,7 +1203,8 @@ const AnnouncementsCarousel: React.FC<{
     const handleScroll = useCallback(() => {
         if (scroll.ref.current) {
             const containerWidth = scroll.ref.current.offsetWidth;
-            const cardWidth = window.innerWidth < 1024 ? containerWidth - 32 : 480;
+            const firstCard = scroll.ref.current.firstElementChild as HTMLElement;
+            const cardWidth = firstCard?.offsetWidth || containerWidth;
             const gap = 16;
             const index = Math.round(scroll.ref.current.scrollLeft / (cardWidth + gap));
             if (index !== currentIndex) {
@@ -1242,7 +1247,7 @@ const AnnouncementsCarousel: React.FC<{
                 onMouseMove={scroll.onMouseMove}
                 onMouseLeave={scroll.onMouseLeave}
                 onContextMenu={scroll.onContextMenu}
-                className={`flex gap-4 overflow-x-auto no-scrollbar sm:mx-0 sm:px-0 -mx-4 px-4 h-full snap-x snap-mandatory ${announcements.length === 1 ? 'justify-center' : 'justify-start'} ${scroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+                className={`flex gap-4 overflow-x-auto no-scrollbar h-full snap-x snap-mandatory ${announcements.length === 1 ? 'justify-center' : 'justify-start'} ${scroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
             >
                 {announcements.map(ann => <PromoCard key={ann.id} ann={ann} onShowPopup={onShowPopup} />)}
             </div>
