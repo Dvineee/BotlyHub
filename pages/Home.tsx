@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Search, ChevronLeft, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, Send, Instagram, Youtube, Link, CheckCircle2, ChevronDown, Sun, Moon, Wallet, Menu } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, Send, Instagram, Youtube, Link, CheckCircle2, ChevronDown, Sun, Moon, Wallet, Menu, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Bot, Announcement, Notification } from '../types';
@@ -75,7 +75,7 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
     <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-[calc(100vw-32px)] sm:w-[480px] h-[128px] rounded-[24px] relative bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 flex items-center p-3 gap-4 shrink-0 snap-center overflow-hidden cursor-pointer group"
+        className="w-[calc(100vw-32px)] sm:w-[480px] h-[128px] rounded-[32px] relative bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 flex items-center p-3 gap-4 shrink-0 snap-center overflow-hidden cursor-pointer group promo-card"
         onClick={handleAction}
     >
         {/* Left Side: Thumbnail with decorative dots */}
@@ -190,7 +190,7 @@ const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = React.memo(({ bots }) => {
     if (bots.length === 0) return null;
 
     return (
-        <div className="mb-10 flex flex-col md:flex-row items-center !gap-[0.3rem] bg-[#ffffff] dark:bg-[#1e293b] px-4 md:px-[10px] !pt-[0.3rem] !pb-0 -mx-4 md:mx-0 rounded-none md:rounded-lg border-y md:border border-black/5 dark:border-white/5 relative overflow-hidden group !shadow-none">
+        <div className="mb-6 md:mb-10 flex flex-col md:flex-row items-center !gap-[0.3rem] bg-[#ffffff] dark:bg-[#1e293b] px-4 md:px-[10px] !pt-[0.3rem] !pb-0 -mx-4 md:mx-0 rounded-none md:rounded-lg border-y md:border border-black/5 dark:border-white/5 relative overflow-hidden group !shadow-none">
             {/* Header Info */}
             <div className="flex flex-col shrink-0 min-w-full md:min-w-[180px] md:border-r border-black/5 dark:border-white/5 md:pr-6 h-full justify-center">
                 <div 
@@ -303,13 +303,13 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonR
   const prices = useMemo(() => PriceService.convert(bot.price, tonRate), [bot.price, tonRate]);
   
   return (
-    <div onClick={() => navigate(`/bot/${bot.id}`)} className="flex items-center p-4 sm:p-6 bot-card cursor-pointer group bg-white dark:bg-transparent hover:bg-slate-100 dark:hover:bg-slate-900/60 rounded-[32px] transition-all border border-black/5 dark:border-transparent hover:border-slate-200 dark:hover:border-slate-800/50 active:bg-slate-200 dark:active:bg-slate-900 transform-gpu">
+    <div onClick={() => navigate(`/bot/${bot.id}`)} className="flex items-center p-3 sm:p-6 bot-card cursor-pointer group bg-white dark:bg-transparent hover:bg-slate-100 dark:hover:bg-slate-900/60 rounded-[32px] transition-all border border-black/5 dark:border-transparent hover:border-slate-200 dark:hover:border-slate-800/50 active:bg-slate-200 dark:active:bg-slate-900 transform-gpu">
         <div className="relative shrink-0">
             <img 
                 src={getLiveBotIcon(bot)} 
                 alt={bot.name} 
                 loading="lazy"
-                className="w-[4.4rem] h-[4.4rem] sm:w-[5.5rem] sm:h-[5.5rem] rounded-[28px] sm:rounded-[22px] object-cover bg-slate-200 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 group-hover:scale-105 transition-transform" 
+                className="w-[3.8rem] h-[3.8rem] sm:w-[4.4rem] sm:h-[4.4rem] rounded-[22px] sm:rounded-[22px] object-cover bg-slate-200 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 group-hover:scale-105 transition-transform" 
                 onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
             />
             {/* Removed Zap icon badge for paid bots */}
@@ -326,9 +326,7 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonR
             </h3>
             <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider truncate mb-2">{bot.description}</p>
             <div className="flex items-center gap-3">
-                {bot.price === 0 ? (
-                    <span className="text-[8px] font-black text-emerald-600 dark:text-emerald-500 uppercase tracking-widest bg-emerald-500/10 px-2 py-1 rounded-md border border-emerald-500/20">Ücretsiz</span>
-                ) : (
+                {bot.price > 0 && (
                     <div className="flex items-center gap-2 px-2 py-1 bg-blue-500/10 rounded-md border border-blue-500/20">
                         <span className="text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-tighter">{Number(prices.ton).toFixed(1)} TON</span>
                     </div>
@@ -379,61 +377,82 @@ const AddProjectBanner: React.FC<{ className?: string }> = ({ className = "" }) 
     
     return (
         <div 
-            className={`h-32 rounded-[32px] bg-[#0066ff] p-6 flex flex-col justify-between relative overflow-hidden group cursor-pointer active:scale-[0.98] transition-all ${className}`}
+            className={`h-[128px] rounded-[32px] bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 p-3 flex flex-col justify-between relative overflow-hidden group cursor-pointer active:scale-[0.98] transition-all AddProjectBanner ${className}`}
             onClick={() => navigate('/settings')}
         >
-            {/* Background Sharp Diagonal Split */}
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 opacity-90"></div>
-            <div 
-                className="absolute top-0 right-0 bottom-0 w-[60%] bg-[#0ea5e9] transform skew-x-[-20deg] translate-x-[20%] transition-transform duration-700 group-hover:translate-x-[15%]"
-                style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%, 15% 100%)' }}
-            ></div>
-            
-            {/* Subtle Diagonal Pattern Overlay */}
-            <div className="absolute inset-0 opacity-[0.05] pointer-events-none" 
-                 style={{ backgroundImage: 'linear-gradient(45deg, #fff 25%, transparent 25%, transparent 50%, #fff 50%, #fff 75%, transparent 75%, transparent)', backgroundSize: '20px 20px' }}>
-            </div>
-
-            {/* Background SVG Asset */}
-            <div className="absolute -right-6 -bottom-6 w-48 h-48 opacity-10 pointer-events-none transform rotate-12 group-hover:scale-110 group-hover:rotate-0 transition-transform duration-1000">
-                <svg width="100%" height="100%" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <g transform="rotate(204 24 25)">
-                        <path d="M23.4365 26.5357L17.5199 39.224C16.1195 42.2273 12.5496 43.5266 9.54633 42.1262V42.1262C6.54309 40.7257 5.24376 37.1558 6.6442 34.1526L18.373 9" fill="#FFFFFF" stroke="white" strokeWidth="2" strokeLinecap="round"></path>
-                        <path d="M41.3541 34.1527L29.5208 8.7761C28.1203 5.77286 24.5505 4.47352 21.5472 5.87396C18.544 7.27439 17.2447 10.8443 18.6451 13.8475L30.4784 39.2241C31.8788 42.2274 35.4487 43.5267 38.452 42.1263C41.4552 40.7258 42.7545 37.156 41.3541 34.1527Z" fill="white" stroke="white" strokeWidth="2"></path>
-                        <circle cx="25" cy="38" r="6" fill="white" stroke="white" strokeWidth="2"></circle>
-                    </g>
-                </svg>
-            </div>
+            {/* Subtle background glow */}
+            <div className="absolute -right-20 -top-20 w-64 h-64 bg-blue-500/5 dark:bg-blue-400/5 blur-[80px] rounded-full pointer-events-none group-hover:bg-blue-500/10 transition-colors"></div>
             
             <div className="relative z-10">
-                <h3 className="text-white font-extrabold text-lg sm:text-xl md:text-[22px] tracking-tight leading-tight mb-1 max-w-[90%]">
-                    Binlerce güvenilir Bot tek bir ecosistem
+                <div className="flex items-center gap-2 mb-2">
+                    <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                        <Plus size={16} className="text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.2em]">Sponsorlu Reklam</span>
+                </div>
+                <h3 className="text-slate-900 dark:text-white font-black text-lg md:text-[20px] tracking-tight leading-tight mb-0.5">
+                    Projeni Ekosisteme Dahil Et
                 </h3>
-                <p className="text-white/90 text-[11px] md:text-[13px] font-medium tracking-normal">
-                    Projeni ekle ve bu ekosistemde yerini al
+                <p className="text-slate-400 dark:text-slate-500 text-[12px] font-medium leading-tight">
+                    Binlerce kullanıcıya anında ulaşın ve büyümeye başlayın.
                 </p>
             </div>
             
-            <div className="relative z-10 self-start">
-                <div className="bg-[#f8fafc] text-[#0066ff] px-5 py-2.5 rounded-2xl text-[12px] font-bold shadow-md group-hover:shadow-lg group-hover:bg-white transition-all active:scale-95">
-                    Proje Ekle
+            <div className="relative z-10 flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                    <div className="flex -space-x-2">
+                        {[1,2,3].map(i => (
+                            <div key={i} className="w-6 h-6 rounded-full border-2 border-white dark:border-slate-900 bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden">
+                                <img src={`https://ui-avatars.com/api/?name=${i}&background=random`} alt="" className="w-full h-full object-cover" />
+                            </div>
+                        ))}
+                    </div>
+                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-wider">500+ Proje Yayında</span>
+                </div>
+                <div className="flex items-center gap-1 text-blue-600 dark:text-blue-400 font-bold text-[11px] uppercase tracking-widest group-hover:translate-x-1 transition-transform">
+                    Hemen Ekle <ChevronRight size={14} />
                 </div>
             </div>
         </div>
     );
 };
 
-const NavMenu = () => {
+const NavMenu = ({ 
+    isScrolled, 
+    user, 
+    unreadCount, 
+    theme, 
+    toggleTheme, 
+    haptic, 
+    isMenuOpen, 
+    setIsMenuOpen, 
+    setIsLoginModalOpen, 
+    setWebAuthUser, 
+    isLoginModalOpen,
+    menuRef: parentMenuRef
+}: { 
+    isScrolled: boolean, 
+    user: any, 
+    unreadCount: number, 
+    theme: string, 
+    toggleTheme: () => void, 
+    haptic: any, 
+    isMenuOpen: boolean, 
+    setIsMenuOpen: (v: boolean) => void,
+    setIsLoginModalOpen: (v: boolean) => void,
+    setWebAuthUser: (v: any) => void,
+    isLoginModalOpen: boolean,
+    menuRef: React.RefObject<HTMLDivElement>
+}) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const { haptic } = useTelegram();
     const [openMenu, setOpenMenu] = useState<string | null>(null);
     const [mobileModal, setMobileModal] = useState<string | null>(null);
-    const menuRef = useRef<HTMLDivElement>(null);
+    const internalMenuRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+            if (internalMenuRef.current && !internalMenuRef.current.contains(event.target as Node)) {
                 setOpenMenu(null);
             }
         };
@@ -453,8 +472,17 @@ const NavMenu = () => {
 
     return (
         <>
-        <div className="sticky top-0 z-[80] bg-white dark:bg-slate-950/90 backdrop-blur-xl border-b border-[#f7f7f7] dark:border-white/5 w-full flex justify-center py-4" ref={menuRef}>
-            <div className="flex items-center gap-10 md:gap-14">
+        <div className="sticky top-0 z-[80] bg-white dark:bg-slate-950/90 backdrop-blur-xl border-b border-[#f7f7f7] dark:border-white/5 w-full py-2.5 md:py-4 transition-all" ref={internalMenuRef}>
+            <div className={`max-w-7xl mx-auto px-4 flex items-center ${isScrolled ? 'md:justify-between justify-center' : 'justify-center'}`}>
+                {/* Logo shown only when scrolled (optional, but makes it a real header) */}
+                {isScrolled && (
+                    <div className="hidden md:flex items-center gap-3 shrink-0 cursor-pointer" onClick={() => navigate('/')}>
+                        <Logo style={{ width: '1.8rem', height: 'auto' }} />
+                        <span className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">BotlyHub</span>
+                    </div>
+                )}
+
+                <div className={`flex items-center gap-8 md:gap-14 ${isScrolled ? 'md:mx-0 mx-auto' : 'mx-auto'}`}>
                 {/* Bots Dropdown */}
                 <div className="relative md:static">
                     <button 
@@ -578,7 +606,71 @@ const NavMenu = () => {
                     Blog
                 </button>
             </div>
-        </div>
+
+            {/* Profile buttons on the right when scrolled - Hidden on mobile as per user's "tablet and larger" requirement */}
+            <AnimatePresence>
+                {isScrolled && (
+                    <motion.div 
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 20 }}
+                        className="hidden md:flex items-center gap-2 md:gap-3"
+                    >
+                        <button 
+                            onClick={() => { haptic('light'); toggleTheme(); }} 
+                            className="w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl text-slate-900 dark:text-white active:scale-95 transition-transform"
+                        >
+                            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                        </button>
+
+                        {user ? (
+                            <>
+                                <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="flex w-10 h-10 items-center justify-center bg-slate-50 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl text-slate-900 dark:text-white active:scale-95 transition-transform">
+                                    <Wallet size={18} />
+                                </button>
+                                <div className="relative" ref={parentMenuRef}>
+                                    <button 
+                                      onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
+                                      className="w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl text-slate-900 dark:text-white active:scale-95 transition-transform relative"
+                                    >
+                                        <Menu size={20} strokeWidth={2.5} />
+                                        {unreadCount > 0 && (
+                                            <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[8px] font-black text-white flex items-center justify-center px-1">
+                                                {unreadCount > 9 ? '9+' : unreadCount}
+                                            </div>
+                                        )}
+                                    </button>
+                                    {isMenuOpen && (
+                                        <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-[24px] overflow-hidden z-[100] animate-in py-2 backdrop-blur-2xl shadow-2xl">
+                                            {[
+                                                { path: '/', icon: Store, color: 'text-blue-500 dark:text-blue-400', label: 'market' },
+                                                { path: '/settings', icon: User, color: 'text-purple-500 dark:text-purple-400', label: 'profile' },
+                                                { path: '/my-bots', icon: BotIcon, color: 'text-emerald-500 dark:text-emerald-400', label: 'my_bots' },
+                                                { path: '/channels', icon: Megaphone, color: 'text-orange-500 dark:text-orange-400', label: 'my_channels' },
+                                                { path: '/notifications', icon: Bell, color: 'text-blue-600 dark:text-blue-500', label: 'notifications', badge: unreadCount > 0 }
+                                            ].map((item, i) => (
+                                                <button key={i} onClick={() => { navigate(item.path); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-black/5 dark:hover:bg-white/5 text-left border-b border-black/5 dark:border-white/5 last:border-0 relative">
+                                                    <item.icon size={18} className={item.color} /> 
+                                                    <span className="text-[11px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300">{t(item.label)}</span>
+                                                    {item.badge && <div className="absolute right-6 w-2.5 h-2.5 bg-red-600 rounded-full"></div>}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </>
+                        ) : (
+                            <button 
+                                onClick={() => { haptic('light'); setIsLoginModalOpen(true); }}
+                                className="px-5 h-10 bg-blue-500 hover:bg-blue-600 text-white text-[13px] font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center whitespace-nowrap shadow-lg shadow-blue-500/25"
+                            >
+                                Giriş yap
+                            </button>
+                        )}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div></div>
 
         {/* Mobile Modal for Categories */}
         <AnimatePresence>
@@ -610,32 +702,42 @@ const NavMenu = () => {
                             </button>
                         </div>
                         
-                        <div className="space-y-2 max-h-[60vh] overflow-y-auto pr-1">
-                            {(mobileModal === 'bots' ? botsCategories : appsCategories).length > 0 ? (mobileModal === 'bots' ? botsCategories : appsCategories).map((cat) => (
-                                <button
-                                    key={cat.id}
-                                    onClick={() => handleCategoryClick(cat.id)}
-                                    className="w-full flex items-center gap-4 p-4 hover:bg-slate-50 dark:hover:bg-white/5 active:bg-slate-100 dark:active:bg-white/10 rounded-3xl transition-all border border-black/[0.03] dark:border-white/[0.03]"
-                                >
-                                    <div className="w-12 h-12 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-2xl shrink-0 shadow-sm">
-                                        <cat.icon size={22} className="text-slate-500 dark:text-slate-400 group-hover:text-blue-500" />
+                        <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1 pb-4">
+                            {(() => {
+                                const activeCats = mobileModal === 'bots' ? botsCategories : appsCategories;
+                                if (activeCats.length > 0) {
+                                    return activeCats.map((cat) => (
+                                        <button
+                                            key={cat.id}
+                                            onClick={() => handleCategoryClick(cat.id)}
+                                            className="w-full flex items-center gap-4 p-3 hover:bg-slate-50 dark:hover:bg-white/5 active:bg-slate-100 dark:active:bg-white/10 rounded-2xl transition-all border border-black/[0.03] dark:border-white/[0.03] group"
+                                        >
+                                            <div className="w-11 h-11 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-xl shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+                                                <cat.icon size={20} className="text-slate-500 dark:text-slate-400 group-hover:text-blue-500" />
+                                            </div>
+                                            <div className="flex flex-col items-start min-w-0">
+                                                <span className="text-sm font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider truncate w-full">
+                                                    {t(cat.label)}
+                                                </span>
+                                                {cat.desc && (
+                                                    <span className="text-[10px] text-slate-400 dark:text-slate-600 font-bold uppercase tracking-tight line-clamp-1 text-left">
+                                                        {t(cat.desc)}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <ChevronRight size={16} className="ml-auto text-slate-300 dark:text-slate-700 shrink-0" />
+                                        </button>
+                                    ));
+                                }
+                                return (
+                                    <div className="py-20 text-center">
+                                        <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <Zap size={28} className="text-yellow-500" />
+                                        </div>
+                                        <p className="text-sm font-black text-slate-400 uppercase tracking-[0.3em]">{t('coming_soon') || 'Pek Yakında'}</p>
                                     </div>
-                                    <div className="flex flex-col items-start">
-                                        <span className="text-sm font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider">
-                                            {t(cat.label)}
-                                        </span>
-                                        {cat.desc && <span className="text-[10px] text-slate-400 dark:text-slate-600 font-bold uppercase tracking-tight line-clamp-1">{t(cat.desc)}</span>}
-                                    </div>
-                                    <ChevronRight size={16} className="ml-auto text-slate-300 dark:text-slate-700" />
-                                </button>
-                            )) : (
-                                <div className="py-20 text-center">
-                                    <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <Zap size={28} className="text-yellow-500" />
-                                    </div>
-                                    <p className="text-sm font-black text-slate-400 uppercase tracking-[0.3em]">{t('coming_soon') || 'Pek Yakında'}</p>
-                                </div>
-                            )}
+                                );
+                            })()}
                         </div>
                     </motion.div>
                 </div>
@@ -658,8 +760,17 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [tonRate, setTonRate] = useState(250);
   const [selectedAnn, setSelectedAnn] = useState<Announcement | null>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const { activeFilter } = useFilter();
+
+  useEffect(() => {
+    const handleScroll = () => {
+        setIsScrolled(window.scrollY > 200);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
   
   const annScroll = useDraggableScroll();
 
@@ -730,7 +841,7 @@ const Home = () => {
           description="BotlyHub V3, Telegram ekosistemindeki en iyi botları ve kanalları bulabileceğiniz, kendi botlarınızı tanıtabileceğiniz ve yönetebileceğiniz kapsamlı bir platformdur."
       />
       {/* Top Section */}
-      <div className="bg-[#00000008] dark:bg-slate-900/10 w-full pt-10 pb-4 shadow-[inset_0_-1px_0_0_rgba(0,0,0,0.03)]">
+      <div className="bg-[#00000008] dark:bg-slate-900/10 w-full pt-6 md:pt-10 pb-4 shadow-[inset_0_-1px_0_0_rgba(0,0,0,0.03)]">
           <div className="max-w-7xl mx-auto px-4">
               <div className="flex flex-wrap md:flex-nowrap items-center justify-between mb-8 px-1 gap-y-6 md:gap-x-6">
                   <div className="flex items-center gap-3 order-1">
@@ -742,11 +853,11 @@ const Home = () => {
 
                   <div className="w-full md:w-auto md:flex-1 md:max-w-2xl order-3 md:order-2 flex items-center gap-2 md:gap-3">
                       <div className="flex-1 cursor-pointer" onClick={() => navigate('/search')}>
-                          <div className="relative flex items-center bg-white dark:bg-slate-900/40 backdrop-blur-2xl border border-black/5 dark:border-white/10 rounded-[28px] sm:rounded-[22px] p-1 md:p-1.5 transition-all active:scale-[0.98] group">
-                              <div className="ml-3 md:ml-4 w-10 h-10 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-2xl text-slate-400 group-hover:text-blue-500 transition-colors">
-                                  <Search size={20} />
+                          <div className="relative flex items-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl p-0.5 md:p-1 transition-all active:scale-[0.98] group">
+                              <div className="ml-2 md:ml-3 w-8 h-8 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
+                                  <Search size={18} />
                               </div>
-                              <div className="w-full py-2.5 md:py-3 px-4 text-[13px] md:text-sm text-slate-400 font-bold uppercase tracking-widest opacity-60 truncate">{t('search_placeholder')}</div>
+                              <div className="w-full py-2 px-3 text-[13px] text-slate-400 font-bold uppercase tracking-widest opacity-60 truncate">{t('search_placeholder')}</div>
                           </div>
                       </div>
                       <div className="shrink-0">
@@ -757,20 +868,20 @@ const Home = () => {
                   <div className="flex items-center gap-2 md:gap-3 order-2 md:order-3">
                       <button 
                           onClick={() => { haptic('light'); toggleTheme(); }} 
-                          className="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-900 dark:text-white active:scale-95 transition-transform"
+                          className="w-10 h-10 flex items-center justify-center text-slate-900 dark:text-white active:scale-95 transition-transform"
                       >
                           {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
                       </button>
 
                       {user ? (
                           <>
-                              <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="hidden sm:flex w-12 h-12 items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-900 dark:text-white active:scale-95 transition-transform">
+                              <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="hidden sm:flex w-10 h-10 items-center justify-center text-slate-900 dark:text-white active:scale-95 transition-transform">
                                   <Wallet size={20} />
                               </button>
                               <div className="relative" ref={menuRef}>
                                   <button 
                                     onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
-                                    className="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-900 dark:text-white active:scale-95 transition-transform relative"
+                                    className="w-10 h-10 flex items-center justify-center text-slate-900 dark:text-white active:scale-95 transition-transform relative"
                                   >
                                       <Menu size={22} strokeWidth={2.5} />
                                       {unreadCount > 0 && (
@@ -780,7 +891,7 @@ const Home = () => {
                                       )}
                                   </button>
                                   {isMenuOpen && (
-                                      <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-[32px] overflow-hidden z-[100] animate-in py-2 backdrop-blur-2xl">
+                                      <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-[28px] overflow-hidden z-[100] animate-in py-2 backdrop-blur-2xl">
                                           {[
                                               { path: '/', icon: Store, color: 'text-blue-500 dark:text-blue-400', label: 'market' },
                                               { path: '/settings', icon: User, color: 'text-purple-500 dark:text-purple-400', label: 'profile' },
@@ -801,7 +912,7 @@ const Home = () => {
                       ) : (
                           <button 
                               onClick={() => { haptic('light'); setIsLoginModalOpen(true); }}
-                              className="px-6 md:px-8 h-12 bg-blue-500 hover:bg-blue-600 text-white text-[14px] md:text-[15px] font-bold rounded-[16px] md:rounded-[18px] transition-all active:scale-95 flex items-center justify-center whitespace-nowrap shadow-lg shadow-blue-500/25"
+                              className="px-5 h-10 bg-blue-500 hover:bg-blue-600 text-white text-[13px] font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center whitespace-nowrap shadow-lg shadow-blue-500/25"
                           >
                               Giriş yap
                           </button>
@@ -815,15 +926,30 @@ const Home = () => {
               </div>
           </div>
       </div>
-      {!isLoading && <NavMenu />}
+      {!isLoading && (
+        <NavMenu 
+            isScrolled={isScrolled}
+            user={user}
+            unreadCount={unreadCount}
+            theme={theme}
+            toggleTheme={toggleTheme}
+            haptic={haptic}
+            isMenuOpen={isMenuOpen}
+            setIsMenuOpen={setIsMenuOpen}
+            setIsLoginModalOpen={setIsLoginModalOpen}
+            setWebAuthUser={setWebAuthUser}
+            isLoginModalOpen={isLoginModalOpen}
+            menuRef={menuRef}
+        />
+      )}
 
       {isLoading ? (
           <div className="flex flex-col items-center justify-center py-24 gap-4"><Loader2 className="animate-spin text-blue-500" size={32} /></div>
       ) : (
           <>
             {announcements.length > 0 && (
-                <div className="mb-10 flex flex-col lg:flex-row justify-center gap-6 mt-6">
-                    <div className="w-full lg:w-[480px] shrink-0">
+                <div className="mb-10 flex flex-col lg:flex-row justify-center items-center gap-6 mt-8 max-w-7xl mx-auto px-4 w-full">
+                    <div className="w-full lg:w-[480px] shrink-0 h-[128px]">
                         <AnnouncementsCarousel 
                             announcements={announcements} 
                             scroll={annScroll} 
@@ -871,7 +997,7 @@ const Home = () => {
                                         onClick={() => navigate(`/search?category=${catId}`)}
                                     >
                                         <div className="flex items-center gap-2">
-                                            <h2 className="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight uppercase">
+                                            <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white tracking-tight uppercase">
                                                 {t(category.label)}
                                             </h2>
                                             <span className="text-sm font-bold text-slate-400 dark:text-slate-600 ml-1">
@@ -960,9 +1086,9 @@ const Home = () => {
                     
                     <button 
                         onClick={() => setSelectedAnn(null)} 
-                        className="absolute top-6 right-6 p-2.5 bg-black/20 backdrop-blur-md rounded-2xl text-white/80 hover:bg-black/40 hover:text-white transition-all active:scale-90"
+                        className="absolute top-6 right-6 flex items-center justify-center p-2 text-white/80 hover:text-white transition-all active:scale-90 drop-shadow-lg"
                     >
-                        <X size={18} />
+                        <X size={20} />
                     </button>
 
                     <div className="absolute bottom-6 left-8 flex items-center gap-2">
@@ -1013,7 +1139,7 @@ const Home = () => {
                                 else navigate(link);
                                 setSelectedAnn(null); 
                             }} 
-                            className="w-full h-18 bg-brand dark:bg-brand-light text-white text-[11px] font-black rounded-3xl uppercase tracking-[0.2em] active:translate-y-1 transition-all flex items-center justify-center gap-3 group"
+                            className="w-full h-14 bg-brand dark:bg-brand-light text-white text-[12px] font-black rounded-2xl uppercase tracking-[0.2em] active:scale-95 transition-all flex items-center justify-center gap-3 group shadow-lg shadow-brand/20"
                         >
                             {selectedAnn.button_text || 'ŞİMDİ KEŞFET'} 
                             <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
@@ -1092,7 +1218,7 @@ const AnnouncementsCarousel: React.FC<{
     }, [handleScroll, scroll.ref]);
 
     return (
-        <div className="relative">
+        <div className="relative h-full">
             {announcements.length > 1 && (
                 <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex justify-center gap-1.5 z-20">
                     {announcements.map((_, i) => (
@@ -1116,7 +1242,7 @@ const AnnouncementsCarousel: React.FC<{
                 onMouseMove={scroll.onMouseMove}
                 onMouseLeave={scroll.onMouseLeave}
                 onContextMenu={scroll.onContextMenu}
-                className={`flex gap-4 overflow-x-auto no-scrollbar sm:mx-0 sm:px-0 -mx-4 px-4 pb-2 snap-x snap-mandatory ${scroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+                className={`flex gap-4 overflow-x-auto no-scrollbar sm:mx-0 sm:px-0 -mx-4 px-4 h-full snap-x snap-mandatory ${announcements.length === 1 ? 'justify-center' : 'justify-start'} ${scroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
             >
                 {announcements.map(ann => <PromoCard key={ann.id} ann={ann} onShowPopup={onShowPopup} />)}
             </div>

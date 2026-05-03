@@ -71,7 +71,7 @@
   }
 
   .font-black {
-    font-weight: 100 !important;
+    font-weight: 400 !important;
   }
 
   #root {
@@ -149,7 +149,7 @@ input, textarea, select {
 }
 
 .font-black {
-  font-weight: 900;
+  font-weight: 400 !important;
 }
 
 /* Menu Icon Colors */
@@ -226,18 +226,32 @@ span.text-\[10px\].font-black.text-slate-500.dark\:text-slate-400.uppercase.trac
     border-color: rgba(255, 255, 255, 0.1);
 }
 
-.py-4 {
+.bot-card .py-4, .sticky.py-4 {
     box-shadow: none !important;
     padding-top: 0.6rem;
     padding-bottom: 0.6rem;
 }
 
-.mb-10 {
-  margin-bottom: 01rem;
+.bot-card .mb-10 {
+  margin-bottom: 0rem;
 }
 
 .bot-card {
     padding: 6px !important;
+}
+
+.bot-card .py-1 {
+    padding-top: 0.1rem !important;
+    padding-bottom: 0.1rem !important;
+}
+
+.bot-card .text-\[9px\] {
+    font-size: 12px !important;
+    font-weight: 400 !important;
+}
+
+.bot-card svg.lucide-star {
+    stroke-width: 1.5px !important;
 }
 
 .font-bold {
@@ -341,15 +355,15 @@ svg.lucide.lucide-chevron-right:focus {
     }
 }
 
-.p-1\.5 {
-    padding: 0.175rem;
+.p-1\.5, .md\:p-1\.5 {
+    padding: 0.1rem;
 }
 
 .gap-y-6 {
     row-gap: 1rem;
 }
 
-.pt-10 {
+.bot-card .pt-10 {
     padding-top: 1rem;
 }
 
@@ -370,6 +384,18 @@ svg.lucide.lucide-chevron-right:focus {
     margin-bottom: 1.2rem;
 }
 
+.mt-8 {
+    margin-top: 0.5rem;
+}
+
+.mb-10 {
+    margin-bottom: 0rem;
+}
+
+.pt-10 {
+    padding-top: 1.5rem;
+}
+
 .bg-slate-50 {
     --tw-bg-opacity: 1;
 }
@@ -387,7 +413,7 @@ svg.lucide.lucide-chevron-right:focus {
     margin-bottom: calc(1.5rem * var(--tw-space-y-reverse));
 }
 
-.p-5 {
+.bot-card .p-5 {
     /* background: none; */
     padding: 0.5rem;
 }
@@ -408,7 +434,7 @@ img, video {
     height: auto;
 }
 
-.p-6 {
+.bot-card .p-6 {
     padding: 0.5rem;
 }
 
@@ -454,13 +480,13 @@ button.w-10.h-10.flex.items-center.justify-center.rounded-2xl.border.transition-
     padding: 1px 8px;
 }
 
-.px-3, .px-4 {
+.bot-card .px-3, .bot-card .px-4 {
     padding: 6px;
     padding-left: .5rem;
     padding-right: .5rem;
 }
 
-.gap-2 {
+.bot-card .gap-2 {
     gap: 0.2rem;
 }
 
@@ -560,7 +586,7 @@ span.text-\[10px\].font-black.uppercase.tracking-tight {
     transition: background-color .3s ease;
 }
 .font-black {
-    font-weight: 700;
+    font-weight: 400 !important;
 }
 button.w-full.flex.items-center.gap-3.px-4.py-3.hover\:bg-slate-50.dark\:hover\:bg-white\/5.rounded-xl.transition-colors.text-left {
     border-radius: 12px;
@@ -584,7 +610,13 @@ button.w-full.flex.items-center.gap-3.px-4.py-3.hover\:bg-slate-50.dark\:hover\:
 
 .rounded-\[32px\] {
     box-shadow: none;
-    border-radius: 1rem;
+    border-radius: 12px;
+}
+
+.lg\:w-\[480px\] {
+    border-radius: 12px;
+    outline: solid 1px #0000000d;
+    width: 480px;
 }
 
 /* Light mode hover effect for bot card chevron */
@@ -597,9 +629,13 @@ html:not(.dark) .group:hover .lucide-chevron-right {
     transition-duration: 700ms;
 }
 
-.px-6 {
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
+.promo-card .px-1\.5 {
+    padding-left: .375rem;
+    padding-right: .1rem;
+}
+
+.promo-card span.text-\[9px\].font-semibold.text-white.uppercase.tracking-wider {
+    font-size: 9px;
 }
 
 .max-w-4xl {
@@ -616,7 +652,7 @@ html:not(.dark) .group:hover .lucide-chevron-right {
 }
 
 .p-1 {
-    padding: 0rem;
+    padding: 0.1rem;
 }
 
 .from-brand {

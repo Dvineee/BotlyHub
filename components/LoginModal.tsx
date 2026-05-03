@@ -47,9 +47,9 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onAuth }) => {
             className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-[40px] sm:rounded-[32px] overflow-hidden relative shadow-2xl border border-black/5 dark:border-white/5"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-8 sm:p-12">
-              <div className="flex justify-between items-start mb-10">
-                <h2 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">Giriş Yap</h2>
+            <div className="p-6 sm:p-12">
+              <div className="flex justify-between items-start mb-6 sm:mb-10">
+                <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">Giriş Yap</h2>
                 <button
                   onClick={onClose}
                   className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-full transition-colors text-slate-400"
@@ -58,13 +58,13 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onAuth }) => {
                 </button>
               </div>
 
-              <div className="space-y-8 mb-12">
+              <div className="space-y-6 sm:space-y-8 mb-8 sm:mb-12">
                 {benefits.map((item, idx) => (
-                  <div key={idx} className="flex items-center gap-5">
-                    <div className={`w-12 h-12 rounded-full ${item.color} flex items-center justify-center shrink-0`}>
-                      <item.icon size={22} />
+                  <div key={idx} className="flex items-center gap-4 sm:gap-5">
+                    <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full ${item.color} flex items-center justify-center shrink-0`}>
+                      <item.icon size={20} className="sm:w-[22px] sm:h-[22px]" />
                     </div>
-                    <p className="text-slate-700 dark:text-slate-300 font-medium text-lg tracking-tight">
+                    <p className="text-slate-700 dark:text-slate-300 font-medium text-base sm:text-lg tracking-tight">
                       {item.text}
                     </p>
                   </div>
