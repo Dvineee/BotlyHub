@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
-import { User, CreditCard, Bell, Globe, ChevronRight, Crown, Users, Sun, Moon, Settings } from 'lucide-react';
+import { User, CreditCard, Bell, Globe, ChevronRight, Crown, Users, Sun, Moon, Settings, ChevronLeft } from 'lucide-react';
 // Fixed: Use namespace import for react-router-dom to resolve "no exported member" errors
 import * as Router from 'react-router-dom';
 import { subscriptionPlans } from '../data';
@@ -13,7 +13,7 @@ const { useNavigate } = Router as any;
 
 const ProfileSettings = () => {
   const navigate = useNavigate();
-  const { user } = useTelegram();
+  const { user, haptic } = useTelegram();
   const { theme, toggleTheme } = useTheme();
   const { language, setLanguage } = useTranslation();
   const [currentPlanName, setCurrentPlanName] = useState('Başlangıç');
@@ -59,115 +59,65 @@ const ProfileSettings = () => {
 
   const MenuItem = React.memo(({ icon: Icon, label, value, hasArrow = true, onClick }: { icon: any, label: string, value?: string, hasArrow?: boolean, onClick?: () => void }) => (
     <div 
-        onClick={onClick}
-        className="flex items-center justify-between p-5 bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-900/60 transition-all cursor-pointer group first:rounded-t-[32px] last:rounded-b-[32px] border-b border-black/5 dark:border-white/5 last:border-0 active:scale-[0.98]"
+        onClick={() => { haptic('light'); onClick?.(); }}
+        className="flex items-center justify-between p-4 bg-white dark:bg-slate-900 border border-black/5 dark:border-white/5 rounded-xl mb-2 transition-all cursor-pointer active:scale-[0.98]"
     >
-        <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-950 group-hover:bg-brand/10 dark:group-hover:bg-brand-light/10 flex items-center justify-center transition-all border border-black/5 dark:border-white/5 group-hover:border-brand/20 dark:group-hover:border-brand-light/20 ">
-                <Icon size={20} className="text-slate-500 dark:text-slate-400 group-hover:text-brand dark:group-hover:text-brand-light transition-colors" />
-            </div>
-            <span className="font-bold text-[11px] text-slate-900 dark:text-white uppercase tracking-wider">{label}</span>
-        </div>
         <div className="flex items-center gap-3">
-            {value && <span className="text-slate-500 text-[10px] font-bold uppercase tracking-wider">{value}</span>}
-            {hasArrow && <ChevronRight size={18} className="text-slate-400 dark:text-slate-700 group-hover:text-slate-900 dark:group-hover:text-white transition-colors" />}
+            <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center border border-black/5 dark:border-white/5">
+                <Icon size={18} className="text-slate-500" />
+            </div>
+            <span className="font-bold text-[12px] text-slate-800 dark:text-slate-200 uppercase tracking-tight">{label}</span>
+        </div>
+        <div className="flex items-center gap-2">
+            {value && <span className="text-slate-400 text-[10px] font-bold uppercase">{value}</span>}
+            {hasArrow && <ChevronRight size={16} className="text-slate-300" />}
         </div>
     </div>
   ));
 
   return (
-    <div className="min-h-screen p-6 pt-10 pb-32 bg-slate-50 dark:bg-slate-950 transition-colors animate-in fade-in">
+    <div className="min-h-screen px-5 sm:px-8 pt-6 md:pt-10 pb-32 bg-slate-50 dark:bg-slate-950 transition-colors animate-in fade-in">
         <div className="max-w-7xl mx-auto">
-             <div className="flex items-center justify-between mb-10 px-1">
-            <div>
-                <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter italic uppercase">Profil Ayarları</h1>
-                <p className="text-[10px] font-black text-brand dark:text-brand-light uppercase tracking-[0.3em] mt-1">CONFIG v4.2.0</p>
-            </div>
-            <div className="w-12 h-12 bg-white dark:bg-slate-900 rounded-2xl flex items-center justify-center border border-black/5 dark:border-white/5 text-slate-400">
-                <Settings size={20} />
-            </div>
+             <div className="flex items-center justify-between mb-8 px-1">
+            <h1 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight uppercase tracking-widest">Ayarlar</h1>
+            <div className="w-10 h-10" />
         </div>
 
         {/* Profile Card */}
-        <div className="relative mb-10 p-8 bg-white dark:bg-slate-900/40 rounded-[44px] border border-black/5 dark:border-white/5 backdrop-blur-xl overflow-hidden fancy-glass-card group">
-             <div className="absolute top-0 right-0 w-32 h-32 bg-brand/5 dark:bg-brand-light/5 blur-3xl -mr-16 -mt-16 rounded-full group-hover:bg-brand/10 transition-colors duration-700" />
-             
+        <div className="relative mb-8 p-6 bg-white dark:bg-slate-900 border border-black/5 dark:border-white/5 rounded-xl overflow-hidden group">
              <div className="relative z-10 flex items-center gap-6">
                 <div className="relative">
-                    <div className="w-24 h-24 rounded-[32px] p-1 bg-gradient-to-tr from-brand to-brand-light">
-                        <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover rounded-[28px] border-4 border-white dark:border-slate-900" loading="lazy" />
+                    <div className="w-20 h-20 rounded-xl p-0.5 bg-gradient-to-tr from-brand to-brand-light">
+                        <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover rounded-xl border-4 border-white dark:border-slate-900" loading="lazy" />
                     </div>
-                    <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-emerald-500 rounded-xl border-4 border-white dark:border-slate-900 flex items-center justify-center">
-                        <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                    </div>
+                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 rounded-lg border-2 border-white dark:border-slate-900 flex items-center justify-center" />
                 </div>
                 
                 <div className="flex-1 min-w-0">
-                    <h2 className="font-black text-2xl text-slate-900 dark:text-white tracking-tighter truncate uppercase italic leading-none mb-2">{displayName}</h2>
-                    <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-4">{displayUsername}</p>
+                    <h2 className="font-bold text-xl text-slate-900 dark:text-white tracking-tight truncate leading-none mb-1">{displayName}</h2>
+                    <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-3">{displayUsername}</p>
                     
-                    <div className="inline-flex items-center gap-2 bg-brand/10 dark:bg-brand-light/10 text-brand dark:text-brand-light px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border border-brand/20 dark:border-brand-light/20 shadow-sm animate-pulse">
-                        <Crown size={12} className="fill-brand/20 dark:fill-brand-light/20" />
-                        <span>{currentPlanName} LİSANSI</span>
+                    <div className="inline-flex items-center gap-2 bg-blue-500/10 text-blue-500 px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border border-blue-500/20">
+                        <Crown size={10} />
+                        <span>{currentPlanName} Planı</span>
                     </div>
                 </div>
              </div>
         </div>
 
-        <div className="space-y-4 mb-8">
-            <div className="flex items-center justify-between px-4">
-                <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-[0.3em]">HESAP YÖNETİMİ</h3>
-                <div className="w-8 h-px bg-slate-200 dark:bg-slate-900" />
+        <div className="space-y-6">
+            <div>
+                <h3 className="text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest mb-3 px-1">Hesap</h3>
+                <MenuItem icon={User} label="Hesap Bilgileri" onClick={() => navigate('/account-settings')} />
+                <MenuItem icon={CreditCard} label="Abonelik" value={currentPlanName} onClick={() => navigate('/premium')} />
+                <MenuItem icon={Users} label="Referanslar" onClick={() => navigate('/referral')} />
             </div>
-            
-            <div className="rounded-[40px] border border-black/5 dark:border-white/5 bg-white dark:bg-slate-900/20 overflow-hidden fancy-glass-card">
-                <div className="p-2 space-y-1">
-                    <MenuItem 
-                        icon={User} 
-                        label="Hesap Bilgileri" 
-                        onClick={() => navigate('/account-settings')}
-                    />
-                    <MenuItem 
-                        icon={CreditCard} 
-                        label="Abonelik Yönetimi" 
-                        value={currentPlanName} 
-                        onClick={() => navigate('/premium')}
-                    />
-                    <MenuItem 
-                        icon={Users} 
-                        label="Referans Sistemi" 
-                        onClick={() => navigate('/referral')}
-                    />
-                </div>
-            </div>
-        </div>
 
-        <div className="space-y-4 mb-8">
-            <div className="flex items-center justify-between px-4">
-                <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-[0.3em]">UYGULAMA TERCIHLERI</h3>
-                <div className="w-8 h-px bg-slate-200 dark:bg-slate-900" />
-            </div>
-            
-            <div className="rounded-[40px] border border-black/5 dark:border-white/5 bg-white dark:bg-slate-900/20 overflow-hidden fancy-glass-card">
-                <div className="p-2 space-y-1">
-                    <MenuItem 
-                        icon={Bell} 
-                        label="Bildirimler" 
-                        onClick={() => navigate('/notifications')}
-                    />
-                    <MenuItem 
-                        icon={theme === 'dark' ? Moon : Sun} 
-                        label="Görünüm Modu" 
-                        value={theme === 'dark' ? 'Karanlık' : 'Aydınlık'} 
-                        onClick={toggleTheme}
-                    />
-                    <MenuItem 
-                        icon={Globe} 
-                        label="Dil Seçimi" 
-                        value={currentLangLabel} 
-                        onClick={() => setShowLanguagePicker(true)}
-                    />
-                </div>
+            <div>
+                <h3 className="text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest mb-3 px-1">Uygulama</h3>
+                <MenuItem icon={Bell} label="Bildirimler" onClick={() => navigate('/notifications')} />
+                <MenuItem icon={theme === 'dark' ? Moon : Sun} label="Görünüm" value={theme === 'dark' ? 'Karanlık' : 'Aydınlık'} onClick={toggleTheme} />
+                <MenuItem icon={Globe} label="Dil" value={currentLangLabel} onClick={() => setShowLanguagePicker(true)} />
             </div>
         </div>
 
@@ -187,7 +137,7 @@ const ProfileSettings = () => {
                         animate={{ y: 0 }}
                         exit={{ y: "100%" }}
                         transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                        className="relative w-full max-w-sm bg-white dark:bg-slate-900 rounded-t-[40px] sm:rounded-[40px] overflow-hidden  border-t sm:border border-black/10 dark:border-white/10"
+                        className="relative w-full max-w-sm bg-white dark:bg-slate-900 rounded-t-xl sm:rounded-xl overflow-hidden  border-t sm:border border-black/10 dark:border-white/10"
                     >
                         <div className="p-8">
                             <div className="flex justify-between items-center mb-8">
@@ -204,7 +154,7 @@ const ProfileSettings = () => {
                                             setLanguage(lang.code as any);
                                             setShowLanguagePicker(false);
                                         }}
-                                        className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all ${
+                                        className={`w-full flex items-center justify-between p-4 rounded-xl transition-all ${
                                             language === lang.code 
                                             ? 'bg-brand/10 border-brand/20 border' 
                                             : 'hover:bg-slate-50 dark:hover:bg-white/5 border border-transparent'

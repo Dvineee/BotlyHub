@@ -48,12 +48,12 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = ({ bot, tonRate }) => {
   const prices = PriceService.convert(bot.price, tonRate);
   
   return (
-    <div onClick={() => navigate(`/bot/${bot.id}`)} className="flex items-center p-3 sm:p-6 bot-card cursor-pointer group bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-900/80 rounded-[32px] transition-all border border-black/5 dark:border-white/5 active:scale-[0.98] ">
+    <div onClick={() => navigate(`/bot/${bot.id}`)} className="flex items-center p-3 sm:p-6 bot-card cursor-pointer group bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-900/80 rounded-xl transition-all border border-black/5 dark:border-white/5 active:scale-[0.98] ">
         <div className="relative shrink-0">
             <img 
                 src={getLiveBotIcon(bot)} 
                 alt={bot.name} 
-                className="w-14 h-14 sm:w-20 sm:h-20 rounded-[20px] sm:rounded-[24px] object-cover bg-slate-200 dark:bg-slate-900  border border-black/5 dark:border-white/5 group-hover:scale-105 transition-transform" 
+                className="w-14 h-14 sm:w-20 sm:h-20 rounded-xl sm:rounded-xl object-cover bg-slate-200 dark:bg-slate-900  border border-black/5 dark:border-white/5 group-hover:scale-105 transition-transform" 
                 onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
             />
             {bot.price > 0 && (
@@ -210,74 +210,17 @@ const SearchPage = () => {
         title="Bot ve Kanal Ara" 
         description="BotlyHub üzerinde dilediğiniz Telegram botunu veya kanalını arayarak keşfedin."
     />
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 pt-6 md:pt-10 pb-32 animate-in fade-in transition-colors duration-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 px-5 sm:px-8 pt-4 md:pt-10 pb-32 transition-colors duration-300">
       <div className="max-w-7xl mx-auto">
         {/* Header & Search Box */}
-      <div className="flex flex-wrap md:flex-nowrap items-center gap-3 md:gap-4 mb-8 justify-between">
-        <div className="order-1 md:w-48 shrink-0 flex items-center">
-          <button onClick={() => navigate(-1)} className="w-10 h-10 flex items-center justify-center text-slate-500 dark:text-slate-400 active:scale-90 transition-transform shrink-0">
-            <ChevronLeft size={22} />
+      <div className="flex items-center gap-3 mb-6">
+          <button onClick={() => navigate(-1)} className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl text-slate-500 active:scale-90 transition-transform shrink-0">
+            <ChevronLeft size={20} />
           </button>
-        </div>
-
-        <div className="order-2 md:order-3 flex ml-auto items-center gap-3 md:w-48 justify-end shrink-0">
-            <button 
-                onClick={() => { haptic('light'); toggleTheme(); }} 
-                className="w-10 h-10 flex items-center justify-center text-slate-900 dark:text-white active:scale-95 transition-transform"
-            >
-                {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-            </button>
-
-            {user ? (
-                <>
-                    <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="hidden sm:flex w-10 h-10 items-center justify-center text-slate-900 dark:text-white active:scale-95 transition-transform">
-                        <Wallet size={20} />
-                    </button>
-                    <div className="relative" ref={menuRef}>
-                        <button 
-                            onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
-                            className="w-10 h-10 flex items-center justify-center text-slate-900 dark:text-white active:scale-95 transition-transform relative"
-                        >
-                            <Menu size={22} strokeWidth={2.5} />
-                            {unreadCount > 0 && (
-                                <div className="absolute -top-1 -right-1 min-w-[20px] h-[20px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[9px] font-black text-white flex items-center justify-center px-1">
-                                    {unreadCount > 9 ? '9+' : unreadCount}
-                                </div>
-                            )}
-                        </button>
-                        {isMenuOpen && (
-                            <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-[28px] overflow-hidden z-[100] animate-in py-2 backdrop-blur-2xl shadow-2xl">
-                                {[
-                                    { path: '/', icon: Store, color: 'text-blue-500 dark:text-blue-400', label: 'market' },
-                                    { path: '/settings', icon: User, color: 'text-purple-500 dark:text-purple-400', label: 'profile' },
-                                    { path: '/my-bots', icon: BotIcon, color: 'text-emerald-500 dark:text-emerald-400', label: 'my_bots' },
-                                    { path: '/channels', icon: Megaphone, color: 'text-orange-500 dark:text-orange-400', label: 'my_channels' },
-                                    { path: '/notifications', icon: Bell, color: 'text-blue-600 dark:text-blue-500', label: 'notifications', badge: unreadCount > 0 }
-                                ].map((item, i) => (
-                                    <button key={i} onClick={() => { navigate(item.path); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-black/5 dark:hover:bg-white/5 text-left border-b border-black/5 dark:border-white/5 last:border-0 relative">
-                                        <item.icon size={18} className={item.color} /> 
-                                        <span className="text-[11px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300">{t(item.label)}</span>
-                                        {item.badge && <div className="absolute right-6 w-2.5 h-2.5 bg-red-600 rounded-full"></div>}
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                </>
-            ) : (
-                <button 
-                    onClick={() => { haptic('light'); setIsLoginModalOpen(true); }}
-                    className="px-5 h-10 bg-blue-500 hover:bg-blue-600 text-white text-[13px] font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center whitespace-nowrap shadow-lg shadow-blue-500/25"
-                >
-                    Giriş yap
-                </button>
-            )}
-        </div>
-
-        <div className="order-3 md:order-2 w-full md:flex-1 md:max-w-4xl flex items-center gap-3">
-          <div className="relative flex-1">
-            <div className="relative flex items-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl p-0.5 md:p-1 ring-2 ring-transparent focus-within:ring-blue-500/30 transition-all group">
-              <div className="ml-2 md:ml-3 w-8 h-8 flex items-center justify-center text-slate-400 group-focus-within:text-blue-500 transition-colors">
+          
+          <div className="flex-1 relative">
+            <div className="relative flex items-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl p-1 transition-all group custom-search-outline">
+              <div className="ml-2 w-8 h-8 flex items-center justify-center text-slate-400 group-focus-within:text-blue-500">
                 <SearchIcon size={18} />
               </div>
               <input 
@@ -286,24 +229,19 @@ const SearchPage = () => {
                 autoFocus
                 onChange={(e) => setQuery(e.target.value)} 
                 placeholder={t('search_placeholder')} 
-                className="w-full bg-transparent py-2 px-3 text-[13px] text-slate-900 dark:text-white outline-none placeholder:text-slate-400 dark:placeholder:text-slate-600 font-bold uppercase tracking-widest" 
+                className="w-full bg-transparent py-2 px-2 text-[13px] text-slate-900 dark:text-white outline-none placeholder:text-slate-400 font-bold uppercase tracking-widest" 
               />
               {query && (
-                <button onClick={() => setQuery('')} className="mr-2 w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                <button onClick={() => setQuery('')} className="mr-1 w-8 h-8 flex items-center justify-center text-slate-400">
                   <X size={16} />
                 </button>
               )}
             </div>
           </div>
+
           <div className="shrink-0">
               <FilterMenu />
           </div>
-        </div>
-        <LoginModal 
-            isOpen={isLoginModalOpen} 
-            onClose={() => setIsLoginModalOpen(false)} 
-            onAuth={(user) => setWebAuthUser(user)} 
-        />
       </div>
 
       {/* Categories Horizontal Scroll */}
@@ -326,7 +264,7 @@ const SearchPage = () => {
                     DatabaseService.logActivity(user.id.toString(), 'system', 'search_category', 'Kategori Filtresi', `Arama motorunda '${t(cat.label)}' kategorisi filtrelendi.`);
                 }
               }}
-              className={`flex items-center gap-3 px-4 py-2.5 md:px-6 md:py-4 rounded-2xl border transition-all active:scale-95  whitespace-nowrap snap-center ${
+              className={`flex items-center gap-3 px-4 py-2.5 md:px-6 md:py-4 rounded-xl border transition-all active:scale-95  whitespace-nowrap snap-center ${
                 activeCategory === cat.id 
                 ? 'bg-brand/10 dark:bg-brand-light/10 border-brand/40 dark:border-brand-light/40 text-brand dark:text-brand-light ring-1 ring-brand/20 dark:ring-brand-light/20' 
                 : 'bg-white dark:bg-slate-900/60 border-black/5 dark:border-white/5 text-slate-500 dark:text-slate-400'

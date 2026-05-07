@@ -44,10 +44,10 @@ const UserList = () => {
           <input 
             type="text" 
             placeholder="Kullanıcı ara..." 
-            className="w-full bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-[24px] py-5 pl-14 pr-6 text-[11px] font-bold uppercase tracking-widest focus:outline-none focus:border-purple-500/50 focus:bg-white dark:focus:bg-slate-900/60 transition-all placeholder:text-slate-300 dark:placeholder:text-slate-700  text-slate-900 dark:text-white"
+            className="w-full bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-xl py-5 pl-14 pr-6 text-[11px] font-bold uppercase tracking-widest focus:outline-none focus:border-purple-500/50 focus:bg-white dark:focus:bg-slate-900/60 transition-all placeholder:text-slate-300 dark:placeholder:text-slate-700  text-slate-900 dark:text-white"
           />
         </div>
-        <button className="w-14 h-14 flex items-center justify-center bg-white dark:bg-slate-900/40 rounded-[24px] border border-black/5 dark:border-white/5 text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-slate-300 transition-all ">
+        <button className="w-14 h-14 flex items-center justify-center bg-white dark:bg-slate-900/40 rounded-xl border border-black/5 dark:border-white/5 text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-slate-300 transition-all ">
             <SlidersHorizontal size={20} />
         </button>
       </div>
@@ -73,14 +73,14 @@ const UserList = () => {
           <div 
             key={user.id} 
             onClick={() => navigate(`/users/${user.id}`)}
-            className="flex items-center justify-between p-5 rounded-[32px] bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 hover:border-purple-500/30 dark:hover:border-purple-500/30 hover:bg-slate-50 dark:hover:bg-slate-900/60 transition-all cursor-pointer group "
+            className="flex items-center justify-between p-5 rounded-xl bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 hover:border-purple-500/30 dark:hover:border-purple-500/30 hover:bg-slate-50 dark:hover:bg-slate-900/60 transition-all cursor-pointer group "
           >
             <div className="flex items-center gap-5">
               <div className="relative">
                 <img 
                     src={user.avatar} 
                     alt={user.name} 
-                    className="w-14 h-14 rounded-[20px] object-cover border border-black/5 dark:border-white/10 group-hover:scale-105 transition-transform " 
+                    className="w-14 h-14 rounded-xl object-cover border border-black/5 dark:border-white/10 group-hover:scale-105 transition-transform " 
                     referrerPolicy="no-referrer"
                 />
                 {user.status === 'Active' && (

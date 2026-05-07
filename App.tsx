@@ -27,7 +27,9 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import UserPanelLogin from './pages/UserPanelLogin';
 import UserPanel from './pages/UserPanel';
 import ReferralPage from './pages/ReferralPage';
+import ScrollToTop from './components/ScrollToTop';
 import Footer from './components/Footer';
+import BottomNav from './components/BottomNav';
 
 import { FilterProvider } from './FilterContext';
 
@@ -160,6 +162,8 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
     return () => tg.BackButton.offClick(handleBack);
   }, [location.pathname, navigate, isAdminPath]);
 
+  const hideBottomNav = isPanelPath || location.pathname.includes('/bot/') || location.pathname.includes('/payment/');
+
   return (
     <div className={`${isPanelPath ? 'dark bg-slate-950' : 'bg-slate-50 dark:bg-slate-950'} flex flex-col min-h-screen transition-colors duration-300`}>
       {isMaintenance && !isAdminPath ? (
@@ -169,7 +173,12 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
       ) : (
         <div className="w-full flex-1 flex flex-col">
           {children}
-          {!isPanelPath && !isMaintenance && !isRestricted && <Footer />}
+          {!isPanelPath && !isMaintenance && !isRestricted && (
+            <>
+              <Footer />
+              {!hideBottomNav && <BottomNav />}
+            </>
+          )}
         </div>
       )}
     </div>
@@ -179,6 +188,7 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
 export default function App() {
   return (
     <HashRouter>
+      <ScrollToTop />
       <FilterProvider>
         <TelegramWrapper>
           <Routes>

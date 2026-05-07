@@ -94,9 +94,6 @@ const AccountSettings = () => {
       {/* Header */}
       <div className="p-4 flex items-center justify-between sticky top-0 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl z-50 border-b border-black/5 dark:border-white/5">
         <div className="flex items-center gap-3">
-            <button onClick={() => navigate(-1)} className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-2xl text-slate-500 dark:text-slate-400 active:scale-90 transition-transform ">
-                <ChevronLeft size={20} />
-            </button>
             <h1 className="text-[14px] font-black text-slate-900 dark:text-white uppercase tracking-tight">Hesap Ayarları</h1>
         </div>
         <div className="flex items-center gap-2">

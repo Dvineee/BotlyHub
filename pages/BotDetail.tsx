@@ -286,98 +286,29 @@ const BotDetail = () => {
         ogImage={bot.icon || undefined}
     />
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 pb-40 animate-in fade-in transition-colors duration-300">
-      <div className="max-w-7xl mx-auto px-4 md:px-10">
-        {/* Responsive Header */}
-        <div className="flex items-center justify-between mb-8 pt-6 gap-3 md:gap-6">
-            <div className="flex items-center gap-2 shrink-0">
-                <div className="shrink-0 cursor-pointer" onClick={() => navigate('/')}>
-                    <Logo style={{ width: '2.5rem', height: 'auto', display: 'block' }} className="" />
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 md:px-10">
+        {/* Header Section */}
+        <div className="flex items-center justify-between mb-8 pt-4">
+            <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
+                <div className="shrink-0">
+                    <Logo style={{ width: '2.5rem', height: 'auto', display: 'block' }} />
                 </div>
-                <h1 className="hidden sm:block text-2xl font-bold text-slate-900 dark:text-white tracking-tight cursor-pointer" onClick={() => navigate('/')}>BotlyHub</h1>
+                <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">BotlyHub</h1>
             </div>
 
-            <div className="flex-1 max-w-2xl cursor-pointer" onClick={() => navigate('/search')}>
-                <div className="relative flex items-center bg-white dark:bg-slate-900/40 backdrop-blur-2xl border border-black/5 dark:border-white/10 rounded-[28px] sm:rounded-[22px] p-1 md:p-1.5 transition-all active:scale-[0.98] group">
-                    <div className="ml-3 md:ml-4 w-10 h-10 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-2xl text-slate-400 group-hover:text-blue-500 transition-colors">
-                        <Search size={20} />
-                    </div>
-                    <div className="w-full py-2.5 md:py-3 px-4 text-[13px] md:text-sm text-slate-400 font-bold uppercase tracking-widest opacity-60 truncate">
-                        {t('search_placeholder')}
-                    </div>
-                </div>
-            </div>
-
-            <div className="flex items-center gap-2 md:gap-3 shrink-0">
+            <div className="flex items-center gap-2 md:gap-3">
+                <button 
+                    onClick={() => { haptic('light'); navigate('/search'); }} 
+                    className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/5 rounded-xl text-slate-500 active:scale-90 transition-all "
+                >
+                    <Search size={20} />
+                </button>
                 <button 
                     onClick={() => { haptic('light'); toggleTheme(); }} 
-                    className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-2xl text-slate-500 dark:text-slate-400 active:scale-90 transition-all "
+                    className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/5 rounded-xl text-slate-500 active:scale-90 transition-all "
                 >
-                    {theme === 'dark' ? (
-                        <Sun size={20} />
-                    ) : (
-                        <Moon size={20} />
-                    )}
+                    {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
                 </button>
-
-                {DatabaseService.isAdminLoggedIn() && (
-                    <button 
-                        onClick={() => navigate(`/a/dashboard/bots`)}
-                        className="flex w-10 h-10 md:w-12 md:h-12 items-center justify-center bg-brand border border-brand/20 rounded-2xl text-white active:scale-95 transition-transform shadow-lg shadow-blue-500/20"
-                        title="Yönet"
-                    >
-                        <Edit3 size={18} />
-                    </button>
-                )}
-
-                {user ? (
-                    <>
-                        <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="hidden sm:flex w-10 h-10 md:w-12 md:h-12 items-center justify-center bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-2xl text-slate-500 dark:text-slate-400 active:scale-90 transition-all">
-                            <Wallet size={20} />
-                        </button>
-                        <div className="relative" ref={menuRef}>
-                            <button 
-                              onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
-                              className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-2xl text-slate-500 dark:text-slate-400 active:scale-90 transition-all relative"
-                            >
-                                <Menu size={20} className="md:w-[22px] md:h-[22px]" strokeWidth={2.5} />
-                                {unreadCount > 0 && (
-                                    <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[8px] font-black text-white flex items-center justify-center px-1 badge-pop">
-                                        {unreadCount > 9 ? '9+' : unreadCount}
-                                    </div>
-                                )}
-                            </button>
-                            {isMenuOpen && (
-                                <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-[32px] overflow-hidden z-[100] animate-in py-2 backdrop-blur-2xl">
-                                    {[
-                                        { path: '/', icon: Store, color: 'text-blue-500 dark:text-blue-400', label: 'market' },
-                                        { path: '/settings', icon: UserIcon, color: 'text-purple-500 dark:text-purple-400', label: 'profile' },
-                                        { path: '/my-bots', icon: BotIcon, color: 'text-emerald-500 dark:text-emerald-400', label: 'my_bots' },
-                                        { path: '/channels', icon: Megaphone, color: 'text-orange-500 dark:text-orange-400', label: 'my_channels' },
-                                        { path: '/notifications', icon: Bell, color: 'text-blue-600 dark:text-blue-500', label: 'notifications', badge: unreadCount > 0 }
-                                    ].map((item, i) => (
-                                        <button key={i} onClick={() => { navigate(item.path); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-black/5 dark:hover:bg-white/5 text-left border-b border-black/5 dark:border-white/5 last:border-0 relative">
-                                            <item.icon size={18} className={item.color} /> 
-                                            <span className="text-[11px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300">{t(item.label)}</span>
-                                            {item.badge && <div className="absolute right-6 w-2.5 h-2.5 bg-red-600 rounded-full"></div>}
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </>
-                ) : (
-                    <button 
-                        onClick={() => { haptic('light'); setIsLoginModalOpen(true); }}
-                        className="px-6 h-10 md:h-12 bg-blue-500 hover:bg-blue-600 text-white text-[12px] md:text-[14px] font-bold rounded-[16px] md:rounded-[18px] transition-all active:scale-95 flex items-center justify-center whitespace-nowrap shadow-lg shadow-blue-500/25"
-                    >
-                        Giriş yap
-                    </button>
-                )}
-                <LoginModal 
-                    isOpen={isLoginModalOpen} 
-                    onClose={() => setIsLoginModalOpen(false)} 
-                    onAuth={(user) => setWebAuthUser(user)} 
-                />
             </div>
         </div>
 
@@ -390,7 +321,7 @@ const BotDetail = () => {
               <img 
                 src={getLiveBotIcon(bot)} 
                 loading="lazy"
-                className="w-24 h-24 rounded-[32px] !p-0 border border-black/10 dark:border-white/10 object-cover bg-slate-200 dark:bg-slate-900" 
+                className="w-24 h-24 rounded-xl !p-0 border border-black/10 dark:border-white/10 object-cover bg-slate-200 dark:bg-slate-900" 
                 onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=1e293b&color=fff&bold=true`; }}
               />
               {isOwned && (
@@ -454,7 +385,7 @@ const BotDetail = () => {
                                       initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                       animate={{ opacity: 1, y: 0, scale: 1 }}
                                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                      className="absolute left-0 mt-2 w-48 bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-2xl z-[80] overflow-hidden"
+                                      className="absolute left-0 mt-2 w-48 bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl z-[80] overflow-hidden"
                                   >
                                       <div className="p-2 space-y-1">
                                           {bot.telegram_group && (
@@ -517,31 +448,23 @@ const BotDetail = () => {
         </div>
 
         <div className="w-full md:w-auto md:min-w-[320px] lg:hidden">
-            <div className="flex flex-col bg-white dark:bg-slate-900/60 rounded-[32px] border border-black/5 dark:border-white/5 backdrop-blur-xl overflow-hidden fancy-glass-card stats-card-bg">
-                <div className="flex items-center justify-between p-6">
-                    <div className="flex flex-col items-center flex-1 border-r border-black/5 dark:border-white/5">
-                        <span className="text-slate-900 dark:text-white font-bold text-base">{bot.rating || '0.0'} <Star size={12} className="inline mb-1 fill-slate-900 dark:fill-white" /></span>
-                        <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">{bot.rating_count || 0} Oy</span>
+            <div className="flex flex-col bg-white dark:bg-slate-900 border border-black/5 dark:border-white/5 p-4 rounded-xl stats-card-bg">
+                <div className="flex items-center justify-between">
+                    <div className="flex flex-col items-center flex-1">
+                        <span className="text-slate-900 dark:text-white font-bold text-base">{bot.rating || '0.0'} <Star size={12} className="inline mb-1 fill-yellow-500 text-yellow-500" /></span>
+                        <span className="text-[9px] text-slate-500 font-bold uppercase mt-0.5 tracking-wider">{bot.rating_count || 0} Oy</span>
                     </div>
-                    <div className="flex flex-col items-center flex-1 border-r border-black/5 dark:border-white/5">
+                    <div className="w-px h-8 bg-black/5 dark:bg-white/5"></div>
+                    <div className="flex flex-col items-center flex-1">
                         <span className="text-slate-900 dark:text-white font-bold text-base">{bot.user_count && bot.user_count > 1000 ? `${(bot.user_count / 1000).toFixed(1)}K` : bot.user_count || 0}</span>
-                        <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">Kullanıcı</span>
+                        <span className="text-[9px] text-slate-500 font-bold uppercase mt-0.5 tracking-wider">Kullanıcı</span>
                     </div>
+                    <div className="w-px h-8 bg-black/5 dark:bg-white/5"></div>
                     <div className="flex flex-col items-center flex-1">
                         <span className="text-slate-900 dark:text-white font-bold text-base">{bot.views && bot.views > 1000 ? `${(bot.views / 1000).toFixed(1)}K` : bot.views || 0}</span>
-                        <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">Görüntüleme</span>
+                        <span className="text-[9px] text-slate-500 font-bold uppercase mt-0.5 tracking-wider">Görüntüleme</span>
                     </div>
                 </div>
-                {bot.languages && bot.languages.length > 0 && (
-                    <div className="px-6 py-3 border-t border-black/5 dark:border-white/5 flex items-center justify-start gap-3">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0 mr-[3px]"><path fillRule="evenodd" clipRule="evenodd" d="M5.5 2.5V2C5.5 1.17157 6.17157 0.5 7 0.5C7.82843 0.5 8.5 1.17157 8.5 2V2.5H9.9742C9.9901 2.49975 10.0061 2.49974 10.0221 2.5H12C12.8284 2.5 13.5 3.17157 13.5 4C13.5 4.82843 12.8284 5.5 12 5.5H11.2512C10.7379 7.82318 9.75127 9.98263 8.30067 11.9736C9.27943 12.9992 10.4353 13.9118 11.7719 14.7138C12.4823 15.14 12.7126 16.0614 12.2864 16.7717C11.8602 17.4821 10.9388 17.7125 10.2284 17.2862C8.75981 16.4051 7.46579 15.399 6.34922 14.2699C5.33326 15.3069 4.1736 16.2908 2.87186 17.2206C2.19774 17.7021 1.26091 17.546 0.7794 16.8719C0.297886 16.1977 0.454024 15.2609 1.12814 14.7794C2.38555 13.8813 3.48271 12.9379 4.42182 11.9481C3.69705 10.8985 3.09174 9.76779 2.60746 8.55709C2.29979 7.78791 2.67391 6.91496 3.44309 6.60729C4.21226 6.29961 5.08522 6.67374 5.39289 7.44291C5.67512 8.14848 6.00658 8.8209 6.38782 9.46053C7.19463 8.20649 7.78489 6.88692 8.16216 5.5H2C1.17157 5.5 0.5 4.82843 0.5 4C0.5 3.17157 1.17157 2.5 2 2.5H5.5ZM16.4912 16.5H18.5088L17.5 13.5856L16.4912 16.5ZM15.4527 19.5L14.4175 22.4907C14.1465 23.2735 13.2922 23.6885 12.5093 23.4175C11.7265 23.1465 11.3115 22.2922 11.5825 21.5093L16.0825 8.50933C16.5484 7.16356 18.4516 7.16356 18.9175 8.50933L23.4175 21.5093C23.6885 22.2922 23.2735 23.1465 22.4907 23.4175C21.7078 23.6885 20.8535 23.2735 20.5825 22.4907L19.5473 19.5H15.4527Z" fill="#758CA3"/></svg>
-                        {bot.languages.map((lang, idx) => (
-                        <span key={idx} className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
-                            {lang}
-                        </span>
-                        ))}
-                    </div>
-                )}
             </div>
         </div>
       </div>
@@ -562,7 +485,7 @@ const BotDetail = () => {
                     <motion.div 
                       key={i} 
                       whileHover={{ scale: 1.02 }}
-                      className="h-[320px] rounded-[32px] bg-slate-200 dark:bg-slate-900 border border-black/5 dark:border-white/5 overflow-hidden snap-center shrink-0 cursor-zoom-in group relative"
+                      className="h-[320px] rounded-xl bg-slate-200 dark:bg-slate-900 border border-black/5 dark:border-white/5 overflow-hidden snap-center shrink-0 cursor-zoom-in group relative"
                       onClick={() => openLightbox(i)}
                     >
                         <img src={s} loading="lazy" className="h-full w-auto object-contain" />
@@ -573,7 +496,7 @@ const BotDetail = () => {
                   ))
               ) : (
                   [1,2,3].map(i => (
-                    <div key={i} className="min-w-[180px] h-[320px] rounded-[32px] bg-slate-100 dark:bg-slate-900/50 border border-black/5 dark:border-white/5 overflow-hidden snap-center shrink-0 flex items-center justify-center">
+                    <div key={i} className="min-w-[180px] h-[320px] rounded-xl bg-slate-100 dark:bg-slate-900/50 border border-black/5 dark:border-white/5 overflow-hidden snap-center shrink-0 flex items-center justify-center">
                         <ImageIcon className="text-slate-300 dark:text-slate-800" size={32} />
                     </div>
                   ))
@@ -588,7 +511,7 @@ const BotDetail = () => {
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="relative p-5 bg-white/5 dark:bg-slate-900/40 backdrop-blur-xl rounded-[32px] border border-black/5 dark:border-white/5 overflow-hidden group"
+                className="relative p-5 bg-white/5 dark:bg-slate-900/40 backdrop-blur-xl rounded-xl border border-black/5 dark:border-white/5 overflow-hidden group"
               >
                   <div className="relative z-10">
                       <div className="flex items-center justify-between mb-5">
@@ -651,7 +574,7 @@ const BotDetail = () => {
           <div className="flex items-center justify-between mb-4 px-2">
             <h3 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Hakkında</h3>
           </div>
-          <div className="p-[11px] bg-white dark:bg-slate-900/60 rounded-[32px] border border-black/5 dark:border-white/5 text-sm text-slate-600 dark:text-slate-400 leading-[1.6] whitespace-pre-wrap">
+          <div className="p-[11px] bg-white dark:bg-slate-900/60 rounded-xl border border-black/5 dark:border-white/5 text-sm text-slate-600 dark:text-slate-400 leading-[1.6] whitespace-pre-wrap">
               {bot.description}
           </div>
       </div>
@@ -661,7 +584,7 @@ const BotDetail = () => {
           {/* Right Column (PC only) - Action bar moved here for large screens */}
           <aside className="hidden lg:flex flex-col gap-4 pt-10 sticky top-10 h-fit pr-6 lg:pr-0">
               <div className="w-full">
-                  <div className="flex flex-col bg-white dark:bg-slate-900/60 rounded-[32px] border border-black/5 dark:border-white/5 backdrop-blur-xl overflow-hidden fancy-glass-card stats-card-bg">
+                  <div className="flex flex-col bg-white dark:bg-slate-900/60 rounded-xl border border-black/5 dark:border-white/5 backdrop-blur-xl overflow-hidden fancy-glass-card stats-card-bg">
                       <div className="flex items-center justify-between p-6">
                           <div className="flex flex-col items-center flex-1 border-r border-black/5 dark:border-white/5">
                               <span className="text-slate-900 dark:text-white font-bold text-base">{bot.rating || '0.0'} <Star size={12} className="inline mb-1 fill-slate-900 dark:fill-white" /></span>
@@ -694,7 +617,7 @@ const BotDetail = () => {
                   <button 
                     onClick={handleAction}
                     disabled={isProcessing}
-                    className={`w-full h-20 rounded-[32px] text-[11px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 border-b-8 ${
+                    className={`w-full h-20 rounded-xl text-[11px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 border-b-8 ${
                         isOwned 
                         ? 'bg-emerald-600 text-white border-emerald-800' 
                         : 'bg-slate-900 dark:bg-white text-white dark:text-slate-950 border-slate-700 dark:border-slate-300'
@@ -719,7 +642,7 @@ const BotDetail = () => {
                   <div className="flex gap-3">
                       <button 
                         onClick={handleShare}
-                        className="h-20 flex-1 bg-white dark:bg-slate-900 rounded-[32px] border border-black/5 dark:border-white/10 flex items-center justify-center gap-3 text-slate-500 dark:text-slate-400 active:scale-95 transition-all relative border-b-8 border-transparent"
+                        className="h-20 flex-1 bg-white dark:bg-slate-900 rounded-xl border border-black/5 dark:border-white/10 flex items-center justify-center gap-3 text-slate-500 dark:text-slate-400 active:scale-95 transition-all relative border-b-8 border-transparent"
                       >
                           <Share2 size={20} className={isCopied ? 'text-emerald-500' : ''} />
                           <span className="text-[10px] font-black uppercase tracking-[0.2em]">PAYLAŞ</span>
@@ -739,7 +662,7 @@ const BotDetail = () => {
 
                       <button 
                         onClick={() => { haptic('medium'); notification('warning'); /* Future Report logic */ }}
-                        className="h-20 w-20 shrink-0 bg-white dark:bg-slate-900 rounded-[32px] border border-black/5 dark:border-white/10 flex items-center justify-center text-slate-400 hover:text-red-500 active:scale-95 transition-all border-b-8 border-transparent"
+                        className="h-20 w-20 shrink-0 bg-white dark:bg-slate-900 rounded-xl border border-black/5 dark:border-white/10 flex items-center justify-center text-slate-400 hover:text-red-500 active:scale-95 transition-all border-b-8 border-transparent"
                       >
                           <Flag size={20} />
                       </button>
@@ -747,7 +670,7 @@ const BotDetail = () => {
 
                   {/* Direct Link Buttons for Sidebar (PC/Large Screens) */}
                   {(bot.telegram_group || bot.website_url || bot.app_url || bot.social_url) && (
-                      <div className="flex flex-col bg-white dark:bg-slate-900/40 rounded-[32px] border border-black/5 dark:border-white/5 p-4 pt-5 gap-[0.6em] official-links-box">
+                      <div className="flex flex-col bg-white dark:bg-slate-900/40 rounded-xl border border-black/5 dark:border-white/5 p-4 pt-5 gap-[0.6em] official-links-box">
                           <div className="px-2 mb-1">
                               <h4 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">OFFICIAL LINKS</h4>
                           </div>
@@ -810,7 +733,7 @@ const BotDetail = () => {
           <div className="max-w-md mx-auto flex items-center gap-3">
               <button 
                 onClick={handleShare}
-                className="h-20 w-20 shrink-0 bg-white dark:bg-slate-900 rounded-[32px] border border-black/5 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 active:scale-95 transition-all relative border-b-8 border-transparent"
+                className="h-20 w-20 shrink-0 bg-white dark:bg-slate-900 rounded-xl border border-black/5 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 active:scale-95 transition-all relative border-b-8 border-transparent"
               >
                   <Share2 size={24} className={isCopied ? 'text-emerald-500' : ''} />
                   <AnimatePresence>
@@ -837,7 +760,7 @@ const BotDetail = () => {
               <button 
                 onClick={handleAction}
                 disabled={isProcessing}
-                className={`flex-1 h-20 rounded-[32px] text-[11px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 border-b-8 ${
+                className={`flex-1 h-20 rounded-xl text-[11px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 border-b-8 ${
                     isOwned 
                     ? 'bg-emerald-600 text-white border-emerald-800' 
                     : 'bg-slate-900 dark:bg-white text-white dark:text-slate-950 border-slate-700 dark:border-slate-300'
@@ -877,7 +800,7 @@ const BotDetail = () => {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-sm bg-white dark:bg-slate-900 border border-black/10 dark:border-white/10 rounded-[44px] overflow-hidden"
+              className="relative w-full max-w-sm bg-white dark:bg-slate-900 border border-black/10 dark:border-white/10 rounded-xl overflow-hidden"
             >
               <div className="p-8 lg:p-10">
                 <div className="flex justify-between items-center mb-8">
@@ -921,7 +844,7 @@ const BotDetail = () => {
                       setShowGuide(false);
                       handleAction();
                     }}
-                    className="w-full py-5 bg-brand dark:bg-brand-light hover:opacity-90 text-white font-black rounded-[24px] text-[10px] uppercase tracking-[0.4em] transition-all active:scale-95 flex items-center justify-center gap-3"
+                    className="w-full py-5 bg-brand dark:bg-brand-light hover:opacity-90 text-white font-black rounded-xl text-[10px] uppercase tracking-[0.4em] transition-all active:scale-95 flex items-center justify-center gap-3"
                   >
                     <Send size={16} /> ŞİMDİ BAŞLAT
                   </button>
@@ -980,7 +903,7 @@ const BotDetail = () => {
               <img 
                 src={bot.screenshots[currentImageIndex]} 
                 alt={`Ekran Görüntüsü ${currentImageIndex + 1}`}
-                className="max-w-full max-h-full object-contain rounded-2xl md:rounded-[40px] shadow-2xl"
+                className="max-w-full max-h-full object-contain rounded-xl md:rounded-xl shadow-2xl"
               />
             </motion.div>
 

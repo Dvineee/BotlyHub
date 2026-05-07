@@ -104,7 +104,7 @@ const Earnings = () => {
   const totalViews = stats.reduce((acc, curr) => acc + (curr.views || 0), 0);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 pt-10 pb-32 flex flex-col transition-colors animate-in fade-in duration-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 px-5 sm:px-8 pt-6 md:pt-10 pb-32 flex flex-col transition-colors animate-in fade-in duration-300">
         <div className="max-w-7xl mx-auto w-full">
             <div className="flex items-center gap-4 mb-10 px-1">
             <div>
@@ -113,20 +113,20 @@ const Earnings = () => {
             </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900/40 p-1.5 rounded-[28px] sm:rounded-[22px] flex mb-10 border border-black/5 dark:border-white/5 backdrop-blur-xl ">
-            <button onClick={()=>setActiveTab('wallet')} className={`flex-1 py-3.5 rounded-[22px] text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab==='wallet'?'bg-brand dark:bg-brand-light text-white  ':'text-slate-500 hover:bg-black/5 dark:hover:bg-white/5'}`}>Cüzdan Yönetimi</button>
-            <button onClick={()=>setActiveTab('revenue')} className={`flex-1 py-3.5 rounded-[22px] text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab==='revenue'?'bg-brand dark:bg-brand-light text-white  ':'text-slate-500 hover:bg-black/5 dark:hover:bg-white/5'}`}>Performans Analitiği</button>
+        <div className="bg-white dark:bg-slate-900/40 p-1.5 rounded-xl flex mb-10 border border-black/5 dark:border-white/5 backdrop-blur-xl ">
+            <button onClick={()=>setActiveTab('wallet')} className={`flex-1 py-3.5 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab==='wallet'?'bg-brand dark:bg-brand-light text-white  ':'text-slate-500 hover:bg-black/5 dark:hover:bg-white/5'}`}>Cüzdan Yönetimi</button>
+            <button onClick={()=>setActiveTab('revenue')} className={`flex-1 py-3.5 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab==='revenue'?'bg-brand dark:bg-brand-light text-white  ':'text-slate-500 hover:bg-black/5 dark:hover:bg-white/5'}`}>Performans Analitiği</button>
         </div>
 
         <div className="flex-1 overflow-y-auto no-scrollbar px-1">
             {activeTab === 'wallet' ? (
                 <div className="animate-in slide-in-from-bottom-4">
                     {/* ... wallet content ... */}
-                    <div className="bg-gradient-to-br from-brand to-indigo-700 p-8 rounded-[44px] mb-8 relative overflow-hidden  ">
+                    <div className="bg-gradient-to-br from-brand to-indigo-700 p-8 rounded-xl mb-8 relative overflow-hidden  ">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-3xl"></div>
                         <div className="relative z-10">
                             <div className="flex justify-between items-start mb-10">
-                                <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/30 ">
+                                <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/30 ">
                                     <Zap size={24} className="text-white" />
                                 </div>
                                 <div className="flex items-center gap-2 bg-black/20 px-3 py-1.5 rounded-xl border border-white/10 backdrop-blur-sm">
@@ -145,14 +145,14 @@ const Earnings = () => {
                     </div>
 
                     <div className="grid grid-cols-2 gap-4 mb-8">
-                        <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-[32px] flex flex-col items-center gap-3 stats-card-bg">
+                        <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-xl flex flex-col items-center gap-3 stats-card-bg">
                             <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-500 "><TrendingUp size={20} /></div>
                             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Kümülatif Kazanç</p>
                             <h4 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight leading-none">
                                 ₺{wallet ? wallet.total_earned.toLocaleString() : '0.00'}
                             </h4>
                         </div>
-                        <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-[32px] flex flex-col items-center gap-3 stats-card-bg">
+                        <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-xl flex flex-col items-center gap-3 stats-card-bg">
                             <div className="w-10 h-10 bg-brand/10 dark:bg-brand-light/10 rounded-xl flex items-center justify-center text-brand dark:text-brand-light "><PieChart size={20} /></div>
                             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Bağlı Kanallar</p>
                             <h4 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight leading-none">
@@ -161,7 +161,7 @@ const Earnings = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-[40px] p-8 text-center backdrop-blur-md mb-8 ">
+                    <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-xl p-8 text-center backdrop-blur-md mb-8 ">
                         <p className="text-slate-500 text-[11px] font-bold uppercase tracking-wider mb-8 leading-relaxed px-4">
                             Ödemelerinizi almak ve lisans işlemleri yapmak için cüzdanınızı bağlayın.
                         </p>
@@ -171,12 +171,12 @@ const Earnings = () => {
                     </div>
 
                     {tonWallet && (
-                        <div className="bg-white dark:bg-slate-900/60 border border-brand/20 dark:border-brand-light/20 rounded-[32px] p-6 animate-in zoom-in-95 ">
+                        <div className="bg-white dark:bg-slate-900/60 border border-brand/20 dark:border-brand-light/20 rounded-xl p-6 animate-in zoom-in-95 ">
                             <div className="flex items-center gap-4 mb-4">
                                 <div className="w-10 h-10 bg-brand/10 dark:bg-brand-light/10 rounded-xl flex items-center justify-center text-brand dark:text-brand-light "><WalletIcon size={18} /></div>
                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Bağlı Adres</p>
                             </div>
-                            <p className="text-[11px] text-slate-900 dark:text-white font-bold break-all bg-slate-50 dark:bg-black/40 p-5 rounded-2xl border border-black/5 dark:border-white/5 leading-relaxed tracking-tight ">
+                            <p className="text-[11px] text-slate-900 dark:text-white font-bold break-all bg-slate-50 dark:bg-black/40 p-5 rounded-xl border border-black/5 dark:border-white/5 leading-relaxed tracking-tight ">
                                 {userFriendlyAddress}
                             </p>
                         </div>
@@ -201,12 +201,12 @@ const Earnings = () => {
                         </button>
                     </div>
                     <div className="grid grid-cols-2 gap-4 mb-8">
-                        <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-[32px] flex flex-col items-center gap-3 stats-card-bg">
+                        <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-xl flex flex-col items-center gap-3 stats-card-bg">
                             <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-500 "><ArrowUpRight size={20} /></div>
                             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Kümülatif Kazanç</p>
                             <h4 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight leading-none">₺{totalRevenue.toFixed(2)}</h4>
                         </div>
-                        <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-[32px] flex flex-col items-center gap-3 stats-card-bg">
+                        <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-xl flex flex-col items-center gap-3 stats-card-bg">
                             <div className="w-10 h-10 bg-brand/10 dark:bg-brand-light/10 rounded-xl flex items-center justify-center text-brand dark:text-brand-light "><TrendingUp size={20} /></div>
                             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Toplam Etkileşim</p>
                             <h4 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight leading-none">{totalViews.toLocaleString()}</h4>
@@ -219,7 +219,7 @@ const Earnings = () => {
                             <span className="text-[11px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest">Veriler Yükleniyor...</span>
                         </div>
                     ) : stats.length === 0 ? (
-                        <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-[44px] p-10 flex flex-col items-center justify-center gap-8 relative overflow-hidden ">
+                        <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-xl p-10 flex flex-col items-center justify-center gap-8 relative overflow-hidden ">
                             <div className="absolute top-0 right-0 p-8 opacity-5">
                                 <PieChart size={120} className="text-brand dark:text-brand-light" />
                             </div>
@@ -237,10 +237,10 @@ const Earnings = () => {
                         <div className="space-y-4">
                             <p className="text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest mb-4 ml-4">Kanal Bazlı Yayın Raporu</p>
                             {stats.map(s => (
-                                <div key={s.id} className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-[32px] space-y-4 group hover:bg-slate-50 dark:hover:bg-slate-900/60 transition-all ">
+                                <div key={s.id} className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-6 rounded-xl space-y-4 group hover:bg-slate-50 dark:hover:bg-slate-900/60 transition-all ">
                                     <div className="flex justify-between items-start">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-brand/10 dark:bg-brand-light/10 rounded-2xl flex items-center justify-center text-brand dark:text-brand-light ">
+                                            <div className="w-12 h-12 bg-brand/10 dark:bg-brand-light/10 rounded-xl flex items-center justify-center text-brand dark:text-brand-light ">
                                                 <Megaphone size={20} />
                                             </div>
                                             <div>
@@ -271,8 +271,8 @@ const Earnings = () => {
                         </div>
                     )}
 
-                    <div className="mt-8 flex items-center gap-4 p-6 bg-brand/5 dark:bg-brand-light/5 border border-brand/10 dark:border-brand-light/10 rounded-[32px] ">
-                        <div className="w-12 h-12 bg-brand/10 dark:bg-brand-light/10 rounded-2xl flex items-center justify-center text-brand dark:text-brand-light "><Clock size={22}/></div>
+                    <div className="mt-8 flex items-center gap-4 p-6 bg-brand/5 dark:bg-brand-light/5 border border-brand/10 dark:border-brand-light/10 rounded-xl ">
+                        <div className="w-12 h-12 bg-brand/10 dark:bg-brand-light/10 rounded-xl flex items-center justify-center text-brand dark:text-brand-light "><Clock size={22}/></div>
                         <div>
                             <p className="text-[11px] font-bold text-brand dark:text-brand-light uppercase tracking-widest mb-1">Ödeme ve Hakediş Döngüsü</p>
                             <p className="text-xs text-slate-500 font-medium">Hakedişler her ayın 15'inde cüzdana aktarılır.</p>

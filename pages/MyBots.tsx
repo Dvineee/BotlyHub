@@ -166,19 +166,19 @@ const MyBots = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 pt-10 pb-32 animate-in fade-in transition-colors duration-300" onClick={() => setOpenSettingsId(null)}>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 px-5 sm:px-8 pt-6 md:pt-10 pb-32 animate-in fade-in transition-colors duration-300" onClick={() => setOpenSettingsId(null)}>
       <div className="max-w-7xl mx-auto">
       <div className="flex items-center justify-between mb-8 px-1">
         <div className="flex items-center gap-4">
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Botlarım</h1>
         </div>
-        <button onClick={(e) => { e.stopPropagation(); navigate('/'); }} className="w-12 h-12 flex items-center justify-center bg-brand dark:bg-brand-light rounded-full text-white active:scale-90 transition-transform  ">
+        <button onClick={(e) => { e.stopPropagation(); navigate('/'); }} className="w-12 h-12 flex items-center justify-center bg-brand dark:bg-brand-light rounded-xl text-white active:scale-90 transition-transform  ">
             <ShoppingBag size={20} />
         </button>
       </div>
 
       {expiredBotNotice && (
-          <div className="mb-6 p-4 bg-orange-500/10 border border-orange-500/20 rounded-2xl flex items-start gap-3 animate-in fade-in">
+          <div className="mb-6 p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl flex items-start gap-3 animate-in fade-in">
               <Info className="text-orange-600 dark:text-orange-500 shrink-0 mt-0.5" size={18} />
               <p className="text-[11px] text-orange-800 dark:text-orange-200 font-medium leading-relaxed">{expiredBotNotice}</p>
               <button onClick={() => setExpiredBotNotice(null)} className="text-orange-600 dark:text-orange-500"><X size={16}/></button>
@@ -189,7 +189,7 @@ const MyBots = () => {
         {isLoading ? (
             <div className="flex justify-center py-20"><Loader2 className="animate-spin text-blue-500" /></div>
         ) : bots.length === 0 ? (
-             <div className="flex flex-col items-center justify-center py-16 text-slate-500 bg-white dark:bg-slate-900/30 rounded-3xl border border-black/5 dark:border-slate-800/50 border-dashed ">
+             <div className="flex flex-col items-center justify-center py-16 text-slate-500 bg-white dark:bg-slate-900/30 rounded-xl border border-black/5 dark:border-slate-800/50 border-dashed ">
                 <div className="w-20 h-20 bg-slate-100 dark:bg-slate-900 rounded-full flex items-center justify-center mb-4 ">
                     <Bot size={40} className="opacity-40" />
                 </div>
@@ -198,13 +198,13 @@ const MyBots = () => {
             </div>
         ) : (
             bots.map((bot) => (
-                <div key={bot.id} className="group relative bg-white dark:bg-slate-900/40 rounded-[32px] border border-black/5 dark:border-white/5 overflow-hidden transition-all hover:bg-slate-50 dark:hover:bg-slate-900/60 ">
+                <div key={bot.id} className="group relative bg-white dark:bg-slate-900/40 rounded-xl border border-black/5 dark:border-white/5 overflow-hidden transition-all hover:bg-slate-50 dark:hover:bg-slate-900/60 ">
                     <div className="p-4 flex items-center relative z-10">
                          <div className="relative flex-shrink-0">
                              <img 
                                 src={getLiveBotIcon(bot)} 
                                 alt={bot.name} 
-                                className="w-24 h-24 rounded-[24px] object-cover bg-slate-200 dark:bg-slate-800 border border-black/5 dark:border-white/5 " 
+                                className="w-24 h-24 rounded-xl object-cover bg-slate-200 dark:bg-slate-800 border border-black/5 dark:border-white/5 " 
                                 onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
                              />
                              {bot.price > 0 && (
@@ -264,7 +264,7 @@ const MyBots = () => {
                                         {bot.price > 0 ? (
                                             <div 
                                                 onClick={(e) => { e.stopPropagation(); toggleAdRevenue(bot.id); }}
-                                                className={`cursor-pointer rounded-2xl px-4 h-full max-h-[64px] flex items-center gap-3 border transition-all active:scale-95  ${
+                                                className={`cursor-pointer rounded-xl px-4 h-full max-h-[64px] flex items-center gap-3 border transition-all active:scale-95  ${
                                                     bot.revenueEnabled ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-white dark:bg-slate-900/60 border-black/5 dark:border-white/5'
                                                 }`}
                                             >
@@ -272,7 +272,7 @@ const MyBots = () => {
                                                 <span className={`text-[11px] font-bold uppercase tracking-tight ${bot.revenueEnabled ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'}`}>Gelir Modu</span>
                                             </div>
                                         ) : (
-                                            <div className="rounded-2xl px-4 h-full max-h-[64px] flex flex-col items-center justify-center bg-slate-100 dark:bg-slate-950/40 border border-black/5 dark:border-white/5 opacity-40 text-center">
+                                            <div className="rounded-xl px-4 h-full max-h-[64px] flex flex-col items-center justify-center bg-slate-100 dark:bg-slate-950/40 border border-black/5 dark:border-white/5 opacity-40 text-center">
                                                 <Lock size={14} className="text-slate-400 dark:text-slate-500 mb-1" />
                                                 <span className="text-[8px] font-bold uppercase text-slate-400 dark:text-slate-500 tracking-widest">Ücretsiz</span>
                                             </div>
@@ -280,7 +280,7 @@ const MyBots = () => {
 
                                         <div 
                                             onClick={(e) => { e.stopPropagation(); toggleActiveStatus(bot.id); }}
-                                            className={`cursor-pointer rounded-2xl px-4 h-full max-h-[64px] flex items-center gap-3 border transition-all active:scale-95  ${
+                                            className={`cursor-pointer rounded-xl px-4 h-full max-h-[64px] flex items-center gap-3 border transition-all active:scale-95  ${
                                                 bot.isActive ? 'bg-brand/10 dark:bg-brand-light/10 border-brand/30 dark:border-brand-light/30' : 'bg-white dark:bg-slate-900/60 border-black/5 dark:border-white/5'
                                             }`}
                                         >
@@ -292,14 +292,14 @@ const MyBots = () => {
 
                                 <div 
                                     onClick={(e) => { e.stopPropagation(); handleDeleteClick(bot); }}
-                                    className={`cursor-pointer rounded-2xl px-4 h-full max-h-[64px] flex items-center justify-center gap-3 border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 transition-all active:scale-95  ${bot.is_official ? 'col-start-2 row-start-2' : ''}`}
+                                    className={`cursor-pointer rounded-xl px-4 h-full max-h-[64px] flex items-center justify-center gap-3 border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 transition-all active:scale-95  ${bot.is_official ? 'col-start-2 row-start-2' : ''}`}
                                 >
                                     <Trash2 size={18} className="text-red-500" />
                                     <span className="text-[11px] font-bold uppercase text-red-500">Kaldır</span>
                                 </div>
 
                                 {bot.is_official && bot.price > 0 && (
-                                    <div className="rounded-2xl px-4 h-full max-h-[64px] flex flex-col items-center justify-center bg-slate-100 dark:bg-slate-950 border border-black/5 dark:border-white/5 opacity-60 col-start-2 row-start-2 text-center ">
+                                    <div className="rounded-xl px-4 h-full max-h-[64px] flex flex-col items-center justify-center bg-slate-100 dark:bg-slate-950 border border-black/5 dark:border-white/5 opacity-60 col-start-2 row-start-2 text-center ">
                                         <Lock size={14} className="text-slate-400 dark:text-slate-500 mb-1" />
                                         <span className="text-[9px] font-bold uppercase text-slate-400 dark:text-slate-500 tracking-widest">Kilitli</span>
                                     </div>
@@ -313,7 +313,7 @@ const MyBots = () => {
 
       {showDeleteModal && botToDelete && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 animate-in fade-in" onClick={() => !isDeleting && setShowDeleteModal(false)}>
-              <div className="bg-white dark:bg-slate-900 border border-black/5 dark:border-slate-800 p-8 rounded-3xl w-full max-w-sm text-center  relative" onClick={e => e.stopPropagation()}>
+              <div className="bg-white dark:bg-slate-900 border border-black/5 dark:border-slate-800 p-8 rounded-xl w-full max-w-sm text-center  relative" onClick={e => e.stopPropagation()}>
                   {!isDeleting && <button onClick={() => setShowDeleteModal(false)} className="absolute top-4 right-4 text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white"><X size={20} /></button>}
                   <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/20">
                       {isDeleting ? <Loader2 className="animate-spin text-red-500" size={32} /> : <AlertTriangle size={32} className="text-red-500" />}

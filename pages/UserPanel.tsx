@@ -91,7 +91,7 @@ const UserPanel: React.FC = () => {
                                                 setIsSidebarOpen(false);
                                             }}
                                             className={`
-                                                w-full flex items-center justify-between px-5 py-4 rounded-[20px] transition-all group
+                                                w-full flex items-center justify-between px-5 py-4 rounded-xl transition-all group
                                                 ${activeSection === item.id 
                                                     ? 'bg-purple-600 text-white  ' 
                                                     : 'hover:bg-white/5 text-slate-400 hover:text-white'}
@@ -111,9 +111,9 @@ const UserPanel: React.FC = () => {
 
                     {/* Footer */}
                     <div className="p-6 border-t border-white/5">
-                        <div className="bg-slate-950/50 rounded-[24px] p-5 mb-5 border border-white/5">
+                        <div className="bg-slate-950/50 rounded-xl p-5 mb-5 border border-white/5">
                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-slate-800 rounded-[18px] flex items-center justify-center font-bold text-sm text-white uppercase border border-white/5 ">
+                                <div className="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center font-bold text-sm text-white uppercase border border-white/5 ">
                                     {user.username?.substring(0, 2)}
                                 </div>
                                 <div className="flex-1 min-w-0">
@@ -124,7 +124,7 @@ const UserPanel: React.FC = () => {
                         </div>
                         <button 
                             onClick={handleLogout}
-                            className="w-full flex items-center justify-center gap-3 py-4 rounded-[20px] text-red-500 hover:bg-red-500/10 transition-all text-[11px] font-bold uppercase tracking-widest border border-transparent hover:border-red-500/20"
+                            className="w-full flex items-center justify-center gap-3 py-4 rounded-xl text-red-500 hover:bg-red-500/10 transition-all text-[11px] font-bold uppercase tracking-widest border border-transparent hover:border-red-500/20"
                         >
                             <LogOut size={18} />
                             GÜVENLİ ÇIKIŞ
@@ -140,18 +140,18 @@ const UserPanel: React.FC = () => {
                     <div className="flex items-center gap-6">
                         <button 
                             onClick={() => setIsSidebarOpen(true)}
-                            className="lg:hidden w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-slate-400"
+                            className="lg:hidden w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-slate-400"
                         >
                             <Menu size={24} />
                         </button>
-                        <div className="hidden md:flex items-center gap-3 px-5 h-12 bg-slate-950/50 rounded-2xl border border-white/5 w-80">
+                        <div className="hidden md:flex items-center gap-3 px-5 h-12 bg-slate-950/50 rounded-xl border border-white/5 w-80">
                             <Search size={18} className="text-slate-500" />
                             <input type="text" placeholder="Panelde ara..." className="bg-transparent border-none outline-none text-xs font-bold text-white placeholder:text-slate-600 w-full uppercase tracking-widest" />
                         </div>
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <button className="w-12 h-12 bg-slate-950/50 rounded-2xl border border-white/5 flex items-center justify-center text-slate-500 hover:text-purple-400 transition-colors relative">
+                        <button className="w-12 h-12 bg-slate-950/50 rounded-xl border border-white/5 flex items-center justify-center text-slate-500 hover:text-purple-400 transition-colors relative">
                             <Bell size={20} />
                             <span className="absolute top-3 right-3 w-2 h-2 bg-purple-500 rounded-full border-2 border-slate-900"></span>
                         </button>
@@ -161,7 +161,7 @@ const UserPanel: React.FC = () => {
                                 <p className="text-xs font-bold text-white tracking-tight">@{user.username}</p>
                                 <p className="text-[9px] font-bold text-purple-500 uppercase tracking-widest mt-0.5">Çevrimiçi</p>
                             </div>
-                            <div className="w-12 h-12 bg-purple-600/20 rounded-2xl border border-purple-500/20 flex items-center justify-center text-purple-400 font-bold">
+                            <div className="w-12 h-12 bg-purple-600/20 rounded-xl border border-purple-500/20 flex items-center justify-center text-purple-400 font-bold">
                                 <UserIcon size={20} />
                             </div>
                         </div>
@@ -186,7 +186,7 @@ const UserPanel: React.FC = () => {
                                 <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mt-2">Bugün neler yapmak istersin?</p>
                             </div>
                             <div className="flex items-center gap-3">
-                                <div className="px-5 py-3 bg-purple-600/10 border border-purple-500/20 rounded-2xl flex items-center gap-3">
+                                <div className="px-5 py-3 bg-purple-600/10 border border-purple-500/20 rounded-xl flex items-center gap-3">
                                     <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
                                     <span className="text-[10px] font-bold text-purple-400 uppercase tracking-widest">Sistem Durumu: Aktif</span>
                                 </div>
@@ -201,10 +201,10 @@ const UserPanel: React.FC = () => {
                                 { label: 'Aylık Kazanç', value: '₺1,250', icon: TrendingUp, color: 'emerald' },
                                 { label: 'Toplam Etkileşim', value: '45.2K', icon: Activity, color: 'orange' },
                             ].map((stat, i) => (
-                                <div key={i} className="bg-slate-900/40 border border-white/5 p-8 rounded-[44px] backdrop-blur-xl group hover:border-purple-500/20 transition-all fancy-glass-card stats-card-bg relative overflow-hidden">
+                                <div key={i} className="bg-slate-900/40 border border-white/5 p-8 rounded-xl backdrop-blur-xl group hover:border-purple-500/20 transition-all fancy-glass-card stats-card-bg relative overflow-hidden">
                                      <div className={`absolute top-0 right-0 w-24 h-24 bg-${stat.color}-500/5 blur-3xl -mr-12 -mt-12 rounded-full`} />
                                      <div className="flex items-center justify-between mb-6 relative z-10">
-                                         <div className={`w-14 h-14 bg-${stat.color}-500/10 rounded-[24px] flex items-center justify-center text-${stat.color}-400 border border-${stat.color}-500/10`}>
+                                         <div className={`w-14 h-14 bg-${stat.color}-500/10 rounded-xl flex items-center justify-center text-${stat.color}-400 border border-${stat.color}-500/10`}>
                                              <stat.icon size={26} />
                                          </div>
                                          <div className="px-3 py-1 bg-white/5 rounded-full border border-white/5">
@@ -218,9 +218,9 @@ const UserPanel: React.FC = () => {
                         </div>
 
                         {/* Placeholder for sections */}
-                        <div className="bg-slate-900/40 border border-white/5 rounded-[64px] p-20 flex flex-col items-center justify-center text-center space-y-8 min-h-[500px] fancy-glass-card relative overflow-hidden">
+                        <div className="bg-slate-900/40 border border-white/5 rounded-xl p-20 flex flex-col items-center justify-center text-center space-y-8 min-h-[500px] fancy-glass-card relative overflow-hidden">
                             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-purple-500/5" />
-                            <div className="w-24 h-24 bg-white/5 rounded-[40px] flex items-center justify-center text-slate-700 relative z-10 border border-white/5 animate-pulse">
+                            <div className="w-24 h-24 bg-white/5 rounded-xl flex items-center justify-center text-slate-700 relative z-10 border border-white/5 animate-pulse">
                                 <LayoutDashboard size={48} />
                             </div>
                             <div className="relative z-10 max-w-md">

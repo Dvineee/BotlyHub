@@ -69,7 +69,7 @@ const Notifications = () => {
       {/* Premium Navigation Header */}
       <div className="flex items-center justify-between mb-12 px-1">
         <div className="flex items-center gap-5">
-            <div className="w-12 h-12 bg-white dark:bg-slate-900 rounded-[18px] border border-black/5 dark:border-white/5 flex items-center justify-center shadow-sm">
+            <div className="w-12 h-12 bg-white dark:bg-slate-900 rounded-xl border border-black/5 dark:border-white/5 flex items-center justify-center shadow-sm">
                 <Bell className="text-brand dark:text-brand-light" size={20} />
             </div>
             <div>
@@ -79,7 +79,7 @@ const Notifications = () => {
         </div>
         <button 
             onClick={markAllAsRead} 
-            className="w-12 h-12 flex items-center justify-center bg-brand/10 dark:bg-brand-light/10 border border-brand/20 dark:border-brand-light/20 rounded-2xl text-brand dark:text-brand-light active:scale-90 transition-transform "
+            className="w-12 h-12 flex items-center justify-center bg-brand/10 dark:bg-brand-light/10 border border-brand/20 dark:border-brand-light/20 rounded-xl text-brand dark:text-brand-light active:scale-90 transition-transform "
             title="Hepsini Oku"
         >
             <CheckCheck size={22} />
@@ -90,7 +90,7 @@ const Notifications = () => {
           <div className="flex flex-col items-center justify-center py-32 gap-6">
               <div className="relative">
                   <div className="absolute inset-0 blur-3xl bg-brand/20 dark:bg-brand-light/20 animate-pulse"></div>
-                  <div className="w-20 h-20 bg-white dark:bg-slate-900 rounded-[32px] border border-black/5 dark:border-white/10 flex items-center justify-center relative z-10 shadow-xl">
+                  <div className="w-20 h-20 bg-white dark:bg-slate-900 rounded-xl border border-black/5 dark:border-white/10 flex items-center justify-center relative z-10 shadow-xl">
                     <Loader2 className="animate-spin text-brand dark:text-brand-light" size={32} />
                   </div>
               </div>
@@ -98,7 +98,7 @@ const Notifications = () => {
           </div>
       ) : notifications.length === 0 ? (
           <div className="py-32 text-center animate-in zoom-in-95">
-              <div className="w-24 h-24 bg-white dark:bg-slate-900/40 rounded-[44px] border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center mx-auto mb-10 fancy-glass-card shadow-inner">
+              <div className="w-24 h-24 bg-white dark:bg-slate-900/40 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center mx-auto mb-10 fancy-glass-card shadow-inner">
                 <Bell size={36} className="text-slate-200 dark:text-slate-800" />
               </div>
               <p className="text-slate-300 dark:text-slate-700 font-black uppercase text-[11px] tracking-[0.4em] italic">İLETİŞİM HATTI TEMİZ</p>
@@ -109,7 +109,7 @@ const Notifications = () => {
                   <div 
                     key={note.id} 
                     onClick={() => handleNoteClick(note)}
-                    className={`p-6 rounded-[36px] border transition-all flex gap-5 relative overflow-hidden group cursor-pointer backdrop-blur-xl fancy-glass-card ${
+                    className={`p-6 rounded-xl border transition-all flex gap-5 relative overflow-hidden group cursor-pointer backdrop-blur-xl fancy-glass-card ${
                         note.isRead 
                         ? 'bg-white/40 dark:bg-slate-950/40 border-black/5 dark:border-white/5 opacity-50' 
                         : 'bg-white dark:bg-slate-900/60 border-brand/20 dark:border-brand-light/20 shadow-lg shadow-brand/5'
@@ -122,7 +122,7 @@ const Notifications = () => {
                         </>
                       )}
                       
-                      <div className={`w-16 h-16 rounded-[24px] flex items-center justify-center flex-shrink-0 border border-black/5 dark:border-white/5 transition-all group-active:scale-95 shadow-sm ${note.isRead ? 'bg-slate-100 dark:bg-slate-950' : 'bg-slate-50 dark:bg-slate-800'}`}>
+                      <div className={`w-16 h-16 rounded-xl flex items-center justify-center flex-shrink-0 border border-black/5 dark:border-white/5 transition-all group-active:scale-95 shadow-sm ${note.isRead ? 'bg-slate-100 dark:bg-slate-950' : 'bg-slate-50 dark:bg-slate-800'}`}>
                           {getIcon(note.type)}
                       </div>
                       
@@ -147,25 +147,25 @@ const Notifications = () => {
       {/* DETAY MODALI */}
       {selectedNote && (
           <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-xl animate-in fade-in" onClick={() => setSelectedNote(null)}>
-              <div className="bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 w-full max-w-sm rounded-[48px] overflow-hidden animate-in zoom-in-95 shadow-2xl relative" onClick={e => e.stopPropagation()}>
+              <div className="bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 w-full max-w-sm rounded-xl overflow-hidden animate-in zoom-in-95 shadow-2xl relative" onClick={e => e.stopPropagation()}>
                   <div className="absolute top-0 right-0 p-10 opacity-5">
                       {getIcon(selectedNote.type)}
                   </div>
                   <div className="p-10 text-center">
-                      <div className="w-24 h-24 bg-slate-50 dark:bg-slate-950 border border-black/5 dark:border-white/5 rounded-[32px] flex items-center justify-center mx-auto mb-8 shadow-inner">
+                      <div className="w-24 h-24 bg-slate-50 dark:bg-slate-950 border border-black/5 dark:border-white/5 rounded-xl flex items-center justify-center mx-auto mb-8 shadow-inner">
                         {getIcon(selectedNote.type)}
                       </div>
                       
                       <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter uppercase italic leading-none">{selectedNote.title}</h3>
                       <p className="text-[10px] font-black text-brand uppercase tracking-[0.4em] mb-10">{selectedNote.type} CORE MODULE</p>
                       
-                      <div className="bg-slate-50/50 dark:bg-slate-950/50 p-8 rounded-[36px] border border-black/5 dark:border-white/5 mb-10 text-left">
+                      <div className="bg-slate-50/50 dark:bg-slate-950/50 p-8 rounded-xl border border-black/5 dark:border-white/5 mb-10 text-left">
                           <p className="text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed font-black uppercase tracking-widest">{selectedNote.message}</p>
                       </div>
 
                       <button 
                         onClick={() => setSelectedNote(null)} 
-                        className="w-full py-5 bg-slate-900 dark:bg-slate-950 hover:opacity-90 text-white font-black rounded-[24px] text-[12px] uppercase tracking-[0.3em] active:scale-95 transition-all italic border-b-8 border-black dark:border-slate-800"
+                        className="w-full py-5 bg-slate-900 dark:bg-slate-950 hover:opacity-90 text-white font-black rounded-xl text-[12px] uppercase tracking-[0.3em] active:scale-95 transition-all italic border-b-8 border-black dark:border-slate-800"
                       >
                         ONAYLANDI
                       </button>

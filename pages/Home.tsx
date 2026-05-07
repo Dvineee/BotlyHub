@@ -75,56 +75,48 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
     <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-[calc(100vw-48px)] sm:w-full h-[128px] rounded-[32px] relative bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 flex items-center p-3 gap-4 shrink-0 snap-center overflow-hidden cursor-pointer group promo-card"
+        className="w-full relative bg-white dark:bg-slate-900/60 border border-black/5 dark:border-white/10 flex items-center p-2 sm:p-3 gap-4 shrink-0 snap-center rounded-xl overflow-hidden cursor-pointer group promo-card backdrop-blur-xl"
         onClick={handleAction}
     >
-        {/* Left Side: Thumbnail with decorative dots */}
-        <div className="w-[104px] h-[104px] rounded-[20px] overflow-hidden relative shrink-0 bg-slate-100 dark:bg-slate-800">
+        {/* Left Side: Thumbnail */}
+        <div className="w-[100px] h-[100px] rounded-xl overflow-hidden relative shrink-0">
             <img 
                 src={ann.bg_image_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(ann.title)}&background=random&color=fff`} 
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
                 referrerPolicy="no-referrer"
-                onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(ann.title)}&background=random&color=fff&size=256`; }}
             />
-            {/* Decorative dots/bar at bottom of image matching the user screenshot */}
-            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1 z-10 scale-[0.8] opacity-80">
-                <div className="w-2 h-2 rounded-full bg-white/40"></div>
-                <div className="w-2 h-2 rounded-full bg-white"></div>
-                <div className="w-12 h-1 bg-white/20 rounded-full overflow-hidden relative">
-                    <div className="absolute left-0 top-0 h-full w-[85%] bg-sky-400"></div>
-                </div>
-            </div>
-            <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors"></div>
+            <div className="absolute inset-0 bg-black/5"></div>
         </div>
         
         {/* Right Side: Content */}
-        <div className="flex-1 min-w-0 pr-1 flex flex-col justify-start h-full py-0">
-            <div className="flex items-center justify-between mb-1.5 gap-2">
-                <div className="flex items-center gap-2 min-w-0">
-                    <h3 className="text-slate-900 dark:text-white font-bold text-[18px] tracking-tight truncate leading-tight">
-                        {ann.title}
-                    </h3>
-                    {/* Coral BOT badge with bullet and chevron */}
-                    <div className="flex items-center gap-1.5 px-1.5 py-0 rounded-md bg-[#ff7b63] shrink-0">
-                        <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></div>
-                        <span className="text-[9px] font-semibold text-white uppercase tracking-wider">BOT</span>
-                        <ChevronRight size={10} className="text-white" />
-                    </div>
-                </div>
-                {/* Grey sponsor badge with megaphone */}
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-xl shrink-0 border border-black/5 dark:border-white/5">
-                    <Megaphone size={14} className="text-slate-900 dark:text-white fill-current" />
-                    <span className="text-[12px] font-extrabold text-slate-900 dark:text-white lowercase">sponsor</span>
-                </div>
+        <div className="flex-1 min-w-0 pr-1 py-1">
+            <div className="flex items-center gap-1.5 mb-1.5">
+                <h3 className="text-slate-900 dark:text-white font-bold text-[17px] tracking-tight truncate leading-tight flex-1">
+                    {ann.title}
+                </h3>
             </div>
             
-            <p className="text-slate-400 dark:text-slate-500 text-[13.5px] leading-[1.3] line-clamp-3 font-medium opacity-90">
+            <p className="text-slate-400 dark:text-slate-500 text-[12px] leading-[1.4] line-clamp-2 font-medium opacity-90 mb-2">
                 {ann.description}
             </p>
-        </div>
 
-        {/* Gloss effect overlay */}
-        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+            <div className="flex items-center gap-2">
+                <div 
+                    className="flex items-center gap-1.5 px-2 py-0.5 rounded-lg shrink-0"
+                    style={{ background: 'linear-gradient(135deg, #FF6B6B, #FF8E53)' }}
+                >
+                    <span className="text-[9px] font-black text-white uppercase tracking-widest leading-none">
+                        {ann.tag || 'ETİKET'}
+                    </span>
+                </div>
+                <div className="flex items-center gap-1.5 px-2 py-0.5 bg-slate-100 dark:bg-white/5 rounded-lg shrink-0 border border-black/5 dark:border-white/5">
+                    <Megaphone size={10} className="text-slate-400" />
+                    <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest leading-none">
+                        {ann.badge_text || 'ROZET'}
+                    </span>
+                </div>
+            </div>
+        </div>
     </motion.div>
   );
 });
@@ -190,7 +182,7 @@ const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = React.memo(({ bots }) => {
     if (bots.length === 0) return null;
 
     return (
-        <div className="mb-6 md:mb-10 flex flex-col md:flex-row items-center !gap-[0.3rem] bg-[#ffffff] dark:bg-[#1e293b] px-4 md:px-[10px] !pt-[0.3rem] !pb-0 -mx-4 md:mx-0 rounded-none md:rounded-lg border-y md:border border-black/5 dark:border-white/5 relative overflow-hidden group !shadow-none">
+        <div className="mb-6 md:mb-10 flex flex-col md:flex-row items-center !gap-[0.3rem] bg-[#ffffff] dark:bg-[#1e293b] px-4 md:px-[10px] !pt-[0.3rem] !pb-0 -mx-4 md:mx-0 rounded-none md:rounded-xl border-y md:border border-black/5 dark:border-white/5 relative overflow-hidden group !shadow-none">
             {/* Header Info */}
             <div className="flex flex-col shrink-0 min-w-full md:min-w-[180px] md:border-r border-black/5 dark:border-white/5 md:pr-6 h-full justify-center">
                 <div 
@@ -303,13 +295,13 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonR
   const prices = useMemo(() => PriceService.convert(bot.price, tonRate), [bot.price, tonRate]);
   
   return (
-    <div onClick={() => navigate(`/bot/${bot.id}`)} className="flex items-center p-3 sm:p-6 bot-card cursor-pointer group bg-white dark:bg-transparent hover:bg-slate-100 dark:hover:bg-slate-900/60 rounded-[32px] transition-all border border-black/5 dark:border-transparent hover:border-slate-200 dark:hover:border-slate-800/50 active:bg-slate-200 dark:active:bg-slate-900 transform-gpu">
+    <div onClick={() => navigate(`/bot/${bot.id}`)} className="flex items-center p-3 sm:p-6 bot-card cursor-pointer group bg-white dark:bg-transparent hover:bg-slate-100 dark:hover:bg-slate-900/60 rounded-xl transition-all border border-black/5 dark:border-transparent hover:border-slate-200 dark:hover:border-slate-800/50 active:bg-slate-200 dark:active:bg-slate-900 transform-gpu">
         <div className="relative shrink-0">
             <img 
                 src={getLiveBotIcon(bot)} 
                 alt={bot.name} 
                 loading="lazy"
-                className="w-[3.8rem] h-[3.8rem] sm:w-[4.4rem] sm:h-[4.4rem] rounded-[22px] sm:rounded-[22px] object-cover bg-slate-200 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 group-hover:scale-105 transition-transform" 
+                className="w-[3.8rem] h-[3.8rem] sm:w-[4.4rem] sm:h-[4.4rem] rounded-xl sm:rounded-xl object-cover bg-slate-200 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 group-hover:scale-105 transition-transform" 
                 onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
             />
             {/* Removed Zap icon badge for paid bots */}
@@ -365,7 +357,7 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonR
                 )}
             </div>
         </div>
-        <div className="bg-slate-100 dark:bg-slate-800/60 p-2.5 rounded-2xl border border-slate-200 dark:border-slate-700/50 text-slate-400 group-hover:text-white group-hover:bg-blue-600 group-hover:border-blue-500 transition-all">
+        <div className="bg-slate-100 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700/50 text-slate-400 group-hover:text-white group-hover:bg-blue-600 group-hover:border-blue-500 transition-all">
             <ChevronRight size={18} />
         </div>
     </div>
@@ -377,40 +369,35 @@ const AddProjectBanner: React.FC<{ className?: string }> = ({ className = "" }) 
     
     return (
         <div 
-            className={`h-[128px] rounded-[32px] bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 p-3 flex flex-col justify-between relative overflow-hidden group cursor-pointer active:scale-[0.98] transition-all AddProjectBanner ${className}`}
+            className={`h-[128px] rounded-xl bg-white dark:bg-slate-900/60 border border-black/5 dark:border-white/10 flex items-center p-2 sm:p-3 gap-4 shrink-0 snap-center overflow-hidden cursor-pointer group backdrop-blur-xl transition-all hover:border-blue-500/30 ${className}`}
             onClick={() => navigate('/settings')}
         >
-            {/* Subtle background glow */}
-            <div className="absolute -right-20 -top-20 w-64 h-64 bg-blue-500/5 dark:bg-blue-400/5 blur-[80px] rounded-full pointer-events-none group-hover:bg-blue-500/10 transition-colors"></div>
-            
-            <div className="relative z-10">
-                <div className="flex items-center gap-2 mb-2">
-                    <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center">
-                        <Plus size={16} className="text-blue-600 dark:text-blue-400" />
-                    </div>
-                    <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.2em]">Sponsorlu Reklam</span>
-                </div>
-                <h3 className="text-slate-900 dark:text-white font-black text-lg md:text-[20px] tracking-tight leading-tight mb-0.5">
-                    Projeni Ekosisteme Dahil Et
-                </h3>
-                <p className="text-slate-400 dark:text-slate-500 text-[12px] font-medium leading-tight">
-                    Binlerce kullanıcıya anında ulaşın ve büyümeye başlayın.
-                </p>
+            {/* Left Side: Illustration Placeholder */}
+            <div className="w-[100px] h-[100px] rounded-xl overflow-hidden relative shrink-0 bg-blue-500 flex items-center justify-center">
+                <Sparkles size={42} className="text-white/40 animate-pulse" />
+                <div className="absolute inset-0 bg-gradient-to-tr from-black/20 to-transparent"></div>
             </div>
             
-            <div className="relative z-10 flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                    <div className="flex -space-x-2">
-                        {[1,2,3].map(i => (
-                            <div key={i} className="w-6 h-6 rounded-full border-2 border-white dark:border-slate-900 bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden">
-                                <img src={`https://ui-avatars.com/api/?name=${i}&background=random`} alt="" className="w-full h-full object-cover" />
-                            </div>
-                        ))}
-                    </div>
-                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-wider">500+ Proje Yayında</span>
+            {/* Right Side: Content */}
+            <div className="flex-1 min-w-0 pr-1 py-1 flex flex-col justify-between h-[100px]">
+                <div>
+                    <h3 className="text-slate-900 dark:text-white font-bold text-[17px] tracking-tight truncate leading-tight mb-1 group-hover:text-blue-500 transition-colors">
+                        Kendi Otomasyonunu Kur
+                    </h3>
+                    <p className="text-slate-400 dark:text-slate-500 text-[12px] leading-[1.4] line-clamp-2 font-medium opacity-90">
+                        Premium ile projeni öne çıkar ve sistemini kur.
+                    </p>
                 </div>
-                <div className="flex items-center gap-1 text-blue-600 dark:text-blue-400 font-bold text-[11px] uppercase tracking-widest group-hover:translate-x-1 transition-transform">
-                    Hemen Ekle <ChevronRight size={14} />
+                
+                <div className="flex items-center gap-2">
+                    <div 
+                        className="flex items-center gap-1.5 px-2 py-0.5 rounded-lg shrink-0"
+                        style={{ background: 'linear-gradient(135deg, #3B82F6, #2563EB)' }}
+                    >
+                        <span className="text-[9px] font-black text-white uppercase tracking-widest leading-none">
+                            REKLAM
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -472,9 +459,9 @@ const NavMenu = ({
 
     return (
         <>
-        <div className="sticky top-0 z-[80] bg-white dark:bg-slate-950/90 backdrop-blur-xl border-b border-[#f7f7f7] dark:border-white/5 w-full py-2.5 md:py-4 transition-all" ref={internalMenuRef}>
-            <div className="max-w-7xl mx-auto px-4 flex items-center justify-center md:justify-between">
-                {/* Logo shown only when scrolled (optional, but makes it a real header) */}
+        <div className="sticky top-0 z-[80] bg-white dark:bg-slate-900 border-b border-[#f7f7f7] dark:border-white/5 w-full py-2.5 md:py-4 transition-all" ref={internalMenuRef}>
+            <div className="max-w-7xl mx-auto px-5 sm:px-8 flex items-center justify-center md:justify-between">
+                {/* Logo shown only when scrolled - keeping logic but background is now white */}
                 {isScrolled ? (
                     <div className="hidden md:flex items-center gap-3 w-48 shrink-0 cursor-pointer" onClick={() => navigate('/')}>
                         <Logo style={{ width: '1.8rem', height: 'auto' }} />
@@ -519,7 +506,7 @@ const NavMenu = ({
                                             <button 
                                                 key={cat.id}
                                                 onClick={() => handleCategoryClick(cat.id)}
-                                                className="flex items-center gap-4 p-3 hover:bg-slate-50 dark:hover:bg-white/5 rounded-2xl transition-all group border border-transparent hover:border-black/5"
+                                                className="flex items-center gap-4 p-3 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-all group border border-transparent hover:border-black/5"
                                             >
                                                 <div className="w-12 h-12 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-xl shrink-0 group-hover:scale-110 transition-transform">
                                                     <cat.icon size={24} className="text-slate-500 dark:text-slate-400 group-hover:text-blue-500" />
@@ -573,9 +560,9 @@ const NavMenu = ({
                                                     <button 
                                                         key={cat.id}
                                                         onClick={() => handleCategoryClick(cat.id)}
-                                                        className="flex items-center gap-6 p-6 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[2.5rem] transition-all group border border-transparent hover:border-black/5 w-[320px]"
+                                                        className="flex items-center gap-6 p-6 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-all group border border-transparent hover:border-black/5 w-[320px]"
                                                     >
-                                                        <div className="w-16 h-16 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-[1.5rem] shrink-0 group-hover:scale-110 transition-transform">
+                                                        <div className="w-16 h-16 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-xl shrink-0 group-hover:scale-110 transition-transform">
                                                             <cat.icon size={32} className="text-slate-500 dark:text-slate-400 group-hover:text-blue-500" />
                                                         </div>
                                                         <div className="flex flex-col items-start text-left">
@@ -644,7 +631,7 @@ const NavMenu = ({
                                         )}
                                     </button>
                                     {isMenuOpen && (
-                                        <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-[24px] overflow-hidden z-[100] animate-in py-2 backdrop-blur-2xl shadow-2xl">
+                                        <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden z-[100] animate-in py-2 backdrop-blur-2xl shadow-2xl">
                                             {[
                                                 { path: '/', icon: Store, color: 'text-blue-500 dark:text-blue-400', label: 'market' },
                                                 { path: '/settings', icon: User, color: 'text-purple-500 dark:text-purple-400', label: 'profile' },
@@ -691,12 +678,12 @@ const NavMenu = ({
                         animate={{ y: 0 }}
                         exit={{ y: "100%" }}
                         transition={{ type: "spring", damping: 30, stiffness: 300 }}
-                        className="relative w-full bg-white dark:bg-slate-900 rounded-t-[40px] overflow-hidden pt-4 pb-12 px-6 border-t border-black/10 dark:border-white/10"
+                        className="relative w-full bg-white dark:bg-slate-900 rounded-t-xl overflow-hidden pt-4 pb-12 border-t border-black/10 dark:border-white/10"
                     >
                         {/* Drag Handle */}
                         <div className="w-12 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full mx-auto mb-8" />
                         
-                        <div className="flex justify-between items-center mb-8 px-2">
+                        <div className="flex justify-between items-center mb-8 px-6">
                             <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-widest uppercase italic">
                                 {mobileModal === 'bots' ? 'BOTS KATEGORİ' : 'APPS KATEGORİ'}
                             </h3>
@@ -705,7 +692,7 @@ const NavMenu = ({
                             </button>
                         </div>
                         
-                        <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1 pb-4">
+                        <div className="max-h-[60vh] overflow-y-auto pb-4">
                             {(() => {
                                 const activeCats = mobileModal === 'bots' ? botsCategories : appsCategories;
                                 if (activeCats.length > 0) {
@@ -713,7 +700,7 @@ const NavMenu = ({
                                         <button
                                             key={cat.id}
                                             onClick={() => handleCategoryClick(cat.id)}
-                                            className="w-full flex items-center gap-4 p-3 hover:bg-slate-50 dark:hover:bg-white/5 active:bg-slate-100 dark:active:bg-white/10 rounded-2xl transition-all border border-black/[0.03] dark:border-white/[0.03] group"
+                                            className="w-full flex items-center gap-4 py-4 px-6 hover:bg-slate-50 dark:hover:bg-white/5 active:bg-slate-100 dark:active:bg-white/10 transition-all border-b border-black/[0.03] dark:border-white/[0.03] group last:border-0"
                                         >
                                             <div className="w-11 h-11 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-xl shrink-0 shadow-sm group-hover:scale-105 transition-transform">
                                                 <cat.icon size={20} className="text-slate-500 dark:text-slate-400 group-hover:text-blue-500" />
@@ -838,14 +825,16 @@ const Home = () => {
   }, [filteredBots]);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-200 animate-in transition-colors duration-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-200 animate-in transition-colors duration-300">
       <SEO 
           title="Telegram Bot ve Kanalları - Keşfet, Tanıt ve Yönet" 
           description="BotlyHub V3, Telegram ekosistemindeki en iyi botları ve kanalları bulabileceğiniz, kendi botlarınızı tanıtabileceğiniz ve yönetebileceğiniz kapsamlı bir platformdur."
       />
-      {/* Top Section */}
-      <div className="bg-[#00000008] dark:bg-slate-900/10 w-full pt-6 md:pt-10 pb-4 shadow-[inset_0_-1px_0_0_rgba(0,0,0,0.03)]">
-          <div className="max-w-7xl mx-auto px-4">
+      {/* Top Background Wrapper */}
+      <div className="bg-[#00000008] dark:bg-slate-900/10">
+        {/* Top Section */}
+        <div className="w-full pt-6 md:pt-10 pb-4 shadow-[inset_0_-1px_0_0_rgba(0,0,0,0.03)]">
+          <div className="max-w-7xl mx-auto px-5 sm:px-8">
               <div className="flex flex-wrap md:flex-nowrap items-center justify-between mb-8 px-1 gap-y-6 md:gap-x-6">
                   <div className="flex items-center gap-3 order-1 md:w-48 shrink-0">
                       <div className="shrink-0">
@@ -855,8 +844,8 @@ const Home = () => {
                   </div>
 
                   <div className="w-full md:flex-1 md:max-w-2xl order-3 md:order-2 flex items-center gap-2 md:gap-3">
-                      <div className="flex-1 cursor-pointer" onClick={() => navigate('/search')}>
-                          <div className="relative flex items-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl p-0.5 md:p-1 transition-all active:scale-[0.98] group">
+                      <div className="w-[330px] cursor-pointer" onClick={() => navigate('/search')}>
+                          <div className="relative flex items-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl p-0.5 md:p-1 transition-all active:scale-[0.98] group custom-search-outline">
                               <div className="ml-2 md:ml-3 w-8 h-8 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
                                   <Search size={18} />
                               </div>
@@ -894,7 +883,7 @@ const Home = () => {
                                       )}
                                   </button>
                                   {isMenuOpen && (
-                                      <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-[28px] overflow-hidden z-[100] animate-in py-2 backdrop-blur-2xl">
+                                      <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden z-[100] animate-in py-2 backdrop-blur-2xl">
                                           {[
                                               { path: '/', icon: Store, color: 'text-blue-500 dark:text-blue-400', label: 'market' },
                                               { path: '/settings', icon: User, color: 'text-purple-500 dark:text-purple-400', label: 'profile' },
@@ -929,6 +918,27 @@ const Home = () => {
               </div>
           </div>
       </div>
+        {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-24 gap-4"><Loader2 className="animate-spin text-blue-500" size={32} /></div>
+        ) : (
+            <>
+              {announcements.length > 0 && (
+                  <div className="h-[150px] pb-5 flex flex-col lg:flex-row justify-center items-center gap-6 pt-3 max-w-7xl mx-auto w-full overflow-hidden px-5 sm:px-8">
+                      <div className="w-full sm:max-w-[480px] lg:w-[480px] shrink-0 h-[118px]">
+                          <AnnouncementsCarousel 
+                              announcements={announcements} 
+                              scroll={annScroll} 
+                              onShowPopup={(a) => setSelectedAnn(a)} 
+                          />
+                      </div>
+                      {/* PC & Tablet: Show banner next to announcement on larger screens */}
+                      <AddProjectBanner className="hidden lg:flex lg:w-[480px] shrink-0 h-[118px]" />
+                  </div>
+              )}
+            </>
+          )}
+      </div>
+
       {!isLoading && (
         <NavMenu 
             isScrolled={isScrolled}
@@ -946,30 +956,9 @@ const Home = () => {
         />
       )}
 
-      {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-24 gap-4"><Loader2 className="animate-spin text-blue-500" size={32} /></div>
-      ) : (
-          <>
-            {announcements.length > 0 && (
-                <div className="mb-10 flex flex-col lg:flex-row justify-center items-center gap-6 mt-8 max-w-7xl mx-auto px-4 w-full">
-                    <div className="w-full sm:max-w-[480px] lg:w-[480px] shrink-0 h-[128px] overflow-hidden">
-                        <AnnouncementsCarousel 
-                            announcements={announcements} 
-                            scroll={annScroll} 
-                            onShowPopup={(a) => setSelectedAnn(a)} 
-                        />
-                    </div>
-                    {/* PC & Tablet: Show banner next to announcement on larger screens */}
-                    <AddProjectBanner className="hidden lg:flex lg:w-[480px] shrink-0 h-[128px]" />
-                </div>
-            )}
-
-            </>
-        )}
-
       {/* Bottom Section */}
       <div className="bg-white dark:bg-slate-950 w-full pt-10 pb-32 shadow-[0_-1px_0_0_rgba(0,0,0,0.015)]">
-          <div className="max-w-7xl mx-auto px-4">
+          <div className="max-w-7xl mx-auto px-5 sm:px-8">
               {!isLoading && (
                   <>
                       <FeaturedBotsSlider bots={bots} />
@@ -1031,7 +1020,9 @@ const Home = () => {
                                 </div>
                                 {/* Mobile: Show banner after the first category */}
                                 {index === 0 && (
-                                    <AddProjectBanner className="flex sm:hidden mb-10" />
+                                    <div className="px-4 mb-10 sm:hidden">
+                                        <AddProjectBanner />
+                                    </div>
                                 )}
                             </React.Fragment>
                         );
@@ -1067,7 +1058,7 @@ const Home = () => {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-white dark:bg-slate-900 border border-black/10 dark:border-white/10 w-[min(calc(100vw-32px),384px)] rounded-[44px] overflow-hidden relative" 
+              className="bg-white dark:bg-slate-900 border border-black/10 dark:border-white/10 w-[min(calc(100vw-32px),384px)] rounded-xl overflow-hidden relative" 
               onClick={e => e.stopPropagation()}
             >
                 <div className="relative h-44 overflow-hidden">
@@ -1117,7 +1108,7 @@ const Home = () => {
                 <div className="p-8 pt-2">
                     <div className="flex items-center gap-4 mb-4">
                         {selectedAnn.icon_name !== 'None' && (
-                            <div className="w-12 h-12 bg-slate-100 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-2xl flex items-center justify-center shrink-0">
+                            <div className="w-12 h-12 bg-slate-100 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-xl flex items-center justify-center shrink-0">
                                 {React.createElement(iconMap[selectedAnn.icon_name] || Sparkles, { size: 22, className: 'text-brand dark:text-brand-light' })}
                             </div>
                         )}
@@ -1126,7 +1117,7 @@ const Home = () => {
                         </h3>
                     </div>
 
-                    <div className="bg-slate-50 dark:bg-black/20 rounded-3xl p-6 mb-8 border border-black/5 dark:border-white/5">
+                    <div className="bg-slate-50 dark:bg-black/20 rounded-xl p-6 mb-8 border border-black/5 dark:border-white/5">
                         <p className="text-slate-600 dark:text-slate-400 text-[12px] leading-relaxed font-bold uppercase italic opacity-80 whitespace-pre-wrap">
                             {selectedAnn.content_detail || selectedAnn.description}
                         </p>
@@ -1142,7 +1133,7 @@ const Home = () => {
                                 else navigate(link);
                                 setSelectedAnn(null); 
                             }} 
-                            className="w-full h-14 bg-brand dark:bg-brand-light text-white text-[12px] font-black rounded-2xl uppercase tracking-[0.2em] active:scale-95 transition-all flex items-center justify-center gap-3 group shadow-lg shadow-brand/20"
+                            className="w-full h-14 bg-brand dark:bg-brand-light text-white text-[12px] font-black rounded-xl uppercase tracking-[0.2em] active:scale-95 transition-all flex items-center justify-center gap-3 group shadow-lg shadow-brand/20"
                         >
                             {selectedAnn.button_text || 'ŞİMDİ KEŞFET'} 
                             <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
@@ -1170,46 +1161,13 @@ const AnnouncementsCarousel: React.FC<{
     onShowPopup: (ann: Announcement) => void 
 }> = React.memo(({ announcements, scroll, onShowPopup }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [progress, setProgress] = useState(0);
-
-    useEffect(() => {
-        if (announcements.length <= 1) return;
-
-        const interval = setInterval(() => {
-            setProgress(prev => {
-                if (scroll.isDragging) return 0;
-                if (prev >= 100) {
-                    setCurrentIndex(current => {
-                        const next = (current + 1) % announcements.length;
-                        if (scroll.ref.current) {
-                            const containerWidth = scroll.ref.current.offsetWidth;
-                            const firstCard = scroll.ref.current.firstElementChild as HTMLElement;
-                            const cardWidth = firstCard?.offsetWidth || containerWidth;
-                            const gap = 16;
-                            const scrollLeft = next * (cardWidth + gap);
-                            scroll.ref.current.scrollTo({ left: scrollLeft, behavior: 'smooth' });
-                        }
-                        return next;
-                    });
-                    return 0;
-                }
-                return prev + 1;
-            });
-        }, 50);
-
-        return () => clearInterval(interval);
-    }, [announcements.length, currentIndex, scroll.ref, scroll.isDragging]);
 
     const handleScroll = useCallback(() => {
         if (scroll.ref.current) {
-            const containerWidth = scroll.ref.current.offsetWidth;
-            const firstCard = scroll.ref.current.firstElementChild as HTMLElement;
-            const cardWidth = firstCard?.offsetWidth || containerWidth;
-            const gap = 16;
-            const index = Math.round(scroll.ref.current.scrollLeft / (cardWidth + gap));
+            const width = scroll.ref.current.offsetWidth;
+            const index = Math.round(scroll.ref.current.scrollLeft / width);
             if (index !== currentIndex) {
                 setCurrentIndex(index);
-                setProgress(0);
             }
         }
     }, [currentIndex, scroll.ref]);
@@ -1222,24 +1180,25 @@ const AnnouncementsCarousel: React.FC<{
         }
     }, [handleScroll, scroll.ref]);
 
+    useEffect(() => {
+        if (announcements.length <= 1) return;
+
+        const interval = setInterval(() => {
+            if (scroll.ref.current && !scroll.isDragging) {
+                const nextIndex = (currentIndex + 1) % announcements.length;
+                const width = scroll.ref.current.offsetWidth;
+                scroll.ref.current.scrollTo({
+                    left: nextIndex * width,
+                    behavior: 'smooth'
+                });
+            }
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, [currentIndex, announcements.length, scroll.isDragging, scroll.ref]);
+
     return (
-        <div className="relative h-full">
-            {announcements.length > 1 && (
-                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex justify-center gap-1.5 z-20">
-                    {announcements.map((_, i) => (
-                        <div key={i} className="w-6 h-1 bg-white/20 dark:bg-black/30 backdrop-blur-sm rounded-full overflow-hidden border border-white/10">
-                            <motion.div 
-                                className="h-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"
-                                initial={{ width: 0 }}
-                                animate={{ 
-                                    width: i === currentIndex ? `${progress}%` : (i < currentIndex ? '100%' : '0%') 
-                                }}
-                                transition={{ duration:  0.1 }}
-                            />
-                        </div>
-                    ))}
-                </div>
-            )}
+        <div className="relative h-full px-4 sm:px-0">
             <div 
                 ref={scroll.ref}
                 onMouseDown={scroll.onMouseDown}
@@ -1247,10 +1206,22 @@ const AnnouncementsCarousel: React.FC<{
                 onMouseMove={scroll.onMouseMove}
                 onMouseLeave={scroll.onMouseLeave}
                 onContextMenu={scroll.onContextMenu}
-                className={`flex gap-4 overflow-x-auto no-scrollbar h-full snap-x snap-mandatory ${announcements.length === 1 ? 'justify-center' : 'justify-start'} ${scroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+                className={`flex gap-4 overflow-x-auto no-scrollbar h-full snap-x snap-mandatory ${scroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
             >
-                {announcements.map(ann => <PromoCard key={ann.id} ann={ann} onShowPopup={onShowPopup} />)}
+                {announcements.map(ann => (
+                    <div key={ann.id} className="w-full shrink-0 snap-center">
+                        <PromoCard ann={ann} onShowPopup={onShowPopup} />
+                    </div>
+                ))}
             </div>
+            
+            {announcements.length > 1 && (
+                <div className="absolute -bottom-4 left-0 right-0 flex justify-center gap-1.5">
+                    {announcements.map((_, i) => (
+                        <div key={i} className={`h-1 rounded-full transition-all duration-300 ${i === currentIndex ? 'w-6 bg-blue-500' : 'w-2 bg-slate-300 dark:bg-slate-700'}`} />
+                    ))}
+                </div>
+            )}
         </div>
     );
 });

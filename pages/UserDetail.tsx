@@ -27,9 +27,6 @@ const UserDetail = () => {
       {/* Header */}
       <div className="p-4 flex items-center justify-between sticky top-0 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl z-50 border-b border-black/5 dark:border-white/5">
         <div className="flex items-center gap-3">
-            <button onClick={() => navigate(-1)} className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-2xl text-slate-500 dark:text-slate-400 active:scale-90 transition-transform ">
-                <ChevronLeft size={20} />
-            </button>
             <h1 className="text-[14px] font-black text-slate-900 dark:text-white uppercase tracking-tight">Kullanıcı Detayları</h1>
         </div>
         <div className="flex items-center gap-2">
@@ -41,16 +38,16 @@ const UserDetail = () => {
 
       {/* Profile Header Card */}
       <div className="px-6 mt-8 mb-10">
-        <div className="relative p-8 bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-[44px] overflow-hidden fancy-glass-card">
+        <div className="relative p-8 bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-xl overflow-hidden fancy-glass-card">
             <div className="absolute top-0 right-0 w-32 h-32 bg-brand/5 dark:bg-brand-light/5 blur-3xl -mr-16 -mt-16 rounded-full" />
             
             <div className="relative z-10 flex flex-col items-center">
                 <div className="relative mb-6">
-                    <div className="w-28 h-28 rounded-[36px] p-1 bg-gradient-to-tr from-brand/20 to-brand-light/20 backdrop-blur-md">
+                    <div className="w-28 h-28 rounded-xl p-1 bg-gradient-to-tr from-brand/20 to-brand-light/20 backdrop-blur-md">
                         <img 
                             src={`https://picsum.photos/seed/${id || 'user'}/300`} 
                             alt="Profile" 
-                            className="w-full h-full rounded-[32px] object-cover border-4 border-white dark:border-slate-950" 
+                            className="w-full h-full rounded-xl object-cover border-4 border-white dark:border-slate-950" 
                         />
                     </div>
                 </div>
@@ -80,7 +77,7 @@ const UserDetail = () => {
       <div className="px-6 space-y-10 max-w-lg mx-auto">
         
         {/* Action Button */}
-        <button className="w-full bg-brand dark:bg-brand-light hover:shadow-lg hover:shadow-brand/20 active:scale-95 transition-all text-white font-black py-6 rounded-[28px] sm:rounded-[22px] flex items-center justify-center gap-4 uppercase text-[11px] tracking-[0.3em] border-b-8 border-brand-dark dark:border-brand-light/20 relative group overflow-hidden">
+        <button className="w-full bg-brand dark:bg-brand-light hover:shadow-lg hover:shadow-brand/20 active:scale-95 transition-all text-white font-black py-6 rounded-xl flex items-center justify-center gap-4 uppercase text-[11px] tracking-[0.3em] border-b-8 border-brand-dark dark:border-brand-light/20 relative group overflow-hidden">
             <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
             <Bell size={20} className="relative z-10" />
             <span className="relative z-10">Bildirim Gönder</span>
@@ -88,8 +85,8 @@ const UserDetail = () => {
 
         {/* Tab Switcher */}
         <div>
-            <div className="bg-slate-100 dark:bg-slate-900/60 p-1.5 rounded-[28px] sm:rounded-[22px] flex border border-black/5 dark:border-white/5 mb-6">
-                <button className="flex-1 py-4 text-[11px] font-black bg-white dark:bg-slate-800 rounded-[22px] text-slate-900 dark:text-white uppercase tracking-widest shadow-sm">Botlar</button>
+            <div className="bg-slate-100 dark:bg-slate-900/60 p-1.5 rounded-xl flex border border-black/5 dark:border-white/5 mb-6">
+                <button className="flex-1 py-4 text-[11px] font-black bg-white dark:bg-slate-800 rounded-xl text-slate-900 dark:text-white uppercase tracking-widest shadow-sm">Botlar</button>
                 <button className="flex-1 py-4 text-[11px] font-black text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-300 uppercase tracking-widest transition-colors">Kanallar</button>
             </div>
 
@@ -100,11 +97,11 @@ const UserDetail = () => {
                 </div>
 
                 {/* Bot List with Toggles */}
-                <div className="flex flex-col bg-white dark:bg-slate-900/40 rounded-[32px] border border-black/5 dark:border-white/5 backdrop-blur-xl overflow-hidden fancy-glass-card">
+                <div className="flex flex-col bg-white dark:bg-slate-900/40 rounded-xl border border-black/5 dark:border-white/5 backdrop-blur-xl overflow-hidden fancy-glass-card">
                     <div className="p-2 space-y-1">
-                        <div className="p-6 flex items-center justify-between hover:bg-black/5 dark:hover:bg-white/5 rounded-[24px] transition-colors">
+                        <div className="p-6 flex items-center justify-between hover:bg-black/5 dark:hover:bg-white/5 rounded-xl transition-colors">
                             <div className="flex items-center gap-4">
-                                <div className="w-14 h-14 bg-slate-50 dark:bg-slate-950 rounded-[20px] flex items-center justify-center border border-black/5 dark:border-white/5 text-blue-500">
+                                <div className="w-14 h-14 bg-slate-50 dark:bg-slate-950 rounded-xl flex items-center justify-center border border-black/5 dark:border-white/5 text-blue-500">
                                     <Bot size={24} />
                                 </div>
                                 <div>
@@ -120,9 +117,9 @@ const UserDetail = () => {
                             </div>
                         </div>
 
-                        <div className="p-6 flex items-center justify-between hover:bg-black/5 dark:hover:bg-white/5 rounded-[24px] transition-colors">
+                        <div className="p-6 flex items-center justify-between hover:bg-black/5 dark:hover:bg-white/5 rounded-xl transition-colors">
                             <div className="flex items-center gap-4">
-                                <div className="w-14 h-14 bg-slate-50 dark:bg-slate-950 rounded-[20px] flex items-center justify-center border border-black/5 dark:border-white/5 text-purple-500">
+                                <div className="w-14 h-14 bg-slate-50 dark:bg-slate-950 rounded-xl flex items-center justify-center border border-black/5 dark:border-white/5 text-purple-500">
                                     <BarChart2 size={24} />
                                 </div>
                                 <div>
@@ -149,11 +146,11 @@ const UserDetail = () => {
                 <ShieldAlert size={14} className="text-red-500/50" />
             </div>
 
-            <div className="flex flex-col bg-white dark:bg-slate-900/40 rounded-[32px] border border-red-500/5 dark:border-red-500/10 overflow-hidden fancy-glass-card">
+            <div className="flex flex-col bg-white dark:bg-slate-900/40 rounded-xl border border-red-500/5 dark:border-red-500/10 overflow-hidden fancy-glass-card">
                 <div className="p-2 space-y-1">
-                    <div className="p-6 flex items-center justify-between bg-red-500/5 dark:bg-red-500/5 rounded-[24px]">
+                    <div className="p-6 flex items-center justify-between bg-red-500/5 dark:bg-red-500/5 rounded-xl">
                         <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 bg-red-500/10 rounded-[20px] flex items-center justify-center border border-red-500/10 text-red-500">
+                            <div className="w-14 h-14 bg-red-500/10 rounded-xl flex items-center justify-center border border-red-500/10 text-red-500">
                                 <Ban size={24} />
                             </div>
                             <div>
@@ -169,9 +166,9 @@ const UserDetail = () => {
                         </div>
                     </div>
 
-                    <div className="p-6 flex items-center justify-between hover:bg-black/5 dark:hover:bg-white/5 rounded-[24px] transition-colors">
+                    <div className="p-6 flex items-center justify-between hover:bg-black/5 dark:hover:bg-white/5 rounded-xl transition-colors">
                         <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 bg-slate-50 dark:bg-slate-950 rounded-[20px] flex items-center justify-center border border-black/5 dark:border-white/5 text-orange-500">
+                            <div className="w-14 h-14 bg-slate-50 dark:bg-slate-950 rounded-xl flex items-center justify-center border border-black/5 dark:border-white/5 text-orange-500">
                                 <ShieldAlert size={24} />
                             </div>
                             <div>

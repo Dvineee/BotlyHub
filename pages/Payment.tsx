@@ -205,12 +205,6 @@ const Payment = () => {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 transition-colors duration-300">
         {/* Header Navigation */}
         <header className="fixed top-0 inset-x-0 h-16 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl z-50 border-b border-black/5 dark:border-white/5 px-6 flex items-center justify-between">
-            <button 
-                onClick={() => navigate(-1)}
-                className="w-10 h-10 rounded-2xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-600 dark:text-slate-400 active:scale-90 transition-all"
-            >
-                <ChevronLeft size={20} />
-            </button>
             <div className="flex items-center gap-2">
                 <Lock size={14} className="text-emerald-500" />
                 <span className="text-[11px] font-black uppercase tracking-[0.2em] italic text-slate-400">Güvenli Ödeme</span>
@@ -223,7 +217,7 @@ const Payment = () => {
             <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white dark:bg-slate-900/60 rounded-[44px] border border-black/5 dark:border-white/10 overflow-hidden  relative mb-8"
+                className="bg-white dark:bg-slate-900/60 rounded-xl border border-black/5 dark:border-white/10 overflow-hidden  relative mb-8"
             >
                 <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-br from-brand via-brand/50 to-indigo-600 opacity-20 dark:opacity-40"></div>
                 <div className="relative pt-12 pb-10 px-8 text-center flex flex-col items-center">
@@ -231,7 +225,7 @@ const Payment = () => {
                         <div className="absolute inset-0 bg-brand/20 dark:bg-brand-light/20 blur-[30px] rounded-full scale-125"></div>
                         <img 
                             src={targetBot ? getLiveBotIcon(targetBot) : `https://ui-avatars.com/api/?name=${encodeURIComponent(plan?.name || 'P')}&background=1e293b&color=fff&bold=true`} 
-                            className="w-24 h-24 rounded-[32px] border-4 border-white dark:border-slate-800  relative z-10 bg-slate-100 dark:bg-slate-900 object-cover" 
+                            className="w-24 h-24 rounded-xl border-4 border-white dark:border-slate-800  relative z-10 bg-slate-100 dark:bg-slate-900 object-cover" 
                             referrerPolicy="no-referrer"
                             onError={(e) => {
                                 if (targetBot) {
@@ -246,7 +240,7 @@ const Payment = () => {
                     </h2>
                     <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em] mb-8">Sipariş Özeti</p>
                     
-                    <div className="w-full bg-slate-50 dark:bg-black/20 rounded-3xl p-6 border border-black/5 dark:border-white/5 flex flex-col items-center">
+                    <div className="w-full bg-slate-50 dark:bg-black/20 rounded-xl p-6 border border-black/5 dark:border-white/5 flex flex-col items-center">
                         <div className="flex items-center gap-2 mb-2">
                             <Zap size={14} className="text-brand dark:text-brand-light" />
                             <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest italic">Toplam Tutar</span>
@@ -275,11 +269,11 @@ const Payment = () => {
                     transition={{ delay: 0.1 }}
                     onClick={payWithTON} 
                     disabled={isLoading}
-                    className="w-full group relative overflow-hidden bg-brand dark:bg-brand-light p-6 rounded-[32px] flex items-center justify-between active:scale-[0.98] transition-all disabled:opacity-50  "
+                    className="w-full group relative overflow-hidden bg-brand dark:bg-brand-light p-6 rounded-xl flex items-center justify-between active:scale-[0.98] transition-all disabled:opacity-50  "
                 >
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                     <div className="flex items-center gap-4 relative z-10">
-                        <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white">
+                        <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white">
                             {isLoading ? <Loader2 className="animate-spin" size={20} /> : <Wallet size={20} />}
                         </div>
                         <div className="text-left">
@@ -296,10 +290,10 @@ const Payment = () => {
                     transition={{ delay: 0.2 }}
                     onClick={payWithStars} 
                     disabled={isLoading}
-                    className="w-full group relative overflow-hidden bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 p-6 rounded-[32px] flex items-center justify-between active:scale-[0.98] transition-all disabled:opacity-50 "
+                    className="w-full group relative overflow-hidden bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 p-6 rounded-xl flex items-center justify-between active:scale-[0.98] transition-all disabled:opacity-50 "
                 >
                     <div className="flex items-center gap-4 relative z-10">
-                        <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500">
+                        <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500">
                             {isLoading ? <Loader2 className="animate-spin" size={20} /> : <Star size={20} />}
                         </div>
                         <div className="text-left">

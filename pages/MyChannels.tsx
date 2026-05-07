@@ -130,20 +130,20 @@ const MyChannels = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 pt-10 pb-32 animate-in fade-in transition-colors duration-300" onClick={() => setOpenSettingsId(null)}>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 px-5 sm:px-8 pt-6 md:pt-10 pb-32 animate-in fade-in transition-colors duration-300" onClick={() => setOpenSettingsId(null)}>
       <div className="flex items-center justify-between mb-10 px-1">
         <div className="flex items-center gap-4">
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Kanallarım</h1>
         </div>
         <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 px-4 py-2 bg-purple-600/10 border border-purple-500/20 rounded-2xl ">
+            <div className="flex items-center gap-2 px-4 py-2 bg-purple-600/10 border border-purple-500/20 rounded-xl ">
                 <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse "></div>
                 <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider">Canlı</span>
             </div>
             <button 
                 onClick={(e) => { e.stopPropagation(); handleManualRefresh(); }} 
                 disabled={isSyncing}
-                className="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-full text-slate-500 dark:text-slate-400 active:scale-90 transition-all disabled:opacity-30 "
+                className="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 rounded-xl text-slate-500 dark:text-slate-400 active:scale-90 transition-all disabled:opacity-30 "
             >
                 <RefreshCw size={22} className={isSyncing ? 'animate-spin text-purple-600 dark:text-purple-500' : ''} />
             </button>
@@ -151,7 +151,7 @@ const MyChannels = () => {
       </div>
 
       {autoSyncStatus !== 'idle' && (
-          <div className={`mb-6 p-4 rounded-2xl border flex items-center justify-center gap-3 animate-in slide-in-from-top-4 transition-all ${
+          <div className={`mb-6 p-4 rounded-xl border flex items-center justify-center gap-3 animate-in slide-in-from-top-4 transition-all ${
               autoSyncStatus === 'syncing' ? 'bg-blue-600/10 border-blue-500/20 text-blue-600 dark:text-blue-400' : 
               autoSyncStatus === 'done' ? 'bg-emerald-600/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400' :
               'bg-red-600/10 border-red-500/20 text-red-600 dark:text-red-400'
@@ -171,15 +171,15 @@ const MyChannels = () => {
               <p className="text-[10px] font-black text-slate-300 dark:text-slate-700 uppercase tracking-widest">Kanallar Getiriliyor...</p>
           </div>
       ) : channels.length === 0 ? (
-          <div className="text-center py-20 bg-white dark:bg-slate-900/20 rounded-[44px] border-2 border-dashed border-slate-200 dark:border-slate-900 flex flex-col items-center gap-6 ">
-              <div className="w-20 h-20 bg-slate-50 dark:bg-slate-900 rounded-full flex items-center justify-center text-slate-200 dark:text-slate-800"><Megaphone size={40} /></div>
+          <div className="text-center py-20 bg-white dark:bg-slate-900/20 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-900 flex flex-col items-center gap-6 ">
+              <div className="w-20 h-20 bg-slate-50 dark:bg-slate-900 rounded-xl flex items-center justify-center text-slate-200 dark:text-slate-800"><Megaphone size={40} /></div>
               <div className="px-10">
                   <p className="text-slate-400 dark:text-slate-500 text-sm font-bold uppercase tracking-widest">Kanal Bulunamadı</p>
                   <p className="text-[10px] text-slate-300 dark:text-slate-700 mt-2 italic font-medium">Botu kanalınıza ekleyip sinyal gönderin.</p>
               </div>
               <button 
                 onClick={(e) => { e.stopPropagation(); handleManualRefresh(); }} 
-                className="px-8 py-4 bg-slate-900 border border-slate-800 rounded-2xl text-[10px] font-black text-purple-500 dark:text-blue-500 uppercase tracking-widest hover:text-white transition-all active:scale-95"
+                className="px-8 py-4 bg-slate-900 border border-slate-800 rounded-xl text-[10px] font-black text-purple-500 dark:text-blue-500 uppercase tracking-widest hover:text-white transition-all active:scale-95"
               >
                   Şimdi Tara
               </button>
@@ -190,12 +190,12 @@ const MyChannels = () => {
                   <h2 className="text-[10px] font-black text-slate-400 dark:text-slate-700 uppercase tracking-[0.4em]">Bağlı Kanallar ({channels.length})</h2>
               </div>
               {channels.map(c => (
-                  <div key={c.id} className="group relative bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-[32px] overflow-hidden transition-all hover:bg-slate-50 dark:hover:bg-slate-900/60  animate-in slide-in-from-bottom-2">
+                  <div key={c.id} className="group relative bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-xl overflow-hidden transition-all hover:bg-slate-50 dark:hover:bg-slate-900/60  animate-in slide-in-from-bottom-2">
                       <div className="p-5 flex items-center h-full pr-14 relative z-10">
                           <div className="relative shrink-0">
                             <img 
                                 src={c.icon} 
-                                className="w-16 h-16 rounded-[20px] border border-black/5 dark:border-white/5  object-cover bg-slate-50 dark:bg-slate-900" 
+                                className="w-16 h-16 rounded-xl border border-black/5 dark:border-white/5  object-cover bg-slate-50 dark:bg-slate-900" 
                                 onError={(e) => {
                                     (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(c.name)}&background=1e293b&color=fff`;
                                 }}
@@ -237,14 +237,14 @@ const MyChannels = () => {
                            <div className="w-full h-full flex items-center justify-center gap-4 relative z-40">
                                 <div 
                                     onClick={(e) => { e.stopPropagation(); toggleAdMode(c.id); }}
-                                    className={`cursor-pointer rounded-2xl px-6 py-4 flex items-center gap-4 border transition-all active:scale-95  ${
+                                    className={`cursor-pointer rounded-xl px-6 py-4 flex items-center gap-4 border transition-all active:scale-95  ${
                                         c.revenueEnabled ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-white dark:bg-slate-900/60 border-black/5 dark:border-white/5'
                                     }`}
                                 >
                                     <TrendingUp size={20} className={c.revenueEnabled ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'} />
                                     <span className={`text-[11px] font-bold uppercase tracking-widest ${c.revenueEnabled ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-400'}`}>Yayın Modu</span>
                                 </div>
-                                <div className="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 rounded-2xl text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer border border-black/5 dark:border-white/5 " onClick={(e) => { e.stopPropagation(); setOpenSettingsId(null); }}>
+                                <div className="w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-900/80 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer border border-black/5 dark:border-white/5 " onClick={(e) => { e.stopPropagation(); setOpenSettingsId(null); }}>
                                     <X size={22} />
                                 </div>
                            </div>
@@ -254,7 +254,7 @@ const MyChannels = () => {
           </div>
       )}
       
-      <div className="mt-10 p-6 bg-purple-600/5 border border-purple-600/10 rounded-[32px] ">
+      <div className="mt-10 p-6 bg-purple-600/5 border border-purple-600/10 rounded-xl ">
           <div className="flex items-center gap-3 mb-3 text-purple-600 dark:text-purple-400">
               <Info size={18} />
               <h4 className="text-[10px] font-bold uppercase tracking-widest">Akıllı Tanıtım Dağıtımı</h4>

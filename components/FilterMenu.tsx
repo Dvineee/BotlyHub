@@ -76,7 +76,7 @@ export const FilterMenu: React.FC = () => {
             initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            className="absolute right-0 mt-3 w-56 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-[28px] sm:rounded-[22px] overflow-hidden z-[100] py-2 backdrop-blur-2xl"
+            className="absolute right-0 mt-3 w-56 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden z-[100] py-2 backdrop-blur-2xl"
           >
             <div className="px-5 py-2 border-b border-black/5 dark:border-white/5 flex items-center justify-between">
               <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Filtrele</span>

@@ -44,7 +44,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onAuth }) => {
             initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-[40px] sm:rounded-[32px] overflow-hidden relative shadow-2xl border border-black/5 dark:border-white/5"
+            className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-xl overflow-hidden relative shadow-2xl border border-black/5 dark:border-white/5"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-6 sm:p-12">
@@ -75,7 +75,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onAuth }) => {
                 <div className="flex justify-center w-full">
                   <TelegramLoginWidget 
                     botUsername="BotlyHubBOT" 
-                    cornerRadius={18}
+                    cornerRadius={12}
                     size="large"
                     onAuth={(user) => {
                       onAuth(user);

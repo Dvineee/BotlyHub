@@ -68,7 +68,7 @@ const ReferralPage = () => {
                 {/* Header */}
             <div className="flex items-center justify-between mb-10 px-1">
                 <div className="flex items-center gap-5">
-                    <div className="w-14 h-14 bg-white dark:bg-slate-900 rounded-[22px] border border-black/5 dark:border-white/5 flex items-center justify-center shadow-sm">
+                    <div className="w-14 h-14 bg-white dark:bg-slate-900 rounded-xl border border-black/5 dark:border-white/5 flex items-center justify-center shadow-sm">
                         <Users className="text-brand dark:text-brand-light" size={24} />
                     </div>
                     <div>
@@ -76,14 +76,14 @@ const ReferralPage = () => {
                         <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em] mt-1.5">HUB NETWORK v4.2.0</p>
                     </div>
                 </div>
-                <div className="w-10 h-10 bg-brand/10 border border-brand/20 rounded-2xl flex items-center justify-center text-brand dark:text-brand-light animate-bounce">
+                <div className="w-10 h-10 bg-brand/10 border border-brand/20 rounded-xl flex items-center justify-center text-brand dark:text-brand-light animate-bounce">
                     <Gift size={18} />
                 </div>
             </div>
 
             {/* Stats Grid */}
             <div className="grid grid-cols-2 gap-5">
-                <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-8 rounded-[44px] space-y-2 fancy-glass-card stats-card-bg group overflow-hidden relative">
+                <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-8 rounded-xl space-y-2 fancy-glass-card stats-card-bg group overflow-hidden relative">
                     <div className="absolute top-0 right-0 w-16 h-16 bg-slate-500/5 blur-2xl -mr-8 -mt-8 rounded-full" />
                     <span className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-[0.2em] relative z-10">TOPLAM DAVET</span>
                     <div className="flex items-baseline gap-2 relative z-10">
@@ -91,7 +91,7 @@ const ReferralPage = () => {
                         <span className="text-[11px] font-black text-slate-400 uppercase italic">KİŞİ</span>
                     </div>
                 </div>
-                <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-8 rounded-[44px] space-y-2 fancy-glass-card stats-card-bg group overflow-hidden relative">
+                <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-8 rounded-xl space-y-2 fancy-glass-card stats-card-bg group overflow-hidden relative">
                     <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-500/5 blur-2xl -mr-8 -mt-8 rounded-full" />
                     <span className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-[0.2em] relative z-10">TOPLAM KAZANÇ</span>
                     <div className="flex items-baseline gap-2 relative z-10">
@@ -102,7 +102,7 @@ const ReferralPage = () => {
             </div>
 
             {/* Referral Link Box */}
-            <div className="bg-brand/10 dark:bg-brand-light/5 border border-brand/20 dark:border-brand-light/20 p-10 rounded-[48px] space-y-10 relative overflow-hidden group">
+            <div className="bg-brand/10 dark:bg-brand-light/5 border border-brand/20 dark:border-brand-light/20 p-10 rounded-xl space-y-10 relative overflow-hidden group">
                 <div className="absolute top-0 right-0 p-10 opacity-5 group-hover:scale-125 transition-transform duration-1000">
                     <Gift size={200} />
                 </div>
@@ -116,8 +116,8 @@ const ReferralPage = () => {
                 </div>
 
                 <div className="flex flex-col gap-5 relative z-10">
-                    <div className="flex items-center gap-4 bg-white/50 dark:bg-slate-950/50 border border-black/5 dark:border-white/5 p-2 pr-6 rounded-[32px] group-focus-within:border-brand/40 transition-all shadow-sm">
-                        <div className="w-14 h-14 bg-white dark:bg-slate-900 rounded-[24px] flex items-center justify-center text-slate-400 group-hover:text-brand transition-colors">
+                    <div className="flex items-center gap-4 bg-white/50 dark:bg-slate-950/50 border border-black/5 dark:border-white/5 p-2 pr-6 rounded-xl group-focus-within:border-brand/40 transition-all shadow-sm">
+                        <div className="w-14 h-14 bg-white dark:bg-slate-900 rounded-xl flex items-center justify-center text-slate-400 group-hover:text-brand transition-colors">
                             <ExternalLink size={20} />
                         </div>
                         <input 
@@ -127,7 +127,7 @@ const ReferralPage = () => {
                         />
                         <button 
                             onClick={handleCopy}
-                            className="w-12 h-12 flex items-center justify-center bg-brand/10 dark:bg-brand-light/10 hover:bg-brand/20 dark:hover:bg-brand-light/20 rounded-2xl transition-all text-brand dark:text-brand-light group active:scale-90"
+                            className="w-12 h-12 flex items-center justify-center bg-brand/10 dark:bg-brand-light/10 hover:bg-brand/20 dark:hover:bg-brand-light/20 rounded-xl transition-all text-brand dark:text-brand-light group active:scale-90"
                         >
                             {copied ? <CheckCircle2 size={20} className="animate-in zoom-in" /> : <Copy size={20} />}
                         </button>
@@ -135,7 +135,7 @@ const ReferralPage = () => {
                     
                     <button 
                         onClick={handleShare}
-                        className="w-full py-6 bg-brand dark:bg-brand-light hover:shadow-lg hover:shadow-brand/20 text-white font-black text-[12px] uppercase tracking-[0.3em] rounded-[32px] transition-all flex items-center justify-center gap-4 active:scale-95 border-b-8 border-brand-dark dark:border-brand-light/20 group relative overflow-hidden"
+                        className="w-full py-6 bg-brand dark:bg-brand-light hover:shadow-lg hover:shadow-brand/20 text-white font-black text-[12px] uppercase tracking-[0.3em] rounded-xl transition-all flex items-center justify-center gap-4 active:scale-95 border-b-8 border-brand-dark dark:border-brand-light/20 group relative overflow-hidden"
                     >
                         <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
                         <Share2 size={20} className="relative z-10" />
@@ -145,9 +145,9 @@ const ReferralPage = () => {
             </div>
 
             {/* Security Info */}
-            <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-10 rounded-[44px] space-y-8 fancy-glass-card">
+            <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-10 rounded-xl space-y-8 fancy-glass-card">
                 <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-emerald-500/10 dark:bg-emerald-500/5 rounded-[20px] flex items-center justify-center">
+                    <div className="w-12 h-12 bg-emerald-500/10 dark:bg-emerald-500/5 rounded-xl flex items-center justify-center">
                         <ShieldCheck className="text-emerald-500" size={24} />
                     </div>
                     <h4 className="text-[15px] font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">NASIL ÖDÜL KAZANILIR?</h4>
@@ -178,21 +178,21 @@ const ReferralPage = () => {
 
                 <div className="space-y-3">
                     {referrals.length === 0 ? (
-                        <div className="py-20 text-center bg-white dark:bg-slate-900/20 border border-dashed border-black/5 dark:border-white/10 rounded-[48px] fancy-glass-card">
+                        <div className="py-20 text-center bg-white dark:bg-slate-900/20 border border-dashed border-black/5 dark:border-white/10 rounded-xl fancy-glass-card">
                             <Users className="mx-auto text-slate-100 dark:text-slate-800 mb-6" size={56} />
                             <p className="text-[11px] font-black text-slate-300 dark:text-slate-700 uppercase tracking-[0.3em] italic">Henüz bir veri girişi bulunamadı</p>
                         </div>
                     ) : (
                         referrals.map((ref) => (
-                            <div key={ref.id} className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-5 rounded-[36px] flex items-center justify-between fancy-glass-card group hover:border-brand/20 transition-all">
+                            <div key={ref.id} className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-5 rounded-xl flex items-center justify-between fancy-glass-card group hover:border-brand/20 transition-all">
                                 <div className="flex items-center gap-5">
                                     {ref.referred_user?.avatar ? (
                                         <div className="relative">
-                                            <div className="w-14 h-14 rounded-[22px] p-0.5 bg-gradient-to-tr from-slate-200 to-slate-100 dark:from-slate-800 dark:to-slate-700">
+                                            <div className="w-14 h-14 rounded-xl p-0.5 bg-gradient-to-tr from-slate-200 to-slate-100 dark:from-slate-800 dark:to-slate-700">
                                                 <img 
                                                     src={ref.referred_user.avatar} 
                                                     alt={ref.referred_user.name} 
-                                                    className="w-full h-full rounded-[20px] object-cover"
+                                                    className="w-full h-full rounded-xl object-cover"
                                                     referrerPolicy="no-referrer"
                                                 />
                                             </div>
@@ -201,7 +201,7 @@ const ReferralPage = () => {
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className={`w-14 h-14 rounded-[22px] flex items-center justify-center border ${ref.status === 'confirmed' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : ref.status === 'pending' ? 'bg-orange-500/10 border-orange-500/20 text-orange-500' : 'bg-red-500/10 border-red-500/20 text-red-500'}`}>
+                                        <div className={`w-14 h-14 rounded-xl flex items-center justify-center border ${ref.status === 'confirmed' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : ref.status === 'pending' ? 'bg-orange-500/10 border-orange-500/20 text-orange-500' : 'bg-red-500/10 border-red-500/20 text-red-500'}`}>
                                             {ref.status === 'confirmed' ? <CheckCircle2 size={24} /> : ref.status === 'pending' ? <Clock size={24} /> : <XCircle size={24} />}
                                         </div>
                                     )}
