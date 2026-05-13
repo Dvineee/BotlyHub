@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
-import { Search as SearchIcon, ChevronLeft, X, Zap, Loader2, Sparkles, Send, Bot as BotIcon, Star, Sun, Moon, Wallet, Menu, Store, User, Bell, Megaphone } from 'lucide-react';
+import { Search as SearchIcon, ChevronLeft, ChevronDown, X, Zap, Loader2, Sparkles, Send, Bot as BotIcon, Star, Sun, Moon, Wallet, Menu, Store, User, Bell, Megaphone } from 'lucide-react';
 import { Bot, Notification } from '../types';
-import { categories } from '../data';
+import { categories, appsSubCategories } from '../data';
 import { useTranslation } from '../TranslationContext';
 import { DatabaseService } from '../services/DatabaseService';
 import PriceService from '../services/PriceService';
@@ -77,7 +77,21 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = ({ bot, tonRate }) => {
                 {bot.price > 0 && (
                     <div className="flex items-center gap-2 bg-brand/10 dark:bg-brand-light/10 px-3 py-1 rounded-xl">
                         <Zap size={10} className="text-brand dark:text-brand-light" />
-                        <span className="text-[10px] font-bold text-brand dark:text-brand-light uppercase tracking-wider">{Number(prices.ton).toFixed(1)} TON</span>
+                        <span className="text-[10px] font-bold text-brand dark:text-brand-light uppercase tracking-wider flex items-center gap-1">
+                            {Number(prices.ton).toFixed(1)}
+                            <svg fill="none" height="12" width="12" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" className="translate-y-[0.5px]">
+                                <title>Payment TON icon</title>
+                                <g clipPath="url(#a_ton_search)" fill="currentColor">
+                                    <path d="M7.5 11.015V5.963H5.268a.31.31 0 0 0-.272.463l1.772 3.17.734 1.419ZM9.232 9.596l1.771-3.17a.31.31 0 0 0-.272-.463H8.498v5.053l.734-1.42Z"></path>
+                                    <path clipRule="evenodd" d="M16 8.5a8 8 0 1 1-16 0 8 8 0 0 1 16 0ZM5.268 4.965h5.464c1.004 0 1.64 1.085 1.136 1.96l-3.372 5.844a.572.572 0 0 1-.992 0L4.132 6.925c-.505-.876.132-1.96 1.136-1.96Z" fillRule="evenodd"></path>
+                                </g>
+                                <defs>
+                                    <clipPath id="a_ton_search">
+                                        <path d="M0 0h16v16H0z" fill="#fff" transform="translate(0 .5)"></path>
+                                    </clipPath>
+                                </defs>
+                            </svg>
+                        </span>
                     </div>
                 )}
                 <div className="flex items-center gap-1.5 bg-yellow-500/10 px-3 py-1 rounded-xl border border-yellow-500/20">
@@ -132,7 +146,10 @@ const SearchPage = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [searchMode, setSearchMode] = useState<'bots' | 'apps'>('bots');
+  const [isModeMenuOpen, setIsModeMenuOpen] = useState(false);
   const menuRef = React.useRef<HTMLDivElement>(null);
+  const modeMenuRef = React.useRef<HTMLDivElement>(null);
   const catScroll = useDraggableScroll();
   const { activeFilter } = useFilter();
   const [aiQuery, setAiQuery] = useState('');
@@ -166,6 +183,7 @@ const SearchPage = () => {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
         if (menuRef.current && !menuRef.current.contains(event.target as Node)) setIsMenuOpen(false);
+        if (modeMenuRef.current && !modeMenuRef.current.contains(event.target as Node)) setIsModeMenuOpen(false);
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -174,7 +192,34 @@ const SearchPage = () => {
   const filteredBots = bots.filter(bot => {
     const matchesQuery = bot.name.toLowerCase().includes(query.toLowerCase()) || 
                          bot.description.toLowerCase().includes(query.toLowerCase());
-    const matchesCategory = activeCategory === 'all' || (Array.isArray(bot.category) ? bot.category.includes(activeCategory) : bot.category === activeCategory);
+    
+    let matchesCategory = false;
+    if (searchMode === 'bots') {
+        matchesCategory = activeCategory === 'all' || (Array.isArray(bot.category) ? bot.category.includes(activeCategory) : bot.category === activeCategory);
+    } else {
+        // Apps Mode Mapping
+        if (activeCategory === 'all') {
+            matchesCategory = true;
+        } else {
+            const appsCategoryMap: Record<string, (b: Bot) => boolean> = {
+                'trending': (b) => (b.views || 0) > 50,
+                'editors_choice': (b) => b.promoted_type === 'featured',
+                'new': (b) => !!b.isNew,
+                'games_sub': (b) => b.category.includes('games'),
+                'ai_sub': (b) => b.category.includes('ai_services'),
+                'trade': (b) => b.category.includes('finance'),
+                'social': (b) => b.category.includes('communication'),
+                'security_privacy': (b) => b.category.includes('security'),
+                'dev': (b) => b.category.includes('utilities'),
+                'art': (b) => b.category.includes('content')
+            };
+            if (appsCategoryMap[activeCategory]) {
+                matchesCategory = appsCategoryMap[activeCategory](bot);
+            } else {
+                matchesCategory = (Array.isArray(bot.category) ? bot.category.includes(activeCategory) : bot.category === activeCategory);
+            }
+        }
+    }
     
     let matchesFilter = true;
     if (activeFilter === 'paid') matchesFilter = bot.price > 0;
@@ -183,7 +228,8 @@ const SearchPage = () => {
     
     return matchesQuery && matchesCategory && matchesFilter;
   }).sort((a, b) => {
-    if (activeFilter === 'popular') return (b.views || 0) - (a.views || 0);
+    if (activeFilter === 'popular' || activeCategory === 'trending') return (b.views || 0) - (a.views || 0);
+    if (activeCategory === 'new') return b.id.localeCompare(a.id); // Mock new sort
     return 0;
   });
 
@@ -210,17 +256,55 @@ const SearchPage = () => {
         title="Bot ve Kanal Ara" 
         description="BotlyHub üzerinde dilediğiniz Telegram botunu veya kanalını arayarak keşfedin."
     />
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 px-5 sm:px-8 pt-4 md:pt-10 pb-32 transition-colors duration-300">
+    <div className="min-h-screen bg-white dark:bg-slate-950 px-5 sm:px-8 pt-4 md:pt-10 pb-32 transition-colors duration-300 search-page">
       <div className="max-w-7xl mx-auto">
         {/* Header & Search Box */}
       <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => navigate(-1)} className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl text-slate-500 active:scale-90 transition-transform shrink-0">
-            <ChevronLeft size={20} />
-          </button>
+          <div className="relative" ref={modeMenuRef}>
+              <button 
+                onClick={() => setIsModeMenuOpen(!isModeMenuOpen)} 
+                className="h-10 px-3 flex items-center gap-2 bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl text-slate-700 dark:text-slate-200 active:scale-95 transition-all shrink-0 font-black text-[11px] tracking-wider uppercase"
+              >
+                {searchMode === 'bots' ? 'Bots' : 'Apps'}
+                <ChevronDown size={14} className={`text-slate-400 transition-transform duration-200 ${isModeMenuOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              <AnimatePresence>
+                  {isModeMenuOpen && (
+                      <motion.div
+                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 5, scale: 1 }}
+                          exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                          className="absolute left-0 top-full z-50 w-32 bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl shadow-xl overflow-hidden"
+                      >
+                          <button
+                              onClick={() => {
+                                  setSearchMode('bots');
+                                  setIsModeMenuOpen(false);
+                                  setActiveCategory('all');
+                              }}
+                              className={`w-full px-4 py-3 text-left text-[11px] font-black uppercase tracking-wider transition-colors ${searchMode === 'bots' ? 'text-blue-500 bg-blue-50/50 dark:bg-blue-500/10' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5'}`}
+                          >
+                              Bots
+                          </button>
+                          <button
+                              onClick={() => {
+                                  setSearchMode('apps');
+                                  setIsModeMenuOpen(false);
+                                  setActiveCategory('all');
+                              }}
+                              className={`w-full px-4 py-3 text-left text-[11px] font-black uppercase tracking-wider transition-colors border-t border-black/[0.03] dark:border-white/[0.03] ${searchMode === 'apps' ? 'text-blue-500 bg-blue-50/50 dark:bg-blue-500/10' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5'}`}
+                          >
+                              Apps
+                          </button>
+                      </motion.div>
+                  )}
+              </AnimatePresence>
+          </div>
           
           <div className="flex-1 relative">
             <div className="relative flex items-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl p-1 transition-all group custom-search-outline">
-              <div className="ml-2 w-8 h-8 flex items-center justify-center text-slate-400 group-focus-within:text-blue-500">
+              <div className="ml-2 w-8 h-8 flex items-center justify-center text-slate-400 group-focus-within:text-blue-500 shrink-0">
                 <SearchIcon size={18} />
               </div>
               <input 
@@ -229,18 +313,18 @@ const SearchPage = () => {
                 autoFocus
                 onChange={(e) => setQuery(e.target.value)} 
                 placeholder={t('search_placeholder')} 
-                className="w-full bg-transparent py-2 px-2 text-[13px] text-slate-900 dark:text-white outline-none placeholder:text-slate-400 font-bold uppercase tracking-widest" 
+                className="w-full bg-transparent py-2 px-2 text-[13px] text-slate-900 dark:text-white outline-none placeholder:text-slate-400 font-bold uppercase tracking-widest min-w-0" 
               />
-              {query && (
-                <button onClick={() => setQuery('')} className="mr-1 w-8 h-8 flex items-center justify-center text-slate-400">
-                  <X size={16} />
-                </button>
-              )}
+              <div className="flex items-center gap-0.5 pr-1 shrink-0">
+                {query && (
+                  <button onClick={() => setQuery('')} className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+                    <X size={16} />
+                  </button>
+                )}
+                <div className="w-px h-5 bg-black/[0.05] dark:bg-white/[0.05] mx-1" />
+                <FilterMenu />
+              </div>
             </div>
-          </div>
-
-          <div className="shrink-0">
-              <FilterMenu />
           </div>
       </div>
 
@@ -255,7 +339,7 @@ const SearchPage = () => {
             onContextMenu={catScroll.onContextMenu}
             className={`flex gap-3 overflow-x-auto no-scrollbar -mx-4 px-4 pb-2 snap-x ${catScroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
         >
-          {categories.map((cat) => (
+          {(searchMode === 'bots' ? categories : [{id: 'all', label: 'cat_all', icon: Sparkles}, ...appsSubCategories]).map((cat) => (
             <button 
               key={cat.id} 
               onClick={() => {

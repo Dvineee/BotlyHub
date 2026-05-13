@@ -49,6 +49,7 @@ const translations = {
     "open": "Aç",
     "premium": "Premium",
     "verified": "Doğrulanmış",
+    "preview": "Önizleme",
     "preview_screens": "Bot Önizleme Ekranları",
     "no_images": "Görsel bulunmuyor",
     "add_to_library": "Kütüphaneye Ekle",
@@ -56,7 +57,8 @@ const translations = {
     "start_bot": "Botu Başlat",
     "share_copied": "Link kopyalandı!",
     "featured": "Öne Çıkanlar",
-    "search_results": "Arama Sonuçları"
+    "search_results": "Arama Sonuçları",
+    "add_your": "Add Your"
   },
   en: {
     "market": "Market",
@@ -94,12 +96,14 @@ const translations = {
     "open": "Open",
     "premium": "Premium",
     "verified": "Verified",
+    "preview": "Preview",
     "preview_screens": "Bot Preview Screens",
     "no_images": "No images available",
     "add_to_library": "Add to Library",
     "buy_now": "Buy Now",
     "start_bot": "Start Bot",
-    "share_copied": "Link copied!"
+    "share_copied": "Link copied!",
+    "add_your": "Add Your"
   },
   ru: {
     "market": "Магазин",
@@ -121,12 +125,14 @@ const translations = {
     "open": "Открыть",
     "premium": "Премиум",
     "verified": "Подтверждено",
+    "preview": "Предпросмотр",
     "preview_screens": "Предпросмотр бота",
     "no_images": "Нет изображений",
     "add_to_library": "Добавить в библиотеку",
     "buy_now": "Купить",
     "start_bot": "Запустить бота",
-    "share_copied": "Ссылка скопирована!"
+    "share_copied": "Ссылка скопирована!",
+    "add_your": "Add Your"
   },
   fa: {
     "market": "فروشگاه",
@@ -148,12 +154,14 @@ const translations = {
     "open": "باز کردن",
     "premium": "پریمیوم",
     "verified": "تایید شده",
+    "preview": "پیش‌نمایش",
     "preview_screens": "پیش‌نمایش ربات",
     "no_images": "تصویری موجود نیست",
     "add_to_library": "افزودن به کتابخانه",
     "buy_now": "خرید",
     "start_bot": "شروع ربات",
-    "share_copied": "لینک کپی شد!"
+    "share_copied": "لینک کپی شد!",
+    "add_your": "Add Your"
   },
   uk: {
     "market": "Крамниця",
@@ -175,12 +183,14 @@ const translations = {
     "open": "Відкрити",
     "premium": "Преміум",
     "verified": "Підтверджено",
+    "preview": "Передпрогляд",
     "preview_screens": "Передпрогляд бота",
     "no_images": "Немає зображень",
     "add_to_library": "Додати до бібліотеки",
     "buy_now": "Купити",
     "start_bot": "Запустити бота",
-    "share_copied": "Посилання скопійовано!"
+    "share_copied": "Посилання скопійовано!",
+    "add_your": "Add Your"
   },
   es: {
     "market": "Mercado",
@@ -202,12 +212,14 @@ const translations = {
     "open": "Abrir",
     "premium": "Premium",
     "verified": "Verificado",
+    "preview": "Vistas previas",
     "preview_screens": "Vistas previas del bot",
     "no_images": "No hay imágenes disponibles",
     "add_to_library": "Añadir a la biblioteca",
     "buy_now": "Comprar ahora",
     "start_bot": "Iniciar Bot",
-    "share_copied": "¡Enlace copiado!"
+    "share_copied": "¡Enlace copiado!",
+    "add_your": "Add Your"
   },
   hi: {
     "market": "मार्केट",
@@ -229,12 +241,14 @@ const translations = {
     "open": "खोलें",
     "premium": "प्रीमियम",
     "verified": "सत्यापित",
+    "preview": "पूर्वावलोकन",
     "preview_screens": "बॉट प्रीव्यू स्क्रीन्स",
     "no_images": "कोई चित्र उपलब्ध नहीं है",
     "add_to_library": "लाइब्रेरी में जोड़ें",
     "buy_now": "अभी खरीदें",
     "start_bot": "बॉट शुरू करें",
-    "share_copied": "लिंक कॉपी हो गया!"
+    "share_copied": "लिंक कॉपी हो गया!",
+    "add_your": "Add Your"
   },
   ar: {
     "market": "المتجر",
@@ -256,12 +270,14 @@ const translations = {
     "open": "افتح",
     "premium": "بريميوم",
     "verified": "مؤكد",
+    "preview": "معاينة",
     "preview_screens": "معاينة البوت",
     "no_images": "لا توجد صور متوفرة",
     "add_to_library": "إضافة إلى المكتبة",
     "buy_now": "شراء الآن",
     "start_bot": "بدء البوت",
-    "share_copied": "تم نسخ الرابط!"
+    "share_copied": "تم نسخ الرابط!",
+    "add_your": "Add Your"
   }
 };
 

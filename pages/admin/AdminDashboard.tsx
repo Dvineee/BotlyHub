@@ -15,7 +15,7 @@ import { DatabaseService } from '../../services/DatabaseService';
 import { GeminiService } from '../../services/GeminiService';
 import { GoogleGenAI, Type } from "@google/genai";
 import { User, Bot as BotType, Announcement, Promotion, ActivityLog, Notification, Referral, ReferralSettings } from '../../types';
-import { categories } from '../../data';
+import { categories, appsSubCategories } from '../../data';
 import Logo from '../../components/Logo';
 
 const getLiveBotIcon = (botLink: string) => {
@@ -245,6 +245,7 @@ const BotManagement = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingBot, setEditingBot] = useState<any>(null);
+    const [listFilter, setListFilter] = useState<'apps' | 'bots'>('apps');
     const [copiedId, setCopiedId] = useState(false);
     const [activeTab, setActiveTab] = useState<'info' | 'media' | 'pricing'>('info');
     const [isSaving, setIsSaving] = useState(false);
@@ -265,11 +266,13 @@ const BotManagement = () => {
         if (editId && bots.length > 0) {
             const bot = bots.find(b => b.id === editId);
             if (bot) {
+                const cats = Array.isArray(bot.category) ? bot.category : (bot.category ? (typeof bot.category === 'string' && bot.category.startsWith('[') ? JSON.parse(bot.category) : [bot.category]) : ['utilities']);
                 setEditingBot({
                     ...bot,
+                    product_type: cats.includes('apps') ? 'app' : 'bot',
                     promoted_type: bot.promoted_type || 'none',
                     languages: bot.languages || [],
-                    category: Array.isArray(bot.category) ? bot.category : (bot.category ? [bot.category] : ['utilities'])
+                    category: cats
                 });
                 setIsModalOpen(true);
                 setSearchParams({}, { replace: true });
@@ -283,7 +286,8 @@ const BotManagement = () => {
             name: '',
             description: '',
             price: 0,
-            category: ['utilities'],
+            category: listFilter === 'apps' ? ['apps'] : ['utilities'],
+            product_type: listFilter === 'apps' ? 'app' : 'bot', // Set based on current filter
             bot_link: '@',
             icon: '',
             screenshots: [],
@@ -317,11 +321,16 @@ const BotManagement = () => {
         setEditingBot({ ...editingBot, screenshots: next });
     };
 
-    const filteredBots = (bots || []).filter(b => 
-        (b.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
-        (b.bot_link || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (b.id || '').toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredBotsList = (bots || []).filter(b => {
+        const matchesSearch = (b.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+                             (b.bot_link || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                             (b.id || '').toLowerCase().includes(searchTerm.toLowerCase());
+        
+        const cats = Array.isArray(b.category) ? b.category : (b.category ? (typeof b.category === 'string' && b.category.startsWith('[') ? JSON.parse(b.category) : [b.category]) : []);
+        const typeMatches = listFilter === 'apps' ? cats.includes('apps') : !cats.includes('apps');
+        
+        return matchesSearch && typeMatches;
+    });
 
     return (
         <div className="space-y-12 animate-in fade-in">
@@ -335,7 +344,7 @@ const BotManagement = () => {
                         <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-brand transition-colors" size={18} />
                         <input 
                             type="text" 
-                            placeholder="BOT ARA (İSİM, @, ID)..." 
+                            placeholder="ÜRÜN ARA (İSİM, @, ID)..." 
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="w-full md:w-80 h-16 bg-slate-900 border border-white/5 rounded-[24px] pl-16 pr-8 text-[10px] font-black uppercase tracking-widest text-white outline-none focus:border-brand transition-all"
@@ -357,6 +366,21 @@ const BotManagement = () => {
                 </div>
             </div>
 
+            <div className="flex gap-4 p-2 bg-slate-900 border border-white/5 rounded-[28px] w-full md:w-fit">
+                <button 
+                    onClick={() => setListFilter('apps')}
+                    className={`flex-1 md:px-12 py-4 rounded-[22px] text-[10px] font-black uppercase tracking-widest transition-all ${listFilter === 'apps' ? 'bg-brand text-white' : 'text-slate-500 hover:text-white'}`}
+                >
+                    UYGULAMALAR
+                </button>
+                <button 
+                    onClick={() => setListFilter('bots')}
+                    className={`flex-1 md:px-12 py-4 rounded-[22px] text-[10px] font-black uppercase tracking-widest transition-all ${listFilter === 'bots' ? 'bg-brand text-white' : 'text-slate-500 hover:text-white'}`}
+                >
+                    BOTLAR
+                </button>
+            </div>
+
             {isLoading ? (
                 <div className="flex flex-col items-center justify-center py-32 gap-4">
                     <Loader2 className="animate-spin text-brand" size={40} />
@@ -364,15 +388,17 @@ const BotManagement = () => {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-                    {filteredBots.map(b => (
+                    {filteredBotsList.map(b => (
                         <div 
                             key={b.id} 
                             onClick={() => {
+                                const cats = Array.isArray(b.category) ? b.category : (b.category ? (typeof b.category === 'string' && b.category.startsWith('[') ? JSON.parse(b.category) : [b.category]) : ['utilities']);
                                 setEditingBot({
                                     ...b,
+                                    product_type: cats.includes('apps') ? 'app' : 'bot',
                                     promoted_type: b.promoted_type || 'none',
                                     languages: b.languages || [],
-                                    category: Array.isArray(b.category) ? b.category : (b.category ? [b.category] : ['utilities'])
+                                    category: cats
                                 });
                                 setIsModalOpen(true);
                             }}
@@ -409,11 +435,13 @@ const BotManagement = () => {
                                     <button 
                                         onClick={(e) => {
                                             e.stopPropagation();
+                                            const cats = Array.isArray(b.category) ? b.category : (b.category ? (typeof b.category === 'string' && b.category.startsWith('[') ? JSON.parse(b.category) : [b.category]) : ['utilities']);
                                             setEditingBot({
                                                 ...b,
+                                                product_type: cats.includes('apps') ? 'app' : 'bot',
                                                 promoted_type: b.promoted_type || 'none',
                                                 languages: b.languages || [],
-                                                category: Array.isArray(b.category) ? b.category : (b.category ? [b.category] : ['utilities'])
+                                                category: cats
                                             });
                                             setIsModalOpen(true);
                                         }} 
@@ -520,6 +548,41 @@ const BotManagement = () => {
                                 }} className="space-y-8">
                                     {activeTab === 'info' && (
                                         <div className="space-y-8 animate-in slide-in-from-left-4">
+                                            <div className="p-8 bg-brand/10 border border-brand/20 rounded-[32px] space-y-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 bg-brand rounded-lg flex items-center justify-center text-white"><Star size={16} /></div>
+                                                    <h4 className="text-[11px] font-black uppercase tracking-widest text-white italic">1. ADIM: ÜRÜN TİPİ SEÇİMİ</h4>
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <button 
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setEditingBot({
+                                                                ...editingBot, 
+                                                                product_type: 'app',
+                                                                category: ['apps']
+                                                            });
+                                                        }}
+                                                        className={`py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border ${editingBot.product_type === 'app' || (editingBot.category || []).includes('apps') ? 'bg-brand border-brand text-white' : 'bg-slate-950 border-white/5 text-slate-500 hover:bg-white/5'}`}
+                                                    >
+                                                        UYGULAMA (APP)
+                                                    </button>
+                                                    <button 
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setEditingBot({
+                                                                ...editingBot, 
+                                                                product_type: 'bot',
+                                                                category: ['utilities']
+                                                            });
+                                                        }}
+                                                        className={`py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border ${editingBot.product_type === 'bot' && !(editingBot.category || []).includes('apps') ? 'bg-brand border-brand text-white' : 'bg-slate-950 border-white/5 text-slate-500 hover:bg-white/5'}`}
+                                                    >
+                                                        TELEGRAM BOTU
+                                                    </button>
+                                                </div>
+                                            </div>
+
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
                                                 <div className="space-y-2">
                                                     <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4">SİSTEM ID</label>
@@ -531,15 +594,24 @@ const BotManagement = () => {
                                                     </div>
                                                 </div>
                                                 <AdminInput label="BOT İSMİ" value={editingBot.name} onChange={(v:any)=>setEditingBot({...editingBot, name:v})} />
+                                                
                                                 <AdminInput label="@KULLANICIADI" value={editingBot.bot_link} onChange={(v:any)=>setEditingBot({...editingBot, bot_link:v})} />
                                                 <div className="space-y-4 md:col-span-2">
-                                                    <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4">KATEGORİLER (BİRDEN FAZLA SEÇİLEBİLİR)</label>
+                                                    <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 px-4 py-2 bg-slate-900 rounded-full inline-block">
+                                                        2. ADIM: {(editingBot.product_type === 'app' || (editingBot.category || []).includes('apps')) ? 'APP KATEGORİSİ' : 'BOT KATEGORİSİ'} SEÇİMİ
+                                                    </label>
                                                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-6 bg-slate-950 border border-white/5 rounded-[28px] lg:rounded-[36px]">
-                                                        {categories.filter(c => c.id !== 'all').map(cat => {
+                                                        {((editingBot.product_type === 'app' || (editingBot.category || []).includes('apps')) 
+                                                            ? [
+                                                                { id: 'apps', label: 'Ana Uygulama', icon: BotIcon },
+                                                                ...appsSubCategories
+                                                              ]
+                                                            : categories.filter(c => c.id !== 'all' && c.id !== 'apps')
+                                                        ).map((cat: any) => {
                                                             const isSelected = (editingBot.category || []).includes(cat.id);
                                                             const labelMap: Record<string, string> = {
-                                                                'cat_apps': 'Apps',
-                                                                'cat_games': 'Oyun',
+                                                                'cat_apps': 'Uygulamalar',
+                                                                'cat_games': 'Oyunlar',
                                                                 'cat_finance': 'Finans',
                                                                 'cat_moderation': 'Moderasyon',
                                                                 'cat_utilities': 'Araçlar',
@@ -569,7 +641,7 @@ const BotManagement = () => {
                                                                     className={`flex items-center gap-3 px-5 py-4 rounded-2xl text-[9px] font-black tracking-widest transition-all border ${isSelected ? 'bg-brand border-brand text-white ' : 'bg-white/5 border-white/5 text-slate-500 hover:bg-white/10'}`}
                                                                 >
                                                                     <cat.icon size={16} className={isSelected ? 'text-white' : 'text-slate-600'} />
-                                                                    <span className="uppercase italic truncate">{labelMap[cat.label] || cat.label.replace('cat_', '')}</span>
+                                                                    <span className="uppercase italic truncate">{cat.label?.startsWith('cat_') ? labelMap[cat.label] || cat.label?.replace('cat_', '') : cat.label}</span>
                                                                 </button>
                                                             );
                                                         })}

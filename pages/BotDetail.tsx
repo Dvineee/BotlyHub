@@ -50,6 +50,7 @@ const BotDetail = () => {
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isCategoriesExpanded, setIsCategoriesExpanded] = useState(false);
   const [isSidebarDropdownOpen, setIsSidebarDropdownOpen] = useState(false);
   const [userRating, setUserRating] = useState<number | null>(null);
   const [hoverRating, setHoverRating] = useState<number | null>(null);
@@ -285,21 +286,32 @@ const BotDetail = () => {
         description={bot.description}
         ogImage={bot.icon || undefined}
     />
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 pb-40 animate-in fade-in transition-colors duration-300">
+    <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-200 pb-40 animate-in fade-in transition-colors duration-300 bot-detail-page">
       <div className="max-w-7xl mx-auto px-5 sm:px-8 md:px-10">
         {/* Header Section */}
-        <div className="flex items-center justify-between mb-8 pt-4">
-            <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
+        <div className="flex flex-wrap md:flex-nowrap items-center justify-between mb-8 pt-4 gap-y-6 md:gap-x-6">
+            <div className="flex items-center gap-3 order-1 md:w-48 shrink-0 cursor-pointer" onClick={() => navigate('/')}>
                 <div className="shrink-0">
                     <Logo style={{ width: '2.5rem', height: 'auto', display: 'block' }} />
                 </div>
                 <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">BotlyHub</h1>
             </div>
 
-            <div className="flex items-center gap-2 md:gap-3">
+            <div className="hidden md:flex flex-1 md:max-w-2xl order-3 md:order-2 items-center gap-2 md:gap-3">
+                <div className="flex-1 cursor-pointer" onClick={() => navigate('/search')}>
+                    <div className="relative flex items-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl p-0.5 md:p-1 transition-all active:scale-[0.98] group custom-search-outline">
+                        <div className="ml-2 md:ml-3 w-8 h-8 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
+                            <Search size={18} />
+                        </div>
+                        <div className="w-full py-2 px-3 text-[13px] text-slate-400 font-bold uppercase tracking-widest opacity-60 truncate">{t('search_placeholder')}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="flex items-center gap-2 md:gap-3 order-2 md:order-3 md:w-48 justify-end ml-auto shrink-0">
                 <button 
                     onClick={() => { haptic('light'); navigate('/search'); }} 
-                    className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/5 rounded-xl text-slate-500 active:scale-90 transition-all "
+                    className="md:hidden w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/5 rounded-xl text-slate-500 active:scale-90 transition-all "
                 >
                     <Search size={20} />
                 </button>
@@ -313,22 +325,67 @@ const BotDetail = () => {
         </div>
 
         <div className="lg:grid lg:grid-cols-[1fr_320px] lg:gap-16 overflow-visible">
-          <div className="lg:col-start-1">
+          <div className="lg:col-start-1 min-w-0">
             {/* Hero & Stats Section */}
             <div className="pt-10 px-6 lg:px-0 flex flex-col md:flex-row md:items-center gap-6 mb-10">
-              <div className="flex items-start gap-6 flex-1">
-          <div className="relative shrink-0">
-              <img 
-                src={getLiveBotIcon(bot)} 
-                loading="lazy"
-                className="w-24 h-24 rounded-xl !p-0 border border-black/10 dark:border-white/10 object-cover bg-slate-200 dark:bg-slate-900" 
-                onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=1e293b&color=fff&bold=true`; }}
-              />
-              {isOwned && (
-                  <div className="absolute -bottom-2 -right-2 bg-emerald-500 text-white p-1.5 rounded-xl border-2 border-slate-50 dark:border-slate-950">
-                      <CheckCircle2 size={14} />
-                  </div>
-              )}
+              <div className="flex items-start justify-between gap-6 flex-1">
+            <div className="flex items-start gap-6 min-w-0">
+          <div className="flex flex-col gap-4 shrink-0 w-24">
+              <div className="relative">
+                  <img 
+                    src={getLiveBotIcon(bot)} 
+                    loading="lazy"
+                    className="w-24 h-24 rounded-xl !p-0 border border-black/10 dark:border-white/10 object-cover bg-slate-200 dark:bg-slate-900" 
+                    onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=1e293b&color=fff&bold=true`; }}
+                  />
+                  {isOwned && (
+                      <div className="absolute -bottom-2 -right-2 bg-emerald-500 text-white p-1.5 rounded-xl border-2 border-slate-50 dark:border-slate-950">
+                          <CheckCircle2 size={14} />
+                      </div>
+                  )}
+              </div>
+
+              {/* Categories Moved under Photo */}
+              <div className="flex flex-nowrap gap-2 w-max min-w-full">
+                  {(() => {
+                      const catList = Array.isArray(bot.category) ? bot.category : [bot.category];
+                      const visibleCats = isCategoriesExpanded ? catList : catList.slice(0, 2);
+
+                      return (
+                          <div className="flex flex-nowrap gap-1.5 items-center">
+                              {visibleCats.map(catId => {
+                                  const cat = categories.find(c => c.id === catId);
+                                  return (
+                                      <motion.span 
+                                          key={catId} 
+                                          initial={isCategoriesExpanded ? { opacity: 0, scale: 0.9 } : false}
+                                          animate={{ opacity: 1, scale: 1 }}
+                                          className="text-brand dark:text-brand-light text-[8px] font-black uppercase tracking-wider border border-brand/20 px-2 py-0.5 rounded-lg bg-brand/5 whitespace-nowrap bot-category-tag"
+                                      >
+                                          {cat ? t(cat.label) : catId}
+                                      </motion.span>
+                                  );
+                              })}
+                              {!isCategoriesExpanded && catList.length > 2 && (
+                                  <button 
+                                      onClick={(e) => { e.stopPropagation(); haptic('light'); setIsCategoriesExpanded(true); }}
+                                      className="text-brand dark:text-brand-light text-[8px] font-black uppercase tracking-wider border border-brand/20 px-2 py-0.5 rounded-lg bg-brand/5 flex items-center gap-1 active:scale-95 transition-all shadow-sm bot-category-tag"
+                                  >
+                                      +{catList.length - 2}
+                                  </button>
+                              )}
+                              {isCategoriesExpanded && catList.length > 2 && (
+                                  <button 
+                                      onClick={(e) => { e.stopPropagation(); haptic('light'); setIsCategoriesExpanded(false); }}
+                                      className="text-slate-400 dark:text-slate-500 text-[8px] font-bold uppercase tracking-wider px-1 py-0.5 flex items-center gap-1 active:scale-95 transition-all"
+                                  >
+                                      <X size={8} />
+                                  </button>
+                              )}
+                          </div>
+                      );
+                  })()}
+              </div>
           </div>
           <div className="flex-1 min-w-0 pt-1">
               <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight truncate mb-1 flex items-center gap-2">
@@ -349,158 +406,230 @@ const BotDetail = () => {
                   )}
               </h1>
               <div className="flex flex-wrap gap-2 mb-3">
-                  {(Array.isArray(bot.category) ? bot.category : [bot.category]).map(catId => {
-                      const cat = categories.find(c => c.id === catId);
-                      return (
-                          <span key={catId} className="text-brand dark:text-brand-light text-[10px] font-bold uppercase tracking-wider border border-brand/20 px-2.5 py-1 rounded-xl bg-brand/5">
-                              {cat ? t(cat.label) : catId}
-                          </span>
-                      );
-                  })}
-              </div>
-              <div className="flex flex-wrap gap-2 items-center">
-                  <span className="bg-white dark:bg-slate-900/80 border border-black/5 dark:border-white/5 text-slate-500 dark:text-slate-400 text-[10px] font-bold px-3 py-1 rounded-xl uppercase">v4.2.0</span>
                   <span className="bg-brand/10 border border-brand/20 text-brand dark:text-brand-light text-[10px] font-bold px-3 py-1 rounded-xl uppercase flex items-center gap-1">
                       <ShieldCheck size={12} /> Onaylı
                   </span>
-                  
-                  {/* Dropdown Menu - Default position for small screens, hidden on lg */}
-                  <div className="relative lg:hidden">
-                      <button 
-                          onClick={() => {
-                              if (bot.telegram_group || bot.website_url || bot.app_url || bot.social_url) {
-                                  setIsDropdownOpen(!isDropdownOpen);
-                              }
-                          }}
-                          className={`bg-brand dark:bg-brand-light text-white text-[10px] font-black px-4 py-1.5 rounded-xl uppercase flex items-center gap-2 active:scale-95 transition-all ${!(bot.telegram_group || bot.website_url || bot.app_url || bot.social_url) ? 'opacity-50 cursor-default' : ''}`}
-                      >
-                          AÇ <ChevronDown size={12} className={`transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
-                      </button>
-                      
-                      <AnimatePresence>
-                          {isDropdownOpen && (
-                              <>
-                                  <div className="fixed inset-0 z-[70]" onClick={() => setIsDropdownOpen(false)}></div>
-                                  <motion.div 
-                                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                      className="absolute left-0 mt-2 w-48 bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl z-[80] overflow-hidden"
-                                  >
-                                      <div className="p-2 space-y-1">
-                                          {bot.telegram_group && (
-                                              <button 
-                                                  onClick={() => {
-                                                      const url = bot.telegram_group!.startsWith('@') ? `https://t.me/${bot.telegram_group!.substring(1)}` : bot.telegram_group;
-                                                      window.open(url, '_blank');
-                                                      setIsDropdownOpen(false);
-                                                  }}
-                                                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-colors text-left"
-                                              >
-                                                  <Send size={14} className="text-blue-500" />
-                                                  <span className="text-[10px] font-black uppercase tracking-tight">Telegram Grup</span>
-                                              </button>
-                                          )}
-                                          {bot.website_url && (
-                                              <button 
-                                                  onClick={() => {
-                                                      window.open(bot.website_url, '_blank');
-                                                      setIsDropdownOpen(false);
-                                                  }}
-                                                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-colors text-left"
-                                              >
-                                                  <Globe size={14} className="text-emerald-500" />
-                                                  <span className="text-[10px] font-black uppercase tracking-tight">Web Site</span>
-                                              </button>
-                                          )}
-                                          {bot.app_url && (
-                                              <button 
-                                                  onClick={() => {
-                                                      window.open(bot.app_url, '_blank');
-                                                      setIsDropdownOpen(false);
-                                                  }}
-                                                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-colors text-left"
-                                              >
-                                                  <Cpu size={14} className="text-purple-500" />
-                                                  <span className="text-[10px] font-black uppercase tracking-tight">App</span>
-                                              </button>
-                                          )}
-                                          {bot.social_url && (
-                                              <button 
-                                                  onClick={() => {
-                                                      window.open(bot.social_url, '_blank');
-                                                      setIsDropdownOpen(false);
-                                                  }}
-                                                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-colors text-left"
-                                              >
-                                                  <Share2 size={14} className="text-orange-500" />
-                                                  <span className="text-[10px] font-black uppercase tracking-tight">Sosyal</span>
-                                              </button>
-                                          )}
-                                      </div>
-                                  </motion.div>
-                              </>
-                          )}
-                      </AnimatePresence>
-                  </div>
               </div>
           </div>
-        </div>
+          </div>
+          <div className="lg:hidden flex flex-col gap-2 shrink-0">
+            <button 
+              onClick={() => { haptic('medium'); notification('warning'); /* Future Report logic */ }}
+              className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl text-slate-400 hover:text-red-500 active:scale-90 transition-all shrink-0"
+            >
+              <Flag size={20} />
+            </button>
+            <button 
+              onClick={handleShare}
+              className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl text-slate-400 active:scale-90 transition-all shrink-0 relative"
+            >
+                <Share2 size={18} className={isCopied ? 'text-emerald-500' : ''} />
+                <AnimatePresence>
+                    {isCopied && (
+                        <motion.span 
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute -top-8 left-1/2 -translate-x-1/2 text-[8px] font-black text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-md uppercase whitespace-nowrap"
+                        >
+                            Kopyalandı!
+                        </motion.span>
+                    )}
+                </AnimatePresence>
+            </button>
+          </div>
+      </div>
 
-        <div className="w-full md:w-auto md:min-w-[320px] lg:hidden">
-            <div className="flex flex-col bg-white dark:bg-slate-900 border border-black/5 dark:border-white/5 p-4 rounded-xl stats-card-bg">
+        <div className="w-full md:w-auto md:min-w-[320px] lg:hidden px-6">
+            <div className="flex flex-col bg-white dark:bg-slate-900 border border-black/5 dark:border-white/5 p-4 rounded-xl stats-card-bg mb-4">
                 <div className="flex items-center justify-between">
                     <div className="flex flex-col items-center flex-1">
                         <span className="text-slate-900 dark:text-white font-bold text-base">{bot.rating || '0.0'} <Star size={12} className="inline mb-1 fill-yellow-500 text-yellow-500" /></span>
                         <span className="text-[9px] text-slate-500 font-bold uppercase mt-0.5 tracking-wider">{bot.rating_count || 0} Oy</span>
                     </div>
-                    <div className="w-px h-8 bg-black/5 dark:bg-white/5"></div>
+                    <div className="w-px h-8 bg-black/5 dark:bg-white/5 mx-2"></div>
                     <div className="flex flex-col items-center flex-1">
                         <span className="text-slate-900 dark:text-white font-bold text-base">{bot.user_count && bot.user_count > 1000 ? `${(bot.user_count / 1000).toFixed(1)}K` : bot.user_count || 0}</span>
                         <span className="text-[9px] text-slate-500 font-bold uppercase mt-0.5 tracking-wider">Kullanıcı</span>
                     </div>
-                    <div className="w-px h-8 bg-black/5 dark:bg-white/5"></div>
+                    <div className="w-px h-8 bg-black/5 dark:bg-white/5 mx-2"></div>
                     <div className="flex flex-col items-center flex-1">
                         <span className="text-slate-900 dark:text-white font-bold text-base">{bot.views && bot.views > 1000 ? `${(bot.views / 1000).toFixed(1)}K` : bot.views || 0}</span>
                         <span className="text-[9px] text-slate-500 font-bold uppercase mt-0.5 tracking-wider">Görüntüleme</span>
                     </div>
                 </div>
             </div>
+
+            {/* Bağlantılar Dropdown Menu */}
+            {(bot.telegram_group || bot.website_url || bot.app_url || bot.social_url) && (
+              <div className="relative mb-6">
+                  <button 
+                      onClick={() => { haptic('light'); setIsDropdownOpen(!isDropdownOpen); }}
+                      className="w-full h-14 bg-white dark:bg-slate-900 rounded-xl border border-black/5 dark:border-white/10 flex items-center justify-between px-5 text-[11px] font-black uppercase tracking-[0.2em] transition-all active:scale-[0.98] stats-card-bg"
+                  >
+                      <div className="flex items-center gap-3">
+                          <Link size={18} className="text-brand" />
+                          <span>{t('official_links')}</span>
+                      </div>
+                      <ChevronDown size={18} className={`transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  <AnimatePresence>
+                      {isDropdownOpen && (
+                          <>
+                              <div className="fixed inset-0 z-[60]" onClick={() => setIsDropdownOpen(false)}></div>
+                              <motion.div 
+                                  initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                                  exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                                  className="absolute left-0 right-0 top-full mt-2 z-[70] bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl shadow-2xl overflow-hidden"
+                              >
+                                  <div className="p-2 space-y-1">
+                                      {bot.telegram_group && (
+                                          <button 
+                                              onClick={() => {
+                                                  const url = bot.telegram_group!.startsWith('@') ? `https://t.me/${bot.telegram_group!.substring(1)}` : bot.telegram_group;
+                                                  window.open(url, '_blank');
+                                                  setIsDropdownOpen(false);
+                                              }}
+                                              className="w-full flex items-center justify-between px-4 py-4 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-colors text-left group"
+                                          >
+                                              <div className="flex items-center gap-3">
+                                                  <Send size={14} className="text-blue-500" />
+                                                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300">Telegram Grup</span>
+                                              </div>
+                                              <ChevronRight size={14} className="text-slate-300 dark:text-slate-700" />
+                                          </button>
+                                      )}
+                                      {bot.website_url && (
+                                          <button 
+                                              onClick={() => { window.open(bot.website_url, '_blank'); setIsDropdownOpen(false); }}
+                                              className="w-full flex items-center justify-between px-4 py-4 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-colors text-left group border-t border-black/[0.03] dark:border-white/[0.03]"
+                                          >
+                                              <div className="flex items-center gap-3">
+                                                  <Globe size={14} className="text-emerald-500" />
+                                                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300">Web Site</span>
+                                              </div>
+                                              <ChevronRight size={14} className="text-slate-300 dark:text-slate-700" />
+                                          </button>
+                                      )}
+                                      {bot.app_url && (
+                                          <button 
+                                              onClick={() => { window.open(bot.app_url, '_blank'); setIsDropdownOpen(false); }}
+                                              className="w-full flex items-center justify-between px-4 py-4 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-colors text-left group border-t border-black/[0.03] dark:border-white/[0.03]"
+                                          >
+                                              <div className="flex items-center gap-3">
+                                                  <Cpu size={14} className="text-purple-500" />
+                                                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300">App / Bot</span>
+                                              </div>
+                                              <ChevronRight size={14} className="text-slate-300 dark:text-slate-700" />
+                                          </button>
+                                      )}
+                                      {bot.social_url && (
+                                          <button 
+                                              onClick={() => { window.open(bot.social_url, '_blank'); setIsDropdownOpen(false); }}
+                                              className="w-full flex items-center justify-between px-4 py-4 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-colors text-left group border-t border-black/[0.03] dark:border-white/[0.03]"
+                                          >
+                                              <div className="flex items-center gap-3">
+                                                  <Share2 size={14} className="text-orange-500" />
+                                                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300">Sosyal Medya</span>
+                                              </div>
+                                              <ChevronRight size={14} className="text-slate-300 dark:text-slate-700" />
+                                          </button>
+                                      )}
+                                  </div>
+                              </motion.div>
+                          </>
+                      )}
+                  </AnimatePresence>
+              </div>
+            )}
         </div>
       </div>
 
       {/* Gallery Section */}
-      <div className="mb-10">
-          <div 
-            ref={screenshotScroll.ref}
-            onMouseDown={screenshotScroll.onMouseDown}
-            onMouseUp={screenshotScroll.onMouseUp}
-            onMouseMove={screenshotScroll.onMouseMove}
-            onMouseLeave={screenshotScroll.onMouseLeave}
-            onContextMenu={screenshotScroll.onContextMenu}
-            className={`flex gap-4 overflow-x-auto no-scrollbar px-6 snap-x pb-4 ${screenshotScroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
-          >
-              {bot.screenshots && bot.screenshots.length > 0 ? (
-                  bot.screenshots.map((s, i) => (
-                    <motion.div 
-                      key={i} 
-                      whileHover={{ scale: 1.02 }}
-                      className="h-[320px] rounded-xl bg-slate-200 dark:bg-slate-900 border border-black/5 dark:border-white/5 overflow-hidden snap-center shrink-0 cursor-zoom-in group relative"
-                      onClick={() => openLightbox(i)}
-                    >
-                        <img src={s} loading="lazy" className="h-full w-auto object-contain" />
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center pointer-events-none">
-                            <Maximize2 size={24} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="mb-12 relative group/gallery DappScreenshot_root__FSZyc">
+          <div className="px-6 mb-6 flex items-center justify-between">
+              <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-[0.2em]">{t('preview')}</h3>
+              
+              <div className="flex gap-2">
+                  <button 
+                    onClick={() => {
+                        if (screenshotScroll.ref.current) {
+                            screenshotScroll.ref.current.scrollBy({ left: -340, behavior: 'smooth' });
+                            haptic('light');
+                        }
+                    }}
+                    className="w-10 h-10 rounded-full bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 flex items-center justify-center text-slate-400 hover:text-brand hover:scale-110 shadow-lg transition-all active:scale-95"
+                  >
+                      <ChevronLeft size={20} />
+                  </button>
+                  <button 
+                    onClick={() => {
+                        if (screenshotScroll.ref.current) {
+                            screenshotScroll.ref.current.scrollBy({ left: 340, behavior: 'smooth' });
+                            haptic('light');
+                        }
+                    }}
+                    className="w-10 h-10 rounded-full bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 flex items-center justify-center text-slate-400 hover:text-brand hover:scale-110 shadow-lg transition-all active:scale-95"
+                  >
+                      <ChevronRight size={20} />
+                  </button>
+              </div>
+          </div>
+
+          <div className="overflow-hidden">
+              <div 
+                ref={screenshotScroll.ref}
+                onMouseDown={screenshotScroll.onMouseDown}
+                onMouseUp={screenshotScroll.onMouseUp}
+                onMouseMove={screenshotScroll.onMouseMove}
+                onMouseLeave={screenshotScroll.onMouseLeave}
+                onContextMenu={screenshotScroll.onContextMenu}
+                className={`flex gap-4 overflow-x-auto no-scrollbar px-6 snap-x pb-0 ${screenshotScroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'} DappScreenshotsCarousel_root__s30Gy`}
+              >
+                  {bot.screenshots && bot.screenshots.length > 0 ? (
+                      bot.screenshots.map((s, i) => (
+                        <motion.div 
+                          key={i} 
+                          whileHover={{ scale: 1.02, y: -4 }}
+                          className="h-[260px] w-[380px] rounded-[2.5rem] bg-slate-200 dark:bg-slate-950 border border-black/5 dark:border-white/10 overflow-hidden snap-center shrink-0 cursor-zoom-in group relative DappScreenshotsCarousel_emblaItem__s30Gy"
+                          onClick={() => openLightbox(i)}
+                        >
+                            {/* Blurred Background Layer - Using the image itself */}
+                            <div className="absolute inset-0 transform-gpu overflow-hidden">
+                                <img src={s} className="w-full h-full object-cover blur-[40px] opacity-70 dark:opacity-50 scale-150" />
+                                <div className="absolute inset-0 bg-white/20 dark:bg-black/40" />
+                            </div>
+
+                            {/* Central Crisp Phone Mockup */}
+                            <div className="absolute inset-0 flex items-center justify-center p-0 z-10">
+                                <div className="h-full aspect-[9/19] relative group-hover:scale-105 transition-transform duration-700 ease-out">
+                                    <img 
+                                        src={s} 
+                                        loading="lazy" 
+                                        className="h-full w-full object-cover rounded-xl relative z-10 border-2 border-white/40 dark:border-white/20" 
+                                    />
+                                    {/* Glass Reflection */}
+                                    <div className="absolute inset-0 bg-gradient-to-tr from-white/30 via-white/5 to-transparent z-20 rounded-xl" />
+                                </div>
+                            </div>
+
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center pointer-events-none z-30">
+                                <div className="bg-white/20 backdrop-blur-md p-4 rounded-full opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100 border border-white/20">
+                                    <Maximize2 size={24} className="text-white" />
+                                </div>
+                            </div>
+                        </motion.div>
+                      ))
+                  ) : (
+                      [1,2,3].map(i => (
+                        <div key={i} className="w-[380px] h-[260px] rounded-[2.5rem] bg-slate-100 dark:bg-slate-900/50 border border-black/5 dark:border-white/5 overflow-hidden snap-center shrink-0 flex items-center justify-center">
+                            <ImageIcon className="text-slate-300 dark:text-slate-800" size={32} />
                         </div>
-                    </motion.div>
-                  ))
-              ) : (
-                  [1,2,3].map(i => (
-                    <div key={i} className="min-w-[180px] h-[320px] rounded-xl bg-slate-100 dark:bg-slate-900/50 border border-black/5 dark:border-white/5 overflow-hidden snap-center shrink-0 flex items-center justify-center">
-                        <ImageIcon className="text-slate-300 dark:text-slate-800" size={32} />
-                    </div>
-                  ))
-              )}
+                      ))
+                  )}
+              </div>
           </div>
       </div>
 
@@ -582,36 +711,7 @@ const BotDetail = () => {
           </div>
 
           {/* Right Column (PC only) - Action bar moved here for large screens */}
-          <aside className="hidden lg:flex flex-col gap-4 pt-10 sticky top-10 h-fit pr-6 lg:pr-0">
-              <div className="w-full">
-                  <div className="flex flex-col bg-white dark:bg-slate-900/60 rounded-xl border border-black/5 dark:border-white/5 backdrop-blur-xl overflow-hidden fancy-glass-card stats-card-bg">
-                      <div className="flex items-center justify-between p-6">
-                          <div className="flex flex-col items-center flex-1 border-r border-black/5 dark:border-white/5">
-                              <span className="text-slate-900 dark:text-white font-bold text-base">{bot.rating || '0.0'} <Star size={12} className="inline mb-1 fill-slate-900 dark:fill-white" /></span>
-                              <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">{bot.rating_count || 0} Oy</span>
-                          </div>
-                          <div className="flex flex-col items-center flex-1 border-r border-black/5 dark:border-white/5">
-                              <span className="text-slate-900 dark:text-white font-bold text-base">{bot.user_count && bot.user_count > 1000 ? `${(bot.user_count / 1000).toFixed(1)}K` : bot.user_count || 0}</span>
-                              <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">Kullanıcı</span>
-                          </div>
-                          <div className="flex flex-col items-center flex-1">
-                              <span className="text-slate-900 dark:text-white font-bold text-base">{bot.views && bot.views > 1000 ? `${(bot.views / 1000).toFixed(1)}K` : bot.views || 0}</span>
-                              <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">Görüntüleme</span>
-                          </div>
-                      </div>
-                      {bot.languages && bot.languages.length > 0 && (
-                          <div className="px-6 py-3 border-t border-black/5 dark:border-white/5 flex items-center justify-start gap-3">
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0 mr-[3px]"><path fillRule="evenodd" clipRule="evenodd" d="M5.5 2.5V2C5.5 1.17157 6.17157 0.5 7 0.5C7.82843 0.5 8.5 1.17157 8.5 2V2.5H9.9742C9.9901 2.49975 10.0061 2.49974 10.0221 2.5H12C12.8284 2.5 13.5 3.17157 13.5 4C13.5 4.82843 12.8284 5.5 12 5.5H11.2512C10.7379 7.82318 9.75127 9.98263 8.30067 11.9736C9.27943 12.9992 10.4353 13.9118 11.7719 14.7138C12.4823 15.14 12.7126 16.0614 12.2864 16.7717C11.8602 17.4821 10.9388 17.7125 10.2284 17.2862C8.75981 16.4051 7.46579 15.399 6.34922 14.2699C5.33326 15.3069 4.1736 16.2908 2.87186 17.2206C2.19774 17.7021 1.26091 17.546 0.7794 16.8719C0.297886 16.1977 0.454024 15.2609 1.12814 14.7794C2.38555 13.8813 3.48271 12.9379 4.42182 11.9481C3.69705 10.8985 3.09174 9.76779 2.60746 8.55709C2.29979 7.78791 2.67391 6.91496 3.44309 6.60729C4.21226 6.29961 5.08522 6.67374 5.39289 7.44291C5.67512 8.14848 6.00658 8.8209 6.38782 9.46053C7.19463 8.20649 7.78489 6.88692 8.16216 5.5H2C1.17157 5.5 0.5 4.82843 0.5 4C0.5 3.17157 1.17157 2.5 2 2.5H5.5ZM16.4912 16.5H18.5088L17.5 13.5856L16.4912 16.5ZM15.4527 19.5L14.4175 22.4907C14.1465 23.2735 13.2922 23.6885 12.5093 23.4175C11.7265 23.1465 11.3115 22.2922 11.5825 21.5093L16.0825 8.50933C16.5484 7.16356 18.4516 7.16356 18.9175 8.50933L23.4175 21.5093C23.6885 22.2922 23.2735 23.1465 22.4907 23.4175C21.7078 23.6885 20.8535 23.2735 20.5825 22.4907L19.5473 19.5H15.4527Z" fill="#758CA3"/></svg>
-                              {bot.languages.map((lang, idx) => (
-                              <span key={idx} className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
-                                  {lang}
-                              </span>
-                              ))}
-                          </div>
-                      )}
-                  </div>
-              </div>
-
+          <aside className="hidden lg:flex flex-col gap-4 sticky top-10 h-fit pr-6 lg:pr-0 mt-10">
               {/* Action Buttons for Sidebar */}
               <div className="flex flex-col gap-4">
                   <button 
@@ -626,13 +726,13 @@ const BotDetail = () => {
                       {isProcessing ? <Loader2 className="animate-spin" /> : (
                           isOwned ? <><Send size={20} /> BOTU BAŞLAT</> : (
                               bot.price === 0 ? <><PlusCircle size={20} /> ÜCRETSİZ EDİN</> : (
-                                  <div className="flex items-center gap-4">
-                                      <div className="text-left">
-                                          <p className="text-[8px] font-black text-slate-400 dark:text-slate-500 mb-1 uppercase tracking-widest">LİSANS ÜCRETİ</p>
-                                          <p className="text-lg font-black italic tracking-tighter">{prices.ton} TON</p>
+                                  <div className="flex items-center gap-5">
+                                      <span className="text-2xl font-black italic tracking-tighter leading-none">{prices.ton}</span>
+                                      <div className="h-6 w-px bg-white/20 dark:bg-slate-400/20"></div>
+                                      <div className="flex items-center gap-2">
+                                          <span className="font-black tracking-[0.3em]">{t('buy')}</span>
+                                          <ChevronRight size={20} className="opacity-50 group-hover:opacity-100 transition-opacity" />
                                       </div>
-                                      <div className="h-10 w-px bg-white/20 dark:bg-slate-200/20"></div>
-                                      <span className="flex items-center gap-2">SATIN AL <ChevronRight size={18} /></span>
                                   </div>
                               )
                           )
@@ -724,58 +824,74 @@ const BotDetail = () => {
                       </div>
                   )}
               </div>
+
+              <div className="w-full">
+                  <div className="flex flex-col bg-white dark:bg-slate-900/60 rounded-xl border border-black/5 dark:border-white/5 backdrop-blur-xl overflow-hidden fancy-glass-card stats-card-bg">
+                      <div className="flex items-center justify-between p-6">
+                          <div className="flex flex-col items-center flex-1 border-r border-black/5 dark:border-white/5">
+                              <span className="text-slate-900 dark:text-white font-bold text-base">{bot.rating || '0.0'} <Star size={12} className="inline mb-1 fill-yellow-500 text-yellow-500" /></span>
+                              <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">{bot.rating_count || 0} Oy</span>
+                          </div>
+                          <div className="flex flex-col items-center flex-1 border-r border-black/5 dark:border-white/5">
+                              <span className="text-slate-900 dark:text-white font-bold text-base">{bot.user_count && bot.user_count > 1000 ? `${(bot.user_count / 1000).toFixed(1)}K` : bot.user_count || 0}</span>
+                              <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">Kullanıcı</span>
+                          </div>
+                          <div className="flex flex-col items-center flex-1">
+                              <span className="text-slate-900 dark:text-white font-bold text-base">{bot.views && bot.views > 1000 ? `${(bot.views / 1000).toFixed(1)}K` : bot.views || 0}</span>
+                              <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">Görüntüleme</span>
+                          </div>
+                      </div>
+                      {bot.languages && bot.languages.length > 0 && (
+                          <div className="px-6 py-3 border-t border-black/5 dark:border-white/5 flex items-center justify-start gap-3">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0 mr-[3px]"><path fillRule="evenodd" clipRule="evenodd" d="M5.5 2.5V2C5.5 1.17157 6.17157 0.5 7 0.5C7.82843 0.5 8.5 1.17157 8.5 2V2.5H9.9742C9.9901 2.49975 10.0061 2.49974 10.0221 2.5H12C12.8284 2.5 13.5 3.17157 13.5 4C13.5 4.82843 12.8284 5.5 12 5.5H11.2512C10.7379 7.82318 9.75127 9.98263 8.30067 11.9736C9.27943 12.9992 10.4353 13.9118 11.7719 14.7138C12.4823 15.14 12.7126 16.0614 12.2864 16.7717C11.8602 17.4821 10.9388 17.7125 10.2284 17.2862C8.75981 16.4051 7.46579 15.399 6.34922 14.2699C5.33326 15.3069 4.1736 16.2908 2.87186 17.2206C2.19774 17.7021 1.26091 17.546 0.7794 16.8719C0.297886 16.1977 0.454024 15.2609 1.12814 14.7794C2.38555 13.8813 3.48271 12.9379 4.42182 11.9481C3.69705 10.8985 3.09174 9.76779 2.60746 8.55709C2.29979 7.78791 2.67391 6.91496 3.44309 6.60729C4.21226 6.29961 5.08522 6.67374 5.39289 7.44291C5.67512 8.14848 6.00658 8.8209 6.38782 9.46053C7.19463 8.20649 7.78489 6.88692 8.16216 5.5H2C1.17157 5.5 0.5 4.82843 0.5 4C0.5 3.17157 1.17157 2.5 2 2.5H5.5ZM16.4912 16.5H18.5088L17.5 13.5856L16.4912 16.5ZM15.4527 19.5L14.4175 22.4907C14.1465 23.2735 13.2922 23.6885 12.5093 23.4175C11.7265 23.1465 11.3115 22.2922 11.5825 21.5093L16.0825 8.50933C16.5484 7.16356 18.4516 7.16356 18.9175 8.50933L23.4175 21.5093C23.6885 22.2922 23.2735 23.1465 22.4907 23.4175C21.7078 23.6885 20.8535 23.2735 20.5825 22.4907L19.5473 19.5H15.4527Z" fill="#758CA3"/></svg>
+                              {bot.languages.map((lang, idx) => (
+                              <span key={idx} className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                                  {lang}
+                              </span>
+                              ))}
+                          </div>
+                      )}
+                  </div>
+              </div>
           </aside>
         </div>
       </div>
 
       {/* Sticky Action Bar */}
-      <div className="fixed bottom-0 inset-x-0 p-6 z-[70] bg-gradient-to-t from-slate-50 dark:from-[#020617] via-slate-50 dark:via-[#020617]/95 to-transparent pb-10 lg:hidden">
+      <div className="fixed bottom-0 inset-x-0 p-6 z-[70] bg-gradient-to-t from-slate-50 dark:from-[#020617] via-slate-50 dark:via-[#020617]/95 to-transparent pb-10 lg:hidden bot-sticky-action-bar">
           <div className="max-w-md mx-auto flex items-center gap-3">
-              <button 
-                onClick={handleShare}
-                className="h-20 w-20 shrink-0 bg-white dark:bg-slate-900 rounded-xl border border-black/5 dark:border-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 active:scale-95 transition-all relative border-b-8 border-transparent"
-              >
-                  <Share2 size={24} className={isCopied ? 'text-emerald-500' : ''} />
-                  <AnimatePresence>
-                      {isCopied && (
-                          <motion.span 
-                              initial={{ opacity: 0, y: -20 }}
-                              animate={{ opacity: 1, y: -45 }}
-                              exit={{ opacity: 0 }}
-                              className="absolute left-1/2 -translate-x-1/2 text-[8px] font-black text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-md uppercase whitespace-nowrap"
-                          >
-                              Kopyalandı!
-                          </motion.span>
-                      )}
-                  </AnimatePresence>
-              </button>
-
-              <button 
-                onClick={() => { haptic('medium'); notification('warning'); /* Future Report logic */ }}
-                className="h-20 w-20 shrink-0 bg-white dark:bg-slate-900 rounded-[32px] border border-black/5 dark:border-white/10 flex items-center justify-center text-slate-400 hover:text-red-500 active:scale-95 transition-all border-b-8 border-transparent"
-              >
-                  <Flag size={24} />
-              </button>
-
               <button 
                 onClick={handleAction}
                 disabled={isProcessing}
-                className={`flex-1 h-20 rounded-xl text-[11px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 border-b-8 ${
+                className={`flex-1 h-14 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 border-b-4 ${
                     isOwned 
                     ? 'bg-emerald-600 text-white border-emerald-800' 
-                    : 'bg-slate-900 dark:bg-white text-white dark:text-slate-950 border-slate-700 dark:border-slate-300'
+                    : 'bg-slate-900 dark:bg-white text-white dark:text-slate-950 border-slate-700 dark:border-slate-300 shadow-lg shadow-brand/20'
                 }`}
               >
                   {isProcessing ? <Loader2 className="animate-spin" /> : (
-                      isOwned ? <><Send size={20} /> BOTU BAŞLAT</> : (
-                          bot.price === 0 ? <><PlusCircle size={20} /> ÜCRETSİZ EDİN</> : (
+                      isOwned ? <><Send size={18} /> {t('launch_bot')}</> : (
+                          bot.price === 0 ? <><PlusCircle size={18} /> {t('get_free')}</> : (
                               <div className="flex items-center gap-4">
-                                  <div className="text-left">
-                                      <p className="text-[8px] font-black text-slate-400 dark:text-slate-500 mb-1 uppercase tracking-widest">LİSANS ÜCRETİ</p>
-                                      <p className="text-lg font-black italic tracking-tighter">{prices.ton} TON</p>
+                                  <div className="flex items-center gap-1.5">
+                                      <span className="text-xl font-black italic tracking-tighter leading-none">{Number(prices.ton).toFixed(1)}</span>
+                                      <svg fill="none" height="14" width="14" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" className="opacity-90">
+                                          <title>Payment TON icon</title>
+                                          <g clipPath="url(#a_ton_buy)" fill="currentColor">
+                                              <path d="M7.5 11.015V5.963H5.268a.31.31 0 0 0-.272.463l1.772 3.17.734 1.419ZM9.232 9.596l1.771-3.17a.31.31 0 0 0-.272-.463H8.498v5.053l.734-1.42Z"></path>
+                                              <path clipRule="evenodd" d="M16 8.5a8 8 0 1 1-16 0 8 8 0 0 1 16 0ZM5.268 4.965h5.464c1.004 0 1.64 1.085 1.136 1.96l-3.372 5.844a.572.572 0 0 1-.992 0L4.132 6.925c-.505-.876.132-1.96 1.136-1.96Z" fill-rule="evenodd"></path>
+                                          </g>
+                                          <defs>
+                                              <clipPath id="a_ton_buy">
+                                                  <path d="M0 0h16v16H0z" fill="#fff" transform="translate(0 .5)"></path>
+                                              </clipPath>
+                                          </defs>
+                                      </svg>
                                   </div>
-                                  <div className="h-10 w-px bg-white/20 dark:bg-slate-200/20"></div>
-                                  <span className="flex items-center gap-2">SATIN AL <ChevronRight size={18} /></span>
+                                  <div className="flex items-center gap-2 border-l border-white/20 dark:border-slate-400/20 pl-4">
+                                      <span className="font-black tracking-[0.2em]">{t('buy')}</span>
+                                      <ChevronRight size={18} className="opacity-40" />
+                                  </div>
                               </div>
                           )
                       )

@@ -87,8 +87,8 @@ const ProfileSettings = () => {
         <div className="relative mb-8 p-6 bg-white dark:bg-slate-900 border border-black/5 dark:border-white/5 rounded-xl overflow-hidden group">
              <div className="relative z-10 flex items-center gap-6">
                 <div className="relative">
-                    <div className="w-20 h-20 rounded-xl p-0.5 bg-gradient-to-tr from-brand to-brand-light">
-                        <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover rounded-xl border-4 border-white dark:border-slate-900" loading="lazy" />
+                    <div className="w-20 h-20 rounded-xl overflow-hidden">
+                        <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover rounded-xl" loading="lazy" />
                     </div>
                     <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 rounded-lg border-2 border-white dark:border-slate-900 flex items-center justify-center" />
                 </div>

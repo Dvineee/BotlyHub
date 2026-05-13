@@ -61,7 +61,7 @@ export const FilterMenu: React.FC = () => {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => { haptic('light'); setIsOpen(!isOpen); }}
-        className={`w-10 h-10 flex items-center justify-center transition-all active:scale-90  ${
+        className={`w-8 h-8 flex items-center justify-center transition-all active:scale-90  ${
           isOpen || activeFilter !== 'all'
             ? 'text-blue-600 dark:text-blue-500'
             : 'text-slate-500 dark:text-slate-400'

@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Search, ChevronLeft, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, Send, Instagram, Youtube, Link, CheckCircle2, ChevronDown, Sun, Moon, Wallet, Menu, Plus } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Bot, Announcement, Notification } from '../types';
-import { categories } from '../data';
+import { categories, appsSubCategories } from '../data';
 import { useTranslation } from '../TranslationContext';
 import { DatabaseService } from '../services/DatabaseService';
 import PriceService from '../services/PriceService';
@@ -29,22 +29,7 @@ const getLiveBotIcon = (bot: Bot) => {
     return bot.icon || `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=random&color=fff`;
 };
 
-const getLangLabel = (lang: string) => {
-    const mapping: Record<string, string> = {
-        '🇹🇷': 'TR',
-        '🇬🇧': 'EN',
-        '🇺🇸': 'EN',
-        '🇷🇺': 'RU',
-        '🇮🇷': 'FA',
-        '🇺🇦': 'UA',
-        '🇪🇸': 'ES',
-        '🇮🇳': 'HI',
-        '🇸🇦': 'AR',
-        '🇫🇷': 'FR',
-        '🇩🇪': 'DE'
-    };
-    return mapping[lang] || lang;
-};
+
 
 const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) => void }> = React.memo(({ ann, onShowPopup }) => {
   const navigate = useNavigate();
@@ -75,11 +60,11 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
     <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full relative bg-white dark:bg-slate-900/60 border border-black/5 dark:border-white/10 flex items-center p-2 sm:p-3 gap-4 shrink-0 snap-center rounded-xl overflow-hidden cursor-pointer group promo-card backdrop-blur-xl"
+        className="w-full relative bg-white dark:bg-slate-900/60 border border-black/5 dark:border-white/10 flex items-center p-2 sm:p-3 gap-3 sm:gap-4 shrink-0 snap-center rounded-xl overflow-hidden cursor-pointer group promo-card backdrop-blur-xl"
         onClick={handleAction}
     >
         {/* Left Side: Thumbnail */}
-        <div className="w-[100px] h-[100px] rounded-xl overflow-hidden relative shrink-0">
+        <div className="w-[85px] h-[85px] sm:w-[100px] sm:h-[100px] rounded-xl overflow-hidden relative shrink-0">
             <img 
                 src={ann.bg_image_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(ann.title)}&background=random&color=fff`} 
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
@@ -182,7 +167,7 @@ const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = React.memo(({ bots }) => {
     if (bots.length === 0) return null;
 
     return (
-        <div className="mb-6 md:mb-10 flex flex-col md:flex-row items-center !gap-[0.3rem] bg-[#ffffff] dark:bg-[#1e293b] px-4 md:px-[10px] !pt-[0.3rem] !pb-0 -mx-4 md:mx-0 rounded-none md:rounded-xl border-y md:border border-black/5 dark:border-white/5 relative overflow-hidden group !shadow-none">
+        <div className="home-search-bar mb-6 md:mb-10 flex flex-col md:flex-row items-center !gap-[0.3rem] bg-[#ffffff] dark:bg-[#1e293b] px-4 md:px-[10px] !pt-[0.3rem] !pb-0 -mx-4 md:mx-0 rounded-none md:rounded-xl border-y md:border border-black/5 dark:border-white/5 relative overflow-hidden group !shadow-none">
             {/* Header Info */}
             <div className="flex flex-col shrink-0 min-w-full md:min-w-[180px] md:border-r border-black/5 dark:border-white/5 md:pr-6 h-full justify-center">
                 <div 
@@ -320,41 +305,28 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonR
             <div className="flex items-center gap-3">
                 {bot.price > 0 && (
                     <div className="flex items-center gap-2 px-2 py-1 bg-blue-500/10 rounded-md border border-blue-500/20">
-                        <span className="text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-tighter">{Number(prices.ton).toFixed(1)} TON</span>
+                        <span className="text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-tighter flex items-center gap-1">
+                            {Number(prices.ton).toFixed(1)}
+                            <svg fill="none" height="12" width="12" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" className="translate-y-[0.5px]">
+                                <title>Payment TON icon</title>
+                                <g clipPath="url(#a_ton_home)" fill="currentColor">
+                                    <path d="M7.5 11.015V5.963H5.268a.31.31 0 0 0-.272.463l1.772 3.17.734 1.419ZM9.232 9.596l1.771-3.17a.31.31 0 0 0-.272-.463H8.498v5.053l.734-1.42Z"></path>
+                                    <path clipRule="evenodd" d="M16 8.5a8 8 0 1 1-16 0 8 8 0 0 1 16 0ZM5.268 4.965h5.464c1.004 0 1.64 1.085 1.136 1.96l-3.372 5.844a.572.572 0 0 1-.992 0L4.132 6.925c-.505-.876.132-1.96 1.136-1.96Z" fillRule="evenodd"></path>
+                                </g>
+                                <defs>
+                                    <clipPath id="a_ton_home">
+                                        <path d="M0 0h16v16H0z" fill="#fff" transform="translate(0 .5)"></path>
+                                    </clipPath>
+                                </defs>
+                            </svg>
+                        </span>
                     </div>
                 )}
                 <div className="flex items-center gap-1 px-2 py-1 bg-yellow-500/10 rounded-md border border-yellow-500/20">
                     <Star size={10} className="text-yellow-500 fill-yellow-500" />
                     <span className="text-[9px] font-black text-yellow-600 dark:text-yellow-400 uppercase tracking-tighter">{bot.rating || '0.0'}</span>
                 </div>
-                {bot.languages && bot.languages.length > 0 && (
-                    <div className="flex items-center gap-1.5">
-                        {bot.languages.map((lang, idx) => (
-                            <span 
-                                key={idx} 
-                                className={`
-                                    text-[6px] md:text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-tighter opacity-80
-                                    ${idx === 3 ? '!hidden !md:inline-block' : ''}
-                                    ${idx >= 4 ? '!hidden !lg:inline-block' : ''}
-                                `}
-                            >
-                                <span className="md:hidden">{getLangLabel(lang)}</span>
-                                <span className="hidden md:inline">{lang}</span>
-                            </span>
-                        ))}
-                        {/* Plus SVG indicators for mobile/tablet truncation */}
-                        {bot.languages.length > 3 && (
-                            <span className="!inline-flex !md:hidden text-slate-400 dark:text-slate-500 opacity-80 items-center">
-                                <svg width="6" height="6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                            </span>
-                        )}
-                        {bot.languages.length > 4 && (
-                            <span className="!hidden !md:inline-flex !lg:hidden text-slate-400 dark:text-slate-500 opacity-80 items-center">
-                                <svg width="6" height="6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                            </span>
-                        )}
-                    </div>
-                )}
+
             </div>
         </div>
         <div className="bg-slate-100 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700/50 text-slate-400 group-hover:text-white group-hover:bg-blue-600 group-hover:border-blue-500 transition-all">
@@ -373,9 +345,14 @@ const AddProjectBanner: React.FC<{ className?: string }> = ({ className = "" }) 
             onClick={() => navigate('/settings')}
         >
             {/* Left Side: Illustration Placeholder */}
-            <div className="w-[100px] h-[100px] rounded-xl overflow-hidden relative shrink-0 bg-blue-500 flex items-center justify-center">
-                <Sparkles size={42} className="text-white/40 animate-pulse" />
-                <div className="absolute inset-0 bg-gradient-to-tr from-black/20 to-transparent"></div>
+            <div className="w-[100px] h-[100px] rounded-xl overflow-hidden relative shrink-0 bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                <img 
+                    src="https://i.hizliresim.com/eoisiuq.png" 
+                    alt="Add Project" 
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    referrerPolicy="no-referrer"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
             </div>
             
             {/* Right Side: Content */}
@@ -395,7 +372,7 @@ const AddProjectBanner: React.FC<{ className?: string }> = ({ className = "" }) 
                         style={{ background: 'linear-gradient(135deg, #3B82F6, #2563EB)' }}
                     >
                         <span className="text-[9px] font-black text-white uppercase tracking-widest leading-none">
-                            REKLAM
+                            HEMEN KATIL →
                         </span>
                     </div>
                 </div>
@@ -459,19 +436,20 @@ const NavMenu = ({
 
     return (
         <>
-        <div className="sticky top-0 z-[80] bg-white dark:bg-slate-900 border-b border-[#f7f7f7] dark:border-white/5 w-full py-2.5 md:py-4 transition-all" ref={internalMenuRef}>
-            <div className="max-w-7xl mx-auto px-5 sm:px-8 flex items-center justify-center md:justify-between">
-                {/* Logo shown only when scrolled - keeping logic but background is now white */}
-                {isScrolled ? (
-                    <div className="hidden md:flex items-center gap-3 w-48 shrink-0 cursor-pointer" onClick={() => navigate('/')}>
-                        <Logo style={{ width: '1.8rem', height: 'auto' }} />
-                        <span className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">BotlyHub</span>
-                    </div>
-                ) : (
-                    <div className="hidden md:block w-48 shrink-0"></div>
-                )}
+        <div className="sticky top-0 z-[80] bg-white dark:bg-slate-900 border-b border-[#f7f7f7] dark:border-white/5 w-full py-2.5 md:py-4 transition-colors" ref={internalMenuRef}>
+            <div className="max-w-7xl mx-auto px-5 sm:px-8 flex items-center justify-between">
+                {/* Left Section (Logo) */}
+                <div className="hidden md:flex items-center w-48 shrink-0">
+                    {isScrolled ? (
+                        <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
+                            <Logo style={{ width: '1.8rem', height: 'auto' }} />
+                            <span className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">BotlyHub</span>
+                        </div>
+                    ) : null}
+                </div>
 
-                <div className="flex items-center gap-8 md:gap-14 mx-auto">
+                {/* Center Section (Navigation) */}
+                <div className="flex items-center justify-center gap-8 md:gap-14 flex-1">
                 {/* Bots Dropdown */}
                 <div className="relative md:static">
                     <button 
@@ -553,33 +531,22 @@ const NavMenu = ({
                                 onMouseLeave={() => setOpenMenu(null)}
                             >
                                 <div className="max-w-7xl mx-auto px-6">
-                                    <div className="flex justify-center">
-                                        {appsCategories.length > 0 ? (
-                                            <div className="grid grid-cols-2 gap-8">
-                                                {appsCategories.map(cat => (
-                                                    <button 
-                                                        key={cat.id}
-                                                        onClick={() => handleCategoryClick(cat.id)}
-                                                        className="flex items-center gap-6 p-6 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-all group border border-transparent hover:border-black/5 w-[320px]"
-                                                    >
-                                                        <div className="w-16 h-16 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-xl shrink-0 group-hover:scale-110 transition-transform">
-                                                            <cat.icon size={32} className="text-slate-500 dark:text-slate-400 group-hover:text-blue-500" />
-                                                        </div>
-                                                        <div className="flex flex-col items-start text-left">
-                                                            <span className="text-base font-black uppercase tracking-widest text-slate-800 dark:text-slate-200 group-hover:text-blue-500 transition-colors">{t(cat.label)}</span>
-                                                            <span className="text-[11px] text-slate-400 dark:text-slate-500 font-bold uppercase mt-1">Platform Uygulamaları</span>
-                                                        </div>
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        ) : (
-                                            <div className="py-10 text-center">
-                                                <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                                                    <Zap size={28} className="text-yellow-500" />
+                                    <div className="grid grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-4">
+                                        {appsSubCategories.map(cat => (
+                                            <button 
+                                                key={cat.id}
+                                                onClick={() => handleCategoryClick(cat.id)}
+                                                className="flex items-center gap-3 p-3 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-all group border border-transparent hover:border-black/5"
+                                            >
+                                                <div className="w-10 h-10 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-lg shrink-0 group-hover:scale-110 transition-transform">
+                                                    <cat.icon size={22} />
                                                 </div>
-                                                <p className="text-sm font-black text-slate-400 uppercase tracking-[0.3em]">{t('coming_soon') || 'Pek Yakında'}</p>
-                                            </div>
-                                        )}
+                                                <div className="flex flex-col items-start overflow-hidden">
+                                                    <span className="text-[11px] font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 group-hover:text-blue-500 transition-colors truncate w-full text-left">{t(cat.label)}</span>
+                                                    <span className="text-[9px] text-slate-400 dark:text-slate-500 truncate w-full text-left font-bold uppercase mt-0.5">Platform Uygulamaları</span>
+                                                </div>
+                                            </button>
+                                        ))}
                                     </div>
                                 </div>
                             </motion.div>
@@ -598,69 +565,73 @@ const NavMenu = ({
 
             {/* Profile buttons on the right when scrolled - Hidden on mobile as per user's "tablet and larger" requirement */}
             <div className="hidden md:flex items-center justify-end w-48 shrink-0">
-                <AnimatePresence>
+                <AnimatePresence mode="wait">
                     {isScrolled && (
                         <motion.div 
-                            initial={{ opacity: 0, x: 20 }}
+                            key="scrolled-actions"
+                            initial={{ opacity: 0, x: 10 }}
                             animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: 20 }}
+                            exit={{ opacity: 0, x: 10 }}
+                            transition={{ duration: 0.2 }}
                             className="flex items-center gap-2 md:gap-3"
                         >
-                        <button 
-                            onClick={() => { haptic('light'); toggleTheme(); }} 
-                            className="w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl text-slate-900 dark:text-white active:scale-95 transition-transform"
-                        >
-                            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-                        </button>
+                            <button 
+                                onClick={() => { haptic('light'); toggleTheme(); }} 
+                                className="w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl text-slate-900 dark:text-white active:scale-95 transition-transform"
+                            >
+                                {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                            </button>
 
-                        {user ? (
-                            <>
-                                <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="flex w-10 h-10 items-center justify-center bg-slate-50 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl text-slate-900 dark:text-white active:scale-95 transition-transform">
-                                    <Wallet size={18} />
-                                </button>
-                                <div className="relative" ref={parentMenuRef}>
-                                    <button 
-                                      onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
-                                      className="w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl text-slate-900 dark:text-white active:scale-95 transition-transform relative"
-                                    >
-                                        <Menu size={20} strokeWidth={2.5} />
-                                        {unreadCount > 0 && (
-                                            <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[8px] font-black text-white flex items-center justify-center px-1">
-                                                {unreadCount > 9 ? '9+' : unreadCount}
+                            {user ? (
+                                <>
+                                    <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="flex w-10 h-10 items-center justify-center bg-slate-50 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl text-slate-900 dark:text-white active:scale-95 transition-transform">
+                                        <Wallet size={18} />
+                                    </button>
+                                    <div className="relative" ref={parentMenuRef}>
+                                        <button 
+                                          onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
+                                          className="w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl text-slate-900 dark:text-white active:scale-95 transition-transform relative"
+                                        >
+                                            <Menu size={20} strokeWidth={2.5} />
+                                            {unreadCount > 0 && (
+                                                <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[8px] font-black text-white flex items-center justify-center px-1">
+                                                    {unreadCount > 9 ? '9+' : unreadCount}
+                                                </div>
+                                            )}
+                                        </button>
+                                        {isMenuOpen && (
+                                            <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden z-[100] animate-in py-2 backdrop-blur-2xl shadow-2xl">
+                                                {[
+                                                    { path: '/', icon: Store, color: 'text-blue-500 dark:text-blue-400', label: 'market' },
+                                                    { path: '/settings', icon: User, color: 'text-purple-500 dark:text-purple-400', label: 'profile' },
+                                                    { path: '/my-bots', icon: BotIcon, color: 'text-emerald-500 dark:text-emerald-400', label: 'my_bots' },
+                                                    { path: '/channels', icon: Megaphone, color: 'text-orange-500 dark:text-orange-400', label: 'my_channels' },
+                                                    { path: '/notifications', icon: Bell, color: 'text-blue-600 dark:text-blue-500', label: 'notifications', badge: unreadCount > 0 }
+                                                ].map((item, i) => (
+                                                    <button key={i} onClick={() => { navigate(item.path); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-black/5 dark:hover:bg-white/5 text-left border-b border-black/5 dark:border-white/5 last:border-0 relative">
+                                                        <item.icon size={18} className={item.color} /> 
+                                                        <span className="text-[11px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300">{t(item.label)}</span>
+                                                        {item.badge && <div className="absolute right-6 w-2.5 h-2.5 bg-red-600 rounded-full"></div>}
+                                                    </button>
+                                                ))}
                                             </div>
                                         )}
-                                    </button>
-                                    {isMenuOpen && (
-                                        <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden z-[100] animate-in py-2 backdrop-blur-2xl shadow-2xl">
-                                            {[
-                                                { path: '/', icon: Store, color: 'text-blue-500 dark:text-blue-400', label: 'market' },
-                                                { path: '/settings', icon: User, color: 'text-purple-500 dark:text-purple-400', label: 'profile' },
-                                                { path: '/my-bots', icon: BotIcon, color: 'text-emerald-500 dark:text-emerald-400', label: 'my_bots' },
-                                                { path: '/channels', icon: Megaphone, color: 'text-orange-500 dark:text-orange-400', label: 'my_channels' },
-                                                { path: '/notifications', icon: Bell, color: 'text-blue-600 dark:text-blue-500', label: 'notifications', badge: unreadCount > 0 }
-                                            ].map((item, i) => (
-                                                <button key={i} onClick={() => { navigate(item.path); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-black/5 dark:hover:bg-white/5 text-left border-b border-black/5 dark:border-white/5 last:border-0 relative">
-                                                    <item.icon size={18} className={item.color} /> 
-                                                    <span className="text-[11px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300">{t(item.label)}</span>
-                                                    {item.badge && <div className="absolute right-6 w-2.5 h-2.5 bg-red-600 rounded-full"></div>}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            </>
-                        ) : (
-                            <button 
-                                onClick={() => { haptic('light'); setIsLoginModalOpen(true); }}
-                                className="px-5 h-10 bg-blue-500 hover:bg-blue-600 text-white text-[13px] font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center whitespace-nowrap shadow-lg shadow-blue-500/25"
-                            >
-                                Giriş yap
-                            </button>
-                        )}
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </div></div></div>
+                                    </div>
+                                </>
+                            ) : (
+                                <button 
+                                    onClick={() => { haptic('light'); setIsLoginModalOpen(true); }}
+                                    className="px-5 h-10 bg-blue-500 hover:bg-blue-600 text-white text-[13px] font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center whitespace-nowrap shadow-lg shadow-blue-500/25"
+                                >
+                                    Giriş yap
+                                </button>
+                            )}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+        </div>
+    </div>
 
         {/* Mobile Modal for Categories */}
         <AnimatePresence>
@@ -694,7 +665,7 @@ const NavMenu = ({
                         
                         <div className="max-h-[60vh] overflow-y-auto pb-4">
                             {(() => {
-                                const activeCats = mobileModal === 'bots' ? botsCategories : appsCategories;
+                                const activeCats = mobileModal === 'bots' ? botsCategories : appsSubCategories;
                                 if (activeCats.length > 0) {
                                     return activeCats.map((cat) => (
                                         <button
@@ -703,15 +674,15 @@ const NavMenu = ({
                                             className="w-full flex items-center gap-4 py-4 px-6 hover:bg-slate-50 dark:hover:bg-white/5 active:bg-slate-100 dark:active:bg-white/10 transition-all border-b border-black/[0.03] dark:border-white/[0.03] group last:border-0"
                                         >
                                             <div className="w-11 h-11 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-xl shrink-0 shadow-sm group-hover:scale-105 transition-transform">
-                                                <cat.icon size={20} className="text-slate-500 dark:text-slate-400 group-hover:text-blue-500" />
+                                                <cat.icon size={20} className={mobileModal === 'bots' ? "text-slate-500 dark:text-slate-400 group-hover:text-blue-500" : ""} />
                                             </div>
                                             <div className="flex flex-col items-start min-w-0">
                                                 <span className="text-sm font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider truncate w-full">
                                                     {t(cat.label)}
                                                 </span>
-                                                {cat.desc && (
+                                                {'desc' in cat && cat.desc && (
                                                     <span className="text-[10px] text-slate-400 dark:text-slate-600 font-bold uppercase tracking-tight line-clamp-1 text-left">
-                                                        {t(cat.desc)}
+                                                        {t(cat.desc as string)}
                                                     </span>
                                                 )}
                                             </div>
@@ -763,6 +734,10 @@ const Home = () => {
   }, []);
   
   const annScroll = useDraggableScroll();
+  const catScroll = useDraggableScroll();
+  const botsCatScroll = useDraggableScroll();
+
+  const botsCategories = categories.filter(c => c.id !== 'apps' && c.id !== 'all');
 
   const filteredBots = useMemo(() => {
     let result = [...bots];
@@ -810,22 +785,35 @@ const Home = () => {
 
   const categorizedBots = useMemo(() => {
     const result: Record<string, { bots: Bot[], total: number }> = {};
-    const baseBots = filteredBots; // Use filtered bots instead of all bots
+    const baseBots = filteredBots;
 
-    categories.filter(c => c.id !== 'all').forEach(cat => {
-        const botsInCat = baseBots.filter(b => Array.isArray(b.category) ? b.category.includes(cat.id) : b.category === cat.id);
-        if (botsInCat.length > 0) {
-            result[cat.id] = {
-                bots: botsInCat.slice(0, 9),
-                total: botsInCat.length
-            };
-        }
-    });
+    // Apps section
+    const appsBots = baseBots
+        .filter(b => Array.isArray(b.category) ? b.category.includes('apps') : b.category === 'apps')
+        .sort((a, b) => (b.views || 0) - (a.views || 0)); // Sort by views (popularity)
+    if (appsBots.length > 0) {
+        result['apps'] = {
+            bots: appsBots.slice(0, 12),
+            total: appsBots.length
+        };
+    }
+
+    // Bots section (everything else)
+    const otherBots = baseBots
+        .filter(b => Array.isArray(b.category) ? !b.category.includes('apps') : b.category !== 'apps')
+        .sort((a, b) => (b.views || 0) - (a.views || 0)); // Sort by views (popularity)
+    if (otherBots.length > 0) {
+        result['bots'] = {
+            bots: otherBots.slice(0, 12),
+            total: otherBots.length
+        };
+    }
+    
     return result;
   }, [filteredBots]);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-200 animate-in transition-colors duration-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-200 animate-in transition-colors duration-300 home-page">
       <SEO 
           title="Telegram Bot ve Kanalları - Keşfet, Tanıt ve Yönet" 
           description="BotlyHub V3, Telegram ekosistemindeki en iyi botları ve kanalları bulabileceğiniz, kendi botlarınızı tanıtabileceğiniz ve yönetebileceğiniz kapsamlı bir platformdur."
@@ -844,17 +832,26 @@ const Home = () => {
                   </div>
 
                   <div className="w-full md:flex-1 md:max-w-2xl order-3 md:order-2 flex items-center gap-2 md:gap-3">
-                      <div className="w-[330px] cursor-pointer" onClick={() => navigate('/search')}>
+                      <div className="flex-1 md:w-[330px] md:flex-none cursor-pointer" onClick={() => navigate('/search')}>
                           <div className="relative flex items-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl p-0.5 md:p-1 transition-all active:scale-[0.98] group custom-search-outline">
-                              <div className="ml-2 md:ml-3 w-8 h-8 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
+                              <div className="ml-2 md:ml-3 w-8 h-8 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors shrink-0">
                                   <Search size={18} />
                               </div>
-                              <div className="w-full py-2 px-3 text-[13px] text-slate-400 font-bold uppercase tracking-widest opacity-60 truncate">{t('search_placeholder')}</div>
+                              <div className="w-full py-2 px-3 text-[13px] text-slate-400 font-bold uppercase tracking-widest opacity-60 truncate min-w-0">{t('search_placeholder')}</div>
+                              <div className="flex items-center gap-0.5 pr-1 shrink-0 ml-auto" onClick={(e) => e.stopPropagation()}>
+                                  <div className="w-px h-5 bg-black/[0.05] dark:bg-white/[0.05] mx-1" />
+                                  <FilterMenu />
+                              </div>
                           </div>
                       </div>
-                      <div className="shrink-0">
-                          <FilterMenu />
-                      </div>
+                      <RouterLink 
+                          to="/settings"
+                          onClick={() => haptic('light')}
+                          className="hidden md:flex items-center gap-1 text-[13px] font-bold text-blue-500 hover:underline transition-all"
+                      >
+                          <Plus size={14} />
+                          <span>{t('add_your')}</span>
+                      </RouterLink>
                   </div>
 
                   <div className="flex items-center gap-2 md:gap-3 order-2 md:order-3 md:w-48 justify-end ml-auto shrink-0">
@@ -923,8 +920,8 @@ const Home = () => {
         ) : (
             <>
               {announcements.length > 0 && (
-                  <div className="h-[150px] pb-5 flex flex-col lg:flex-row justify-center items-center gap-6 pt-3 max-w-7xl mx-auto w-full overflow-hidden px-5 sm:px-8">
-                      <div className="w-full sm:max-w-[480px] lg:w-[480px] shrink-0 h-[118px]">
+                  <div className="min-h-[150px] pb-5 flex flex-col lg:flex-row justify-center items-center gap-6 pt-3 max-w-7xl mx-auto w-full overflow-hidden px-4 sm:px-8">
+                      <div className="w-full sm:max-w-[480px] lg:w-[480px] shrink h-[118px]">
                           <AnnouncementsCarousel 
                               announcements={announcements} 
                               scroll={annScroll} 
@@ -961,9 +958,13 @@ const Home = () => {
           <div className="max-w-7xl mx-auto px-5 sm:px-8">
               {!isLoading && (
                   <>
-                      <FeaturedBotsSlider bots={bots} />
+                    <div className="mb-10 sm:mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700 text-center">
+                        <h1 className="text-3xl sm:text-5xl md:text-[2.75rem] font-bold tracking-[-0.035em] md:leading-none leading-tight text-slate-900 dark:text-white">
+                            <span className="text-blue-500">En iyi</span> Telegram <span className="text-blue-500">Ekosistemini</span> Keşfet : Ekle ve Kazan
+                        </h1>
+                    </div>
 
-            <AnimatePresence mode="wait">
+                    <AnimatePresence mode="wait">
                 <motion.div 
                     key={activeFilter}
                     initial={{ opacity: 0, y: 20 }}
@@ -971,25 +972,29 @@ const Home = () => {
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.3 }}
                 >
-                    {Object.entries(categorizedBots).map(([catId, data], index) => {
-                        const category = categories.find(c => c.id === catId);
+                    {/* Apps Section */}
+                    {categorizedBots['apps'] && (() => {
+                        const data = categorizedBots['apps'];
+                        const category = categories.find(c => c.id === 'apps');
                         if (!category) return null;
                         
-                        // Group bots in chunks of 3 for vertical columns in horizontal scroll
+                        const featuredBots = data.bots.slice(0, 3);
+                        const sliderBots = data.bots.slice(3);
+
                         const botChunks = [];
-                        for (let i = 0; i < data.bots.length; i += 3) {
-                            botChunks.push(data.bots.slice(i, i + 3));
+                        for (let i = 0; i < sliderBots.length; i += 3) {
+                            botChunks.push(sliderBots.slice(i, i + 3));
                         }
 
                         return (
-                            <React.Fragment key={catId}>
-                                <div className="mt-10 mb-10 space-y-4">
+                            <div className="mt-10 mb-10 space-y-6">
+                                <div className="flex flex-col gap-6 overflow-hidden">
                                     <div 
-                                        className="flex flex-col gap-1 px-2 cursor-pointer group"
-                                        onClick={() => navigate(`/search?category=${catId}`)}
+                                        className="flex flex-col gap-1 cursor-pointer group shrink-0"
+                                        onClick={() => navigate(`/search?category=apps`)}
                                     >
                                         <div className="flex items-center gap-2">
-                                            <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white tracking-tight uppercase">
+                                            <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight uppercase italic">
                                                 {t(category.label)}
                                             </h2>
                                             <span className="text-sm font-bold text-slate-400 dark:text-slate-600 ml-1">
@@ -997,53 +1002,217 @@ const Home = () => {
                                             </span>
                                             <ChevronRight size={16} className="text-slate-300 dark:text-slate-700 group-hover:translate-x-1 transition-transform" />
                                         </div>
-                                        {category.desc && (
-                                            <p className="hidden sm:block text-[0.86rem] text-slate-400 dark:text-slate-600 font-normal leading-relaxed max-w-[95%]">
-                                                {t(category.desc)}
-                                            </p>
-                                        )}
+                                        <p className="hidden sm:block text-[0.86rem] text-slate-400 dark:text-slate-600 font-normal leading-relaxed">
+                                            {t('Telegram ekosistemindeki en iyi uygulamaları keşfedin')}
+                                        </p>
                                     </div>
-                                    
-                                    <div className="relative -mx-4 px-4 overflow-hidden">
-                                        <div className="flex gap-3 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory pb-4">
-                                            {botChunks.map((chunk, chunkIdx) => (
-                                                <div key={chunkIdx} className="flex flex-col gap-3 min-w-[88vw] sm:min-w-[400px] snap-center first:pl-2">
-                                                    {chunk.map(bot => (
-                                                        <div key={bot.id} className="w-full h-full">
-                                                            <BotCard bot={bot} tonRate={tonRate} />
+
+                                    {/* Top 3 Featured Cards for this section */}
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2 animate-in fade-in slide-in-from-bottom-2 duration-700">
+                                        {featuredBots.map((bot) => (
+                                            <div 
+                                                key={bot.id} 
+                                                onClick={() => navigate(`/bot/${bot.id}`)}
+                                                className="flex items-center justify-between p-4 rounded-xl border border-black/[0.05] dark:border-white/[0.08] hover:border-blue-500/20 transition-all cursor-pointer group hover:scale-[1.01] bg-[#00000008] dark:bg-white/[0.03]"
+                                            >
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-12 h-12 featured-bot-card-img flex items-center justify-center p-[1px] overflow-hidden shrink-0">
+                                                        <img 
+                                                            src={getLiveBotIcon(bot)} 
+                                                            className="w-full h-full object-cover bg-white featured-bot-card-img" 
+                                                            alt=""
+                                                            onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
+                                                        />
+                                                    </div>
+                                                    <div className="flex flex-col min-w-0">
+                                                        <div className="flex items-center gap-1">
+                                                            <span className="text-lg font-black text-slate-900 dark:text-white tracking-tight truncate leading-tight">{bot.name}</span>
+                                                            <CheckCircle2 size={14} className="text-blue-500 fill-blue-500/10 shrink-0" />
                                                         </div>
-                                                    ))}
+                                                        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold line-clamp-1 uppercase tracking-tight">{bot.description}</span>
+                                                    </div>
                                                 </div>
-                                            ))}
-                                        </div>
+                                                <div className="text-2xl font-black text-slate-900 dark:text-white mr-1 shrink-0 italic">
+                                                    {bot.rating || '0.0'}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <div 
+                                        ref={catScroll.ref}
+                                        onMouseDown={catScroll.onMouseDown}
+                                        onMouseUp={catScroll.onMouseUp}
+                                        onMouseMove={catScroll.onMouseMove}
+                                        onMouseLeave={catScroll.onMouseLeave}
+                                        onContextMenu={catScroll.onContextMenu}
+                                        className="category-filter-container no-scrollbar"
+                                    >
+                                        {appsSubCategories.map((subCat, i) => (
+                                            <div 
+                                                key={subCat.id} 
+                                                className={`category-filter-item cursor-pointer hover:text-blue-500 transition-colors`}
+                                                onClick={() => navigate(`/search?category=${subCat.id}`)}
+                                            >
+                                                {t(subCat.label)}
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
-                                {/* Mobile: Show banner after the first category */}
-                                {index === 0 && (
-                                    <div className="px-4 mb-10 sm:hidden">
-                                        <AddProjectBanner />
+                                
+                                <div className="relative -mx-4 px-4 overflow-hidden">
+                                    <div className="flex gap-3 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory pb-4">
+                                        {botChunks.map((chunk, chunkIdx) => (
+                                            <div key={chunkIdx} className="flex flex-col gap-3 min-w-[88vw] sm:min-w-[400px] snap-center first:pl-2">
+                                                {chunk.map(bot => (
+                                                    <div key={bot.id} className="w-full h-full">
+                                                        <BotCard bot={bot} tonRate={tonRate} />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ))}
                                     </div>
-                                )}
-                            </React.Fragment>
+                                </div>
+                            </div>
                         );
-                    })}
+                    })()}
+
+                    {/* Mobile Banner between sections */}
+                    <div className="px-4 mb-10 sm:hidden">
+                        <AddProjectBanner />
+                    </div>
+
+                    {/* Bots Section */}
+                    {categorizedBots['bots'] && (() => {
+                        const data = categorizedBots['bots'];
+                        
+                        const featuredBots = data.bots.slice(0, 3);
+                        const sliderBots = data.bots.slice(3);
+
+                        const botChunks = [];
+                        for (let i = 0; i < sliderBots.length; i += 3) {
+                            botChunks.push(sliderBots.slice(i, i + 3));
+                        }
+
+                        return (
+                            <div className="mt-16 mb-10 space-y-6">
+                                <div className="flex flex-col gap-6 overflow-hidden">
+                                    <div 
+                                        className="flex flex-col gap-1 cursor-pointer group shrink-0"
+                                        onClick={() => navigate(`/search?category=all`)}
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight uppercase italic">
+                                                BOTS
+                                            </h2>
+                                            <span className="text-sm font-bold text-slate-400 dark:text-slate-600 ml-1">
+                                                {data.total}
+                                            </span>
+                                            <ChevronRight size={16} className="text-slate-300 dark:text-slate-700 group-hover:translate-x-1 transition-transform" />
+                                        </div>
+                                        <p className="hidden sm:block text-[0.86rem] text-slate-400 dark:text-slate-600 font-normal leading-relaxed">
+                                            {t('Telegram ekosistemindeki en iyi botları keşfedin')}
+                                        </p>
+                                    </div>
+
+                                    {/* Top 3 Featured Cards for this section */}
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2 animate-in fade-in slide-in-from-bottom-2 duration-700">
+                                        {featuredBots.map((bot) => (
+                                            <div 
+                                                key={bot.id} 
+                                                onClick={() => navigate(`/bot/${bot.id}`)}
+                                                className="flex items-center justify-between p-4 rounded-xl border border-black/[0.05] dark:border-white/[0.08] hover:border-blue-500/20 transition-all cursor-pointer group hover:scale-[1.01] bg-[#00000008] dark:bg-white/[0.03]"
+                                            >
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-12 h-12 featured-bot-card-img flex items-center justify-center p-[1px] overflow-hidden shrink-0">
+                                                        <img 
+                                                            src={getLiveBotIcon(bot)} 
+                                                            className="w-full h-full object-cover bg-white featured-bot-card-img" 
+                                                            alt=""
+                                                            onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
+                                                        />
+                                                    </div>
+                                                    <div className="flex flex-col min-w-0">
+                                                        <div className="flex items-center gap-1">
+                                                            <span className="text-lg font-black text-slate-900 dark:text-white tracking-tight truncate leading-tight">{bot.name}</span>
+                                                            <CheckCircle2 size={14} className="text-blue-500 fill-blue-500/10 shrink-0" />
+                                                        </div>
+                                                        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold line-clamp-1 uppercase tracking-tight">{bot.description}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="text-2xl font-black text-slate-900 dark:text-white mr-1 shrink-0 italic">
+                                                    {bot.rating || '0.0'}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <div 
+                                        ref={botsCatScroll.ref}
+                                        onMouseDown={botsCatScroll.onMouseDown}
+                                        onMouseUp={botsCatScroll.onMouseUp}
+                                        onMouseMove={botsCatScroll.onMouseMove}
+                                        onMouseLeave={botsCatScroll.onMouseLeave}
+                                        onContextMenu={botsCatScroll.onContextMenu}
+                                        className="category-filter-container no-scrollbar"
+                                    >
+                                        {botsCategories.map((cat, i) => (
+                                            <div 
+                                                key={cat.id} 
+                                                className={`category-filter-item cursor-pointer hover:text-blue-500 transition-colors`}
+                                                onClick={() => navigate(`/search?category=${cat.id}`)}
+                                            >
+                                                {t(cat.label)}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                
+                                <div className="relative -mx-4 px-4 overflow-hidden">
+                                    <div className="flex gap-3 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory pb-4">
+                                        {botChunks.map((chunk, chunkIdx) => (
+                                            <div key={chunkIdx} className="flex flex-col gap-3 min-w-[88vw] sm:min-w-[400px] snap-center first:pl-2">
+                                                {chunk.map(bot => (
+                                                    <div key={bot.id} className="w-full h-full">
+                                                        <BotCard bot={bot} tonRate={tonRate} />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })()}
 
                     {Object.keys(categorizedBots).length === 0 && (
                         <div className="py-24 text-center text-slate-400 dark:text-slate-700 font-bold uppercase text-xs tracking-widest animate-in fade-in zoom-in duration-500">
-                             BU KATEGORİDE Kİ BOTLAR HENÜZ EKLENMEDİ.
+                             HENÜZ ÖĞE EKLENMEDİ.
                         </div>
                     )}
                 </motion.div>
             </AnimatePresence>
 
-            <div className="space-y-6">
+            <div className="mt-16">
+                <FeaturedBotsSlider bots={bots} />
+            </div>
+
+            <div className="mt-16 space-y-6">
                 <div className="flex items-center justify-between mb-4 px-2">
                     <h2 className="text-[10px] font-black text-slate-400 dark:text-slate-700 uppercase tracking-[0.4em]">
-                        MAĞAZA VİTRİNİ
+                        MAĞAZA VİTRİNİ (SON EKLENENLER)
                     </h2>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {filteredBots.length > 0 ? filteredBots.map(bot => <BotCard key={bot.id} bot={bot} tonRate={tonRate} />) : <div className="col-span-full py-24 text-center text-slate-400 dark:text-slate-700 font-bold uppercase text-xs tracking-widest">Sonuç yok.</div>}
+                    {filteredBots.length > 0 ? (
+                        filteredBots.slice(0, 12).map(bot => (
+                            <BotCard key={bot.id} bot={bot} tonRate={tonRate} />
+                        ))
+                    ) : (
+                        <div className="col-span-full py-24 text-center text-slate-400 dark:text-slate-700 font-bold uppercase text-xs tracking-widest">
+                            Sonuç yok.
+                        </div>
+                    )}
                 </div>
             </div>
           </>
@@ -1198,7 +1367,7 @@ const AnnouncementsCarousel: React.FC<{
     }, [currentIndex, announcements.length, scroll.isDragging, scroll.ref]);
 
     return (
-        <div className="relative h-full px-4 sm:px-0">
+        <div className="relative h-full">
             <div 
                 ref={scroll.ref}
                 onMouseDown={scroll.onMouseDown}
@@ -1206,19 +1375,31 @@ const AnnouncementsCarousel: React.FC<{
                 onMouseMove={scroll.onMouseMove}
                 onMouseLeave={scroll.onMouseLeave}
                 onContextMenu={scroll.onContextMenu}
-                className={`flex gap-4 overflow-x-auto no-scrollbar h-full snap-x snap-mandatory ${scroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+                className={`flex overflow-x-auto no-scrollbar h-full snap-x snap-mandatory ${scroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
             >
                 {announcements.map(ann => (
-                    <div key={ann.id} className="w-full shrink-0 snap-center">
+                    <div key={ann.id} className="w-full shrink-0 snap-center px-4 sm:px-0">
                         <PromoCard ann={ann} onShowPopup={onShowPopup} />
                     </div>
                 ))}
             </div>
             
             {announcements.length > 1 && (
-                <div className="absolute -bottom-4 left-0 right-0 flex justify-center gap-1.5">
+                <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1.5 z-10">
                     {announcements.map((_, i) => (
-                        <div key={i} className={`h-1 rounded-full transition-all duration-300 ${i === currentIndex ? 'w-6 bg-blue-500' : 'w-2 bg-slate-300 dark:bg-slate-700'}`} />
+                        <button 
+                            key={i} 
+                            onClick={() => {
+                                if (scroll.ref.current) {
+                                    const width = scroll.ref.current.offsetWidth;
+                                    scroll.ref.current.scrollTo({
+                                        left: i * width,
+                                        behavior: 'smooth'
+                                    });
+                                }
+                            }}
+                            className={`h-1.5 rounded-full transition-all duration-300 shadow-sm cursor-pointer outline-hidden ${i === currentIndex ? 'w-6 bg-blue-500' : 'w-2 bg-slate-300/50 dark:bg-white/20 hover:bg-slate-400 dark:hover:bg-white/40'}`} 
+                        />
                     ))}
                 </div>
             )}
