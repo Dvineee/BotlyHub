@@ -13,6 +13,7 @@
   "dependencies": {
     "@google/genai": "^1.47.0",
     "@supabase/supabase-js": "^2.39.7",
+    "@tailwindcss/typography": "^0.5.19",
     "@tonconnect/ui-react": "^2.0.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",

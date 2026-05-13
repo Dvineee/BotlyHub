@@ -270,8 +270,12 @@ const SearchPage = () => {
   return (
     <>
     <SEO 
-        title="Bot ve Kanal Ara" 
-        description="BotlyHub üzerinde dilediğiniz Telegram botunu veya kanalını arayarak keşfedin."
+        title="Bot ve Uygulama Arayın" 
+        description="BotlyHub üzerinde dilediğiniz Telegram botunu veya otomasyonunu arayarak keşfedin. Filtreleyebilir ve detaylı inceleyebilirsiniz."
+        breadcrumbs={[
+            { name: 'Anasayfa', item: 'https://botlyhub.com/' },
+            { name: 'Arama', item: 'https://botlyhub.com/search' }
+        ]}
     />
     <div className="min-h-screen bg-white dark:bg-slate-950 px-5 sm:px-8 pt-4 md:pt-10 pb-32 transition-colors duration-300 search-page">
       <div className="max-w-7xl mx-auto">

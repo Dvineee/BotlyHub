@@ -18,16 +18,27 @@ const Footer: React.FC = () => {
                 <span className="text-xl font-bold text-slate-900 dark:text-white uppercase italic tracking-tighter">BotlyHub</span>
             </div>
             <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest leading-relaxed max-w-xs">
-                Telegram otomasyon ve keşif platformu. Tüm botlarınız tek bir çatıda.
+                BotlyHub, Telegram botları, TON ekosistemi ve modern Web3 uygulamaları için en gelişmiş keşif, tanıtım ve yönetim platformudur.
             </p>
         </div>
 
         <div className="space-y-4">
             <h4 className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-[0.3em]">HIZLI LİNKLER</h4>
             <div className="flex flex-col gap-3">
-                <button onClick={() => navigate('/')} className="text-[11px] font-bold text-slate-400 hover:text-blue-500 text-left uppercase tracking-widest transition-colors tracking-widest">Keşfet</button>
-                <button onClick={() => navigate('/premium')} className="text-[11px] font-bold text-slate-400 hover:text-blue-500 text-left uppercase tracking-widest transition-colors tracking-widest">Lisanslar</button>
-                <button onClick={() => navigate('/settings')} className="text-[11px] font-bold text-slate-400 hover:text-blue-500 text-left uppercase tracking-widest transition-colors tracking-widest">Hesabım</button>
+                <button onClick={() => navigate('/')} className="text-[11px] font-bold text-slate-400 hover:text-blue-500 text-left uppercase tracking-widest transition-colors">Ana Sayfa</button>
+                <button onClick={() => navigate('/blog')} className="text-[11px] font-bold text-slate-400 hover:text-blue-500 text-left uppercase tracking-widest transition-colors">Trend Blog</button>
+                <button onClick={() => navigate('/premium')} className="text-[11px] font-bold text-slate-400 hover:text-blue-500 text-left uppercase tracking-widest transition-colors">Premium Üyelik</button>
+                <button onClick={() => navigate('/search?mode=apps')} className="text-[11px] font-bold text-slate-400 hover:text-blue-500 text-left uppercase tracking-widest transition-colors">Uygulamalar</button>
+            </div>
+        </div>
+
+        <div className="space-y-4">
+            <h4 className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-[0.3em]">KATEGORİLER</h4>
+            <div className="flex flex-col gap-3">
+                <button onClick={() => navigate('/search?category=bots')} className="text-[11px] font-bold text-slate-400 hover:text-blue-500 text-left uppercase tracking-widest transition-colors">Telegram Botları</button>
+                <button onClick={() => navigate('/search?category=apps')} className="text-[11px] font-bold text-slate-400 hover:text-blue-500 text-left uppercase tracking-widest transition-colors">Mini Apps</button>
+                <button onClick={() => navigate('/search?category=channels')} className="text-[11px] font-bold text-slate-400 hover:text-blue-500 text-left uppercase tracking-widest transition-colors">Kanallar</button>
+                <button onClick={() => navigate('/search?category=groups')} className="text-[11px] font-bold text-slate-400 hover:text-blue-500 text-left uppercase tracking-widest transition-colors">Gruplar</button>
             </div>
         </div>
 

@@ -282,9 +282,13 @@ const BotDetail = () => {
   return (
     <>
     <SEO 
-        title={bot.name} 
-        description={bot.description}
+        title={`${bot.name} - Bot Detayları ve Özellikleri`} 
+        description={`${bot.name} hakkında detaylı bilgi, kullanıcı yorumları ve özellikler. BotlyHub üzerinden ${bot.name} botunu hemen keşfedin ve kullanmaya başlayın.`}
         ogImage={bot.icon || undefined}
+        breadcrumbs={[
+            { name: 'Anasayfa', item: 'https://botlyhub.com/' },
+            { name: bot.name, item: `https://botlyhub.com/bot/${bot.id}` }
+        ]}
     />
     <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-200 pb-40 animate-in fade-in transition-colors duration-300 bot-detail-page">
       <div className="max-w-7xl mx-auto px-5 sm:px-8 md:px-10">

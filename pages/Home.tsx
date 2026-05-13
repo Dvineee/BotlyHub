@@ -69,6 +69,8 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
                 src={ann.bg_image_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(ann.title)}&background=random&color=fff`} 
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
                 referrerPolicy="no-referrer"
+                alt={ann.title}
+                loading="lazy"
             />
             <div className="absolute inset-0 bg-black/5"></div>
         </div>
@@ -556,7 +558,7 @@ const NavMenu = ({
 
                 {/* Blog Link */}
                 <button 
-                    onClick={() => { haptic('light'); }}
+                    onClick={() => { haptic('light'); navigate('/blog'); }}
                     className="text-[14px] font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all py-2"
                 >
                     Blog
@@ -815,8 +817,8 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-200 animate-in transition-colors duration-300 home-page">
       <SEO 
-          title="Telegram Bot ve Kanalları - Keşfet, Tanıt ve Yönet" 
-          description="BotlyHub V3, Telegram ekosistemindeki en iyi botları ve kanalları bulabileceğiniz, kendi botlarınızı tanıtabileceğiniz ve yönetebileceğiniz kapsamlı bir platformdur."
+          title="Keşfet, Tanıt ve Yönet" 
+          description="BotlyHub - Telegram ekosistemindeki en iyi botları ve kanalları bulabileceğiniz, kendi otomasyonlarınızı tanıtabileceğiniz en gelişmiş platform."
       />
       {/* Top Background Wrapper */}
       <div className="bg-[#00000008] dark:bg-slate-900/10">
@@ -1204,6 +1206,80 @@ const Home = () => {
                     )}
                 </motion.div>
             </AnimatePresence>
+
+            <div className="mt-20 mb-20 px-4 max-w-4xl mx-auto">
+                <div className="flex items-center gap-3 mb-8">
+                    <div className="w-10 h-[2px] bg-blue-500"></div>
+                    <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight uppercase italic">
+                        SIKÇA SORULAN SORULAR
+                    </h2>
+                </div>
+                
+                <div className="space-y-4">
+                    {[
+                        {
+                            q: "BotlyHub nedir?",
+                            a: "BotlyHub, Telegram ekosistemindeki en iyi botları, kanalları ve uygulamaları keşfetmenizi sağlayan merkezi bir platformdur. Aynı zamanda bot geliştiricileri için projelerini tanıtabilecekleri gelişmiş bir pazaryeridir."
+                        },
+                        {
+                            q: "Kendi botumu nasıl ekleyebilirim?",
+                            a: "Kendi botunuzu veya kanalınızı eklemek için sağ üstteki 'Bot Ekle' butonuna basabilir veya admin panelimiz üzerinden projenizi sisteme kaydedebilirsiniz. Onay sürecinden sonra projeniz yayına alınacaktır."
+                        },
+                        {
+                            q: "Premium üyelik avantajları nelerdir?",
+                            a: "Premium üyelik ile daha düşük satış komisyonları, öne çıkanlar bölümünde listelenme, detaylı istatistik analizleri ve öncelikli teknik destek gibi ayrıcalıklardan yararlanabilirsiniz."
+                        },
+                        {
+                            q: "Sistem nasıl çalışır?",
+                            a: "Kullanıcılar BotlyHub üzerinden botları keşfeder, puanlar ve yorum yapar. Geliştiriciler ise botlarını listeler ve satış yaparak TON veya diğer yöntemlerle gelir elde eder."
+                        }
+                    ].map((item, idx) => (
+                        <details key={idx} className="group bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-xl transition-all overflow-hidden shadow-sm">
+                            <summary className="flex items-center justify-between p-5 cursor-pointer list-none">
+                                <span className="text-[13px] font-bold text-slate-900 dark:text-white uppercase tracking-tight italic">{item.q}</span>
+                                <ChevronDown size={18} className="text-slate-400 group-open:rotate-180 transition-transform duration-300" />
+                            </summary>
+                            <div className="p-5 pt-0 text-[12px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed italic border-t border-black/[0.03] dark:border-white/[0.03] bg-[#00000004] dark:bg-black/20">
+                                {item.a}
+                            </div>
+                        </details>
+                    ))}
+                </div>
+                
+                {/* FAQ Schema */}
+                <script type="application/ld+json">
+                    {JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "FAQPage",
+                        "mainEntity": [
+                            {
+                                "@type": "Question",
+                                "name": "BotlyHub nedir?",
+                                "acceptedAnswer": {
+                                    "@type": "AcceptedAnswer",
+                                    "text": "BotlyHub, Telegram ekosistemindeki en iyi botları, kanalları ve uygulamaları keşfetmenizi sağlayan merkezi bir platformdur."
+                                }
+                            },
+                            {
+                                "@type": "Question",
+                                "name": "Kendi botumu nasıl ekleyebilirim?",
+                                "acceptedAnswer": {
+                                    "@type": "AcceptedAnswer",
+                                    "text": "Sağ üstteki 'Bot Ekle' butonuna basarak veya admin paneli üzerinden projenizi sisteme kaydedebilirsiniz."
+                                }
+                            },
+                            {
+                                "@type": "Question",
+                                "name": "Premium üyelik avantajları nelerdir?",
+                                "acceptedAnswer": {
+                                    "@type": "AcceptedAnswer",
+                                    "text": "Düşük komisyonlar, öne çıkan listeleme ve detaylı analizler sunar."
+                                }
+                            }
+                        ]
+                    })}
+                </script>
+            </div>
 
             <div className="mt-16">
                 <div className="pb-32" />

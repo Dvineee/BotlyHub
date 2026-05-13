@@ -27,6 +27,8 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import UserPanelLogin from './pages/UserPanelLogin';
 import UserPanel from './pages/UserPanel';
 import ReferralPage from './pages/ReferralPage';
+import BlogPage from './pages/BlogPage';
+import BlogPostDetail from './pages/BlogPostDetail';
 import ScrollToTop from './components/ScrollToTop';
 import Footer from './components/Footer';
 import BottomNav from './components/BottomNav';
@@ -208,6 +210,8 @@ export default function App() {
             <Route path="/u/login" element={<UserPanelLogin />} />
             <Route path="/u/panel/*" element={<UserPanel />} />
             <Route path="/referral" element={<ReferralPage />} />
+            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/blog/:id" element={<BlogPostDetail />} />
           </Routes>
         </TelegramWrapper>
       </FilterProvider>
