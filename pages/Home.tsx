@@ -832,14 +832,20 @@ const Home = () => {
                   </div>
 
                   <div className="w-full md:flex-1 md:max-w-2xl order-3 md:order-2 flex items-center gap-2 md:gap-3">
-                      <div className="flex-1 md:w-[330px] md:flex-none cursor-pointer" onClick={() => navigate('/search')}>
-                          <div className="relative flex items-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl p-0.5 md:p-1 transition-all active:scale-[0.98] group custom-search-outline">
-                              <div className="ml-2 md:ml-3 w-8 h-8 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors shrink-0">
-                                  <Search size={18} />
+                      <div className="flex-1 md:w-[330px] md:flex-none">
+                          <div className="relative flex items-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl p-0.5 md:p-1 transition-all active:scale-[0.98] group custom-search-outline shadow-sm">
+                              <div 
+                                onClick={() => navigate('/search')} 
+                                className="flex items-center flex-1 min-w-0 cursor-pointer"
+                              >
+                                  <div className="ml-2 md:ml-3 w-8 h-8 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors shrink-0">
+                                      <Search size={18} />
+                                  </div>
+                                  <div className="w-full py-2 px-3 text-[13px] text-slate-400 font-bold uppercase tracking-widest opacity-60 truncate min-w-0">
+                                      {t('search_placeholder')}
+                                  </div>
                               </div>
-                              <div className="w-full py-2 px-3 text-[13px] text-slate-400 font-bold uppercase tracking-widest opacity-60 truncate min-w-0">{t('search_placeholder')}</div>
-                              <div className="flex items-center gap-0.5 pr-1 shrink-0 ml-auto" onClick={(e) => e.stopPropagation()}>
-                                  <div className="w-px h-5 bg-black/[0.05] dark:bg-white/[0.05] mx-1" />
+                              <div className="flex items-center gap-0.5 pr-1 shrink-0 ml-auto border-l border-black/[0.05] dark:border-white/[0.05] pl-1 relative z-50">
                                   <FilterMenu />
                               </div>
                           </div>
@@ -1044,16 +1050,16 @@ const Home = () => {
                                         onMouseMove={catScroll.onMouseMove}
                                         onMouseLeave={catScroll.onMouseLeave}
                                         onContextMenu={catScroll.onContextMenu}
-                                        className="category-filter-container no-scrollbar"
+                                        className="category-filter-container no-scrollbar relative z-10"
                                     >
                                         {appsSubCategories.map((subCat, i) => (
-                                            <div 
+                                            <button 
                                                 key={subCat.id} 
-                                                className={`category-filter-item cursor-pointer hover:text-blue-500 transition-colors`}
+                                                className={`category-filter-item cursor-pointer hover:text-blue-500 transition-colors whitespace-nowrap outline-none focus-visible:ring-2 ring-blue-500/50 rounded-lg`}
                                                 onClick={() => navigate(`/search?mode=apps&category=${subCat.id}`)}
                                             >
                                                 {t(subCat.label)}
-                                            </div>
+                                            </button>
                                         ))}
                                     </div>
                                 </div>
@@ -1156,16 +1162,16 @@ const Home = () => {
                                         onMouseMove={botsCatScroll.onMouseMove}
                                         onMouseLeave={botsCatScroll.onMouseLeave}
                                         onContextMenu={botsCatScroll.onContextMenu}
-                                        className="category-filter-container no-scrollbar"
+                                        className="category-filter-container no-scrollbar relative z-10"
                                     >
                                         {botsCategories.map((cat, i) => (
-                                            <div 
+                                            <button 
                                                 key={cat.id} 
-                                                className={`category-filter-item cursor-pointer hover:text-blue-500 transition-colors`}
+                                                className={`category-filter-item cursor-pointer hover:text-blue-500 transition-colors whitespace-nowrap outline-none focus-visible:ring-2 ring-blue-500/50 rounded-lg`}
                                                 onClick={() => navigate(`/search?mode=bots&category=${cat.id}`)}
                                             >
                                                 {t(cat.label)}
-                                            </div>
+                                            </button>
                                         ))}
                                     </div>
                                 </div>

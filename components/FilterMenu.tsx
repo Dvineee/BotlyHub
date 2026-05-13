@@ -60,7 +60,7 @@ export const FilterMenu: React.FC = () => {
   return (
     <div className="relative" ref={menuRef}>
       <button
-        onClick={() => { haptic('light'); setIsOpen(!isOpen); }}
+        onClick={(e) => { e.stopPropagation(); haptic('light'); setIsOpen(!isOpen); }}
         className={`w-8 h-8 flex items-center justify-center transition-all active:scale-90  ${
           isOpen || activeFilter !== 'all'
             ? 'text-blue-600 dark:text-blue-500'
@@ -77,17 +77,21 @@ export const FilterMenu: React.FC = () => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             className="absolute right-0 mt-3 w-56 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden z-[100] py-2 backdrop-blur-2xl"
+            onClick={(e) => e.stopPropagation()}
           >
             <div className="px-5 py-2 border-b border-black/5 dark:border-white/5 flex items-center justify-between">
               <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Filtrele</span>
-              <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-slate-900 dark:hover:text-white">
+              <button 
+                onClick={(e) => { e.stopPropagation(); setIsOpen(false); }} 
+                className="text-slate-400 hover:text-slate-900 dark:hover:text-white"
+              >
                 <X size={14} />
               </button>
             </div>
             {options.map((opt) => (
               <button
                 key={opt.id}
-                onClick={() => handleSelect(opt.id)}
+                onClick={(e) => { e.stopPropagation(); handleSelect(opt.id); }}
                 className="w-full flex items-center justify-between px-5 py-4 hover:bg-black/5 dark:hover:bg-white/5 text-left transition-colors group"
               >
                 <div className="flex items-center gap-4">
