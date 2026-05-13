@@ -914,10 +914,7 @@ h2.text-lg.sm\:text-xl.font-extrabold.text-slate-900.dark\:text-white.tracking-t
 }
 
 .home-page .home-search-bar {
-    border-width: 0;
-    border-radius: 0;
     padding-left: 6px;
-    border-top: solid 1px #ffffff0d;
 }
 
 .category-filter-container {
@@ -984,6 +981,14 @@ h2.text-lg.sm\:text-xl.font-extrabold.text-slate-900.dark\:text-white.tracking-t
         margin-top: -5.5px;
         position: relative;
     }
+}
+
+.latest-slider-container {
+    border-width: 0 !important;
+    border-radius: 0 !important;
+    padding-left: 6px !important;
+    border-top: solid 1px #ffffff0d !important;
+    background-color: rgb(30 41 59 / 0%) !important;
 }
 
 .aspect-\[9\/19\] {
