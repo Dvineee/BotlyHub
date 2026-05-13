@@ -61,7 +61,7 @@ export const FilterMenu: React.FC = () => {
     <div className="relative" ref={menuRef}>
       <button
         onClick={(e) => { e.stopPropagation(); haptic('light'); setIsOpen(!isOpen); }}
-        className={`w-8 h-8 flex items-center justify-center transition-all active:scale-90  ${
+        className={`w-10 h-10 flex items-center justify-center transition-all ${
           isOpen || activeFilter !== 'all'
             ? 'text-blue-600 dark:text-blue-500'
             : 'text-slate-500 dark:text-slate-400'
@@ -76,7 +76,7 @@ export const FilterMenu: React.FC = () => {
             initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            className="absolute right-0 mt-3 w-56 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden z-[100] py-2 backdrop-blur-2xl"
+            className="absolute right-0 mt-3 w-56 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden z-[150] py-2 backdrop-blur-2xl shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="px-5 py-2 border-b border-black/5 dark:border-white/5 flex items-center justify-between">

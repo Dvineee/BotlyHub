@@ -821,7 +821,7 @@ const Home = () => {
       {/* Top Background Wrapper */}
       <div className="bg-[#00000008] dark:bg-slate-900/10">
         {/* Top Section */}
-        <div className="w-full pt-6 md:pt-10 pb-4 shadow-[inset_0_-1px_0_0_rgba(0,0,0,0.03)]">
+        <div className="w-full pt-6 md:pt-10 pb-4 shadow-[inset_0_-1px_0_0_rgba(0,0,0,0.03)] relative z-20">
           <div className="max-w-7xl mx-auto px-5 sm:px-8">
               <div className="flex flex-wrap md:flex-nowrap items-center justify-between mb-8 px-1 gap-y-6 md:gap-x-6">
                   <div className="flex items-center gap-3 order-1 md:w-48 shrink-0">
@@ -832,11 +832,11 @@ const Home = () => {
                   </div>
 
                   <div className="w-full md:flex-1 md:max-w-2xl order-3 md:order-2 flex items-center gap-2 md:gap-3">
-                      <div className="flex-1 md:w-[330px] md:flex-none">
-                          <div className="relative flex items-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl p-0.5 md:p-1 transition-all active:scale-[0.98] group custom-search-outline shadow-sm">
+                      <div className="flex-1 md:w-[330px] md:flex-none relative z-[100]">
+                          <div className="relative flex items-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl p-0.5 md:p-1 group custom-search-outline shadow-sm">
                               <div 
                                 onClick={() => navigate('/search')} 
-                                className="flex items-center flex-1 min-w-0 cursor-pointer"
+                                className="flex items-center flex-1 min-w-0 cursor-pointer active:scale-[0.98] transition-transform"
                               >
                                   <div className="ml-2 md:ml-3 w-8 h-8 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors shrink-0">
                                       <Search size={18} />
@@ -845,7 +845,7 @@ const Home = () => {
                                       {t('search_placeholder')}
                                   </div>
                               </div>
-                              <div className="flex items-center gap-0.5 pr-1 shrink-0 ml-auto border-l border-black/[0.05] dark:border-white/[0.05] pl-1 relative z-50">
+                              <div className="flex items-center gap-0.5 pr-1 shrink-0 ml-auto border-l border-black/[0.05] dark:border-white/[0.05] pl-1 relative z-[110]">
                                   <FilterMenu />
                               </div>
                           </div>
