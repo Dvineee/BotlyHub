@@ -431,12 +431,12 @@ const NavMenu = ({
         haptic('light');
         navigate(`/search?mode=${mode}&category=${catId}`);
         setOpenMenu(null);
-        setMobileModal(null);
+                setMobileModal(null);
     };
 
     return (
         <>
-        <div className="sticky top-0 z-[80] bg-white dark:bg-slate-900 border-b border-[#f7f7f7] dark:border-white/5 w-full py-2.5 md:py-4 transition-colors" ref={internalMenuRef}>
+        <div className="sticky top-0 z-[1] bg-white dark:bg-slate-900 border-b border-[#f7f7f7] dark:border-white/5 w-full py-2.5 md:py-4 transition-colors" ref={internalMenuRef}>
             <div className="max-w-7xl mx-auto px-5 sm:px-8 flex items-center justify-between">
                 {/* Left Section (Logo) */}
                 <div className="hidden md:flex items-center w-48 shrink-0">
@@ -821,7 +821,7 @@ const Home = () => {
       {/* Top Background Wrapper */}
       <div className="bg-[#00000008] dark:bg-slate-900/10">
         {/* Top Section */}
-        <div className="w-full pt-6 md:pt-10 pb-4 shadow-[inset_0_-1px_0_0_rgba(0,0,0,0.03)] relative z-20">
+        <div className="w-full pt-6 md:pt-10 pb-4 shadow-[inset_0_-1px_0_0_rgba(0,0,0,0.03)] relative z-[120]">
           <div className="max-w-7xl mx-auto px-5 sm:px-8">
               <div className="flex flex-wrap md:flex-nowrap items-center justify-between mb-8 px-1 gap-y-6 md:gap-x-6">
                   <div className="flex items-center gap-3 order-1 md:w-48 shrink-0">
@@ -833,7 +833,7 @@ const Home = () => {
 
                   <div className="w-full md:flex-1 md:max-w-2xl order-3 md:order-2 flex items-center gap-2 md:gap-3">
                       <div className="flex-1 md:w-[330px] md:flex-none relative z-[100]">
-                          <div className="relative flex items-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl p-0.5 md:p-1 group custom-search-outline shadow-sm">
+                          <div className="relative flex items-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl p-0.5 md:p-1 group custom-search-outline shadow-sm home-search-bar">
                               <div 
                                 onClick={() => navigate('/search')} 
                                 className="flex items-center flex-1 min-w-0 cursor-pointer active:scale-[0.98] transition-transform"
@@ -1050,7 +1050,7 @@ const Home = () => {
                                         onMouseMove={catScroll.onMouseMove}
                                         onMouseLeave={catScroll.onMouseLeave}
                                         onContextMenu={catScroll.onContextMenu}
-                                        className="category-filter-container no-scrollbar relative z-10"
+                                        className="category-filter-container no-scrollbar relative z-0"
                                     >
                                         {appsSubCategories.map((subCat, i) => (
                                             <button 
@@ -1162,7 +1162,7 @@ const Home = () => {
                                         onMouseMove={botsCatScroll.onMouseMove}
                                         onMouseLeave={botsCatScroll.onMouseLeave}
                                         onContextMenu={botsCatScroll.onContextMenu}
-                                        className="category-filter-container no-scrollbar relative z-10"
+                                        className="category-filter-container no-scrollbar relative z-0"
                                     >
                                         {botsCategories.map((cat, i) => (
                                             <button 
