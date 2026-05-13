@@ -427,9 +427,9 @@ const NavMenu = ({
     const botsCategories = categories.filter(c => c.id !== 'apps' && c.id !== 'all');
     const appsCategories = categories.filter(c => c.id === 'apps');
 
-    const handleCategoryClick = (catId: string) => {
+    const handleCategoryClick = (catId: string, mode: 'bots' | 'apps') => {
         haptic('light');
-        navigate(`/search?category=${catId}`);
+        navigate(`/search?mode=${mode}&category=${catId}`);
         setOpenMenu(null);
         setMobileModal(null);
     };
@@ -483,7 +483,7 @@ const NavMenu = ({
                                         {botsCategories.map(cat => (
                                             <button 
                                                 key={cat.id}
-                                                onClick={() => handleCategoryClick(cat.id)}
+                                                onClick={() => handleCategoryClick(cat.id, 'bots')}
                                                 className="flex items-center gap-4 p-3 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-all group border border-transparent hover:border-black/5"
                                             >
                                                 <div className="w-12 h-12 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-xl shrink-0 group-hover:scale-110 transition-transform">
@@ -535,7 +535,7 @@ const NavMenu = ({
                                         {appsSubCategories.map(cat => (
                                             <button 
                                                 key={cat.id}
-                                                onClick={() => handleCategoryClick(cat.id)}
+                                                onClick={() => handleCategoryClick(cat.id, 'apps')}
                                                 className="flex items-center gap-3 p-3 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-all group border border-transparent hover:border-black/5"
                                             >
                                                 <div className="w-10 h-10 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-lg shrink-0 group-hover:scale-110 transition-transform">
@@ -670,7 +670,7 @@ const NavMenu = ({
                                     return activeCats.map((cat) => (
                                         <button
                                             key={cat.id}
-                                            onClick={() => handleCategoryClick(cat.id)}
+                                            onClick={() => handleCategoryClick(cat.id, mobileModal as 'bots' | 'apps')}
                                             className="w-full flex items-center gap-4 py-4 px-6 hover:bg-slate-50 dark:hover:bg-white/5 active:bg-slate-100 dark:active:bg-white/10 transition-all border-b border-black/[0.03] dark:border-white/[0.03] group last:border-0"
                                         >
                                             <div className="w-11 h-11 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-xl shrink-0 shadow-sm group-hover:scale-105 transition-transform">
@@ -975,8 +975,6 @@ const Home = () => {
                     {/* Apps Section */}
                     {categorizedBots['apps'] && (() => {
                         const data = categorizedBots['apps'];
-                        const category = categories.find(c => c.id === 'apps');
-                        if (!category) return null;
                         
                         const featuredBots = data.bots.slice(0, 3);
                         const sliderBots = data.bots.slice(3);
@@ -991,11 +989,11 @@ const Home = () => {
                                 <div className="flex flex-col gap-6 overflow-hidden">
                                     <div 
                                         className="flex flex-col gap-1 cursor-pointer group shrink-0"
-                                        onClick={() => navigate(`/search?category=apps`)}
+                                        onClick={() => navigate(`/search?mode=apps&category=all`)}
                                     >
                                         <div className="flex items-center gap-2">
-                                            <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight uppercase italic">
-                                                {t(category.label)}
+                                            <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight uppercase italic text-blue-500">
+                                                APPS
                                             </h2>
                                             <span className="text-sm font-bold text-slate-400 dark:text-slate-600 ml-1">
                                                 {data.total}
@@ -1052,7 +1050,7 @@ const Home = () => {
                                             <div 
                                                 key={subCat.id} 
                                                 className={`category-filter-item cursor-pointer hover:text-blue-500 transition-colors`}
-                                                onClick={() => navigate(`/search?category=${subCat.id}`)}
+                                                onClick={() => navigate(`/search?mode=apps&category=${subCat.id}`)}
                                             >
                                                 {t(subCat.label)}
                                             </div>
@@ -1072,6 +1070,10 @@ const Home = () => {
                                             </div>
                                         ))}
                                     </div>
+                                </div>
+
+                                <div className="mt-8">
+                                    <FeaturedBotsSlider bots={bots.filter(b => Array.isArray(b.category) ? b.category.includes('apps') : b.category === 'apps')} />
                                 </div>
                             </div>
                         );
@@ -1095,14 +1097,14 @@ const Home = () => {
                         }
 
                         return (
-                            <div className="mt-16 mb-10 space-y-6">
+                            <div className="mt-20 mb-10 space-y-6">
                                 <div className="flex flex-col gap-6 overflow-hidden">
                                     <div 
                                         className="flex flex-col gap-1 cursor-pointer group shrink-0"
-                                        onClick={() => navigate(`/search?category=all`)}
+                                        onClick={() => navigate(`/search?mode=bots&category=all`)}
                                     >
                                         <div className="flex items-center gap-2">
-                                            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight uppercase italic">
+                                            <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight uppercase italic">
                                                 BOTS
                                             </h2>
                                             <span className="text-sm font-bold text-slate-400 dark:text-slate-600 ml-1">
@@ -1160,7 +1162,7 @@ const Home = () => {
                                             <div 
                                                 key={cat.id} 
                                                 className={`category-filter-item cursor-pointer hover:text-blue-500 transition-colors`}
-                                                onClick={() => navigate(`/search?category=${cat.id}`)}
+                                                onClick={() => navigate(`/search?mode=bots&category=${cat.id}`)}
                                             >
                                                 {t(cat.label)}
                                             </div>
@@ -1181,6 +1183,10 @@ const Home = () => {
                                         ))}
                                     </div>
                                 </div>
+
+                                <div className="mt-8">
+                                    <FeaturedBotsSlider bots={bots.filter(b => Array.isArray(b.category) ? !b.category.includes('apps') : b.category !== 'apps')} />
+                                </div>
                             </div>
                         );
                     })()}
@@ -1194,26 +1200,7 @@ const Home = () => {
             </AnimatePresence>
 
             <div className="mt-16">
-                <FeaturedBotsSlider bots={bots} />
-            </div>
-
-            <div className="mt-16 space-y-6">
-                <div className="flex items-center justify-between mb-4 px-2">
-                    <h2 className="text-[10px] font-black text-slate-400 dark:text-slate-700 uppercase tracking-[0.4em]">
-                        MAĞAZA VİTRİNİ (SON EKLENENLER)
-                    </h2>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {filteredBots.length > 0 ? (
-                        filteredBots.slice(0, 12).map(bot => (
-                            <BotCard key={bot.id} bot={bot} tonRate={tonRate} />
-                        ))
-                    ) : (
-                        <div className="col-span-full py-24 text-center text-slate-400 dark:text-slate-700 font-bold uppercase text-xs tracking-widest">
-                            Sonuç yok.
-                        </div>
-                    )}
-                </div>
+                <div className="pb-32" />
             </div>
           </>
         )}

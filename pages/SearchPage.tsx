@@ -146,7 +146,7 @@ const SearchPage = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [searchMode, setSearchMode] = useState<'bots' | 'apps'>('bots');
+  const [searchMode, setSearchMode] = useState<'bots' | 'apps'>((searchParams.get('mode') as 'bots' | 'apps') || 'bots');
   const [isModeMenuOpen, setIsModeMenuOpen] = useState(false);
   const menuRef = React.useRef<HTMLDivElement>(null);
   const modeMenuRef = React.useRef<HTMLDivElement>(null);
@@ -156,6 +156,13 @@ const SearchPage = () => {
   const [aiResponse, setAiResponse] = useState<string | null>(null);
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [showAiAssistant, setShowAiAssistant] = useState(false);
+
+  useEffect(() => {
+    const mode = searchParams.get('mode') as 'bots' | 'apps';
+    const category = searchParams.get('category');
+    if (mode && mode !== searchMode) setSearchMode(mode);
+    if (category && category !== activeCategory) setActiveCategory(category);
+  }, [searchParams]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -193,6 +200,11 @@ const SearchPage = () => {
     const matchesQuery = bot.name.toLowerCase().includes(query.toLowerCase()) || 
                          bot.description.toLowerCase().includes(query.toLowerCase());
     
+    // Top-level filter: Apps vs Bots
+    const isApp = Array.isArray(bot.category) ? bot.category.includes('apps') : bot.category === 'apps';
+    if (searchMode === 'apps' && !isApp) return false;
+    if (searchMode === 'bots' && isApp) return false;
+
     let matchesCategory = false;
     if (searchMode === 'bots') {
         matchesCategory = activeCategory === 'all' || (Array.isArray(bot.category) ? bot.category.includes(activeCategory) : bot.category === activeCategory);
@@ -205,13 +217,18 @@ const SearchPage = () => {
                 'trending': (b) => (b.views || 0) > 50,
                 'editors_choice': (b) => b.promoted_type === 'featured',
                 'new': (b) => !!b.isNew,
-                'games_sub': (b) => b.category.includes('games'),
-                'ai_sub': (b) => b.category.includes('ai_services'),
-                'trade': (b) => b.category.includes('finance'),
-                'social': (b) => b.category.includes('communication'),
-                'security_privacy': (b) => b.category.includes('security'),
-                'dev': (b) => b.category.includes('utilities'),
-                'art': (b) => b.category.includes('content')
+                'games_sub': (b) => Array.isArray(b.category) ? b.category.includes('games') : b.category === 'games',
+                'ai_sub': (b) => Array.isArray(b.category) ? b.category.includes('ai_services') : b.category === 'ai_services',
+                'trade': (b) => Array.isArray(b.category) ? b.category.includes('finance') : b.category === 'finance',
+                'social': (b) => Array.isArray(b.category) ? b.category.includes('communication') : b.category === 'communication',
+                'security_privacy': (b) => Array.isArray(b.category) ? b.category.includes('security') : b.category === 'security',
+                'dev': (b) => Array.isArray(b.category) ? b.category.includes('utilities') : b.category === 'utilities',
+                'art': (b) => Array.isArray(b.category) ? b.category.includes('content') : b.category === 'content',
+                'earn': (b) => Array.isArray(b.category) ? b.category.includes('crypto') : b.category === 'crypto',
+                'web3_general': (b) => Array.isArray(b.category) ? b.category.includes('crypto') || b.category.includes('finance') : b.category === 'crypto',
+                'tma_bots': (b) => true, // Already filtered by searchMode (isApp)
+                'ton_sites': (b) => true,
+                'saas': (b) => Array.isArray(b.category) ? b.category.includes('productivity') : b.category === 'productivity'
             };
             if (appsCategoryMap[activeCategory]) {
                 matchesCategory = appsCategoryMap[activeCategory](bot);
@@ -259,49 +276,27 @@ const SearchPage = () => {
     <div className="min-h-screen bg-white dark:bg-slate-950 px-5 sm:px-8 pt-4 md:pt-10 pb-32 transition-colors duration-300 search-page">
       <div className="max-w-7xl mx-auto">
         {/* Header & Search Box */}
-      <div className="flex items-center gap-3 mb-6">
-          <div className="relative" ref={modeMenuRef}>
-              <button 
-                onClick={() => setIsModeMenuOpen(!isModeMenuOpen)} 
-                className="h-10 px-3 flex items-center gap-2 bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl text-slate-700 dark:text-slate-200 active:scale-95 transition-all shrink-0 font-black text-[11px] tracking-wider uppercase"
-              >
-                {searchMode === 'bots' ? 'Bots' : 'Apps'}
-                <ChevronDown size={14} className={`text-slate-400 transition-transform duration-200 ${isModeMenuOpen ? 'rotate-180' : ''}`} />
-              </button>
+      {/* Search Mode Tabs */}
+      <div className="flex gap-2 p-1.5 bg-slate-100 dark:bg-slate-900 border border-black/5 dark:border-white/5 rounded-2xl mb-6">
+          <button 
+              onClick={() => {
+                  navigate('/search?mode=bots&category=all');
+              }}
+              className={`flex-1 py-3.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${searchMode === 'bots' ? 'bg-white dark:bg-slate-800 text-blue-500 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+          >
+              BOTLAR
+          </button>
+          <button 
+              onClick={() => {
+                  navigate('/search?mode=apps&category=all');
+              }}
+              className={`flex-1 py-3.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${searchMode === 'apps' ? 'bg-white dark:bg-slate-800 text-blue-500 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+          >
+              UYGULAMALAR (APPS)
+          </button>
+      </div>
 
-              <AnimatePresence>
-                  {isModeMenuOpen && (
-                      <motion.div
-                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                          animate={{ opacity: 1, y: 5, scale: 1 }}
-                          exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                          className="absolute left-0 top-full z-50 w-32 bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl shadow-xl overflow-hidden"
-                      >
-                          <button
-                              onClick={() => {
-                                  setSearchMode('bots');
-                                  setIsModeMenuOpen(false);
-                                  setActiveCategory('all');
-                              }}
-                              className={`w-full px-4 py-3 text-left text-[11px] font-black uppercase tracking-wider transition-colors ${searchMode === 'bots' ? 'text-blue-500 bg-blue-50/50 dark:bg-blue-500/10' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5'}`}
-                          >
-                              Bots
-                          </button>
-                          <button
-                              onClick={() => {
-                                  setSearchMode('apps');
-                                  setIsModeMenuOpen(false);
-                                  setActiveCategory('all');
-                              }}
-                              className={`w-full px-4 py-3 text-left text-[11px] font-black uppercase tracking-wider transition-colors border-t border-black/[0.03] dark:border-white/[0.03] ${searchMode === 'apps' ? 'text-blue-500 bg-blue-50/50 dark:bg-blue-500/10' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5'}`}
-                          >
-                              Apps
-                          </button>
-                      </motion.div>
-                  )}
-              </AnimatePresence>
-          </div>
-          
+      <div className="flex items-center gap-3 mb-10">
           <div className="flex-1 relative">
             <div className="relative flex items-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl p-1 transition-all group custom-search-outline">
               <div className="ml-2 w-8 h-8 flex items-center justify-center text-slate-400 group-focus-within:text-blue-500 shrink-0">
@@ -312,7 +307,7 @@ const SearchPage = () => {
                 value={query} 
                 autoFocus
                 onChange={(e) => setQuery(e.target.value)} 
-                placeholder={t('search_placeholder')} 
+                placeholder={searchMode === 'bots' ? t('Bot ARA...') : t('UYGULAMA ARA...')} 
                 className="w-full bg-transparent py-2 px-2 text-[13px] text-slate-900 dark:text-white outline-none placeholder:text-slate-400 font-bold uppercase tracking-widest min-w-0" 
               />
               <div className="flex items-center gap-0.5 pr-1 shrink-0">
@@ -343,7 +338,7 @@ const SearchPage = () => {
             <button 
               key={cat.id} 
               onClick={() => {
-                setActiveCategory(cat.id);
+                navigate(`/search?mode=${searchMode}&category=${cat.id}`);
                 if (user?.id) {
                     DatabaseService.logActivity(user.id.toString(), 'system', 'search_category', 'Kategori Filtresi', `Arama motorunda '${t(cat.label)}' kategorisi filtrelendi.`);
                 }

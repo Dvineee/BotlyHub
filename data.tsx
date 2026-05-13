@@ -286,7 +286,6 @@ const ContentIcon = ({ size = 20, className = "" }: { size?: number, className?:
 
 export const categories = [
   { id: 'all', label: 'cat_all', icon: AllIcon },
-  { id: 'apps', label: 'cat_apps', desc: 'desc_cat_apps', icon: AppsIcon },
   { id: 'games', label: 'cat_games', desc: 'desc_cat_games', icon: GamesIcon },
   { id: 'finance', label: 'cat_finance', desc: 'desc_cat_finance', icon: FinanceIcon },
   { id: 'moderation', label: 'cat_moderation', desc: 'desc_cat_moderation', icon: ModerationIcon },

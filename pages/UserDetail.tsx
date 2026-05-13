@@ -18,6 +18,8 @@ const UserDetail = () => {
     analysisBot: false
   });
 
+  const [activeTab, setActiveTab] = useState<'bots' | 'apps' | 'channels'>('bots');
+
   const toggle = (key: keyof typeof restrictions) => {
     setRestrictions(prev => ({ ...prev, [key]: !prev[key] }));
   };
@@ -86,8 +88,24 @@ const UserDetail = () => {
         {/* Tab Switcher */}
         <div>
             <div className="bg-slate-100 dark:bg-slate-900/60 p-1.5 rounded-xl flex border border-black/5 dark:border-white/5 mb-6">
-                <button className="flex-1 py-4 text-[11px] font-black bg-white dark:bg-slate-800 rounded-xl text-slate-900 dark:text-white uppercase tracking-widest shadow-sm">Botlar</button>
-                <button className="flex-1 py-4 text-[11px] font-black text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-300 uppercase tracking-widest transition-colors">Kanallar</button>
+                <button 
+                  onClick={() => setActiveTab('bots')}
+                  className={`flex-1 py-4 text-[11px] font-black rounded-xl uppercase tracking-widest transition-all ${activeTab === 'bots' ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm' : 'text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-300'}`}
+                >
+                  Botlar
+                </button>
+                <button 
+                  onClick={() => setActiveTab('apps' as any)}
+                  className={`flex-1 py-4 text-[11px] font-black rounded-xl uppercase tracking-widest transition-all ${activeTab === 'apps' as any ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm' : 'text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-300'}`}
+                >
+                  Apps
+                </button>
+                <button 
+                  onClick={() => setActiveTab('channels')}
+                  className={`flex-1 py-4 text-[11px] font-black rounded-xl uppercase tracking-widest transition-all ${activeTab === 'channels' ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm' : 'text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-300'}`}
+                >
+                  Kanallar
+                </button>
             </div>
 
             <div className="space-y-4">

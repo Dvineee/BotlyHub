@@ -4,7 +4,7 @@
 @import url('https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap');
 
 :root {
-  --font-main: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif;
+  --font-main: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
 }
 
 body {
@@ -655,15 +655,23 @@ button.w-full.flex.items-center.gap-3.px-4.py-3.hover\:bg-slate-50.dark\:hover\:
     --tw-border-opacity: 1;
 }
 
-/* Removing conflicting rounded classes as per user request */
-.rounded-\[32px\] {
-    box-shadow: none;
+.aspect-\[9\/19\] {
+    aspect-ratio: inherit;
+} 
+.blur-\[40px\] {
+    --tw-blur: blur(3px);
+    filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
 
 .lg\:w-\[480px\] {
     border-radius: 12px;
     outline: solid 1px #0000000d;
     width: 480px;
+}
+
+.flex.flex-col.gap-6.overflow-hidden.px-0 {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
 }
 
 /* Light mode hover effect for bot card chevron */
@@ -941,6 +949,7 @@ h2.text-lg.sm\:text-xl.font-extrabold.text-slate-900.dark\:text-white.tracking-t
 .dark .category-filter-item {
     border-color: rgba(255, 255, 255, 0.05);
     color: rgba(255, 255, 255, 0.4);
+    background-color: rgba(255, 255, 255, 0.03);
 }
 
 .category-filter-item:hover {
