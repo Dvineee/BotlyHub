@@ -72,6 +72,7 @@ export interface Bot {
   price: number;
   category: string[];
   bot_link: string;
+  slug: string;
   screenshots: string[];
   isNew?: boolean;
   features?: string[];

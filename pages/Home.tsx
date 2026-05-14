@@ -250,7 +250,7 @@ const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = React.memo(({ bots }) => {
                             key={bot.id}
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            onClick={() => navigate(`/bot/${bot.id}`)}
+                            onClick={() => navigate(`/bot/${bot.slug}`)}
                             className="flex flex-col items-center gap-2 shrink-0 cursor-pointer group/item w-20"
                         >
                                 <div className="relative">
@@ -282,7 +282,7 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonR
   const prices = useMemo(() => PriceService.convert(bot.price, tonRate), [bot.price, tonRate]);
   
   return (
-    <div onClick={() => navigate(`/bot/${bot.id}`)} className="flex items-center p-3 sm:p-6 bot-card cursor-pointer group bg-white dark:bg-transparent hover:bg-slate-100 dark:hover:bg-slate-900/60 rounded-xl transition-all border border-black/5 dark:border-transparent hover:border-slate-200 dark:hover:border-slate-800/50 active:bg-slate-200 dark:active:bg-slate-900 transform-gpu">
+    <div onClick={() => navigate(`/bot/${bot.slug}`)} className="flex items-center p-3 sm:p-6 bot-card cursor-pointer group bg-white dark:bg-transparent hover:bg-slate-100 dark:hover:bg-slate-900/60 rounded-xl transition-all border border-black/5 dark:border-transparent hover:border-slate-200 dark:hover:border-slate-800/50 active:bg-slate-200 dark:active:bg-slate-900 transform-gpu">
         <div className="relative shrink-0">
             <img 
                 src={getLiveBotIcon(bot)} 
@@ -1015,7 +1015,7 @@ const Home = () => {
                                         {featuredBots.map((bot) => (
                                             <div 
                                                 key={bot.id} 
-                                                onClick={() => navigate(`/bot/${bot.id}`)}
+                                                onClick={() => navigate(`/bot/${bot.slug}`)}
                                                 className="flex items-center justify-between p-4 rounded-xl border border-black/[0.05] dark:border-white/[0.08] hover:border-blue-500/20 transition-all cursor-pointer group hover:scale-[1.01] bg-[#00000008] dark:bg-white/[0.03]"
                                             >
                                                 <div className="flex items-center gap-4">
@@ -1127,7 +1127,7 @@ const Home = () => {
                                         {featuredBots.map((bot) => (
                                             <div 
                                                 key={bot.id} 
-                                                onClick={() => navigate(`/bot/${bot.id}`)}
+                                                onClick={() => navigate(`/bot/${bot.slug}`)}
                                                 className="flex items-center justify-between p-4 rounded-xl border border-black/[0.05] dark:border-white/[0.08] hover:border-blue-500/20 transition-all cursor-pointer group hover:scale-[1.01] bg-[#00000008] dark:bg-white/[0.03]"
                                             >
                                                 <div className="flex items-center gap-4">

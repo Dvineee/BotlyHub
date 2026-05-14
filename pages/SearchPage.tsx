@@ -48,7 +48,7 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = ({ bot, tonRate }) => {
   const prices = PriceService.convert(bot.price, tonRate);
   
   return (
-    <div onClick={() => navigate(`/bot/${bot.id}`)} className="flex items-center p-3 sm:p-6 bot-card cursor-pointer group bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-900/80 rounded-xl transition-all border border-black/5 dark:border-white/5 active:scale-[0.98] ">
+    <div onClick={() => navigate(`/bot/${bot.slug}`)} className="flex items-center p-3 sm:p-6 bot-card cursor-pointer group bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-900/80 rounded-xl transition-all border border-black/5 dark:border-white/5 active:scale-[0.98] ">
         <div className="relative shrink-0">
             <img 
                 src={getLiveBotIcon(bot)} 

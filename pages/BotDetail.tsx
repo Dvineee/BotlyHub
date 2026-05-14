@@ -35,7 +35,7 @@ const getLiveBotIcon = (bot: Bot) => {
 
 const BotDetail = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { slug } = useParams();
   const { haptic, user, notification, tg, isTelegram, setWebAuthUser } = useTelegram();
   const { t } = useTranslation();
   const { toggleTheme, theme } = useTheme();
@@ -65,20 +65,21 @@ const BotDetail = () => {
   const screenshotScroll = useDraggableScroll();
   
   const fetchBotData = useCallback(async () => {
-    if (!id) return;
+    if (!slug) return;
     setIsLoading(true);
     try {
-        const data = await DatabaseService.getBotById(id);
+        const data = await DatabaseService.getBotBySlug(slug);
         setBot(data);
+        if (data) {
+            DatabaseService.incrementBotView(data.id);
+        }
         const userId = user?.id?.toString();
-        if (userId) {
-            const owned = await DatabaseService.isBotOwnedByUser(userId, id);
+        if (userId && data) {
+            const owned = await DatabaseService.isBotOwnedByUser(userId, data.id);
             setIsOwned(owned);
             
             // Log bot view
-            if (data) {
-                await DatabaseService.logActivity(userId, 'system', 'bot_view', 'Bot İnceleme', `${data.name} botu detayları görüntülendi.`);
-            }
+            await DatabaseService.logActivity(userId, 'system', 'bot_view', 'Bot İnceleme', `${data.name} botu detayları görüntülendi.`);
 
             // Get notifications for unread count
             DatabaseService.getNotifications(userId).then(notes => {
@@ -88,13 +89,10 @@ const BotDetail = () => {
         }
     } catch (e) { console.error(e); }
     finally { setIsLoading(false); }
-  }, [id, user?.id]);
+  }, [slug, user?.id]);
 
   useEffect(() => {
     fetchBotData();
-    if (id) {
-        DatabaseService.incrementBotView(id);
-    }
     const handleClickOutside = (event: MouseEvent) => {
         if (menuRef.current && !menuRef.current.contains(event.target as Node)) setIsMenuOpen(false);
     };
@@ -111,7 +109,7 @@ const BotDetail = () => {
       document.removeEventListener('mousedown', handleClickOutside);
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [fetchBotData, id]);
+  }, [fetchBotData, slug]);
 
   const openLightbox = (index: number) => {
     setCurrentImageIndex(index);
@@ -137,10 +135,10 @@ const BotDetail = () => {
   };
 
   useEffect(() => {
-    if (user?.id && id) {
-        DatabaseService.getUserBotRating(user.id.toString(), id).then(setUserRating);
+    if (user?.id && bot?.id) {
+        DatabaseService.getUserBotRating(user.id.toString(), bot.id).then(setUserRating);
     }
-  }, [user?.id, id]);
+  }, [user?.id, bot?.id]);
 
   useEffect(() => {
     PriceService.getTonPrice().then(p => setTonRate(p.tonTry));
@@ -198,9 +196,9 @@ const BotDetail = () => {
               setIsProcessing(false);
           }
       } else {
-          navigate(`/payment/${id}`);
+          navigate(`/payment/${bot.slug}`);
       }
-  }, [isProcessing, bot, isOwned, haptic, tg, user, notification, setShowGuide, navigate, id]);
+  }, [isProcessing, bot, isOwned, haptic, tg, user, notification, setShowGuide, navigate]);
 
   const handleAiAnalysis = async () => {
     if (!bot || isAiLoading) return;
@@ -222,7 +220,7 @@ const BotDetail = () => {
 
   const handleShare = () => {
     if (!bot) return;
-    const shareUrl = `https://t.me/BotlyHubBot/app?startapp=bot_${bot.id}`;
+    const shareUrl = `https://t.me/BotlyHubBot/app?startapp=bot_${bot.slug}`;
     const shareText = `BotlyHub'da harika bir bot buldum: ${bot.name}\n\n${bot.description}\n\n${shareUrl}`;
     
     if (tg?.openTelegramLink) {
@@ -246,12 +244,12 @@ const BotDetail = () => {
         return;
     }
 
-    if (!id) return;
+    if (!bot?.id) return;
 
     setIsRating(true);
     try {
         console.log("Saving rating to DB...");
-        await DatabaseService.rateBot(user.id.toString(), id, rating);
+        await DatabaseService.rateBot(user.id.toString(), bot.id, rating);
         console.log("Rating saved successfully");
         setUserRating(rating);
         await fetchBotData();
@@ -287,7 +285,7 @@ const BotDetail = () => {
         ogImage={bot.icon || undefined}
         breadcrumbs={[
             { name: 'Anasayfa', item: 'https://botlyhub.com/' },
-            { name: bot.name, item: `https://botlyhub.com/bot/${bot.id}` }
+            { name: bot.name, item: `https://botlyhub.com/bot/${bot.slug}` }
         ]}
     />
     <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-200 pb-40 animate-in fade-in transition-colors duration-300 bot-detail-page">

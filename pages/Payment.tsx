@@ -23,7 +23,7 @@ const getLiveBotIcon = (bot: Bot) => {
 
 const Payment = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { slug } = useParams();
   const { haptic, user, notification, tg } = useTelegram();
   const [isLoading, setIsLoading] = useState(false);
   const [targetBot, setTargetBot] = useState<Bot | null>(null);
@@ -32,8 +32,12 @@ const Payment = () => {
   const [orderId, setOrderId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (id) {
-        DatabaseService.getBotById(id).then(data => setTargetBot(data));
+    if (slug) {
+        if (slug.startsWith('plan_')) {
+            // It's a plan, no need to fetch bot
+        } else {
+            DatabaseService.getBotBySlug(slug).then(data => setTargetBot(data));
+        }
         PriceService.getTonPrice().then(p => setTonPrice(p.tonTry));
     }
     
@@ -50,9 +54,9 @@ const Payment = () => {
         }
     };
     testBackend();
-  }, [id, tg]);
+  }, [slug, tg]);
 
-  const plan = subscriptionPlans.find(p => p.id === id);
+  const plan = subscriptionPlans.find(p => p.id === slug);
   const item = targetBot || plan;
 
   const handleSuccess = async (currentOrderId: string, txHash?: string) => {

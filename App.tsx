@@ -196,8 +196,8 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/search" element={<SearchPage />} />
-            <Route path="/bot/:id" element={<BotDetail />} />
-            <Route path="/payment/:id" element={<Payment />} />
+            <Route path="/bot/:slug" element={<BotDetail />} />
+            <Route path="/payment/:slug" element={<Payment />} />
             <Route path="/settings" element={<ProfileSettings />} />
             <Route path="/account-settings" element={<AccountSettings />} />
             <Route path="/my-bots" element={<MyBots />} />

@@ -439,6 +439,12 @@ export class DatabaseService {
     return cat.split(',').map((s: string) => s.trim()).filter(Boolean);
   }
 
+  static generateSlug(text: string): string {
+    return text.toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
+
   static async getBots(): Promise<Bot[]> {
     const { data: bots } = await supabase.from('bots').select('*').order('id', { ascending: false });
     const { data: ratings } = await supabase.from('bot_ratings').select('bot_id, rating');
@@ -451,8 +457,11 @@ export class DatabaseService {
             : 0;
         const userCount = (userBots || []).filter(ub => ub.bot_id === bot.id).length;
 
+        const slug = bot.slug || this.generateSlug(bot.name);
+
         return {
             ...bot,
+            slug,
             category: this.parseCategory(bot.category),
             languages: (bot.languages || (bot.name.toLowerCase().includes('botlyhub') ? ['🇬🇧', '🇹🇷'] : [])).map((l: string) => l === 'İng' ? '🇬🇧' : l),
             rating: Number(avgRating.toFixed(1)),
@@ -466,6 +475,21 @@ export class DatabaseService {
     const { data } = await supabase.from('bots').select('*').eq('id', id).maybeSingle();
     if (!data) return null;
     
+    return this.mapBotData(data);
+  }
+
+  static async getBotBySlug(slug: string): Promise<Bot | null> {
+    const { data } = await supabase.from('bots').select('*').eq('slug', slug).maybeSingle();
+    if (!data) {
+        // Fallback: check if id matches (just in case)
+        return this.getBotById(slug);
+    }
+    
+    return this.mapBotData(data);
+  }
+
+  private static async mapBotData(data: any): Promise<Bot> {
+    const id = data.id;
     let user_count = 0;
     let rating = 0;
     let rating_count = 0;
@@ -492,6 +516,7 @@ export class DatabaseService {
 
     return {
         ...data,
+        slug: data.slug || this.generateSlug(data.name),
         category: this.parseCategory(data.category),
         languages: (data.languages || (data.name.toLowerCase().includes('botlyhub') ? ['🇬🇧', '🇹🇷'] : [])).map((l: string) => l === 'İng' ? '🇬🇧' : l),
         user_count,
@@ -551,6 +576,7 @@ export class DatabaseService {
     const payload = { 
         id: bot.id, 
         name: bot.name, 
+        slug: bot.slug || this.generateSlug(bot.name),
         description: bot.description || '', 
         price: Number(bot.price) || 0, 
         category: JSON.stringify(Array.isArray(bot.category) ? bot.category : [bot.category || 'utilities']), 
