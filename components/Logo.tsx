@@ -47,8 +47,9 @@ export const Logo: React.FC<LogoProps> = ({ className, style, onClick }) => {
           </g>
         </svg>
       </div>
-      <span className="text-lg font-black tracking-tighter text-slate-900 dark:text-white uppercase italic">
-        BOTLY<span className="text-blue-500">HUB</span>
+      <span className="flex items-center text-xl font-black tracking-[-0.05em] uppercase italic">
+        <span className="text-slate-900 dark:text-white">BOTLY</span>
+        <span className="text-blue-500 ml-0.5">HUB</span>
       </span>
     </div>
   );

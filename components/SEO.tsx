@@ -135,9 +135,10 @@ export const SEO: React.FC<SEOProps> = ({
       <meta name="apple-mobile-web-app-title" content={siteName} />
       
       {/* Extra SEO Labels */}
-      <meta name="keywords" content="botlyhub, telegram botları, ton ecosystem, telegram automation, bot store, ai services, telegram news" />
+      <meta name="keywords" content="botlyhub, telegram bot platformu, telegram botları, ton ecosystem, telegram automation, bot store, ai services, telegram mini apps, telegram kanalları, bot keşif" />
       <meta name="author" content="BotlyHub Team" />
       <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+      <meta name="google-site-verification" content="GOOGLE_SITE_VERIFICATION_CODE_HERE" />
 
       {/* JSON-LD Schemas */}
       <script type="application/ld+json">

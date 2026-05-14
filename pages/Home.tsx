@@ -443,10 +443,7 @@ const NavMenu = ({
                 {/* Left Section (Logo) */}
                 <div className="hidden md:flex items-center w-48 shrink-0">
                     {isScrolled ? (
-                        <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
-                            <Logo style={{ width: '1.8rem', height: 'auto' }} />
-                            <span className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">BotlyHub</span>
-                        </div>
+                        <Logo onClick={() => navigate('/')} className="cursor-pointer" />
                     ) : null}
                 </div>
 
@@ -817,8 +814,8 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-200 animate-in transition-colors duration-300 home-page">
       <SEO 
-          title="Keşfet, Tanıt ve Yönet" 
-          description="BotlyHub - Telegram ekosistemindeki en iyi botları ve kanalları bulabileceğiniz, kendi otomasyonlarınızı tanıtabileceğiniz en gelişmiş platform."
+          title="Telegram Bot Platformu | En İyi Botları Keşfedin" 
+          description="BotlyHub - Türkiye'nin en gelişmiş Telegram bot platformu. En iyi Telegram botlarını keşfedin, kendi botlarınızı tanıtın ve TON ekosisteminde gelir elde edin."
       />
       {/* Top Background Wrapper */}
       <div className="bg-[#00000008] dark:bg-slate-900/10">
@@ -826,12 +823,9 @@ const Home = () => {
         <div className="w-full pt-6 md:pt-10 pb-4 shadow-[inset_0_-1px_0_0_rgba(0,0,0,0.03)] relative z-[120]">
           <div className="max-w-7xl mx-auto px-5 sm:px-8">
               <div className="flex flex-wrap md:flex-nowrap items-center justify-between mb-8 px-1 gap-y-6 md:gap-x-6">
-                  <div className="flex items-center gap-3 order-1 md:w-48 shrink-0">
-                      <div className="shrink-0">
-                          <Logo style={{ width: '2.5rem', height: 'auto', display: 'block' }} className="" />
-                      </div>
-                      <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">BotlyHub</h1>
-                  </div>
+                <div className="flex items-center order-1 md:w-48 shrink-0">
+                    <Logo onClick={() => navigate('/')} className="cursor-pointer" />
+                </div>
 
                   <div className="w-full md:flex-1 md:max-w-2xl order-3 md:order-2 flex items-center gap-2 md:gap-3">
                       <div className="flex-1 md:w-[330px] md:flex-none relative z-[100]">
@@ -968,8 +962,11 @@ const Home = () => {
                   <>
                     <div className="mb-10 sm:mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700 text-center">
                         <h1 className="text-3xl sm:text-5xl md:text-[2.75rem] font-bold tracking-[-0.035em] md:leading-none leading-tight text-slate-900 dark:text-white">
-                            <span className="text-blue-500">En iyi</span> Telegram <span className="text-blue-500">Ekosistemini</span> Keşfet : Ekle ve Kazan
+                            BotlyHub: En Gelişmiş <span className="text-blue-500">Telegram Bot Platformu</span>
                         </h1>
+                        <p className="mt-6 text-slate-500 dark:text-slate-400 text-sm sm:text-base font-medium max-w-2xl mx-auto uppercase tracking-widest italic">
+                            En iyi Telegram Botlarını ve Kanallarını Keşfet, Tanıt ve TON ile Kazanmaya Başla.
+                        </p>
                     </div>
 
                     <AnimatePresence mode="wait">
@@ -1206,6 +1203,28 @@ const Home = () => {
                     )}
                 </motion.div>
             </AnimatePresence>
+
+            <div className="mt-20 mb-20 px-4 max-w-4xl mx-auto border-t border-black/[0.03] dark:border-white/[0.03] pt-20">
+                <div className="prose prose-slate dark:prose-invert max-w-none">
+                    <h2 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight italic mb-6">
+                        BotlyHub: Türkiye'nin Öncü <span className="text-blue-500">Telegram Bot Platformu</span>
+                    </h2>
+                    <div className="text-[13px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed italic space-y-4">
+                        <p>
+                            BotlyHub, modern Telegram ekosisteminde bot geliştiricileri ile kullanıcıları bir araya getiren en kapsamlı <strong>Telegram bot platformu</strong> ve pazaryeridir. Amacımız, Telegram üzerinde çalışan yenilikçi otomasyon sistemlerini, yapay zeka (AI) destekli araçları ve dijital servisleri tek bir çatı altında toplayarak herkes için erişilebilir kılmaktır.
+                        </p>
+                        <p>
+                            Kullanıcılarımız için; finansal botlardan eğlence kanallarına, TON ağı (The Open Network) tabanlı Web3 uygulamalarından günlük hayatı kolaylaştıran Mini App'lere kadar geniş bir yelpazede keşif imkanı sunuyoruz. <strong>BotlyHub</strong> üzerinden dilediğiniz botu arayabilir, kullanıcı yorumlarını okuyabilir ve puanlayarak topluluğa katkı sağlayabilirsiniz.
+                        </p>
+                        <p>
+                            Geliştiriciler için; hazırladığınız Telegram botlarını dünyaya tanıtmanız ve projelerinizden gelir elde etmeniz için profesyonel araçlar sağlıyoruz. Botunuzu platformumuza ekleyerek binlerce potansiyel kullanıcıya ulaşabilir, güvenli ödeme sistemlerimiz ve düşük komisyon oranlarımızla satış yapmaya başlayabilirsiniz.
+                        </p>
+                        <p>
+                            Geleceğin Telegram uygulamaları (Mini Apps) ve bot trendleri için en doğru adres BotlyHub. Şimdi aramıza katılın ve Telegram bot dünyasının sınırlarını bizimle keşfedin.
+                        </p>
+                    </div>
+                </div>
+            </div>
 
             <div className="mt-20 mb-20 px-4 max-w-4xl mx-auto">
                 <div className="flex items-center gap-3 mb-8">

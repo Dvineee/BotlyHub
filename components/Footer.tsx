@@ -13,9 +13,8 @@ const Footer: React.FC = () => {
     <footer className="mt-12 px-4 pb-32 max-w-7xl mx-auto w-full border-t border-black/5 dark:border-white/5 pt-12">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-16">
         <div className="col-span-2">
-            <div className="flex items-center gap-2 mb-4">
-                <Logo style={{ width: '2rem', height: 'auto' }} />
-                <span className="text-xl font-bold text-slate-900 dark:text-white uppercase italic tracking-tighter">BotlyHub</span>
+            <div className="flex items-center mb-4">
+                <Logo />
             </div>
             <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest leading-relaxed max-w-xs">
                 BotlyHub, Telegram botları, TON ekosistemi ve modern Web3 uygulamaları için en gelişmiş keşif, tanıtım ve yönetim platformudur.

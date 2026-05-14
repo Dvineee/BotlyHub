@@ -398,12 +398,12 @@ const BlogPostDetail: React.FC = () => {
               </button>
               
               {!isSidebarCollapsed ? (
-                <div className="flex bg-slate-100 dark:bg-white/5 p-1 rounded-xl flex-[2]">
+                <div className="flex bg-slate-100 dark:bg-white/5 p-1 rounded-xl flex-[2] h-[38px]">
                   {(['tr', 'en', 'ru'] as const).map((lang) => (
                     <button
                       key={lang}
                       onClick={() => setLanguage(lang)}
-                      className={`flex-1 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${
+                      className={`flex-1 flex items-center justify-center rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${
                         language === lang 
                           ? 'bg-white dark:bg-white/10 text-blue-600 dark:text-blue-400 shadow-sm' 
                           : 'text-slate-400'
