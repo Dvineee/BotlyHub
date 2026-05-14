@@ -4,7 +4,8 @@
 @import url('https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap');
 
 :root {
-  --font-main: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  --font-main: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  --font-headers: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
 }
 
 body {
@@ -73,15 +74,11 @@ body {
     padding-bottom: env(safe-area-inset-bottom);
   }
 
-  h1, h2, h3, .title {
+  h1, h2, h3, h4, h5, h6, .title {
+    font-family: var(--font-headers);
     font-weight: 600;
     letter-spacing: -0.03em;
     line-height: 1.2;
-  }
-
-  h4, h5, h6 {
-    font-weight: 600;
-    letter-spacing: -0.02em;
   }
 
   p {
@@ -102,7 +99,7 @@ body {
   }
 
   .font-black {
-    font-weight: 600 !important;
+    font-weight: 500 !important;
   }
 
   #root {
@@ -628,7 +625,7 @@ span.text-\[10px\].font-black.uppercase.tracking-tight {
     transition: background-color .3s ease;
 }
 .font-black {
-    font-weight: 400 !important;
+    font-weight: 500 !important;
 }
 button.w-full.flex.items-center.gap-3.px-4.py-3.hover\:bg-slate-50.dark\:hover\:bg-white\/5.rounded-xl.transition-colors.text-left {
     border-radius: 12px;
@@ -637,10 +634,6 @@ button.w-full.flex.items-center.gap-3.px-4.py-3.hover\:bg-slate-50.dark\:hover\:
 }
 
 @media (min-width: 768px) {
-    .tracking-wider {
-        font-size: 13px;
-        letter-spacing: 0.05em;
-    }
 }
 
 .border-blue-500 {
@@ -993,4 +986,31 @@ h2.text-lg.sm\:text-xl.font-extrabold.text-slate-900.dark\:text-white.tracking-t
 .blur-\[40px\] {
     --tw-blur: blur(3px);
     filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}
+
+.tracking-wider {
+    font-size: 13px;
+    letter-spacing: 0em;
+}
+
+.md\:text-\[2\.75rem\] {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -.01em;
+}
+
+@media (min-width: 768px) {
+    .md\:text-\[2\.75rem\] {
+        font-size: 2rem;
+    }
+}
+
+.sm\:text-base {
+    letter-spacing: -.0em;
+    font-size: unset;
+    line-height: normal;
+}
+
+.text-\[11px\] {
+    font-size: 13px;
 }
