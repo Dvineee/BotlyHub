@@ -1,6 +1,6 @@
 
 import { createClient } from '@supabase/supabase-js';
-import { Bot, User, Channel, Announcement, Notification, UserBot, ActivityLog, Promotion, Referral, ReferralSettings, BlogPost } from '../types';
+import { Bot, User, Channel, Announcement, Notification, UserBot, ActivityLog, Promotion, Referral, ReferralSettings, BlogPost, BlogComment } from '../types';
 
 const SUPABASE_URL = (typeof process !== 'undefined' && process.env?.SUPABASE_URL) || 
                     (import.meta.env?.VITE_SUPABASE_URL) || 
@@ -933,6 +933,60 @@ export class DatabaseService {
         isFeatured: data.is_featured,
         authorAvatar: data.author_avatar
     };
+  }
+
+  static async incrementBlogView(id: string) {
+    try {
+        const { data: current } = await supabase.from('blogs').select('views_count').eq('id', id).single();
+        await supabase.from('blogs').update({ views_count: (current?.views_count || 0) + 1 }).eq('id', id);
+    } catch(e) {}
+  }
+
+  static async getBlogLikes(blogId: string): Promise<number> {
+    const { count, error } = await supabase
+        .from('blog_likes')
+        .select('*', { count: 'exact', head: true })
+        .eq('blog_id', blogId);
+    return count || 0;
+  }
+
+  static async toggleBlogLike(blogId: string, userId: string): Promise<boolean> {
+    // Check if liked
+    const { data } = await supabase.from('blog_likes').select('id').eq('blog_id', blogId).eq('user_id', userId).maybeSingle();
+    
+    if (data) {
+        // Unlike
+        await supabase.from('blog_likes').delete().eq('id', data.id);
+        const { data: current } = await supabase.from('blogs').select('likes_count').eq('id', blogId).single();
+        await supabase.from('blogs').update({ likes_count: Math.max(0, (current?.likes_count || 0) - 1) }).eq('id', blogId);
+        return false;
+    } else {
+        // Like
+        await supabase.from('blog_likes').insert([{ blog_id: blogId, user_id: userId }]);
+        const { data: current } = await supabase.from('blogs').select('likes_count').eq('id', blogId).single();
+        await supabase.from('blogs').update({ likes_count: (current?.likes_count || 0) + 1 }).eq('id', blogId);
+        return true;
+    }
+  }
+
+  static async isBlogLikedByUser(blogId: string, userId: string): Promise<boolean> {
+    const { data } = await supabase.from('blog_likes').select('id').eq('blog_id', blogId).eq('user_id', userId).maybeSingle();
+    return !!data;
+  }
+
+  static async getBlogComments(blogId: string): Promise<BlogComment[]> {
+    const { data, error } = await supabase
+        .from('blog_comments')
+        .select('*')
+        .eq('blog_id', blogId)
+        .eq('is_approved', true)
+        .order('created_at', { ascending: false });
+    return data || [];
+  }
+
+  static async addBlogComment(comment: Partial<BlogComment>) {
+    const { error } = await supabase.from('blog_comments').insert([comment]);
+    if (error) throw error;
   }
 
   static async saveBlog(blog: Partial<BlogPost>) {

@@ -1,4 +1,14 @@
 
+export interface BlogComment {
+  id: string;
+  blog_id: string;
+  user_id: string;
+  user_name: string;
+  user_avatar: string;
+  content: string;
+  created_at: string;
+}
+
 export interface BlogPost {
   id: string;
   title: string;
@@ -13,6 +23,8 @@ export interface BlogPost {
   readTime: string;
   slug?: string;
   isFeatured?: boolean;
+  views_count?: number;
+  likes_count?: number;
 }
 
 export interface User {

@@ -30,7 +30,8 @@ import {
   Sun,
   Moon,
   Globe,
-  Star
+  Star,
+  Heart
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../TranslationContext';
@@ -539,6 +540,14 @@ const BlogPage: React.FC = () => {
                            <span className="text-[10px] font-bold uppercase">{new Date(featuredPost.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                         </div>
                         <div className="flex items-center gap-2 text-slate-400">
+                           <TrendingUp size={14} className="text-blue-500" />
+                           <span className="text-[10px] font-bold uppercase">{featuredPost.views_count || 0}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-slate-400">
+                           <Heart size={14} className="text-red-500" />
+                           <span className="text-[10px] font-bold uppercase">{featuredPost.likes_count || 0}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-slate-400">
                            <Clock size={14} />
                            <span className="text-[10px] font-bold uppercase">{featuredPost.readTime || '5 dk'}</span>
                         </div>
@@ -596,6 +605,8 @@ const BlogPage: React.FC = () => {
                         <div className="flex items-center gap-4 text-[9px] font-black uppercase tracking-widest text-slate-400 italic">
                           <span>{new Date(post.created_at).toLocaleDateString('tr-TR')}</span>
                           <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-800"></span>
+                          <span className="flex items-center gap-1.5"><TrendingUp size={12} className="text-blue-500" /> {post.views_count || 0}</span>
+                          <span className="flex items-center gap-1.5"><Heart size={12} className="text-red-500" /> {post.likes_count || 0}</span>
                           <span className="flex items-center gap-1.5"><Clock size={12} className="text-blue-500" /> {post.readTime || '5 dk'}</span>
                         </div>
                         <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tighter group-hover:text-blue-600 transition-colors line-clamp-2 italic leading-tight">

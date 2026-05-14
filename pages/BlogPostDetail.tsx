@@ -31,7 +31,11 @@ import {
   PanelLeft,
   Sun,
   Moon,
-  Globe
+  Globe,
+  MessageSquare,
+  Send,
+  Loader2,
+  ThumbsUp
 } from 'lucide-react';
 import { useTelegram } from '../hooks/useTelegram';
 import { useTranslation } from '../TranslationContext';
@@ -39,8 +43,9 @@ import { useTheme } from '../ThemeContext';
 import { SEO } from '../components/SEO';
 import { Logo } from '../components/Logo';
 import { DatabaseService } from '../services/DatabaseService';
-import { BlogPost } from '../types';
-import { Loader2 } from 'lucide-react';
+import { BlogPost, BlogComment } from '../types';
+
+const UserIcon = User;
 
 // Mock data (sharing with BlogPage)
 const mockPosts = [
@@ -93,7 +98,7 @@ const categories = [
 const BlogPostDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { haptic } = useTelegram();
+  const { haptic, user } = useTelegram();
   const { language, setLanguage } = useTranslation();
   const { theme, toggleTheme } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -104,6 +109,10 @@ const BlogPostDetail: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [similarPosts, setSimilarPosts] = useState<BlogPost[]>([]);
   const [allPosts, setAllPosts] = useState<BlogPost[]>([]);
+  const [comments, setComments] = useState<BlogComment[]>([]);
+  const [isLiked, setIsLiked] = useState(false);
+  const [newComment, setNewComment] = useState('');
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -113,10 +122,25 @@ const BlogPostDetail: React.FC = () => {
         const data = await DatabaseService.getBlogById(id);
         setPost(data);
         
-        // Fetch similar posts
-        const blogs = await DatabaseService.getBlogs();
-        setAllPosts(blogs);
-        setSimilarPosts(blogs.filter(b => b.id !== id).slice(0, 3));
+        if (data) {
+            // Log view
+            DatabaseService.incrementBlogView(id);
+            
+            // Similar posts
+            const blogs = await DatabaseService.getBlogs();
+            setAllPosts(blogs);
+            setSimilarPosts(blogs.filter(b => b.id !== id).slice(0, 3));
+            
+            // Comments
+            const comms = await DatabaseService.getBlogComments(id);
+            setComments(comms);
+            
+            // Check if liked
+            if (user?.id) {
+                const liked = await DatabaseService.isBlogLikedByUser(id, user.id.toString());
+                setIsLiked(liked);
+            }
+        }
       } catch (err) {
         console.error("Fetch Blog Detail Error:", err);
       } finally {
@@ -125,7 +149,53 @@ const BlogPostDetail: React.FC = () => {
     };
     fetchPost();
     window.scrollTo(0, 0);
-  }, [id]);
+  }, [id, user?.id]);
+
+  const handleLike = async () => {
+    if (!id || !user?.id) {
+        alert('Beğenmek için giriş yapmalısınız.');
+        return;
+    }
+    try {
+        haptic('light');
+        const liked = await DatabaseService.toggleBlogLike(id, user.id.toString());
+        setIsLiked(liked);
+        if (post) {
+            setPost({
+                ...post,
+                likes_count: liked ? (post.likes_count || 0) + 1 : Math.max(0, (post.likes_count || 0) - 1)
+            });
+        }
+    } catch (e) {
+        console.error("Like Error:", e);
+    }
+  };
+
+  const handleCommentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newComment.trim() || !id || !user) return;
+    
+    setIsSubmittingComment(true);
+    try {
+        const commentData = {
+            blog_id: id,
+            user_id: user.id.toString(),
+            user_name: `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Kullanıcı',
+            user_avatar: user.photo_url || '',
+            content: newComment.trim(),
+            created_at: new Date().toISOString()
+        };
+        await DatabaseService.addBlogComment(commentData);
+        setComments([commentData as any, ...comments]);
+        setNewComment('');
+        haptic('medium');
+    } catch (e) {
+        console.error("Comment Error:", e);
+        alert('Yorum gönderilirken bir hata oluştu.');
+    } finally {
+        setIsSubmittingComment(false);
+    }
+  };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -497,6 +567,10 @@ const BlogPostDetail: React.FC = () => {
                 <Clock size={14} />
                 {post.readTime}
               </div>
+              <div className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-wider ml-auto">
+                <TrendingUp size={14} className="text-blue-500" />
+                {post.views_count || 0} Görüntülenme
+              </div>
             </div>
 
             <h1 className="text-3xl md:text-5xl font-black tracking-tighter text-slate-900 dark:text-white mb-8 leading-[1.1]">
@@ -506,20 +580,24 @@ const BlogPostDetail: React.FC = () => {
             <div className="flex items-center justify-between py-6 border-y border-slate-100 dark:border-white/5">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-black text-xs">
-                  {post.authorAvatar}
+                  {post.authorAvatar || post.author.substring(0, 2).toUpperCase()}
                 </div>
                 <div>
                   <div className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">{post.author}</div>
-                  <div className="text-xs font-bold text-slate-400">{post.date}</div>
+                  <div className="text-xs font-bold text-slate-400">{new Date(post.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
                 </div>
               </div>
 
               <div className="flex items-center gap-2">
-                <button className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-full transition-colors text-slate-400 hover:text-blue-500">
-                  <Share2 size={20} />
+                <button 
+                  onClick={handleLike}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all ${isLiked ? 'bg-red-500 text-white shadow-lg shadow-red-500/20' : 'bg-slate-100 dark:bg-white/5 text-slate-400 hover:text-red-500'}`}
+                >
+                  <Heart size={18} className={isLiked ? 'fill-white' : ''} />
+                  <span className="text-xs font-black">{post.likes_count || 0}</span>
                 </button>
                 <button className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-full transition-colors text-slate-400 hover:text-blue-500">
-                  <Bookmark size={20} />
+                  <Share2 size={20} />
                 </button>
               </div>
             </div>
@@ -546,26 +624,101 @@ const BlogPostDetail: React.FC = () => {
           <footer className="mt-16 pt-10 border-t border-slate-100 dark:border-white/5">
             <div className="flex flex-wrap items-center justify-between gap-6 pb-12">
               <div className="flex items-center gap-6">
-                <button className="flex items-center gap-2 group">
-                  <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400 group-hover:text-red-500 group-hover:bg-red-50 dark:group-hover:bg-red-500/10 transition-all">
-                    <Heart size={20} />
+                <button 
+                  onClick={handleLike}
+                  className="flex items-center gap-2 group"
+                >
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${isLiked ? 'bg-red-500 text-white shadow-lg' : 'bg-slate-100 dark:bg-white/5 text-slate-400 group-hover:text-red-500 group-hover:bg-red-50 dark:group-hover:bg-red-500/10'}`}>
+                    <Heart size={20} className={isLiked ? 'fill-white' : ''} />
                   </div>
-                  <span className="text-sm font-black text-slate-500 italic">42 Likes</span>
+                  <span className={`text-sm font-black italic ${isLiked ? 'text-red-500' : 'text-slate-500'}`}>{post.likes_count || 0} Beğeni</span>
                 </button>
                 <button className="flex items-center gap-2 group">
                   <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400 group-hover:text-blue-500 group-hover:bg-blue-50 dark:group-hover:bg-blue-500/10 transition-all">
                     <MessageCircle size={20} />
                   </div>
-                  <span className="text-sm font-black text-slate-500 italic">8 Comments</span>
+                  <span className="text-sm font-black text-slate-500 italic">{comments.length} Yorum</span>
                 </button>
               </div>
 
               <div className="flex items-center gap-2">
-                {['#TON', '#PassiveIncome', '#Web3'].map(tag => (
-                   <span key={tag} className="px-3 py-1 bg-slate-50 dark:bg-white/5 text-slate-500 text-[10px] font-black uppercase tracking-widest rounded-lg">{tag}</span>
-                ))}
+                <span className="px-3 py-1 bg-slate-50 dark:bg-white/5 text-slate-500 text-[10px] font-black uppercase tracking-widest rounded-lg">#BotlyHub</span>
               </div>
             </div>
+
+            {/* Comments Section */}
+            <section className="mb-20">
+              <h3 className="text-xl font-black text-slate-900 dark:text-white mb-8 italic uppercase tracking-tighter flex items-center gap-3">
+                <MessageSquare size={20} className="text-blue-500" />
+                Yorumlar <span className="text-slate-300 dark:text-slate-800">/</span> {comments.length}
+              </h3>
+              
+              <div className="bg-white dark:bg-slate-900/40 p-6 rounded-[32px] border border-slate-100 dark:border-white/5 mb-12">
+                <form onSubmit={handleCommentSubmit} className="space-y-4">
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 shrink-0 overflow-hidden">
+                      {user?.photo_url ? (
+                        <img src={user.photo_url} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      ) : (
+                        <UserIcon size={20} />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <textarea 
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                        placeholder="Düşüncelerini paylaş..."
+                        className="w-full bg-transparent border-none outline-none text-slate-900 dark:text-white placeholder:text-slate-400 resize-none h-24 font-medium italic"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex justify-end pt-4 border-t border-slate-50 dark:border-white/5">
+                    <button 
+                      type="submit"
+                      disabled={isSubmittingComment || !newComment.trim()}
+                      className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-blue-700 transition-all disabled:opacity-50 shadow-lg shadow-blue-500/20"
+                    >
+                      {isSubmittingComment ? 'GÖNDERİLİYOR...' : 'GÖNDER'}
+                      <Send size={14} />
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              <div className="space-y-6">
+                {comments.map((comment, idx) => (
+                  <motion.div 
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: idx * 0.05 }}
+                    key={comment.id || idx} 
+                    className="flex gap-4 group"
+                  >
+                    <div className="w-10 h-10 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 shrink-0 overflow-hidden shadow-sm">
+                      {comment.user_avatar ? (
+                        <img src={comment.user_avatar} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      ) : (
+                        <UserIcon size={20} />
+                      )}
+                    </div>
+                    <div className="flex-1 bg-slate-50 dark:bg-white/5 p-4 rounded-2xl rounded-tl-none border border-transparent group-hover:border-blue-500/20 transition-all">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">{comment.user_name}</span>
+                        <span className="text-[10px] font-bold text-slate-400">{new Date(comment.created_at).toLocaleDateString('tr-TR')}</span>
+                      </div>
+                      <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+                        {comment.content}
+                      </p>
+                    </div>
+                  </motion.div>
+                ))}
+                {comments.length === 0 && (
+                  <div className="py-12 text-center border-2 border-dashed border-slate-100 dark:border-white/5 rounded-[32px]">
+                    <p className="text-slate-400 font-black uppercase tracking-widest text-[10px] italic">İlk yorumu sen yap!</p>
+                  </div>
+                )}
+              </div>
+            </section>
 
             {/* Author Card */}
             <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-white/5 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-6">
