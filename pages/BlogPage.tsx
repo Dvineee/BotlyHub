@@ -29,7 +29,8 @@ import {
   PanelLeft,
   Sun,
   Moon,
-  Globe
+  Globe,
+  Star
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../TranslationContext';
@@ -37,7 +38,10 @@ import { useTheme } from '../ThemeContext';
 import { useTelegram } from '../hooks/useTelegram';
 import { SEO } from '../components/SEO';
 import { Logo } from '../components/Logo';
+import { DatabaseService } from '../services/DatabaseService';
+import { BlogPost } from '../types';
 import { AnimatePresence } from 'motion/react';
+import { Loader2 } from 'lucide-react';
 
 const categories = [
   { id: 'all', label: 'Tümü', icon: Layout, color: 'text-slate-600' },
@@ -51,49 +55,6 @@ const categories = [
   { id: 'guides', label: 'Rehberler', icon: BookOpen, color: 'text-rose-500' },
 ];
 
-const mockPosts = [
-  {
-    id: '1',
-    title: 'Telegram Botları ile Pasif Gelir Elde Etme Yöntemleri',
-    excerpt: '2024 yılında popülerleşen yeni nesil botlar ve TON ekosistemi üzerinden nasıl gelir elde edebileceğinizi adım adım anlatıyoruz.',
-    category: 'Para Kazanma',
-    date: '12 Mayıs 2024',
-    readTime: '6 dk okuma',
-    image: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1074&auto=format&fit=crop',
-    author: 'BotlyHub Ekibi'
-  },
-  {
-    id: '2',
-    title: 'TON Ekosisteminde Öne Çıkan 5 Proje',
-    excerpt: 'Geleceğin interneti olarak adlandırılan TON ağında bu ayın en çok ses getiren ve kullanım oranı artan projelerini inceledik.',
-    category: 'TON Ekosistemi',
-    date: '10 Mayıs 2024',
-    readTime: '4 dk okuma',
-    image: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=1170&auto=format&fit=crop',
-    author: 'Analiz Ekibi'
-  },
-  {
-    id: '3',
-    title: 'Yapay Zeka Destekli Trading Botları Güvenli mi?',
-    excerpt: 'Kendi başlarına işlem yapabilen AI botların riskleri, avantajları ve dikkat edilmesi gereken güvenlik önlemleri.',
-    category: 'Yapay Zeka Araçları',
-    date: '08 Mayıs 2024',
-    readTime: '8 dk okuma',
-    image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=1332&auto=format&fit=crop',
-    author: 'Teknoloji Editörü'
-  },
-  {
-    id: '4',
-    title: 'Telegram Mini Apps (TMA) Geliştirme Rehberi',
-    excerpt: 'Sıfırdan bir Telegram uygulaması geliştirmek için bilmeniz gerekenler, framework seçimleri ve dağıtım süreci.',
-    category: 'Rehberler',
-    date: '05 Mayıs 2024',
-    readTime: '12 dk okuma',
-    image: 'https://images.unsplash.com/photo-1551033406-611cf9a28f67?q=80&w=1074&auto=format&fit=crop',
-    author: 'Geliştirici Grubu'
-  }
-];
-
 const BlogPage: React.FC = () => {
   const navigate = useNavigate();
   const { t, language, setLanguage } = useTranslation();
@@ -104,6 +65,23 @@ const BlogPage: React.FC = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [blogs, setBlogs] = useState<BlogPost[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      setIsLoading(true);
+      try {
+        const data = await DatabaseService.getBlogs();
+        setBlogs(data);
+      } catch (err) {
+        console.error("Fetch Blogs Error:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchBlogs();
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -119,11 +97,15 @@ const BlogPage: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const filteredPosts = activeCategory === 'all' 
-    ? (searchQuery 
-        ? mockPosts.filter(p => p.title.toLowerCase().includes(searchQuery.toLowerCase()) || p.excerpt.toLowerCase().includes(searchQuery.toLowerCase()))
-        : mockPosts)
-    : mockPosts.filter(post => post.category === categories.find(c => c.id === activeCategory)?.label);
+  const filteredPosts = blogs.filter(post => {
+    const matchesCategory = activeCategory === 'all' || post.category === categories.find(c => c.id === activeCategory)?.label;
+    const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                         post.excerpt?.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
+
+  const featuredPost = blogs.find(b => b.isFeatured) || blogs[0];
+  const regularPosts = featuredPost ? filteredPosts.filter(p => p.id !== featuredPost.id) : filteredPosts;
 
   return (
     <div className="bg-[#fcfcfc] dark:bg-slate-950 min-h-screen text-slate-900 dark:text-slate-100 font-sans">
@@ -174,15 +156,15 @@ const BlogPage: React.FC = () => {
               <div className="max-h-[60vh] overflow-y-auto p-4 no-scrollbar">
                 {searchQuery.length > 0 ? (
                   <div className="space-y-2">
-                    {mockPosts.filter(p => p.title.toLowerCase().includes(searchQuery.toLowerCase())).length > 0 ? (
-                      mockPosts.filter(p => p.title.toLowerCase().includes(searchQuery.toLowerCase())).map(post => (
+                    {blogs.filter(p => p.title.toLowerCase().includes(searchQuery.toLowerCase())).length > 0 ? (
+                      blogs.filter(p => p.title.toLowerCase().includes(searchQuery.toLowerCase())).map(post => (
                         <button 
                           key={post.id}
                           onClick={() => { navigate('/blog/' + post.id); setIsSearchModalOpen(false); }}
                           className="w-full flex items-center gap-4 p-4 hover:bg-slate-50 dark:hover:bg-white/5 rounded-2xl transition-all text-left group"
                         >
                           <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-slate-100">
-                            <img src={post.image} alt="" className="w-full h-full object-cover" />
+                            {post.image ? <img src={post.image} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" /> : <div className="w-full h-full flex items-center justify-center bg-slate-200 dark:bg-slate-800"><BookOpen size={20}/></div>}
                           </div>
                           <div>
                             <h4 className="font-bold text-slate-900 dark:text-white group-hover:text-blue-500 transition-colors">{post.title}</h4>
@@ -266,41 +248,49 @@ const BlogPage: React.FC = () => {
               </div>
             </nav>
 
-            <div className="mt-6 flex flex-col gap-3">
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  onClick={() => { haptic('light'); toggleTheme(); }}
-                  className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white font-bold"
-                >
-                  {theme === 'dark' ? <Sun size={24} className="text-yellow-400" /> : <Moon size={24} className="text-blue-500" />}
-                  {theme === 'dark' ? 'Gündüz' : 'Gece'}
-                </button>
+            <div className="mt-auto pt-6 border-t border-slate-100 dark:border-white/5 space-y-4">
+               <div className="p-4 bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-500/10 dark:to-blue-500/10 rounded-2xl border border-blue-100/50 dark:border-blue-500/20">
+                  <h4 className="text-xs font-black text-blue-900 dark:text-blue-200 uppercase tracking-widest mb-2">PRO Sürüm</h4>
+                  <p className="text-[11px] text-blue-700/70 dark:text-blue-400/70 mb-3 leading-relaxed">Gelişmiş analizlere ve özel rehberlere erişin.</p>
+                  <button onClick={() => { haptic('light'); navigate('/premium'); }} className="w-full py-2 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20">YÜKSELT</button>
+               </div>
 
-                <button
-                  onClick={() => { haptic('light'); setIsSearchModalOpen(true); setIsMobileMenuOpen(false); }}
-                  className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white font-bold"
-                >
-                  <Search size={24} className="text-blue-500" />
-                  Ara
-                </button>
-              </div>
+              <div className="flex flex-col gap-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => { haptic('light'); toggleTheme(); }}
+                    className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white font-bold"
+                  >
+                    {theme === 'dark' ? <Sun size={24} className="text-yellow-400" /> : <Moon size={24} className="text-blue-500" />}
+                    {theme === 'dark' ? 'Gündüz' : 'Gece'}
+                  </button>
 
-              <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 overflow-x-auto no-scrollbar">
-                <Globe size={24} className="text-slate-400 shrink-0" />
-                <div className="flex gap-2">
-                  {(['tr', 'en', 'ru'] as const).map((lang) => (
-                    <button
-                      key={lang}
-                      onClick={() => { haptic('light'); setLanguage(lang); }}
-                      className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
-                        language === lang 
-                          ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' 
-                          : 'bg-white dark:bg-white/5 text-slate-400'
-                      }`}
-                    >
-                      {lang === 'tr' ? 'Türkçe' : lang === 'en' ? 'English' : 'Русский'}
-                    </button>
-                  ))}
+                  <button
+                    onClick={() => { haptic('light'); setIsSearchModalOpen(true); setIsMobileMenuOpen(false); }}
+                    className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white font-bold"
+                  >
+                    <Search size={24} className="text-blue-500" />
+                    Ara
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 h-[64px]">
+                  <Globe size={24} className="text-slate-400 shrink-0" />
+                  <div className="flex flex-1 gap-2">
+                    {(['tr', 'en', 'ru'] as const).map((lang) => (
+                      <button
+                        key={lang}
+                        onClick={() => { haptic('light'); setLanguage(lang); }}
+                        className={`flex-1 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                          language === lang 
+                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' 
+                            : 'bg-white dark:bg-white/5 text-slate-400'
+                        }`}
+                      >
+                        {lang}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -388,7 +378,7 @@ const BlogPage: React.FC = () => {
                 <PenTool size={20} className="group-hover:rotate-12 transition-transform" />
                 {!isSidebarCollapsed && <span>Yazı Yaz</span>}
                 {isSidebarCollapsed && (
-                  <div className="absolute left-full ml-3 px-3 py-1.5 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 shadow-xl">
+                  <div className="absolute left-full ml-3 px-3 py-1.5 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-[1001] shadow-xl">
                     Yazı Yaz
                     <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-slate-900 rotate-45"></div>
                   </div>
@@ -401,7 +391,7 @@ const BlogPage: React.FC = () => {
                 <FileText size={20} />
                 {!isSidebarCollapsed && <span>Taslaklar</span>}
                 {isSidebarCollapsed && (
-                  <div className="absolute left-full ml-3 px-3 py-1.5 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 shadow-xl">
+                  <div className="absolute left-full ml-3 px-3 py-1.5 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-[1001] shadow-xl">
                     Taslaklar
                     <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-slate-900 rotate-45"></div>
                   </div>
@@ -423,7 +413,7 @@ const BlogPage: React.FC = () => {
               <button
                 onClick={() => toggleTheme()}
                 title={theme === 'dark' ? 'Gündüz Modu' : 'Gece Modu'}
-                className="p-2.5 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 transition-all flex-1 flex justify-center"
+                className="h-[38px] rounded-xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 transition-all flex-1 flex items-center justify-center"
               >
                 {theme === 'dark' ? <Sun size={18} className="text-yellow-400" /> : <Moon size={18} className="text-blue-500" />}
               </button>
@@ -501,77 +491,127 @@ const BlogPage: React.FC = () => {
           </div>
 
           <div className="space-y-12">
-            {filteredPosts.length === 0 ? (
+            {isLoading ? (
+              <div className="py-32 flex flex-col items-center justify-center space-y-6">
+                 <Loader2 className="animate-spin text-blue-500" size={48} />
+                 <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 animate-pulse">İçerikler Yükleniyor...</p>
+              </div>
+            ) : filteredPosts.length === 0 ? (
               <div className="py-20 text-center">
                 <p className="text-slate-400 font-bold uppercase tracking-widest">Bu kategoride henüz yazı bulunmuyor.</p>
               </div>
             ) : (
               <>
                 {/* Featured Post - First post of filtered list */}
-                {activeCategory === 'all' && (
+                {activeCategory === 'all' && featuredPost && (
                   <motion.div 
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    onClick={() => { haptic('light'); navigate('/blog/' + mockPosts[0].id); }}
-                    className="group cursor-pointer"
+                    onClick={() => { haptic('light'); navigate('/blog/' + featuredPost.id); }}
+                    className="group cursor-pointer bg-white dark:bg-slate-900/40 p-6 md:p-8 rounded-[44px] border border-slate-100 dark:border-white/5 hover:border-blue-500/30 transition-all shadow-xl shadow-slate-200/20 dark:shadow-none"
                   >
-                    <div className="aspect-[16/9] md:aspect-[2/1] rounded-2xl overflow-hidden mb-6 bg-slate-100 dark:bg-slate-900 shadow-sm">
-                      <img 
-                        src={mockPosts[0].image} 
-                        alt={mockPosts[0].title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                      />
-                    </div>
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-3">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400">{mockPosts[0].category}</span>
-                        <span className="w-1 h-1 rounded-full bg-slate-300"></span>
-                        <span className="text-[10px] font-bold text-slate-400">{mockPosts[0].date}</span>
+                    <div className="aspect-[16/9] md:aspect-[2.4/1] rounded-[32px] overflow-hidden mb-8 bg-slate-100 dark:bg-slate-900 shadow-2xl relative">
+                      {featuredPost.image ? (
+                        <img 
+                          src={featuredPost.image} 
+                          alt={featuredPost.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
+                          referrerPolicy="no-referrer"
+                        />
+                      ) : (
+                         <div className="w-full h-full flex items-center justify-center bg-slate-950">
+                            <BookOpen size={64} className="text-slate-800" />
+                         </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity"></div>
+                      <div className="absolute bottom-10 left-10 hidden md:block">
+                         <div className="flex items-center gap-3 bg-white/10 backdrop-blur-md px-5 py-3 rounded-2xl border border-white/10">
+                            <Star size={16} className="text-amber-400 fill-amber-400" />
+                            <span className="text-[10px] font-black text-white uppercase tracking-widest">Haftanın Öne Çıkanı</span>
+                         </div>
                       </div>
-                      <h2 className="text-2xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.1] group-hover:text-blue-600 transition-colors">
-                        {mockPosts[0].title}
+                    </div>
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-4">
+                        <span className="px-4 py-1.5 bg-blue-600 text-white text-[9px] font-black uppercase tracking-widest rounded-full">{featuredPost.category}</span>
+                        <div className="flex items-center gap-2 text-slate-400">
+                           <Calendar size={14} />
+                           <span className="text-[10px] font-bold uppercase">{new Date(featuredPost.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-slate-400">
+                           <Clock size={14} />
+                           <span className="text-[10px] font-bold uppercase">{featuredPost.readTime || '5 dk'}</span>
+                        </div>
+                      </div>
+                      <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tighter leading-tight group-hover:text-blue-600 transition-colors italic">
+                        {featuredPost.title}
                       </h2>
-                      <p className="text-sm md:text-lg text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-3">
-                        {mockPosts[0].excerpt}
+                      <p className="text-base md:text-xl text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2 italic font-medium">
+                        {featuredPost.excerpt}
                       </p>
-                      <div className="flex items-center gap-3 pt-2">
-                        <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 font-black text-[10px]">BH</div>
-                        <span className="text-sm font-bold text-slate-700 dark:text-slate-300">{mockPosts[0].author}</span>
+                      <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-white/5">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-[10px] shadow-lg shadow-blue-500/20">BH</div>
+                          <div>
+                            <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider block">{featuredPost.author}</span>
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">BotlyHub Editörü</span>
+                          </div>
+                        </div>
+                        <button className="flex items-center gap-2 text-blue-600 font-black text-[11px] uppercase tracking-widest group/btn hover:mr-2 transition-all">
+                           OKUMAYA BAŞLA <ArrowRight size={18} className="group-hover/btn:translate-x-2 transition-transform" />
+                        </button>
                       </div>
                     </div>
                   </motion.div>
                 )}
 
-                <div className={`grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-16 ${activeCategory === 'all' ? 'py-12 border-t' : ''} border-slate-100 dark:border-white/5`}>
-                  {(activeCategory === 'all' ? filteredPosts.slice(1) : filteredPosts).map((post, idx) => (
+                <div className={`grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-16 ${activeCategory === 'all' ? 'py-20 border-t' : ''} border-slate-100 dark:border-white/5`}>
+                  {regularPosts.map((post, idx) => (
                     <motion.div 
                       key={post.id}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.1 }}
                       onClick={() => { haptic('light'); navigate('/blog/' + post.id); }}
-                      className="group cursor-pointer"
+                      className="group cursor-pointer flex flex-col h-full"
                     >
-                      <div className="aspect-[16/10] rounded-xl overflow-hidden mb-5 bg-slate-100 dark:bg-slate-900 shadow-sm">
-                        <img 
-                          src={post.image} 
-                          alt={post.title}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                        />
-                      </div>
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-black uppercase tracking-wider text-blue-500">{post.category}</span>
+                      <div className="aspect-[16/10] rounded-[32px] overflow-hidden mb-8 bg-slate-100 dark:bg-slate-900 shadow-lg relative">
+                        {post.image ? (
+                          <img 
+                            src={post.image} 
+                            alt={post.title}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+                            referrerPolicy="no-referrer"
+                          />
+                        ) : (
+                           <div className="w-full h-full flex items-center justify-center bg-slate-950">
+                              <BookOpen size={32} className="text-slate-800" />
+                           </div>
+                        )}
+                        <div className="absolute top-6 left-6">
+                           <span className="bg-slate-950/80 backdrop-blur-md px-4 py-2 rounded-xl text-[8px] font-black text-white uppercase tracking-widest border border-white/10">{post.category}</span>
                         </div>
-                        <h3 className="text-lg md:text-xl font-bold text-slate-900 dark:text-white tracking-tight group-hover:text-blue-600 transition-colors line-clamp-2">
+                      </div>
+                      <div className="space-y-4 flex-1 flex flex-col">
+                        <div className="flex items-center gap-4 text-[9px] font-black uppercase tracking-widest text-slate-400 italic">
+                          <span>{new Date(post.created_at).toLocaleDateString('tr-TR')}</span>
+                          <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-800"></span>
+                          <span className="flex items-center gap-1.5"><Clock size={12} className="text-blue-500" /> {post.readTime || '5 dk'}</span>
+                        </div>
+                        <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tighter group-hover:text-blue-600 transition-colors line-clamp-2 italic leading-tight">
                           {post.title}
                         </h3>
-                        <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                        <p className="text-sm text-slate-500 dark:text-slate-500 line-clamp-3 leading-relaxed flex-1 font-medium italic">
                           {post.excerpt}
                         </p>
-                        <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-slate-400 pt-2">
-                          <div className="flex items-center gap-1.5"><Clock size={12} /> {post.readTime}</div>
-                          <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                        <div className="flex items-center justify-between pt-6 group-hover:translate-y-[-4px] transition-transform">
+                          <div className="flex items-center gap-2">
+                             <div className="w-6 h-6 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500 font-black text-[8px]">BH</div>
+                             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">BotlyHub Team</span>
+                          </div>
+                          <div className="w-10 h-10 rounded-full border border-slate-100 dark:border-white/5 flex items-center justify-center group-hover:bg-blue-600 group-hover:border-blue-600 group-hover:text-white transition-all">
+                             <ChevronRight size={18} className="group-hover:translate-x-0.5 transition-transform" />
+                          </div>
                         </div>
                       </div>
                     </motion.div>

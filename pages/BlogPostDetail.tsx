@@ -38,6 +38,9 @@ import { useTranslation } from '../TranslationContext';
 import { useTheme } from '../ThemeContext';
 import { SEO } from '../components/SEO';
 import { Logo } from '../components/Logo';
+import { DatabaseService } from '../services/DatabaseService';
+import { BlogPost } from '../types';
+import { Loader2 } from 'lucide-react';
 
 // Mock data (sharing with BlogPage)
 const mockPosts = [
@@ -97,11 +100,30 @@ const BlogPostDetail: React.FC = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  
-  // Find post (fallback to first one for demo)
-  const post = mockPosts.find(p => p.id === id) || mockPosts[0];
+  const [post, setPost] = useState<BlogPost | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [similarPosts, setSimilarPosts] = useState<BlogPost[]>([]);
+  const [allPosts, setAllPosts] = useState<BlogPost[]>([]);
 
   useEffect(() => {
+    const fetchPost = async () => {
+      if (!id) return;
+      setIsLoading(true);
+      try {
+        const data = await DatabaseService.getBlogById(id);
+        setPost(data);
+        
+        // Fetch similar posts
+        const blogs = await DatabaseService.getBlogs();
+        setAllPosts(blogs);
+        setSimilarPosts(blogs.filter(b => b.id !== id).slice(0, 3));
+      } catch (err) {
+        console.error("Fetch Blog Detail Error:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchPost();
     window.scrollTo(0, 0);
   }, [id]);
 
@@ -118,6 +140,26 @@ const BlogPostDetail: React.FC = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="bg-[#fcfcfc] dark:bg-slate-950 min-h-screen flex flex-col items-center justify-center space-y-6">
+        <Loader2 className="animate-spin text-blue-500" size={48} />
+        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 animate-pulse">İçerik Hazırlanıyor...</p>
+      </div>
+    );
+  }
+
+  if (!post) {
+    return (
+      <div className="bg-[#fcfcfc] dark:bg-slate-950 min-h-screen flex flex-col items-center justify-center space-y-6 p-8 text-center">
+        <BotIcon size={64} className="text-slate-800" />
+        <h2 className="text-2xl font-black uppercase italic tracking-tighter">Yazı <span className="text-red-500">Bulunamadı</span></h2>
+        <p className="text-slate-500 max-w-xs text-sm font-medium">Aradığınız blog yazısı silinmiş veya taşınmış olabilir.</p>
+        <button onClick={() => navigate('/blog')} className="px-8 py-4 bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-blue-500/20">BLOGA DÖN</button>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#fcfcfc] dark:bg-slate-950 min-h-screen text-slate-900 dark:text-slate-100 font-sans">
@@ -177,15 +219,15 @@ const BlogPostDetail: React.FC = () => {
               <div className="max-h-[60vh] overflow-y-auto p-4 no-scrollbar">
                 {searchQuery.length > 0 ? (
                   <div className="space-y-2">
-                    {mockPosts.filter(p => p.title.toLowerCase().includes(searchQuery.toLowerCase())).length > 0 ? (
-                      mockPosts.filter(p => p.title.toLowerCase().includes(searchQuery.toLowerCase())).map(post => (
+                    {allPosts.filter(p => p.title.toLowerCase().includes(searchQuery.toLowerCase())).length > 0 ? (
+                      allPosts.filter(p => p.title.toLowerCase().includes(searchQuery.toLowerCase())).map(post => (
                         <button 
                           key={post.id}
                           onClick={() => { navigate('/blog/' + post.id); setIsSearchModalOpen(false); }}
                           className="w-full flex items-center gap-4 p-4 hover:bg-slate-50 dark:hover:bg-white/5 rounded-2xl transition-all text-left group"
                         >
                           <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-slate-100">
-                            <img src={post.image} alt="" className="w-full h-full object-cover" />
+                            {post.image ? <img src={post.image} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center bg-slate-200 dark:bg-slate-800"><BookOpen size={20}/></div>}
                           </div>
                           <div>
                             <h4 className="font-bold text-slate-900 dark:text-white group-hover:text-blue-500 transition-colors">{post.title}</h4>
@@ -565,12 +607,17 @@ const BlogPostDetail: React.FC = () => {
           <div className="space-y-6">
             <h4 className="px-2 text-[10px] font-black uppercase tracking-widest text-slate-400">BENZER YAZILAR</h4>
             <div className="space-y-4">
-              {[1, 2].map(i => (
-                <div key={i} className="group cursor-pointer">
-                  <h5 className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-blue-500 transition-colors mb-1 line-clamp-2">TON Ekosisteminde Öne Çıkan 5 Proje ve Analiz</h5>
-                  <div className="text-[10px] font-black text-slate-400 uppercase tracking-wider">4 Dakika Okuma</div>
+              {similarPosts.map(p => (
+                <div key={p.id} onClick={() => navigate('/blog/' + p.id)} className="group cursor-pointer">
+                  <h5 className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-blue-500 transition-colors mb-1 line-clamp-2 italic">
+                    {p.title}
+                  </h5>
+                  <div className="text-[10px] font-black text-slate-400 uppercase tracking-wider">{p.readTime || '5 Dakika'} Okuma</div>
                 </div>
               ))}
+              {similarPosts.length === 0 && (
+                 <p className="text-[10px] font-bold text-slate-700 uppercase tracking-widest italic px-2">Gösterilecek benzer yazı yok.</p>
+              )}
             </div>
           </div>
         </aside>

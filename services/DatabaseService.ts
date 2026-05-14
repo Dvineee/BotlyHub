@@ -1,6 +1,6 @@
 
 import { createClient } from '@supabase/supabase-js';
-import { Bot, User, Channel, Announcement, Notification, UserBot, ActivityLog, Promotion, Referral, ReferralSettings } from '../types';
+import { Bot, User, Channel, Announcement, Notification, UserBot, ActivityLog, Promotion, Referral, ReferralSettings, BlogPost } from '../types';
 
 const SUPABASE_URL = (typeof process !== 'undefined' && process.env?.SUPABASE_URL) || 
                     (import.meta.env?.VITE_SUPABASE_URL) || 
@@ -893,6 +893,82 @@ export class DatabaseService {
 
   static async deleteAnnouncement(id: string) {
     const { error } = await supabase.from('announcements').delete().eq('id', id);
+    if (error) throw error;
+  }
+  
+  // --- BLOGS ---
+  static async getBlogs(): Promise<BlogPost[]> {
+    const { data, error } = await supabase
+      .from('blogs')
+      .select('*')
+      .order('created_at', { ascending: false });
+      
+    if (error) {
+        console.error("Blogs Fetch Error:", error);
+        return [];
+    }
+    return (data || []).map(b => ({
+        ...b,
+        readTime: b.read_time,
+        isFeatured: b.is_featured,
+        authorAvatar: b.author_avatar
+    }));
+  }
+
+  static async getBlogById(id: string): Promise<BlogPost | null> {
+    const { data, error } = await supabase
+      .from('blogs')
+      .select('*')
+      .eq('id', id)
+      .maybeSingle();
+      
+    if (error) {
+        console.error("Blog Fetch Error:", error);
+        return null;
+    }
+    if (!data) return null;
+    return {
+        ...data,
+        readTime: data.read_time,
+        isFeatured: data.is_featured,
+        authorAvatar: data.author_avatar
+    };
+  }
+
+  static async saveBlog(blog: Partial<BlogPost>) {
+    const payload: any = {
+        title: blog.title,
+        content: blog.content,
+        excerpt: blog.excerpt,
+        image: blog.image,
+        author: blog.author,
+        author_avatar: blog.authorAvatar,
+        category: blog.category,
+        read_time: blog.readTime,
+        is_featured: blog.isFeatured || false,
+        updated_at: new Date().toISOString()
+    };
+
+    if (blog.id && blog.id !== '') {
+        const { error } = await supabase
+            .from('blogs')
+            .update(payload)
+            .eq('id', blog.id);
+            
+        if (error) throw new Error(`Güncelleme başarısız: ${error.message}`);
+    } else {
+        payload.id = Math.floor(Math.random() * 999999).toString();
+        payload.created_at = new Date().toISOString();
+        const { error } = await supabase
+            .from('blogs')
+            .insert([payload]);
+            
+        if (error) throw new Error(`Ekleme başarısız: ${error.message}`);
+    }
+  }
+
+  static async deleteBlog(id: string) {
+    const { error } = await supabase.from('blogs').delete().eq('id', id);
     if (error) throw error;
   }
 

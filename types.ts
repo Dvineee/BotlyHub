@@ -1,4 +1,20 @@
 
+export interface BlogPost {
+  id: string;
+  title: string;
+  content: string;
+  excerpt: string;
+  image: string;
+  author: string;
+  authorAvatar?: string;
+  category: string;
+  date: string;
+  created_at: string;
+  readTime: string;
+  slug?: string;
+  isFeatured?: boolean;
+}
+
 export interface User {
   id: string;
   name: string;

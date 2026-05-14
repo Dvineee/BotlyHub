@@ -9,7 +9,7 @@ import {
   CheckCircle2, AlertTriangle, TrendingUp, BarChart3, RadioIcon, Sparkles, UserPlus,
   ShieldCheck, ShieldAlert, Globe, Zap, Clock, ExternalLink, Filter, PieChart, Layers, 
   Settings as SettingsIcon, History, Copy, Check, Eye, ChevronRight, Monitor, Smartphone, Cpu, Save, Key,
-  Info, Star, MousePointer2, Link2, AlertCircle, Shield, Calendar, Hash, Heart, Gift, Bot as BotIcon
+  Info, Star, MousePointer2, Link2, AlertCircle, Shield, Calendar, Hash, Heart, Gift, Bot as BotIcon, BookOpen, FileText
 } from 'lucide-react';
 import { DatabaseService } from '../../services/DatabaseService';
 import { GeminiService } from '../../services/GeminiService';
@@ -102,6 +102,7 @@ const AdminDashboard = () => {
             <NavItem to="/a/dashboard/promotions" icon={RadioIcon} label="Tanıtım Motoru" active={location.pathname.startsWith('/a/dashboard/promotions')} onClick={() => setSidebarOpen(false)} />
             <NavItem to="/a/dashboard/announcements" icon={Megaphone} label="Duyuru Merkezi" active={location.pathname.startsWith('/a/dashboard/announcements')} onClick={() => setSidebarOpen(false)} />
             <NavItem to="/a/dashboard/notifications" icon={Bell} label="Bildirim Gönder" active={location.pathname.startsWith('/a/dashboard/notifications')} onClick={() => setSidebarOpen(false)} />
+            <NavItem to="/a/dashboard/blogs" icon={BookOpen} label="Blog Yönetimi" active={location.pathname.startsWith('/a/dashboard/blogs')} onClick={() => setSidebarOpen(false)} />
             
             <div className="pt-8 pb-3 px-6"><span className="text-[9px] font-black text-slate-600 uppercase tracking-widest italic">Sistem</span></div>
             <NavItem to="/a/dashboard/settings" icon={SettingsIcon} label="Sistem Ayarları" active={location.pathname.startsWith('/a/dashboard/settings')} onClick={() => setSidebarOpen(false)} />
@@ -154,6 +155,7 @@ const AdminDashboard = () => {
               <Route path="promotions" element={<PromotionManagement />} />
               <Route path="announcements" element={<AnnouncementCenter />} />
               <Route path="notifications" element={<NotificationCenter />} />
+              <Route path="blogs" element={<BlogManagement />} />
               <Route path="settings" element={<SettingsManager />} />
             </Routes>
           </div>
@@ -3319,6 +3321,333 @@ const ReferralManagement = () => {
                                     AYARLARI KAYDET
                                 </button>
                             </form>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+const BlogManagement = () => {
+    const [blogs, setBlogs] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingBlog, setEditingBlog] = useState<any>(null);
+    const [activeTab, setActiveTab] = useState<'content' | 'meta' | 'settings'>('content');
+    const [searchQuery, setSearchQuery] = useState('');
+
+    const load = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            const data = await DatabaseService.getBlogs();
+            setBlogs(data);
+        } catch (e) {
+            console.error("Blogs Load Error:", e);
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    useEffect(() => { load(); }, [load]);
+
+    const openCreateModal = () => {
+        setEditingBlog({
+            id: '',
+            title: '',
+            content: '',
+            excerpt: '',
+            image: '',
+            author: 'BotlyHub Team',
+            category: 'Haberler',
+            date: new Date().toISOString(),
+            readTime: '5 dk',
+            isFeatured: false,
+            slug: ''
+        });
+        setIsModalOpen(true);
+        setActiveTab('content');
+    };
+
+    const handleSave = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            const payload = { ...editingBlog };
+            if (!payload.slug) {
+                payload.slug = payload.title.toLowerCase()
+                    .replace(/ /g, '-')
+                    .replace(/[^\w-]+/g, '');
+            }
+            if (!payload.id || payload.id === '') {
+                delete payload.id;
+            }
+            await DatabaseService.saveBlog(payload);
+            await DatabaseService.logActivity('admin', 'system', 'blog_saved', 'Blog Kaydedildi', `${editingBlog.title} başlıklı blog güncellendi/oluşturuldu.`);
+            setIsModalOpen(false);
+            load();
+            alert('Blog başarıyla kaydedildi.');
+        } catch (err: any) {
+            console.error("Save Blog Error:", err);
+            alert(`Hata: ${err.message || 'Blog kaydedilemedi.'}`);
+        }
+    };
+
+    const filteredBlogs = blogs.filter(b => 
+        b.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        b.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        b.category.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    return (
+        <div className="space-y-12 animate-in fade-in">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <div>
+                    <h2 className="text-3xl lg:text-4xl font-black text-white italic uppercase tracking-tighter leading-none">Blog <span className="text-blue-500">Merkezi</span></h2>
+                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em] mt-2 italic">İçerik stratejinizi ve blog yazılarını yönetin</p>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+                    <div className="relative group">
+                        <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-700 group-focus-within:text-blue-500 transition-colors" size={18} />
+                        <input 
+                            type="text"
+                            placeholder="BLOG ARA..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full sm:w-80 h-14 bg-slate-950 border border-white/5 rounded-[22px] pl-14 pr-8 text-[11px] font-black text-white outline-none focus:border-blue-500 transition-all uppercase italic "
+                        />
+                    </div>
+                    <button 
+                        onClick={openCreateModal}
+                        className="bg-blue-600 hover:bg-blue-500 px-8 py-5 rounded-[24px] text-[10px] font-black uppercase tracking-[0.4em] transition-all active:scale-95 flex items-center justify-center gap-3 border-b-4 border-blue-800"
+                    >
+                        <Plus size={18} /> YENİ YAZI OLUŞTUR
+                    </button>
+                </div>
+            </div>
+
+            {isLoading ? (
+                <div className="flex justify-center py-32"><Loader2 className="animate-spin text-blue-500" size={40} /></div>
+            ) : filteredBlogs.length === 0 ? (
+                <div className="py-32 text-center bg-slate-900/20 rounded-[44px] border-2 border-dashed border-slate-900">
+                    <FileText size={48} className="mx-auto text-slate-600 mb-4" />
+                    <p className="text-slate-500 text-sm font-bold uppercase tracking-widest">Blog Yazısı Bulunmuyor</p>
+                    <p className="text-[10px] text-slate-700 mt-2 italic font-medium">İlk blog yazınızı oluşturarak başlayın.</p>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                    {filteredBlogs.map(blog => (
+                        <div key={blog.id} className="bg-slate-900/40 border border-white/5 rounded-[44px] overflow-hidden flex flex-col group hover:border-blue-500/30 transition-all relative backdrop-blur-sm">
+                            <div className="h-48 relative overflow-hidden">
+                                {blog.image ? (
+                                    <img src={blog.image} alt={blog.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" referrerPolicy="no-referrer" />
+                                ) : (
+                                    <div className="w-full h-full bg-slate-950 flex items-center justify-center text-slate-800">
+                                        <BookOpen size={48} />
+                                    </div>
+                                )}
+                                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent"></div>
+                                <div className="absolute top-6 left-6">
+                                    <span className="bg-blue-600/90 backdrop-blur-md text-white text-[8px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border border-white/10">{blog.category}</span>
+                                </div>
+                                {blog.is_featured && (
+                                    <div className="absolute top-6 right-6">
+                                        <div className="bg-amber-500 p-2 rounded-xl text-white shadow-lg shadow-amber-500/20">
+                                            <Star size={14} />
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="p-8 space-y-4 flex-1 flex flex-col">
+                                <h4 className="text-xl font-black text-white italic uppercase tracking-tighter leading-tight group-hover:text-blue-400 transition-colors line-clamp-2">
+                                    {blog.title}
+                                </h4>
+                                <p className="text-[10px] text-slate-500 line-clamp-2 leading-relaxed font-bold uppercase italic flex-1">
+                                    {blog.excerpt || 'Özet belirtilmemiş.'}
+                                </p>
+
+                                <div className="pt-6 border-t border-white/5 flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <Clock size={12} className="text-slate-600" />
+                                        <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">{blog.read_time || '5 dk'}</span>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <button onClick={() => { setEditingBlog(blog); setIsModalOpen(true); setActiveTab('content'); }} className="p-3 bg-white/5 rounded-xl hover:bg-blue-600 text-slate-500 hover:text-white transition-all">
+                                            <Edit3 size={18}/>
+                                        </button>
+                                        <button onClick={async () => { if(confirm('Bu yazıyı silmek istediğinizde emin misiniz?')) { await DatabaseService.deleteBlog(blog.id); await DatabaseService.logActivity('admin', 'system', 'blog_deleted', 'Blog Silindi', `${blog.title} başlıklı blog silindi.`); load(); } }} className="p-3 bg-white/5 rounded-xl text-red-500 hover:bg-red-500 hover:text-white transition-all">
+                                            <Trash2 size={18}/>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {isModalOpen && editingBlog && (
+                <div className="fixed inset-0 z-[110] bg-black/95 flex items-end lg:items-center justify-center p-0 lg:p-8 backdrop-blur-3xl animate-in slide-in-from-bottom lg:fade-in">
+                    <div className="bg-[#020617] border-t lg:border border-white/10 rounded-t-[40px] lg:rounded-[64px] w-full max-w-6xl h-[94vh] lg:h-[90vh] flex flex-col lg:flex-row overflow-hidden relative">
+                        
+                        <button onClick={() => setIsModalOpen(false)} className="absolute top-6 right-6 lg:top-8 lg:right-8 z-[120] p-3 lg:p-4 bg-white/5 rounded-2xl hover:bg-red-600 transition-all active:scale-90">
+                            <X size={20} />
+                        </button>
+
+                        <div className="flex-1 flex flex-col overflow-hidden">
+                            <div className="p-8 lg:p-12 pb-4 lg:pb-0 space-y-8">
+                                <div className="flex items-center gap-5">
+                                    <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-[20px] flex items-center justify-center rotate-3">
+                                        <BookOpen size={24} className="text-white"/>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-2xl lg:text-3xl font-black uppercase italic tracking-tighter">İçerik <span className="text-blue-500">Editörü</span></h3>
+                                        <p className="text-[9px] font-black text-slate-700 uppercase tracking-[0.4em] mt-1 italic">BLOG POST COMPOSER V1.0</p>
+                                    </div>
+                                </div>
+
+                                <div className="flex gap-2 bg-white/5 p-1.5 rounded-3xl border border-white/5">
+                                    {['content', 'meta', 'settings'].map(tab => (
+                                        <button 
+                                            key={tab}
+                                            onClick={() => setActiveTab(tab as any)}
+                                            className={`flex-1 py-3 lg:py-4 rounded-[20px] lg:rounded-[22px] text-[9px] font-black uppercase tracking-widest transition-all ${activeTab === tab ? 'bg-blue-600 text-white  ' : 'text-slate-500 hover:bg-white/5'}`}
+                                        >
+                                            {tab === 'content' ? 'İÇERİK' : tab === 'meta' ? 'META VERİ' : 'AYARLAR'}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="flex-1 overflow-y-auto p-8 lg:p-12 space-y-8 pb-32 lg:pb-12">
+                                <form onSubmit={handleSave} className="space-y-8">
+                                    
+                                    {activeTab === 'content' && (
+                                        <div className="space-y-8 animate-in slide-in-from-left-4">
+                                            <AdminInput label="BAŞLIK" value={editingBlog.title} onChange={(v:any)=>setEditingBlog({...editingBlog, title:v})} />
+                                            <div className="space-y-2">
+                                                <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">İÇERİK (HTML/MARKDOWN DESTEKLİ)</label>
+                                                <textarea 
+                                                    value={editingBlog.content} 
+                                                    onChange={e => setEditingBlog({...editingBlog, content: e.target.value})} 
+                                                    className="w-full bg-slate-950 border border-white/5 p-8 rounded-[36px] lg:rounded-[44px] text-[11px] font-black h-96 outline-none text-slate-400 focus:border-blue-500/30 italic leading-relaxed" 
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {activeTab === 'meta' && (
+                                        <div className="space-y-8 animate-in slide-in-from-left-4">
+                                            <div className="space-y-2">
+                                                <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">ÖZET (EXCERPT)</label>
+                                                <textarea 
+                                                    value={editingBlog.excerpt} 
+                                                    onChange={e => setEditingBlog({...editingBlog, excerpt: e.target.value})} 
+                                                    className="w-full h-32 bg-slate-950 border border-white/5 rounded-[22px] lg:rounded-[28px] px-8 py-6 text-[11px] font-black text-white outline-none focus:border-blue-500 uppercase italic " 
+                                                />
+                                            </div>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                                <AdminInput label="KATEGORİ" value={editingBlog.category} onChange={(v:any)=>setEditingBlog({...editingBlog, category:v})} />
+                                                <AdminInput label="OKUMA SÜRESİ (ÖR: 5 dk)" value={editingBlog.readTime} onChange={(v:any)=>setEditingBlog({...editingBlog, readTime:v})} />
+                                            </div>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                                <AdminInput label="YAZAR" value={editingBlog.author} onChange={(v:any)=>setEditingBlog({...editingBlog, author:v})} />
+                                                <AdminInput label="SLUG (OPSİYONEL)" value={editingBlog.slug} onChange={(v:any)=>setEditingBlog({...editingBlog, slug:v})} placeholder="baslik-url-formatinda" />
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {activeTab === 'settings' && (
+                                        <div className="space-y-8 animate-in slide-in-from-left-4">
+                                            <AdminInput label="ÖNE ÇIKAN GÖRSEL URL" value={editingBlog.image} onChange={(v:any)=>setEditingBlog({...editingBlog, image:v})} icon={ImageIcon} />
+                                            
+                                            <div className="flex items-center justify-between p-8 bg-white/5 rounded-[36px] border border-white/5">
+                                                <div>
+                                                    <p className="text-sm font-black text-white italic uppercase tracking-tighter">ÖNE ÇIKAN YAZI</p>
+                                                    <p className="text-[10px] text-slate-500 font-bold uppercase mt-1 italic tracking-widest">BLOG ANA SAYFASINDA EN ÜSTTE GÖRÜNÜR</p>
+                                                </div>
+                                                <button 
+                                                    type="button"
+                                                    onClick={() => setEditingBlog({...editingBlog, isFeatured: !editingBlog.isFeatured})}
+                                                    className={`w-16 h-8 rounded-full transition-all relative ${editingBlog.isFeatured ? 'bg-amber-500' : 'bg-slate-800'}`}
+                                                >
+                                                    <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-all ${editingBlog.isFeatured ? 'left-9' : 'left-1'}`} />
+                                                </button>
+                                            </div>
+
+                                            <div className="p-8 bg-blue-500/5 border border-blue-500/10 rounded-[36px] flex items-start gap-4">
+                                                <div className="p-3 bg-blue-500/10 rounded-2xl text-blue-500">
+                                                    <Info size={20} />
+                                                </div>
+                                                <div>
+                                                    <p className="text-[11px] font-black text-blue-500 uppercase tracking-widest mb-1">SEO İPUCU</p>
+                                                    <p className="text-[9px] text-slate-500 font-bold uppercase italic leading-relaxed">
+                                                        Blog yazısı yayınlandığında ana sayfa ve bot detay sayfalarında çapraz referans olarak görünecektir. Google SEO puanını artırmak için açıklayıcı başlıklar (H1, H2) kullanmaya özen gösterin.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div className="fixed lg:relative bottom-0 left-0 right-0 p-6 lg:p-0 bg-gradient-to-t from-[#020617] lg:from-transparent via-[#020617]/90 lg:via-transparent to-transparent z-[130]">
+                                        <button type="submit" className="w-full h-16 lg:h-24 bg-blue-600 text-white rounded-2xl lg:rounded-[32px] font-black text-[12px] uppercase tracking-[0.4em] transition-all border-b-8 border-blue-800 active:translate-y-1 active:border-b-4 flex items-center justify-center gap-4">
+                                            <Send size={20} /> YAZIYI YAYINLA
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        {/* RIGHT: LIVE BLOG PREVIEW SIMULATOR */}
+                        <div className="hidden lg:flex w-[480px] bg-slate-950/40 border-l border-white/5 p-12 flex-col items-center justify-center bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/10 via-transparent to-transparent">
+                            <div className="text-center mb-12 space-y-3">
+                                <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.6em] italic block">PREVIEW ENGINE</span>
+                                <h4 className="text-xl font-black text-white italic tracking-widest opacity-20 uppercase">Mobile Simulator</h4>
+                            </div>
+
+                            <div className="w-full max-w-[320px] aspect-[9/16] bg-slate-900 border-4 border-slate-800 rounded-[56px] overflow-hidden shadow-2xl relative">
+                                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-slate-800 rounded-b-2xl z-20"></div>
+                                
+                                <div className="h-full flex flex-col bg-[#020617]">
+                                    <div className="h-40 bg-slate-800 relative shrink-0">
+                                        {editingBlog.image ? (
+                                            <img src={editingBlog.image} alt="" className="w-full h-full object-cover opacity-60" referrerPolicy="no-referrer" />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center">
+                                                <ImageIcon size={32} className="text-slate-700" />
+                                            </div>
+                                        )}
+                                        <div className="absolute bottom-4 left-6">
+                                            <span className="bg-blue-600 text-[7px] font-black p-1.5 rounded-md text-white uppercase">{editingBlog.category || 'Haberler'}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="p-6 space-y-4">
+                                        <h5 className="text-white font-black text-lg italic uppercase leading-tight line-clamp-3">
+                                            {editingBlog.title || 'TASLAK BAŞLIK'}
+                                        </h5>
+                                        <div className="flex items-center gap-3 text-slate-500">
+                                            <div className="w-4 h-4 rounded-full bg-blue-600/20 flex items-center justify-center">
+                                                <UserPlus size={8} className="text-blue-500" />
+                                            </div>
+                                            <span className="text-[8px] font-black uppercase text-slate-600 italic">@{editingBlog.author.replace(/ /g, '').toLowerCase()}</span>
+                                        </div>
+                                        <div className="space-y-2 opacity-30">
+                                            <div className="h-2 w-full bg-slate-700 rounded-full"></div>
+                                            <div className="h-2 w-full bg-slate-700 rounded-full"></div>
+                                            <div className="h-2 w-3/4 bg-slate-700 rounded-full"></div>
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-auto p-6">
+                                        <div className="w-full h-10 bg-blue-600/10 border border-blue-500/20 rounded-xl flex items-center justify-center">
+                                            <span className="text-blue-500 text-[8px] font-black uppercase tracking-widest">DEVAMINI OKU</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <p className="text-[9px] font-black text-slate-700 uppercase tracking-widest mt-12 italic">Cihaz bazlı görünüm simülasyonu</p>
                         </div>
                     </div>
                 </div>
