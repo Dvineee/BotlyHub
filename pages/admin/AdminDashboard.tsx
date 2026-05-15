@@ -3584,36 +3584,58 @@ const BlogManagement = () => {
                                         <p className="text-[9px] font-black text-slate-700 uppercase tracking-[0.4em] mt-1 italic">BLOG POST COMPOSER V1.0</p>
                                     </div>
                                 </div>
-
-                                <div className="flex gap-2 bg-white/5 p-1.5 rounded-3xl border border-white/5">
-                                    {['content', 'meta', 'hashtags', 'settings'].map(tab => (
-                                        <button 
-                                            key={tab}
-                                            onClick={() => setActiveTab(tab as any)}
-                                            className={`flex-1 py-3 lg:py-4 rounded-[20px] lg:rounded-[22px] text-[9px] font-black uppercase tracking-widest transition-all ${activeTab === tab ? 'bg-blue-600 text-white  ' : 'text-slate-500 hover:bg-white/5'}`}
-                                        >
-                                            {tab === 'content' ? 'İÇERİK' : tab === 'meta' ? 'META VERİ' : tab === 'hashtags' ? 'HASHTAGLER' : 'AYARLAR'}
-                                        </button>
-                                    ))}
-                                </div>
                             </div>
 
-                            <div className="flex-1 overflow-y-auto p-8 lg:p-12 space-y-8 pb-32 lg:pb-12">
-                                <form onSubmit={handleSave} className="space-y-8">
-                                    
-                                    {activeTab === 'content' && (
-                                        <div className="space-y-8 animate-in slide-in-from-left-4">
-                                            <AdminInput label="BAŞLIK" value={editingBlog.title} onChange={(v:any)=>setEditingBlog({...editingBlog, title:v})} />
-                                            <div className="space-y-2">
-                                                <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">İÇERİK (HTML/MARKDOWN DESTEKLİ)</label>
-                                                <textarea 
-                                                    value={editingBlog.content} 
-                                                    onChange={e => setEditingBlog({...editingBlog, content: e.target.value})} 
-                                                    className="w-full bg-slate-950 border border-white/5 p-8 rounded-[36px] lg:rounded-[44px] text-[11px] font-black h-96 outline-none text-slate-400 focus:border-blue-500/30 italic leading-relaxed" 
-                                                />
+                            <div className="flex-1 overflow-y-auto p-12 no-scrollbar">
+                                <div className="max-w-4xl mx-auto space-y-12">
+                                    <div className="flex gap-2 bg-slate-950/50 p-1.5 rounded-[28px] border border-white/5">
+                                        {['content', 'meta', 'hashtags', 'settings'].map(tab => (
+                                            <button 
+                                                key={tab}
+                                                type="button"
+                                                onClick={() => setActiveTab(tab as any)}
+                                                className={`flex-1 py-4 lg:py-5 rounded-[22px] lg:rounded-[24px] text-[9px] font-black uppercase tracking-[0.2em] transition-all relative ${activeTab === tab ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/20' : 'text-slate-500 hover:bg-white/5 hover:text-slate-400'}`}
+                                            >
+                                                {tab === 'content' ? 'İÇERİK FABRİKASI' : tab === 'meta' ? 'YAYIN BİLGİLERİ' : tab === 'hashtags' ? 'TAG ANALİZİ' : 'GELİŞMİŞ'}
+                                                {activeTab === tab && <motion.div layoutId="activeTab" className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-white rounded-full" />}
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                    <form onSubmit={handleSave} className="space-y-12">
+                                        
+                                        {activeTab === 'content' && (
+                                            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                                <div className="space-y-4">
+                                                    <div className="flex items-center justify-between px-4">
+                                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Yazı Başlığı</label>
+                                                        <span className="text-[8px] font-black text-blue-500/50 uppercase tracking-widest italic">{(editingBlog.title || '').length} Karakter</span>
+                                                    </div>
+                                                    <input 
+                                                        value={editingBlog.title} 
+                                                        onChange={e => setEditingBlog({...editingBlog, title: e.target.value})} 
+                                                        placeholder="Etkileyici bir başlık girin..."
+                                                        className="w-full h-20 lg:h-24 bg-slate-950 border border-white/5 p-8 rounded-[36px] text-xl lg:text-3xl font-black text-white outline-none focus:border-blue-500/30 uppercase italic leading-tight placeholder:opacity-20" 
+                                                    />
+                                                </div>
+                                                
+                                                <div className="space-y-4">
+                                                    <div className="flex items-center justify-between px-4">
+                                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Ana İçerik (Markdown/HTML)</label>
+                                                        <div className="flex items-center gap-3">
+                                                            <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest italic">{(editingBlog.content || '').length} Karakter</span>
+                                                            <div className="w-1 h-1 rounded-full bg-slate-800" />
+                                                            <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest italic">{editingBlog.readTime} Tahmini</span>
+                                                        </div>
+                                                    </div>
+                                                    <textarea 
+                                                        value={editingBlog.content} 
+                                                        onChange={e => setEditingBlog({...editingBlog, content: e.target.value})} 
+                                                        className="w-full bg-slate-950 border border-white/5 p-8 rounded-[44px] text-[12px] font-medium h-[400px] lg:h-[500px] outline-none text-slate-300 focus:border-blue-500/20 italic leading-relaxed no-scrollbar resize-none" 
+                                                    />
+                                                </div>
                                             </div>
-                                        </div>
-                                    )}
+                                        )}
 
                                     {activeTab === 'meta' && (
                                         <div className="space-y-8 animate-in slide-in-from-left-4">
@@ -3724,6 +3746,7 @@ const BlogManagement = () => {
                                 </form>
                             </div>
                         </div>
+                    </div>
 
                         {/* RIGHT: LIVE BLOG PREVIEW SIMULATOR */}
                         <div className="hidden lg:flex w-[480px] bg-slate-950/40 border-l border-white/5 p-12 flex-col items-center justify-center bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/10 via-transparent to-transparent">

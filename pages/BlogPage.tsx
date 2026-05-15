@@ -70,6 +70,7 @@ const BlogPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [trendHashtags, setTrendHashtags] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchBlogs = async () => {
@@ -77,6 +78,20 @@ const BlogPage: React.FC = () => {
       try {
         const data = await DatabaseService.getBlogs();
         setBlogs(data);
+        
+        // Calculate trend hashtags
+        const tagCounts: { [key: string]: number } = {};
+        data.forEach(blog => {
+          blog.hashtags?.forEach(tag => {
+            tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+          });
+        });
+        const sortedTags = Object.entries(tagCounts)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 10)
+          .map(entry => entry[0]);
+        
+        setTrendHashtags(sortedTags.length > 0 ? sortedTags : ['TON', 'PassiveIncome', 'AIBots', 'MiniApps', 'Web3']);
       } catch (err) {
         console.error("Fetch Blogs Error:", err);
       } finally {
@@ -772,9 +787,13 @@ const BlogPage: React.FC = () => {
           <div className="space-y-6">
             <h4 className="px-2 text-[10px] font-black uppercase tracking-widest text-slate-400">TREND ETİKETLER</h4>
             <div className="flex flex-wrap gap-2">
-              {['#TON', '#PassiveIncome', '#AIBots', '#MiniApps', '#Web3'].map(tag => (
-                <button key={tag} className="px-3 py-1.5 rounded-lg bg-white dark:bg-white/5 border border-slate-100 dark:border-white/5 text-[11px] font-bold text-slate-600 dark:text-slate-400 hover:border-blue-500 hover:text-blue-500 transition-all">
-                  {tag}
+              {trendHashtags.map(tag => (
+                <button 
+                  key={tag} 
+                  onClick={() => { haptic('light'); setSearchQuery(tag); setIsSearchModalOpen(true); }}
+                  className="px-3 py-1.5 rounded-lg bg-white dark:bg-white/5 border border-slate-100 dark:border-white/5 text-[11px] font-bold text-slate-600 dark:text-slate-400 hover:border-blue-500 hover:text-blue-500 transition-all font-black uppercase tracking-widest"
+                >
+                  #{tag}
                 </button>
               ))}
             </div>
