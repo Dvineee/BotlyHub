@@ -961,10 +961,10 @@ const Home = () => {
               {!isLoading && (
                   <>
                     <div className="mb-10 sm:mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700 text-center">
-                        <h1 className="text-3xl sm:text-5xl md:text-[2.75rem] font-bold tracking-[-0.035em] md:leading-none leading-tight text-slate-900 dark:text-white">
+                        <h1 className="mobile-hero-title font-bold tracking-[-0.035em] md:leading-none leading-tight text-slate-900 dark:text-white">
                             BotlyHub: En Gelişmiş <span className="text-blue-500">Telegram Bot Platformu</span>
                         </h1>
-                        <p className="mt-6 text-slate-500 dark:text-slate-400 text-sm sm:text-base font-medium max-w-2xl mx-auto uppercase tracking-widest italic">
+                        <p className="mt-6 text-slate-500 dark:text-slate-400 text-sm md:hero-desc font-medium max-w-2xl mx-auto uppercase tracking-widest italic">
                             En iyi Telegram Botlarını ve Kanallarını Keşfet, Tanıt ve TON ile Kazanmaya Başla.
                         </p>
                     </div>

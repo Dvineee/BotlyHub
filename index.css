@@ -461,7 +461,7 @@ html:not(.dark) .text-slate-400 {
 }
 
 .border-b-8 {
-    height: 60px;
+    height: 55px;
     border-bottom-width: 0;
 }
 
@@ -988,27 +988,36 @@ h2.text-lg.sm\:text-xl.font-extrabold.text-slate-900.dark\:text-white.tracking-t
     filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
 
+.tracking-widest {
+    letter-spacing: -0.013em;
+}
+
 .tracking-wider {
     font-size: 13px;
     letter-spacing: 0em;
 }
 
-.md\:text-\[2\.75rem\] {
-    font-size: 26px;
-    font-weight: 700;
-    letter-spacing: -.01em;
-}
-
 @media (min-width: 768px) {
-    .md\:text-\[2\.75rem\] {
-        font-size: 33px;
+    .md\:hero-desc {
+        font-size: 15px !important;
     }
 }
 
-.sm\:text-base {
-    letter-spacing: -.0em;
-    font-size: unset;
-    line-height: normal;
+.mobile-hero-title {
+    font-size: 1.6rem;
+    line-height: 1.2;
+}
+
+@media (min-width: 640px) {
+    .mobile-hero-title {
+        font-size: 3rem;
+    }
+}
+
+@media (min-width: 768px) {
+    .mobile-hero-title {
+        font-size: 2rem;
+    }
 }
 
 .text-\[11px\] {
