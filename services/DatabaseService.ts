@@ -479,13 +479,34 @@ export class DatabaseService {
   }
 
   static async getBotBySlug(slug: string): Promise<Bot | null> {
-    const { data } = await supabase.from('bots').select('*').eq('slug', slug).maybeSingle();
-    if (!data) {
-        // Fallback: check if id matches (just in case)
-        return this.getBotById(slug);
+    // 1. Try finding by ID first (for backward compatibility or if slug is just the ID)
+    const botById = await this.getBotById(slug);
+    if (botById) return botById;
+
+    // 2. Try finding by name using ilike (approximate slug match)
+    // This is more efficient than fetching all bots
+    const searchTerm = slug.replace(/-/g, ' ');
+    const { data: bots } = await supabase
+        .from('bots')
+        .select('*')
+        .ilike('name', `%${searchTerm}%`);
+    
+    if (bots && bots.length > 0) {
+        // Find the exact slug match in the filtered results
+        const exactMatch = bots.find(b => this.generateSlug(b.name) === slug);
+        if (exactMatch) return this.mapBotData(exactMatch);
     }
     
-    return this.mapBotData(data);
+    // 3. Fallback: fetch all and find (most robust but least efficient)
+    try {
+        const allBots = await this.getBots();
+        const found = allBots.find(b => b.slug === slug);
+        if (found) return found;
+    } catch (e) {
+        console.error("Fallback slug search failed:", e);
+    }
+    
+    return null;
   }
 
   private static async mapBotData(data: any): Promise<Bot> {

@@ -275,7 +275,19 @@ const BotDetail = () => {
     </div>
   );
 
-  if (!bot) return null;
+  if (!bot) return (
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
+        <BotIcon className="text-slate-300 dark:text-slate-700 mb-4" size={64} />
+        <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-2 italic uppercase tracking-tight">Bot Bulunamadı</h2>
+        <p className="text-slate-500 dark:text-slate-400 mb-6 font-medium">Aradığınız bot sistemde bulunamadı veya silinmiş olabilir.</p>
+        <button 
+          onClick={() => navigate('/')}
+          className="px-8 py-3 bg-blue-600 text-white rounded-xl font-black text-[11px] uppercase tracking-widest active:scale-95 transition-transform"
+        >
+            Anasayfaya Dön
+        </button>
+    </div>
+  );
 
   return (
     <>

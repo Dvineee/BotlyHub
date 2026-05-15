@@ -120,6 +120,11 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
                     }
                 }
 
+                if (startParam && startParam.startsWith('bot_')) {
+                    const botSlug = startParam.replace('bot_', '');
+                    navigate(`/bot/${botSlug}`, { replace: true });
+                }
+
                 // 4. Kısıtlama Kontrolü
                 const dbUser = await DatabaseService.getUser(user.id.toString());
                 if (dbUser && dbUser.isRestricted) {
