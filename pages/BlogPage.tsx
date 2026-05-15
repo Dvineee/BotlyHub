@@ -2,13 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { 
-  ResponsiveContainer, 
-  AreaChart, 
-  Area 
-} from 'recharts';
-import { 
   TrendingUp, 
-  Bot as BotIcon,
+  Bot as BotIcon, 
   Network, 
   BarChart3, 
   Search, 
@@ -37,8 +32,7 @@ import {
   Globe,
   Star,
   Heart,
-  LogOut,
-  Loader2
+  LogOut
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../TranslationContext';
@@ -49,16 +43,7 @@ import { Logo } from '../components/Logo';
 import { DatabaseService } from '../services/DatabaseService';
 import { BlogPost } from '../types';
 import { AnimatePresence } from 'motion/react';
-
-const analysisData = [
-  { name: 'Pzt', value: 400 },
-  { name: 'Sal', value: 300 },
-  { name: 'Çar', value: 600 },
-  { name: 'Per', value: 800 },
-  { name: 'Cum', value: 500 },
-  { name: 'Cmt', value: 900 },
-  { name: 'Paz', value: 1100 },
-];
+import { Loader2 } from 'lucide-react';
 
 const categories = [
   { id: 'all', label: 'Tümü', icon: Layout, color: 'text-slate-600' },
@@ -141,13 +126,7 @@ const BlogPage: React.FC = () => {
   const regularPosts = featuredPost ? filteredPosts.filter(p => p.id !== featuredPost.id) : filteredPosts;
 
   return (
-    <div className="bg-[#fcfcfc] dark:bg-[#0a0d1a] min-h-screen text-slate-900 dark:text-slate-100 font-sans relative overflow-hidden">
-      {/* Decorative Background Elements */}
-      <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-blue-500/5 to-transparent pointer-events-none" />
-      <div className="absolute top-20 -left-20 w-80 h-80 bg-blue-600/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute top-40 -right-20 w-80 h-80 bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.02] dark:opacity-[0.05] pointer-events-none" />
-      
+    <div className="bg-[#fcfcfc] dark:bg-slate-950 min-h-screen text-slate-900 dark:text-slate-100 font-sans">
       <SEO 
           title="Blog - En Son Bot Trendleri ve TON Ekosistemi" 
           description="Telegram ekosistemindeki en son gelişmeleri, bot trendlerini, TON ağı haberlerini ve derinlemesine teknik analizleri BotlyHub Blog üzerinden takip edin." 
@@ -472,46 +451,28 @@ const BlogPage: React.FC = () => {
               </div>
             )}
 
-            <div className={`px-4 space-y-4 ${isSidebarCollapsed ? 'items-center flex flex-col' : ''}`}>
-              {!isSidebarCollapsed && (
-                <div className="h-20 w-full bg-slate-50 dark:bg-white/5 rounded-xl overflow-hidden p-2 border border-slate-100 dark:border-white/5 group">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={analysisData}>
-                      <defs>
-                        <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                          <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-                        </linearGradient>
-                      </defs>
-                      <Area type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#colorValue)" />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-              )}
-
-              <div className="flex flex-col space-y-1">
-                <div 
-                  className={`w-full relative flex items-center gap-3 p-2.5 rounded-lg text-slate-600 dark:text-slate-400 font-semibold group ${isSidebarCollapsed ? 'justify-center' : ''}`}
-                >
-                  <Trophy size={18} className="text-amber-500" />
-                  {!isSidebarCollapsed && (
-                    <div className="flex flex-col">
-                      <span className="text-xs font-black uppercase italic leading-tight">En Çok Okunan</span>
-                      <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Bot Geliştirme #1</span>
-                    </div>
-                  )}
-                </div>
-                <div 
-                  className={`w-full relative flex items-center gap-3 p-2.5 rounded-lg text-slate-600 dark:text-slate-400 font-semibold group ${isSidebarCollapsed ? 'justify-center' : ''}`}
-                >
-                  <Zap size={18} className="text-blue-500" />
-                  {!isSidebarCollapsed && (
-                    <div className="flex flex-col">
-                      <span className="text-xs font-black uppercase italic leading-tight">Toplam Okuma</span>
-                      <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">{blogs.reduce((acc, b) => acc + (b.views_count || 0), 0)} Görüntülenme</span>
-                    </div>
-                  )}
-                </div>
+            <div className="flex flex-col space-y-1">
+              <div 
+                className={`w-full relative flex items-center gap-3 p-2.5 rounded-lg text-slate-600 dark:text-slate-400 font-semibold group ${isSidebarCollapsed ? 'justify-center' : ''}`}
+              >
+                <Trophy size={18} className="text-amber-500" />
+                {!isSidebarCollapsed && (
+                  <div className="flex flex-col">
+                    <span className="text-xs font-black uppercase italic">En Çok Okunan</span>
+                    <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Bot Geliştirme #1</span>
+                  </div>
+                )}
+              </div>
+              <div 
+                className={`w-full relative flex items-center gap-3 p-2.5 rounded-lg text-slate-600 dark:text-slate-400 font-semibold group ${isSidebarCollapsed ? 'justify-center' : ''}`}
+              >
+                <Zap size={18} className="text-blue-500" />
+                {!isSidebarCollapsed && (
+                  <div className="flex flex-col">
+                    <span className="text-xs font-black uppercase italic">Toplam Okuma</span>
+                    <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">{blogs.reduce((acc, b) => acc + (b.views_count || 0), 0)} Görüntülenme</span>
+                  </div>
+                )}
               </div>
             </div>
           </nav>
@@ -744,26 +705,22 @@ const BlogPage: React.FC = () => {
                   </motion.div>
                 )}
 
-                <div className={`grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16 ${activeCategory === 'all' ? 'py-20 border-t' : ''} border-slate-100 dark:border-white/5`}>
+                <div className={`grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-16 ${activeCategory === 'all' ? 'py-20 border-t' : ''} border-slate-100 dark:border-white/5`}>
                   {regularPosts.map((post, idx) => (
                     <motion.div 
                       key={post.id}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      whileHover={{ y: -8 }}
-                      transition={{ 
-                        opacity: { duration: 0.3, delay: idx * 0.05 },
-                        y: { duration: 0.4, ease: "easeOut" }
-                      }}
+                      transition={{ delay: idx * 0.1 }}
                       onClick={() => { haptic('light'); navigate('/blog/' + post.id); }}
-                      className="group cursor-pointer flex flex-col h-full relative"
+                      className="group cursor-pointer flex flex-col h-full"
                     >
-                      <div className="aspect-[16/10] rounded-[32px] overflow-hidden mb-8 bg-slate-100 dark:bg-slate-900 shadow-xl shadow-slate-200/50 dark:shadow-none relative isolate">
+                      <div className="aspect-[16/10] rounded-[32px] overflow-hidden mb-8 bg-slate-100 dark:bg-slate-900 shadow-lg relative">
                         {post.image ? (
                           <img 
                             src={post.image} 
                             alt={post.title}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 ease-out"
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
                             referrerPolicy="no-referrer"
                           />
                         ) : (
@@ -771,32 +728,36 @@ const BlogPage: React.FC = () => {
                               <BookOpen size={32} className="text-slate-800" />
                            </div>
                         )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                        <div className="absolute top-6 left-6 z-10">
-                           <span className="bg-white/90 dark:bg-slate-950/80 backdrop-blur-md px-4 py-2 rounded-xl text-[8px] font-black text-blue-600 dark:text-white uppercase tracking-[0.2em] border border-black/5 dark:border-white/10 shadow-lg">{post.category}</span>
+                        <div className="absolute top-6 left-6">
+                           <span className="bg-slate-950/80 backdrop-blur-md px-4 py-2 rounded-xl text-[8px] font-black text-white uppercase tracking-widest border border-white/10">{post.category}</span>
                         </div>
                       </div>
-                      <div className="space-y-4 flex-1 flex flex-col px-4">
-                        <div className="flex items-center gap-4 blog-meta-text text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 italic">
-                          <span className="flex items-center gap-1.5"><Calendar size={12} className="opacity-50" /> {new Date(post.created_at).toLocaleDateString('tr-TR')}</span>
-                          <span className="w-1 h-1 rounded-full bg-slate-200 dark:bg-slate-800"></span>
+                      <div className="space-y-4 flex-1 flex flex-col">
+                        <div className="flex items-center gap-4 blog-meta-text text-[9px] font-black uppercase tracking-widest text-slate-400 italic">
+                          <span>{new Date(post.created_at).toLocaleDateString('tr-TR')}</span>
+                          <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-800"></span>
                           <span className="flex items-center gap-1.5"><TrendingUp size={12} className="text-blue-500" /> {post.views_count || 0}</span>
-                          <span className="flex items-center gap-1.5 font-bold"><Clock size={12} className="text-slate-400" /> {post.readTime || '5 dk'}</span>
+                          <span className="flex items-center gap-1.5"><Heart size={12} className="text-red-500" /> {post.likes_count || 0}</span>
+                          <span className="flex items-center gap-1.5"><Clock size={12} className="text-blue-500" /> {post.readTime || '5 dk'}</span>
                         </div>
-                        <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tighter group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 italic leading-tight">
+                        <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tighter group-hover:text-blue-600 transition-colors line-clamp-2 italic leading-tight">
                           {post.title}
                         </h3>
-                        <p className="text-[13px] text-slate-500 dark:text-slate-400 line-clamp-3 leading-relaxed flex-1 font-medium italic opacity-80">
+                        <p className="text-sm text-slate-500 dark:text-slate-500 line-clamp-3 leading-relaxed flex-1 font-medium italic">
                           {post.excerpt}
                         </p>
-                        
-                        <div className="flex items-center justify-between pt-6 group-hover:translate-x-1 transition-transform">
-                          <div className="flex items-center gap-3">
-                             <div className="w-8 h-8 rounded-xl bg-blue-500/10 dark:bg-blue-500/20 flex items-center justify-center text-blue-500 font-black text-[9px] border border-blue-500/10">BH</div>
-                             <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] italic">BotlyHub Team</span>
+                        <div className="flex flex-wrap gap-2 pt-2 pb-4">
+                          {post.hashtags?.slice(0, 3).map((tag, i) => (
+                            <span key={i} className="text-[9px] font-black text-blue-500/50 uppercase tracking-widest group-hover:text-blue-500 transition-colors">#{tag}</span>
+                          ))}
+                        </div>
+                        <div className="flex items-center justify-between pt-6 group-hover:translate-y-[-4px] transition-transform">
+                          <div className="flex items-center gap-2">
+                             <div className="w-6 h-6 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500 font-black text-[8px]">BH</div>
+                             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">BotlyHub Team</span>
                           </div>
-                          <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 text-[10px] font-black opacity-0 group-hover:opacity-100 transition-opacity tracking-widest">
-                             DEVAMINI OKU <ChevronRight size={14} />
+                          <div className="w-10 h-10 rounded-full border border-slate-100 dark:border-white/5 flex items-center justify-center group-hover:bg-blue-600 group-hover:border-blue-600 group-hover:text-white transition-all">
+                             <ChevronRight size={18} className="group-hover:translate-x-0.5 transition-transform" />
                           </div>
                         </div>
                       </div>
@@ -837,7 +798,7 @@ const BlogPage: React.FC = () => {
           <div className="space-y-6">
             <h4 className="px-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 italic">POPÜLER İÇERİKLER</h4>
             <div className="space-y-4">
-              {[...blogs].sort((a, b) => (b.views_count || 0) - (a.views_count || 0)).slice(0, 4).map((post, i) => (
+              {blogs.sort((a, b) => (b.views_count || 0) - (a.views_count || 0)).slice(0, 4).map((post, i) => (
                 <button 
                   key={post.id}
                   onClick={() => { haptic('light'); navigate('/blog/' + post.id); }}

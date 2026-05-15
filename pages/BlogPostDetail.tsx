@@ -35,14 +35,8 @@ import {
   MessageSquare,
   Send,
   Loader2,
-  ThumbsUp,
-  Trophy
+  ThumbsUp
 } from 'lucide-react';
-import { 
-  ResponsiveContainer, 
-  AreaChart, 
-  Area 
-} from 'recharts';
 import { useTelegram } from '../hooks/useTelegram';
 import { useTranslation } from '../TranslationContext';
 import { useTheme } from '../ThemeContext';
@@ -101,16 +95,6 @@ const categories = [
   { id: 'guides', label: 'Rehberler', icon: BookOpen, color: 'text-rose-500' },
 ];
 
-const analysisData = [
-  { name: 'Pzt', value: 400 },
-  { name: 'Sal', value: 300 },
-  { name: 'Çar', value: 600 },
-  { name: 'Per', value: 800 },
-  { name: 'Cum', value: 500 },
-  { name: 'Cmt', value: 900 },
-  { name: 'Paz', value: 1100 },
-];
-
 const BlogPostDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -125,7 +109,6 @@ const BlogPostDetail: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [similarPosts, setSimilarPosts] = useState<BlogPost[]>([]);
   const [allPosts, setAllPosts] = useState<BlogPost[]>([]);
-  const [trendHashtags, setTrendHashtags] = useState<string[]>([]);
   const [comments, setComments] = useState<BlogComment[]>([]);
   const [isLiked, setIsLiked] = useState(false);
   const [newComment, setNewComment] = useState('');
@@ -147,19 +130,6 @@ const BlogPostDetail: React.FC = () => {
             const blogs = await DatabaseService.getBlogs();
             setAllPosts(blogs);
             setSimilarPosts(blogs.filter(b => b.id !== id).slice(0, 3));
-
-            // Calculate trend hashtags
-            const tagCounts: { [key: string]: number } = {};
-            blogs.forEach(blog => {
-              blog.hashtags?.forEach(tag => {
-                tagCounts[tag] = (tagCounts[tag] || 0) + 1;
-              });
-            });
-            const sortedTags = Object.entries(tagCounts)
-              .sort((a, b) => b[1] - a[1])
-              .slice(0, 8)
-              .map(entry => entry[0]);
-            setTrendHashtags(sortedTags.length > 0 ? sortedTags : ['TON', 'BotlyHub', 'Airdrop', 'Web3', 'Trading', 'MiniApp']);
             
             // Comments
             const comms = await DatabaseService.getBlogComments(id);
@@ -296,20 +266,14 @@ const BlogPostDetail: React.FC = () => {
   }
 
   return (
-    <div className="bg-[#fcfcfc] dark:bg-[#0a0d1a] min-h-screen text-slate-900 dark:text-slate-100 font-sans relative overflow-hidden">
-      {/* Decorative Background Elements */}
-      <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-blue-500/5 to-transparent pointer-events-none" />
-      <div className="absolute top-20 -left-20 w-80 h-80 bg-blue-600/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute top-40 -right-20 w-80 h-80 bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.02] dark:opacity-[0.05] pointer-events-none" />
-
+    <div className="bg-[#fcfcfc] dark:bg-slate-950 min-h-screen text-slate-900 dark:text-slate-100 font-sans">
       <SEO 
         title={`${post.title}`} 
         description={post.title} 
         ogType="article"
         ogImage={post.image}
         articleData={{
-          publishedTime: post.created_at, // Use real date
+          publishedTime: '2024-05-12T00:00:00Z', // ISO format for SEO
           author: post.author,
           category: post.category,
           image: post.image
@@ -548,55 +512,24 @@ const BlogPostDetail: React.FC = () => {
               </div>
             )}
 
-            {!isSidebarCollapsed && (
-              <div className="pt-6 pb-2">
-                <span className="px-3 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-600">
-                  TOPLULUK ANALİZİ
-                </span>
-              </div>
-            )}
-
-            <div className={`px-4 space-y-4 ${isSidebarCollapsed ? 'items-center flex flex-col' : ''}`}>
-              {!isSidebarCollapsed && (
-                <div className="h-20 w-full bg-slate-50 dark:bg-white/5 rounded-xl overflow-hidden p-2 border border-slate-100 dark:border-white/5 group">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={analysisData}>
-                      <defs>
-                        <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                          <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-                        </linearGradient>
-                      </defs>
-                      <Area type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#colorValue)" />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-              )}
-
-              <div className="flex flex-col space-y-1">
-                <div 
-                  className={`w-full relative flex items-center gap-3 p-2.5 rounded-lg text-slate-600 dark:text-slate-400 font-semibold group ${isSidebarCollapsed ? 'justify-center' : ''}`}
+            <div className="flex flex-col space-y-1">
+              {categories.slice(1, 6).map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => { haptic('light'); navigate('/blog'); }}
+                  title={cat.label}
+                  className={`w-full relative flex items-center gap-3 p-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 transition-all text-sm font-semibold group ${isSidebarCollapsed ? 'justify-center' : ''}`}
                 >
-                  <Trophy size={18} className="text-amber-500" />
-                  {!isSidebarCollapsed && (
-                    <div className="flex flex-col">
-                      <span className="text-xs font-black uppercase italic leading-tight">En Çok Okunan</span>
-                      <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Bot Geliştirme #1</span>
+                  <cat.icon size={20} className="text-slate-400 group-hover:text-blue-500 transition-colors" />
+                  {!isSidebarCollapsed && <span>{cat.label}</span>}
+                  {isSidebarCollapsed && (
+                    <div className="absolute left-full ml-3 px-3 py-1.5 bg-slate-900 dark:bg-slate-800 text-white text-[10px] font-black uppercase tracking-widest rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity backdrop-blur-md whitespace-nowrap z-[110] shadow-2xl border border-white/10">
+                      {cat.label}
+                      <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-slate-900 dark:bg-slate-800 rotate-45 border-l border-b border-white/10"></div>
                     </div>
                   )}
-                </div>
-                <div 
-                  className={`w-full relative flex items-center gap-3 p-2.5 rounded-lg text-slate-600 dark:text-slate-400 font-semibold group ${isSidebarCollapsed ? 'justify-center' : ''}`}
-                >
-                  <Zap size={18} className="text-blue-500" />
-                  {!isSidebarCollapsed && (
-                    <div className="flex flex-col">
-                      <span className="text-xs font-black uppercase italic leading-tight">Toplam Okuma</span>
-                      <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">{allPosts.reduce((acc, b) => acc + (b.views_count || 0), 0)} Görüntülenme</span>
-                    </div>
-                  )}
-                </div>
-              </div>
+                </button>
+              ))}
             </div>
           </nav>
 
@@ -847,7 +780,7 @@ const BlogPostDetail: React.FC = () => {
         </main>
 
         {/* Right Sidebar - Sticky Tools */}
-        <aside className="hidden xl:flex flex-col w-80 h-screen sticky top-0 py-12 px-6 overflow-y-auto no-scrollbar space-y-10">
+        <aside className="hidden xl:flex flex-col w-80 h-screen sticky top-0 py-12 px-6 space-y-10">
           <button
              onClick={() => { haptic('light'); setIsSearchModalOpen(true); }}
              className="w-full flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-white/10 border border-slate-100 dark:border-white/5 hover:border-blue-500/50 transition-all text-sm font-semibold group"
@@ -857,59 +790,28 @@ const BlogPostDetail: React.FC = () => {
             <div className="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded border border-slate-200 dark:border-white/10 opacity-50 bg-white dark:bg-slate-800">⌘K</div>
           </button>
 
-          <div className="space-y-6">
-            <h4 className="px-2 text-[10px] font-black uppercase tracking-widest text-slate-400">TREND ETİKETLER</h4>
-            <div className="flex flex-wrap gap-2">
-              {trendHashtags.map(tag => (
-                <button 
-                  key={tag} 
-                  onClick={() => { haptic('light'); setSearchQuery(tag); setIsSearchModalOpen(true); }}
-                  className="px-3 py-1.5 rounded-lg bg-white dark:bg-white/5 border border-slate-100 dark:border-white/5 text-[11px] font-bold text-slate-600 dark:text-slate-400 hover:border-blue-500 hover:text-blue-500 transition-all font-black uppercase tracking-widest"
-                >
-                  #{tag}
-                </button>
-              ))}
-            </div>
+          <div className="bg-slate-900 rounded-3xl p-8 text-white relative overflow-hidden group">
+            <Zap size={32} className="text-yellow-400 mb-6" />
+            <h3 className="text-xl font-bold tracking-tight mb-3">Abone Ol</h3>
+            <p className="text-slate-400 text-sm mb-6">Bu yazarın yeni yazılarını anında bildir.</p>
+            <button className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-black uppercase text-[10px] tracking-widest rounded-xl transition-colors">Abone Ol</button>
           </div>
 
           <div className="space-y-6">
-            <h4 className="px-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 italic">POPÜLER İÇERİKLER</h4>
+            <h4 className="px-2 text-[10px] font-black uppercase tracking-widest text-slate-400">BENZER YAZILAR</h4>
             <div className="space-y-4">
-              {[...allPosts]
-                .filter(p => p.id !== id)
-                .sort((a, b) => (b.views_count || 0) - (a.views_count || 0))
-                .slice(0, 4)
-                .map((p, i) => (
-                <button 
-                  key={p.id}
-                  onClick={() => { haptic('light'); navigate('/blog/' + p.id); }}
-                  className="w-full flex items-start gap-4 p-4 rounded-2xl bg-white dark:bg-white/2 hover:bg-blue-500/5 border border-slate-100 dark:border-white/5 transition-all text-left group"
-                >
-                  <span className="text-xl font-black text-slate-200 dark:text-white/5 group-hover:text-blue-500/30 transition-colors italic">0{i+1}</span>
-                  <div className="flex-1 min-w-0">
-                    <h5 className="text-[11px] font-black text-slate-900 dark:text-white line-clamp-2 leading-tight uppercase tracking-tight italic group-hover:text-blue-600 transition-colors">{p.title}</h5>
-                    <div className="flex items-center gap-2 mt-2">
-                       <span className="text-[8px] font-black text-blue-500 uppercase tracking-widest">{p.category}</span>
-                       <div className="w-1 h-1 rounded-full bg-slate-200 dark:bg-white/10" />
-                       <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{p.views_count || 0} İzlenme</span>
-                    </div>
-                  </div>
-                </button>
+              {similarPosts.map(p => (
+                <div key={p.id} onClick={() => navigate('/blog/' + p.id)} className="group cursor-pointer">
+                  <h5 className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-blue-500 transition-colors mb-1 line-clamp-2 italic">
+                    {p.title}
+                  </h5>
+                  <div className="text-[10px] font-black text-slate-400 uppercase tracking-wider">{p.readTime || '5 Dakika'} Okuma</div>
+                </div>
               ))}
+              {similarPosts.length === 0 && (
+                 <p className="text-[10px] font-bold text-slate-700 uppercase tracking-widest italic px-2">Gösterilecek benzer yazı yok.</p>
+              )}
             </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[32px] p-8 text-white relative overflow-hidden group shadow-2xl shadow-blue-500/20">
-            <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/20 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
-            <TrendingUp size={32} className="text-white mb-6 animate-bounce" />
-            <h3 className="text-xl font-black italic tracking-tighter mb-3 uppercase">Topluluğa Katılın</h3>
-            <p className="text-blue-100 text-[11px] font-medium mb-6 leading-relaxed italic">TON ekosistemindeki 10,000+ geliştirici ve yatırımcı ile birlikte BotlyHub ağının bir parçası olun.</p>
-            <button 
-              onClick={() => { haptic('medium'); window.open('https://t.me/BotlyHub', '_blank'); }}
-              className="w-full py-4 bg-white text-blue-600 font-black uppercase text-[10px] tracking-widest rounded-2xl hover:bg-blue-50 transition-colors shadow-lg flex items-center justify-center gap-2"
-            >
-              TELEGRAM KANALIMIZ <ChevronRight size={14} />
-            </button>
           </div>
         </aside>
 
