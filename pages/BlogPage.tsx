@@ -60,7 +60,7 @@ const BlogPage: React.FC = () => {
   const navigate = useNavigate();
   const { t, language, setLanguage } = useTranslation();
   const { theme, toggleTheme } = useTheme();
-  const { haptic } = useTelegram();
+  const { haptic, user } = useTelegram();
   const [activeCategory, setActiveCategory] = useState('all');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -250,11 +250,32 @@ const BlogPage: React.FC = () => {
             </nav>
 
             <div className="mt-auto pt-6 border-t border-slate-100 dark:border-white/5 space-y-4">
-               <div className="p-4 bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-500/10 dark:to-blue-500/10 rounded-2xl border border-blue-100/50 dark:border-blue-500/20">
-                  <h4 className="text-xs font-black text-blue-900 dark:text-blue-200 uppercase tracking-widest mb-2">PRO Sürüm</h4>
-                  <p className="text-[11px] text-blue-700/70 dark:text-blue-400/70 mb-3 leading-relaxed">Gelişmiş analizlere ve özel rehberlere erişin.</p>
-                  <button onClick={() => { haptic('light'); navigate('/premium'); }} className="w-full py-2 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20">YÜKSELT</button>
-               </div>
+               {user ? (
+                 <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10">
+                    <div className="w-12 h-12 rounded-2xl overflow-hidden shrink-0 border-2 border-white dark:border-slate-800 shadow-xl">
+                      {user.photo_url ? (
+                        <img src={user.photo_url} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      ) : (
+                        <div className="w-full h-full bg-blue-500 flex items-center justify-center text-white font-bold text-xl uppercase">
+                          {user.first_name?.[0] || 'U'}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 overflow-hidden">
+                      <p className="text-sm font-black text-slate-900 dark:text-white truncate uppercase tracking-widest">{user.first_name} {user.last_name || ''}</p>
+                      <p className="text-[10px] font-bold text-slate-400">@{user.username || 'kullanici'}</p>
+                    </div>
+                 </div>
+               ) : (
+                 <div className="p-5 bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-500/10 dark:to-blue-500/10 rounded-2xl border border-blue-100/50 dark:border-blue-500/20">
+                    <h4 className="text-xs font-black text-blue-900 dark:text-blue-200 uppercase tracking-widest mb-2">Giriş Yap</h4>
+                    <p className="text-[11px] text-blue-700/70 dark:text-blue-400/70 mb-4 leading-relaxed">Tüm özelliklere erişmek için giriş yap.</p>
+                    <button onClick={() => { haptic('light'); navigate('/login'); }} className="w-full py-3 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2">
+                      <User size={16} />
+                      Giriş Yap
+                    </button>
+                 </div>
+               )}
 
               <div className="flex flex-col gap-3">
                 <div className="grid grid-cols-2 gap-3">
@@ -402,12 +423,45 @@ const BlogPage: React.FC = () => {
           </nav>
 
           <div className="mt-auto px-6 pt-6 shrink-0 border-t border-slate-100 dark:border-white/5 space-y-4">
-            {!isSidebarCollapsed && (
-               <div className="p-4 bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-500/10 dark:to-blue-500/10 rounded-2xl border border-blue-100/50 dark:border-blue-500/20">
-                  <h4 className="text-xs font-black text-blue-900 dark:text-blue-200 uppercase tracking-widest mb-2">PRO Sürüm</h4>
-                  <p className="text-[11px] text-blue-700/70 dark:text-blue-400/70 mb-3 leading-relaxed">Gelişmiş analizlere ve özel rehberlere erişin.</p>
-                  <button onClick={() => navigate('/premium')} className="w-full py-2 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20">YÜKSELT</button>
+            {user ? (
+               <div className={`flex items-center gap-3 p-3 rounded-2xl bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10 shadow-sm ${isSidebarCollapsed ? 'justify-center p-2' : ''}`}>
+                  <div className="w-10 h-10 rounded-xl overflow-hidden shrink-0 border border-slate-100 dark:border-white/10">
+                    {user.photo_url ? (
+                      <img src={user.photo_url} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                    ) : (
+                      <div className="w-full h-full bg-blue-600 flex items-center justify-center text-white font-bold text-lg uppercase">
+                        {user.first_name?.[0] || 'U'}
+                      </div>
+                    )}
+                  </div>
+                  {!isSidebarCollapsed && (
+                    <div className="flex-1 overflow-hidden">
+                      <p className="text-[11px] font-black text-slate-900 dark:text-white truncate uppercase tracking-widest">
+                        {user.first_name} {user.last_name || ''}
+                      </p>
+                      <p className="text-[9px] font-bold text-slate-400 truncate">@{user.username || 'user'}</p>
+                    </div>
+                  )}
                </div>
+            ) : (
+               !isSidebarCollapsed ? (
+                <div className="p-4 bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-500/10 dark:to-blue-500/10 rounded-2xl border border-blue-100/50 dark:border-blue-500/20">
+                   <h4 className="text-xs font-black text-blue-900 dark:text-blue-200 uppercase tracking-widest mb-1 whitespace-nowrap">Giriş Yap</h4>
+                   <p className="text-[10px] text-blue-700/70 dark:text-blue-400/70 mb-3 leading-tight">Tüm özelliklere erişmek için giriş yap.</p>
+                   <button onClick={() => navigate('/login')} className="w-full py-2 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2">
+                     <User size={14} />
+                     Giriş Yap
+                   </button>
+                </div>
+               ) : (
+                 <button 
+                  onClick={() => navigate('/login')}
+                  title="Giriş Yap"
+                  className="w-full h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center transition-all hover:bg-blue-700 shadow-lg shadow-blue-500/20"
+                 >
+                   <User size={20} />
+                 </button>
+               )
             )}
 
             <div className={`flex items-center gap-2 ${isSidebarCollapsed ? 'flex-col' : ''}`}>
