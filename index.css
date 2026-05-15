@@ -1106,3 +1106,7 @@ button.text-\[14px\].font-medium.text-slate-600.dark\:text-slate-400.hover\:text
     background-color: #ffffff0d;
     --tw-text-opacity: 1;
 }
+
+.font-normal {
+    font-weight: 500;
+}
