@@ -66,6 +66,7 @@ const BlogPage: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+  const [isLangPickerOpen, setIsLangPickerOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -221,9 +222,9 @@ const BlogPage: React.FC = () => {
             <nav className="flex-1 space-y-4 overflow-y-auto no-scrollbar">
               <button
                  onClick={() => { haptic('light'); navigate('/'); }}
-                 className="w-full flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 text-lg font-bold"
+                 className="w-full flex items-center gap-3 p-3.5 rounded-2xl bg-slate-50 dark:bg-white/5 text-base font-bold"
               >
-                <Home size={24} className="text-blue-500" />
+                <Home size={22} className="text-blue-500" />
                 Anasayfa
               </button>
 
@@ -234,14 +235,14 @@ const BlogPage: React.FC = () => {
                   <button
                     key={cat.id}
                     onClick={() => { haptic('light'); setActiveCategory(cat.id); setIsMobileMenuOpen(false); }}
-                    className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all text-base font-bold ${
+                    className={`w-full flex items-center justify-between p-3.5 rounded-2xl transition-all text-sm font-bold ${
                       activeCategory === cat.id 
                       ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/30' 
                       : 'bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-slate-400'
                     }`}
                   >
-                    <div className="flex items-center gap-4">
-                      <cat.icon size={22} className={activeCategory === cat.id ? 'text-white' : 'text-slate-400'} />
+                    <div className="flex items-center gap-3">
+                      <cat.icon size={20} className={activeCategory === cat.id ? 'text-white' : 'text-slate-400'} />
                       {cat.label}
                     </div>
                     {activeCategory === cat.id && <ChevronRight size={18} />}
@@ -287,45 +288,81 @@ const BlogPage: React.FC = () => {
                  </div>
                )}
 
-              <div className="flex flex-col gap-3">
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={() => { haptic('light'); toggleTheme(); }}
-                    className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white font-bold"
-                  >
-                    {theme === 'dark' ? <Sun size={24} className="text-yellow-400" /> : <Moon size={24} className="text-blue-500" />}
-                    {theme === 'dark' ? 'Gündüz' : 'Gece'}
-                  </button>
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  onClick={() => { haptic('light'); toggleTheme(); }}
+                  className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white"
+                >
+                  {theme === 'dark' ? <Sun size={20} className="text-yellow-400" /> : <Moon size={20} className="text-blue-500" />}
+                  <span className="text-[10px] font-bold uppercase tracking-widest">{theme === 'dark' ? 'Gündüz' : 'Gece'}</span>
+                </button>
 
-                  <button
-                    onClick={() => { haptic('light'); setIsSearchModalOpen(true); setIsMobileMenuOpen(false); }}
-                    className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white font-bold"
-                  >
-                    <Search size={24} className="text-blue-500" />
-                    Ara
-                  </button>
-                </div>
+                <button
+                  onClick={() => { haptic('light'); setIsSearchModalOpen(true); setIsMobileMenuOpen(false); }}
+                  className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white"
+                >
+                  <Search size={20} className="text-blue-500" />
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Ara</span>
+                </button>
 
-                <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 h-[64px]">
-                  <Globe size={24} className="text-slate-400 shrink-0" />
-                  <div className="flex flex-1 gap-2">
-                    {(['tr', 'en', 'ru'] as const).map((lang) => (
-                      <button
-                        key={lang}
-                        onClick={() => { haptic('light'); setLanguage(lang); }}
-                        className={`flex-1 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
-                          language === lang 
-                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' 
-                            : 'bg-white dark:bg-white/5 text-slate-400'
-                        }`}
-                      >
-                        {lang}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                <button
+                  onClick={() => { haptic('light'); setIsLangPickerOpen(true); }}
+                  className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white"
+                >
+                  <Globe size={20} className="text-slate-400" />
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Dil</span>
+                </button>
               </div>
             </div>
+
+            {/* Language Picker Bottom Sheet */}
+            <AnimatePresence>
+              {isLangPickerOpen && (
+                <>
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    onClick={() => setIsLangPickerOpen(false)}
+                    className="fixed inset-0 z-[1100] bg-black/40 backdrop-blur-sm"
+                  />
+                  <motion.div 
+                    initial={{ y: "100%" }}
+                    animate={{ y: 0 }}
+                    exit={{ y: "100%" }}
+                    transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                    className="fixed bottom-0 left-0 right-0 z-[1101] bg-white dark:bg-slate-900 rounded-t-[40px] border-t border-slate-100 dark:border-white/10 p-8 pb-12 shadow-2xl"
+                  >
+                    <div className="w-12 h-1 bg-slate-200 dark:bg-white/10 rounded-full mx-auto mb-8"></div>
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-[0.2em] mb-6 text-center">Dil Seçimi</h3>
+                    <div className="grid grid-cols-1 gap-3">
+                      {(['tr', 'en', 'ru'] as const).map((lang) => (
+                        <button
+                          key={lang}
+                          onClick={() => { haptic('medium'); setLanguage(lang); setIsLangPickerOpen(false); }}
+                          className={`w-full flex items-center justify-between p-5 rounded-2xl transition-all ${
+                            language === lang 
+                              ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/30' 
+                              : 'bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-slate-400'
+                          }`}
+                        >
+                          <span className="text-sm font-bold uppercase tracking-widest">
+                            {lang === 'tr' ? 'Türkçe' : lang === 'en' ? 'English' : 'Русский'}
+                          </span>
+                          {language === lang && <Globe size={20} />}
+                        </button>
+                      ))}
+                    </div>
+                    <button 
+                      onClick={() => setIsLangPickerOpen(false)}
+                      className="w-full mt-6 py-4 text-slate-400 text-[10px] font-black uppercase tracking-widest"
+                    >
+                      İptal
+                    </button>
+                  </motion.div>
+                </>
+              )}
+            </AnimatePresence>
           </motion.div>
         )}
       </AnimatePresence>
