@@ -347,7 +347,7 @@ const AddProjectBanner: React.FC<{ className?: string }> = ({ className = "" }) 
             onClick={() => navigate('/settings')}
         >
             {/* Left Side: Illustration Placeholder */}
-            <div className="w-[100px] h-[100px] rounded-xl overflow-hidden relative shrink-0 bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+            <div className="w-[116px] h-[108px] rounded-xl overflow-hidden relative shrink-0 bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
                 <img 
                     src="https://i.hizliresim.com/eoisiuq.png" 
                     alt="Add Project" 
@@ -358,7 +358,7 @@ const AddProjectBanner: React.FC<{ className?: string }> = ({ className = "" }) 
             </div>
             
             {/* Right Side: Content */}
-            <div className="flex-1 min-w-0 pr-1 py-1 flex flex-col justify-between h-[100px]">
+            <div className="flex-1 min-w-0 pr-1 py-1 flex flex-col justify-between h-[108px]">
                 <div>
                     <h3 className="text-slate-900 dark:text-white font-bold text-[17px] tracking-tight truncate leading-tight mb-1 group-hover:text-blue-500 transition-colors">
                         Kendi Otomasyonunu Kur

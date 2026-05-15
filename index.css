@@ -1134,3 +1134,9 @@ button.text-\[14px\].font-medium.text-slate-600.dark\:text-slate-400.hover\:text
 .bg-black\/5 {
     background: linear-gradient(180deg, transparent, #000000b5) !important;
 }
+
+@media (min-width: 640px) {
+    .sm\:p-3 {
+    }
+}
+
