@@ -1033,6 +1033,11 @@ h2.text-lg.sm\:text-xl.font-extrabold.text-slate-900.dark\:text-white.tracking-t
     padding-bottom: 0.5rem !important;
 }
 
+.blog-featured-card {
+    padding-left: 0.5px !important;
+    padding-right: 0.5px !important;
+}
+
 .text-\[11px\] {
     font-size: 13px;
 }

@@ -615,7 +615,7 @@ const BlogPage: React.FC = () => {
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     onClick={() => { haptic('light'); navigate('/blog/' + featuredPost.id); }}
-                    className="group cursor-pointer bg-white dark:bg-slate-900/40 p-6 md:p-8 rounded-[44px] border border-slate-100 dark:border-white/5 hover:border-blue-500/30 transition-all shadow-xl shadow-slate-200/20 dark:shadow-none"
+                    className="group cursor-pointer blog-featured-card custom-cursor-on-hover bg-white dark:bg-slate-900/40 p-6 md:p-8 rounded-[44px] border border-slate-100 dark:border-white/5 hover:border-blue-500/30 transition-all shadow-xl shadow-slate-200/20 dark:shadow-none"
                   >
                     <div className="aspect-[16/9] md:aspect-[2.4/1] rounded-[32px] overflow-hidden mb-8 bg-slate-100 dark:bg-slate-900 shadow-2xl relative">
                       {featuredPost.image ? (
