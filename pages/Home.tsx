@@ -1487,7 +1487,7 @@ const AnnouncementsCarousel: React.FC<{
             </div>
             
             {announcements.length > 1 && (
-                <div className="absolute left-[44px] sm:left-[53px] top-1/2 -translate-y-1/2 flex flex-col items-center gap-1.5 z-10 pointer-events-none">
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10 pointer-events-none">
                     {announcements.map((_, i) => (
                         <button 
                             key={i} 
@@ -1501,7 +1501,7 @@ const AnnouncementsCarousel: React.FC<{
                                     });
                                 }
                             }}
-                            className={`w-1.5 rounded-full transition-all duration-300 shadow-sm cursor-pointer outline-hidden pointer-events-auto ${i === currentIndex ? 'h-5 bg-white' : 'h-1.5 bg-white/40 dark:bg-white/20 hover:bg-white/60'}`} 
+                            className={`h-1.5 rounded-full transition-all duration-300 shadow-sm cursor-pointer outline-hidden pointer-events-auto ${i === currentIndex ? 'w-5 bg-white' : 'w-1.5 bg-white/40 hover:bg-white/60'}`} 
                         />
                     ))}
                 </div>
