@@ -448,7 +448,7 @@ const NavMenu = ({
                 </div>
 
                 {/* Center Section (Navigation) */}
-                <div className="flex items-center justify-center gap-8 md:gap-14 flex-1 md:max-w-2xl mx-auto">
+                <div className="flex items-center justify-center gap-8 md:gap-14 flex-1">
                 {/* Bots Dropdown */}
                 <div className="relative md:static">
                     <button 
@@ -461,9 +461,9 @@ const NavMenu = ({
                                 setOpenMenu(openMenu === 'bots' ? null : 'bots');
                             }
                         }}
-                        className="flex items-center justify-center gap-2 text-[14px] font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all py-2 min-w-[70px]"
+                        className="flex items-center gap-2 text-[14px] font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all py-2 grow-0"
                     >
-                        Bots <ChevronDown size={14} className={`text-slate-400 shrink-0 transition-transform duration-300 ${openMenu === 'bots' ? 'rotate-180' : ''}`} />
+                        Bots <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'bots' ? 'rotate-180' : ''}`} />
                     </button>
                     
                     {/* Desktop Mega Menu for Bots */}
@@ -513,9 +513,9 @@ const NavMenu = ({
                                 setOpenMenu(openMenu === 'apps' ? null : 'apps');
                             }
                         }}
-                        className="flex items-center justify-center gap-2 text-[14px] font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all py-2 min-w-[70px]"
+                        className="flex items-center gap-2 text-[14px] font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all py-2 grow-0"
                     >
-                        Apps <ChevronDown size={14} className={`text-slate-400 shrink-0 transition-transform duration-300 ${openMenu === 'apps' ? 'rotate-180' : ''}`} />
+                        Apps <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'apps' ? 'rotate-180' : ''}`} />
                     </button>
                     
                     {/* Desktop Mega Menu for Apps */}
@@ -556,7 +556,7 @@ const NavMenu = ({
                 {/* Blog Link */}
                 <button 
                     onClick={() => { haptic('light'); navigate('/blog'); }}
-                    className="flex items-center justify-center text-[14px] font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all py-2 min-w-[70px]"
+                    className="text-[14px] font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all py-2"
                 >
                     Blog
                 </button>
