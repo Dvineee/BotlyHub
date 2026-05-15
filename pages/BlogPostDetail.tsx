@@ -702,7 +702,7 @@ const BlogPostDetail: React.FC = () => {
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
                         placeholder="Düşüncelerini paylaş..."
-                        className="w-full bg-transparent border-none outline-none text-slate-900 dark:text-white placeholder:text-slate-400 resize-none h-24 font-medium italic"
+                        className="comment-textarea w-full bg-transparent border-none outline-none text-slate-900 dark:text-white placeholder:text-slate-400 resize-none h-24 font-medium italic"
                       />
                     </div>
                   </div>

@@ -64,7 +64,7 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
         onClick={handleAction}
     >
         {/* Left Side: Thumbnail */}
-        <div className="w-[116px] h-[108px] rounded-xl overflow-hidden relative shrink-0">
+        <div className="w-[85px] h-[85px] sm:w-[100px] sm:h-[100px] rounded-xl overflow-hidden relative shrink-0">
             <img 
                 src={ann.bg_image_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(ann.title)}&background=random&color=fff`} 
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
@@ -347,7 +347,7 @@ const AddProjectBanner: React.FC<{ className?: string }> = ({ className = "" }) 
             onClick={() => navigate('/settings')}
         >
             {/* Left Side: Illustration Placeholder */}
-            <div className="w-[116px] h-[108px] rounded-xl overflow-hidden relative shrink-0 bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+            <div className="w-[100px] h-[100px] rounded-xl overflow-hidden relative shrink-0 bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
                 <img 
                     src="https://i.hizliresim.com/eoisiuq.png" 
                     alt="Add Project" 
@@ -358,7 +358,7 @@ const AddProjectBanner: React.FC<{ className?: string }> = ({ className = "" }) 
             </div>
             
             {/* Right Side: Content */}
-            <div className="flex-1 min-w-0 pr-1 py-1 flex flex-col justify-between h-[108px]">
+            <div className="flex-1 min-w-0 pr-1 py-1 flex flex-col justify-between h-[100px]">
                 <div>
                     <h3 className="text-slate-900 dark:text-white font-bold text-[17px] tracking-tight truncate leading-tight mb-1 group-hover:text-blue-500 transition-colors">
                         Kendi Otomasyonunu Kur
@@ -1487,7 +1487,7 @@ const AnnouncementsCarousel: React.FC<{
             </div>
             
             {announcements.length > 1 && (
-                <div className="absolute bottom-5 left-[82px] sm:left-[70px] -translate-x-1/2 flex items-center gap-1 z-10 pointer-events-none">
+                <div className="absolute bottom-5 left-[58px] sm:left-[62px] -translate-x-1/2 flex items-center gap-1 z-10 pointer-events-none">
                     {announcements.map((_, i) => (
                         <button 
                             key={i} 
