@@ -1038,6 +1038,15 @@ h2.text-lg.sm\:text-xl.font-extrabold.text-slate-900.dark\:text-white.tracking-t
     padding-right: 0.5px !important;
 }
 
+.blog-meta-text {
+    font-size: 13px !important;
+}
+
+/* Ensure PNG images (often used as illustrations/icons) have specific radius as requested */
+img[src$=".png"] {
+    border-radius: 18px !important;
+}
+
 .text-\[11px\] {
     font-size: 13px;
 }

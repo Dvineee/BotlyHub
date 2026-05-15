@@ -631,6 +631,15 @@ const BlogPage: React.FC = () => {
                          </div>
                       )}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity"></div>
+                      
+                      {/* Mobile Date Overlay */}
+                      <div className="absolute bottom-4 right-4 md:hidden z-10">
+                         <div className="flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10 text-white">
+                            <Calendar size={12} />
+                            <span className="text-[10px] font-bold uppercase">{new Date(featuredPost.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' })}</span>
+                         </div>
+                      </div>
+
                       <div className="absolute bottom-10 left-10 hidden md:block">
                          <div className="flex items-center gap-3 bg-white/10 backdrop-blur-md px-5 py-3 rounded-2xl border border-white/10">
                             <Star size={16} className="text-amber-400 fill-amber-400" />
@@ -641,21 +650,21 @@ const BlogPage: React.FC = () => {
                     <div className="space-y-6">
                       <div className="flex items-center gap-4">
                         <span className="px-4 py-1.5 bg-blue-600 text-white text-[9px] font-black uppercase tracking-widest rounded-full">{featuredPost.category}</span>
-                        <div className="flex items-center gap-2 text-slate-400">
-                           <Calendar size={14} />
-                           <span className="text-[10px] font-bold uppercase">{new Date(featuredPost.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                        <div className="hidden md:flex items-center gap-2 text-slate-400">
+                          <Calendar size={14} />
+                          <span className="text-[10px] font-bold uppercase">{new Date(featuredPost.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                         </div>
                         <div className="flex items-center gap-2 text-slate-400">
-                           <TrendingUp size={14} className="text-blue-500" />
-                           <span className="text-[10px] font-bold uppercase">{featuredPost.views_count || 0}</span>
+                          <TrendingUp size={14} className="text-blue-500" />
+                          <span className="text-[10px] font-bold uppercase">{featuredPost.views_count || 0}</span>
                         </div>
                         <div className="flex items-center gap-2 text-slate-400">
-                           <Heart size={14} className="text-red-500" />
-                           <span className="text-[10px] font-bold uppercase">{featuredPost.likes_count || 0}</span>
+                          <Heart size={14} className="text-red-500" />
+                          <span className="text-[10px] font-bold uppercase">{featuredPost.likes_count || 0}</span>
                         </div>
                         <div className="flex items-center gap-2 text-slate-400">
-                           <Clock size={14} />
-                           <span className="text-[10px] font-bold uppercase">{featuredPost.readTime || '5 dk'}</span>
+                          <Clock size={14} />
+                          <span className="text-[10px] font-bold uppercase">{featuredPost.readTime || '5 dk'}</span>
                         </div>
                       </div>
                       <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tighter leading-tight group-hover:text-blue-600 transition-colors italic">
@@ -708,7 +717,7 @@ const BlogPage: React.FC = () => {
                         </div>
                       </div>
                       <div className="space-y-4 flex-1 flex flex-col">
-                        <div className="flex items-center gap-4 text-[9px] font-black uppercase tracking-widest text-slate-400 italic">
+                        <div className="flex items-center gap-4 blog-meta-text text-[9px] font-black uppercase tracking-widest text-slate-400 italic">
                           <span>{new Date(post.created_at).toLocaleDateString('tr-TR')}</span>
                           <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-800"></span>
                           <span className="flex items-center gap-1.5"><TrendingUp size={12} className="text-blue-500" /> {post.views_count || 0}</span>
