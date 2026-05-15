@@ -1110,17 +1110,3 @@ button.text-\[14px\].font-medium.text-slate-600.dark\:text-slate-400.hover\:text
 .font-normal {
     font-weight: 500;
 }
-
-.blog-category-scroller {
-    display: flex !important;
-    align-items: center !important;
-    min-height: 52px !important;
-    flex-wrap: nowrap !important;
-    width: calc(100% + 2rem) !important;
-    padding-bottom: 0.75rem !important;
-}
-
-.blog-category-item {
-    flex-shrink: 0 !important;
-    height: 36px !important;
-}
