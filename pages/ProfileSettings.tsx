@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
-import { User, CreditCard, Bell, Globe, ChevronRight, Crown, Users, Sun, Moon, Settings, ChevronLeft } from 'lucide-react';
+import { User, CreditCard, Bell, Globe, ChevronRight, Crown, Users, Sun, Moon, Settings, ChevronLeft, LogOut } from 'lucide-react';
 // Fixed: Use namespace import for react-router-dom to resolve "no exported member" errors
 import * as Router from 'react-router-dom';
 import { subscriptionPlans } from '../data';
@@ -13,7 +13,7 @@ const { useNavigate } = Router as any;
 
 const ProfileSettings = () => {
   const navigate = useNavigate();
-  const { user, haptic } = useTelegram();
+  const { user, haptic, setWebAuthUser } = useTelegram();
   const { theme, toggleTheme } = useTheme();
   const { language, setLanguage } = useTranslation();
   const [currentPlanName, setCurrentPlanName] = useState('Başlangıç');
@@ -119,6 +119,24 @@ const ProfileSettings = () => {
                 <MenuItem icon={theme === 'dark' ? Moon : Sun} label="Görünüm" value={theme === 'dark' ? 'Karanlık' : 'Aydınlık'} onClick={toggleTheme} />
                 <MenuItem icon={Globe} label="Dil" value={currentLangLabel} onClick={() => setShowLanguagePicker(true)} />
             </div>
+
+            {user && (
+                <div>
+                    <h3 className="text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest mb-3 px-1">Oturum</h3>
+                    <div 
+                        onClick={() => { haptic('medium'); setWebAuthUser(null); navigate('/'); }}
+                        className="flex items-center justify-between p-4 bg-white dark:bg-slate-900 border border-red-500/10 dark:border-red-500/10 rounded-xl mb-2 transition-all cursor-pointer active:scale-[0.98] group"
+                    >
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-500/10 flex items-center justify-center border border-red-100 dark:border-red-500/20 transition-colors group-hover:bg-red-100 dark:group-hover:bg-red-500/20">
+                                <LogOut size={18} className="text-red-500" />
+                            </div>
+                            <span className="font-bold text-[12px] text-red-600 dark:text-red-400 uppercase tracking-tight">Çıkış Yap</span>
+                        </div>
+                        <ChevronRight size={16} className="text-red-200 dark:text-red-900" />
+                    </div>
+                </div>
+            )}
         </div>
 
         {/* Language Picker Modal */}

@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Search, ChevronLeft, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, Send, Instagram, Youtube, Link, CheckCircle2, ChevronDown, Sun, Moon, Wallet, Menu, Plus } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, Send, Instagram, Youtube, Link, CheckCircle2, ChevronDown, Sun, Moon, Wallet, Menu, Plus, LogOut } from 'lucide-react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Bot, Announcement, Notification } from '../types';
@@ -613,6 +613,13 @@ const NavMenu = ({
                                                         {item.badge && <div className="absolute right-6 w-2.5 h-2.5 bg-red-600 rounded-full"></div>}
                                                     </button>
                                                 ))}
+                                                <button 
+                                                    onClick={() => { haptic('medium'); setWebAuthUser(null); setIsMenuOpen(false); }} 
+                                                    className="w-full flex items-center gap-4 px-6 py-4 hover:bg-black/5 dark:hover:bg-white/5 text-left text-red-500 dark:text-red-400"
+                                                >
+                                                    <LogOut size={18} /> 
+                                                    <span className="text-[11px] font-black uppercase tracking-tight">Çıkış Yap</span>
+                                                </button>
                                             </div>
                                         )}
                                     </div>
@@ -896,6 +903,13 @@ const Home = () => {
                                                   {item.badge && <div className="absolute right-6 w-2.5 h-2.5 bg-red-600 rounded-full"></div>}
                                               </button>
                                           ))}
+                                          <button 
+                                               onClick={() => { haptic('medium'); setWebAuthUser(null); setIsMenuOpen(false); }} 
+                                               className="w-full flex items-center gap-4 px-6 py-4 hover:bg-black/5 dark:hover:bg-white/5 text-left text-red-500 dark:text-red-400 font-bold"
+                                           >
+                                               <LogOut size={18} /> 
+                                               <span className="text-[11px] font-black uppercase tracking-tight">Çıkış Yap</span>
+                                           </button>
                                       </div>
                                   )}
                               </div>

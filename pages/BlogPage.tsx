@@ -31,7 +31,8 @@ import {
   Moon,
   Globe,
   Star,
-  Heart
+  Heart,
+  LogOut
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../TranslationContext';
@@ -60,7 +61,7 @@ const BlogPage: React.FC = () => {
   const navigate = useNavigate();
   const { t, language, setLanguage } = useTranslation();
   const { theme, toggleTheme } = useTheme();
-  const { haptic, user } = useTelegram();
+  const { haptic, user, setWebAuthUser } = useTelegram();
   const [activeCategory, setActiveCategory] = useState('all');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -251,20 +252,29 @@ const BlogPage: React.FC = () => {
 
             <div className="mt-auto pt-6 border-t border-slate-100 dark:border-white/5 space-y-4">
                {user ? (
-                 <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10">
-                    <div className="w-12 h-12 rounded-2xl overflow-hidden shrink-0 border-2 border-white dark:border-slate-800 shadow-xl">
-                      {user.photo_url ? (
-                        <img src={user.photo_url} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                      ) : (
-                        <div className="w-full h-full bg-blue-500 flex items-center justify-center text-white font-bold text-xl uppercase">
-                          {user.first_name?.[0] || 'U'}
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1 overflow-hidden">
-                      <p className="text-sm font-black text-slate-900 dark:text-white truncate uppercase tracking-widest">{user.first_name} {user.last_name || ''}</p>
-                      <p className="text-[10px] font-bold text-slate-400">@{user.username || 'kullanici'}</p>
-                    </div>
+                 <div className="space-y-3">
+                   <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10">
+                      <div className="w-12 h-12 rounded-2xl overflow-hidden shrink-0 border-2 border-white dark:border-slate-800 shadow-xl">
+                        {user.photo_url ? (
+                          <img src={user.photo_url} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                        ) : (
+                          <div className="w-full h-full bg-blue-500 flex items-center justify-center text-white font-bold text-xl uppercase">
+                            {user.first_name?.[0] || 'U'}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 overflow-hidden">
+                        <p className="text-sm font-black text-slate-900 dark:text-white truncate uppercase tracking-widest">{user.first_name} {user.last_name || ''}</p>
+                        <p className="text-[10px] font-bold text-slate-400">@{user.username || 'kullanici'}</p>
+                      </div>
+                   </div>
+                   <button 
+                    onClick={() => { haptic('medium'); setWebAuthUser(null); setIsMobileMenuOpen(false); }}
+                    className="w-full py-3 bg-red-500/10 text-red-500 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-red-500/20 transition-all flex items-center justify-center gap-2"
+                   >
+                     <LogOut size={16} />
+                     Çıkış Yap
+                   </button>
                  </div>
                ) : (
                  <div className="p-5 bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-500/10 dark:to-blue-500/10 rounded-2xl border border-blue-100/50 dark:border-blue-500/20">
@@ -424,24 +434,35 @@ const BlogPage: React.FC = () => {
 
           <div className="mt-auto px-6 pt-6 shrink-0 border-t border-slate-100 dark:border-white/5 space-y-4">
             {user ? (
-               <div className={`flex items-center gap-3 p-3 rounded-2xl bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10 shadow-sm ${isSidebarCollapsed ? 'justify-center p-2' : ''}`}>
-                  <div className="w-10 h-10 rounded-xl overflow-hidden shrink-0 border border-slate-100 dark:border-white/10">
-                    {user.photo_url ? (
-                      <img src={user.photo_url} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                    ) : (
-                      <div className="w-full h-full bg-blue-600 flex items-center justify-center text-white font-bold text-lg uppercase">
-                        {user.first_name?.[0] || 'U'}
+               <div className="space-y-2">
+                 <div className={`flex items-center gap-3 p-3 rounded-2xl bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10 shadow-sm ${isSidebarCollapsed ? 'justify-center p-2' : ''}`}>
+                    <div className="w-10 h-10 rounded-xl overflow-hidden shrink-0 border border-slate-100 dark:border-white/10">
+                      {user.photo_url ? (
+                        <img src={user.photo_url} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      ) : (
+                        <div className="w-full h-full bg-blue-600 flex items-center justify-center text-white font-bold text-lg uppercase">
+                          {user.first_name?.[0] || 'U'}
+                        </div>
+                      )}
+                    </div>
+                    {!isSidebarCollapsed && (
+                      <div className="flex-1 overflow-hidden">
+                        <p className="text-[11px] font-black text-slate-900 dark:text-white truncate uppercase tracking-widest">
+                          {user.first_name} {user.last_name || ''}
+                        </p>
+                        <p className="text-[9px] font-bold text-slate-400 truncate">@{user.username || 'user'}</p>
                       </div>
                     )}
-                  </div>
-                  {!isSidebarCollapsed && (
-                    <div className="flex-1 overflow-hidden">
-                      <p className="text-[11px] font-black text-slate-900 dark:text-white truncate uppercase tracking-widest">
-                        {user.first_name} {user.last_name || ''}
-                      </p>
-                      <p className="text-[9px] font-bold text-slate-400 truncate">@{user.username || 'user'}</p>
-                    </div>
-                  )}
+                 </div>
+                 {!isSidebarCollapsed && (
+                   <button 
+                    onClick={() => { haptic('medium'); setWebAuthUser(null); }}
+                    className="w-full py-2 bg-slate-100 dark:bg-white/5 text-slate-400 hover:text-red-500 hover:bg-red-500/5 transition-all text-[9px] font-black uppercase tracking-widest rounded-lg flex items-center justify-center gap-2"
+                   >
+                     <LogOut size={12} />
+                     Çıkış Yap
+                   </button>
+                 )}
                </div>
             ) : (
                !isSidebarCollapsed ? (
