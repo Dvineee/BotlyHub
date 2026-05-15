@@ -382,7 +382,7 @@ const BlogPage: React.FC = () => {
             <button
                onClick={() => { haptic('light'); navigate('/'); }}
                title="Anasayfa"
-               className={`w-full relative flex items-center gap-3 p-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 transition-all text-sm font-semibold group ${isSidebarCollapsed ? 'justify-center' : ''}`}
+               className={`w-full relative flex items-center gap-3 p-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 transition-all text-sm font-semibold group ${isSidebarCollapsed ? 'justify-center' : ''} blog-sidebar-cat`}
             >
               <Home size={20} className="group-hover:scale-110 transition-transform" />
               {!isSidebarCollapsed && <span>Anasayfa</span>}
@@ -408,7 +408,7 @@ const BlogPage: React.FC = () => {
                   key={cat.id}
                   onClick={() => { haptic('light'); setActiveCategory(cat.id); }}
                   title={cat.label}
-                  className={`w-full relative flex items-center gap-3 p-2.5 rounded-lg transition-all text-sm font-semibold group ${
+                  className={`w-full relative flex items-center gap-3 p-2.5 rounded-lg transition-all text-sm font-semibold group blog-sidebar-cat ${
                     activeCategory === cat.id 
                     ? 'bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white' 
                     : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5'

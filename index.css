@@ -1068,12 +1068,18 @@ img[src$=".png"] {
 }
 
 span, div, input {
-    font-weight: 600;
+    font-weight: 400;
 }
 
 @media (min-width: 640px) {
     .sm\:mb-16 {
         margin-bottom: 2rem !important;
+    }
+}
+
+@media (min-width: 1024px) {
+    .blog-sidebar-cat, .blog-sidebar-cat span {
+        font-weight: 600 !important;
     }
 }
 
@@ -1097,7 +1103,6 @@ button.text-\[14px\].font-medium.text-slate-600.dark\:text-slate-400.hover\:text
 }
 
 .hover\:text-slate-900:hover {
-    background-color: #ffffff0d !important;
-    --tw-text-opacity: 1 !important;
-    color: rgb(15 23 42 / var(--tw-text-opacity, 1)) !important;
+    background-color: #ffffff0d;
+    --tw-text-opacity: 1;
 }
