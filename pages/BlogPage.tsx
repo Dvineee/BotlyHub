@@ -277,9 +277,8 @@ const BlogPage: React.FC = () => {
                  </div>
                ) : (
                  <div className="mobile-menu-profile bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-500/10 dark:to-blue-500/10 rounded-2xl border border-blue-100/50 dark:border-blue-500/20">
-                    <h4 className="text-xs font-black text-blue-900 dark:text-blue-200 uppercase tracking-widest mb-2">Giriş Yap</h4>
-                    <p className="text-[11px] text-blue-700/70 dark:text-blue-400/70 mb-4 leading-relaxed">Tüm özelliklere erişmek için giriş yap.</p>
-                    <button onClick={() => { haptic('light'); navigate('/login'); }} className="w-full py-3 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2">
+                    <p className="text-[11px] text-blue-700/70 dark:text-blue-400/70 mb-3 leading-relaxed">Tüm özelliklere erişmek için giriş yap.</p>
+                    <button onClick={() => { haptic('light'); navigate('/login'); }} className="w-full mobile-login-btn bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2">
                       <User size={16} />
                       Giriş Yap
                     </button>
@@ -500,9 +499,8 @@ const BlogPage: React.FC = () => {
             ) : (
                !isSidebarCollapsed ? (
                 <div className="p-4 bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-500/10 dark:to-blue-500/10 rounded-2xl border border-blue-100/50 dark:border-blue-500/20">
-                   <h4 className="text-xs font-black text-blue-900 dark:text-blue-200 uppercase tracking-widest mb-1 whitespace-nowrap">Giriş Yap</h4>
                    <p className="text-[10px] text-blue-700/70 dark:text-blue-400/70 mb-3 leading-tight">Tüm özelliklere erişmek için giriş yap.</p>
-                   <button onClick={() => navigate('/login')} className="w-full py-2 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2">
+                   <button onClick={() => navigate('/login')} className="w-full mobile-login-btn bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2">
                      <User size={14} />
                      Giriş Yap
                    </button>
