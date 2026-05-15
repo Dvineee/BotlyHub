@@ -656,29 +656,35 @@ const BlogPostDetail: React.FC = () => {
 
           {/* Article Footer Area */}
           <footer className="mt-16 pt-10 border-t border-slate-100 dark:border-white/5">
-            <div className="flex flex-wrap items-center justify-between gap-6 pb-12">
-              <div className="flex items-center gap-6">
-                <button 
-                  onClick={handleLike}
-                  className="flex items-center gap-2 group"
-                >
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${isLiked ? 'bg-red-500 text-white shadow-lg' : 'bg-slate-100 dark:bg-white/5 text-slate-400 group-hover:text-red-500 group-hover:bg-red-50 dark:group-hover:bg-red-500/10'}`}>
-                    <Heart size={20} className={isLiked ? 'fill-white' : ''} />
-                  </div>
-                  <span className={`text-sm font-black italic ${isLiked ? 'text-red-500' : 'text-slate-500'}`}>{post.likes_count || 0} Beğeni</span>
-                </button>
-                <button className="flex items-center gap-2 group">
-                  <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400 group-hover:text-blue-500 group-hover:bg-blue-50 dark:group-hover:bg-blue-500/10 transition-all">
-                    <MessageCircle size={20} />
-                  </div>
-                  <span className="text-sm font-black text-slate-500 italic">{comments.length} Yorum</span>
-                </button>
-              </div>
+              <div className="flex flex-wrap items-center justify-between gap-6 pb-12">
+                <div className="flex items-center gap-6">
+                  <button 
+                    onClick={handleLike}
+                    className="flex items-center gap-2 group"
+                  >
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${isLiked ? 'bg-red-500 text-white shadow-lg' : 'bg-slate-100 dark:bg-white/5 text-slate-400 group-hover:text-red-500 group-hover:bg-red-50 dark:group-hover:bg-red-500/10'}`}>
+                      <Heart size={20} className={isLiked ? 'fill-white' : ''} />
+                    </div>
+                    <span className={`text-sm font-black italic ${isLiked ? 'text-red-500' : 'text-slate-500'}`}>{post.likes_count || 0} Beğeni</span>
+                  </button>
+                  <button className="flex items-center gap-2 group">
+                    <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400 group-hover:text-blue-500 group-hover:bg-blue-50 dark:group-hover:bg-blue-500/10 transition-all">
+                      <MessageCircle size={20} />
+                    </div>
+                    <span className="text-sm font-black text-slate-500 italic">{comments.length} Yorum</span>
+                  </button>
+                </div>
 
-              <div className="flex items-center gap-2">
-                <span className="px-3 py-1 bg-slate-50 dark:bg-white/5 text-slate-500 text-[10px] font-black uppercase tracking-widest rounded-lg">#BotlyHub</span>
+                <div className="flex flex-wrap items-center gap-2">
+                  {post.hashtags && post.hashtags.length > 0 ? (
+                    post.hashtags.map((tag, i) => (
+                      <span key={i} className="px-3 py-1 bg-slate-50 dark:bg-white/5 text-slate-500 text-[10px] font-black uppercase tracking-widest rounded-lg border border-slate-100 dark:border-white/10 hover:border-blue-500/50 hover:text-blue-500 transition-all cursor-default">#{tag}</span>
+                    ))
+                  ) : (
+                    <span className="px-3 py-1 bg-slate-50 dark:bg-white/5 text-slate-500 text-[10px] font-black uppercase tracking-widest rounded-lg">#BotlyHub</span>
+                  )}
+                </div>
               </div>
-            </div>
 
             {/* Comments Section */}
             <section className="mb-20">

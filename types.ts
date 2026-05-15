@@ -25,6 +25,7 @@ export interface BlogPost {
   isFeatured?: boolean;
   views_count?: number;
   likes_count?: number;
+  hashtags?: string[];
 }
 
 export interface User {

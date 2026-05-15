@@ -990,7 +990,8 @@ export class DatabaseService {
                 isFeatured: b.is_featured,
                 authorAvatar: b.author_avatar,
                 likes_count: blogLikes || 0,
-                views_count: b.views_count || 0
+                views_count: b.views_count || 0,
+                hashtags: Array.isArray(b.hashtags) ? b.hashtags : (typeof b.hashtags === 'string' ? JSON.parse(b.hashtags) : [])
             };
         });
     } catch (e) {
@@ -1021,7 +1022,8 @@ export class DatabaseService {
         isFeatured: data.is_featured,
         authorAvatar: data.author_avatar,
         likes_count: likesCount || data.likes_count || 0,
-        views_count: data.views_count || 0
+        views_count: data.views_count || 0,
+        hashtags: Array.isArray(data.hashtags) ? data.hashtags : (typeof data.hashtags === 'string' ? JSON.parse(data.hashtags) : [])
     };
   }
 
@@ -1126,6 +1128,7 @@ export class DatabaseService {
         author_avatar: blog.authorAvatar,
         category: blog.category,
         read_time: blog.readTime,
+        hashtags: blog.hashtags || [],
         is_featured: blog.isFeatured || false,
         updated_at: new Date().toISOString()
     };

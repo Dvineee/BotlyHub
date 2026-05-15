@@ -3334,8 +3334,23 @@ const BlogManagement = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingBlog, setEditingBlog] = useState<any>(null);
-    const [activeTab, setActiveTab] = useState<'content' | 'meta' | 'settings'>('content');
+    const [activeTab, setActiveTab] = useState<'content' | 'meta' | 'settings' | 'hashtags'>('content');
     const [searchQuery, setSearchQuery] = useState('');
+
+    const calculateReadTime = (content: string) => {
+        const words = content.trim().split(/\s+/).length;
+        const minutes = Math.ceil(words / 200);
+        return `${minutes} dk`;
+    };
+
+    useEffect(() => {
+        if (editingBlog && editingBlog.content && activeTab === 'content') {
+            const newReadTime = calculateReadTime(editingBlog.content);
+            if (newReadTime !== editingBlog.readTime) {
+                setEditingBlog((prev: any) => ({ ...prev, readTime: newReadTime }));
+            }
+        }
+    }, [editingBlog?.content, activeTab]);
 
     const load = useCallback(async () => {
         setIsLoading(true);
@@ -3361,9 +3376,10 @@ const BlogManagement = () => {
             author: 'BotlyHub Team',
             category: 'Haberler',
             date: new Date().toISOString(),
-            readTime: '5 dk',
+            readTime: '1 dk',
             isFeatured: false,
-            slug: ''
+            slug: '',
+            hashtags: []
         });
         setIsModalOpen(true);
         setActiveTab('content');
@@ -3425,6 +3441,63 @@ const BlogManagement = () => {
                 </div>
             </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="bg-slate-900/40 p-8 rounded-[44px] border border-white/5 backdrop-blur-sm">
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 italic text-blue-500">YAZI İSTATİSTİKLERİ</p>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <span className="text-4xl font-black text-white italic tracking-tighter block">{blogs.length}</span>
+                            <span className="text-[9px] font-black text-slate-600 uppercase italic">TOPLAM İÇERİK</span>
+                        </div>
+                        <div className="p-4 bg-blue-500/10 rounded-2xl text-blue-500">
+                            <FileText size={24} />
+                        </div>
+                    </div>
+                </div>
+                <div className="bg-slate-900/40 p-8 rounded-[44px] border border-white/5 backdrop-blur-sm">
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 italic text-emerald-500">ERİŞİM VERİLERİ</p>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <span className="text-4xl font-black text-white italic tracking-tighter block">
+                                {blogs.reduce((acc, b) => acc + (b.views_count || 0), 0)}
+                            </span>
+                            <span className="text-[9px] font-black text-slate-600 uppercase italic">GÖRÜNTÜLENME</span>
+                        </div>
+                        <div className="p-4 bg-emerald-500/10 rounded-2xl text-emerald-500">
+                            <TrendingUp size={24} />
+                        </div>
+                    </div>
+                </div>
+                <div className="bg-slate-900/40 p-8 rounded-[44px] border border-white/5 backdrop-blur-sm">
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 italic text-red-500">ETKİLEŞİM SKORU</p>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <span className="text-4xl font-black text-white italic tracking-tighter block">
+                                {blogs.reduce((acc, b) => acc + (b.likes_count || 0), 0)}
+                            </span>
+                            <span className="text-[9px] font-black text-slate-600 uppercase italic">TOPLAM BEĞENİ</span>
+                        </div>
+                        <div className="p-4 bg-red-500/10 rounded-2xl text-red-500">
+                            <Heart size={24} />
+                        </div>
+                    </div>
+                </div>
+                <div className="bg-slate-900/40 p-8 rounded-[44px] border border-white/5 backdrop-blur-sm">
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 italic text-amber-500">KATEGORİ YÖNETİMİ</p>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <span className="text-4xl font-black text-white italic tracking-tighter block">
+                                {new Set(blogs.map(b => b.category)).size}
+                            </span>
+                            <span className="text-[9px] font-black text-slate-600 uppercase italic">AKTİF DAL</span>
+                        </div>
+                        <div className="p-4 bg-amber-500/10 rounded-2xl text-amber-500">
+                            <Zap size={24} />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {isLoading ? (
                 <div className="flex justify-center py-32"><Loader2 className="animate-spin text-blue-500" size={40} /></div>
             ) : filteredBlogs.length === 0 ? (
@@ -3467,9 +3540,15 @@ const BlogManagement = () => {
                                 </p>
 
                                 <div className="pt-6 border-t border-white/5 flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <Clock size={12} className="text-slate-600" />
-                                        <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">{blog.read_time || '5 dk'}</span>
+                                    <div className="flex gap-2">
+                                        <div className="flex items-center gap-2">
+                                            <Eye size={12} className="text-slate-600" />
+                                            <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">{blog.views_count || 0}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <Clock size={12} className="text-slate-600" />
+                                            <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">{blog.readTime || '1 dk'}</span>
+                                        </div>
                                     </div>
                                     <div className="flex gap-2">
                                         <button onClick={() => { setEditingBlog(blog); setIsModalOpen(true); setActiveTab('content'); }} className="p-3 bg-white/5 rounded-xl hover:bg-blue-600 text-slate-500 hover:text-white transition-all">
@@ -3507,13 +3586,13 @@ const BlogManagement = () => {
                                 </div>
 
                                 <div className="flex gap-2 bg-white/5 p-1.5 rounded-3xl border border-white/5">
-                                    {['content', 'meta', 'settings'].map(tab => (
+                                    {['content', 'meta', 'hashtags', 'settings'].map(tab => (
                                         <button 
                                             key={tab}
                                             onClick={() => setActiveTab(tab as any)}
                                             className={`flex-1 py-3 lg:py-4 rounded-[20px] lg:rounded-[22px] text-[9px] font-black uppercase tracking-widest transition-all ${activeTab === tab ? 'bg-blue-600 text-white  ' : 'text-slate-500 hover:bg-white/5'}`}
                                         >
-                                            {tab === 'content' ? 'İÇERİK' : tab === 'meta' ? 'META VERİ' : 'AYARLAR'}
+                                            {tab === 'content' ? 'İÇERİK' : tab === 'meta' ? 'META VERİ' : tab === 'hashtags' ? 'HASHTAGLER' : 'AYARLAR'}
                                         </button>
                                     ))}
                                 </div>
@@ -3548,11 +3627,59 @@ const BlogManagement = () => {
                                             </div>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                                 <AdminInput label="KATEGORİ" value={editingBlog.category} onChange={(v:any)=>setEditingBlog({...editingBlog, category:v})} />
-                                                <AdminInput label="OKUMA SÜRESİ (ÖR: 5 dk)" value={editingBlog.readTime} onChange={(v:any)=>setEditingBlog({...editingBlog, readTime:v})} />
+                                                <div className="space-y-2">
+                                                    <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">OKUMA SÜRESİ (OTOMATİK)</label>
+                                                    <input 
+                                                        readOnly
+                                                        value={editingBlog.readTime} 
+                                                        className="w-full h-14 lg:h-18 bg-slate-950/50 border border-white/5 rounded-[22px] lg:rounded-[28px] px-8 text-[11px] font-black text-slate-500 outline-none uppercase italic" 
+                                                    />
+                                                </div>
                                             </div>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                                 <AdminInput label="YAZAR" value={editingBlog.author} onChange={(v:any)=>setEditingBlog({...editingBlog, author:v})} />
                                                 <AdminInput label="SLUG (OPSİYONEL)" value={editingBlog.slug} onChange={(v:any)=>setEditingBlog({...editingBlog, slug:v})} placeholder="baslik-url-formatinda" />
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {activeTab === 'hashtags' && (
+                                        <div className="space-y-8 animate-in slide-in-from-left-4">
+                                            <div className="space-y-4">
+                                                <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">ETIKETLER (VIRGÜL ILE AYIRIN)</label>
+                                                <div className="flex flex-wrap gap-2 p-6 bg-slate-950 border border-white/5 rounded-[32px]">
+                                                    {editingBlog.hashtags?.map((tag: string, i: number) => (
+                                                        <span key={i} className="flex items-center gap-2 bg-blue-500/10 text-blue-500 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border border-blue-500/20">
+                                                            #{tag}
+                                                            <button 
+                                                                type="button" 
+                                                                onClick={() => setEditingBlog({...editingBlog, hashtags: editingBlog.hashtags.filter((_:any, idx:any) => idx !== i)})}
+                                                                className="hover:text-red-500"
+                                                            >
+                                                                <X size={12} />
+                                                            </button>
+                                                        </span>
+                                                    ))}
+                                                    <input 
+                                                        type="text"
+                                                        placeholder="YENİ ETİKET EKLE..."
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter' || e.key === ',') {
+                                                                e.preventDefault();
+                                                                const val = e.currentTarget.value.trim().replace(/#/g, '').replace(/,/g, '');
+                                                                if (val && !editingBlog.hashtags?.includes(val)) {
+                                                                    setEditingBlog({
+                                                                        ...editingBlog,
+                                                                        hashtags: [...(editingBlog.hashtags || []), val]
+                                                                    });
+                                                                }
+                                                                e.currentTarget.value = '';
+                                                            }
+                                                        }}
+                                                        className="bg-transparent border-none outline-none text-[10px] font-black uppercase tracking-widest text-white ml-2 flex-1 min-w-[120px]"
+                                                    />
+                                                </div>
+                                                <p className="text-[9px] text-slate-600 italic px-4">Enter veya virgül ile yeni etiket ekleyebilirsiniz.</p>
                                             </div>
                                         </div>
                                     )}

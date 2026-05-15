@@ -673,6 +673,11 @@ const BlogPage: React.FC = () => {
                       <p className="text-base md:text-xl text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2 italic font-medium">
                         {featuredPost.excerpt}
                       </p>
+                      <div className="flex flex-wrap gap-2 py-4">
+                        {featuredPost.hashtags?.map((tag, i) => (
+                           <span key={i} className="px-2 py-1 bg-slate-100 dark:bg-white/5 rounded-lg text-[9px] font-black text-slate-500 uppercase tracking-widest border border-slate-100 dark:border-white/10 group-hover:border-blue-500/30 transition-all">#{tag}</span>
+                        ))}
+                      </div>
                       <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-white/5">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-[10px] shadow-lg shadow-blue-500/20">BH</div>
@@ -730,6 +735,11 @@ const BlogPage: React.FC = () => {
                         <p className="text-sm text-slate-500 dark:text-slate-500 line-clamp-3 leading-relaxed flex-1 font-medium italic">
                           {post.excerpt}
                         </p>
+                        <div className="flex flex-wrap gap-2 pt-2 pb-4">
+                          {post.hashtags?.slice(0, 3).map((tag, i) => (
+                            <span key={i} className="text-[9px] font-black text-blue-500/50 uppercase tracking-widest group-hover:text-blue-500 transition-colors">#{tag}</span>
+                          ))}
+                        </div>
                         <div className="flex items-center justify-between pt-6 group-hover:translate-y-[-4px] transition-transform">
                           <div className="flex items-center gap-2">
                              <div className="w-6 h-6 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500 font-black text-[8px]">BH</div>
