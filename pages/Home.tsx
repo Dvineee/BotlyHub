@@ -1487,11 +1487,12 @@ const AnnouncementsCarousel: React.FC<{
             </div>
             
             {announcements.length > 1 && (
-                <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1.5 z-10">
+                <div className="absolute left-[44px] sm:left-[53px] top-1/2 -translate-y-1/2 flex flex-col items-center gap-1.5 z-10 pointer-events-none">
                     {announcements.map((_, i) => (
                         <button 
                             key={i} 
-                            onClick={() => {
+                            onClick={(e) => {
+                                e.stopPropagation();
                                 if (scroll.ref.current) {
                                     const width = scroll.ref.current.offsetWidth;
                                     scroll.ref.current.scrollTo({
@@ -1500,7 +1501,7 @@ const AnnouncementsCarousel: React.FC<{
                                     });
                                 }
                             }}
-                            className={`h-1.5 rounded-full transition-all duration-300 shadow-sm cursor-pointer outline-hidden ${i === currentIndex ? 'w-6 bg-blue-500' : 'w-2 bg-slate-300/50 dark:bg-white/20 hover:bg-slate-400 dark:hover:bg-white/40'}`} 
+                            className={`w-1.5 rounded-full transition-all duration-300 shadow-sm cursor-pointer outline-hidden pointer-events-auto ${i === currentIndex ? 'h-5 bg-white' : 'h-1.5 bg-white/40 dark:bg-white/20 hover:bg-white/60'}`} 
                         />
                     ))}
                 </div>
