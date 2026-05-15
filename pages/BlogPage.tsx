@@ -254,7 +254,7 @@ const BlogPage: React.FC = () => {
             <div className="mt-auto pt-6 border-t border-slate-100 dark:border-white/5 space-y-4">
                {user ? (
                  <div className="space-y-3">
-                   <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10">
+                   <div className="flex items-center gap-4 mobile-menu-profile rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10">
                       <div className="w-12 h-12 rounded-2xl overflow-hidden shrink-0 border-2 border-white dark:border-slate-800 shadow-xl">
                         {user.photo_url ? (
                           <img src={user.photo_url} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
@@ -278,7 +278,7 @@ const BlogPage: React.FC = () => {
                    </button>
                  </div>
                ) : (
-                 <div className="p-5 bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-500/10 dark:to-blue-500/10 rounded-2xl border border-blue-100/50 dark:border-blue-500/20">
+                 <div className="mobile-menu-profile bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-500/10 dark:to-blue-500/10 rounded-2xl border border-blue-100/50 dark:border-blue-500/20">
                     <h4 className="text-xs font-black text-blue-900 dark:text-blue-200 uppercase tracking-widest mb-2">Giriş Yap</h4>
                     <p className="text-[11px] text-blue-700/70 dark:text-blue-400/70 mb-4 leading-relaxed">Tüm özelliklere erişmek için giriş yap.</p>
                     <button onClick={() => { haptic('light'); navigate('/login'); }} className="w-full py-3 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2">
@@ -291,7 +291,7 @@ const BlogPage: React.FC = () => {
               <div className="grid grid-cols-3 gap-2">
                 <button
                   onClick={() => { haptic('light'); toggleTheme(); }}
-                  className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white"
+                  className="flex flex-col items-center justify-center gap-1.5 mobile-menu-actions-btn rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white"
                 >
                   {theme === 'dark' ? <Sun size={20} className="text-yellow-400" /> : <Moon size={20} className="text-blue-500" />}
                   <span className="text-[10px] font-bold uppercase tracking-widest">{theme === 'dark' ? 'Gündüz' : 'Gece'}</span>
@@ -299,7 +299,7 @@ const BlogPage: React.FC = () => {
 
                 <button
                   onClick={() => { haptic('light'); setIsSearchModalOpen(true); setIsMobileMenuOpen(false); }}
-                  className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white"
+                  className="flex flex-col items-center justify-center gap-1.5 mobile-menu-actions-btn rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white"
                 >
                   <Search size={20} className="text-blue-500" />
                   <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Ara</span>
@@ -307,7 +307,7 @@ const BlogPage: React.FC = () => {
 
                 <button
                   onClick={() => { haptic('light'); setIsLangPickerOpen(true); }}
-                  className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white"
+                  className="flex flex-col items-center justify-center gap-1.5 mobile-menu-actions-btn rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white"
                 >
                   <Globe size={20} className="text-slate-400" />
                   <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Dil</span>

@@ -1020,6 +1020,14 @@ h2.text-lg.sm\:text-xl.font-extrabold.text-slate-900.dark\:text-white.tracking-t
     }
 }
 
+.mobile-menu-profile {
+    padding: 0.5rem !important;
+}
+
+.mobile-menu-actions-btn {
+    padding: 0.6rem !important;
+}
+
 .text-\[11px\] {
     font-size: 13px;
 }
