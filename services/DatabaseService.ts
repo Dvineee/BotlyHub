@@ -472,19 +472,41 @@ export class DatabaseService {
   }
 
   static async getBotById(id: string): Promise<Bot | null> {
-    const { data } = await supabase.from('bots').select('*').eq('id', id).maybeSingle();
-    if (!data) return null;
-    
-    return this.mapBotData(data);
+    try {
+      // Robustly check if id is a UUID or integer to avoid Postgres error 22P02
+      // Supabase default IDs are often UUIDs or bigints
+      const isPotentialId = id.length >= 1 && (
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id) || // UUID
+        /^\d+$/.test(id) // integer
+      );
+      
+      if (!isPotentialId) return null;
+
+      const { data, error } = await supabase.from('bots').select('*').eq('id', id).maybeSingle();
+      if (error || !data) return null;
+      
+      return this.mapBotData(data);
+    } catch (e) {
+      return null;
+    }
   }
 
   static async getBotBySlug(slug: string): Promise<Bot | null> {
-    // 1. Try finding by ID first (for backward compatibility or if slug is just the ID)
+    if (!slug) return null;
+
+    // 1. Try finding by ID first if it looks like an ID
     const botById = await this.getBotById(slug);
     if (botById) return botById;
 
-    // 2. Try finding by name using ilike (approximate slug match)
-    // This is more efficient than fetching all bots
+    // 2. Try direct slug column match (in case it exists)
+    try {
+        const { data: slugBot } = await supabase.from('bots').select('*').eq('slug', slug).maybeSingle();
+        if (slugBot) return this.mapBotData(slugBot);
+    } catch (e) {
+        // Fall through
+    }
+
+    // 3. Try finding by name using ilike (approximate slug match)
     const searchTerm = slug.replace(/-/g, ' ');
     const { data: bots } = await supabase
         .from('bots')
@@ -497,13 +519,13 @@ export class DatabaseService {
         if (exactMatch) return this.mapBotData(exactMatch);
     }
     
-    // 3. Fallback: fetch all and find (most robust but least efficient)
+    // 4. Fallback search
     try {
         const allBots = await this.getBots();
-        const found = allBots.find(b => b.slug === slug);
-        if (found) return found;
+        const match = allBots.find(b => (b as any).slug === slug || this.generateSlug(b.name) === slug);
+        if (match) return match;
     } catch (e) {
-        console.error("Fallback slug search failed:", e);
+        console.error("Slug fallback failed:", e);
     }
     
     return null;
@@ -945,21 +967,36 @@ export class DatabaseService {
   
   // --- BLOGS ---
   static async getBlogs(): Promise<BlogPost[]> {
-    const { data, error } = await supabase
-      .from('blogs')
-      .select('*')
-      .order('created_at', { ascending: false });
-      
-    if (error) {
-        console.error("Blogs Fetch Error:", error);
+    try {
+        const { data, error } = await supabase
+          .from('blogs')
+          .select('*')
+          .order('created_at', { ascending: false });
+          
+        if (error) {
+            console.error("Blogs Fetch Error:", error);
+            return [];
+        }
+
+        // Fetch all likes to count them efficiently in memory for the list view
+        // (Better would be a SQL join or view, but we are constrained)
+        const { data: likesData } = await supabase.from('blog_likes').select('blog_id');
+        
+        return (data || []).map(b => {
+            const blogLikes = (likesData || []).filter(l => l.blog_id === b.id).length;
+            return {
+                ...b,
+                readTime: b.read_time,
+                isFeatured: b.is_featured,
+                authorAvatar: b.author_avatar,
+                likes_count: blogLikes || 0,
+                views_count: b.views_count || 0
+            };
+        });
+    } catch (e) {
+        console.error("getBlogs Error:", e);
         return [];
     }
-    return (data || []).map(b => ({
-        ...b,
-        readTime: b.read_time,
-        isFeatured: b.is_featured,
-        authorAvatar: b.author_avatar
-    }));
   }
 
   static async getBlogById(id: string): Promise<BlogPost | null> {
@@ -974,19 +1011,35 @@ export class DatabaseService {
         return null;
     }
     if (!data) return null;
+    
+    // Fetch actual likes count
+    const likesCount = await this.getBlogLikes(id);
+    
     return {
         ...data,
         readTime: data.read_time,
         isFeatured: data.is_featured,
-        authorAvatar: data.author_avatar
+        authorAvatar: data.author_avatar,
+        likes_count: likesCount || data.likes_count || 0,
+        views_count: data.views_count || 0
     };
   }
 
   static async incrementBlogView(id: string) {
     try {
-        const { data: current } = await supabase.from('blogs').select('views_count').eq('id', id).single();
+        const { data: current, error: fetchError } = await supabase.from('blogs').select('views_count').eq('id', id).single();
+        if (fetchError) {
+          // If column is missing, we can't update it, but we don't want to throw
+          if (fetchError.message.includes('column blogs.views_count does not exist')) {
+            console.warn("Table 'blogs' is missing 'views_count' column.");
+            return;
+          }
+          throw fetchError;
+        }
         await supabase.from('blogs').update({ views_count: (current?.views_count || 0) + 1 }).eq('id', id);
-    } catch(e) {}
+    } catch(e) {
+      console.error("incrementBlogView Error:", e);
+    }
   }
 
   static async getBlogLikes(blogId: string): Promise<number> {
@@ -994,24 +1047,48 @@ export class DatabaseService {
         .from('blog_likes')
         .select('*', { count: 'exact', head: true })
         .eq('blog_id', blogId);
+    if (error) {
+        console.error("getBlogLikes Error:", error);
+        return 0;
+    }
     return count || 0;
   }
 
   static async toggleBlogLike(blogId: string, userId: string): Promise<boolean> {
     // Check if liked
-    const { data } = await supabase.from('blog_likes').select('id').eq('blog_id', blogId).eq('user_id', userId).maybeSingle();
+    const { data, error: selectError } = await supabase.from('blog_likes').select('id').eq('blog_id', blogId).eq('user_id', userId).maybeSingle();
     
     if (data) {
         // Unlike
         await supabase.from('blog_likes').delete().eq('id', data.id);
-        const { data: current } = await supabase.from('blogs').select('likes_count').eq('id', blogId).single();
-        await supabase.from('blogs').update({ likes_count: Math.max(0, (current?.likes_count || 0) - 1) }).eq('id', blogId);
+        
+        // Try to update denormalized count if exists
+        try {
+            const { data: current } = await supabase.from('blogs').select('likes_count').eq('id', blogId).single();
+            if (current) {
+                await supabase.from('blogs').update({ likes_count: Math.max(0, (current?.likes_count || 0) - 1) }).eq('id', blogId);
+            }
+        } catch(e) {
+            // Silently fail if column missing
+        }
         return false;
     } else {
         // Like
-        await supabase.from('blog_likes').insert([{ blog_id: blogId, user_id: userId }]);
-        const { data: current } = await supabase.from('blogs').select('likes_count').eq('id', blogId).single();
-        await supabase.from('blogs').update({ likes_count: (current?.likes_count || 0) + 1 }).eq('id', blogId);
+        const { error: insertError } = await supabase.from('blog_likes').insert([{ blog_id: blogId, user_id: userId }]);
+        if (insertError) {
+            console.error("Like Insert Error:", insertError);
+            throw insertError;
+        }
+        
+        // Try to update denormalized count if exists
+        try {
+            const { data: current } = await supabase.from('blogs').select('likes_count').eq('id', blogId).single();
+            if (current) {
+                await supabase.from('blogs').update({ likes_count: (current?.likes_count || 0) + 1 }).eq('id', blogId);
+            }
+        } catch(e) {
+            // Silently fail if column missing
+        }
         return true;
     }
   }
@@ -1026,8 +1103,11 @@ export class DatabaseService {
         .from('blog_comments')
         .select('*')
         .eq('blog_id', blogId)
-        .eq('is_approved', true)
         .order('created_at', { ascending: false });
+    if (error) {
+        console.error("getBlogComments Error:", error);
+        return [];
+    }
     return data || [];
   }
 

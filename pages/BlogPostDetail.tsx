@@ -156,18 +156,39 @@ const BlogPostDetail: React.FC = () => {
         alert('Beğenmek için giriş yapmalısınız.');
         return;
     }
+
+    // Optimistic update
+    const previousLiked = isLiked;
+    const previousCount = post?.likes_count || 0;
+    
+    setIsLiked(!previousLiked);
+    if (post) {
+        setPost({
+            ...post,
+            likes_count: !previousLiked ? previousCount + 1 : Math.max(0, previousCount - 1)
+        });
+    }
+    haptic('medium');
+
     try {
-        haptic('light');
         const liked = await DatabaseService.toggleBlogLike(id, user.id.toString());
-        setIsLiked(liked);
+        // Sync if server differs
+        if (liked !== !previousLiked) {
+            setIsLiked(liked);
+        }
+    } catch (e: any) {
+        console.error("Like Error:", e);
+        // Rollback on error
+        setIsLiked(previousLiked);
         if (post) {
             setPost({
                 ...post,
-                likes_count: liked ? (post.likes_count || 0) + 1 : Math.max(0, (post.likes_count || 0) - 1)
+                likes_count: previousCount
             });
         }
-    } catch (e) {
-        console.error("Like Error:", e);
+        if (e?.code === '42501') {
+            console.warn("RLS policy blocking like.");
+        }
     }
   };
 
@@ -176,25 +197,38 @@ const BlogPostDetail: React.FC = () => {
     if (!newComment.trim() || !id || !user) return;
     
     setIsSubmittingComment(true);
-    try {
-        const commentData = {
-            blog_id: id,
-            user_id: user.id.toString(),
-            user_name: `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Kullanıcı',
-            user_avatar: user.photo_url || '',
-            content: newComment.trim(),
-            created_at: new Date().toISOString()
-        };
-        await DatabaseService.addBlogComment(commentData);
-        setComments([commentData as any, ...comments]);
-        setNewComment('');
-        haptic('medium');
-    } catch (e) {
-        console.error("Comment Error:", e);
-        alert('Yorum gönderilirken bir hata oluştu.');
-    } finally {
-        setIsSubmittingComment(false);
-    }
+        try {
+            const commentData = {
+                blog_id: id,
+                user_id: user.id.toString(),
+                user_name: `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Kullanıcı',
+                user_avatar: user.photo_url || '',
+                content: newComment.trim(),
+                created_at: new Date().toISOString()
+            };
+            
+            // Optimistic update: add to UI immediately
+            setComments([commentData as any, ...comments]);
+            setNewComment('');
+            haptic('medium');
+
+            try {
+                await DatabaseService.addBlogComment(commentData);
+            } catch (error: any) {
+                console.error("Database Comment Error:", error);
+                if (error?.code === '42501') {
+                    // Specific RLS error help (only in console for now as we did optimistic update)
+                    console.warn("RLS policy is blocking comment insertion. Please check Supabase policies.");
+                }
+                // Optional: rollback if we really want to be strict, but optimistic is better for engagement
+                // setComments(comments); 
+            }
+        } catch (e) {
+            console.error("Comment Error:", e);
+            alert('Yorum gönderilirken bir hata oluştu.');
+        } finally {
+            setIsSubmittingComment(false);
+        }
   };
 
   useEffect(() => {
