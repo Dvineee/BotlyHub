@@ -755,7 +755,7 @@ const BlogPostDetail: React.FC = () => {
             </section>
 
             {/* Author Card */}
-            <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-white/5 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-6">
+            <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-white/5 rounded-3xl p-6 flex flex-col md:flex-row items-center gap-6">
               <div className="w-20 h-20 rounded-full bg-blue-600 flex items-center justify-center text-white font-black text-xl shrink-0">
                 {post.authorAvatar}
               </div>
