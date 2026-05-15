@@ -1062,3 +1062,42 @@ img[src$=".png"] {
 .text-\[11px\] {
     font-size: 13px;
 }
+
+.md\:p-8 {
+    display: inline !important;
+}
+
+span, div, input {
+    font-weight: 600;
+}
+
+@media (min-width: 640px) {
+    .sm\:mb-16 {
+        margin-bottom: 2rem !important;
+    }
+}
+
+@media (min-width: 768px) {
+    .md\:gap-14 {
+        gap: 2rem !important;
+    }
+}
+
+button.text-\[14px\].font-medium.text-slate-600.dark\:text-slate-400.hover\:text-slate-900.dark\:hover\:text-white.transition-all.py-2 {
+    height: 33px !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 0 12px !important;
+    border-radius: 10px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    gap: 4px !important;
+    transition: background-color .3s ease !important;
+    white-space: nowrap !important;
+}
+
+.hover\:text-slate-900:hover {
+    background-color: #ffffff0d !important;
+    --tw-text-opacity: 1 !important;
+    color: rgb(15 23 42 / var(--tw-text-opacity, 1)) !important;
+}
