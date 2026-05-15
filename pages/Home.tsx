@@ -64,7 +64,7 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
         onClick={handleAction}
     >
         {/* Left Side: Thumbnail */}
-        <div className="w-[85px] h-[85px] sm:w-[100px] sm:h-[100px] rounded-xl overflow-hidden relative shrink-0">
+        <div className="w-[116px] h-[108px] rounded-xl overflow-hidden relative shrink-0">
             <img 
                 src={ann.bg_image_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(ann.title)}&background=random&color=fff`} 
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
@@ -1487,7 +1487,7 @@ const AnnouncementsCarousel: React.FC<{
             </div>
             
             {announcements.length > 1 && (
-                <div className="absolute bottom-5 left-[58px] sm:left-[62px] -translate-x-1/2 flex items-center gap-1 z-10 pointer-events-none">
+                <div className="absolute bottom-5 left-[82px] sm:left-[70px] -translate-x-1/2 flex items-center gap-1 z-10 pointer-events-none">
                     {announcements.map((_, i) => (
                         <button 
                             key={i} 

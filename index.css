@@ -1123,3 +1123,14 @@ button.text-\[14px\].font-medium.text-slate-600.dark\:text-slate-400.hover\:text
 .border-t {
     border-top-width: inherit;
 }
+
+.inset-0 {
+    top: 80px !important;
+    right: 0 !important;
+    bottom: 0px !important;
+    left: 0 !important;
+}
+
+.bg-black\/5 {
+    background: linear-gradient(180deg, transparent, #000000b5) !important;
+}
