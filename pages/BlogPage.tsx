@@ -446,38 +446,34 @@ const BlogPage: React.FC = () => {
             {!isSidebarCollapsed && (
               <div className="pt-6 pb-2">
                 <span className="px-3 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-600">
-                  Yazar Araçları
+                  TOPLULUK ANALİZİ
                 </span>
               </div>
             )}
 
             <div className="flex flex-col space-y-1">
-              <button 
-                title="Yazı Yaz"
-                className={`w-full relative flex items-center gap-3 p-2.5 rounded-lg text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/5 transition-all text-sm font-semibold group ${isSidebarCollapsed ? 'justify-center' : ''}`}
+              <div 
+                className={`w-full relative flex items-center gap-3 p-2.5 rounded-lg text-slate-600 dark:text-slate-400 font-semibold group ${isSidebarCollapsed ? 'justify-center' : ''}`}
               >
-                <PenTool size={20} className="group-hover:rotate-12 transition-transform" />
-                {!isSidebarCollapsed && <span>Yazı Yaz</span>}
-                {isSidebarCollapsed && (
-                  <div className="absolute left-full ml-3 px-3 py-1.5 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-[1001] shadow-xl">
-                    Yazı Yaz
-                    <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-slate-900 rotate-45"></div>
+                <Trophy size={18} className="text-amber-500" />
+                {!isSidebarCollapsed && (
+                  <div className="flex flex-col">
+                    <span className="text-xs font-black uppercase italic">En Çok Okunan</span>
+                    <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Bot Geliştirme #1</span>
                   </div>
                 )}
-              </button>
-              <button 
-                title="Taslaklar"
-                className={`w-full relative flex items-center gap-3 p-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 transition-all text-sm font-semibold group ${isSidebarCollapsed ? 'justify-center' : ''}`}
+              </div>
+              <div 
+                className={`w-full relative flex items-center gap-3 p-2.5 rounded-lg text-slate-600 dark:text-slate-400 font-semibold group ${isSidebarCollapsed ? 'justify-center' : ''}`}
               >
-                <FileText size={20} />
-                {!isSidebarCollapsed && <span>Taslaklar</span>}
-                {isSidebarCollapsed && (
-                  <div className="absolute left-full ml-3 px-3 py-1.5 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-[1001] shadow-xl">
-                    Taslaklar
-                    <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-slate-900 rotate-45"></div>
+                <Zap size={18} className="text-blue-500" />
+                {!isSidebarCollapsed && (
+                  <div className="flex flex-col">
+                    <span className="text-xs font-black uppercase italic">Toplam Okuma</span>
+                    <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">{blogs.reduce((acc, b) => acc + (b.views_count || 0), 0)} Görüntülenme</span>
                   </div>
                 )}
-              </button>
+              </div>
             </div>
           </nav>
 
@@ -799,15 +795,40 @@ const BlogPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-slate-900 rounded-3xl p-8 text-white relative overflow-hidden group">
-            <div className="absolute -top-10 -right-10 w-32 h-32 bg-blue-500 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
-            <Zap size={32} className="text-yellow-400 mb-6" />
-            <h3 className="text-xl font-bold tracking-tight mb-3">Hiçbir şeyi kaçırmayın.</h3>
-            <p className="text-slate-400 text-sm mb-6 leading-relaxed">Haftalık en iyi botları ve ekosistem haberlerini direkt gelen kutunuza gönderelim.</p>
-            <div className="space-y-3">
-              <input type="email" placeholder="E-posta" className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-1 ring-blue-500" />
-              <button className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-black uppercase text-[10px] tracking-widest rounded-xl transition-colors">Abone Ol</button>
+          <div className="space-y-6">
+            <h4 className="px-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 italic">POPÜLER İÇERİKLER</h4>
+            <div className="space-y-4">
+              {blogs.sort((a, b) => (b.views_count || 0) - (a.views_count || 0)).slice(0, 4).map((post, i) => (
+                <button 
+                  key={post.id}
+                  onClick={() => { haptic('light'); navigate('/blog/' + post.id); }}
+                  className="w-full flex items-start gap-4 p-4 rounded-2xl bg-white dark:bg-white/2 hover:bg-blue-500/5 border border-slate-100 dark:border-white/5 transition-all text-left group"
+                >
+                  <span className="text-xl font-black text-slate-200 dark:text-white/5 group-hover:text-blue-500/30 transition-colors italic">0{i+1}</span>
+                  <div className="flex-1 min-w-0">
+                    <h5 className="text-[11px] font-black text-slate-900 dark:text-white line-clamp-2 leading-tight uppercase tracking-tight italic group-hover:text-blue-600 transition-colors">{post.title}</h5>
+                    <div className="flex items-center gap-2 mt-2">
+                       <span className="text-[8px] font-black text-blue-500 uppercase tracking-widest">{post.category}</span>
+                       <div className="w-1 h-1 rounded-full bg-slate-200 dark:bg-white/10" />
+                       <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{post.views_count || 0} İzlenme</span>
+                    </div>
+                  </div>
+                </button>
+              ))}
             </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[32px] p-8 text-white relative overflow-hidden group shadow-2xl shadow-blue-500/20">
+            <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/20 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
+            <Trophy size={32} className="text-white mb-6 animate-bounce" />
+            <h3 className="text-xl font-black italic tracking-tighter mb-3 uppercase">Topluluğa Katılın</h3>
+            <p className="text-blue-100 text-[11px] font-medium mb-6 leading-relaxed italic">TON ekosistemindeki 10,000+ geliştirici ve yatırımcı ile birlikte BotlyHub ağının bir parçası olun.</p>
+            <button 
+              onClick={() => { haptic('medium'); window.open('https://t.me/BotlyHub', '_blank'); }}
+              className="w-full py-4 bg-white text-blue-600 font-black uppercase text-[10px] tracking-widest rounded-2xl hover:bg-blue-50 transition-colors shadow-lg flex items-center justify-center gap-2"
+            >
+              TELEGRAM KANALIMIZ <ArrowRight size={14} />
+            </button>
           </div>
         </aside>
 
