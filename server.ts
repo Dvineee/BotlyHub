@@ -62,16 +62,16 @@ async function startServer() {
 
   // --- MANDATORY CORS ---
   app.use(cors({
-    origin: function(origin, callback) {
-      // Allow any origin for now to solve the constant CORS issues with Vercel/Telegram
-      callback(null, true);
-    },
+    origin: true,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
   }));
 
   app.use((req, res, next) => {
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(200);
+    }
     console.log(`[REQUEST] ${req.method} ${req.url} - Origin: ${req.get('Origin')}`);
     next();
   });
@@ -116,6 +116,7 @@ async function startServer() {
 
   // --- API ROUTES ---
   app.get("/api/health", (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     res.json({ status: "ok", time: new Date().toISOString() });
   });
 

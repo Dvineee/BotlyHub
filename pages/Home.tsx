@@ -730,6 +730,8 @@ const Home = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const { activeFilter } = useFilter();
+  const [selectedAppsCategory, setSelectedAppsCategory] = useState('all');
+  const [selectedBotsCategory, setSelectedBotsCategory] = useState('all');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -790,33 +792,61 @@ const Home = () => {
   }, [loadData]);
 
   const categorizedBots = useMemo(() => {
-    const result: Record<string, { bots: Bot[], total: number }> = {};
-    const baseBots = filteredBots;
+    const result: Record<string, { featured: Bot[], slider: Bot[], total: number }> = {};
+    const baseBots = [...filteredBots].sort((a, b) => (b.views || 0) - (a.views || 0));
 
     // Apps section
-    const appsBots = baseBots
-        .filter(b => Array.isArray(b.category) ? b.category.includes('apps') : b.category === 'apps')
-        .sort((a, b) => (b.views || 0) - (a.views || 0)); // Sort by views (popularity)
-    if (appsBots.length > 0) {
+    const allApps = baseBots.filter(b => Array.isArray(b.category) ? b.category.includes('apps') : b.category === 'apps');
+    
+    // Top 3 (Overall most popular apps)
+    const appsFeatured = allApps.slice(0, 3);
+    
+    // Slider/List (Popular apps in selected category)
+    let appsForList = allApps;
+    if (selectedAppsCategory !== 'all') {
+        appsForList = allApps.filter(b => 
+            Array.isArray(b.category) 
+                ? b.category.includes(selectedAppsCategory) 
+                : b.category === selectedAppsCategory
+        );
+    }
+    const appsSlider = appsForList.slice(0, 12); // Grid/Slider for bottom
+
+    if (allApps.length > 0) {
         result['apps'] = {
-            bots: appsBots.slice(0, 12),
-            total: appsBots.length
+            featured: appsFeatured,
+            slider: appsSlider,
+            total: allApps.length
         };
     }
 
     // Bots section (everything else)
-    const otherBots = baseBots
-        .filter(b => Array.isArray(b.category) ? !b.category.includes('apps') : b.category !== 'apps')
-        .sort((a, b) => (b.views || 0) - (a.views || 0)); // Sort by views (popularity)
-    if (otherBots.length > 0) {
+    const allBots = baseBots.filter(b => Array.isArray(b.category) ? !b.category.includes('apps') : b.category !== 'apps');
+    
+    // Top 3 (Overall most popular bots)
+    const botsFeatured = allBots.slice(0, 3);
+    
+    // Slider/List (Popular bots in selected category)
+    let botsForList = allBots;
+    if (selectedBotsCategory !== 'all') {
+        botsForList = allBots.filter(b => 
+            Array.isArray(b.category) 
+                ? b.category.includes(selectedBotsCategory) 
+                : b.category === selectedBotsCategory
+        );
+    }
+    const botsSlider = botsForList.slice(0, 12);
+
+    if (allBots.length > 0) {
         result['bots'] = {
-            bots: otherBots.slice(0, 12),
-            total: otherBots.length
+            featured: botsFeatured,
+            slider: botsSlider,
+            total: allBots.length
         };
     }
     
     return result;
-  }, [filteredBots]);
+  }, [filteredBots, selectedAppsCategory, selectedBotsCategory]);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-200 animate-in transition-colors duration-300 home-page">
@@ -995,8 +1025,8 @@ const Home = () => {
                     {categorizedBots['apps'] && (() => {
                         const data = categorizedBots['apps'];
                         
-                        const featuredBots = data.bots.slice(0, 3);
-                        const sliderBots = data.bots.slice(3);
+                        const featuredBots = data.featured;
+                        const sliderBots = data.slider;
 
                         const botChunks = [];
                         for (let i = 0; i < sliderBots.length; i += 3) {
@@ -1065,11 +1095,17 @@ const Home = () => {
                                         onContextMenu={catScroll.onContextMenu}
                                         className="category-filter-container no-scrollbar relative z-0"
                                     >
-                                        {appsSubCategories.map((subCat, i) => (
+                                        <button 
+                                            className={`category-filter-item cursor-pointer hover:text-blue-500 transition-all whitespace-nowrap outline-none focus-visible:ring-2 ring-blue-500/50 rounded-lg px-4 py-2 text-sm font-medium border ${selectedAppsCategory === 'all' ? 'text-blue-500 border-blue-500 bg-blue-500/5 font-black' : 'text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:hover:bg-white/5'}`}
+                                            onClick={() => { haptic('light'); setSelectedAppsCategory('all'); }}
+                                        >
+                                            {t('Tümü')}
+                                        </button>
+                                        {appsSubCategories.map((subCat) => (
                                             <button 
                                                 key={subCat.id} 
-                                                className={`category-filter-item cursor-pointer hover:text-blue-500 transition-colors whitespace-nowrap outline-none focus-visible:ring-2 ring-blue-500/50 rounded-lg`}
-                                                onClick={() => navigate(`/search?mode=apps&category=${subCat.id}`)}
+                                                className={`category-filter-item cursor-pointer hover:text-blue-500 transition-all whitespace-nowrap outline-none focus-visible:ring-2 ring-blue-500/50 rounded-lg px-4 py-2 text-sm font-medium border ${selectedAppsCategory === subCat.id ? 'text-blue-500 border-blue-500 bg-blue-500/5 font-black' : 'text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:hover:bg-white/5'}`}
+                                                onClick={() => { haptic('light'); setSelectedAppsCategory(subCat.id); }}
                                             >
                                                 {t(subCat.label)}
                                             </button>
@@ -1107,8 +1143,8 @@ const Home = () => {
                     {categorizedBots['bots'] && (() => {
                         const data = categorizedBots['bots'];
                         
-                        const featuredBots = data.bots.slice(0, 3);
-                        const sliderBots = data.bots.slice(3);
+                        const featuredBots = data.featured;
+                        const sliderBots = data.slider;
 
                         const botChunks = [];
                         for (let i = 0; i < sliderBots.length; i += 3) {
@@ -1177,11 +1213,17 @@ const Home = () => {
                                         onContextMenu={botsCatScroll.onContextMenu}
                                         className="category-filter-container no-scrollbar relative z-0"
                                     >
-                                        {botsCategories.map((cat, i) => (
+                                        <button 
+                                            className={`category-filter-item cursor-pointer hover:text-blue-500 transition-all whitespace-nowrap outline-none focus-visible:ring-2 ring-blue-500/50 rounded-lg px-4 py-2 text-sm font-medium border ${selectedBotsCategory === 'all' ? 'text-blue-500 border-blue-500 bg-blue-500/5 font-black' : 'text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:hover:bg-white/5'}`}
+                                            onClick={() => { haptic('light'); setSelectedBotsCategory('all'); }}
+                                        >
+                                            {t('Tümü')}
+                                        </button>
+                                        {botsCategories.map((cat) => (
                                             <button 
                                                 key={cat.id} 
-                                                className={`category-filter-item cursor-pointer hover:text-blue-500 transition-colors whitespace-nowrap outline-none focus-visible:ring-2 ring-blue-500/50 rounded-lg`}
-                                                onClick={() => navigate(`/search?mode=bots&category=${cat.id}`)}
+                                                className={`category-filter-item cursor-pointer hover:text-blue-500 transition-all whitespace-nowrap outline-none focus-visible:ring-2 ring-blue-500/50 rounded-lg px-4 py-2 text-sm font-medium border ${selectedBotsCategory === cat.id ? 'text-blue-500 border-blue-500 bg-blue-500/5 font-black' : 'text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:hover:bg-white/5'}`}
+                                                onClick={() => { haptic('light'); setSelectedBotsCategory(cat.id); }}
                                             >
                                                 {t(cat.label)}
                                             </button>
