@@ -60,39 +60,40 @@ async function startServer() {
 
   app.set('trust proxy', true);
 
+  // --- CORS CONFIGURATION ---
+  const allowedOrigins = [
+    'https://botlyhub.vercel.app',
+    'https://ais-pre-ubzg6ohqwxfncnjxhzi3nj-16842427189.europe-west2.run.app',
+    'http://localhost:3000',
+    'http://localhost:5173'
+  ];
+
+  app.use(cors({
+    origin: function (origin, callback) {
+      // allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) !== -1 || origin.includes('.run.app')) {
+        return callback(null, true);
+      }
+      // For development, allow any origin if not explicitly blocked
+      return callback(null, true);
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+    credentials: true,
+    preflightContinue: false,
+    optionsSuccessStatus: 204
+  }));
+
   app.use((req, res, next) => {
     console.log(`[REQUEST] ${req.method} ${req.url} - Origin: ${req.get('Origin')} - UA: ${req.get('User-Agent')} - IP: ${req.ip}`);
     next();
   });
 
-  app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
-    
-    if (req.method === 'OPTIONS') {
-      return res.status(200).end();
-    }
-    next();
-  });
-
   app.use(express.json());
-
-  // Global Error Handler
-  app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.error('[SERVER ERROR]', err);
-    res.status(500).json({ 
-      error: 'Internal Server Error', 
-      message: err.message,
-      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
-    });
-  });
 
   // --- DYNAMIC TON CONNECT MANIFEST ---
   app.get("/tonconnect-manifest.json", (req, res) => {
-    // Force CORS for manifest specifically
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     res.setHeader('Content-Type', 'application/json');
 
@@ -111,7 +112,7 @@ async function startServer() {
     res.json({
       url: origin,
       name: "BotlyHub V3",
-      iconUrl: `${origin}/logo.svg`, // Changed from favicon.ico to logo.svg
+      iconUrl: `${origin}/logo.svg`,
       termsOfServiceUrl: `${origin}/terms`,
       privacyPolicyUrl: `${origin}/privacy`
     });
@@ -201,6 +202,7 @@ async function startServer() {
 
   // 3. Verify TON Transaction
   app.post("/api/payments/verify-ton", paymentLimiter, async (req, res) => {
+    // ... logic remains same
     try {
       const validated = VerifyTonSchema.parse(req.body);
       const { transactionHash, orderId, userId } = validated;
@@ -293,6 +295,16 @@ async function startServer() {
     // Map txHash to transactionHash for consistency
     if (req.body.txHash) req.body.transactionHash = req.body.txHash;
     return app._router.handle(req, res, () => {});
+  });
+
+  // Global Error Handler - Moved to end of API section
+  app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    console.error('[SERVER ERROR]', err);
+    res.status(500).json({ 
+      error: 'Internal Server Error', 
+      message: err.message,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
   });
 
   // --- VITE MIDDLEWARE ---

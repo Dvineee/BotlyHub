@@ -500,8 +500,8 @@ export class DatabaseService {
 
     // 2. Try direct slug column match (in case it exists)
     try {
-        const { data: slugBot } = await supabase.from('bots').select('*').eq('slug', slug).maybeSingle();
-        if (slugBot) return this.mapBotData(slugBot);
+        const { data: slugBot, error: slugError } = await supabase.from('bots').select('*').eq('slug', slug).maybeSingle();
+        if (slugBot && !slugError) return this.mapBotData(slugBot);
     } catch (e) {
         // Fall through
     }
