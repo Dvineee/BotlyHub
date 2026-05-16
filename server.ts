@@ -60,39 +60,19 @@ async function startServer() {
 
   app.set('trust proxy', true);
 
-  // --- MANDATORY CORS FOR EXTERNAL DOMAINS (TELEGRAM / VERCEL) ---
-  // This must be the very first middleware
-  app.use((req, res, next) => {
-    const origin = req.get('Origin');
-    const allowedOrigins = [
-      'https://botlyhub.vercel.app',
-      'https://botlyhub.com',
-      'https://t.me'
-    ];
-
-    if (origin) {
-      if (allowedOrigins.includes(origin) || origin.includes('.run.app') || origin.includes('localhost') || origin.includes('127.0.0.1')) {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-      } else {
-        // Fallback or allowed origin for development
-        res.setHeader('Access-Control-Allow-Origin', '*');
-      }
-    } else {
-      res.setHeader('Access-Control-Allow-Origin', '*');
-    }
-
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-
-    if (req.method === 'OPTIONS') {
-      return res.status(204).end();
-    }
-    next();
-  });
+  // --- MANDATORY CORS ---
+  app.use(cors({
+    origin: function(origin, callback) {
+      // Allow any origin for now to solve the constant CORS issues with Vercel/Telegram
+      callback(null, true);
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
+  }));
 
   app.use((req, res, next) => {
-    console.log(`[REQUEST] ${req.method} ${req.url} - Origin: ${req.get('Origin')} - UA: ${req.get('User-Agent')} - IP: ${req.ip}`);
+    console.log(`[REQUEST] ${req.method} ${req.url} - Origin: ${req.get('Origin')}`);
     next();
   });
 
@@ -102,7 +82,7 @@ async function startServer() {
   app.get("/tonconnect-manifest.json", (req, res) => {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     res.setHeader('Content-Type', 'application/json');
-    res.setHeader('Access-Control-Allow-Origin', '*'); // Allow wallets to fetch manifest from anywhere
+    res.setHeader('Access-Control-Allow-Origin', '*'); // CRITICAL: Allow wallets to fetch
 
     const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
     const host = req.get('host');
@@ -117,6 +97,9 @@ async function startServer() {
         origin = 'https://botlyhub.com';
     } else if (host?.includes('botlyhub')) {
         origin = `https://${host}`;
+    } else if (origin.includes('.run.app')) {
+        // If we are on AI Studio runner, use the full current origin
+        origin = `${protocol}://${host}`;
     }
 
     // Ensure origin does not have trailing slash
