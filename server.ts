@@ -60,30 +60,36 @@ async function startServer() {
 
   app.set('trust proxy', true);
 
-  // --- CORS CONFIGURATION ---
-  const allowedOrigins = [
-    'https://botlyhub.vercel.app',
-    'https://ais-pre-ubzg6ohqwxfncnjxhzi3nj-16842427189.europe-west2.run.app',
-    'http://localhost:3000',
-    'http://localhost:5173'
-  ];
+  // --- MANDATORY CORS FOR EXTERNAL DOMAINS (TELEGRAM / VERCEL) ---
+  // This must be the very first middleware
+  app.use((req, res, next) => {
+    const origin = req.get('Origin');
+    const allowedOrigins = [
+      'https://botlyhub.vercel.app',
+      'https://botlyhub.com',
+      'https://t.me'
+    ];
 
-  app.use(cors({
-    origin: function (origin, callback) {
-      // allow requests with no origin (like mobile apps or curl requests)
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf(origin) !== -1 || origin.includes('.run.app')) {
-        return callback(null, true);
+    if (origin) {
+      if (allowedOrigins.includes(origin) || origin.includes('.run.app') || origin.includes('localhost') || origin.includes('127.0.0.1')) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+      } else {
+        // Fallback or allowed origin for development
+        res.setHeader('Access-Control-Allow-Origin', '*');
       }
-      // For development, allow any origin if not explicitly blocked
-      return callback(null, true);
-    },
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
-    credentials: true,
-    preflightContinue: false,
-    optionsSuccessStatus: 204
-  }));
+    } else {
+      res.setHeader('Access-Control-Allow-Origin', '*');
+    }
+
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+      return res.status(204).end();
+    }
+    next();
+  });
 
   app.use((req, res, next) => {
     console.log(`[REQUEST] ${req.method} ${req.url} - Origin: ${req.get('Origin')} - UA: ${req.get('User-Agent')} - IP: ${req.ip}`);
@@ -96,14 +102,21 @@ async function startServer() {
   app.get("/tonconnect-manifest.json", (req, res) => {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*'); // Allow wallets to fetch manifest from anywhere
 
     const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
-    const host = req.headers['x-forwarded-host'] || req.get('host');
+    const host = req.get('host');
     
-    // Safety check for origin
+    // Determine the canonical URL for the manifest
+    const requestOrigin = req.get('Origin') || '';
     let origin = `${protocol}://${host}`;
-    if (host && typeof host === 'string' && (host.includes('botlyhub.vercel.app') || req.get('Origin')?.includes('botlyhub.vercel.app'))) {
+    
+    if (requestOrigin.includes('botlyhub.vercel.app')) {
         origin = 'https://botlyhub.vercel.app';
+    } else if (requestOrigin.includes('botlyhub.com')) {
+        origin = 'https://botlyhub.com';
+    } else if (host?.includes('botlyhub')) {
+        origin = `https://${host}`;
     }
 
     // Ensure origin does not have trailing slash
