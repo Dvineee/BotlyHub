@@ -935,9 +935,26 @@ h2.text-lg.sm\:text-xl.font-extrabold.text-slate-900.dark\:text-white.tracking-t
 }
 
 .dark .category-filter-item {
-    border-color: rgba(255, 255, 255, 0.05);
-    color: rgba(255, 255, 255, 0.4);
-    background-color: rgba(255, 255, 255, 0.03);
+    padding: 7px 12px;
+    border: 1px solid #0000000d;
+    margin-right: 12px;
+    border-radius: 10px;
+    color: #0006;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    transition: all .2s ease;
+    -webkit-user-select: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+    border-color: #ffffff0d;
+    color: #fff6;
+    background-color: #ffffff08;
+}
+.dark\:text-slate-400:is(.dark *) {
+    --tw-text-opacity: 1;
+    color: #fff6;
 }
 
 .category-filter-item:hover {
