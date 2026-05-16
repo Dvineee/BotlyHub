@@ -924,6 +924,7 @@ h2.text-lg.sm\:text-xl.font-extrabold.text-slate-900.dark\:text-white.tracking-t
     margin-right: 12px;
     border-radius: 10px;
     color: #00000066;
+    background-color: #00000005;
     cursor: pointer;
     font-size: 14px;
     font-weight: 500;
@@ -965,15 +966,17 @@ h2.text-lg.sm\:text-xl.font-extrabold.text-slate-900.dark\:text-white.tracking-t
 }
 
 .category-filter-item.active {
-    border-color: rgba(0, 0, 0, 0);
+    border-color: #0000001a;
     background-color: #0000000a;
-    color: #000000;
+    color: #000;
+    font-weight: 700;
 }
 
 .dark .category-filter-item.active {
-    border-color: rgba(255, 255, 255, 0.1);
-    background-color: rgba(255, 255, 255, 0.05);
-    color: #ffffff;
+    border-color: #ffffff26;
+    background-color: #ffffff0d;
+    color: #fff;
+    font-weight: 700;
 }
 
 @media (min-width: 769px) {
@@ -1208,4 +1211,11 @@ button.text-\[14px\].font-medium.text-slate-600.dark\:text-slate-400.hover\:text
 .dark\:text-slate-400:is(.dark *) {
     --tw-text-opacity: 1;
     color: #fff6 !important;
+}
+
+@media (min-width: 640px) {
+    .home-page .sm\:flex {
+        margin-top: 0px;
+        display: flex;
+    }
 }
