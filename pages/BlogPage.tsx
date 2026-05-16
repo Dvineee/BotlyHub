@@ -803,9 +803,9 @@ const BlogPage: React.FC = () => {
                 <button 
                   key={post.id}
                   onClick={() => { haptic('light'); navigate('/blog/' + post.id); }}
-                  className="w-full flex items-start gap-4 p-4 rounded-2xl bg-white dark:bg-white/2 hover:bg-blue-500/5 border border-slate-100 dark:border-white/5 transition-all text-left group"
+                  className="w-full flex items-start gap-4 p-4 rounded-2xl bg-white dark:bg-white/2 hover:bg-blue-500/5 border border-slate-100 dark:border-white/5 transition-all text-left group similar-post-card"
                 >
-                  <span className="text-xl font-black text-slate-200 dark:text-white/5 group-hover:text-blue-500/30 transition-colors italic">0{i+1}</span>
+                  <span className="text-xl font-black text-slate-200 dark:text-white/10 group-hover:text-blue-500/30 transition-colors italic">0{i+1}</span>
                   <div className="flex-1 min-w-0">
                     <h5 className="text-[11px] font-black text-slate-900 dark:text-white line-clamp-2 leading-tight uppercase tracking-tight italic group-hover:text-blue-600 transition-colors">{post.title}</h5>
                     <div className="flex items-center gap-2 mt-2">
@@ -819,16 +819,18 @@ const BlogPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[32px] p-8 text-white relative overflow-hidden group shadow-2xl shadow-blue-500/20">
-            <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/20 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
-            <Trophy size={32} className="text-white mb-6 animate-bounce" />
-            <h3 className="text-xl font-black italic tracking-tighter mb-3 uppercase">Topluluğa Katılın</h3>
-            <p className="text-blue-100 text-[11px] font-medium mb-6 leading-relaxed italic">TON ekosistemindeki 10,000+ geliştirici ve yatırımcı ile birlikte BotlyHub ağının bir parçası olun.</p>
+          <div className="bg-white dark:bg-slate-900/40 rounded-[32px] p-8 border border-slate-100 dark:border-white/5 relative group shadow-sm">
+            <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center mb-6">
+              <Trophy size={24} className="text-blue-600 dark:text-blue-400" />
+            </div>
+            <h3 className="text-xl font-black italic tracking-tighter mb-3 uppercase text-slate-900 dark:text-white">Topluluğa Katılın</h3>
+            <p className="text-slate-500 dark:text-slate-400 text-[11px] font-medium mb-6 leading-relaxed italic">TON ekosistemindeki 10,000+ geliştirici ve yatırımcı ile birlikte BotlyHub ağının bir parçası olun.</p>
             <button 
               onClick={() => { haptic('medium'); window.open('https://t.me/BotlyHub', '_blank'); }}
-              className="w-full py-4 bg-white text-blue-600 font-black uppercase text-[10px] tracking-widest rounded-2xl hover:bg-blue-50 transition-colors shadow-lg flex items-center justify-center gap-2"
+              className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-black uppercase text-[10px] tracking-widest rounded-2xl transition-all shadow-lg shadow-blue-500/20 active:scale-95 flex items-center justify-center gap-3 group/btn"
             >
-              TELEGRAM KANALIMIZ <ArrowRight size={14} />
+              TELEGRAM KANALIMIZ 
+              <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
             </button>
           </div>
         </aside>
