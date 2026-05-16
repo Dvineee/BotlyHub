@@ -952,11 +952,6 @@ h2.text-lg.sm\:text-xl.font-extrabold.text-slate-900.dark\:text-white.tracking-t
     color: #fff6;
     background-color: #ffffff08;
 }
-.dark\:text-slate-400:is(.dark *) {
-    --tw-text-opacity: 1;
-    color: #fff6;
-}
-
 .category-filter-item:hover {
     border-color: rgba(0, 0, 0, 0);
     background-color: #0000000a;
@@ -1208,4 +1203,9 @@ button.text-\[14px\].font-medium.text-slate-600.dark\:text-slate-400.hover\:text
 .dark .similar-post-card:hover {
     background-color: #232a48 !important;
     border-color: rgba(59, 130, 246, 0.3) !important;
+}
+
+.dark\:text-slate-400:is(.dark *) {
+    --tw-text-opacity: 1;
+    color: #fff6 !important;
 }
