@@ -923,8 +923,7 @@ h2.text-lg.sm\:text-xl.font-extrabold.text-slate-900.dark\:text-white.tracking-t
     border: 1px solid #0000000d;
     margin-right: 12px;
     border-radius: 10px;
-    color: #00000066;
-    background-color: #00000005;
+    color: #0006;
     cursor: pointer;
     font-size: 14px;
     font-weight: 500;
@@ -933,6 +932,7 @@ h2.text-lg.sm\:text-xl.font-extrabold.text-slate-900.dark\:text-white.tracking-t
     -webkit-user-select: none;
     white-space: nowrap;
     flex-shrink: 0;
+    background-color: #00000008;
 }
 
 .dark .category-filter-item {
@@ -966,17 +966,15 @@ h2.text-lg.sm\:text-xl.font-extrabold.text-slate-900.dark\:text-white.tracking-t
 }
 
 .category-filter-item.active {
-    border-color: #0000001a;
+    border-color: rgba(0, 0, 0, 0);
     background-color: #0000000a;
-    color: #000;
-    font-weight: 700;
+    color: #000000;
 }
 
 .dark .category-filter-item.active {
-    border-color: #ffffff26;
-    background-color: #ffffff0d;
-    color: #fff;
-    font-weight: 700;
+    border-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
 }
 
 @media (min-width: 769px) {
