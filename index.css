@@ -932,6 +932,7 @@ h2.text-lg.sm\:text-xl.font-extrabold.text-slate-900.dark\:text-white.tracking-t
     -webkit-user-select: none;
     white-space: nowrap;
     flex-shrink: 0;
+    border-color: #0000000d;
     background-color: #00000008;
 }
 
