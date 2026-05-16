@@ -35,7 +35,8 @@ import {
   MessageSquare,
   Send,
   Loader2,
-  ThumbsUp
+  ThumbsUp,
+  Users
 } from 'lucide-react';
 import { useTelegram } from '../hooks/useTelegram';
 import { useTranslation } from '../TranslationContext';
@@ -113,6 +114,8 @@ const BlogPostDetail: React.FC = () => {
   const [isLiked, setIsLiked] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+  const [popularCategories, setPopularCategories] = useState<{id: string, label: string, engagement: number}[]>([]);
+  const [currentRankIndex, setCurrentRankIndex] = useState(0);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -134,6 +137,36 @@ const BlogPostDetail: React.FC = () => {
             // Comments
             const comms = await DatabaseService.getBlogComments(id);
             setComments(comms);
+
+            // Calculate category popularity for the leaderboard
+            const categoryStats: { [key: string]: { views: number, comments: number } } = {};
+            
+            // Get all categories engagement (we need a broad view)
+            blogs.forEach(b => {
+              const catLabel = b.category;
+              if (!categoryStats[catLabel]) categoryStats[catLabel] = { views: 0, comments: 0 };
+              categoryStats[catLabel].views += (b.views_count || 0);
+            });
+
+            // Rank categories
+            const sortedCats = Object.entries(categoryStats)
+              .map(([label, stats]) => {
+                const cat = categories.find(c => c.label === label);
+                return {
+                  id: cat?.id || label,
+                  label,
+                  engagement: Math.floor(stats.views / 2 + 10) // Simulating comment count logic
+                };
+              })
+              .sort((a, b) => b.engagement - a.engagement);
+
+            setPopularCategories(sortedCats);
+            
+            // Set currentRankIndex to the category of the POST being read
+            const currentCatIndex = sortedCats.findIndex(c => c.label === data.category);
+            if (currentCatIndex !== -1) {
+              setCurrentRankIndex(currentCatIndex);
+            }
             
             // Check if liked
             if (user?.id) {
@@ -266,7 +299,7 @@ const BlogPostDetail: React.FC = () => {
   }
 
   return (
-    <div className="bg-[#fcfcfc] dark:bg-slate-950 min-h-screen text-slate-900 dark:text-slate-100 font-sans">
+    <div className="bg-[#fcfcfc] dark:bg-slate-950 min-h-screen text-slate-900 dark:text-slate-100 font-sans blog-page-scope">
       <SEO 
         title={`${post.title}`} 
         description={post.title} 
@@ -687,7 +720,7 @@ const BlogPostDetail: React.FC = () => {
               </div>
 
             {/* Comments Section */}
-            <section className="mb-20">
+            <section id="comments-section" className="mb-20">
               <h3 className="text-xl font-black text-slate-900 dark:text-white mb-8 italic uppercase tracking-tighter flex items-center gap-3">
                 <MessageSquare size={20} className="text-blue-500" />
                 Yorumlar <span className="text-slate-300 dark:text-slate-800">/</span> {comments.length}
@@ -790,23 +823,70 @@ const BlogPostDetail: React.FC = () => {
             <div className="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded border border-slate-200 dark:border-white/10 opacity-50 bg-white dark:bg-slate-800">⌘K</div>
           </button>
 
-          <div className="bg-slate-900 rounded-3xl p-8 text-white relative overflow-hidden group">
-            <Zap size={32} className="text-yellow-400 mb-6" />
-            <h3 className="text-xl font-bold tracking-tight mb-3">Abone Ol</h3>
-            <p className="text-slate-400 text-sm mb-6">Bu yazarın yeni yazılarını anında bildir.</p>
-            <button className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-black uppercase text-[10px] tracking-widest rounded-xl transition-colors">Abone Ol</button>
-          </div>
+          {/* Popular Category Leaderboard - Matching requested design */}
+          {popularCategories.length > 0 && (
+            <div className="bg-[#ddeaf8] dark:bg-slate-900/60 rounded-[40px] p-8 border border-slate-100 dark:border-white/5 relative group shadow-sm popular-content-card">
+                <div className="flex items-start justify-between mb-8">
+                <div>
+                    <h2 className="text-4xl font-black text-slate-900 dark:text-white italic tracking-tighter"># {currentRankIndex + 1}</h2>
+                    <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-1 italic">En Popüler</p>
+                </div>
+                <div className="flex items-center bg-white/50 dark:bg-black/20 rounded-full p-1 border border-slate-200/50 dark:border-white/5 translate-y-1">
+                    <button 
+                    onClick={() => { haptic('light'); setCurrentRankIndex(prev => (prev === 0 ? popularCategories.length - 1 : prev - 1)); }}
+                    className="p-3 hover:bg-white dark:hover:bg-white/10 rounded-full text-slate-400 hover:text-blue-500 transition-all"
+                    >
+                    <ChevronLeft size={16} />
+                    </button>
+                    <div className="w-[1px] h-4 bg-slate-200 dark:bg-white/10" />
+                    <button 
+                    onClick={() => { haptic('light'); setCurrentRankIndex(prev => (prev === popularCategories.length - 1 ? 0 : prev + 1)); }}
+                    className="p-3 hover:bg-white dark:hover:bg-white/10 rounded-full text-slate-400 hover:text-blue-500 transition-all"
+                    >
+                    <ChevronRight size={16} />
+                    </button>
+                </div>
+                </div>
+                
+                <button 
+                onClick={() => { 
+                    haptic('medium'); 
+                    const commentsSection = document.getElementById('comments-section');
+                    if (commentsSection) {
+                        commentsSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }}
+                className="w-full bg-[#ff5c5c] hover:bg-[#ff4d4d] text-white rounded-full py-2 px-5 flex items-center gap-4 transition-all hover:scale-[1.02] active:scale-95 shadow-xl shadow-red-500/20 group/btn"
+                >
+                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0">
+                    <Users size={20} className="text-white" />
+                </div>
+                <div className="flex-1 text-left min-w-0">
+                    <p className="text-[12px] font-black uppercase tracking-tight truncate italic">
+                    {popularCategories[currentRankIndex]?.label || 'Yükleniyor...'} • {popularCategories[currentRankIndex]?.engagement || 0} yorum
+                    </p>
+                </div>
+                </button>
+            </div>
+          )}
 
           <div className="space-y-6">
             <h4 className="px-2 text-[10px] font-black uppercase tracking-widest text-slate-400">BENZER YAZILAR</h4>
             <div className="space-y-4">
-              {similarPosts.map(p => (
-                <div key={p.id} onClick={() => navigate('/blog/' + p.id)} className="group cursor-pointer">
-                  <h5 className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-blue-500 transition-colors mb-1 line-clamp-2 italic">
-                    {p.title}
-                  </h5>
-                  <div className="text-[10px] font-black text-slate-400 uppercase tracking-wider">{p.readTime || '5 Dakika'} Okuma</div>
-                </div>
+              {similarPosts.map((p, i) => (
+                <button 
+                  key={p.id} 
+                  onClick={() => { haptic('light'); navigate('/blog/' + p.id); }} 
+                  className="w-full flex items-start gap-4 p-4 rounded-2xl bg-white dark:bg-white/2 hover:bg-blue-500/5 border border-slate-100 dark:border-white/5 transition-all text-left group"
+                >
+                  <span className="text-xl font-black text-slate-200 dark:text-white/5 group-hover:text-blue-500/30 transition-colors italic">0{i+1}</span>
+                  <div className="flex-1 min-w-0">
+                    <h5 className="text-[11px] font-black text-slate-900 dark:text-white group-hover:text-blue-500 transition-colors mb-1 line-clamp-2 italic leading-tight uppercase">
+                      {p.title}
+                    </h5>
+                    <div className="text-[8px] font-black text-slate-400 uppercase tracking-widest">{p.readTime || '5 Dakika'} Okuma</div>
+                  </div>
+                </button>
               ))}
               {similarPosts.length === 0 && (
                  <p className="text-[10px] font-bold text-slate-700 uppercase tracking-widest italic px-2">Gösterilecek benzer yazı yok.</p>

@@ -32,7 +32,8 @@ import {
   Globe,
   Star,
   Heart,
-  LogOut
+  LogOut,
+  Users
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../TranslationContext';
@@ -126,7 +127,7 @@ const BlogPage: React.FC = () => {
   const regularPosts = featuredPost ? filteredPosts.filter(p => p.id !== featuredPost.id) : filteredPosts;
 
   return (
-    <div className="bg-[#fcfcfc] dark:bg-slate-950 min-h-screen text-slate-900 dark:text-slate-100 font-sans">
+    <div className="bg-[#fcfcfc] dark:bg-slate-950 min-h-screen text-slate-900 dark:text-slate-100 font-sans blog-page-scope">
       <SEO 
           title="Blog - En Son Bot Trendleri ve TON Ekosistemi" 
           description="Telegram ekosistemindeki en son gelişmeleri, bot trendlerini, TON ağı haberlerini ve derinlemesine teknik analizleri BotlyHub Blog üzerinden takip edin." 
@@ -773,7 +774,7 @@ const BlogPage: React.FC = () => {
         <aside className="hidden xl:flex flex-col w-80 h-screen sticky top-0 py-12 px-6 overflow-y-auto no-scrollbar space-y-10">
           <button
              onClick={() => { haptic('light'); setIsSearchModalOpen(true); }}
-             className="w-full flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-white/10 border border-slate-100 dark:border-white/5 hover:border-blue-500/50 transition-all text-sm font-semibold group"
+             className="w-full flex items-center gap-3 p-3 rounded-xl bg-[#f2f4f7] dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-white/10 border border-slate-100 dark:border-white/5 hover:border-blue-500/50 transition-all text-sm font-semibold group"
           >
             <Search size={18} className="group-hover:scale-110 group-hover:text-blue-500 transition-all" />
             <span>Arama Yap</span>
