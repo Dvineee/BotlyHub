@@ -874,7 +874,7 @@ h2.text-lg.sm\:text-xl.font-extrabold.text-slate-900.dark\:text-white.tracking-t
     padding-right: 1rem;
 }
 
-.home-page .px-4 {
+.home-page .px-4:not(.category-filter-item) {
     padding-left: 0.12rem;
     padding-right: 0.12rem;
 }
