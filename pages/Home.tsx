@@ -1096,7 +1096,7 @@ const Home = () => {
                                         className="category-filter-container no-scrollbar relative z-0"
                                     >
                                         <button 
-                                            className={`category-filter-item cursor-pointer hover:text-blue-500 transition-all whitespace-nowrap outline-none focus-visible:ring-2 ring-blue-500/50 rounded-lg px-4 py-2 text-sm font-medium border ${selectedAppsCategory === 'all' ? 'text-blue-500 border-blue-500 bg-blue-500/5 font-black' : 'text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:hover:bg-white/5'}`}
+                                            className={`category-filter-item cursor-pointer hover:text-blue-500 transition-all whitespace-nowrap outline-none px-3 py-1.5 text-[13px] font-medium border rounded-xl ${selectedAppsCategory === 'all' ? 'text-blue-500 border-[#ffffff1a] bg-[#ffffff0d]' : 'text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:hover:bg-white/5'}`}
                                             onClick={() => { haptic('light'); setSelectedAppsCategory('all'); }}
                                         >
                                             {t('Tümü')}
@@ -1104,7 +1104,7 @@ const Home = () => {
                                         {appsSubCategories.map((subCat) => (
                                             <button 
                                                 key={subCat.id} 
-                                                className={`category-filter-item cursor-pointer hover:text-blue-500 transition-all whitespace-nowrap outline-none focus-visible:ring-2 ring-blue-500/50 rounded-lg px-4 py-2 text-sm font-medium border ${selectedAppsCategory === subCat.id ? 'text-blue-500 border-blue-500 bg-blue-500/5 font-black' : 'text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:hover:bg-white/5'}`}
+                                                className={`category-filter-item cursor-pointer hover:text-blue-500 transition-all whitespace-nowrap outline-none px-3 py-1.5 text-[13px] font-medium border rounded-xl ${selectedAppsCategory === subCat.id ? 'text-blue-500 border-[#ffffff1a] bg-[#ffffff0d]' : 'text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:hover:bg-white/5'}`}
                                                 onClick={() => { haptic('light'); setSelectedAppsCategory(subCat.id); }}
                                             >
                                                 {t(subCat.label)}
@@ -1214,7 +1214,7 @@ const Home = () => {
                                         className="category-filter-container no-scrollbar relative z-0"
                                     >
                                         <button 
-                                            className={`category-filter-item cursor-pointer hover:text-blue-500 transition-all whitespace-nowrap outline-none focus-visible:ring-2 ring-blue-500/50 rounded-lg px-4 py-2 text-sm font-medium border ${selectedBotsCategory === 'all' ? 'text-blue-500 border-blue-500 bg-blue-500/5 font-black' : 'text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:hover:bg-white/5'}`}
+                                            className={`category-filter-item cursor-pointer hover:text-blue-500 transition-all whitespace-nowrap outline-none px-3 py-1.5 text-[13px] font-medium border rounded-xl ${selectedBotsCategory === 'all' ? 'text-blue-500 border-[#ffffff1a] bg-[#ffffff0d]' : 'text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:hover:bg-white/5'}`}
                                             onClick={() => { haptic('light'); setSelectedBotsCategory('all'); }}
                                         >
                                             {t('Tümü')}
@@ -1222,7 +1222,7 @@ const Home = () => {
                                         {botsCategories.map((cat) => (
                                             <button 
                                                 key={cat.id} 
-                                                className={`category-filter-item cursor-pointer hover:text-blue-500 transition-all whitespace-nowrap outline-none focus-visible:ring-2 ring-blue-500/50 rounded-lg px-4 py-2 text-sm font-medium border ${selectedBotsCategory === cat.id ? 'text-blue-500 border-blue-500 bg-blue-500/5 font-black' : 'text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:hover:bg-white/5'}`}
+                                                className={`category-filter-item cursor-pointer hover:text-blue-500 transition-all whitespace-nowrap outline-none px-3 py-1.5 text-[13px] font-medium border rounded-xl ${selectedBotsCategory === cat.id ? 'text-blue-500 border-[#ffffff1a] bg-[#ffffff0d]' : 'text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:hover:bg-white/5'}`}
                                                 onClick={() => { haptic('light'); setSelectedBotsCategory(cat.id); }}
                                             >
                                                 {t(cat.label)}
