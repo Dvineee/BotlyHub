@@ -1179,6 +1179,16 @@ button.text-\[14px\].font-medium.text-slate-600.dark\:text-slate-400.hover\:text
 }
 
 .dark .popular-content-card {
+    background-color: #12172c !important;
+    border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.dark .similar-post-card {
     background-color: #1a1e35 !important;
     border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.dark .similar-post-card:hover {
+    background-color: #232a48 !important;
+    border-color: rgba(59, 130, 246, 0.3) !important;
 }

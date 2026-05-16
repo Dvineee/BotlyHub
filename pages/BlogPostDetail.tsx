@@ -877,7 +877,7 @@ const BlogPostDetail: React.FC = () => {
                 <button 
                   key={p.id} 
                   onClick={() => { haptic('light'); navigate('/blog/' + p.id); }} 
-                  className="w-full flex items-start gap-4 p-4 rounded-2xl bg-white dark:bg-white/2 hover:bg-blue-500/5 border border-slate-100 dark:border-white/5 transition-all text-left group"
+                  className="w-full flex items-start gap-4 p-4 rounded-2xl bg-white dark:bg-white/2 hover:bg-blue-500/5 border border-slate-100 dark:border-white/5 transition-all text-left group similar-post-card"
                 >
                   <span className="text-xl font-black text-slate-200 dark:text-white/5 group-hover:text-blue-500/30 transition-colors italic">0{i+1}</span>
                   <div className="flex-1 min-w-0">
