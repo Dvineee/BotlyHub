@@ -5,33 +5,37 @@ import {
   Users, Calendar, Terminal, Code, ShieldAlert, BarChart3, UserCog, History, 
   Settings, CreditCard, LogOut, LayoutDashboard, Globe, MessageSquare, 
   ChevronRight, Save, Download, Upload, RotateCcw, AlertCircle, Info, Star,
-  Search, Filter, List, MoreVertical, Plus, Check, X, ShieldCheck, Zap
+  Search, Filter, List, MoreVertical, Plus, Check, X, ShieldCheck, Zap,
+  ExternalLink, ListOrdered, Sticker
 } from 'lucide-react';
 import { useTelegram } from '../hooks/useTelegram';
 import { DatabaseService } from '../services/DatabaseService';
 import { UserBot } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 
-const SidebarItem = ({ icon: Icon, label, path, active, badge }: any) => (
+const SidebarItem = ({ icon: Icon, label, path, active, badge, color, external }: any) => (
   <Link 
     to={path} 
-    className={`flex items-center justify-between px-4 py-3 rounded-xl transition-all group ${
+    className={`flex items-center justify-between px-3 py-1.5 transition-all group ${
       active 
-        ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' 
-        : 'text-slate-400 hover:bg-slate-800/50 hover:text-white'
+        ? 'bg-blue-600/10 text-blue-500 font-bold' 
+        : 'text-slate-400 hover:text-white'
     }`}
   >
     <div className="flex items-center gap-3">
-      <Icon size={20} className={active ? 'text-white' : 'group-hover:text-white transition-colors'} />
-      <span className="text-sm font-medium">{label}</span>
+      <Icon size={16} className={`${active ? 'text-blue-500' : color ? color : 'text-slate-500 group-hover:text-white'} transition-colors`} />
+      <span className="text-[12px] font-medium tracking-tight">{label}</span>
     </div>
-    {badge && (
-      <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-md ${
-        active ? 'bg-white/20 text-white' : 'bg-blue-500/20 text-blue-500'
-      }`}>
-        {badge}
-      </span>
-    )}
+    <div className="flex items-center gap-1.5">
+      {badge && (
+        <span className={`text-[8px] font-black px-1 py-0.5 rounded italic uppercase border ${
+          active ? 'bg-white/20 text-white border-white/20' : 'bg-blue-500/10 text-blue-500 border-blue-500/20'
+        }`}>
+          {badge}
+        </span>
+      )}
+      {external && <ExternalLink size={10} className="text-slate-600" />}
+    </div>
   </Link>
 );
 
@@ -112,29 +116,45 @@ const BotManagementPanel = () => {
   ];
 
   const groupNavItems = [
-    { label: 'Ayarlar', icon: Settings, path: `groups/${groupId}/settings` },
-    { label: 'Combot AI', icon: Zap, path: `groups/${groupId}/ai` },
-    { label: 'Pro', icon: Star, path: `groups/${groupId}/pro`, highlight: true },
-    { label: 'Moderasyon', icon: ShieldCheck, path: `groups/${groupId}/moderation` },
-    { label: 'Analiz', icon: BarChart3, path: `groups/${groupId}/analysis` },
-    { label: 'Kullanıcılar', icon: UserCog, path: `groups/${groupId}/users` },
-    { label: 'Yönlendirmeler', icon: Globe, path: `groups/${groupId}/referrals` },
-    { label: 'Günlük', icon: History, path: `groups/${groupId}/logs` },
+    { label: 'Ayarlar', icon: Settings, path: `groups/${groupId}/settings`, color: 'text-blue-500' },
+    { label: 'Combot AI', icon: Zap, path: `groups/${groupId}/ai`, color: 'text-blue-500' },
+    { label: 'Pro', icon: Star, path: `groups/${groupId}/pro`, color: 'text-blue-500' },
+    { label: 'Moderasyon', icon: ShieldCheck, path: `groups/${groupId}/moderation`, color: 'text-blue-500' },
+    { label: 'Analiz', icon: BarChart3, path: `groups/${groupId}/analysis`, color: 'text-blue-500' },
+    { label: 'Kullanıcılar', icon: UserCog, path: `groups/${groupId}/users`, color: 'text-blue-500' },
+    { label: 'Yönlendirmeler', icon: Globe, path: `groups/${groupId}/referrals`, color: 'text-blue-500' },
+    { label: 'Günlük', icon: History, path: `groups/${groupId}/logs`, color: 'text-blue-500' },
+    { label: 'Sıralama', icon: ListOrdered, path: `groups/${groupId}/ranking`, color: 'text-blue-500' },
+  ];
+
+  const externalNavItems = [
+    { label: 'Combot Anti-Spam', icon: ShieldAlert, path: 'antispam', external: true },
+    { label: 'Telegram Top Groups', icon: Globe, path: 'top-groups', external: true },
+    { label: 'Stickers Catalogue', icon: Sticker, path: 'stickers', external: true },
   ];
 
   return (
     <div className="min-h-screen bg-[#0f1218] flex text-slate-300 font-sans selection:bg-blue-500/30">
       {/* Sidebar */}
-      <aside className="w-64 bg-[#14181f] border-r border-white/5 flex flex-col sticky top-0 h-screen overflow-y-auto no-scrollbar">
-        <div className="p-6">
-          <Link to="/" className="flex items-center gap-3 mb-8">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-black text-white italic">B</div>
-            <span className="font-black text-white uppercase italic tracking-tighter">BotlyHub Panel</span>
+      <aside className="w-60 bg-[#11141a] border-r border-white/5 flex flex-col sticky top-0 h-screen overflow-y-auto no-scrollbar">
+        <div className="p-4 flex-1">
+          {/* Brand Header */}
+          <Link to="/" className="flex items-center gap-2 px-3 mb-6">
+            <div className="w-8 h-8 rounded-full border-2 border-white/10 flex items-center justify-center p-1 overflow-hidden shrink-0">
+               <div className="w-full h-full bg-blue-600 rounded-full flex items-center justify-center">
+                 <div className="flex gap-0.5">
+                   <div className="w-0.5 h-3 bg-white/20"></div>
+                   <div className="w-0.5 h-4 bg-white"></div>
+                   <div className="w-0.5 h-2 bg-white/40"></div>
+                 </div>
+               </div>
+            </div>
+            <span className="font-bold text-white text-lg tracking-tight">Combot</span>
           </Link>
 
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* Global Nav */}
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               {globalNavItems.map((item) => (
                 <SidebarItem 
                   key={item.path}
@@ -146,49 +166,73 @@ const BotManagementPanel = () => {
               ))}
             </div>
 
-            {/* Group Nav (Conditional) */}
-            {groupId && (
+            {/* Current Active Item (Kaju Test) */}
+            {groupId ? (
               <div className="space-y-1">
-                <div className="px-4 py-2 flex items-center justify-between text-slate-500">
-                  <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 bg-slate-800 rounded flex items-center justify-center text-[10px] font-black text-white italic">K</div>
-                    <span className="text-[10px] font-black uppercase tracking-widest italic">Kaju Test</span>
+                <div className="px-3 py-2 flex items-center justify-between group cursor-pointer hover:bg-white/2 transition-all rounded-lg mb-2">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full border border-white/10 overflow-hidden shrink-0">
+                       <img src="https://botlyhub.com/kaju-logo.png" alt="Kaju" className="w-full h-full object-cover" />
+                    </div>
+                    <div>
+                      <h4 className="text-[12px] font-bold text-white leading-tight">KAJU TEST</h4>
+                      <span className="text-[10px] text-slate-500 lowercase leading-tight">@botlyhub</span>
+                    </div>
                   </div>
-                  <ChevronRight size={10} className="rotate-90" />
+                  <ChevronRight size={14} className="rotate-90 text-slate-600" />
                 </div>
-                {groupNavItems.map((item) => (
-                  <SidebarItem 
-                    key={item.path}
-                    icon={item.icon}
-                    label={item.label}
-                    path={`/bot-panel/${botId}/${item.path}`}
-                    active={location.pathname.includes(`/${item.path}`)}
-                    badge={item.highlight ? 'Pro' : undefined}
-                  />
-                ))}
+
+                {/* Sub-Nav Group */}
+                <div className="space-y-0.5">
+                  {groupNavItems.map((item) => (
+                    <SidebarItem 
+                      key={item.path}
+                      icon={item.icon}
+                      label={item.label}
+                      color={item.color}
+                      path={`/bot-panel/${botId}/${item.path}`}
+                      active={location.pathname.includes(`/${item.path.split('/').pop()}`)}
+                    />
+                  ))}
+                </div>
               </div>
+            ) : (
+                <div className="px-3 py-4 text-center border border-dashed border-white/5 rounded-2xl">
+                    <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Grup Seçilmedi</p>
+                </div>
             )}
+
+            {/* External Links Section */}
+            <div className="space-y-0.5 pt-4 border-t border-white/5">
+              {externalNavItems.map((item) => (
+                <SidebarItem 
+                  key={item.path}
+                  icon={item.icon}
+                  label={item.label}
+                  path="#"
+                  external={true}
+                />
+              ))}
+            </div>
           </div>
         </div>
 
-        <div className="mt-auto p-6 space-y-1">
-          <div className="p-4 bg-orange-500/5 border border-orange-500/20 rounded-2xl mb-4 group cursor-pointer hover:bg-orange-600/10 transition-all border-dashed">
-             <div className="flex items-center gap-2 mb-1">
-               <Star size={14} className="text-orange-500" />
-               <span className="text-[10px] font-black text-orange-500 uppercase tracking-widest">Bot Anti-Spam</span>
-             </div>
-             <p className="text-[10px] text-slate-500 font-medium tracking-tight">Telegram Anti-Spam korumasını aktif edin.</p>
+        {/* Footer Brand Branding */}
+        <div className="mt-auto p-4 border-t border-white/5 bg-[#0d1014]">
+          <div className="px-3 mb-4">
+             <h3 className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">Kaju</h3>
           </div>
-
-          <SidebarItem icon={Settings} label="Bot Ayarları" path={`/bot-panel/${botId}/bot-settings`} active={location.pathname.includes('bot-settings')} />
-          <SidebarItem icon={CreditCard} label="Faturalandırma" path={`/bot-panel/${botId}/billing`} active={location.pathname.includes('billing')} />
-          <button 
-            onClick={() => { haptic('medium'); navigate('/my-bots'); }}
-            className="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-red-400 hover:bg-red-500/5 rounded-xl transition-all"
-          >
-            <LogOut size={20} />
-            <span className="text-sm font-medium">Paneli Kapat</span>
-          </button>
+          <div className="space-y-0.5">
+            <SidebarItem icon={Settings} label="Ayarlar" path={`/bot-panel/${botId}/bot-settings`} active={location.pathname.includes('bot-settings')} />
+            <SidebarItem icon={CreditCard} label="Faturalandırma" path={`/bot-panel/${botId}/billing`} active={location.pathname.includes('billing')} />
+            <button 
+              onClick={() => { haptic('medium'); navigate('/my-bots'); }}
+              className="w-full flex items-center gap-3 px-3 py-1.5 text-slate-500 hover:text-red-400 transition-all group"
+            >
+              <LogOut size={16} className="text-slate-500 group-hover:text-red-400" />
+              <span className="text-[12px] font-medium tracking-tight">Çıkış Yap</span>
+            </button>
+          </div>
         </div>
       </aside>
 
