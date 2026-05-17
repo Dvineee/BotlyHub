@@ -409,6 +409,16 @@ const BotDetail = () => {
                           <polyline points="20 6 9 17 4 12" />
                       </svg>
                   )}
+                  {isOwned && (
+                      <button 
+                          onClick={() => { haptic('medium'); navigate(`/bot-panel/${bot.id}`); }}
+                          className="flex items-center gap-2 px-3 py-1.5 bg-blue-600/10 border border-blue-600/20 text-blue-600 dark:text-blue-400 rounded-xl hover:bg-blue-600/20 active:scale-95 transition-all ml-2"
+                          title="Bot Yönetim Paneli"
+                      >
+                          <LayoutGrid size={12} />
+                          <span className="text-[10px] font-black uppercase tracking-widest italic">YÖNETİM PANELİ</span>
+                      </button>
+                  )}
                   {DatabaseService.isAdminLoggedIn() && (
                       <button 
                           onClick={() => navigate('/a/dashboard/bots')}

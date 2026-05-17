@@ -10,7 +10,7 @@ import {
 import { useTelegram } from '../hooks/useTelegram';
 import { DatabaseService } from '../services/DatabaseService';
 import { UserBot } from '../types';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 
 const SidebarItem = ({ icon: Icon, label, path, active, badge }: any) => (
   <Link 

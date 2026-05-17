@@ -5,6 +5,8 @@ import { HelmetProvider } from 'react-helmet-async';
 import App from './App';
 import { TranslationProvider, useTranslation } from './TranslationContext';
 import { ThemeProvider } from './ThemeContext';
+import { FilterProvider } from './FilterContext';
+import { HashRouter } from 'react-router-dom';
 import { TonConnectUIProvider } from '@tonconnect/ui-react';
 import './index.css';
 
@@ -88,9 +90,13 @@ if (rootElement) {
       <TonConnectUIProvider manifestUrl={manifestUrl}>
         <ThemeProvider>
           <TranslationProvider>
-            <ErrorBoundaryWrapper>
-              <App />
-            </ErrorBoundaryWrapper>
+            <FilterProvider>
+              <HashRouter>
+                <ErrorBoundaryWrapper>
+                  <App />
+                </ErrorBoundaryWrapper>
+              </HashRouter>
+            </FilterProvider>
           </TranslationProvider>
         </ThemeProvider>
       </TonConnectUIProvider>

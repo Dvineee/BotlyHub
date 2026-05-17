@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { HashRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { Loader2, Megaphone } from 'lucide-react';
 import { PageLoader } from './components/PageLoader';
 import { DatabaseService } from './services/DatabaseService';
@@ -34,7 +34,7 @@ import ScrollToTop from './components/ScrollToTop';
 import Footer from './components/Footer';
 import BottomNav from './components/BottomNav';
 
-import { FilterProvider } from './FilterContext';
+
 
 const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
   const location = useLocation();
@@ -195,33 +195,31 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
 
 export default function App() {
   return (
-    <HashRouter>
+    <>
       <ScrollToTop />
-      <FilterProvider>
-        <TelegramWrapper>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/search" element={<SearchPage />} />
-            <Route path="/bot/:slug" element={<BotDetail />} />
-            <Route path="/payment/:slug" element={<Payment />} />
-            <Route path="/settings" element={<ProfileSettings />} />
-            <Route path="/account-settings" element={<AccountSettings />} />
-            <Route path="/my-bots" element={<MyBots />} />
-            <Route path="/channels" element={<MyChannels />} />
-            <Route path="/premium" element={<Premium />} />
-            <Route path="/notifications" element={<Notifications />} />
-            <Route path="/earnings" element={<Earnings />} />
-            <Route path="/a/admin" element={<AdminLogin />} />
-            <Route path="/a/dashboard/*" element={<AdminDashboard />} />
-            <Route path="/u/login" element={<UserPanelLogin />} />
-            <Route path="/u/panel/*" element={<UserPanel />} />
-            <Route path="/referral" element={<ReferralPage />} />
-            <Route path="/blog" element={<BlogPage />} />
-            <Route path="/blog/:slug" element={<BlogPostDetail />} />
-            <Route path="/bot-panel/:botId/*" element={<BotManagementPanel />} />
-          </Routes>
-        </TelegramWrapper>
-      </FilterProvider>
-    </HashRouter>
+      <TelegramWrapper>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/bot/:slug" element={<BotDetail />} />
+          <Route path="/payment/:slug" element={<Payment />} />
+          <Route path="/settings" element={<ProfileSettings />} />
+          <Route path="/account-settings" element={<AccountSettings />} />
+          <Route path="/my-bots" element={<MyBots />} />
+          <Route path="/channels" element={<MyChannels />} />
+          <Route path="/premium" element={<Premium />} />
+          <Route path="/notifications" element={<Notifications />} />
+          <Route path="/earnings" element={<Earnings />} />
+          <Route path="/a/admin" element={<AdminLogin />} />
+          <Route path="/a/dashboard/*" element={<AdminDashboard />} />
+          <Route path="/u/login" element={<UserPanelLogin />} />
+          <Route path="/u/panel/*" element={<UserPanel />} />
+          <Route path="/referral" element={<ReferralPage />} />
+          <Route path="/blog" element={<BlogPage />} />
+          <Route path="/blog/:slug" element={<BlogPostDetail />} />
+          <Route path="/bot-panel/:botId/*" element={<BotManagementPanel />} />
+        </Routes>
+      </TelegramWrapper>
+    </>
   );
 }

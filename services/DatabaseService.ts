@@ -12,6 +12,9 @@ const SUPABASE_ANON_KEY = (typeof process !== 'undefined' && process.env?.SUPABA
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export class DatabaseService {
+  private static blogsCache: BlogPost[] | null = null;
+  private static blogsCacheTime: number = 0;
+  private static BLOGS_CACHE_TTL = 1000 * 60 * 5; // 5 minutes
   
   // --- PROMOTIONS ---
   static async getPromotions(): Promise<Promotion[]> {
@@ -965,8 +968,15 @@ export class DatabaseService {
     if (error) throw error;
   }
   
-  // --- BLOGS ---
+   // --- BLOGS ---
   static async getBlogs(limit?: number, offset?: number): Promise<BlogPost[]> {
+    // Check cache (only if no special limit/offset is used for simplicity, or we store the first page)
+    const isFirstPage = !offset || offset === 0;
+    if (isFirstPage && !limit && this.blogsCache && Date.now() - this.blogsCacheTime < this.BLOGS_CACHE_TTL) {
+        console.log("[DatabaseService] Returning blogs from cache");
+        return this.blogsCache;
+    }
+
     try {
         let query = supabase
           .from('blogs')
@@ -980,10 +990,10 @@ export class DatabaseService {
           
         if (error) {
             console.error("Blogs Fetch Error:", error);
-            return [];
+            return this.blogsCache || []; // Return cache if error occurs
         }
 
-        return (data || []).map(b => ({
+        const mappedData = (data || []).map(b => ({
             ...b,
             readTime: b.read_time,
             isFeatured: b.is_featured,
@@ -992,9 +1002,17 @@ export class DatabaseService {
             views_count: b.views_count || 0,
             hashtags: Array.isArray(b.hashtags) ? b.hashtags : (typeof b.hashtags === 'string' ? JSON.parse(b.hashtags) : [])
         }));
+
+        // Cache the first page/default fetch
+        if (isFirstPage && !limit) {
+            this.blogsCache = mappedData;
+            this.blogsCacheTime = Date.now();
+        }
+
+        return mappedData;
     } catch (e) {
         console.error("getBlogs Error:", e);
-        return [];
+        return this.blogsCache || [];
     }
   }
 
@@ -1028,10 +1046,17 @@ export class DatabaseService {
 
   static async getTrendingHashtags(): Promise<string[]> {
     try {
-      // In a real app, this would be a specialized table or a complex query.
-      // For now, we'll fetch a small set and extract tags.
-      const { data } = await supabase.from('blogs').select('hashtags').limit(20);
-      if (!data) return ['TON', 'PassiveIncome', 'AIBots', 'MiniApps', 'Web3'];
+      let data: any[] | null = null;
+      
+      // Use cache if available
+      if (this.blogsCache && this.blogsCache.length > 0) {
+        data = this.blogsCache.slice(0, 20);
+      } else {
+        const { data: remoteData } = await supabase.from('blogs').select('hashtags').limit(20);
+        data = remoteData;
+      }
+
+      if (!data || data.length === 0) return ['TON', 'PassiveIncome', 'AIBots', 'MiniApps', 'Web3'];
       
       const tagCounts: { [key: string]: number } = {};
       data.forEach(blog => {
@@ -1126,7 +1151,11 @@ export class DatabaseService {
     
     if (data) {
         // Unlike
-        await supabase.from('blog_likes').delete().eq('id', data.id);
+        const { error: deleteError } = await supabase.from('blog_likes').delete().eq('id', data.id);
+        if (deleteError) {
+            console.error("Unlike Error:", deleteError);
+            throw deleteError;
+        }
         
         // Try to update denormalized count if exists
         try {
@@ -1135,8 +1164,11 @@ export class DatabaseService {
                 await supabase.from('blogs').update({ likes_count: Math.max(0, (current?.likes_count || 0) - 1) }).eq('id', blogId);
             }
         } catch(e) {
-            // Silently fail if column missing
+            console.warn("Could not update likes_count (unlike):", e);
         }
+        
+        // Clear cache
+        this.blogsCache = null;
         return false;
     } else {
         // Like
@@ -1153,8 +1185,11 @@ export class DatabaseService {
                 await supabase.from('blogs').update({ likes_count: (current?.likes_count || 0) + 1 }).eq('id', blogId);
             }
         } catch(e) {
-            // Silently fail if column missing
+            console.warn("Could not update likes_count (like):", e);
         }
+        
+        // Clear cache
+        this.blogsCache = null;
         return true;
     }
   }
