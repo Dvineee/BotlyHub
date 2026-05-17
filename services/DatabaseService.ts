@@ -966,37 +966,89 @@ export class DatabaseService {
   }
   
   // --- BLOGS ---
-  static async getBlogs(): Promise<BlogPost[]> {
+  static async getBlogs(limit?: number, offset?: number): Promise<BlogPost[]> {
     try {
-        const { data, error } = await supabase
+        let query = supabase
           .from('blogs')
           .select('*')
           .order('created_at', { ascending: false });
+          
+        if (limit) query = query.limit(limit);
+        if (offset) query = query.range(offset, offset + (limit || 10) - 1);
+
+        const { data, error } = await query;
           
         if (error) {
             console.error("Blogs Fetch Error:", error);
             return [];
         }
 
-        // Fetch all likes to count them efficiently in memory for the list view
-        // (Better would be a SQL join or view, but we are constrained)
-        const { data: likesData } = await supabase.from('blog_likes').select('blog_id');
-        
-        return (data || []).map(b => {
-            const blogLikes = (likesData || []).filter(l => l.blog_id === b.id).length;
-            return {
-                ...b,
-                readTime: b.read_time,
-                isFeatured: b.is_featured,
-                authorAvatar: b.author_avatar,
-                likes_count: blogLikes || 0,
-                views_count: b.views_count || 0,
-                hashtags: Array.isArray(b.hashtags) ? b.hashtags : (typeof b.hashtags === 'string' ? JSON.parse(b.hashtags) : [])
-            };
-        });
+        return (data || []).map(b => ({
+            ...b,
+            readTime: b.read_time,
+            isFeatured: b.is_featured,
+            authorAvatar: b.author_avatar,
+            likes_count: b.likes_count || 0,
+            views_count: b.views_count || 0,
+            hashtags: Array.isArray(b.hashtags) ? b.hashtags : (typeof b.hashtags === 'string' ? JSON.parse(b.hashtags) : [])
+        }));
     } catch (e) {
         console.error("getBlogs Error:", e);
         return [];
+    }
+  }
+
+  static async getSimilarBlogs(excludeId: string, category?: string, limit: number = 3): Promise<BlogPost[]> {
+    try {
+      let query = supabase
+        .from('blogs')
+        .select('*')
+        .neq('id', excludeId)
+        .order('created_at', { ascending: false })
+        .limit(limit);
+      
+      if (category) {
+        query = query.eq('category', category);
+      }
+
+      const { data, error } = await query;
+      if (error) return [];
+
+      return (data || []).map(b => ({
+          ...b,
+          readTime: b.read_time,
+          isFeatured: b.is_featured,
+          authorAvatar: b.author_avatar,
+          hashtags: Array.isArray(b.hashtags) ? b.hashtags : (typeof b.hashtags === 'string' ? JSON.parse(b.hashtags) : [])
+      }));
+    } catch (e) {
+      return [];
+    }
+  }
+
+  static async getTrendingHashtags(): Promise<string[]> {
+    try {
+      // In a real app, this would be a specialized table or a complex query.
+      // For now, we'll fetch a small set and extract tags.
+      const { data } = await supabase.from('blogs').select('hashtags').limit(20);
+      if (!data) return ['TON', 'PassiveIncome', 'AIBots', 'MiniApps', 'Web3'];
+      
+      const tagCounts: { [key: string]: number } = {};
+      data.forEach(blog => {
+        const hashtags = Array.isArray(blog.hashtags) ? blog.hashtags : (typeof blog.hashtags === 'string' ? JSON.parse(blog.hashtags) : []);
+        hashtags?.forEach((tag: string) => {
+          tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+        });
+      });
+      
+      const sortedTags = Object.entries(tagCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10)
+        .map(entry => entry[0]);
+        
+      return sortedTags.length > 0 ? sortedTags : ['TON', 'PassiveIncome', 'AIBots', 'MiniApps', 'Web3'];
+    } catch (e) {
+      return ['TON', 'PassiveIncome', 'AIBots', 'MiniApps', 'Web3'];
     }
   }
 

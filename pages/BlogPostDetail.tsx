@@ -129,20 +129,23 @@ const BlogPostDetail: React.FC = () => {
             // Log view
             DatabaseService.incrementBlogView(data.id);
             
-            // Similar posts
-            const blogs = await DatabaseService.getBlogs();
-            setAllPosts(blogs);
-            setSimilarPosts(blogs.filter(b => b.id !== data.id).slice(0, 3));
-            
-            // Comments
-            const comms = await DatabaseService.getBlogComments(data.id);
+            // Parallel fetches for details
+            const [similar, comms, likedStatus, topBlogs] = await Promise.all([
+              DatabaseService.getSimilarBlogs(data.id, data.category),
+              DatabaseService.getBlogComments(data.id),
+              user?.id ? DatabaseService.isBlogLikedByUser(data.id, user.id.toString()) : Promise.resolve(false),
+              DatabaseService.getBlogs(20) // Limit to top 20 for analytics
+            ]);
+
+            setSimilarPosts(similar);
             setComments(comms);
+            setIsLiked(likedStatus);
+            setAllPosts(topBlogs);
 
             // Calculate category popularity for the leaderboard
             const categoryStats: { [key: string]: { views: number, comments: number } } = {};
             
-            // Get all categories engagement (we need a broad view)
-            blogs.forEach(b => {
+            topBlogs.forEach(b => {
               const catLabel = b.category;
               if (!categoryStats[catLabel]) categoryStats[catLabel] = { views: 0, comments: 0 };
               categoryStats[catLabel].views += (b.views_count || 0);
@@ -151,9 +154,6 @@ const BlogPostDetail: React.FC = () => {
             // Rank categories
             const sortedCats = Object.entries(categoryStats)
               .map(([label, stats]) => {
-                // Find category by label (assuming label is what's stored in DB)
-                // In data.tsx or our local categories, we might need a reverse map or fix the check
-                // For now, let's look up by translation or known labels if stored in DB as TR
                 const knownTRLabels: Record<string, string> = {
                   'Tümü': 'all',
                   'Trendler': 'trends',
@@ -171,23 +171,16 @@ const BlogPostDetail: React.FC = () => {
                 return {
                   id: catId,
                   label,
-                  engagement: Math.floor(stats.views / 2 + 10) // Simulating comment count logic
+                  engagement: Math.floor(stats.views / 2 + 10)
                 };
               })
               .sort((a, b) => b.engagement - a.engagement);
 
             setPopularCategories(sortedCats);
             
-            // Set currentRankIndex to the category of the POST being read
             const currentCatIndex = sortedCats.findIndex(c => c.label === data.category);
             if (currentCatIndex !== -1) {
               setCurrentRankIndex(currentCatIndex);
-            }
-            
-            // Check if liked
-            if (user?.id) {
-                const liked = await DatabaseService.isBlogLikedByUser(data.id, user.id.toString());
-                setIsLiked(liked);
             }
         }
       } catch (err) {
@@ -688,7 +681,12 @@ const BlogPostDetail: React.FC = () => {
 
           {/* Feature Image */}
           <div className="aspect-[2/1] rounded-3xl overflow-hidden mb-12 shadow-sm bg-slate-100 dark:bg-slate-900">
-            <img src={post.image} alt={post.title} className="w-full h-full object-cover" />
+            <img 
+              src={post.image} 
+              alt={post.title} 
+              className="w-full h-full object-cover" 
+              loading="eager"
+            />
           </div>
 
           {/* Article Body */}

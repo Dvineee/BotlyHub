@@ -77,22 +77,13 @@ const BlogPage: React.FC = () => {
     const fetchBlogs = async () => {
       setIsLoading(true);
       try {
-        const data = await DatabaseService.getBlogs();
+        // Fetch limited blogs for faster initial load
+        const [data, trendingTags] = await Promise.all([
+          DatabaseService.getBlogs(20),
+          DatabaseService.getTrendingHashtags()
+        ]);
         setBlogs(data);
-        
-        // Calculate trend hashtags
-        const tagCounts: { [key: string]: number } = {};
-        data.forEach(blog => {
-          blog.hashtags?.forEach(tag => {
-            tagCounts[tag] = (tagCounts[tag] || 0) + 1;
-          });
-        });
-        const sortedTags = Object.entries(tagCounts)
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 10)
-          .map(entry => entry[0]);
-        
-        setTrendHashtags(sortedTags.length > 0 ? sortedTags : ['TON', 'PassiveIncome', 'AIBots', 'MiniApps', 'Web3']);
+        setTrendHashtags(trendingTags);
       } catch (err) {
         console.error("Fetch Blogs Error:", err);
       } finally {
@@ -637,6 +628,7 @@ const BlogPage: React.FC = () => {
                           alt={featuredPost.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
                           referrerPolicy="no-referrer"
+                          loading="eager"
                         />
                       ) : (
                          <div className="w-full h-full flex items-center justify-center bg-slate-950">
@@ -726,6 +718,7 @@ const BlogPage: React.FC = () => {
                             alt={post.title}
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
                             referrerPolicy="no-referrer"
+                            loading="lazy"
                           />
                         ) : (
                            <div className="w-full h-full flex items-center justify-center bg-slate-950">
