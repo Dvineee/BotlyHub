@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { ShoppingBag, TrendingUp, Bot, Send, Activity, Trash2, AlertTriangle, X, Loader2, Lock, Clock, Info, Settings } from 'lucide-react';
+import { ShoppingBag, TrendingUp, Bot, Send, Activity, Trash2, AlertTriangle, X, Loader2, Lock, Clock, Info, Settings, LayoutDashboard } from 'lucide-react';
 import { UserBot, Bot as BotType } from '../types';
 import { DatabaseService } from '../services/DatabaseService';
 import { useTelegram } from '../hooks/useTelegram';
@@ -286,6 +286,17 @@ const MyBots = () => {
                                         >
                                             <Activity size={18} className={bot.isActive ? 'text-brand dark:text-brand-light' : 'text-slate-400 dark:text-slate-500'} />
                                             <span className={`text-[11px] font-bold uppercase tracking-tight ${bot.isActive ? 'text-brand dark:text-brand-light' : 'text-slate-500 dark:text-slate-400'}`}>Bot Durumu</span>
+                                        </div>
+
+                                        <div 
+                                            onClick={(e) => { e.stopPropagation(); haptic('medium'); navigate(`/bot-panel/${bot.id}`); }}
+                                            className="cursor-pointer rounded-xl px-4 h-full max-h-[64px] flex items-center gap-3 border border-blue-500/30 bg-blue-500/10 hover:bg-blue-500/20 transition-all active:scale-95 col-span-2 shadow-lg shadow-blue-500/10"
+                                        >
+                                            <LayoutDashboard size={18} className="text-blue-500" />
+                                            <div className="flex flex-col">
+                                                <span className="text-[11px] font-black uppercase text-blue-500 tracking-tighter italic text-left">Yönetim Paneli</span>
+                                                <span className="text-[8px] font-medium text-slate-500 uppercase tracking-widest text-left">Bot ayarlarını detaylı yönet</span>
+                                            </div>
                                         </div>
                                     </>
                                 )}

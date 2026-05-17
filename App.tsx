@@ -29,6 +29,7 @@ import UserPanel from './pages/UserPanel';
 import ReferralPage from './pages/ReferralPage';
 import BlogPage from './pages/BlogPage';
 import BlogPostDetail from './pages/BlogPostDetail';
+import BotManagementPanel from './pages/BotManagementPanel';
 import ScrollToTop from './components/ScrollToTop';
 import Footer from './components/Footer';
 import BottomNav from './components/BottomNav';
@@ -169,7 +170,7 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
     return () => tg.BackButton.offClick(handleBack);
   }, [location.pathname, navigate, isAdminPath]);
 
-  const hideBottomNav = isPanelPath || location.pathname.includes('/bot/') || location.pathname.includes('/payment/');
+  const hideBottomNav = isPanelPath || location.pathname.includes('/bot/') || location.pathname.includes('/payment/') || location.pathname.includes('/bot-panel/');
 
   return (
     <div className={`${isPanelPath ? 'dark bg-slate-950' : 'bg-slate-50 dark:bg-slate-950'} flex flex-col min-h-screen transition-colors duration-300`}>
@@ -217,6 +218,7 @@ export default function App() {
             <Route path="/referral" element={<ReferralPage />} />
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/blog/:slug" element={<BlogPostDetail />} />
+            <Route path="/bot-panel/:botId/*" element={<BotManagementPanel />} />
           </Routes>
         </TelegramWrapper>
       </FilterProvider>
