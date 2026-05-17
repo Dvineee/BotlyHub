@@ -6,7 +6,8 @@ import {
   Settings, CreditCard, LogOut, LayoutDashboard, Globe, MessageSquare, 
   ChevronRight, Save, Download, Upload, RotateCcw, AlertCircle, Info, Star,
   Search, Filter, List, MoreVertical, Plus, Check, X, ShieldCheck, Zap,
-  ExternalLink, ListOrdered, Sticker, Lightbulb, Shield, Columns, UserPlus, Trophy, Clock
+  ExternalLink, ListOrdered, Sticker, Lightbulb, Shield, Columns, UserPlus, Trophy, Clock,
+  Loader2
 } from 'lucide-react';
 import { useTelegram } from '../hooks/useTelegram';
 import { DatabaseService } from '../services/DatabaseService';
@@ -68,13 +69,165 @@ const GroupCard = ({ name, username, members, active, onClick }: any) => (
   </motion.div>
 );
 
+const LoginModal = ({ isOpen, onClose, onLoginSuccess }: { isOpen: boolean, onClose: () => void, onLoginSuccess: (user: any) => void }) => {
+    const [identifier, setIdentifier] = useState('');
+    const [step, setStep] = useState<'request' | 'verify'>('request');
+    const [code, setCode] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    const handleRequestCode = async () => {
+        if (!identifier) return;
+        setIsLoading(true);
+        setError('');
+        try {
+            const res = await fetch('/api/auth/telegram/request-code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ identifier })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setStep('verify');
+            } else {
+                setError(data.error || 'Kod gönderilemedi');
+            }
+        } catch (err) {
+            setError('Sunucu bağlantısı başarısız');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleVerifyCode = async () => {
+        if (code.length < 6) return;
+        setIsLoading(true);
+        setError('');
+        try {
+            const res = await fetch('/api/auth/telegram/verify-code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ identifier, code })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                onLoginSuccess(data.user);
+                onClose();
+            } else {
+                setError(data.error || 'Geçersiz kod');
+            }
+        } catch (err) {
+            setError('Doğrulama başarısız');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
+            <div className="bg-[#14181f] border border-white/5 rounded-[32px] p-8 w-full max-w-sm shadow-2xl relative overflow-hidden">
+                <button onClick={onClose} className="absolute top-6 right-6 text-slate-500 hover:text-white transition-colors">
+                    <X size={20} />
+                </button>
+
+                <div className="text-center mb-8">
+                    <div className="w-16 h-16 bg-blue-600/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <ShieldCheck className="text-blue-500" size={32} />
+                    </div>
+                    <h3 className="text-xl font-black text-white italic uppercase tracking-tighter">Giriş Yap</h3>
+                    <p className="text-xs text-slate-500 font-medium mt-1">Telegram ile güvenli giriş yapın</p>
+                </div>
+
+                {error && (
+                    <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-[11px] p-3 rounded-xl mb-6 flex items-center gap-2">
+                        <AlertCircle size={14} />
+                        {error}
+                    </div>
+                )}
+
+                {step === 'request' ? (
+                    <div className="space-y-4">
+                        <div className="bg-blue-600/5 border border-blue-500/10 rounded-2xl p-4 mb-2">
+                            <div className="flex gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-blue-600/20 flex items-center justify-center shrink-0">
+                                    <Info className="text-blue-500" size={16} />
+                                </div>
+                                <div>
+                                    <h4 className="text-[11px] font-black text-white uppercase italic tracking-tighter">Nasıl Giriş Yapılır?</h4>
+                                    <p className="text-[10px] text-slate-500 font-medium leading-relaxed mt-0.5">
+                                        Kodun size ulaşması için öncelikle botumuza <a href="https://t.me/BotlyHubBOT" target="_blank" rel="noreferrer" className="text-blue-500 font-bold hover:underline">@BotlyHubBOT</a> start (başlat) vermeniz gerekmektedir.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1 px-1">Telegram Kullanıcı Adı</label>
+                            <input 
+                                type="text"
+                                placeholder="Örn: @kullaniciadi"
+                                className="w-full h-12 bg-[#0f1218] border border-white/5 rounded-xl px-4 text-white text-sm focus:border-blue-500/50 transition-all outline-none"
+                                value={identifier}
+                                onChange={(e) => setIdentifier(e.target.value)}
+                                onKeyPress={(e) => e.key === 'Enter' && handleRequestCode()}
+                            />
+                            <p className="text-[9px] text-slate-600 mt-2 px-1 font-bold uppercase">
+                                Örn: @kullaniciadi veya @ID
+                            </p>
+                        </div>
+                        <button 
+                            disabled={isLoading || !identifier}
+                            onClick={handleRequestCode}
+                            className="w-full h-12 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2"
+                        >
+                            {isLoading ? <Loader2 className="animate-spin" size={18} /> : 'Doğrulama Kodu Gönder'}
+                        </button>
+                    </div>
+                ) : (
+                    <div className="space-y-4">
+                        <div>
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1 px-1">Doğrulama Kodu</label>
+                            <input 
+                                type="text"
+                                maxLength={6}
+                                placeholder="000000"
+                                className="w-full h-14 bg-[#0f1218] border border-white/5 rounded-xl px-4 text-white text-2xl font-black text-center tracking-[12px] focus:border-blue-500/50 transition-all outline-none"
+                                value={code}
+                                onChange={(e) => setCode(e.target.value)}
+                                onKeyPress={(e) => e.key === 'Enter' && handleVerifyCode()}
+                                autoFocus
+                            />
+                        </div>
+                        <button 
+                            disabled={isLoading || code.length < 6}
+                            onClick={handleVerifyCode}
+                            className="w-full h-12 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2"
+                        >
+                            {isLoading ? <Loader2 className="animate-spin" size={18} /> : 'Onayla'}
+                        </button>
+                        <button 
+                            onClick={() => setStep('request')}
+                            className="w-full text-[10px] text-slate-500 font-bold uppercase tracking-widest hover:text-white transition-colors py-2"
+                        >
+                            Geri Dön
+                        </button>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
 const BotManagementPanel = () => {
   const { botId, groupId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, haptic } = useTelegram();
+  const { user, haptic, notification, setWebAuthUser } = useTelegram();
   const [bot, setBot] = useState<UserBot | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchBot = async () => {
@@ -236,16 +389,35 @@ const BotManagementPanel = () => {
           <div className="space-y-0.5">
             <SidebarItem icon={Settings} label="Ayarlar" path={`/bot-panel/${botId}/bot-settings`} active={location.pathname.includes('bot-settings')} />
             <SidebarItem icon={CreditCard} label="Faturalandırma" path={`/bot-panel/${botId}/billing`} active={location.pathname.includes('billing')} />
-            <button 
-              onClick={() => { haptic('medium'); navigate('/my-bots'); }}
-              className="w-full flex items-center gap-3 px-3 py-1.5 text-slate-500 hover:text-red-400 transition-all group"
-            >
-              <LogOut size={16} className="text-slate-500 group-hover:text-red-400" />
-              <span className="text-[12px] font-medium tracking-tight">Çıkış Yap</span>
-            </button>
+            {user ? (
+              <button 
+                onClick={() => { haptic('medium'); setWebAuthUser(null); }}
+                className="w-full flex items-center gap-3 px-3 py-1.5 text-slate-500 hover:text-red-400 transition-all group"
+              >
+                <LogOut size={16} className="text-slate-500 group-hover:text-red-400" />
+                <span className="text-[12px] font-medium tracking-tight">Çıkış Yap</span>
+              </button>
+            ) : (
+                <button 
+                onClick={() => { haptic('medium'); setIsLoginModalOpen(true); }}
+                className="w-full flex items-center gap-3 px-3 py-1.5 text-blue-500 hover:text-blue-400 transition-all group"
+              >
+                <ShieldCheck size={16} className="text-blue-500 group-hover:text-blue-400" />
+                <span className="text-[12px] font-medium tracking-tight">Giriş Yap</span>
+              </button>
+            )}
           </div>
         </div>
       </aside>
+
+      <LoginModal 
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onLoginSuccess={(user) => {
+            setWebAuthUser(user);
+            notification('success');
+        }}
+      />
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col max-h-screen overflow-hidden">
@@ -262,6 +434,24 @@ const BotManagementPanel = () => {
           </div>
 
           <div className="flex items-center gap-3">
+             {user ? (
+                <div className="flex items-center gap-3 border-r border-white/5 pr-3 mr-3">
+                    <div className="text-right hidden sm:block">
+                        <p className="text-[10px] font-black text-white uppercase italic leading-none">{user.name || user.username}</p>
+                        <p className="text-[9px] text-slate-500 font-bold uppercase tracking-tighter mt-1">@{user.username || 'user'}</p>
+                    </div>
+                    <div className="w-9 h-9 rounded-xl bg-blue-600/20 border border-blue-500/20 overflow-hidden shrink-0 shadow-lg shadow-blue-500/10 capitalize flex items-center justify-center font-bold text-blue-400">
+                        {user.avatar ? <img src={user.avatar} alt="User" className="w-full h-full object-cover" /> : (user.username?.[0] || user.id?.[0] || 'U')}
+                    </div>
+                </div>
+             ) : (
+                <button 
+                    onClick={() => setIsLoginModalOpen(true)}
+                    className="h-10 px-6 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all mr-3 shadow-lg shadow-blue-500/20"
+                >
+                    Giriş Yap
+                </button>
+             )}
              <button className="h-10 px-4 flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
                <Save size={14} />
                Kaydet

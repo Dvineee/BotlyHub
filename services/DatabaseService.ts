@@ -199,6 +199,18 @@ export class DatabaseService {
     };
   }
 
+  static async getUserByUsername(username: string): Promise<User | null> {
+    const cleanUsername = username.startsWith('@') ? username.slice(1) : username;
+    const { data } = await supabase.from('users').select('*').eq('username', cleanUsername).maybeSingle();
+    if (!data) return null;
+    return {
+        ...data,
+        joinDate: data.joindate,
+        canPublishPromos: data.can_publish_promos,
+        isRestricted: data.is_restricted
+    };
+  }
+
   static async getUsers(): Promise<User[]> {
       const { data } = await supabase.from('users').select('*').order('joindate', { ascending: false });
       return (data || []).map(u => ({ 

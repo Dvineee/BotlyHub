@@ -28,6 +28,16 @@ const globalLimiter = rateLimit({
   message: { error: "Too many requests, please try again later." }
 });
 
+// Stricter rate limit for auth code request
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // 5 requests per 15 minutes
+  message: { error: "Too many login attempts. Please try again later." }
+});
+
+// --- AUTH STORE ---
+const authCodes = new Map<string, { code: string, expires: number }>();
+
 // Stricter rate limit for payment verification
 const paymentLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
@@ -118,6 +128,113 @@ async function startServer() {
   app.get("/api/health", (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.json({ status: "ok", time: new Date().toISOString() });
+  });
+
+  // 0. Telegram Auth Code Request
+  app.post("/api/auth/telegram/request-code", authLimiter, async (req, res) => {
+    let { identifier } = req.body;
+    if (!identifier) return res.status(400).json({ error: "Identifier required" });
+
+    identifier = identifier.trim();
+    let chatId = identifier;
+
+    // Resolve username to chat_id if necessary
+    if (identifier.startsWith('@') || isNaN(Number(identifier))) {
+      const user = await DatabaseService.getUserByUsername(identifier);
+      if (user) {
+        chatId = user.id;
+      } else {
+        return res.status(400).json({ 
+          error: "Kullanıcı bulunamadı. Lütfen önce botumuza (@BotlyHubBOT) /start komutunu gönderin.",
+          detail: "Username not found in database. User must interact with the bot first."
+        });
+      }
+    }
+
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    authCodes.set(identifier, { code, expires: Date.now() + 5 * 60 * 1000, chatId });
+
+    const botToken = process.env.TELEGRAM_AUTH_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN;
+
+    if (!botToken) {
+      return res.status(500).json({ error: "Bot token not configured" });
+    }
+
+    try {
+      const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: `🔐 *BotlyHub Giriş Doğrulama*\n\nDoğrulama kodunuz: \`${code}\` \n\nBu kod 5 dakika geçerlidir. Lütfen kimseyle paylaşmayın.`,
+          parse_mode: "Markdown"
+        })
+      });
+
+      const result = await response.json() as any;
+      if (result.ok) {
+        res.json({ success: true, message: "Code sent via Telegram" });
+      } else {
+        console.error("[AUTH] Telegram error:", result);
+        let errorMsg = `Kod gönderilemedi. Lütfen Telegram botumuzu (@${process.env.TELEGRAM_AUTH_BOT_USERNAME || 'BotlyHubBot'}) başlattığınızdan emin olun.`;
+        
+        if (result.description?.includes('chat not found')) {
+            errorMsg = "Bot sizinle iletişim kuramıyor. Lütfen önce Telegram botumuzu (@BotlyHubBOT) başlatın.";
+        }
+
+        res.status(400).json({ 
+          error: errorMsg,
+          detail: result.description 
+        });
+      }
+    } catch (err: any) {
+      console.error("[AUTH] Request code error:", err);
+      res.status(500).json({ error: "Sunucu hatası, lütfen tekrar deneyin." });
+    }
+  });
+
+  // 0.1 Telegram Auth Code Verify
+  app.post("/api/auth/telegram/verify-code", async (req, res) => {
+    const { identifier, code } = req.body;
+    if (!identifier || !code) return res.status(400).json({ error: "Missing fields" });
+
+    const stored = authCodes.get(identifier);
+
+    if (!stored) {
+        return res.status(400).json({ error: "Geçerli bir kod talebi bulunamadı." });
+    }
+
+    if (stored.expires < Date.now()) {
+        authCodes.delete(identifier);
+        return res.status(400).json({ error: "Kodun süresi dolmuş." });
+    }
+
+    if (stored.code === code) {
+        authCodes.delete(identifier);
+        
+        try {
+            const finalUserId = (stored as any).chatId || identifier;
+            const user = await DatabaseService.getUser(finalUserId);
+            
+            if (user) {
+                res.json({ success: true, user });
+            } else {
+                // If user not in DB, sync them minimally
+                await DatabaseService.syncUser({
+                    id: finalUserId,
+                    name: `Telegram User ${identifier}`,
+                    username: identifier.startsWith('@') ? identifier.slice(1) : identifier
+                });
+                const syncedUser = await DatabaseService.getUser(finalUserId);
+                res.json({ success: true, user: syncedUser });
+            }
+        } catch (err) {
+            console.error("[AUTH] Sync user error:", err);
+            res.json({ success: true, user: { id: identifier, username: identifier } });
+        }
+    } else {
+        res.status(400).json({ error: "Hatalı kod. Lütfen tekrar deneyin." });
+    }
   });
 
   // 1. Telegram initData Verification
