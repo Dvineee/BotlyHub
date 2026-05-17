@@ -44,7 +44,8 @@ const GroupCard = ({ name, username, members, active, onClick }: any) => (
     whileHover={{ y: -4 }}
     whileTap={{ scale: 0.98 }}
     onClick={onClick}
-    className="group relative bg-[#1c222d] border border-white/5 rounded-2xl p-4 hover:border-blue-500/30 transition-all cursor-pointer"
+    style={{ outline: 'solid 1px #1f222abf' }}
+    className="group relative bg-transparent rounded-2xl p-4 hover:border-blue-500/30 transition-all cursor-pointer"
   >
     <div className="flex items-center justify-between mb-4">
       <div className="flex items-center gap-3">
@@ -134,7 +135,17 @@ const BotManagementPanel = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0f1218] flex text-slate-300 font-sans selection:bg-blue-500/30">
+    <div className="bot-panel-scoped min-h-screen bg-[#0f1218] flex text-slate-300 font-sans selection:bg-blue-500/30">
+      <style dangerouslySetInnerHTML={{ __html: `
+        .bot-panel-scoped .bg-slate-800 {
+            outline: solid 2px #ffffff08;
+            --tw-bg-opacity: 1 !important;
+        }
+        .bot-panel-scoped .h-11 {
+            margin: 2px !important;
+            height: 1.75rem !important;
+        }
+      ` }} />
       {/* Sidebar */}
       <aside className="w-60 bg-[#11141a] border-r border-white/5 flex flex-col sticky top-0 h-screen overflow-y-auto no-scrollbar">
         <div className="p-4 flex-1">
