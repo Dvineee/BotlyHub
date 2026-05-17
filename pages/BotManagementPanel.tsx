@@ -6,7 +6,7 @@ import {
   Settings, CreditCard, LogOut, LayoutDashboard, Globe, MessageSquare, 
   ChevronRight, Save, Download, Upload, RotateCcw, AlertCircle, Info, Star,
   Search, Filter, List, MoreVertical, Plus, Check, X, ShieldCheck, Zap,
-  ExternalLink, ListOrdered, Sticker
+  ExternalLink, ListOrdered, Sticker, Lightbulb, Shield, Columns, UserPlus, Trophy, Clock
 } from 'lucide-react';
 import { useTelegram } from '../hooks/useTelegram';
 import { DatabaseService } from '../services/DatabaseService';
@@ -16,20 +16,20 @@ import { motion, AnimatePresence } from 'motion/react';
 const SidebarItem = ({ icon: Icon, label, path, active, badge, color, external }: any) => (
   <Link 
     to={path} 
-    className={`flex items-center justify-between px-3 py-1.5 transition-all group ${
+    className={`flex items-center justify-between px-3 py-1.5 transition-all group rounded-lg ${
       active 
-        ? 'bg-blue-600/10 text-blue-500 font-bold' 
+        ? 'bg-[#1e2430] text-blue-500 font-medium' 
         : 'text-slate-400 hover:text-white'
     }`}
   >
     <div className="flex items-center gap-3">
-      <Icon size={16} className={`${active ? 'text-blue-500' : color ? color : 'text-slate-500 group-hover:text-white'} transition-colors`} />
-      <span className="text-[12px] font-medium tracking-tight">{label}</span>
+      <Icon size={18} className={`${active ? 'text-blue-500' : 'text-slate-500 group-hover:text-white'} transition-colors`} />
+      <span className="text-[14px] font-medium tracking-tight">{label}</span>
     </div>
     <div className="flex items-center gap-1.5">
       {badge && (
         <span className={`text-[8px] font-black px-1 py-0.5 rounded italic uppercase border ${
-          active ? 'bg-white/20 text-white border-white/20' : 'bg-blue-500/10 text-blue-500 border-blue-500/20'
+          active ? 'bg-blue-500/20 text-blue-400 border-blue-500/20' : 'bg-blue-500/10 text-blue-500 border-blue-500/20'
         }`}>
           {badge}
         </span>
@@ -117,15 +117,15 @@ const BotManagementPanel = () => {
   ];
 
   const groupNavItems = [
-    { label: 'Ayarlar', icon: Settings, path: `groups/${groupId}/settings`, color: 'text-blue-500' },
-    { label: 'Combot AI', icon: Zap, path: `groups/${groupId}/ai`, color: 'text-blue-500' },
-    { label: 'Pro', icon: Star, path: `groups/${groupId}/pro`, color: 'text-blue-500' },
-    { label: 'Moderasyon', icon: ShieldCheck, path: `groups/${groupId}/moderation`, color: 'text-blue-500' },
-    { label: 'Analiz', icon: BarChart3, path: `groups/${groupId}/analysis`, color: 'text-blue-500' },
-    { label: 'Kullanıcılar', icon: UserCog, path: `groups/${groupId}/users`, color: 'text-blue-500' },
-    { label: 'Yönlendirmeler', icon: Globe, path: `groups/${groupId}/referrals`, color: 'text-blue-500' },
-    { label: 'Günlük', icon: History, path: `groups/${groupId}/logs`, color: 'text-blue-500' },
-    { label: 'Sıralama', icon: ListOrdered, path: `groups/${groupId}/ranking`, color: 'text-blue-500' },
+    { label: 'Ayarlar', icon: Settings, path: `groups/${groupId}/settings` },
+    { label: 'Combot AI', icon: Lightbulb, path: `groups/${groupId}/ai` },
+    { label: 'Pro', icon: Star, path: `groups/${groupId}/pro`, highlight: true },
+    { label: 'Moderasyon', icon: Shield, path: `groups/${groupId}/moderation` },
+    { label: 'Analiz', icon: Columns, path: `groups/${groupId}/analysis` },
+    { label: 'Kullanıcılar', icon: Users, path: `groups/${groupId}/users` },
+    { label: 'Yönlendirmeler', icon: UserPlus, path: `groups/${groupId}/referrals` },
+    { label: 'Günlük', icon: Clock, path: `groups/${groupId}/logs` },
+    { label: 'Sıralama', icon: Trophy, path: `groups/${groupId}/ranking` },
   ];
 
   const externalNavItems = [
@@ -182,25 +182,25 @@ const BotManagementPanel = () => {
               <div className="space-y-1">
                 <div className="px-3 py-2 flex items-center justify-between group cursor-pointer hover:bg-white/2 transition-all rounded-lg mb-2">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full border border-white/10 overflow-hidden shrink-0">
+                    <div className="w-10 h-10 rounded-full border border-white/10 overflow-hidden shrink-0">
                        <img src="https://botlyhub.com/kaju-logo.png" alt="Kaju" className="w-full h-full object-cover" />
                     </div>
                     <div>
-                      <h4 className="text-[12px] font-bold text-white leading-tight">KAJU TEST</h4>
-                      <span className="text-[10px] text-slate-500 lowercase leading-tight">@botlyhub</span>
+                      <h4 className="text-[14px] font-bold text-white leading-tight uppercase tracking-tight">KAJU TEST</h4>
+                      <span className="text-[12px] text-slate-500 lowercase leading-tight">@botlyhub</span>
                     </div>
                   </div>
-                  <ChevronRight size={14} className="rotate-90 text-slate-600" />
+                  <ChevronRight size={14} className="text-slate-600" />
                 </div>
 
                 {/* Sub-Nav Group */}
                 <div className="space-y-0.5">
-                  {groupNavItems.map((item) => (
+                  {groupNavItems.map((item: any) => (
                     <SidebarItem 
                       key={item.path}
                       icon={item.icon}
                       label={item.label}
-                      color={item.color}
+                      badge={item.highlight ? 'Pro' : undefined}
                       path={`/bot-panel/${botId}/${item.path}`}
                       active={location.pathname.includes(`/${item.path.split('/').pop()}`)}
                     />
@@ -305,11 +305,11 @@ const BotManagementPanel = () => {
           <div className="flex items-center gap-6">
             <span className="text-[9px] font-bold text-slate-600 uppercase tracking-widest">[0.091]</span>
             <div className="flex items-center gap-3">
-              <a href="#" className="text-[9px] font-black text-slate-500 hover:text-white uppercase tracking-widest transition-colors">refund policy</a>
+              <a href="#" className="text-[9px] font-black text-slate-500 hover:text-white uppercase tracking-widest transition-colors">İade Politikası</a>
               <span className="text-slate-800">|</span>
               <a href="#" className="text-[9px] font-black text-slate-500 hover:text-white uppercase tracking-widest transition-colors">gizlilik politikası</a>
               <span className="text-slate-800">|</span>
-              <a href="#" className="text-[9px] font-black text-slate-500 hover:text-white uppercase tracking-widest transition-colors">terms of service</a>
+              <a href="#" className="text-[9px] font-black text-slate-500 hover:text-white uppercase tracking-widest transition-colors">hizmet şartları</a>
               <span className="text-slate-800">|</span>
               <a href="#" className="text-[9px] font-black text-slate-500 hover:text-white uppercase tracking-widest transition-colors">@combotchat</a>
               <span className="text-slate-800">|</span>
@@ -347,7 +347,7 @@ const GroupSettingsView = () => {
                   }`}
                 >
                     <Settings size={14} />
-                    Basic
+                    Temel
                 </button>
                 <button 
                   onClick={() => setActiveTab('team')}
@@ -356,7 +356,7 @@ const GroupSettingsView = () => {
                   }`}
                 >
                     <Users size={14} />
-                    Team
+                    Ekip
                 </button>
             </div>
 
@@ -392,27 +392,27 @@ const GroupSettingsView = () => {
                                 <input type="checkbox" className="w-5 h-5 accent-blue-600 rounded bg-[#14181f] border-white/5" />
                             </div>
                             <div>
-                                <h4 className="text-sm font-bold text-white group-hover:text-blue-500 transition-colors">Receive daily analytics report</h4>
-                                <p className="text-[11px] text-slate-500 leading-relaxed font-medium">Combot will send you a daily report about your group</p>
+                                <h4 className="text-sm font-bold text-white group-hover:text-blue-500 transition-colors">Günlük analiz raporu al</h4>
+                                <p className="text-[11px] text-slate-500 leading-relaxed font-medium">Combot grubunuz hakkında günlük bir rapor gönderir</p>
                             </div>
                         </label>
                     </div>
 
                     {/* Tags */}
                     <div>
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-3">Tags</label>
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-3">Etiketler</label>
                         <div className="h-12 bg-[#14181f] border border-white/5 rounded-xl px-4 flex items-center text-sm text-slate-500 italic">
                         </div>
                         <p className="text-[10px] text-slate-600 mt-2 italic flex items-center gap-1">
-                            <Info size={10} /> At the moment, tag is only used for .gban command
+                            <Info size={10} /> Şu anda etiket yalnızca .gban komutu için kullanılır
                         </p>
                     </div>
 
                     {/* Language */}
                     <div>
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-3">Language</label>
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-3">Dil</label>
                         <div className="h-12 bg-[#14181f] border border-white/5 rounded-xl px-4 flex items-center justify-between group cursor-pointer hover:border-white/10 transition-all">
-                            <span className="text-sm text-white font-medium">English (English)</span>
+                            <span className="text-sm text-white font-medium">Türkçe (Turkish)</span>
                             <ChevronRight size={16} className="rotate-90 text-slate-600" />
                         </div>
                     </div>
@@ -456,7 +456,7 @@ const GroupSettingsView = () => {
                     <div className="group bg-gradient-to-br from-slate-900 to-[#0f1218] border border-white/5 p-8 rounded-[40px] relative overflow-hidden">
                         <div className="relative z-10">
                             <div className="flex items-center gap-3 mb-4">
-                                <h3 className="text-xl font-black text-white italic uppercase tracking-tighter">Custom Bot</h3>
+                                <h3 className="text-xl font-black text-white italic uppercase tracking-tighter">Özel Bot</h3>
                                 <span className="text-[10px] font-black bg-blue-600/20 text-blue-400 px-2 py-0.5 rounded italic uppercase tracking-widest border border-blue-500/20">Pro</span>
                             </div>
                             <p className="text-xs text-slate-500 font-medium leading-relaxed max-w-lg mb-0 italic">
