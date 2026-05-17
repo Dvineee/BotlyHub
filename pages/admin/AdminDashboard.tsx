@@ -3340,10 +3340,10 @@ const BlogManagement = () => {
     const [isGeneratingSlug, setIsGeneratingSlug] = useState(false);
 
     const calculateReadTime = (content: string) => {
+        if (!content) return "1 dk";
         const text = content.replace(/<[^>]*>/g, ' ');
         const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
-        const wpm = 200;
-        const minutes = Math.max(1, Math.ceil(words / wpm));
+        const minutes = Math.max(1, Math.ceil(words / 225));
         return `${minutes} dk`;
     };
 
@@ -3365,13 +3365,13 @@ const BlogManagement = () => {
     };
 
     useEffect(() => {
-        if (editingBlog && editingBlog.content && activeTab === 'content') {
-            const newReadTime = calculateReadTime(editingBlog.content);
-            if (newReadTime !== editingBlog.readTime) {
-                setEditingBlog((prev: any) => ({ ...prev, readTime: newReadTime }));
+        if (editingBlog?.content) {
+            const time = calculateReadTime(editingBlog.content);
+            if (time !== editingBlog.readTime) {
+                setEditingBlog((prev: any) => ({ ...prev, readTime: time }));
             }
         }
-    }, [editingBlog?.content, activeTab]);
+    }, [editingBlog?.content]);
 
     const load = useCallback(async () => {
         setIsLoading(true);
@@ -3681,7 +3681,26 @@ const BlogManagement = () => {
                                             </div>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                                 <AdminInput label="YAZAR" value={editingBlog.author} onChange={(v:any)=>setEditingBlog({...editingBlog, author:v})} />
-                                                <AdminInput label="SLUG (OPSİYONEL)" value={editingBlog.slug} onChange={(v:any)=>setEditingBlog({...editingBlog, slug:v})} placeholder="baslik-url-formatinda" />
+                                                <div className="space-y-4">
+                                                    <div className="flex items-center justify-between px-4">
+                                                        <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest italic">SLUG (OPSİYONEL)</label>
+                                                        <button 
+                                                            type="button"
+                                                            onClick={generateAISlug}
+                                                            disabled={isGeneratingSlug}
+                                                            className="text-[9px] font-black text-blue-500 uppercase tracking-widest flex items-center gap-2 hover:text-blue-400 transition-colors disabled:opacity-50"
+                                                        >
+                                                            {isGeneratingSlug ? <Loader2 size={12} className="animate-spin" /> : <Zap size={12} />}
+                                                            YAPAY ZEKA İLE OLUŞTUR
+                                                        </button>
+                                                    </div>
+                                                    <input 
+                                                        value={editingBlog.slug} 
+                                                        onChange={(e) => setEditingBlog({...editingBlog, slug: e.target.value})} 
+                                                        placeholder="baslik-url-formatinda"
+                                                        className="w-full h-14 lg:h-18 bg-slate-950 border border-white/5 rounded-[22px] lg:rounded-[28px] px-8 text-[11px] font-black text-white outline-none focus:border-blue-500 transition-all uppercase italic "
+                                                    />
+                                                </div>
                                             </div>
                                         </div>
                                     )}

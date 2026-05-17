@@ -699,6 +699,7 @@ const BlogPostDetail: React.FC = () => {
             prose-strong:text-slate-900 dark:prose-strong:text-white
             prose-img:rounded-3xl prose-img:shadow-lg
             prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-a:font-black prose-a:no-underline hover:prose-a:underline
+            whitespace-pre-wrap
           ">
             <div dangerouslySetInnerHTML={{ __html: post.content }} />
           </article>

@@ -1001,11 +1001,23 @@ export class DatabaseService {
   }
 
   static async getBlogById(id: string): Promise<BlogPost | null> {
-    const { data, error } = await supabase
+    // Try by ID first
+    let { data, error } = await supabase
       .from('blogs')
       .select('*')
       .eq('id', id)
       .maybeSingle();
+      
+    // If not found by ID, try by slug
+    if (!data && !error) {
+      const { data: slugData, error: slugError } = await supabase
+        .from('blogs')
+        .select('*')
+        .eq('slug', id)
+        .maybeSingle();
+        
+      if (slugData) data = slugData;
+    }
       
     if (error) {
         console.error("Blog Fetch Error:", error);
@@ -1014,7 +1026,7 @@ export class DatabaseService {
     if (!data) return null;
     
     // Fetch actual likes count
-    const likesCount = await this.getBlogLikes(id);
+    const likesCount = await this.getBlogLikes(data.id);
     
     return {
         ...data,
@@ -1128,6 +1140,7 @@ export class DatabaseService {
         author_avatar: blog.authorAvatar,
         category: blog.category,
         read_time: blog.readTime,
+        slug: blog.slug,
         hashtags: blog.hashtags || [],
         is_featured: blog.isFeatured || false,
         updated_at: new Date().toISOString()

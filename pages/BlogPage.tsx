@@ -180,7 +180,7 @@ const BlogPage: React.FC = () => {
                       blogs.filter(p => p.title.toLowerCase().includes(searchQuery.toLowerCase())).map(post => (
                         <button 
                           key={post.id}
-                          onClick={() => { navigate('/blog/' + post.id); setIsSearchModalOpen(false); }}
+                          onClick={() => { navigate('/blog/' + (post.slug || post.id)); setIsSearchModalOpen(false); }}
                           className="w-full flex items-center gap-4 p-4 hover:bg-slate-50 dark:hover:bg-white/5 rounded-2xl transition-all text-left group"
                         >
                           <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-slate-100">
@@ -627,7 +627,7 @@ const BlogPage: React.FC = () => {
                   <motion.div 
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    onClick={() => { haptic('light'); navigate('/blog/' + featuredPost.id); }}
+                    onClick={() => { haptic('light'); navigate('/blog/' + (featuredPost.slug || featuredPost.id)); }}
                     className="group cursor-pointer blog-featured-card custom-cursor-on-hover bg-white dark:bg-slate-900/40 p-6 rounded-[44px] border border-slate-100 dark:border-white/5 hover:border-blue-500/30 transition-all shadow-xl shadow-slate-200/20 dark:shadow-none"
                   >
                     <div className="aspect-[16/9] md:aspect-[2.4/1] rounded-[32px] overflow-hidden mb-8 bg-slate-100 dark:bg-slate-900 shadow-2xl relative">
@@ -716,7 +716,7 @@ const BlogPage: React.FC = () => {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.1 }}
-                      onClick={() => { haptic('light'); navigate('/blog/' + post.id); }}
+                      onClick={() => { haptic('light'); navigate('/blog/' + (post.slug || post.id)); }}
                       className="group cursor-pointer flex flex-col h-full"
                     >
                       <div className="aspect-[16/10] rounded-[32px] overflow-hidden mb-8 bg-slate-100 dark:bg-slate-900 shadow-lg relative">
@@ -828,7 +828,7 @@ const BlogPage: React.FC = () => {
               {[...blogs].sort((a, b) => (b.views_count || 0) - (a.views_count || 0)).slice(0, 4).map((post, i) => (
                 <button 
                   key={post.id}
-                  onClick={() => { haptic('light'); navigate('/blog/' + post.id); }}
+                  onClick={() => { haptic('light'); navigate('/blog/' + (post.slug || post.id)); }}
                   className="w-full flex items-start gap-4 p-4 rounded-2xl bg-white dark:bg-white/2 hover:bg-blue-500/5 border border-slate-100 dark:border-white/5 transition-all text-left group similar-post-card"
                 >
                   <span className="text-xl font-black text-slate-200 dark:text-white/10 group-hover:text-blue-500/30 transition-colors italic">0{i+1}</span>
