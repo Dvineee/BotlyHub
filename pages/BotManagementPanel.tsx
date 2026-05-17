@@ -275,6 +275,12 @@ const BotManagementPanel = () => {
           <Routes>
             <Route index element={<NavigateToGroups botId={botId} />} />
             <Route path="groups" element={<GroupsView />} />
+            <Route path="scheduler" element={<EmptyModule title="Zamanlayıcı" />} />
+            <Route path="commands" element={<EmptyModule title="Komutlar" />} />
+            <Route path="api" element={<EmptyModule title="API Yönetimi" />} />
+            <Route path="bot-settings" element={<BotSettingsView bot={bot} />} />
+            <Route path="billing" element={<BillingView />} />
+            
             <Route path="groups/:groupId/settings" element={<GroupSettingsView />} />
             <Route path="groups/:groupId/moderation" element={<ModerationView />} />
             <Route path="groups/:groupId/analysis" element={<AnalysisView />} />
@@ -498,6 +504,229 @@ const GroupSettingsView = () => {
                     </div>
                 </div>
             )}
+        </div>
+    );
+};
+
+const BotSettingsView = ({ bot }: { bot: UserBot }) => {
+    const [botData, setBotData] = useState(bot);
+    
+    return (
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-4xl space-y-8">
+            <div>
+                <h1 className="text-2xl font-black text-white italic uppercase tracking-tighter mb-1">Bot Ayarları</h1>
+                <p className="text-sm text-slate-500 font-medium">Botunuzun genel bilgilerini ve uygulama içi görünümünü yönetin.</p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Visual Settings */}
+                <div className="lg:col-span-1 space-y-6">
+                    <div className="bg-[#14181f] border border-white/5 rounded-[40px] p-8 text-center">
+                        <div className="w-24 h-24 bg-slate-900 rounded-full mx-auto mb-6 flex items-center justify-center border-4 border-white/5 relative group cursor-pointer overflow-hidden shadow-2xl">
+                            {botData.icon ? <img src={botData.icon} className="w-full h-full object-cover" /> : botData.name[0].toUpperCase()}
+                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <Upload size={20} className="text-white" />
+                            </div>
+                        </div>
+                        <h4 className="text-sm font-bold text-white mb-1">{botData.name}</h4>
+                        <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Bot Profil Resmi</span>
+                    </div>
+
+                    <div className="bg-blue-600/5 border border-blue-500/10 p-6 rounded-3xl">
+                        <div className="flex items-center gap-3 mb-3">
+                            <ShieldCheck size={20} className="text-blue-500" />
+                            <span className="text-xs font-black text-white italic uppercase tracking-tighter">Durum</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold text-slate-400">Pazar Yeri Durumu</span>
+                            <span className="bg-emerald-500/20 text-emerald-400 text-[9px] font-black px-2 py-1 rounded-lg uppercase italic border border-emerald-500/20">Yayınlandı</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Information Settings */}
+                <div className="lg:col-span-2 space-y-8">
+                    <div className="bg-[#14181f] border border-white/5 rounded-[40px] p-8 space-y-6">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Bot Adı</label>
+                            <input 
+                                type="text" 
+                                value={botData.name} 
+                                className="w-full h-12 bg-[#0f1218] border border-white/5 rounded-2xl px-4 text-sm text-white focus:border-blue-500/30 transition-all"
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Kullanıcı Adı (Telegram)</label>
+                            <div className="relative">
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 text-sm">@</span>
+                                <input 
+                                    type="text" 
+                                    value={botData.slug} 
+                                    disabled
+                                    className="w-full h-12 bg-[#0f1218] border border-white/5 rounded-2xl pl-8 pr-4 text-sm text-slate-500 font-mono"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Açıklama</label>
+                            <textarea 
+                                className="w-full h-32 bg-[#0f1218] border border-white/5 rounded-2xl p-4 text-sm text-white focus:border-blue-500/30 transition-all resize-none"
+                                defaultValue="Bu bot, kanallarınızı ve gruplarınızı yönetmenize yardımcı olan gelişmiş bir moderasyon sistemidir."
+                            ></textarea>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Kategori</label>
+                                <select className="w-full h-12 bg-[#0f1218] border border-white/5 rounded-2xl px-4 text-sm text-white appearance-none outline-none">
+                                    <option>Moderasyon</option>
+                                    <option>Eğlence</option>
+                                    <option>Finans</option>
+                                    <option>Oyun</option>
+                                </select>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Fiyatlandırma</label>
+                                <select className="w-full h-12 bg-[#0f1218] border border-white/5 rounded-2xl px-4 text-sm text-white appearance-none outline-none">
+                                    <option>Ücretsiz</option>
+                                    <option>Premium (Aylık/Yıllık)</option>
+                                    <option>Tek Seferlik</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center justify-end gap-3">
+                        <button className="h-12 px-8 flex items-center gap-2 bg-[#14181f] text-slate-400 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all">
+                             İptal Et
+                        </button>
+                        <button className="h-12 px-8 flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-500/20">
+                             <Save size={16} />
+                             Ayarları Kaydet
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const BillingView = () => {
+    return (
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-8 max-w-5xl">
+            <div>
+                <h1 className="text-2xl font-black text-white italic uppercase tracking-tighter mb-1">Faturalandırma</h1>
+                <p className="text-sm text-slate-500 font-medium">Plan ve abonelik durumunuzu yönetin.</p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2 space-y-6">
+                    {/* Active Subscription Card */}
+                    <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[40px] p-10 text-white relative overflow-hidden shadow-2xl shadow-blue-600/20">
+                        <div className="relative z-10">
+                            <div className="flex items-center gap-3 mb-8">
+                                <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
+                                    <Star className="text-white" size={24} fill="white" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-black italic uppercase tracking-tighter">Pro Plan</h3>
+                                    <span className="text-[10px] font-black opacity-60 uppercase tracking-widest">Yıllık Abonelik</span>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-3 gap-8 mb-10">
+                                <div>
+                                    <span className="text-[10px] font-black opacity-60 uppercase tracking-widest block mb-1">Durum</span>
+                                    <p className="text-base font-bold italic">Yayında</p>
+                                </div>
+                                <div>
+                                    <span className="text-[10px] font-black opacity-60 uppercase tracking-widest block mb-1">Yenileme</span>
+                                    <p className="text-base font-bold italic">14 Haziran 2026</p>
+                                </div>
+                                <div>
+                                    <span className="text-[10px] font-black opacity-60 uppercase tracking-widest block mb-1">Tutar</span>
+                                    <p className="text-base font-bold italic">$99.99 / yıl</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-4">
+                                <button className="h-12 px-8 bg-white text-blue-600 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-slate-100 transition-all">
+                                    Planı Değiştir
+                                </button>
+                                <button className="h-12 px-8 bg-black/20 hover:bg-black/30 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all">
+                                    Aboneliği Yönet
+                                </button>
+                            </div>
+                        </div>
+                        {/* Decorative Pattern */}
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none blur-3xl"></div>
+                        <Zap size={240} className="absolute -bottom-20 -right-20 opacity-10 rotate-12" />
+                    </div>
+
+                    {/* Usage Stats */}
+                    <div className="bg-[#14181f] border border-white/5 rounded-[40px] p-8">
+                        <h4 className="text-sm font-black text-white italic uppercase tracking-widest mb-8">Kullanım Limitleri</h4>
+                        <div className="space-y-6">
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest">
+                                    <span className="text-slate-500">Maksimum Grup Sayısı</span>
+                                    <span className="text-white">4 / Sınırsız</span>
+                                </div>
+                                <div className="h-2 bg-[#0f1218] rounded-full overflow-hidden">
+                                    <div className="h-full bg-blue-600 w-[15%] rounded-full shadow-lg shadow-blue-600/40"></div>
+                                </div>
+                            </div>
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest">
+                                    <span className="text-slate-500">Aylık Karşılanan İstek</span>
+                                    <span className="text-white">84.2k / 1M</span>
+                                </div>
+                                <div className="h-2 bg-[#0f1218] rounded-full overflow-hidden">
+                                    <div className="h-full bg-blue-600 w-[8.4%] rounded-full shadow-lg shadow-blue-600/40"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="space-y-6">
+                    <div className="bg-[#14181f] border border-white/5 rounded-[40px] p-8">
+                        <h4 className="text-sm font-black text-white italic uppercase tracking-widest mb-6">Ödeme Yöntemi</h4>
+                        <div className="flex items-center gap-4 p-4 bg-[#0f1218] border border-white/5 rounded-2xl mb-6">
+                            <div className="w-10 h-6 bg-slate-800 rounded-md flex items-center justify-center overflow-hidden">
+                                <CreditCard size={16} className="text-slate-500" />
+                            </div>
+                            <div className="flex-1">
+                                <p className="text-xs font-bold text-white uppercase tracking-widest">•••• 4242</p>
+                                <span className="text-[10px] text-slate-600 font-medium tracking-widest uppercase italic">Vade: 12/28</span>
+                            </div>
+                        </div>
+                        <button className="w-full h-12 bg-white/5 hover:bg-white/10 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all">
+                             Düzenle
+                        </button>
+                    </div>
+
+                    <div className="bg-[#14181f] border border-white/5 rounded-[40px] p-8">
+                        <h4 className="text-sm font-black text-white italic uppercase tracking-widest mb-6">Son İşlemler</h4>
+                        <div className="space-y-4">
+                            {[1, 2].map(i => (
+                                <div key={i} className="flex items-center justify-between py-2 border-b border-white/5 last:border-0 pb-4">
+                                    <div>
+                                        <p className="text-xs font-bold text-white mb-0.5">Yıllık Yenileme</p>
+                                        <span className="text-[10px] text-slate-500 font-medium">14 Haz 2025</span>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-xs font-black text-white italic">$99.99</p>
+                                        <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Başarılı</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };
@@ -785,12 +1014,12 @@ const UsersView = () => (
   </div>
 );
 
-const EmptyModule = () => (
+const EmptyModule = ({ title }: { title?: string }) => (
   <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in">
     <Zap size={48} className="text-blue-500/20 mb-4" />
-    <h3 className="text-lg font-black text-white italic uppercase tracking-tighter mb-2">Geliştirme Aşamasında</h3>
+    <h3 className="text-lg font-black text-white italic uppercase tracking-tighter mb-2">{title || 'Geliştirme Aşamasında'}</h3>
     <p className="text-sm text-slate-600 font-medium max-w-sm">
-      Bu modül henüz prototip aşamasındadır. Yakında aktif hale getirilecektir.
+      {title ? `${title} modülü henüz prototip aşamasındadır. Yakında aktif hale getirilecektir.` : 'Bu modül henüz prototip aşamasındadır. Yakında aktif hale getirilecektir.'}
     </p>
   </div>
 );
