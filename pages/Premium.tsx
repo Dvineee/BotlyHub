@@ -4,9 +4,11 @@ import { Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { subscriptionPlans } from '../data';
 import { SEO } from '../components/SEO';
+import { useTranslation } from '../TranslationContext';
 
 const Premium = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   // Get current plan from local storage (mock)
   const currentPlanId = localStorage.getItem('userPlan') || 'plan_starter';
@@ -28,25 +30,25 @@ const Premium = () => {
   return (
     <>
     <SEO 
-        title="Premium Paketler ve Üyelik Ayrıcalıkları" 
-        description="BotlyHub Premium ile Telegram botu yönetiminizi profesyonelleştirin. Daha düşük komisyonlar, özel araçlar ve kesintisiz destek ile tanışın."
+        title={t('premium_title')} 
+        description={t('premium_hero_desc')}
     />
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 pt-10 pb-32 animate-in fade-in transition-colors duration-300">
       {/* Header */}
       <div className="flex items-center gap-5 mb-10 px-1">
         <div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Premium Paketler</h1>
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Üyelik Yönetimi</p>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{t('premium_title')}</h1>
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">{t('premium_mgmt')}</p>
         </div>
       </div>
 
       {/* Hero */}
       <div className="text-center mb-12 px-4">
           <h2 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
-              Limitleri <span className="text-brand dark:text-brand-light">Kaldırın</span>
+              {t('premium_hero_title').split(' ')[0]} <span className="text-brand dark:text-brand-light">{t('premium_hero_title').split(' ').slice(1).join(' ')}</span>
           </h2>
           <p className="text-slate-500 text-xs mt-3 max-w-xs mx-auto font-medium leading-relaxed">
-              Daha düşük komisyon oranları ve özel özelliklerle gelirinizi artırın.
+              {t('premium_hero_desc')}
           </p>
       </div>
 
@@ -81,7 +83,7 @@ const Premium = () => {
                   >
                       {plan.isPopular && (
                           <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand dark:bg-brand-light text-white text-[10px] font-bold px-4 py-1.5 rounded-full  tracking-wider">
-                              EN POPÜLER
+                              {t('premium_popular')}
                           </div>
                       )}
 
@@ -92,17 +94,17 @@ const Premium = () => {
                           <div className="text-right">
                               <div className="flex items-end justify-end gap-1">
                                   <span className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">₺{plan.price}</span>
-                                  <span className="text-xs text-slate-500 mb-1.5 font-bold">/ay</span>
+                                  <span className="text-xs text-slate-500 mb-1.5 font-bold">{t('premium_per_month')}</span>
                               </div>
-                              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{plan.billingPeriod} faturalandırılır</p>
+                              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{t(plan.billingPeriod)} {t('premium_billed')}</p>
                           </div>
                       </div>
 
                       <h3 className={`text-xl font-bold mb-2 tracking-tight ${plan.color === 'yellow' ? 'text-yellow-600 dark:text-yellow-400' : 'text-slate-900 dark:text-white'}`}>
-                          {plan.name}
+                          {t(plan.name)}
                       </h3>
                       <p className="text-xs text-slate-500 mb-8 min-h-[40px] font-medium leading-relaxed">
-                          {plan.description}
+                          {t(plan.description)}
                       </p>
 
                       <div className="space-y-4 mb-10">
@@ -111,7 +113,7 @@ const Premium = () => {
                                   <div className={`w-5 h-5 rounded-full flex items-center justify-center ${plan.color === 'yellow' ? 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-500' : 'bg-brand/10 dark:bg-brand-light/10 text-brand dark:text-brand-light'}`}>
                                     <Check size={12} strokeWidth={3} />
                                   </div>
-                                  <span className="text-[13px] text-slate-600 dark:text-slate-300 font-medium">{feature}</span>
+                                  <span className="text-[13px] text-slate-600 dark:text-slate-300 font-medium">{t(feature)}</span>
                               </div>
                           ))}
                       </div>
@@ -126,7 +128,7 @@ const Premium = () => {
                               : btnColor
                           }`}
                         >
-                            {isCurrent ? 'Mevcut Plan' : (plan.price === 0 ? 'Ücretsiz Başla' : 'Planı Seç')}
+                            {isCurrent ? t('premium_current_plan') : (plan.price === 0 ? t('premium_start_free') : t('premium_select_plan'))}
                         </button>
                       </div>
                   </div>

@@ -5,9 +5,11 @@ import { DatabaseService } from '../services/DatabaseService';
 import { Referral, ReferralSettings } from '../types';
 import { Users, Gift, Share2, Award, Clock, CheckCircle2, XCircle, Copy, ExternalLink, Loader2, ShieldCheck } from 'lucide-react';
 import { motion } from 'motion/react';
+import { useTranslation } from '../TranslationContext';
 
 const ReferralPage = () => {
     const { user } = useTelegram();
+    const { t, language } = useTranslation();
     const [referrals, setReferrals] = useState<Referral[]>([]);
     const [stats, setStats] = useState<any>(null);
     const [settings, setSettings] = useState<ReferralSettings | null>(null);
@@ -43,13 +45,13 @@ const ReferralPage = () => {
     const handleCopy = () => {
         navigator.clipboard.writeText(referralLink);
         setCopied(true);
-        DatabaseService.logActivity(user.id.toString(), 'system', 'referral_link_copied', 'Referans Linki Kopyalandı', 'Kullanıcı referans linkini kopyaladı.');
+        DatabaseService.logActivity(user.id.toString(), 'system', 'referral_link_copied', t('ref_link_copied_log_title') || 'Referans Linki Kopyalandı', t('ref_link_copied_log_desc') || 'Kullanıcı referans linkini kopyaladı.');
         setTimeout(() => setCopied(false), 2000);
     };
 
     const handleShare = () => {
-        const text = `🚀 BotlyHub V3'e katıl ve en iyi Telegram botlarını keşfet! Benim linkimle katılarak özel ödüller kazanabilirsin: ${referralLink}`;
-        DatabaseService.logActivity(user.id.toString(), 'system', 'referral_link_shared', 'Referans Linki Paylaşıldı', 'Kullanıcı referans linkini Telegram üzerinden paylaştı.');
+        const text = `${t('ref_share_text')} ${referralLink}`;
+        DatabaseService.logActivity(user.id.toString(), 'system', 'referral_link_shared', t('ref_link_shared_log_title') || 'Referans Linki Paylaşıldı', t('ref_link_shared_log_desc') || 'Kullanıcı referans linkini Telegram üzerinden paylaştı.');
         window.open(`https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(text)}`);
     };
 
@@ -57,7 +59,7 @@ const ReferralPage = () => {
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh]">
                 <Loader2 className="w-10 h-10 animate-spin text-blue-500 mb-4" />
-                <span className="text-xs font-black uppercase tracking-widest opacity-40">Veriler Yükleniyor</span>
+                <span className="text-xs font-black uppercase tracking-widest opacity-40">{t('ref_loading')}</span>
             </div>
         );
     }
@@ -72,7 +74,7 @@ const ReferralPage = () => {
                         <Users className="text-brand dark:text-brand-light" size={24} />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter uppercase italic leading-none">Referans <span className="text-brand dark:text-brand-light">Sistemi</span></h1>
+                        <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter uppercase italic leading-none">{t('ref_title').split(' ')[0]} <span className="text-brand dark:text-brand-light">{t('ref_title').split(' ').slice(1).join(' ')}</span></h1>
                         <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em] mt-1.5">HUB NETWORK v4.2.0</p>
                     </div>
                 </div>
@@ -85,15 +87,15 @@ const ReferralPage = () => {
             <div className="grid grid-cols-2 gap-5">
                 <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-8 rounded-xl space-y-2 fancy-glass-card stats-card-bg group overflow-hidden relative">
                     <div className="absolute top-0 right-0 w-16 h-16 bg-slate-500/5 blur-2xl -mr-8 -mt-8 rounded-full" />
-                    <span className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-[0.2em] relative z-10">TOPLAM DAVET</span>
+                    <span className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-[0.2em] relative z-10">{t('ref_total_invites')}</span>
                     <div className="flex items-baseline gap-2 relative z-10">
                         <span className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter italic group-hover:scale-110 transition-transform duration-500">{stats?.total || 0}</span>
-                        <span className="text-[11px] font-black text-slate-400 uppercase italic">KİŞİ</span>
+                        <span className="text-[11px] font-black text-slate-400 uppercase italic">{t('ref_person')}</span>
                     </div>
                 </div>
                 <div className="bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 p-8 rounded-xl space-y-2 fancy-glass-card stats-card-bg group overflow-hidden relative">
                     <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-500/5 blur-2xl -mr-8 -mt-8 rounded-full" />
-                    <span className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-[0.2em] relative z-10">TOPLAM KAZANÇ</span>
+                    <span className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-[0.2em] relative z-10">{t('ref_total_earnings')}</span>
                     <div className="flex items-baseline gap-2 relative z-10">
                         <span className="text-4xl font-black text-emerald-500 tracking-tighter italic group-hover:scale-110 transition-transform duration-500">{stats?.earnings || 0}</span>
                         <span className="text-[11px] font-black text-emerald-500/50 uppercase italic">HP</span>
@@ -109,9 +111,9 @@ const ReferralPage = () => {
                 <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-brand/5 blur-[100px] rounded-full" />
                 
                 <div className="space-y-4 relative z-10 text-center md:text-left">
-                    <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic leading-none">SENİN ÖZEL DAVET LİNKİN</h3>
+                    <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic leading-none">{t('ref_your_link')}</h3>
                     <p className="text-[10px] font-black text-brand dark:text-brand-light/70 leading-relaxed uppercase tracking-widest max-w-sm px-4 md:px-0">
-                        Linkingi paylaş, her yeni üye için <span className="text-brand-dark dark:text-white bg-brand/10 px-2 rounded-lg">{settings?.standard_reward} HP</span> kazanma şansı yakala.
+                        {t('ref_share_desc').replace('{reward}', settings?.standard_reward?.toString() || '0')}
                     </p>
                 </div>
 
@@ -139,7 +141,7 @@ const ReferralPage = () => {
                     >
                         <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
                         <Share2 size={20} className="relative z-10" />
-                        <span className="relative z-10 italic">ARKADAŞINI DAVET ET</span>
+                        <span className="relative z-10 italic">{t('ref_invite_friend')}</span>
                     </button>
                 </div>
             </div>
@@ -150,13 +152,13 @@ const ReferralPage = () => {
                     <div className="w-12 h-12 bg-emerald-500/10 dark:bg-emerald-500/5 rounded-xl flex items-center justify-center">
                         <ShieldCheck className="text-emerald-500" size={24} />
                     </div>
-                    <h4 className="text-[15px] font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">NASIL ÖDÜL KAZANILIR?</h4>
+                    <h4 className="text-[15px] font-black text-slate-900 dark:text-white uppercase tracking-tighter italic">{t('ref_how_to_earn')}</h4>
                 </div>
                 <div className="space-y-6">
                     {[
-                        { step: '01', text: 'Davet linkini sosyal medyada veya arkadaşınla paylaş.', color: 'brand' },
-                        { step: '02', text: 'Arkadaşın botu başlattıktan sonra resmi grubumuza katılmalı.', color: 'emerald' },
-                        { step: '03', text: 'Grup katılımı sağlandığı an ödülün otomatik yansır.', color: 'brand' }
+                        { step: '01', text: t('ref_step_1'), color: 'brand' },
+                        { step: '02', text: t('ref_step_2'), color: 'emerald' },
+                        { step: '03', text: t('ref_step_3'), color: 'brand' }
                     ].map((item, i) => (
                         <div key={i} className="flex gap-5 items-center group">
                             <span className={`text-[20px] font-black text-${item.color}-500 opacity-20 group-hover:opacity-100 transition-opacity italic`}>{item.step}</span>
@@ -169,10 +171,10 @@ const ReferralPage = () => {
             {/* Referral List */}
             <div className="space-y-6">
                 <div className="flex items-center justify-between px-4">
-                    <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-[0.4em]">DAVET DURUMLARI</h3>
+                    <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-[0.4em]">{t('ref_statuses')}</h3>
                     <div className="flex items-center gap-2 text-[9px] font-black text-brand uppercase tracking-widest bg-brand/5 px-3 py-1 rounded-lg border border-brand/10">
                         <div className="w-1 h-1 bg-brand rounded-full animate-pulse" />
-                        <span>OTOMATİK ONAY SİSTEMİ</span>
+                        <span>{t('ref_auto_confirm')}</span>
                     </div>
                 </div>
 
@@ -180,7 +182,7 @@ const ReferralPage = () => {
                     {referrals.length === 0 ? (
                         <div className="py-20 text-center bg-white dark:bg-slate-900/20 border border-dashed border-black/5 dark:border-white/10 rounded-xl fancy-glass-card">
                             <Users className="mx-auto text-slate-100 dark:text-slate-800 mb-6" size={56} />
-                            <p className="text-[11px] font-black text-slate-300 dark:text-slate-700 uppercase tracking-[0.3em] italic">Henüz bir veri girişi bulunamadı</p>
+                            <p className="text-[11px] font-black text-slate-300 dark:text-slate-700 uppercase tracking-[0.3em] italic">{t('ref_no_data')}</p>
                         </div>
                     ) : (
                         referrals.map((ref) => (
@@ -215,7 +217,7 @@ const ReferralPage = () => {
                                             )}
                                         </div>
                                         <span className="text-[9px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest">
-                                            {ref.status === 'pending' ? 'AĞA BAĞLANMASI BEKLENİYOR' : new Date(ref.created_at).toLocaleDateString('tr-TR')}
+                                            {ref.status === 'pending' ? t('ref_waiting') : new Date(ref.created_at).toLocaleDateString(language === 'tr' ? 'tr-TR' : 'en-US')}
                                         </span>
                                     </div>
                                 </div>
@@ -224,7 +226,7 @@ const ReferralPage = () => {
                                         +{ref.reward_amount} HP
                                     </span>
                                     <p className={`text-[8px] font-black uppercase tracking-[0.2em] mt-1 ${ref.status === 'confirmed' ? 'text-emerald-500/50' : 'text-orange-500/50'}`}>
-                                        {ref.status === 'confirmed' ? 'DİSİPLİNE EDİLDİ' : ref.status === 'pending' ? 'BEKLEYİŞTE' : 'İHRAÇ EDİLDİ'}
+                                        {ref.status === 'confirmed' ? t('ref_confirmed') : ref.status === 'pending' ? t('ref_pending') : t('ref_rejected')}
                                     </p>
                                 </div>
                             </div>

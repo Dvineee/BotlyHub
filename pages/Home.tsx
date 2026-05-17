@@ -34,6 +34,7 @@ const getLiveBotIcon = (bot: Bot) => {
 const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) => void }> = React.memo(({ ann, onShowPopup }) => {
   const navigate = useNavigate();
   const { haptic } = useTelegram();
+  const { t } = useTranslation();
 
   const handleAction = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -93,13 +94,13 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
                     style={{ background: 'linear-gradient(135deg, #FF6B6B, #FF8E53)' }}
                 >
                     <span className="text-[9px] font-black text-white uppercase tracking-widest leading-none">
-                        {ann.tag || 'ETİKET'}
+                        {ann.tag || t('home_tag_default')}
                     </span>
                 </div>
                 <div className="flex items-center gap-1.5 px-2 py-0.5 bg-slate-100 dark:bg-white/5 rounded-lg shrink-0 border border-black/5 dark:border-white/5">
                     <Megaphone size={10} className="text-slate-400" />
                     <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest leading-none">
-                        {ann.badge_text || 'ROZET'}
+                        {ann.badge_text || t('home_badge_default')}
                     </span>
                 </div>
             </div>
@@ -110,6 +111,7 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
 
 const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = React.memo(({ bots }) => {
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const scroll = useDraggableScroll();
     const [activeType, setActiveType] = useState<'latest' | 'official' | 'featured'>('latest');
     const [scrollState, setScrollState] = useState({ left: false, right: true });
@@ -155,9 +157,9 @@ const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = React.memo(({ bots }) => {
     }, [bots, activeType]);
 
     const types = [
-        { id: 'latest', label: 'en son eklenenler' },
-        { id: 'official', label: 'orjinal' },
-        { id: 'featured', label: 'market özel' }
+        { id: 'latest', label: t('home_latest_added') },
+        { id: 'official', label: t('home_official') },
+        { id: 'featured', label: t('home_market_special') }
     ];
 
     const cycleType = () => {
@@ -340,6 +342,7 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonR
 
 const AddProjectBanner: React.FC<{ className?: string }> = ({ className = "" }) => {
     const navigate = useNavigate();
+    const { t } = useTranslation();
     
     return (
         <div 
@@ -361,10 +364,10 @@ const AddProjectBanner: React.FC<{ className?: string }> = ({ className = "" }) 
             <div className="flex-1 min-w-0 pr-1 py-1 flex flex-col justify-between h-[100px]">
                 <div>
                     <h3 className="text-slate-900 dark:text-white font-bold text-[17px] tracking-tight truncate leading-tight mb-1 group-hover:text-blue-500 transition-colors">
-                        Kendi Otomasyonunu Kur
+                        {t('home_add_auto_title')}
                     </h3>
                     <p className="text-slate-400 dark:text-slate-500 text-[12px] leading-[1.4] line-clamp-2 font-medium opacity-90">
-                        Premium ile projeni öne çıkar ve sistemini kur.
+                        {t('home_add_auto_desc')}
                     </p>
                 </div>
                 
@@ -374,7 +377,7 @@ const AddProjectBanner: React.FC<{ className?: string }> = ({ className = "" }) 
                         style={{ background: 'linear-gradient(135deg, #3B82F6, #2563EB)' }}
                     >
                         <span className="text-[9px] font-black text-white uppercase tracking-widest leading-none">
-                            HEMEN KATIL →
+                            {t('home_join_now')}
                         </span>
                     </div>
                 </div>
@@ -662,9 +665,9 @@ const NavMenu = ({
                         
                         <div className="flex justify-between items-center mb-8 px-6">
                             <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-widest uppercase italic">
-                                {mobileModal === 'bots' ? 'BOTS KATEGORİ' : 'APPS KATEGORİ'}
+                                {mobileModal === 'bots' ? t('cat_bots_mobile') : t('cat_apps_mobile')}
                             </h3>
-                            <button onClick={() => setMobileModal(null)} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-500 active:scale-90">
+                            <button onClick={() => setMobileModal(null)} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-500 active:scale-90 transition-all">
                                 <X size={20} />
                             </button>
                         </div>
@@ -701,7 +704,7 @@ const NavMenu = ({
                                         <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-4">
                                             <Zap size={28} className="text-yellow-500" />
                                         </div>
-                                        <p className="text-sm font-black text-slate-400 uppercase tracking-[0.3em]">{t('coming_soon') || 'Pek Yakında'}</p>
+                                        <p className="text-sm font-black text-slate-400 uppercase tracking-[0.3em]">{t('coming_soon')}</p>
                                     </div>
                                 );
                             })()}
@@ -851,8 +854,8 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-200 animate-in transition-colors duration-300 home-page">
       <SEO 
-          title="Telegram Bot Platformu | En İyi Botları Keşfedin" 
-          description="BotlyHub - Türkiye'nin en gelişmiş Telegram bot platformu. En iyi Telegram botlarını keşfedin, kendi botlarınızı tanıtın ve TON ekosisteminde gelir elde edin."
+          title={t('home_seo_title')} 
+          description={t('home_seo_desc')}
       />
       {/* Top Background Wrapper */}
       <div className="bg-[#00000008] dark:bg-slate-900/10">
@@ -938,7 +941,7 @@ const Home = () => {
                                                className="w-full flex items-center gap-4 px-6 py-4 hover:bg-black/5 dark:hover:bg-white/5 text-left text-red-500 dark:text-red-400 font-bold"
                                            >
                                                <LogOut size={18} /> 
-                                               <span className="text-[11px] font-black uppercase tracking-tight">Çıkış Yap</span>
+                                               <span className="text-[11px] font-black uppercase tracking-tight">{t('logout')}</span>
                                            </button>
                                       </div>
                                   )}
@@ -949,7 +952,7 @@ const Home = () => {
                               onClick={() => { haptic('light'); setIsLoginModalOpen(true); }}
                               className="px-5 h-10 bg-blue-500 hover:bg-blue-600 text-white text-[13px] font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center whitespace-nowrap shadow-lg shadow-blue-500/25"
                           >
-                              Giriş yap
+                              {t('login')}
                           </button>
                       )}
                       <LoginModal 
@@ -1006,10 +1009,10 @@ const Home = () => {
                   <>
                     <div className="mb-10 sm:mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700 text-center">
                         <h1 className="mobile-hero-title font-bold tracking-[-0.035em] md:leading-none leading-tight text-slate-900 dark:text-white">
-                            BotlyHub: En Gelişmiş <span className="text-blue-500">Telegram Bot Platformu</span>
+                            BotlyHub: En Gelişmiş <span className="text-blue-500">{t('home_hero_title').split(':')[1]?.trim() || 'Telegram Bot Platformu'}</span>
                         </h1>
                         <p className="mt-6 text-slate-500 dark:text-slate-400 text-sm md:hero-desc font-medium max-w-2xl mx-auto uppercase tracking-widest italic">
-                            En iyi Telegram Botlarını ve Kanallarını Keşfet, Tanıt ve TON ile Kazanmaya Başla.
+                            {t('home_hero_desc')}
                         </p>
                     </div>
 
@@ -1099,7 +1102,7 @@ const Home = () => {
                                             className={`category-filter-item cursor-pointer hover:text-blue-500 transition-all whitespace-nowrap outline-none focus-visible:ring-2 ring-blue-500/50 rounded-lg px-4 py-2 text-sm font-medium border ${selectedAppsCategory === 'all' ? 'text-blue-500 border-blue-500 bg-blue-500/5 font-black' : 'text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:hover:bg-white/5'}`}
                                             onClick={() => { haptic('light'); setSelectedAppsCategory('all'); }}
                                         >
-                                            {t('Tümü')}
+                                            {t('home_all')}
                                         </button>
                                         {appsSubCategories.map((subCat) => (
                                             <button 
@@ -1217,7 +1220,7 @@ const Home = () => {
                                             className={`category-filter-item cursor-pointer hover:text-blue-500 transition-all whitespace-nowrap outline-none focus-visible:ring-2 ring-blue-500/50 rounded-lg px-4 py-2 text-sm font-medium border ${selectedBotsCategory === 'all' ? 'text-blue-500 border-blue-500 bg-blue-500/5 font-black' : 'text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:hover:bg-white/5'}`}
                                             onClick={() => { haptic('light'); setSelectedBotsCategory('all'); }}
                                         >
-                                            {t('Tümü')}
+                                            {t('home_all')}
                                         </button>
                                         {botsCategories.map((cat) => (
                                             <button 
@@ -1254,7 +1257,7 @@ const Home = () => {
 
                     {Object.keys(categorizedBots).length === 0 && (
                         <div className="py-24 text-center text-slate-400 dark:text-slate-700 font-bold uppercase text-xs tracking-widest animate-in fade-in zoom-in duration-500">
-                             HENÜZ ÖĞE EKLENMEDİ.
+                             {t('home_no_items')}
                         </div>
                     )}
                 </motion.div>
@@ -1286,27 +1289,27 @@ const Home = () => {
                 <div className="flex items-center gap-3 mb-8">
                     <div className="w-10 h-[2px] bg-blue-500"></div>
                     <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight uppercase italic">
-                        SIKÇA SORULAN SORULAR
+                        {t('home_faq_title')}
                     </h2>
                 </div>
                 
                 <div className="space-y-4">
                     {[
                         {
-                            q: "BotlyHub nedir?",
-                            a: "BotlyHub, Telegram ekosistemindeki en iyi botları, kanalları ve uygulamaları keşfetmenizi sağlayan merkezi bir platformdur. Aynı zamanda bot geliştiricileri için projelerini tanıtabilecekleri gelişmiş bir pazaryeridir."
+                            q: t('home_faq_1_q'),
+                            a: t('home_faq_1_a')
                         },
                         {
-                            q: "Kendi botumu nasıl ekleyebilirim?",
-                            a: "Kendi botunuzu veya kanalınızı eklemek için sağ üstteki 'Bot Ekle' butonuna basabilir veya admin panelimiz üzerinden projenizi sisteme kaydedebilirsiniz. Onay sürecinden sonra projeniz yayına alınacaktır."
+                            q: t('home_faq_2_q'),
+                            a: t('home_faq_2_a')
                         },
                         {
-                            q: "Premium üyelik avantajları nelerdir?",
-                            a: "Premium üyelik ile daha düşük satış komisyonları, öne çıkanlar bölümünde listelenme, detaylı istatistik analizleri ve öncelikli teknik destek gibi ayrıcalıklardan yararlanabilirsiniz."
+                            q: t('home_faq_3_q'),
+                            a: t('home_faq_3_a')
                         },
                         {
-                            q: "Sistem nasıl çalışır?",
-                            a: "Kullanıcılar BotlyHub üzerinden botları keşfeder, puanlar ve yorum yapar. Geliştiriciler ise botlarını listeler ve satış yaparak TON veya diğer yöntemlerle gelir elde eder."
+                            q: t('home_faq_4_q'),
+                            a: t('home_faq_4_a')
                         }
                     ].map((item, idx) => (
                         <details key={idx} className="group bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-xl transition-all overflow-hidden shadow-sm">

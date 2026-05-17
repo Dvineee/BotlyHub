@@ -47,15 +47,15 @@ import { AnimatePresence } from 'motion/react';
 import { Loader2 } from 'lucide-react';
 
 const categories = [
-  { id: 'all', label: 'Tümü', icon: Layout, color: 'text-slate-600' },
-  { id: 'trends', label: 'Trendler', icon: TrendingUp, color: 'text-orange-500' },
-  { id: 'bots', label: 'Botlar', icon: BotIcon, color: 'text-blue-500' },
-  { id: 'ton', label: 'TON Ekosistemi', icon: Network, color: 'text-sky-400' },
-  { id: 'analysis', label: 'Analizler', icon: BarChart3, color: 'text-purple-500' },
-  { id: 'explore', label: 'Keşfet', icon: Search, color: 'text-green-500' },
-  { id: 'earn', label: 'Para Kazanma', icon: DollarSign, color: 'text-emerald-500' },
-  { id: 'ai', label: 'Yapay Zeka Araçları', icon: Cpu, color: 'text-indigo-500' },
-  { id: 'guides', label: 'Rehberler', icon: BookOpen, color: 'text-rose-500' },
+  { id: 'all', translationKey: 'cat_all', icon: Layout, color: 'text-slate-600' },
+  { id: 'trends', translationKey: 'cat_trends', icon: TrendingUp, color: 'text-orange-500' },
+  { id: 'bots', translationKey: 'cat_bots', icon: BotIcon, color: 'text-blue-500' },
+  { id: 'ton', translationKey: 'cat_ton', icon: Network, color: 'text-sky-400' },
+  { id: 'analysis', translationKey: 'cat_analysis', icon: BarChart3, color: 'text-purple-500' },
+  { id: 'explore', translationKey: 'cat_explore', icon: Search, color: 'text-green-500' },
+  { id: 'earn', translationKey: 'cat_earn', icon: DollarSign, color: 'text-emerald-500' },
+  { id: 'ai', translationKey: 'cat_ai_tools', icon: Cpu, color: 'text-indigo-500' },
+  { id: 'guides', translationKey: 'cat_guides', icon: BookOpen, color: 'text-rose-500' },
 ];
 
 const BlogPage: React.FC = () => {
@@ -117,7 +117,8 @@ const BlogPage: React.FC = () => {
   }, []);
 
   const filteredPosts = blogs.filter(post => {
-    const matchesCategory = activeCategory === 'all' || post.category === categories.find(c => c.id === activeCategory)?.label;
+    const activeCatObj = categories.find(c => c.id === activeCategory);
+    const matchesCategory = activeCategory === 'all' || post.category === t(activeCatObj?.translationKey || '');
     const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                          post.excerpt?.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
@@ -207,7 +208,7 @@ const BlogPage: React.FC = () => {
               
               <div className="p-4 bg-slate-50 dark:bg-white/5 flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
                 <div className="flex gap-4">
-                  <span className="flex items-center gap-1"><kbd className="px-1.5 py-0.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded">ESC</kbd> {language === 'tr' ? 'Kapat' : 'Close'}</span>
+                  <span className="flex items-center gap-1"><kbd className="px-1.5 py-0.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded">ESC</kbd> {t('cancel')}</span>
                 </div>
                 <span>BotlyHub Search v1.0</span>
               </div>
@@ -259,7 +260,7 @@ const BlogPage: React.FC = () => {
                   >
                     <div className="flex items-center gap-3">
                       <cat.icon size={20} className={activeCategory === cat.id ? 'text-white' : 'text-slate-400'} />
-                      {cat.id === 'all' ? t('cat_all') : cat.label}
+                      {t(cat.translationKey)}
                     </div>
                     {activeCategory === cat.id && <ChevronRight size={18} />}
                   </button>
@@ -286,17 +287,17 @@ const BlogPage: React.FC = () => {
                     <button 
                       onClick={() => { haptic('medium'); setWebAuthUser(null); setIsMobileMenuOpen(false); }}
                       className="p-3 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500/20 transition-all shrink-0"
-                      title="Çıkış Yap"
+                      title={t('logout')}
                     >
                       <LogOut size={18} />
                     </button>
                  </div>
                ) : (
                  <div className="mobile-menu-profile bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-500/10 dark:to-blue-500/10 rounded-2xl border border-blue-100/50 dark:border-blue-500/20">
-                    <p className="text-[11px] text-blue-700/70 dark:text-blue-400/70 mb-3 leading-relaxed">Tüm özelliklere erişmek için giriş yap.</p>
+                    <p className="text-[11px] text-blue-700/70 dark:text-blue-400/70 mb-3 leading-relaxed">{t('blog_login_desc')}</p>
                     <button onClick={() => { haptic('light'); navigate('/login'); }} className="w-full mobile-login-btn bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2">
                       <User size={16} />
-                      Giriş Yap
+                      {t('login')}
                     </button>
                  </div>
                )}
@@ -307,7 +308,7 @@ const BlogPage: React.FC = () => {
                   className="flex flex-col items-center justify-center gap-1.5 mobile-menu-actions-btn rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white"
                 >
                   {theme === 'dark' ? <Sun size={20} className="text-yellow-400" /> : <Moon size={20} className="text-blue-500" />}
-                  <span className="text-[10px] font-bold uppercase tracking-widest">{theme === 'dark' ? (language === 'tr' ? 'Gündüz' : 'Light') : (language === 'tr' ? 'Gece' : 'Dark')}</span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest">{theme === 'dark' ? t('blog_day_mode') : t('blog_night_mode')}</span>
                 </button>
 
                 <button
@@ -323,7 +324,7 @@ const BlogPage: React.FC = () => {
                   className="flex flex-col items-center justify-center gap-1.5 mobile-menu-actions-btn rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white"
                 >
                   <Globe size={20} className="text-slate-400" />
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{language === 'tr' ? 'Dil' : 'Lang'}</span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{t('blog_lang_selection').split(' ')[0]}</span>
                 </button>
               </div>
             </div>
@@ -347,7 +348,7 @@ const BlogPage: React.FC = () => {
                     className="fixed bottom-0 left-0 right-0 z-[1101] bg-white dark:bg-slate-900 rounded-t-[40px] border-t border-slate-100 dark:border-white/10 p-8 pb-12 shadow-2xl"
                   >
                     <div className="w-12 h-1 bg-slate-200 dark:bg-white/10 rounded-full mx-auto mb-8"></div>
-                    <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-[0.2em] mb-6 text-center">{language === 'tr' ? 'Dil Seçimi' : 'Select Language'}</h3>
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-[0.2em] mb-6 text-center">{t('blog_lang_selection')}</h3>
                     <div className="grid grid-cols-1 gap-3">
                       {(['tr', 'en', 'ru'] as const).map((lang) => (
                         <button
@@ -370,7 +371,7 @@ const BlogPage: React.FC = () => {
                       onClick={() => setIsLangPickerOpen(false)}
                       className="w-full mt-6 py-4 text-slate-400 text-[10px] font-black uppercase tracking-widest"
                     >
-                      {language === 'tr' ? 'İptal' : 'Cancel'}
+                      {t('cancel')}
                     </button>
                   </motion.div>
                 </>
@@ -423,7 +424,7 @@ const BlogPage: React.FC = () => {
                 <button
                   key={cat.id}
                   onClick={() => { haptic('light'); setActiveCategory(cat.id); }}
-                  title={cat.id === 'all' ? t('cat_all') : cat.label}
+                  title={t(cat.translationKey)}
                   className={`w-full relative flex items-center gap-3 p-2.5 rounded-lg transition-all text-sm font-semibold group blog-sidebar-cat ${
                     activeCategory === cat.id 
                     ? 'bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white' 
@@ -431,12 +432,12 @@ const BlogPage: React.FC = () => {
                   } ${isSidebarCollapsed ? 'justify-center' : ''}`}
                 >
                   <cat.icon size={20} className={`group-hover:scale-110 transition-transform ${activeCategory === cat.id ? 'text-blue-500' : 'text-slate-400'}`} />
-                  {!isSidebarCollapsed && <span>{cat.id === 'all' ? t('cat_all') : cat.label}</span>}
+                  {!isSidebarCollapsed && <span>{t(cat.translationKey)}</span>}
                   
                   {/* Tooltip for collapsed state */}
                   {isSidebarCollapsed && (
                     <div className="absolute left-full ml-3 px-3 py-1.5 bg-slate-900 dark:bg-slate-800 text-white text-[10px] font-black uppercase tracking-widest rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity backdrop-blur-md whitespace-nowrap z-[110] shadow-2xl border border-white/10">
-                      {cat.id === 'all' ? t('cat_all') : cat.label}
+                      {cat.id === 'all' ? t('cat_all') : t(cat.translationKey)}
                       <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-slate-900 dark:bg-slate-800 rotate-45 border-l border-b border-white/10"></div>
                     </div>
                   )}
@@ -447,7 +448,7 @@ const BlogPage: React.FC = () => {
             {!isSidebarCollapsed && (
               <div className="pt-6 pb-2">
                 <span className="px-3 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-600">
-                  {language === 'tr' ? 'TOPLULUK ANALİZİ' : 'COMMUNITY ANALYSIS'}
+                  {t('blog_community_analysis')}
                 </span>
               </div>
             )}
@@ -459,7 +460,7 @@ const BlogPage: React.FC = () => {
                 <Trophy size={18} className="text-amber-500" />
                 {!isSidebarCollapsed && (
                   <div className="flex flex-col">
-                    <span className="text-xs font-black uppercase italic">{language === 'tr' ? 'En Çok Okunan' : 'Most Read'}</span>
+                    <span className="text-xs font-black uppercase italic">{t('blog_most_read')}</span>
                     <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Bot Geliştirme #1</span>
                   </div>
                 )}
@@ -501,7 +502,7 @@ const BlogPage: React.FC = () => {
                         <button 
                           onClick={() => { haptic('medium'); setWebAuthUser(null); }}
                           className="p-2 bg-slate-100 dark:bg-white/5 text-slate-400 hover:text-red-500 hover:bg-red-500/5 transition-all rounded-lg shrink-0"
-                          title="Çıkış Yap"
+                          title={t('logout')}
                         >
                           <LogOut size={14} />
                         </button>
@@ -511,16 +512,16 @@ const BlogPage: React.FC = () => {
             ) : (
                !isSidebarCollapsed ? (
                 <div className="p-4 bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-500/10 dark:to-blue-500/10 rounded-2xl border border-blue-100/50 dark:border-blue-500/20">
-                   <p className="text-[10px] text-blue-700/70 dark:text-blue-400/70 mb-3 leading-tight">Tüm özelliklere erişmek için giriş yap.</p>
+                   <p className="text-[10px] text-blue-700/70 dark:text-blue-400/70 mb-3 leading-tight">{t('blog_login_desc')}</p>
                    <button onClick={() => navigate('/login')} className="w-full mobile-login-btn bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2">
                      <User size={14} />
-                     Giriş Yap
+                     {t('login')}
                    </button>
                 </div>
                ) : (
                  <button 
                   onClick={() => navigate('/login')}
-                  title="Giriş Yap"
+                  title={t('login')}
                   className="w-full h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center transition-all hover:bg-blue-700 shadow-lg shadow-blue-500/20"
                  >
                    <User size={20} />
@@ -531,7 +532,7 @@ const BlogPage: React.FC = () => {
             <div className={`flex items-center gap-2 ${isSidebarCollapsed ? 'flex-col' : ''}`}>
               <button
                 onClick={() => toggleTheme()}
-                title={theme === 'dark' ? 'Gündüz Modu' : 'Gece Modu'}
+                title={theme === 'dark' ? t('blog_day_mode') : t('blog_night_mode')}
                 className="h-[38px] rounded-xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 transition-all flex-1 flex items-center justify-center"
               >
                 {theme === 'dark' ? <Sun size={18} className="text-yellow-400" /> : <Moon size={18} className="text-blue-500" />}
@@ -585,11 +586,7 @@ const BlogPage: React.FC = () => {
               BOTLYHUB BLOG
             </div>
             <h1 className="text-3xl md:text-5xl font-black tracking-tighter text-slate-900 dark:text-white mb-4 italic">
-              {language === 'tr' ? (
-                <>Teknoloji, <span className="text-blue-600">TON</span> ve Ötesi.</>
-              ) : (
-                <>Technology, <span className="text-blue-600">TON</span> and Beyond.</>
-              )}
+              {t('blog_hero_title')}
             </h1>
             <p className="text-lg text-slate-500 dark:text-slate-400 font-medium max-w-2xl">
               {t('blog_subtitle')}
@@ -608,7 +605,7 @@ const BlogPage: React.FC = () => {
                   : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 border border-transparent'
                 }`}
               >
-                {cat.label}
+                {t(cat.translationKey)}
               </button>
             ))}
           </div>
@@ -617,11 +614,11 @@ const BlogPage: React.FC = () => {
             {isLoading ? (
               <div className="py-32 flex flex-col items-center justify-center space-y-6">
                  <Loader2 className="animate-spin text-blue-500" size={48} />
-                 <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 animate-pulse">İçerikler Yükleniyor...</p>
+                 <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 animate-pulse">{t('blog_loading_content')}</p>
               </div>
             ) : filteredPosts.length === 0 ? (
               <div className="py-20 text-center">
-                <p className="text-slate-400 font-bold uppercase tracking-widest">Bu kategoride henüz yazı bulunmuyor.</p>
+                <p className="text-slate-400 font-bold uppercase tracking-widest">{t('blog_no_posts_cat')}</p>
               </div>
             ) : (
               <>
@@ -701,7 +698,7 @@ const BlogPage: React.FC = () => {
                           </div>
                           <div>
                             <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider block">{featuredPost.author}</span>
-                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{language === 'tr' ? 'BotlyHub Editörü' : 'BotlyHub Editor'}</span>
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{t('blog_editor')}</span>
                           </div>
                         </div>
                         <button className="flex items-center gap-2 text-blue-600 font-black text-[11px] uppercase tracking-widest group/btn hover:mr-2 transition-all">
@@ -776,6 +773,27 @@ const BlogPage: React.FC = () => {
               </>
             )}
           </div>
+
+          {/* BotlyHub Team Banner - Requested by user */}
+          <div className="mt-20 bg-blue-600 rounded-[44px] p-8 md:p-12 text-white relative overflow-hidden group shadow-2xl shadow-blue-500/30">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:scale-110 transition-transform duration-1000"></div>
+            <div className="relative z-10 flex flex-col md:flex-row items-center gap-10">
+              <div className="w-24 h-24 md:w-32 md:h-32 rounded-3xl bg-white flex items-center justify-center p-6 shadow-2xl shrink-0">
+                <Logo isIcon className="fill-blue-600 w-full h-full" />
+              </div>
+              <div className="flex-1 text-center md:text-left">
+                <div className="flex items-center justify-center md:justify-start gap-3 mb-4">
+                  <span className="px-3 py-1 bg-white/20 rounded-lg text-[10px] font-black uppercase tracking-widest border border-white/20">TEAM</span>
+                  <span className="w-12 h-[1px] bg-white/40"></span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80 uppercase">{t('blog_team_label')}</span>
+                </div>
+                <h2 className="text-3xl md:text-5xl font-black italic tracking-tighter mb-4 leading-tight">{t('blog_team_title')}</h2>
+                <p className="text-blue-100/80 text-sm md:text-lg font-medium leading-relaxed max-w-2xl italic">
+                  {t('blog_team_desc')}
+                </p>
+              </div>
+            </div>
+          </div>
         </main>
 
         {/* Right Sidebar - Search & Floating newsletter */}
@@ -790,7 +808,7 @@ const BlogPage: React.FC = () => {
           </button>
 
           <div className="space-y-6">
-            <h4 className="px-2 text-[10px] font-black uppercase tracking-widest text-slate-400">TREND ETİKETLER</h4>
+            <h4 className="px-2 text-[10px] font-black uppercase tracking-widest text-slate-400">{t('blog_trend_tags')}</h4>
             <div className="flex flex-wrap gap-2">
               {trendHashtags.map(tag => (
                 <button 

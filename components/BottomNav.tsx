@@ -4,18 +4,20 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Store, Search, User, Wallet, Bell } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useTelegram } from '../hooks/useTelegram';
+import { useTranslation } from '../TranslationContext';
 
 const BottomNav: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { haptic } = useTelegram();
+    const { t } = useTranslation();
 
     const navItems = [
-        { id: 'home', icon: Store, path: '/', label: 'Market' },
-        { id: 'search', icon: Search, path: '/search', label: 'Keşfet' },
-        { id: 'earnings', icon: Wallet, path: '/earnings', label: 'Cüzdan' },
-        { id: 'notifications', icon: Bell, path: '/notifications', label: 'Duyuru' },
-        { id: 'profile', icon: User, path: '/settings', label: 'Profil' },
+        { id: 'home', icon: Store, path: '/', label: t('nav_market') },
+        { id: 'search', icon: Search, path: '/search', label: t('nav_explore') },
+        { id: 'earnings', icon: Wallet, path: '/earnings', label: t('nav_wallet') },
+        { id: 'notifications', icon: Bell, path: '/notifications', label: t('nav_announcements') },
+        { id: 'profile', icon: User, path: '/settings', label: t('nav_profile') },
     ];
 
     const isActive = (path: string) => {

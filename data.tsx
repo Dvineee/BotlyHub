@@ -253,21 +253,21 @@ const PrivacyIcon = ({ size = 24 }: { size?: number }) => (
 );
 
 export const appsSubCategories = [
-    { id: 'trending', label: 'Trendler', icon: TrendIcon },
-    { id: 'editors_choice', label: 'Editörün Seçimi', icon: EditorIcon },
-    { id: 'new', label: 'Yeni', icon: NewIcon },
-    { id: 'games_sub', label: 'Oyunlar', icon: AppGamesIcon },
-    { id: 'tma_bots', label: 'TMA & Botlar', icon: BotIconForApps },
-    { id: 'ton_sites', label: 'TON Siteleri', icon: SiteIcon },
-    { id: 'ai_sub', label: 'Yapay Zeka', icon: AIIconForApps },
-    { id: 'web3_general', label: 'Web3 Genel', icon: Web3Icon },
-    { id: 'earn', label: 'Kazan', icon: EarnIcon },
-    { id: 'trade', label: 'Ticaret', icon: TradeIcon },
-    { id: 'art', label: 'Sanat', icon: ArtIcon },
-    { id: 'social', label: 'Sosyal', icon: SocialIcon },
-    { id: 'dev', label: 'Geliştirici', icon: DevIcon },
-    { id: 'saas', label: 'SaaS', icon: SaaSIcon },
-    { id: 'security_privacy', label: 'Güvenlik & Gizlilik', icon: PrivacyIcon },
+    { id: 'trending', label: 'apps_cat_trending', icon: TrendIcon },
+    { id: 'editors_choice', label: 'apps_cat_editors_choice', icon: EditorIcon },
+    { id: 'new', label: 'apps_cat_new', icon: NewIcon },
+    { id: 'games_sub', label: 'apps_cat_games', icon: AppGamesIcon },
+    { id: 'tma_bots', label: 'apps_cat_tma_bots', icon: BotIconForApps },
+    { id: 'ton_sites', label: 'apps_cat_ton_sites', icon: SiteIcon },
+    { id: 'ai_sub', label: 'apps_cat_ai', icon: AIIconForApps },
+    { id: 'web3_general', label: 'apps_cat_web3', icon: Web3Icon },
+    { id: 'earn', label: 'apps_cat_earn', icon: EarnIcon },
+    { id: 'trade', label: 'apps_cat_trade', icon: TradeIcon },
+    { id: 'art', label: 'apps_cat_art', icon: ArtIcon },
+    { id: 'social', label: 'apps_cat_social', icon: SocialIcon },
+    { id: 'dev', label: 'apps_cat_dev', icon: DevIcon },
+    { id: 'saas', label: 'apps_cat_saas', icon: SaaSIcon },
+    { id: 'security_privacy', label: 'apps_cat_security', icon: PrivacyIcon },
 ];
 
 const EducationIcon = ({ size = 20, className = "" }: { size?: number, className?: string }) => (
@@ -312,47 +312,47 @@ export const mockBots: ExtendedBot[] = [
 export const subscriptionPlans: SubscriptionPlan[] = [
   {
     id: 'plan_starter',
-    name: 'Başlangıç',
+    name: 'plan_starter_name',
     price: 0,
-    billingPeriod: 'Aylık',
-    description: 'Platformu keşfetmek isteyenler için.',
+    billingPeriod: 'plan_billing_monthly',
+    description: 'plan_starter_desc',
     color: 'slate',
     icon: Star,
     features: [
-      '5 Kanala Kadar Bağlantı',
-      'Standart Destek',
-      '%20 Reklam Komisyonu'
+      'plan_feature_5_channels',
+      'plan_feature_standard_support',
+      'plan_feature_20_comm'
     ]
   },
   {
     id: 'plan_pro',
-    name: 'Pro Üyelik',
+    name: 'plan_pro_name',
     price: 149.90,
-    billingPeriod: 'Aylık',
-    description: 'Büyüyen topluluklar için.',
+    billingPeriod: 'plan_billing_monthly',
+    description: 'plan_pro_desc',
     color: 'blue',
     icon: Zap,
     isPopular: true,
     features: [
-      '20 Kanala Kadar Bağlantı',
-      'Öncelikli Destek',
-      '%10 Reklam Komisyonu',
-      'Detaylı İstatistikler'
+      'plan_feature_20_channels',
+      'plan_feature_priority_support',
+      'plan_feature_10_comm',
+      'plan_feature_detailed_stats'
     ]
   },
   {
     id: 'plan_elite',
-    name: 'Elite Üyelik',
+    name: 'plan_elite_name',
     price: 399.90,
-    billingPeriod: 'Aylık',
-    description: 'Maksimum kazanç ve sınırsız özellikler.',
+    billingPeriod: 'plan_billing_monthly',
+    description: 'plan_elite_desc',
     color: 'yellow',
     icon: Crown,
     features: [
-      'Sınırsız Kanal Bağlantısı',
-      '7/24 Canlı Destek',
-      '%2 Reklam Komisyonu',
-      'Özel Profil Rozeti'
+      'plan_feature_unlimited_channels',
+      'plan_feature_247_support',
+      'plan_feature_2_comm',
+      'plan_feature_special_badge'
     ]
   }
 ];

@@ -85,15 +85,15 @@ const mockPosts = [
 ];
 
 const categories = [
-  { id: 'all', label: 'Tümü', icon: Layout, color: 'text-slate-600' },
-  { id: 'trends', label: 'Trendler', icon: TrendingUp, color: 'text-orange-500' },
-  { id: 'bots', label: 'Botlar', icon: BotIcon, color: 'text-blue-500' },
-  { id: 'ton', label: 'TON Ekosistemi', icon: Network, color: 'text-sky-400' },
-  { id: 'analysis', label: 'Analizler', icon: BarChart3, color: 'text-purple-500' },
-  { id: 'explore', label: 'Keşfet', icon: Search, color: 'text-green-500' },
-  { id: 'earn', label: 'Para Kazanma', icon: DollarSign, color: 'text-emerald-500' },
-  { id: 'ai', label: 'Yapay Zeka Araçları', icon: Cpu, color: 'text-indigo-500' },
-  { id: 'guides', label: 'Rehberler', icon: BookOpen, color: 'text-rose-500' },
+  { id: 'all', translationKey: 'cat_all', icon: Layout, color: 'text-slate-600' },
+  { id: 'trends', translationKey: 'cat_trends', icon: TrendingUp, color: 'text-orange-500' },
+  { id: 'bots', translationKey: 'cat_bots', icon: BotIcon, color: 'text-blue-500' },
+  { id: 'ton', translationKey: 'cat_ton', icon: Network, color: 'text-sky-400' },
+  { id: 'analysis', translationKey: 'cat_analysis', icon: BarChart3, color: 'text-purple-500' },
+  { id: 'explore', translationKey: 'cat_explore', icon: Search, color: 'text-green-500' },
+  { id: 'earn', translationKey: 'cat_earn', icon: DollarSign, color: 'text-emerald-500' },
+  { id: 'ai', translationKey: 'cat_ai_tools', icon: Cpu, color: 'text-indigo-500' },
+  { id: 'guides', translationKey: 'cat_guides', icon: BookOpen, color: 'text-rose-500' },
 ];
 
 const BlogPostDetail: React.FC = () => {
@@ -151,9 +151,25 @@ const BlogPostDetail: React.FC = () => {
             // Rank categories
             const sortedCats = Object.entries(categoryStats)
               .map(([label, stats]) => {
-                const cat = categories.find(c => c.label === label);
+                // Find category by label (assuming label is what's stored in DB)
+                // In data.tsx or our local categories, we might need a reverse map or fix the check
+                // For now, let's look up by translation or known labels if stored in DB as TR
+                const knownTRLabels: Record<string, string> = {
+                  'Tümü': 'all',
+                  'Trendler': 'trends',
+                  'Botlar': 'bots',
+                  'TON Ekosistemi': 'ton',
+                  'Analizler': 'analysis',
+                  'Keşfet': 'explore',
+                  'Para Kazanma': 'earn',
+                  'Yapay Zeka Araçları': 'ai',
+                  'Rehberler': 'guides'
+                };
+                
+                const catId = knownTRLabels[label] || categories.find(c => t(c.translationKey) === label)?.id || 'all';
+                
                 return {
-                  id: cat?.id || label,
+                  id: catId,
                   label,
                   engagement: Math.floor(stats.views / 2 + 10) // Simulating comment count logic
                 };
@@ -388,7 +404,7 @@ const BlogPostDetail: React.FC = () => {
               
               <div className="p-4 bg-slate-50 dark:bg-white/5 flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
                 <div className="flex gap-4">
-                  <span className="flex items-center gap-1"><kbd className="px-1.5 py-0.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded">ESC</kbd> {language === 'tr' ? 'Kapat' : 'Close'}</span>
+                  <span className="flex items-center gap-1"><kbd className="px-1.5 py-0.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded">ESC</kbd> {t('cancel')}</span>
                 </div>
                 <span>BotlyHub Search v1.0</span>
               </div>
@@ -443,7 +459,7 @@ const BlogPostDetail: React.FC = () => {
                   >
                     <div className="flex items-center gap-4">
                       <cat.icon size={22} className="text-slate-400" />
-                      {cat.label}
+                      {t(cat.translationKey)}
                     </div>
                     <ChevronRight size={18} />
                   </button>
@@ -458,7 +474,7 @@ const BlogPostDetail: React.FC = () => {
                   className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white font-bold"
                 >
                   {theme === 'dark' ? <Sun size={24} className="text-yellow-400" /> : <Moon size={24} className="text-blue-500" />}
-                  {theme === 'dark' ? (language === 'tr' ? 'Gündüz' : 'Light') : (language === 'tr' ? 'Gece' : 'Dark')}
+                  {theme === 'dark' ? t('blog_day_mode') : t('blog_night_mode')}
                 </button>
 
                 <button
@@ -550,14 +566,14 @@ const BlogPostDetail: React.FC = () => {
                 <button
                   key={cat.id}
                   onClick={() => { haptic('light'); navigate('/blog'); }}
-                  title={cat.label}
+                  title={t(cat.translationKey)}
                   className={`w-full relative flex items-center gap-3 p-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 transition-all text-sm font-semibold group ${isSidebarCollapsed ? 'justify-center' : ''}`}
                 >
                   <cat.icon size={20} className="text-slate-400 group-hover:text-blue-500 transition-colors" />
-                  {!isSidebarCollapsed && <span>{cat.label}</span>}
+                  {!isSidebarCollapsed && <span>{t(cat.translationKey)}</span>}
                   {isSidebarCollapsed && (
                     <div className="absolute left-full ml-3 px-3 py-1.5 bg-slate-900 dark:bg-slate-800 text-white text-[10px] font-black uppercase tracking-widest rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity backdrop-blur-md whitespace-nowrap z-[110] shadow-2xl border border-white/10">
-                      {cat.label}
+                      {t(cat.translationKey)}
                       <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-slate-900 dark:bg-slate-800 rotate-45 border-l border-b border-white/10"></div>
                     </div>
                   )}
@@ -570,7 +586,7 @@ const BlogPostDetail: React.FC = () => {
             <div className={`flex items-center gap-2 ${isSidebarCollapsed ? 'flex-col' : ''}`}>
               <button
                 onClick={() => toggleTheme()}
-                title={theme === 'dark' ? 'Gündüz Modu' : 'Gece Modu'}
+                title={theme === 'dark' ? t('blog_day_mode') : t('blog_night_mode')}
                 className="p-2.5 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 transition-all flex-1 flex justify-center"
               >
                 {theme === 'dark' ? <Sun size={18} className="text-yellow-400" /> : <Moon size={18} className="text-blue-500" />}
@@ -794,7 +810,7 @@ const BlogPostDetail: React.FC = () => {
             </section>
 
             {/* Author Card */}
-            <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-white/5 rounded-3xl p-6 flex flex-col md:flex-row items-center gap-6">
+            <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-white/5 rounded-3xl p-6 flex flex-col md:flex-row items-center gap-6 mb-12">
               <div className="w-20 h-20 rounded-full bg-blue-600 flex items-center justify-center text-white shrink-0 p-4">
                 <Logo isIcon className="fill-white" />
               </div>
@@ -809,6 +825,25 @@ const BlogPostDetail: React.FC = () => {
                 </div>
               </div>
             </div>
+
+            {/* Team SVG Banner - Blue Section */}
+             <div className="bg-blue-600 rounded-[44px] p-8 md:p-10 text-white relative overflow-hidden group shadow-2xl shadow-blue-500/30">
+                <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:scale-110 transition-transform duration-1000"></div>
+                <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
+                  <div className="w-20 h-20 rounded-2xl bg-white flex items-center justify-center p-4 shadow-xl shrink-0">
+                    <Logo isIcon className="fill-blue-600 w-full h-full" />
+                  </div>
+                  <div className="flex-1 text-center md:text-left">
+                    <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
+                       <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">{t('blog_team_label')}</span>
+                    </div>
+                    <h3 className="text-2xl md:text-3xl font-black italic tracking-tighter mb-2">{t('blog_team_title')}</h3>
+                    <p className="text-blue-100/70 text-xs md:text-sm font-medium leading-relaxed max-w-xl italic">
+                      {t('blog_team_desc')}
+                    </p>
+                  </div>
+                </div>
+              </div>
           </footer>
         </main>
 
@@ -863,7 +898,7 @@ const BlogPostDetail: React.FC = () => {
                 </div>
                 <div className="flex-1 text-left min-w-0">
                     <p className="text-[12px] font-black uppercase tracking-tight truncate italic">
-                    {popularCategories[currentRankIndex]?.label || (language === 'tr' ? 'Yükleniyor...' : 'Loading...')} • {popularCategories[currentRankIndex]?.engagement || 0} {t('blog_comments').toLowerCase()}
+                    {popularCategories[currentRankIndex]?.id ? t(categories.find(c => c.id === popularCategories[currentRankIndex].id)?.translationKey || '') : t('blog_loading_content')} • {popularCategories[currentRankIndex]?.engagement || 0} {t('blog_comments').toLowerCase()}
                     </p>
                 </div>
                 </button>
