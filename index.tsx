@@ -3,7 +3,7 @@ import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
 import App from './App';
-import { TranslationProvider } from './TranslationContext';
+import { TranslationProvider, useTranslation } from './TranslationContext';
 import { ThemeProvider } from './ThemeContext';
 import { TonConnectUIProvider } from '@tonconnect/ui-react';
 import './index.css';
@@ -21,8 +21,18 @@ interface ErrorBoundaryState {
 }
 
 // Fix: Using React.Component with explicit generic types to ensure that inherited members like 'props' and 'state' are correctly identified by the compiler.
-class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  constructor(props: ErrorBoundaryProps) {
+const ErrorBoundaryWrapper = ({ children }: { children: React.ReactNode }) => {
+  const { t } = useTranslation();
+  
+  return (
+    <ErrorBoundary t={t}>
+      {children}
+    </ErrorBoundary>
+  );
+};
+
+class ErrorBoundary extends React.Component<ErrorBoundaryProps & { t: (key: string) => string }, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps & { t: (key: string) => string }) {
     super(props);
     this.state = {
       hasError: false,
@@ -39,14 +49,15 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   }
 
   render() {
+    const { t } = this.props;
     if (this.state.hasError) {
       return (
         <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center p-8 text-center">
           <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mb-6 border border-red-500/20">
             <span className="text-4xl">⚠️</span>
           </div>
-          <h2 className="text-2xl font-black text-white mb-4 uppercase tracking-tighter italic">Uygulama Hatası</h2>
-          <p className="text-slate-500 text-sm mb-4 max-w-xs font-medium">Bir şeyler ters gitti. Uygulamayı yeniden başlatmayı deneyin.</p>
+          <h2 className="text-2xl font-black text-white mb-4 uppercase tracking-tighter italic">{t('error_boundary_title')}</h2>
+          <p className="text-slate-500 text-sm mb-4 max-w-xs font-medium">{t('error_boundary_desc')}</p>
           {this.state.error && (
             <div className="bg-red-900/10 border border-red-500/20 rounded-xl p-4 mb-8 max-w-xs w-full">
               <p className="text-red-400 text-[10px] font-mono break-all">{this.state.error.toString()}</p>
@@ -56,7 +67,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
             onClick={() => window.location.reload()} 
             className="px-10 py-4 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-2xl transition-all   active:scale-95 text-xs uppercase tracking-widest"
           >
-            Yeniden Başlat
+            {t('error_boundary_reboot')}
           </button>
         </div>
       );
@@ -73,16 +84,16 @@ if (rootElement) {
   const root = createRoot(rootElement);
 
   root.render(
-    <ErrorBoundary>
-      <HelmetProvider>
-        <TonConnectUIProvider manifestUrl={manifestUrl}>
-          <ThemeProvider>
-            <TranslationProvider>
+    <HelmetProvider>
+      <TonConnectUIProvider manifestUrl={manifestUrl}>
+        <ThemeProvider>
+          <TranslationProvider>
+            <ErrorBoundaryWrapper>
               <App />
-            </TranslationProvider>
-          </ThemeProvider>
-        </TonConnectUIProvider>
-      </HelmetProvider>
-    </ErrorBoundary>
+            </ErrorBoundaryWrapper>
+          </TranslationProvider>
+        </ThemeProvider>
+      </TonConnectUIProvider>
+    </HelmetProvider>
   );
 }

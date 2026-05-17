@@ -20,12 +20,14 @@ import {
 import { useTelegram } from '../hooks/useTelegram';
 import { useDraggableScroll } from '../hooks/useDraggableScroll';
 import Logo from '../components/Logo';
+import { useTranslation } from '../TranslationContext';
 
 const UserPanel: React.FC = () => {
     const [activeSection, setActiveSection] = useState('dashboard');
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [user, setUser] = useState<any>(null);
     const navigate = useNavigate();
+    const { t } = useTranslation();
     
     const contentScroll = useDraggableScroll();
 
@@ -46,11 +48,11 @@ const UserPanel: React.FC = () => {
     if (!user) return null;
 
     const menuItems = [
-        { id: 'dashboard', label: 'Panel Özeti', icon: LayoutDashboard, category: 'GENEL' },
-        { id: 'bots', label: 'Botlarım', icon: Bot, category: 'GRUP YÖNETİMİ' },
-        { id: 'channels', label: 'Kanallarım', icon: MessageSquare, category: 'GRUP YÖNETİMİ' },
-        { id: 'earnings', label: 'Kazançlarım', icon: Wallet, category: 'KÜTÜPHANE' },
-        { id: 'settings', label: 'Ayarlar', icon: Settings, category: 'KÜTÜPHANE' },
+        { id: 'dashboard', label: t('user_panel_summary'), icon: LayoutDashboard, category: 'cat_general' },
+        { id: 'bots', label: t('user_panel_my_bots'), icon: Bot, category: 'cat_group_mgmt' },
+        { id: 'channels', label: t('user_panel_my_channels'), icon: MessageSquare, category: 'cat_group_mgmt' },
+        { id: 'earnings', label: t('user_panel_my_earnings'), icon: Wallet, category: 'cat_library' },
+        { id: 'settings', label: t('settings_title'), icon: Settings, category: 'cat_library' },
     ];
 
     return (
@@ -72,16 +74,16 @@ const UserPanel: React.FC = () => {
                             </div>
                             <div>
                                 <h1 className="text-2xl font-bold text-white tracking-tight">BotlyHub</h1>
-                                <p className="text-[9px] font-bold text-purple-500 uppercase tracking-widest mt-0.5">Kullanıcı Paneli</p>
+                                <p className="text-[9px] font-bold text-purple-500 uppercase tracking-widest mt-0.5">{t('user_panel_title')}</p>
                             </div>
                         </div>
                     </div>
 
                     {/* Navigation */}
                     <nav className="flex-1 px-6 space-y-10 overflow-y-auto custom-scrollbar">
-                        {['GENEL', 'GRUP YÖNETİMİ', 'KÜTÜPHANE'].map(category => (
+                        {['cat_general', 'cat_group_mgmt', 'cat_library'].map(category => (
                             <div key={category} className="space-y-3">
-                                <p className="px-4 text-[10px] font-bold text-slate-600 uppercase tracking-widest">{category}</p>
+                                <p className="px-4 text-[10px] font-bold text-slate-600 uppercase tracking-widest">{t(category)}</p>
                                 <div className="space-y-1.5">
                                     {menuItems.filter(item => item.category === category).map(item => (
                                         <button
@@ -118,7 +120,7 @@ const UserPanel: React.FC = () => {
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <p className="text-sm font-bold text-white truncate tracking-tight">@{user.username}</p>
-                                    <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Kullanıcı</p>
+                                    <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">{t('user_panel_user')}</p>
                                 </div>
                             </div>
                         </div>
@@ -127,7 +129,7 @@ const UserPanel: React.FC = () => {
                             className="w-full flex items-center justify-center gap-3 py-4 rounded-xl text-red-500 hover:bg-red-500/10 transition-all text-[11px] font-bold uppercase tracking-widest border border-transparent hover:border-red-500/20"
                         >
                             <LogOut size={18} />
-                            GÜVENLİ ÇIKIŞ
+                            {t('user_panel_logout')}
                         </button>
                     </div>
                 </div>
@@ -146,7 +148,7 @@ const UserPanel: React.FC = () => {
                         </button>
                         <div className="hidden md:flex items-center gap-3 px-5 h-12 bg-slate-950/50 rounded-xl border border-white/5 w-80">
                             <Search size={18} className="text-slate-500" />
-                            <input type="text" placeholder="Panelde ara..." className="bg-transparent border-none outline-none text-xs font-bold text-white placeholder:text-slate-600 w-full uppercase tracking-widest" />
+                            <input type="text" placeholder={t('user_panel_search_placeholder')} className="bg-transparent border-none outline-none text-xs font-bold text-white placeholder:text-slate-600 w-full uppercase tracking-widest" />
                         </div>
                     </div>
 
@@ -159,7 +161,7 @@ const UserPanel: React.FC = () => {
                         <div className="flex items-center gap-4 pl-2">
                             <div className="text-right hidden sm:block">
                                 <p className="text-xs font-bold text-white tracking-tight">@{user.username}</p>
-                                <p className="text-[9px] font-bold text-purple-500 uppercase tracking-widest mt-0.5">Çevrimiçi</p>
+                                <p className="text-[9px] font-bold text-purple-500 uppercase tracking-widest mt-0.5">{t('user_panel_online')}</p>
                             </div>
                             <div className="w-12 h-12 bg-purple-600/20 rounded-xl border border-purple-500/20 flex items-center justify-center text-purple-400 font-bold">
                                 <UserIcon size={20} />
@@ -182,13 +184,13 @@ const UserPanel: React.FC = () => {
                         {/* Welcome Section */}
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                             <div>
-                                <h2 className="text-3xl font-bold text-white tracking-tight">Hoş geldin, {user.username}!</h2>
-                                <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mt-2">Bugün neler yapmak istersin?</p>
+                                <h2 className="text-3xl font-bold text-white tracking-tight">{t('user_panel_welcome')}, {user.username}!</h2>
+                                <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mt-2">{t('user_panel_what_to_do')}</p>
                             </div>
                             <div className="flex items-center gap-3">
                                 <div className="px-5 py-3 bg-purple-600/10 border border-purple-500/20 rounded-xl flex items-center gap-3">
                                     <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
-                                    <span className="text-[10px] font-bold text-purple-400 uppercase tracking-widest">Sistem Durumu: Aktif</span>
+                                    <span className="text-[10px] font-bold text-purple-400 uppercase tracking-widest">{t('user_panel_status_active')}</span>
                                 </div>
                             </div>
                         </div>
@@ -196,10 +198,10 @@ const UserPanel: React.FC = () => {
                         {/* Stats Grid */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             {[
-                                { label: 'Toplam Bot', value: '12', icon: Bot, color: 'purple' },
-                                { label: 'Aktif Kanallar', value: '4', icon: MessageSquare, color: 'blue' },
-                                { label: 'Aylık Kazanç', value: '₺1,250', icon: TrendingUp, color: 'emerald' },
-                                { label: 'Toplam Etkileşim', value: '45.2K', icon: Activity, color: 'orange' },
+                                { label: t('user_panel_total_bots'), value: '12', icon: Bot, color: 'purple' },
+                                { label: t('user_panel_active_channels'), value: '4', icon: MessageSquare, color: 'blue' },
+                                { label: t('user_panel_monthly_earnings'), value: '₺1,250', icon: TrendingUp, color: 'emerald' },
+                                { label: t('user_panel_total_engagement'), value: '45.2K', icon: Activity, color: 'orange' },
                             ].map((stat, i) => (
                                 <div key={i} className="bg-slate-900/40 border border-white/5 p-8 rounded-xl backdrop-blur-xl group hover:border-purple-500/20 transition-all fancy-glass-card stats-card-bg relative overflow-hidden">
                                      <div className={`absolute top-0 right-0 w-24 h-24 bg-${stat.color}-500/5 blur-3xl -mr-12 -mt-12 rounded-full`} />
@@ -224,9 +226,9 @@ const UserPanel: React.FC = () => {
                                 <LayoutDashboard size={48} />
                             </div>
                             <div className="relative z-10 max-w-md">
-                                <h3 className="text-2xl font-black text-white tracking-tighter uppercase italic tracking-widest">Sistem Konfigüre Ediliyor</h3>
+                                <h3 className="text-2xl font-black text-white tracking-tighter uppercase italic tracking-widest">{t('user_panel_configuring')}</h3>
                                 <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mt-3 leading-relaxed opacity-60">
-                                    {activeSection.toUpperCase()} modülü şu anda çekirdek sistem ile senkronize ediliyor. Yakında burada gerçek zamanlı veriler göreceksiniz.
+                                    {activeSection.toUpperCase()} {t('user_panel_sync_msg')}
                                 </p>
                             </div>
                         </div>

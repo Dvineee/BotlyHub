@@ -545,7 +545,7 @@ const NavMenu = ({
                                                 </div>
                                                 <div className="flex flex-col items-start overflow-hidden">
                                                     <span className="text-[11px] font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 group-hover:text-blue-500 transition-colors truncate w-full text-left">{t(cat.label)}</span>
-                                                    <span className="text-[9px] text-slate-400 dark:text-slate-500 truncate w-full text-left font-bold uppercase mt-0.5">Platform Uygulamaları</span>
+                                                    <span className="text-[9px] text-slate-400 dark:text-slate-500 truncate w-full text-left font-bold uppercase mt-0.5">{t('cat_nav_description')}</span>
                                                 </div>
                                             </button>
                                         ))}
@@ -561,7 +561,7 @@ const NavMenu = ({
                     onClick={() => { haptic('light'); navigate('/blog'); }}
                     className="text-[14px] font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all py-2"
                 >
-                    Blog
+                    {t('blog_title')}
                 </button>
             </div>
 
@@ -621,7 +621,7 @@ const NavMenu = ({
                                                     className="w-full flex items-center gap-4 px-6 py-4 hover:bg-black/5 dark:hover:bg-white/5 text-left text-red-500 dark:text-red-400"
                                                 >
                                                     <LogOut size={18} /> 
-                                                    <span className="text-[11px] font-black uppercase tracking-tight">Çıkış Yap</span>
+                                                    <span className="text-[11px] font-black uppercase tracking-tight">{t('home_logout')}</span>
                                                 </button>
                                             </div>
                                         )}
@@ -632,7 +632,7 @@ const NavMenu = ({
                                     onClick={() => { haptic('light'); setIsLoginModalOpen(true); }}
                                     className="px-5 h-10 bg-blue-500 hover:bg-blue-600 text-white text-[13px] font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center whitespace-nowrap shadow-lg shadow-blue-500/25"
                                 >
-                                    Giriş yap
+                                    {t('home_login')}
                                 </button>
                             )}
                         </motion.div>
@@ -1009,7 +1009,11 @@ const Home = () => {
                   <>
                     <div className="mb-10 sm:mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700 text-center">
                         <h1 className="mobile-hero-title font-bold tracking-[-0.035em] md:leading-none leading-tight text-slate-900 dark:text-white">
-                            BotlyHub: En Gelişmiş <span className="text-blue-500">{t('home_hero_title').split(':')[1]?.trim() || 'Telegram Bot Platformu'}</span>
+                            {t('home_hero_title').includes(':') ? (
+                                <>
+                                    {t('home_hero_title').split(':')[0]}: <span className="text-blue-500">{t('home_hero_title').split(':')[1]?.trim()}</span>
+                                </>
+                            ) : t('home_hero_title')}
                         </h1>
                         <p className="mt-6 text-slate-500 dark:text-slate-400 text-sm md:hero-desc font-medium max-w-2xl mx-auto uppercase tracking-widest italic">
                             {t('home_hero_desc')}
@@ -1053,7 +1057,7 @@ const Home = () => {
                                             <ChevronRight size={16} className="text-slate-300 dark:text-slate-700 group-hover:translate-x-1 transition-transform" />
                                         </div>
                                         <p className="hidden sm:block text-[0.86rem] text-slate-400 dark:text-slate-600 font-normal leading-relaxed">
-                                            {t('Telegram ekosistemindeki en iyi uygulamaları keşfedin')}
+                                            {t('home_apps_desc')}
                                         </p>
                                     </div>
 
@@ -1171,7 +1175,7 @@ const Home = () => {
                                             <ChevronRight size={16} className="text-slate-300 dark:text-slate-700 group-hover:translate-x-1 transition-transform" />
                                         </div>
                                         <p className="hidden sm:block text-[0.86rem] text-slate-400 dark:text-slate-600 font-normal leading-relaxed">
-                                            {t('Telegram ekosistemindeki en iyi botları keşfedin')}
+                                            {t('home_bots_desc')}
                                         </p>
                                     </div>
 
@@ -1266,21 +1270,17 @@ const Home = () => {
             <div className="mt-20 mb-20 px-4 max-w-4xl mx-auto border-t border-black/[0.03] dark:border-white/[0.03] pt-20">
                 <div className="prose prose-slate dark:prose-invert max-w-none">
                     <h2 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight italic mb-6">
-                        BotlyHub: Türkiye'nin Öncü <span className="text-blue-500">Telegram Bot Platformu</span>
+                        {t('home_about_title').includes(':') ? (
+                            <>
+                                {t('home_about_title').split(':')[0]}: <span className="text-blue-500">{t('home_about_title').split(':')[1]?.trim()}</span>
+                            </>
+                        ) : t('home_about_title')}
                     </h2>
                     <div className="text-[13px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed italic space-y-4">
-                        <p>
-                            BotlyHub, modern Telegram ekosisteminde bot geliştiricileri ile kullanıcıları bir araya getiren en kapsamlı <strong>Telegram bot platformu</strong> ve pazaryeridir. Amacımız, Telegram üzerinde çalışan yenilikçi otomasyon sistemlerini, yapay zeka (AI) destekli araçları ve dijital servisleri tek bir çatı altında toplayarak herkes için erişilebilir kılmaktır.
-                        </p>
-                        <p>
-                            Kullanıcılarımız için; finansal botlardan eğlence kanallarına, TON ağı (The Open Network) tabanlı Web3 uygulamalarından günlük hayatı kolaylaştıran Mini App'lere kadar geniş bir yelpazede keşif imkanı sunuyoruz. <strong>BotlyHub</strong> üzerinden dilediğiniz botu arayabilir, kullanıcı yorumlarını okuyabilir ve puanlayarak topluluğa katkı sağlayabilirsiniz.
-                        </p>
-                        <p>
-                            Geliştiriciler için; hazırladığınız Telegram botlarını dünyaya tanıtmanız ve projelerinizden gelir elde etmeniz için profesyonel araçlar sağlıyoruz. Botunuzu platformumuza ekleyerek binlerce potansiyel kullanıcıya ulaşabilir, güvenli ödeme sistemlerimiz ve düşük komisyon oranlarımızla satış yapmaya başlayabilirsiniz.
-                        </p>
-                        <p>
-                            Geleceğin Telegram uygulamaları (Mini Apps) ve bot trendleri için en doğru adres BotlyHub. Şimdi aramıza katılın ve Telegram bot dünyasının sınırlarını bizimle keşfedin.
-                        </p>
+                        <p>{t('home_about_p1')}</p>
+                        <p>{t('home_about_p2')}</p>
+                        <p>{t('home_about_p3')}</p>
+                        <p>{t('home_about_p4')}</p>
                     </div>
                 </div>
             </div>
@@ -1449,9 +1449,9 @@ const Home = () => {
                                 else navigate(link);
                                 setSelectedAnn(null); 
                             }} 
-                            className="w-full h-14 bg-brand dark:bg-brand-light text-white text-[12px] font-black rounded-xl uppercase tracking-[0.2em] active:scale-95 transition-all flex items-center justify-center gap-3 group shadow-lg shadow-brand/20"
+                            className="w-full h-14 bg-brand dark:bg-brand-light text-white text-[12px] font-black rounded-xl uppercase tracking-[0.2em] active:scale-[0.98] transition-all flex items-center justify-center gap-3 group shadow-lg shadow-brand/20"
                         >
-                            {selectedAnn.button_text || 'ŞİMDİ KEŞFET'} 
+                            {selectedAnn.button_text || t('home_explore_now')} 
                             <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
                         </button>
                         
@@ -1459,7 +1459,7 @@ const Home = () => {
                             onClick={() => setSelectedAnn(null)} 
                             className="w-full py-4 text-slate-400 dark:text-slate-500 font-black text-[9px] uppercase tracking-[0.2em] hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
                         >
-                            Belki Daha Sonra
+                            {t('home_maybe_later')}
                         </button>
                     </div>
                 </div>

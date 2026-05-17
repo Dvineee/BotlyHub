@@ -15,20 +15,15 @@ const ProfileSettings = () => {
   const navigate = useNavigate();
   const { user, haptic, setWebAuthUser } = useTelegram();
   const { theme, toggleTheme } = useTheme();
-  const { language, setLanguage } = useTranslation();
-  const [currentPlanName, setCurrentPlanName] = useState('Başlangıç');
+  const { language, setLanguage, t } = useTranslation();
+  const [currentPlanName, setCurrentPlanName] = useState(t('plan_starter_name'));
   const [version, setVersion] = useState<string | null>(null);
   const [showLanguagePicker, setShowLanguagePicker] = useState(false);
 
   const languages = [
     { code: 'en', label: 'English (EN)', flag: '🇬🇧' },
     { code: 'ru', label: 'Russian (RU)', flag: '🇷🇺' },
-    { code: 'fa', label: 'Persian / Farsi (FA)', flag: '🇮🇷' },
     { code: 'tr', label: 'Turkish (TR)', flag: '🇹🇷' },
-    { code: 'uk', label: 'Ukrainian (UK)', flag: '🇺🇦' },
-    { code: 'es', label: 'Spanish (ES)', flag: '🇪🇸' },
-    { code: 'hi', label: 'Hindi (HI)', flag: '🇮🇳' },
-    { code: 'ar', label: 'Arabic (AR)', flag: '🇸🇦' },
   ];
 
   const currentLangLabel = languages.find(l => l.code === language)?.label || 'Turkish (TR)';
@@ -37,7 +32,7 @@ const ProfileSettings = () => {
       const planId = localStorage.getItem('userPlan');
       if (planId) {
           const plan = subscriptionPlans.find(p => p.id === planId);
-          if (plan) setCurrentPlanName(plan.name);
+          if (plan) setCurrentPlanName(t(plan.name));
       }
       
       // Fetch version
@@ -49,8 +44,8 @@ const ProfileSettings = () => {
   }, []);
 
   // Kullanıcı adı veya isim yoksa varsayılan değerler
-  const displayName = useMemo(() => user ? `${user.first_name} ${user.last_name || ''}`.trim() : 'Misafir Kullanıcı', [user]);
-  const displayUsername = useMemo(() => user?.username ? `@${user.username}` : (user?.id ? `ID: ${user.id}` : '@misafir'), [user]);
+  const displayName = useMemo(() => user ? `${user.first_name} ${user.last_name || ''}`.trim() : t('guest_user'), [user, t]);
+  const displayUsername = useMemo(() => user?.username ? `@${user.username}` : (user?.id ? `ID: ${user.id}` : '@guest'), [user]);
   
   // Profil fotoğrafı yoksa baş harflerden avatar oluşturma (Placeholder API)
   const avatarUrl = useMemo(() => user?.photo_url 
@@ -79,7 +74,7 @@ const ProfileSettings = () => {
     <div className="min-h-screen px-5 sm:px-8 pt-6 md:pt-10 pb-32 bg-slate-50 dark:bg-slate-950 transition-colors animate-in fade-in">
         <div className="max-w-7xl mx-auto">
              <div className="flex items-center justify-between mb-8 px-1">
-            <h1 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight uppercase tracking-widest">Ayarlar</h1>
+            <h1 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight uppercase tracking-widest">{t('settings_title')}</h1>
             <div className="w-10 h-10" />
         </div>
 
@@ -99,7 +94,7 @@ const ProfileSettings = () => {
                     
                     <div className="inline-flex items-center gap-2 bg-blue-500/10 text-blue-500 px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border border-blue-500/20">
                         <Crown size={10} />
-                        <span>{currentPlanName} Planı</span>
+                        <span>{currentPlanName} {t('plan_suffix')}</span>
                     </div>
                 </div>
              </div>
@@ -107,22 +102,22 @@ const ProfileSettings = () => {
 
         <div className="space-y-6">
             <div>
-                <h3 className="text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest mb-3 px-1">Hesap</h3>
-                <MenuItem icon={User} label="Hesap Bilgileri" onClick={() => navigate('/account-settings')} />
-                <MenuItem icon={CreditCard} label="Abonelik" value={currentPlanName} onClick={() => navigate('/premium')} />
-                <MenuItem icon={Users} label="Referanslar" onClick={() => navigate('/referral')} />
+                <h3 className="text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest mb-3 px-1">{t('settings_account')}</h3>
+                <MenuItem icon={User} label={t('settings_account_info')} onClick={() => navigate('/account-settings')} />
+                <MenuItem icon={CreditCard} label={t('settings_subscription')} value={currentPlanName} onClick={() => navigate('/premium')} />
+                <MenuItem icon={Users} label={t('settings_referrals')} onClick={() => navigate('/referral')} />
             </div>
 
             <div>
-                <h3 className="text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest mb-3 px-1">Uygulama</h3>
-                <MenuItem icon={Bell} label="Bildirimler" onClick={() => navigate('/notifications')} />
-                <MenuItem icon={theme === 'dark' ? Moon : Sun} label="Görünüm" value={theme === 'dark' ? 'Karanlık' : 'Aydınlık'} onClick={toggleTheme} />
-                <MenuItem icon={Globe} label="Dil" value={currentLangLabel} onClick={() => setShowLanguagePicker(true)} />
+                <h3 className="text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest mb-3 px-1">{t('settings_app')}</h3>
+                <MenuItem icon={Bell} label={t('settings_notifications')} onClick={() => navigate('/notifications')} />
+                <MenuItem icon={theme === 'dark' ? Moon : Sun} label={t('settings_appearance')} value={theme === 'dark' ? t('theme_dark') : t('theme_light')} onClick={toggleTheme} />
+                <MenuItem icon={Globe} label={t('settings_language')} value={currentLangLabel} onClick={() => setShowLanguagePicker(true)} />
             </div>
 
             {user && (
                 <div>
-                    <h3 className="text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest mb-3 px-1">Oturum</h3>
+                    <h3 className="text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest mb-3 px-1">{t('settings_session')}</h3>
                     <div 
                         onClick={() => { haptic('medium'); setWebAuthUser(null); navigate('/'); }}
                         className="flex items-center justify-between p-4 bg-white dark:bg-slate-900 border border-red-500/10 dark:border-red-500/10 rounded-xl mb-2 transition-all cursor-pointer active:scale-[0.98] group"
@@ -131,7 +126,7 @@ const ProfileSettings = () => {
                             <div className="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-500/10 flex items-center justify-center border border-red-100 dark:border-red-500/20 transition-colors group-hover:bg-red-100 dark:group-hover:bg-red-500/20">
                                 <LogOut size={18} className="text-red-500" />
                             </div>
-                            <span className="font-bold text-[12px] text-red-600 dark:text-red-400 uppercase tracking-tight">Çıkış Yap</span>
+                            <span className="font-bold text-[12px] text-red-600 dark:text-red-400 uppercase tracking-tight">{t('settings_logout')}</span>
                         </div>
                         <ChevronRight size={16} className="text-red-200 dark:text-red-900" />
                     </div>
@@ -159,7 +154,7 @@ const ProfileSettings = () => {
                     >
                         <div className="p-8">
                             <div className="flex justify-between items-center mb-8">
-                                <h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight uppercase tracking-widest">Dil Seçiniz</h3>
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight uppercase tracking-widest">{t('settings_select_lang')}</h3>
                                 <button onClick={() => setShowLanguagePicker(false)} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-500">
                                     <Globe size={20} />
                                 </button>

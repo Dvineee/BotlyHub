@@ -270,11 +270,11 @@ const SearchPage = () => {
   return (
     <>
     <SEO 
-        title="Bot ve Uygulama Arayın" 
-        description="BotlyHub üzerinde dilediğiniz Telegram botunu veya otomasyonunu arayarak keşfedin. Filtreleyebilir ve detaylı inceleyebilirsiniz."
+        title={t('search_seo_title')}
+        description={t('search_seo_desc')}
         breadcrumbs={[
-            { name: 'Anasayfa', item: 'https://botlyhub.com/' },
-            { name: 'Arama', item: 'https://botlyhub.com/search' }
+            { name: t('search_breadcrumb_home'), item: 'https://botlyhub.com/' },
+            { name: t('search_breadcrumb_search'), item: 'https://botlyhub.com/search' }
         ]}
     />
     <div className="min-h-screen bg-white dark:bg-slate-950 px-5 sm:px-8 pt-4 md:pt-10 pb-32 transition-colors duration-300 search-page">
@@ -288,7 +288,7 @@ const SearchPage = () => {
               }}
               className={`flex-1 py-3.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${searchMode === 'bots' ? 'bg-white dark:bg-slate-800 text-blue-500 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
           >
-              BOTLAR
+              {t('search_tab_bots')}
           </button>
           <button 
               onClick={() => {
@@ -296,7 +296,7 @@ const SearchPage = () => {
               }}
               className={`flex-1 py-3.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${searchMode === 'apps' ? 'bg-white dark:bg-slate-800 text-blue-500 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
           >
-              UYGULAMALAR (APPS)
+              {t('search_tab_apps')}
           </button>
       </div>
 
@@ -311,7 +311,7 @@ const SearchPage = () => {
                 value={query} 
                 autoFocus
                 onChange={(e) => setQuery(e.target.value)} 
-                placeholder={searchMode === 'bots' ? t('Bot ARA...') : t('UYGULAMA ARA...')} 
+                placeholder={searchMode === 'bots' ? t('search_placeholder_bots') : t('search_placeholder_apps')} 
                 className="w-full bg-transparent py-2 px-2 text-[13px] text-slate-900 dark:text-white outline-none placeholder:text-slate-400 font-bold uppercase tracking-widest min-w-0" 
               />
               <div className="flex items-center gap-0.5 pr-1 shrink-0">
@@ -363,7 +363,7 @@ const SearchPage = () => {
       {/* Results */}
       <div className="space-y-1">
         <div className="flex justify-between items-center mb-6 px-2">
-            <h2 className="text-[10px] font-black text-slate-400 dark:text-slate-700 uppercase tracking-[0.4em]">Sonuçlar ({filteredBots.length})</h2>
+            <h2 className="text-[10px] font-black text-slate-400 dark:text-slate-700 uppercase tracking-[0.4em]">{t('search_results_label')} ({filteredBots.length})</h2>
         </div>
 
         {isLoading ? (
@@ -374,7 +374,7 @@ const SearchPage = () => {
             </div>
         ) : (
             <div className="py-24 text-center">
-                <p className="text-slate-500 font-bold uppercase text-xs tracking-widest">Kriterlere uygun bot bulunamadı.</p>
+                <p className="text-slate-500 font-bold uppercase text-xs tracking-widest">{t('search_no_results')}</p>
             </div>
         )}
       </div>

@@ -170,4 +170,30 @@ export class GeminiService {
       return "";
     }
   }
+
+  static async generateSlug(title: string): Promise<string> {
+    const ai = this.getAI();
+    
+    const prompt = `
+      Create a highly SEO-friendly, clean URL slug for this blog post title: "${title}".
+      Requirements:
+      - Language: Turkish (but convert Turkish characters to English equivalents, e.g., ö -> o, ş -> s).
+      - Use only lowercase letters, numbers, and hyphens.
+      - Remove all special characters, punctuation, and extra spaces.
+      - Keep it descriptive but concise.
+      - Do NOT add any suffixes or numbers unless necessary for the title's meaning.
+      - Return ONLY the slug string, nothing else.
+    `;
+
+    try {
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: [{ parts: [{ text: prompt }] }],
+      });
+      return response.text?.trim().toLowerCase() || title.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+    } catch (error) {
+      console.error("Gemini Slug Generation Error:", error);
+      return title.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+    }
+  }
 }

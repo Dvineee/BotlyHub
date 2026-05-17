@@ -3337,10 +3337,31 @@ const BlogManagement = () => {
     const [activeTab, setActiveTab] = useState<'content' | 'meta' | 'settings' | 'hashtags'>('content');
     const [searchQuery, setSearchQuery] = useState('');
 
+    const [isGeneratingSlug, setIsGeneratingSlug] = useState(false);
+
     const calculateReadTime = (content: string) => {
-        const words = content.trim().split(/\s+/).length;
-        const minutes = Math.ceil(words / 200);
+        const text = content.replace(/<[^>]*>/g, ' ');
+        const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+        const wpm = 200;
+        const minutes = Math.max(1, Math.ceil(words / wpm));
         return `${minutes} dk`;
+    };
+
+    const generateAISlug = async () => {
+        if (!editingBlog.title) {
+            alert('Lütfen önce bir başlık girin.');
+            return;
+        }
+        setIsGeneratingSlug(true);
+        try {
+            const slug = await GeminiService.generateSlug(editingBlog.title);
+            setEditingBlog((prev: any) => ({ ...prev, slug }));
+        } catch (e) {
+            console.error("Slug generation failed:", e);
+            alert('Slug oluşturulurken bir hata oluştu.');
+        } finally {
+            setIsGeneratingSlug(false);
+        }
     };
 
     useEffect(() => {

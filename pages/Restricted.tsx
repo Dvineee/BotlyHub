@@ -1,10 +1,10 @@
 
 import React from 'react';
-import { ShieldAlert, LogOut, MessageCircle } from 'lucide-react';
-import { useTelegram } from '../hooks/useTelegram';
+import { ShieldAlert, MessageCircle } from 'lucide-react';
+import { useTranslation } from '../TranslationContext';
 
 const Restricted = () => {
-    const { user } = useTelegram();
+    const { t } = useTranslation();
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-[#020617] flex flex-col items-center justify-center p-10 text-center animate-in fade-in transition-colors duration-300">
@@ -12,9 +12,9 @@ const Restricted = () => {
                 <ShieldAlert size={56} />
             </div>
             
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-4 tracking-tight">Erişim Kısıtlandı</h1>
-            <p className="text-slate-500 text-sm font-medium uppercase tracking-widest leading-relaxed max-w-xs mb-14 opacity-80">
-                Hesabınız platform kurallarını ihlal ettiği gerekçesiyle kısıtlanmıştır.
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-4 tracking-tight">{t('restricted_title')}</h1>
+            <p className="text-slate-500 text-sm font-medium uppercase tracking-widest leading-relaxed max-w-xs mb-14 opacity-80 italic">
+                {t('restricted_desc')}
             </p>
 
             <div className="w-full max-w-sm space-y-5">
@@ -25,14 +25,14 @@ const Restricted = () => {
                     className="flex items-center justify-center gap-4 w-full py-6 bg-brand dark:bg-brand-light rounded-[28px] sm:rounded-[22px] text-white text-[11px] font-bold uppercase tracking-widest   active:scale-95 transition-all"
                 >
                     <MessageCircle size={20} />
-                    Destekle İletişime Geç
+                    {t('restricted_support')}
                 </a>
                 
                 <button 
                     onClick={() => window.location.reload()}
                     className="flex items-center justify-center gap-4 w-full py-6 bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-[28px] sm:rounded-[22px] text-slate-500 dark:text-slate-400 text-[11px] font-bold uppercase tracking-widest active:scale-95 transition-all "
                 >
-                    Tekrar Dene
+                    {t('restricted_retry')}
                 </button>
             </div>
 

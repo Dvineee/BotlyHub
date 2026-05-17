@@ -5,12 +5,14 @@ import * as Router from 'react-router-dom';
 import { Notification } from '../types';
 import { DatabaseService } from '../services/DatabaseService';
 import { useTelegram } from '../hooks/useTelegram';
+import { useTranslation } from '../TranslationContext';
 
 const { useNavigate } = Router as any;
 
 const Notifications = () => {
   const navigate = useNavigate();
   const { user, haptic, notification: tgNotification } = useTelegram();
+  const { t, language } = useTranslation();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedNote, setSelectedNote] = useState<Notification | null>(null);
@@ -61,7 +63,8 @@ const Notifications = () => {
 
   const formatTime = (isoString: string) => {
       const date = new Date(isoString);
-      return date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) + ' • ' + date.toLocaleDateString('tr-TR', { day: '2-digit', month: 'short' });
+      const locale = language === 'ru' ? 'ru-RU' : (language === 'tr' ? 'tr-TR' : 'en-US');
+      return date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' }) + ' • ' + date.toLocaleDateString(locale, { day: '2-digit', month: 'short' });
   };
 
   return (
@@ -73,14 +76,14 @@ const Notifications = () => {
                 <Bell className="text-brand dark:text-brand-light" size={20} />
             </div>
             <div>
-                <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter uppercase italic leading-none">INBOX</h1>
+                <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter uppercase italic leading-none">{t('notif_inbox')}</h1>
                 <p className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-[0.3em] mt-1.5">MESSAGING v4.2.0</p>
             </div>
         </div>
         <button 
             onClick={markAllAsRead} 
             className="w-12 h-12 flex items-center justify-center bg-brand/10 dark:bg-brand-light/10 border border-brand/20 dark:border-brand-light/20 rounded-xl text-brand dark:text-brand-light active:scale-90 transition-transform "
-            title="Hepsini Oku"
+            title={t('notif_mark_all_read')}
         >
             <CheckCheck size={22} />
         </button>
@@ -94,14 +97,14 @@ const Notifications = () => {
                     <Loader2 className="animate-spin text-brand dark:text-brand-light" size={32} />
                   </div>
               </div>
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 dark:text-slate-600 italic animate-pulse">SENKRONİZE EDİLİYOR</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 dark:text-slate-600 italic animate-pulse">{t('notif_syncing')}</p>
           </div>
       ) : notifications.length === 0 ? (
           <div className="py-32 text-center animate-in zoom-in-95">
               <div className="w-24 h-24 bg-white dark:bg-slate-900/40 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center mx-auto mb-10 fancy-glass-card shadow-inner">
                 <Bell size={36} className="text-slate-200 dark:text-slate-800" />
               </div>
-              <p className="text-slate-300 dark:text-slate-700 font-black uppercase text-[11px] tracking-[0.4em] italic">İLETİŞİM HATTI TEMİZ</p>
+              <p className="text-slate-300 dark:text-slate-700 font-black uppercase text-[11px] tracking-[0.4em] italic">{t('notif_empty_alt')}</p>
           </div>
       ) : (
           <div className="space-y-4">

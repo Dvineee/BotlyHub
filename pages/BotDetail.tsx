@@ -178,8 +178,8 @@ const BotDetail = () => {
               try {
                   await DatabaseService.sendUserNotification(
                       userData.id.toString(),
-                      'Kütüphaneye Eklendi',
-                      `'${bot.name}' botu kütüphanenize başarıyla eklendi.`,
+                      t('detail_added_to_lib_title'),
+                      `'${bot.name}' ${t('detail_added_to_lib_msg')}`,
                       'bot'
                   );
               } catch (noteErr) {
@@ -292,11 +292,11 @@ const BotDetail = () => {
   return (
     <>
     <SEO 
-        title={`${bot.name} - Bot Detayları ve Özellikleri`} 
-        description={`${bot.name} hakkında detaylı bilgi, kullanıcı yorumları ve özellikler. BotlyHub üzerinden ${bot.name} botunu hemen keşfedin ve kullanmaya başlayın.`}
+        title={`${bot.name} - ${t('detail_seo_title')}`} 
+        description={`${bot.name} ${t('home_seo_desc')}`}
         ogImage={bot.icon || undefined}
         breadcrumbs={[
-            { name: 'Anasayfa', item: 'https://botlyhub.com/' },
+            { name: t('search_breadcrumb_home'), item: 'https://botlyhub.com/' },
             { name: bot.name, item: `https://botlyhub.com/bot/${bot.slug}` }
         ]}
     />
@@ -421,7 +421,7 @@ const BotDetail = () => {
               </h1>
               <div className="flex flex-wrap gap-2 mb-3">
                   <span className="bg-brand/10 border border-brand/20 text-brand dark:text-brand-light text-[10px] font-bold px-3 py-1 rounded-xl uppercase flex items-center gap-1">
-                      <ShieldCheck size={12} /> Onaylı
+                      <ShieldCheck size={12} /> {t('verified')}
                   </span>
               </div>
           </div>
@@ -715,7 +715,7 @@ const BotDetail = () => {
       {/* Description */}
       <div className="px-6 mb-10">
           <div className="flex items-center justify-between mb-4 px-2">
-            <h3 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Hakkında</h3>
+            <h3 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">{t('detail_about_label')}</h3>
           </div>
           <div className="p-[11px] bg-white dark:bg-slate-900/60 rounded-xl border border-black/5 dark:border-white/5 text-sm text-slate-600 dark:text-slate-400 leading-[1.6] whitespace-pre-wrap">
               {bot.description}
@@ -738,8 +738,8 @@ const BotDetail = () => {
                     }`}
                   >
                       {isProcessing ? <Loader2 className="animate-spin" /> : (
-                          isOwned ? <><Send size={20} /> BOTU BAŞLAT</> : (
-                              bot.price === 0 ? <><PlusCircle size={20} /> ÜCRETSİZ EDİN</> : (
+                          isOwned ? <><Send size={20} /> {t('detail_launch')}</> : (
+                              bot.price === 0 ? <><PlusCircle size={20} /> {t('detail_get_free')}</> : (
                                   <div className="flex items-center gap-5">
                                       <span className="text-2xl font-black italic tracking-tighter leading-none">{prices.ton}</span>
                                       <div className="h-6 w-px bg-white/20 dark:bg-slate-400/20"></div>
@@ -759,7 +759,7 @@ const BotDetail = () => {
                         className="h-20 flex-1 bg-white dark:bg-slate-900 rounded-xl border border-black/5 dark:border-white/10 flex items-center justify-center gap-3 text-slate-500 dark:text-slate-400 active:scale-95 transition-all relative border-b-8 border-transparent"
                       >
                           <Share2 size={20} className={isCopied ? 'text-emerald-500' : ''} />
-                          <span className="text-[10px] font-black uppercase tracking-[0.2em]">PAYLAŞ</span>
+                          <span className="text-[10px] font-black uppercase tracking-[0.2em]">{t('detail_share_btn')}</span>
                           <AnimatePresence>
                               {isCopied && (
                                   <motion.span 
@@ -768,7 +768,7 @@ const BotDetail = () => {
                                       exit={{ opacity: 0 }}
                                       className="absolute left-1/2 -translate-x-1/2 text-[8px] font-black text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-md uppercase whitespace-nowrap"
                                   >
-                                      Kopyalandı!
+                                      {t('share_copied')}
                                   </motion.span>
                               )}
                           </AnimatePresence>
@@ -786,7 +786,7 @@ const BotDetail = () => {
                   {(bot.telegram_group || bot.website_url || bot.app_url || bot.social_url) && (
                       <div className="flex flex-col bg-white dark:bg-slate-900/40 rounded-xl border border-black/5 dark:border-white/5 p-4 pt-5 gap-[0.6em] official-links-box">
                           <div className="px-2 mb-1">
-                              <h4 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">OFFICIAL LINKS</h4>
+                              <h4 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">{t('detail_official_links')}</h4>
                           </div>
                           {bot.telegram_group && (
                               <button 
@@ -799,7 +799,7 @@ const BotDetail = () => {
                                   <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
                                       <Send size={16} className="text-blue-500" />
                                   </div>
-                                  <span className="text-[10px] font-black uppercase tracking-widest italic text-slate-700 dark:text-slate-300">Telegram Grup</span>
+                                  <span className="text-[10px] font-black uppercase tracking-widest italic text-slate-700 dark:text-slate-300">{t('detail_tg_group')}</span>
                               </button>
                           )}
                           {bot.website_url && (
@@ -810,7 +810,7 @@ const BotDetail = () => {
                                   <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
                                       <Globe size={16} className="text-emerald-500" />
                                   </div>
-                                  <span className="text-[10px] font-black uppercase tracking-widest italic text-slate-700 dark:text-slate-300">Web Site</span>
+                                  <span className="text-[10px] font-black uppercase tracking-widest italic text-slate-700 dark:text-slate-300">{t('detail_website')}</span>
                               </button>
                           )}
                           {bot.app_url && (
@@ -821,7 +821,7 @@ const BotDetail = () => {
                                   <div className="w-8 h-8 rounded-xl bg-purple-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
                                       <PlusCircle size={16} className="text-purple-500" />
                                   </div>
-                                  <span className="text-[10px] font-black uppercase tracking-widest italic text-slate-700 dark:text-slate-300">Uygulama / Bot</span>
+                                  <span className="text-[10px] font-black uppercase tracking-widest italic text-slate-700 dark:text-slate-300">{t('detail_app_bot')}</span>
                               </button>
                           )}
                           {bot.social_url && (
@@ -832,7 +832,7 @@ const BotDetail = () => {
                                   <div className="w-8 h-8 rounded-xl bg-blue-400/10 flex items-center justify-center group-hover:scale-110 transition-transform">
                                       <Share2 size={16} className="text-blue-400" />
                                   </div>
-                                  <span className="text-[10px] font-black uppercase tracking-widest italic text-slate-700 dark:text-slate-300">Sosyal Medya</span>
+                                  <span className="text-[10px] font-black uppercase tracking-widest italic text-slate-700 dark:text-slate-300">{t('detail_social')}</span>
                               </button>
                           )}
                       </div>
@@ -844,15 +844,15 @@ const BotDetail = () => {
                       <div className="flex items-center justify-between p-6">
                           <div className="flex flex-col items-center flex-1 border-r border-black/5 dark:border-white/5">
                               <span className="text-slate-900 dark:text-white font-bold text-base">{bot.rating || '0.0'} <Star size={12} className="inline mb-1 fill-yellow-500 text-yellow-500" /></span>
-                              <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">{bot.rating_count || 0} Oy</span>
+                              <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">{bot.rating_count || 0} {t('detail_vote')}</span>
                           </div>
                           <div className="flex flex-col items-center flex-1 border-r border-black/5 dark:border-white/5">
                               <span className="text-slate-900 dark:text-white font-bold text-base">{bot.user_count && bot.user_count > 1000 ? `${(bot.user_count / 1000).toFixed(1)}K` : bot.user_count || 0}</span>
-                              <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">Kullanıcı</span>
+                              <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">{t('detail_users_count')}</span>
                           </div>
                           <div className="flex flex-col items-center flex-1">
                               <span className="text-slate-900 dark:text-white font-bold text-base">{bot.views && bot.views > 1000 ? `${(bot.views / 1000).toFixed(1)}K` : bot.views || 0}</span>
-                              <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">Görüntüleme</span>
+                              <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">{t('detail_views')}</span>
                           </div>
                       </div>
                       {bot.languages && bot.languages.length > 0 && (
@@ -943,18 +943,18 @@ const BotDetail = () => {
                 </div>
 
                 <h2 className="text-2xl font-black text-slate-900 dark:text-white italic uppercase tracking-tighter leading-none mb-3">
-                  Tebrikler! <br/> <span className="text-brand dark:text-brand-light">Botunuz Hazır</span>
+                  {t('guide_congrats_title')} <br/> <span className="text-brand dark:text-brand-light">{t('guide_congrats_subtitle')}</span>
                 </h2>
                 <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-10 italic">
-                  Botu kullanmaya başlamak için şu adımları izleyin:
+                  {t('guide_steps_desc')}
                 </p>
 
                 <div className="space-y-6 mb-10">
                   {[
-                    { icon: Play, title: 'Botu Başlat', desc: 'Aşağıdaki butona basarak Telegram\'a gidin ve /start komutunu verin.' },
-                    { icon: UserPlus, title: 'Kanala Ekle', desc: 'Botu yönetmek istediğiniz kanalınıza "Yönetici" olarak ekleyin.' },
-                    { icon: MessageSquare, title: 'İlk Sinyal', desc: 'Botun yönetim panelinden veya komutlarından ilk paylaşımınızı tetikleyin.' },
-                    { icon: BarChart3, title: 'Kazanç İzle', desc: 'BotlyHub ana sayfasından kanal gelirlerinizi anlık takip edin.' }
+                    { icon: Play, title: t('guide_step_1_title'), desc: t('guide_step_1_desc') },
+                    { icon: UserPlus, title: t('guide_step_2_title'), desc: t('guide_step_2_desc') },
+                    { icon: MessageSquare, title: t('guide_step_3_title'), desc: t('guide_step_3_desc') },
+                    { icon: BarChart3, title: t('guide_step_4_title'), desc: t('guide_step_4_desc') }
                   ].map((step, i) => (
                     <div key={i} className="flex gap-5 group">
                       <div className="w-10 h-10 shrink-0 bg-slate-100 dark:bg-white/5 rounded-xl flex items-center justify-center text-brand dark:text-brand-light border border-black/5 dark:border-white/5 group-hover:bg-brand dark:group-hover:bg-brand-light group-hover:text-white transition-all duration-500">
@@ -976,13 +976,13 @@ const BotDetail = () => {
                     }}
                     className="w-full py-5 bg-brand dark:bg-brand-light hover:opacity-90 text-white font-black rounded-xl text-[10px] uppercase tracking-[0.4em] transition-all active:scale-95 flex items-center justify-center gap-3"
                   >
-                    <Send size={16} /> ŞİMDİ BAŞLAT
+                    <Send size={16} /> {t('guide_now_start')}
                   </button>
                   <button 
                     onClick={() => setShowGuide(false)}
                     className="w-full py-4 text-slate-400 dark:text-slate-600 font-black text-[9px] uppercase tracking-widest hover:text-slate-900 dark:hover:text-slate-400 transition-colors"
                   >
-                    DAHA SONRA
+                    {t('home_maybe_later')}
                   </button>
                 </div>
               </div>
@@ -1003,12 +1003,12 @@ const BotDetail = () => {
           >
             <div className="absolute top-8 right-8 flex items-center gap-4">
               <span className="text-white/40 text-[10px] font-black uppercase tracking-[0.2em] hidden md:block">
-                Ekran Görüntüsü {currentImageIndex + 1} / {bot.screenshots.length}
+                {t('detail_screenshot')} {currentImageIndex + 1} / {bot.screenshots.length}
               </span>
               <button 
                 onClick={closeLightbox}
                 className="w-12 h-12 bg-white/10 hover:bg-white/20 text-white rounded-full flex items-center justify-center transition-colors"
-                aria-label="Kapat"
+                aria-label={t('close')}
               >
                 <X size={24} />
               </button>
@@ -1017,7 +1017,7 @@ const BotDetail = () => {
             <button 
               onClick={prevImage}
               className="absolute left-4 md:left-8 w-12 h-12 md:w-16 md:h-16 bg-white/10 hover:bg-white/20 text-white rounded-full flex items-center justify-center transition-all z-10 active:scale-90"
-              aria-label="Önceki"
+              aria-label={t('prev')}
             >
               <ChevronLeft size={32} />
             </button>
@@ -1032,7 +1032,7 @@ const BotDetail = () => {
             >
               <img 
                 src={bot.screenshots[currentImageIndex]} 
-                alt={`Ekran Görüntüsü ${currentImageIndex + 1}`}
+                alt={`${t('detail_screenshot')} ${currentImageIndex + 1}`}
                 className="max-w-full max-h-full object-contain rounded-xl md:rounded-xl shadow-2xl"
               />
             </motion.div>
@@ -1040,7 +1040,7 @@ const BotDetail = () => {
             <button 
               onClick={nextImage}
               className="absolute right-4 md:right-8 w-12 h-12 md:w-16 md:h-16 bg-white/10 hover:bg-white/20 text-white rounded-full flex items-center justify-center transition-all z-10 active:scale-90"
-              aria-label="Sonraki"
+              aria-label={t('next')}
             >
               <ChevronRight size={32} />
             </button>

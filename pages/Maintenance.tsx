@@ -1,9 +1,12 @@
 
 import React from 'react';
-import { Settings, ShieldAlert, Cpu, Sparkles } from 'lucide-react';
+import { ShieldAlert, Cpu } from 'lucide-react';
 import Logo from '../components/Logo';
+import { useTranslation } from '../TranslationContext';
 
 const Maintenance = () => {
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#020617] flex items-center justify-center p-8 relative overflow-hidden animate-in fade-in transition-colors duration-300">
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-[120px] animate-pulse"></div>
@@ -22,9 +25,9 @@ const Maintenance = () => {
             </div>
         </div>
 
-        <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-6 tracking-tight">Sistem <span className="text-brand">Bakımda</span></h1>
+        <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-6 tracking-tight">{t('maintenance_title').split(' ')[0]} <span className="text-brand">{t('maintenance_title').split(' ')[1]}</span></h1>
         <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-12 px-6 font-medium">
-            Sizlere daha hızlı ve stabil bir deneyim sunmak için sistemimizi kısa süreliğine bakıma aldık. Çok yakında buradayız!
+            {t('maintenance_desc')}
         </p>
 
         <div className="space-y-4 max-w-sm mx-auto">
@@ -34,7 +37,7 @@ const Maintenance = () => {
                 </div>
                 <div>
                     <p className="text-[11px] font-bold text-slate-900 dark:text-white uppercase tracking-widest">Altyapı V3.5</p>
-                    <p className="text-[10px] text-slate-500 font-bold uppercase mt-1 tracking-wider">Yük dengeleme iyileştiriliyor</p>
+                    <p className="text-[10px] text-slate-500 font-bold uppercase mt-1 tracking-wider italic">Maintenance Mode Active</p>
                 </div>
             </div>
         </div>
