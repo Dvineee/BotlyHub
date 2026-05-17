@@ -16,14 +16,15 @@ import { motion, AnimatePresence } from 'motion/react';
 const SidebarItem = ({ icon: Icon, label, path, active, badge, color, external }: any) => (
   <Link 
     to={path} 
-    className={`flex items-center justify-between px-3 py-1.5 transition-all group ${
+    className={`relative flex items-center justify-between px-3 py-1.5 transition-all group ${
       active 
         ? 'bg-blue-600/10 text-blue-500 font-bold' 
         : 'text-slate-400 hover:text-white'
     }`}
   >
+    {active && <div className="absolute left-0 top-1 bottom-1 w-[3px] bg-blue-500 rounded-r-full" />}
     <div className="flex items-center gap-3">
-      <Icon size={16} className={`${active ? 'text-blue-500' : color ? color : 'text-slate-500 group-hover:text-white'} transition-colors`} />
+      <Icon size={16} className={`${active ? 'text-blue-500' : color ? color : 'text-slate-500 group-hover:text-white'} transition-colors pl-1`} />
       <span className="text-[12px] font-medium tracking-tight">{label}</span>
     </div>
     <div className="flex items-center gap-1.5">
@@ -323,185 +324,160 @@ const NavigateToGroups = ({ botId }: any) => {
 };
 
 const GroupSettingsView = () => {
-    const [activeTab, setActiveTab] = useState('basic'); // basic or team
+    const [activeTab, setActiveTab] = useState('basic'); 
     const groupId = '-1003360909133'; // Prototype ID from image
 
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-5xl">
-            <div className="flex items-center gap-2 mb-8 bg-[#14181f] p-1.5 rounded-2xl w-fit border border-white/5">
+            {/* Header Tabs */}
+            <div className="flex items-center gap-1 bg-[#14181f]/40 p-1 rounded-xl w-fit mb-10 border border-white/5">
                 <button 
                   onClick={() => setActiveTab('basic')}
-                  className={`h-11 px-6 rounded-xl flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all ${
-                    activeTab === 'basic' ? 'bg-slate-800 text-white shadow-lg' : 'text-slate-500 hover:text-white'
+                  className={`h-9 px-6 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${
+                    activeTab === 'basic' ? 'bg-[#1a1f26] text-white shadow-sm border border-white/10' : 'text-slate-500 hover:text-slate-300'
                   }`}
                 >
-                    <Settings size={14} />
+                    <Settings size={14} className={activeTab === 'basic' ? 'text-white' : ''} />
                     Basic
                 </button>
                 <button 
                   onClick={() => setActiveTab('team')}
-                  className={`h-11 px-6 rounded-xl flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all ${
-                    activeTab === 'team' ? 'bg-slate-800 text-white shadow-lg' : 'text-slate-500 hover:text-white'
+                  className={`h-9 px-6 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${
+                    activeTab === 'team' ? 'bg-[#1a1f26] text-white shadow-sm border border-white/10' : 'text-slate-500 hover:text-slate-300'
                   }`}
                 >
-                    <Users size={14} />
+                    <Users size={14} className={activeTab === 'team' ? 'text-white' : ''} />
                     Team
                 </button>
             </div>
 
             {activeTab === 'basic' ? (
-                <div className="space-y-8">
+                <div className="space-y-10">
                     {/* ID Section */}
-                    <div>
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-3">ID</label>
-                        <div className="flex items-center gap-2">
-                            <div className="h-12 flex-1 bg-[#14181f] border border-white/5 rounded-xl px-4 flex items-center font-mono text-sm text-white">
+                    <div className="space-y-3">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block">ID</label>
+                        <div className="flex items-center gap-2 max-w-sm">
+                            <div className="flex-1 h-10 bg-[#14181f] border border-white/5 rounded-lg px-4 flex items-center text-sm text-slate-300 font-mono tracking-wider">
                                 {groupId}
                             </div>
-                            <button className="h-12 w-12 bg-white/5 hover:bg-white/10 text-white rounded-xl flex items-center justify-center transition-all">
-                                <CreditCard size={18} />
+                            <button className="w-10 h-10 bg-[#14181f] border border-white/5 rounded-lg flex items-center justify-center text-slate-500 hover:text-white transition-all">
+                                <Copy size={16} />
                             </button>
                         </div>
                     </div>
 
-                    {/* Checkboxes */}
-                    <div className="space-y-4">
-                        <label className="flex items-start gap-3 group cursor-pointer">
-                            <div className="mt-0.5">
-                                <input type="checkbox" className="w-5 h-5 accent-blue-600 rounded bg-[#14181f] border-white/5" />
-                            </div>
+                    {/* Settings Rows */}
+                    <div className="space-y-8">
+                        <div className="flex items-start gap-4">
+                            <input type="checkbox" className="w-5 h-5 mt-0.5 rounded border-white/10 accent-blue-600 bg-[#14181f]" />
                             <div>
-                                <h4 className="text-sm font-bold text-white group-hover:text-blue-500 transition-colors">Analizler sayfasını özel tut</h4>
-                                <p className="text-[11px] text-slate-500 leading-relaxed font-medium">Yalnızca kimliği doğrulanmış yöneticiler erişebilir</p>
+                                <h4 className="text-sm font-bold text-white mb-1">Analizler sayfasını özel tut</h4>
+                                <p className="text-[11px] text-slate-500 font-medium">Yalnızca kimliği doğrulanmış yöneticiler erişebilir</p>
                             </div>
-                        </label>
-
-                        <label className="flex items-start gap-3 group cursor-pointer">
-                            <div className="mt-0.5">
-                                <input type="checkbox" className="w-5 h-5 accent-blue-600 rounded bg-[#14181f] border-white/5" />
-                            </div>
-                            <div>
-                                <h4 className="text-sm font-bold text-white group-hover:text-blue-500 transition-colors">Receive daily analytics report</h4>
-                                <p className="text-[11px] text-slate-500 leading-relaxed font-medium">Combot will send you a daily report about your group</p>
-                            </div>
-                        </label>
-                    </div>
-
-                    {/* Tags */}
-                    <div>
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-3">Tags</label>
-                        <div className="h-12 bg-[#14181f] border border-white/5 rounded-xl px-4 flex items-center text-sm text-slate-500 italic">
                         </div>
-                        <p className="text-[10px] text-slate-600 mt-2 italic flex items-center gap-1">
-                            <Info size={10} /> At the moment, tag is only used for .gban command
-                        </p>
-                    </div>
 
-                    {/* Language */}
-                    <div>
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-3">Language</label>
-                        <div className="h-12 bg-[#14181f] border border-white/5 rounded-xl px-4 flex items-center justify-between group cursor-pointer hover:border-white/10 transition-all">
-                            <span className="text-sm text-white font-medium">English (English)</span>
-                            <ChevronRight size={16} className="rotate-90 text-slate-600" />
+                        <div className="flex items-start gap-4">
+                            <input type="checkbox" className="w-5 h-5 mt-0.5 rounded border-white/10 accent-blue-600 bg-[#14181f]" />
+                            <div>
+                                <h4 className="text-sm font-bold text-white mb-1">Receive daily analytics report</h4>
+                                <p className="text-[11px] text-slate-500 font-medium">Combot will send you a daily report about your group</p>
+                            </div>
                         </div>
-                    </div>
 
-                    {/* Anti-Spam */}
-                    <div className="bg-blue-600/5 border border-blue-500/10 p-6 rounded-[32px]">
-                        <label className="flex items-start gap-4 cursor-pointer group">
-                            <div className="mt-1">
-                                <input type="checkbox" defaultChecked className="w-6 h-6 accent-blue-600 rounded-lg" />
+                        <div className="space-y-3 max-w-5xl">
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block">Tags</label>
+                            <input 
+                                type="text" 
+                                className="w-full h-11 bg-[#14181f] border border-white/10 rounded-lg px-4 text-sm text-white focus:border-blue-500/20 transition-all outline-none"
+                            />
+                            <div className="flex items-center gap-2 text-slate-600">
+                                 <Info size={12} />
+                                 <span className="text-[10px] font-medium">At the moment, tag is only used for .gban command</span>
                             </div>
-                            <div>
-                                <h4 className="text-sm font-black text-white italic uppercase tracking-tighter mb-1">Combot Anti-Spam (CAS) kullan</h4>
-                                <p className="text-xs text-slate-400 leading-relaxed font-medium">Combot Anti-Spam, Telegram'daki spam gönderenleri tespit etmek için tasarlanmış otomatik bir sistemdir. Grubunuzu korur!</p>
-                            </div>
-                        </label>
-                    </div>
+                        </div>
 
-                    {/* Footer Checkboxes */}
-                    <div className="space-y-6 pt-4 border-t border-white/5">
-                        <label className="flex items-start gap-3 group cursor-pointer">
-                            <div className="mt-0.5"><input type="checkbox" className="w-5 h-5 accent-blue-600" /></div>
+                        <div className="space-y-3 max-w-5xl">
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block">Language</label>
+                            <div className="relative">
+                                <select className="w-full h-11 bg-[#14181f] border border-white/10 rounded-lg px-4 text-sm text-white appearance-none outline-none focus:border-blue-500/20 transition-all">
+                                    <option>English (English)</option>
+                                    <option>Türkçe (Turkish)</option>
+                                </select>
+                                <ChevronRight size={14} className="absolute right-4 top-1/2 -translate-y-1/2 rotate-90 text-slate-600 pointer-events-none" />
+                            </div>
+                        </div>
+
+                        <div className="flex items-start gap-4">
+                            <input type="checkbox" defaultChecked className="w-5 h-5 mt-0.5 rounded border-white/10 accent-blue-600 bg-[#14181f]" />
                             <div>
-                                <div className="flex items-center gap-2">
-                                    <h4 className="text-sm font-bold text-white">Yasaklamaları duyurma</h4>
-                                    <span className="text-[9px] font-black bg-orange-500/20 text-orange-400 px-1.5 py-0.5 rounded italic uppercase">Pro</span>
+                                <h4 className="text-sm font-bold text-white mb-1">Combot Anti-Spam (CAS) kullan</h4>
+                                <p className="text-[11px] text-slate-500 font-medium leading-relaxed">
+                                    Combot Anti-Spam, Telegram'daki spam gönderenleri tespit etmek için tasarlanmış otomatik bir sistemdir. Grubunuzu korur!
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-start gap-4">
+                            <input type="checkbox" className="w-5 h-5 mt-0.5 rounded border-white/10 accent-blue-600 bg-[#14181f]" />
+                            <div>
+                                <div className="flex items-center gap-2 mb-1">
+                                    <h4 className="text-sm font-bold text-orange-400">Yasaklamaları duyurma</h4>
+                                    <Star size={12} className="text-amber-500" fill="currentColor" />
                                 </div>
-                                <p className="text-[11px] text-orange-400/60 leading-relaxed font-medium">Yasaklamaları duyurma yalnızca Pro'da kullanılabilir. Kullanmak için Pro'ya yükseltin.</p>
+                                <p className="text-[11px] text-orange-400/60 font-medium leading-relaxed">
+                                    <span className="text-amber-500">★</span> Yasaklamaları duyurma yalnızca Pro'da kullanılabilir. Kullanmak için Pro'ya yükseltin.
+                                </p>
                             </div>
-                        </label>
+                        </div>
 
-                        <label className="flex items-start gap-3 group cursor-pointer">
-                            <div className="mt-0.5"><input type="checkbox" className="w-5 h-5 accent-blue-600" /></div>
+                        <div className="flex items-start gap-4">
+                            <input type="checkbox" className="w-5 h-5 mt-0.5 rounded border-white/10 accent-blue-600 bg-[#14181f]" />
                             <div>
-                                <h4 className="text-sm font-bold text-white">Katılmama "Top Telegram Chats"</h4>
-                                <p className="text-[11px] text-slate-500 leading-relaxed font-medium">24 saat içinde yürürlüğe girer</p>
+                                <h4 className="text-sm font-bold text-white mb-1">Katılmama "Top Telegram Chats"</h4>
+                                <p className="text-[11px] text-slate-500 font-medium">24 saat içinde yürürlüğe girer</p>
                             </div>
-                        </label>
+                        </div>
                     </div>
 
                     {/* Custom Bot Section */}
-                    <div className="group bg-gradient-to-br from-slate-900 to-[#0f1218] border border-white/5 p-8 rounded-[40px] relative overflow-hidden">
-                        <div className="relative z-10">
-                            <div className="flex items-center gap-3 mb-4">
-                                <h3 className="text-xl font-black text-white italic uppercase tracking-tighter">Custom Bot</h3>
-                                <span className="text-[10px] font-black bg-blue-600/20 text-blue-400 px-2 py-0.5 rounded italic uppercase tracking-widest border border-blue-500/20">Pro</span>
+                    <div className="pt-10 border-t border-white/5">
+                        <div className="flex items-center gap-4 mb-3">
+                            <div className="flex items-center gap-2">
+                                 <ChevronRight size={16} className="text-slate-400" />
+                                 <h3 className="text-lg font-black text-white italic uppercase tracking-tighter">Custom bot</h3>
                             </div>
-                            <p className="text-xs text-slate-500 font-medium leading-relaxed max-w-lg mb-0 italic">
-                                Combot yerine kendi botunuzu kullanın. Adını, kullanıcı adını, açıklamasını ve profil resmini ihtiyaçlarınıza göre özelleştirin.
-                            </p>
+                            <span className="text-[8px] font-black bg-[#14181f] text-slate-400 px-1.5 py-0.5 rounded uppercase tracking-widest border border-white/10">Pro</span>
                         </div>
-                        <div className="absolute top-1/2 -right-10 -translate-y-1/2 opacity-5 pointer-events-none">
-                            <Zap size={200} className="text-blue-500" />
+                        <div className="flex items-center gap-3 text-slate-600 pl-6">
+                             <Info size={12} />
+                             <p className="text-[11px] font-medium leading-relaxed">Combot yerine kendi botunuzu kullanın. Adını, kullanıcı adını, açıklamasını ve profil resmini ihtiyaçlarınıza göre özelleştirin.</p>
                         </div>
                     </div>
                 </div>
             ) : (
-                <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-                    <div className="flex items-center justify-between mb-8">
-                        <div>
-                            <h2 className="text-xl font-black text-white italic uppercase tracking-tighter mb-1">Yöneticiler</h2>
-                            <p className="text-xs text-slate-500 font-medium flex items-center gap-1 italic">
-                                <Info size={12} /> Combot'u yönetebilen yöneticiler
-                            </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                             <button className="h-10 px-4 bg-white/5 hover:bg-white/10 text-white rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all">
-                                <RotateCcw size={14} />
-                                Yenile
-                             </button>
-                             <button className="h-10 px-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all shadow-lg shadow-blue-500/20">
-                                <Plus size={14} />
-                                Yönetici ekle
-                             </button>
-                        </div>
-                    </div>
-
-                    <div className="space-y-3">
-                        {[
-                            { id: '210944655', name: 'Combot', user: '@combot', isBot: true },
-                            { id: '842614237', name: 'KAJU', user: '@kajju66', isBot: false },
-                        ].map((admin, i) => (
-                            <div key={i} className="bg-[#14181f] border border-white/5 rounded-[24px] p-4 flex items-center gap-4 group hover:border-blue-500/30 transition-all cursor-pointer">
-                                <div className="w-10 h-10 bg-slate-900 rounded-full flex items-center justify-center p-1 overflow-hidden">
-                                    <div className="w-full h-full bg-slate-800 rounded-full flex items-center justify-center font-black text-white italic text-xs">
-                                        {admin.name[0]}
-                                    </div>
+                <div className="animate-in fade-in slide-in-from-right-4 duration-500 space-y-8">
+                     <div className="flex items-center justify-between">
+                         <h3 className="text-xl font-black text-white italic uppercase tracking-tighter">Ekip Yönetimi</h3>
+                         <button className="h-10 px-6 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
+                             Yönetici Ekle
+                         </button>
+                     </div>
+                     <div className="grid grid-cols-1 gap-4">
+                        {[1, 2].map(i => (
+                            <div key={i} className="flex items-center justify-between p-5 bg-[#14181f] border border-white/5 rounded-2xl">
+                                <div className="flex items-center gap-4">
+                                     <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center font-bold text-white uppercase tracking-tighter">U</div>
+                                     <div>
+                                         <h4 className="text-sm font-bold text-white uppercase tracking-tighter italic">Kullanıcı #{i}</h4>
+                                         <span className="text-[10px] text-slate-500">Yönetici</span>
+                                     </div>
                                 </div>
-                                <div className="flex-1">
-                                    <div className="flex items-center gap-2 mb-0.5">
-                                        <span className="text-xs font-black text-blue-500 italic tracking-tighter">{admin.id}</span>
-                                        <h4 className="text-sm font-bold text-white">{admin.name}</h4>
-                                    </div>
-                                    <span className="text-[10px] text-slate-500 font-medium">{admin.user}</span>
-                                </div>
-                                <div className="p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <MoreVertical size={16} className="text-slate-600" />
-                                </div>
+                                <button className="text-slate-600 hover:text-white transition-colors">
+                                    <MoreVertical size={16} />
+                                </button>
                             </div>
                         ))}
-                    </div>
+                     </div>
                 </div>
             )}
         </div>
@@ -798,71 +774,82 @@ const GroupsView = () => {
 };
 
 const ModerationView = () => {
-  const [activeTab, setActiveTab] = useState('general');
-  const tabs = [
-    { id: 'general', label: 'Temel Ayarlar' },
-    { id: 'users', label: 'Yeni Üyeler' },
-    { id: 'filters', label: 'Filtreler' },
-    { id: 'fun', label: 'Eğlence' },
-    { id: 'comments', label: 'Yorumlar' },
-    { id: 'tools', label: 'Araçlar' },
-    { id: 'triggers', label: 'Tetikleyiciler V2', premium: true },
-  ];
+    const [activeTab, setActiveTab] = useState('general');
+    
+    const tabs = [
+        { id: 'general', label: 'Temel Ayarlar', icon: Settings },
+        { id: 'members', label: 'Yeni üyeler', icon: UserPlus },
+        { id: 'filters', label: 'Filtreler', icon: Shield },
+        { id: 'fun', label: 'Eğlence', icon: Gamepad2 },
+        { id: 'comments', label: 'Yorumlar', icon: MessageSquare },
+        { id: 'tools', label: 'Araçlar', icon: Wrench },
+        { id: 'triggers', label: 'Tetikleyiciler V2', icon: Zap, badge: 'Pro' },
+    ];
 
-  return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-8 no-scrollbar">
-        {tabs.map((tab) => (
-          <button 
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`whitespace-nowrap px-6 h-12 rounded-2xl flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all ${
-              activeTab === tab.id 
-                ? 'bg-slate-800 text-white border border-white/10' 
-                : 'text-slate-500 hover:text-white hover:bg-white/5 border border-transparent'
-            }`}
-          >
-            {tab.label}
-            {tab.premium && <Star size={10} className="text-amber-500" />}
-          </button>
-        ))}
-      </div>
-
-      <div className="bg-[#14181f] border border-white/5 rounded-[40px] p-10">
-        <div className="flex items-center gap-2 mb-8">
-           <LayoutDashboard className="text-blue-500" size={20} />
-           <h2 className="text-2xl font-black text-white italic uppercase tracking-tighter">Beyaz Liste</h2>
-        </div>
-
-        <div className="space-y-6">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between px-2">
-               <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Kullanıcı Listesi</label>
-               <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">3 Kullanıcı</span>
+    return (
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {/* Action Bar */}
+            <div className="flex items-center gap-2 mb-6">
+                <button className="h-9 px-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all shadow-lg shadow-emerald-500/10 border border-emerald-400/20">
+                    <Save size={14} />
+                    Kaydet
+                </button>
+                <button className="h-9 px-4 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all border border-cyan-400/20">
+                    <Download size={14} />
+                    Alıntı
+                </button>
+                <button className="h-9 px-4 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all border border-cyan-400/20">
+                    <Upload size={14} />
+                    Çıktı
+                </button>
+                <button className="h-9 px-4 bg-red-600 hover:bg-red-500 text-white rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all border border-red-400/20">
+                    <RotateCcw size={14} />
+                    Reset
+                </button>
             </div>
-            <textarea 
-               className="w-full h-40 bg-[#0f1218] border border-white/5 rounded-3xl p-6 text-sm text-white outline-none focus:border-blue-500/30 transition-all placeholder:text-slate-700"
-               placeholder="Telegram ID veya kullanıcı adlarını alt alta yazarak ekleyin..."
-            ></textarea>
-            <p className="text-[10px] text-slate-600 font-medium italic">
-              Beyaz listeye giren kullanıcılar denetime tabi değildir. Sistem onları güvenilir olarak işaretler.
-            </p>
-          </div>
 
-          <label className="flex items-center gap-4 group cursor-pointer w-fit p-4 bg-white/5 rounded-2xl border border-transparent hover:border-white/10 transition-all">
-             <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center group-hover:bg-slate-700 transition-colors">
-                <input type="checkbox" className="w-5 h-5 rounded accent-blue-600" />
-             </div>
-             <div>
-                <h4 className="text-sm font-bold text-white group-hover:text-blue-500 transition-colors">Yalnızca Beyaz Liste</h4>
-                <p className="text-[10px] text-slate-500 font-medium">Sadece listedeki kullanıcılar mesaj gönderebilir.</p>
-             </div>
-          </label>
+            {/* Sub Tabs */}
+            <div className="flex flex-wrap items-center gap-1.5 mb-8 bg-[#14181f]/40 p-1 rounded-xl w-fit">
+                {tabs.map(tab => (
+                    <button 
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`h-9 px-4 rounded-lg flex items-center gap-2 text-[10px] font-bold uppercase tracking-tight transition-all border ${
+                            activeTab === tab.id 
+                                ? 'bg-[#1a1f26] border-white/10 text-white shadow-sm' 
+                                : 'border-transparent text-slate-500 hover:text-slate-300'
+                        }`}
+                    >
+                        <tab.icon size={14} />
+                        {tab.label}
+                        {tab.badge && (
+                            <span className="text-[7px] font-black bg-amber-500 text-black px-1 py-0.5 rounded leading-none italic uppercase">
+                                {tab.badge}
+                            </span>
+                        )}
+                    </button>
+                ))}
+            </div>
+
+            {/* Content List */}
+            <div className="space-y-4 max-w-4xl">
+                {[
+                    { title: 'İlkeler', icon: ShieldCheck },
+                    { title: 'Katılma istekleri', icon: UserPlus },
+                    { title: 'Hoş geldin mesajı', icon: MessageSquare },
+                    { title: 'Captcha', icon: ShieldAlert },
+                ].map((item, i) => (
+                    <div key={i} className="group flex items-center justify-between py-5 border-b border-white/5 hover:bg-white/2 transition-all cursor-pointer">
+                        <div className="flex items-center gap-5">
+                            <ChevronRight size={14} className="text-slate-600 group-hover:text-blue-500 transition-colors" />
+                            <h3 className="text-xl font-black text-white italic uppercase tracking-tighter">{item.title}</h3>
+                        </div>
+                    </div>
+                ))}
+            </div>
         </div>
-      </div>
-    </div>
-  );
-}
+    );
+};
 
 const AnalysisView = () => (
   <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
