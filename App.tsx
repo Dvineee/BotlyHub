@@ -216,7 +216,7 @@ export default function App() {
             <Route path="/u/panel/*" element={<UserPanel />} />
             <Route path="/referral" element={<ReferralPage />} />
             <Route path="/blog" element={<BlogPage />} />
-            <Route path="/blog/:id" element={<BlogPostDetail />} />
+            <Route path="/blog/:slug" element={<BlogPostDetail />} />
           </Routes>
         </TelegramWrapper>
       </FilterProvider>

@@ -3340,25 +3340,37 @@ const BlogManagement = () => {
     const [isGeneratingSlug, setIsGeneratingSlug] = useState(false);
 
     const calculateReadTime = (content: string) => {
-        if (!content) return "1 dk";
-        const text = content.replace(/<[^>]*>/g, ' ');
-        const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+        if (!content || content.trim().length === 0) return "1 dk";
+        
+        // Remove HTML tags if present
+        const plainText = content.replace(/<[^>]*>/g, ' ');
+        
+        // Count words (supporting Turkish characters and splitting by any whitespace)
+        const words = plainText.trim().split(/\s+/).filter(w => w.length > 0).length;
+        
+        // Standard reading speed: ~225 words per minute
         const minutes = Math.max(1, Math.ceil(words / 225));
-        return `${minutes} dk`;
+        
+        return `${minutes} ${minutes > 1 ? 'dk' : 'dk'} okuma`;
     };
 
-    const generateAISlug = async () => {
-        if (!editingBlog.title) {
-            alert('Lütfen önce bir başlık girin.');
-            return;
-        }
+    const generateAISlug = async (titleOverride?: string) => {
+        const titleToUse = titleOverride || editingBlog?.title;
+        if (!titleToUse) return;
+
         setIsGeneratingSlug(true);
         try {
-            const slug = await GeminiService.generateSlug(editingBlog.title);
+            const slug = await GeminiService.generateSlug(titleToUse);
             setEditingBlog((prev: any) => ({ ...prev, slug }));
         } catch (e) {
             console.error("Slug generation failed:", e);
-            alert('Slug oluşturulurken bir hata oluştu.');
+            // Fallback manual slug
+            const manualSlug = titleToUse.toLowerCase()
+                .replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's')
+                .replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c')
+                .replace(/ /g, '-')
+                .replace(/[^\w-]+/g, '');
+            setEditingBlog((prev: any) => ({ ...prev, slug: manualSlug }));
         } finally {
             setIsGeneratingSlug(false);
         }
@@ -3635,6 +3647,11 @@ const BlogManagement = () => {
                                                     <input 
                                                         value={editingBlog.title} 
                                                         onChange={e => setEditingBlog({...editingBlog, title: e.target.value})} 
+                                                        onBlur={() => {
+                                                            if (editingBlog.title && !editingBlog.slug) {
+                                                                generateAISlug(editingBlog.title);
+                                                            }
+                                                        }}
                                                         placeholder="Etkileyici bir başlık girin..."
                                                         className="w-full h-20 lg:h-24 bg-slate-950 border border-white/5 p-8 rounded-[36px] text-xl lg:text-3xl font-black text-white outline-none focus:border-blue-500/30 uppercase italic leading-tight placeholder:opacity-20" 
                                                     />
@@ -3686,7 +3703,7 @@ const BlogManagement = () => {
                                                         <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest italic">SLUG (OPSİYONEL)</label>
                                                         <button 
                                                             type="button"
-                                                            onClick={generateAISlug}
+                                                            onClick={() => generateAISlug()}
                                                             disabled={isGeneratingSlug}
                                                             className="text-[9px] font-black text-blue-500 uppercase tracking-widest flex items-center gap-2 hover:text-blue-400 transition-colors disabled:opacity-50"
                                                         >

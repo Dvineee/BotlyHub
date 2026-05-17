@@ -97,7 +97,7 @@ const categories = [
 ];
 
 const BlogPostDetail: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { haptic, user } = useTelegram();
   const { language, setLanguage, t } = useTranslation();
@@ -119,23 +119,23 @@ const BlogPostDetail: React.FC = () => {
 
   useEffect(() => {
     const fetchPost = async () => {
-      if (!id) return;
+      if (!slug) return;
       setIsLoading(true);
       try {
-        const data = await DatabaseService.getBlogById(id);
+        const data = await DatabaseService.getBlogById(slug);
         setPost(data);
         
         if (data) {
             // Log view
-            DatabaseService.incrementBlogView(id);
+            DatabaseService.incrementBlogView(data.id);
             
             // Similar posts
             const blogs = await DatabaseService.getBlogs();
             setAllPosts(blogs);
-            setSimilarPosts(blogs.filter(b => b.id !== id).slice(0, 3));
+            setSimilarPosts(blogs.filter(b => b.id !== data.id).slice(0, 3));
             
             // Comments
-            const comms = await DatabaseService.getBlogComments(id);
+            const comms = await DatabaseService.getBlogComments(data.id);
             setComments(comms);
 
             // Calculate category popularity for the leaderboard
@@ -186,7 +186,7 @@ const BlogPostDetail: React.FC = () => {
             
             // Check if liked
             if (user?.id) {
-                const liked = await DatabaseService.isBlogLikedByUser(id, user.id.toString());
+                const liked = await DatabaseService.isBlogLikedByUser(data.id, user.id.toString());
                 setIsLiked(liked);
             }
         }
@@ -198,10 +198,10 @@ const BlogPostDetail: React.FC = () => {
     };
     fetchPost();
     window.scrollTo(0, 0);
-  }, [id, user?.id]);
+  }, [slug, user?.id]);
 
   const handleLike = async () => {
-    if (!id || !user?.id) {
+    if (!post || !user?.id) {
         alert('Beğenmek için giriş yapmalısınız.');
         return;
     }
@@ -220,7 +220,7 @@ const BlogPostDetail: React.FC = () => {
     haptic('medium');
 
     try {
-        const liked = await DatabaseService.toggleBlogLike(id, user.id.toString());
+        const liked = await DatabaseService.toggleBlogLike(post.id, user.id.toString());
         // Sync if server differs
         if (liked !== !previousLiked) {
             setIsLiked(liked);
@@ -243,12 +243,12 @@ const BlogPostDetail: React.FC = () => {
 
   const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newComment.trim() || !id || !user) return;
+    if (!newComment.trim() || !post || !user) return;
     
     setIsSubmittingComment(true);
         try {
             const commentData = {
-                blog_id: id,
+                blog_id: post.id,
                 user_id: user.id.toString(),
                 user_name: `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Kullanıcı',
                 user_avatar: user.photo_url || '',
@@ -701,7 +701,14 @@ const BlogPostDetail: React.FC = () => {
             prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-a:font-black prose-a:no-underline hover:prose-a:underline
             whitespace-pre-wrap
           ">
-            <div dangerouslySetInnerHTML={{ __html: post.content }} />
+            <div 
+              style={{ whiteSpace: 'pre-wrap' }}
+              dangerouslySetInnerHTML={{ 
+                __html: post.content.includes('<p>') || post.content.includes('<div') 
+                  ? post.content 
+                  : post.content.replace(/\n/g, '<br/>') 
+              }} 
+            />
           </article>
 
           {/* Article Footer Area */}
@@ -912,7 +919,7 @@ const BlogPostDetail: React.FC = () => {
               {similarPosts.map((p, i) => (
                 <button 
                   key={p.id} 
-                  onClick={() => { haptic('light'); navigate('/blog/' + p.id); }} 
+                  onClick={() => { haptic('light'); navigate('/blog/' + (p.slug || p.id)); }} 
                   className="w-full flex items-start gap-4 p-4 rounded-2xl bg-white dark:bg-white/2 hover:bg-blue-500/5 border border-slate-100 dark:border-white/5 transition-all text-left group similar-post-card"
                 >
                   <span className="text-xl font-black text-slate-200 dark:text-white/5 group-hover:text-blue-500/30 transition-colors italic">0{i+1}</span>
