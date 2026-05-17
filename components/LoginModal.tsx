@@ -42,16 +42,23 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onAuth }) => {
         const res = await fetch('/api/auth/telegram/request-code', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ identifier })
+            body: JSON.stringify({ identifier: identifier.trim() })
         });
+        
         const data = await res.json();
+        
         if (res.ok) {
             setStep('verify');
         } else {
             setError(data.error || 'Kod gönderilemedi');
+            // If the error suggests the bot isn't started
+            if (data.detail?.includes('chat not found')) {
+              setError("Bot ile bağlantı kurulamadı. Lütfen @BotlyHubBOT'u başlatın.");
+            }
         }
-    } catch (err) {
-        setError('Sunucu bağlantısı başarısız');
+    } catch (err: any) {
+        console.error("Auth Request Error:", err);
+        setError('Sunucu bağlantısı başarısız. Lütfen internet bağlantınızı kontrol edin.');
     } finally {
         setIsLoading(false);
     }

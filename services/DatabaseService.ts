@@ -201,7 +201,8 @@ export class DatabaseService {
 
   static async getUserByUsername(username: string): Promise<User | null> {
     const cleanUsername = username.startsWith('@') ? username.slice(1) : username;
-    const { data } = await supabase.from('users').select('*').eq('username', cleanUsername).maybeSingle();
+    // Use ilike for case-insensitive search
+    const { data } = await supabase.from('users').select('*').ilike('username', cleanUsername).maybeSingle();
     if (!data) return null;
     return {
         ...data,
