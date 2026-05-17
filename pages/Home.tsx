@@ -463,7 +463,7 @@ const NavMenu = ({
                         }}
                         className="flex items-center gap-2 text-[14px] font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all py-2 grow-0"
                     >
-                        Bots <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'bots' ? 'rotate-180' : ''}`} />
+                        {t('cat_bots_nav') || 'Bots'} <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'bots' ? 'rotate-180' : ''}`} />
                     </button>
                     
                     {/* Desktop Mega Menu for Bots */}
@@ -515,7 +515,7 @@ const NavMenu = ({
                         }}
                         className="flex items-center gap-2 text-[14px] font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all py-2 grow-0"
                     >
-                        Apps <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'apps' ? 'rotate-180' : ''}`} />
+                        {t('cat_apps_nav') || 'Apps'} <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'apps' ? 'rotate-180' : ''}`} />
                     </button>
                     
                     {/* Desktop Mega Menu for Apps */}
@@ -810,7 +810,7 @@ const Home = () => {
                 : b.category === selectedAppsCategory
         );
     }
-    const appsSlider = appsForList.slice(0, 12); // Grid/Slider for bottom
+    const appsSlider = appsForList.slice(0, 9); // Limit to 9 as requested
 
     if (allApps.length > 0) {
         result['apps'] = {
@@ -835,7 +835,7 @@ const Home = () => {
                 : b.category === selectedBotsCategory
         );
     }
-    const botsSlider = botsForList.slice(0, 12);
+    const botsSlider = botsForList.slice(0, 9); // Limit to 9 as requested
 
     if (allBots.length > 0) {
         result['bots'] = {

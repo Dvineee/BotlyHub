@@ -129,11 +129,11 @@ const BlogPage: React.FC = () => {
   return (
     <div className="bg-[#fcfcfc] dark:bg-slate-950 min-h-screen text-slate-900 dark:text-slate-100 font-sans blog-page-scope">
       <SEO 
-          title="Blog - En Son Bot Trendleri ve TON Ekosistemi" 
-          description="Telegram ekosistemindeki en son gelişmeleri, bot trendlerini, TON ağı haberlerini ve derinlemesine teknik analizleri BotlyHub Blog üzerinden takip edin." 
+          title={`${t('blog_title')} - ${t('blog_subtitle')}`} 
+          description={t('blog_community_desc')} 
           breadcrumbs={[
-              { name: 'Anasayfa', item: 'https://botlyhub.com/' },
-              { name: 'Blog', item: 'https://botlyhub.com/blog' }
+              { name: t('blog_home'), item: 'https://botlyhub.com/' },
+              { name: t('blog_title'), item: 'https://botlyhub.com/blog' }
           ]}
       />
       
@@ -159,7 +159,7 @@ const BlogPage: React.FC = () => {
                 <input 
                   autoFocus
                   type="text" 
-                  placeholder="Blogda ara..." 
+                  placeholder={t('blog_search_placeholder')} 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="flex-1 bg-transparent border-none outline-none text-xl font-bold placeholder:text-slate-400"
@@ -193,21 +193,21 @@ const BlogPage: React.FC = () => {
                       ))
                     ) : (
                       <div className="py-12 text-center">
-                        <p className="text-slate-400 font-bold uppercase tracking-widest">Sonuç bulunamadı.</p>
+                        <p className="text-slate-400 font-bold uppercase tracking-widest">{t('blog_search_empty')}</p>
                       </div>
                     )}
                   </div>
                 ) : (
                   <div className="py-12 text-center">
                     <Search size={48} className="mx-auto text-slate-100 dark:text-white/5 mb-4" />
-                    <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Aramak için yazmaya başlayın</p>
+                    <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">{t('blog_search_hint')}</p>
                   </div>
                 )}
               </div>
               
               <div className="p-4 bg-slate-50 dark:bg-white/5 flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
                 <div className="flex gap-4">
-                  <span className="flex items-center gap-1"><kbd className="px-1.5 py-0.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded">ESC</kbd> Kapat</span>
+                  <span className="flex items-center gap-1"><kbd className="px-1.5 py-0.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded">ESC</kbd> {language === 'tr' ? 'Kapat' : 'Close'}</span>
                 </div>
                 <span>BotlyHub Search v1.0</span>
               </div>
@@ -241,10 +241,10 @@ const BlogPage: React.FC = () => {
                  className="w-full flex items-center gap-3 p-3.5 rounded-2xl bg-slate-50 dark:bg-white/5 text-base font-bold"
               >
                 <Home size={22} className="text-blue-500" />
-                Anasayfa
+                {t('blog_home')}
               </button>
 
-              <div className="pt-4 pb-2 px-2 text-xs font-black uppercase tracking-widest text-slate-400">Kategoriler</div>
+              <div className="pt-4 pb-2 px-2 text-xs font-black uppercase tracking-widest text-slate-400">{t('blog_categories')}</div>
               
               <div className="grid grid-cols-1 gap-2">
                 {categories.map((cat) => (
@@ -259,7 +259,7 @@ const BlogPage: React.FC = () => {
                   >
                     <div className="flex items-center gap-3">
                       <cat.icon size={20} className={activeCategory === cat.id ? 'text-white' : 'text-slate-400'} />
-                      {cat.label}
+                      {cat.id === 'all' ? t('cat_all') : cat.label}
                     </div>
                     {activeCategory === cat.id && <ChevronRight size={18} />}
                   </button>
@@ -307,7 +307,7 @@ const BlogPage: React.FC = () => {
                   className="flex flex-col items-center justify-center gap-1.5 mobile-menu-actions-btn rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white"
                 >
                   {theme === 'dark' ? <Sun size={20} className="text-yellow-400" /> : <Moon size={20} className="text-blue-500" />}
-                  <span className="text-[10px] font-bold uppercase tracking-widest">{theme === 'dark' ? 'Gündüz' : 'Gece'}</span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest">{theme === 'dark' ? (language === 'tr' ? 'Gündüz' : 'Light') : (language === 'tr' ? 'Gece' : 'Dark')}</span>
                 </button>
 
                 <button
@@ -315,7 +315,7 @@ const BlogPage: React.FC = () => {
                   className="flex flex-col items-center justify-center gap-1.5 mobile-menu-actions-btn rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white"
                 >
                   <Search size={20} className="text-blue-500" />
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Ara</span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{t('blog_explore')}</span>
                 </button>
 
                 <button
@@ -323,7 +323,7 @@ const BlogPage: React.FC = () => {
                   className="flex flex-col items-center justify-center gap-1.5 mobile-menu-actions-btn rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white"
                 >
                   <Globe size={20} className="text-slate-400" />
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Dil</span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{language === 'tr' ? 'Dil' : 'Lang'}</span>
                 </button>
               </div>
             </div>
@@ -347,7 +347,7 @@ const BlogPage: React.FC = () => {
                     className="fixed bottom-0 left-0 right-0 z-[1101] bg-white dark:bg-slate-900 rounded-t-[40px] border-t border-slate-100 dark:border-white/10 p-8 pb-12 shadow-2xl"
                   >
                     <div className="w-12 h-1 bg-slate-200 dark:bg-white/10 rounded-full mx-auto mb-8"></div>
-                    <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-[0.2em] mb-6 text-center">Dil Seçimi</h3>
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-[0.2em] mb-6 text-center">{language === 'tr' ? 'Dil Seçimi' : 'Select Language'}</h3>
                     <div className="grid grid-cols-1 gap-3">
                       {(['tr', 'en', 'ru'] as const).map((lang) => (
                         <button
@@ -370,7 +370,7 @@ const BlogPage: React.FC = () => {
                       onClick={() => setIsLangPickerOpen(false)}
                       className="w-full mt-6 py-4 text-slate-400 text-[10px] font-black uppercase tracking-widest"
                     >
-                      İptal
+                      {language === 'tr' ? 'İptal' : 'Cancel'}
                     </button>
                   </motion.div>
                 </>
@@ -397,14 +397,14 @@ const BlogPage: React.FC = () => {
           <nav className={`flex-1 px-4 ${isSidebarCollapsed ? 'overflow-visible' : 'overflow-y-auto'} no-scrollbar space-y-1`}>
             <button
                onClick={() => { haptic('light'); navigate('/'); }}
-               title="Anasayfa"
+               title={t('blog_home')}
                className={`w-full relative flex items-center gap-3 p-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 transition-all text-sm font-semibold group ${isSidebarCollapsed ? 'justify-center' : ''} blog-sidebar-cat`}
             >
               <Home size={20} className="group-hover:scale-110 transition-transform" />
-              {!isSidebarCollapsed && <span>Anasayfa</span>}
+              {!isSidebarCollapsed && <span>{t('blog_home')}</span>}
               {isSidebarCollapsed && (
                 <div className="absolute left-full ml-3 px-3 py-1.5 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 shadow-xl">
-                  Anasayfa
+                  {t('blog_home')}
                   <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-slate-900 rotate-45"></div>
                 </div>
               )}
@@ -413,7 +413,7 @@ const BlogPage: React.FC = () => {
             {!isSidebarCollapsed && (
               <div className="pt-6 pb-2">
                 <span className="px-3 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-600">
-                  Kategoriler
+                  {t('blog_categories')}
                 </span>
               </div>
             )}
@@ -423,7 +423,7 @@ const BlogPage: React.FC = () => {
                 <button
                   key={cat.id}
                   onClick={() => { haptic('light'); setActiveCategory(cat.id); }}
-                  title={cat.label}
+                  title={cat.id === 'all' ? t('cat_all') : cat.label}
                   className={`w-full relative flex items-center gap-3 p-2.5 rounded-lg transition-all text-sm font-semibold group blog-sidebar-cat ${
                     activeCategory === cat.id 
                     ? 'bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white' 
@@ -431,12 +431,12 @@ const BlogPage: React.FC = () => {
                   } ${isSidebarCollapsed ? 'justify-center' : ''}`}
                 >
                   <cat.icon size={20} className={`group-hover:scale-110 transition-transform ${activeCategory === cat.id ? 'text-blue-500' : 'text-slate-400'}`} />
-                  {!isSidebarCollapsed && <span>{cat.label}</span>}
+                  {!isSidebarCollapsed && <span>{cat.id === 'all' ? t('cat_all') : cat.label}</span>}
                   
                   {/* Tooltip for collapsed state */}
                   {isSidebarCollapsed && (
                     <div className="absolute left-full ml-3 px-3 py-1.5 bg-slate-900 dark:bg-slate-800 text-white text-[10px] font-black uppercase tracking-widest rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity backdrop-blur-md whitespace-nowrap z-[110] shadow-2xl border border-white/10">
-                      {cat.label}
+                      {cat.id === 'all' ? t('cat_all') : cat.label}
                       <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-slate-900 dark:bg-slate-800 rotate-45 border-l border-b border-white/10"></div>
                     </div>
                   )}
@@ -447,7 +447,7 @@ const BlogPage: React.FC = () => {
             {!isSidebarCollapsed && (
               <div className="pt-6 pb-2">
                 <span className="px-3 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-600">
-                  TOPLULUK ANALİZİ
+                  {language === 'tr' ? 'TOPLULUK ANALİZİ' : 'COMMUNITY ANALYSIS'}
                 </span>
               </div>
             )}
@@ -459,7 +459,7 @@ const BlogPage: React.FC = () => {
                 <Trophy size={18} className="text-amber-500" />
                 {!isSidebarCollapsed && (
                   <div className="flex flex-col">
-                    <span className="text-xs font-black uppercase italic">En Çok Okunan</span>
+                    <span className="text-xs font-black uppercase italic">{language === 'tr' ? 'En Çok Okunan' : 'Most Read'}</span>
                     <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Bot Geliştirme #1</span>
                   </div>
                 )}
@@ -470,8 +470,8 @@ const BlogPage: React.FC = () => {
                 <Zap size={18} className="text-blue-500" />
                 {!isSidebarCollapsed && (
                   <div className="flex flex-col">
-                    <span className="text-xs font-black uppercase italic">Toplam Okuma</span>
-                    <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">{blogs.reduce((acc, b) => acc + (b.views_count || 0), 0)} Görüntülenme</span>
+                    <span className="text-xs font-black uppercase italic">{t('blog_total_reading')}</span>
+                    <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">{blogs.reduce((acc, b) => acc + (b.views_count || 0), 0)} {t('blog_views')}</span>
                   </div>
                 )}
               </div>
@@ -585,10 +585,14 @@ const BlogPage: React.FC = () => {
               BOTLYHUB BLOG
             </div>
             <h1 className="text-3xl md:text-5xl font-black tracking-tighter text-slate-900 dark:text-white mb-4 italic">
-              Teknoloji, <span className="text-blue-600">TON</span> ve Ötesi.
+              {language === 'tr' ? (
+                <>Teknoloji, <span className="text-blue-600">TON</span> ve Ötesi.</>
+              ) : (
+                <>Technology, <span className="text-blue-600">TON</span> and Beyond.</>
+              )}
             </h1>
             <p className="text-lg text-slate-500 dark:text-slate-400 font-medium max-w-2xl">
-              Telegram dünyasindeki en son gelişmeleri, bot trendlerini ve TON ekosistemini yakından takip edin.
+              {t('blog_subtitle')}
             </p>
           </header>
 
@@ -648,14 +652,14 @@ const BlogPage: React.FC = () => {
                       <div className="absolute bottom-4 right-4 md:hidden z-10">
                          <div className="flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10 text-white">
                             <Calendar size={12} />
-                            <span className="text-[10px] font-bold uppercase">{new Date(featuredPost.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' })}</span>
+                            <span className="text-[10px] font-bold uppercase">{new Date(featuredPost.created_at).toLocaleDateString(language === 'tr' ? 'tr-TR' : 'en-US', { day: 'numeric', month: 'long' })}</span>
                          </div>
                       </div>
 
                       <div className="absolute bottom-10 left-10 hidden md:block">
                          <div className="flex items-center gap-3 bg-white/10 backdrop-blur-md px-5 py-3 rounded-2xl border border-white/10">
                             <Star size={16} className="text-amber-400 fill-amber-400" />
-                            <span className="text-[10px] font-black text-white uppercase tracking-widest">Haftanın Öne Çıkanı</span>
+                            <span className="text-[10px] font-black text-white uppercase tracking-widest">{t('blog_featured_post')}</span>
                          </div>
                       </div>
                     </div>
@@ -664,7 +668,7 @@ const BlogPage: React.FC = () => {
                         <span className="px-4 py-1.5 bg-blue-600 text-white text-[9px] font-black uppercase tracking-widest rounded-full">{featuredPost.category}</span>
                         <div className="hidden md:flex items-center gap-2 text-slate-400">
                           <Calendar size={14} />
-                          <span className="text-[10px] font-bold uppercase">{new Date(featuredPost.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                          <span className="text-[10px] font-bold uppercase">{new Date(featuredPost.created_at).toLocaleDateString(language === 'tr' ? 'tr-TR' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                         </div>
                         <div className="flex items-center gap-2 text-slate-400">
                           <TrendingUp size={14} className="text-blue-500" />
@@ -676,7 +680,7 @@ const BlogPage: React.FC = () => {
                         </div>
                         <div className="flex items-center gap-2 text-slate-400">
                           <Clock size={14} />
-                          <span className="text-[10px] font-bold uppercase">{featuredPost.readTime || '5 dk'}</span>
+                          <span className="text-[10px] font-bold uppercase">{featuredPost.readTime || `5 ${t('blog_read_time')}`}</span>
                         </div>
                       </div>
                       <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tighter leading-tight group-hover:text-blue-600 transition-colors italic">
@@ -692,14 +696,16 @@ const BlogPage: React.FC = () => {
                       </div>
                       <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-white/5">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-[10px] shadow-lg shadow-blue-500/20">BH</div>
+                          <div className="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center text-white shrink-0 shadow-lg shadow-blue-500/20">
+                            <Logo isIcon className="scale-50 fill-white" />
+                          </div>
                           <div>
                             <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider block">{featuredPost.author}</span>
-                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">BotlyHub Editörü</span>
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{language === 'tr' ? 'BotlyHub Editörü' : 'BotlyHub Editor'}</span>
                           </div>
                         </div>
                         <button className="flex items-center gap-2 text-blue-600 font-black text-[11px] uppercase tracking-widest group/btn hover:mr-2 transition-all">
-                           OKUMAYA BAŞLA <ArrowRight size={18} className="group-hover/btn:translate-x-2 transition-transform" />
+                           {t('blog_read_more')} <ArrowRight size={18} className="group-hover/btn:translate-x-2 transition-transform" />
                         </button>
                       </div>
                     </div>
@@ -754,7 +760,9 @@ const BlogPage: React.FC = () => {
                         </div>
                         <div className="flex items-center justify-between pt-6 group-hover:translate-y-[-4px] transition-transform">
                           <div className="flex items-center gap-2">
-                             <div className="w-6 h-6 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500 font-black text-[8px]">BH</div>
+                             <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white p-1.5 shadow-sm">
+                                <Logo isIcon className="fill-white" />
+                             </div>
                              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">BotlyHub Team</span>
                           </div>
                           <div className="w-10 h-10 rounded-full border border-slate-100 dark:border-white/5 flex items-center justify-center group-hover:bg-blue-600 group-hover:border-blue-600 group-hover:text-white transition-all">
@@ -777,7 +785,7 @@ const BlogPage: React.FC = () => {
              className="w-full flex items-center gap-3 p-3 rounded-xl bg-[#f2f4f7] dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-white/10 border border-slate-100 dark:border-white/5 hover:border-blue-500/50 transition-all text-sm font-semibold group"
           >
             <Search size={18} className="group-hover:scale-110 group-hover:text-blue-500 transition-all" />
-            <span>Arama Yap</span>
+            <span>{t('blog_search_action')}</span>
             <div className="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded border border-slate-200 dark:border-white/10 opacity-50 bg-white dark:bg-slate-800">⌘K</div>
           </button>
 
@@ -797,9 +805,9 @@ const BlogPage: React.FC = () => {
           </div>
 
           <div className="space-y-6">
-            <h4 className="px-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 italic">POPÜLER İÇERİKLER</h4>
+            <h4 className="px-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 italic font-sans">{t('blog_popular_content')}</h4>
             <div className="space-y-4">
-              {blogs.sort((a, b) => (b.views_count || 0) - (a.views_count || 0)).slice(0, 4).map((post, i) => (
+              {[...blogs].sort((a, b) => (b.views_count || 0) - (a.views_count || 0)).slice(0, 4).map((post, i) => (
                 <button 
                   key={post.id}
                   onClick={() => { haptic('light'); navigate('/blog/' + post.id); }}
@@ -811,7 +819,7 @@ const BlogPage: React.FC = () => {
                     <div className="flex items-center gap-2 mt-2">
                        <span className="text-[8px] font-black text-blue-500 uppercase tracking-widest">{post.category}</span>
                        <div className="w-1 h-1 rounded-full bg-slate-200 dark:bg-white/10" />
-                       <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{post.views_count || 0} İzlenme</span>
+                       <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{post.views_count || 0} {t('blog_views')}</span>
                     </div>
                   </div>
                 </button>
@@ -820,16 +828,16 @@ const BlogPage: React.FC = () => {
           </div>
 
           <div className="bg-white dark:bg-slate-900/40 rounded-[32px] p-8 border border-slate-100 dark:border-white/5 relative group shadow-sm">
-            <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center mb-6">
-              <Trophy size={24} className="text-blue-600 dark:text-blue-400" />
+            <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center mb-6 overflow-hidden p-2.5">
+              <Logo isIcon className="fill-blue-600 dark:fill-blue-400" />
             </div>
-            <h3 className="text-xl font-black italic tracking-tighter mb-3 uppercase text-slate-900 dark:text-white">Topluluğa Katılın</h3>
-            <p className="text-slate-500 dark:text-slate-400 text-[11px] font-medium mb-6 leading-relaxed italic">TON ekosistemindeki 10,000+ geliştirici ve yatırımcı ile birlikte BotlyHub ağının bir parçası olun.</p>
+            <h3 className="text-xl font-black italic tracking-tighter mb-3 uppercase text-slate-900 dark:text-white">{t('blog_join_community')}</h3>
+            <p className="text-slate-500 dark:text-slate-400 text-[11px] font-medium mb-6 leading-relaxed italic">{t('blog_community_desc')}</p>
             <button 
               onClick={() => { haptic('medium'); window.open('https://t.me/BotlyHub', '_blank'); }}
               className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-black uppercase text-[10px] tracking-widest rounded-2xl transition-all shadow-lg shadow-blue-500/20 active:scale-95 flex items-center justify-center gap-3 group/btn"
             >
-              TELEGRAM KANALIMIZ 
+              {t('blog_telegram_channel')} 
               <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
             </button>
           </div>

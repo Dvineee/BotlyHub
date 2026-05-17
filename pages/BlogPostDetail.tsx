@@ -100,7 +100,7 @@ const BlogPostDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { haptic, user } = useTelegram();
-  const { language, setLanguage } = useTranslation();
+  const { language, setLanguage, t } = useTranslation();
   const { theme, toggleTheme } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -258,7 +258,7 @@ const BlogPostDetail: React.FC = () => {
             }
         } catch (e) {
             console.error("Comment Error:", e);
-            alert('Yorum gönderilirken bir hata oluştu.');
+            alert(t('blog_comment_error'));
         } finally {
             setIsSubmittingComment(false);
         }
@@ -282,7 +282,7 @@ const BlogPostDetail: React.FC = () => {
     return (
       <div className="bg-[#fcfcfc] dark:bg-slate-950 min-h-screen flex flex-col items-center justify-center space-y-6">
         <Loader2 className="animate-spin text-blue-500" size={48} />
-        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 animate-pulse">İçerik Hazırlanıyor...</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 animate-pulse">{t('blog_loading')}</p>
       </div>
     );
   }
@@ -291,9 +291,9 @@ const BlogPostDetail: React.FC = () => {
     return (
       <div className="bg-[#fcfcfc] dark:bg-slate-950 min-h-screen flex flex-col items-center justify-center space-y-6 p-8 text-center">
         <BotIcon size={64} className="text-slate-800" />
-        <h2 className="text-2xl font-black uppercase italic tracking-tighter">Yazı <span className="text-red-500">Bulunamadı</span></h2>
-        <p className="text-slate-500 max-w-xs text-sm font-medium">Aradığınız blog yazısı silinmiş veya taşınmış olabilir.</p>
-        <button onClick={() => navigate('/blog')} className="px-8 py-4 bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-blue-500/20">BLOGA DÖN</button>
+        <h2 className="text-2xl font-black uppercase italic tracking-tighter">{t('blog_not_found')}</h2>
+        <p className="text-slate-500 max-w-xs text-sm font-medium">{t('blog_not_found_desc')}</p>
+        <button onClick={() => navigate('/blog')} className="px-8 py-4 bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-blue-500/20">{t('blog_back_to_blog')}</button>
       </div>
     );
   }
@@ -312,8 +312,8 @@ const BlogPostDetail: React.FC = () => {
           image: post.image
         }}
         breadcrumbs={[
-          { name: 'Anasayfa', item: 'https://botlyhub.com/' },
-          { name: 'Blog', item: 'https://botlyhub.com/blog' },
+          { name: t('blog_home'), item: 'https://botlyhub.com/' },
+          { name: t('blog_title'), item: 'https://botlyhub.com/blog' },
           { name: post.title, item: `https://botlyhub.com/blog/${post.id}` }
         ]}
       />
@@ -340,7 +340,7 @@ const BlogPostDetail: React.FC = () => {
                 <input 
                   autoFocus
                   type="text" 
-                  placeholder="Blogda ara..." 
+                  placeholder={t('blog_search_placeholder')} 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="flex-1 bg-transparent border-none outline-none text-xl font-bold placeholder:text-slate-400"
@@ -374,21 +374,21 @@ const BlogPostDetail: React.FC = () => {
                       ))
                     ) : (
                       <div className="py-12 text-center">
-                        <p className="text-slate-400 font-bold uppercase tracking-widest">Sonuç bulunamadı.</p>
+                        <p className="text-slate-400 font-bold uppercase tracking-widest">{t('blog_search_empty')}</p>
                       </div>
                     )}
                   </div>
                 ) : (
                   <div className="py-12 text-center">
                     <Search size={48} className="mx-auto text-slate-100 dark:text-white/5 mb-4" />
-                    <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Aramak için yazmaya başlayın</p>
+                    <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">{t('blog_search_hint')}</p>
                   </div>
                 )}
               </div>
               
               <div className="p-4 bg-slate-50 dark:bg-white/5 flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
                 <div className="flex gap-4">
-                  <span className="flex items-center gap-1"><kbd className="px-1.5 py-0.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded">ESC</kbd> Kapat</span>
+                  <span className="flex items-center gap-1"><kbd className="px-1.5 py-0.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded">ESC</kbd> {language === 'tr' ? 'Kapat' : 'Close'}</span>
                 </div>
                 <span>BotlyHub Search v1.0</span>
               </div>
@@ -422,17 +422,17 @@ const BlogPostDetail: React.FC = () => {
                  className="w-full flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 text-lg font-bold"
               >
                 <Home size={24} className="text-blue-500" />
-                Anasayfa
+                {t('blog_home')}
               </button>
               <button
                  onClick={() => { haptic('light'); navigate('/blog'); }}
                  className="w-full flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 text-lg font-bold"
               >
                 <FileText size={24} className="text-blue-500" />
-                Blog Yazıları
+                {t('blog_all_articles')}
               </button>
 
-              <div className="pt-4 pb-2 px-2 text-xs font-black uppercase tracking-widest text-slate-400">Kategoriler</div>
+              <div className="pt-4 pb-2 px-2 text-xs font-black uppercase tracking-widest text-slate-400">{t('blog_categories')}</div>
               
               <div className="grid grid-cols-1 gap-2">
                 {categories.slice(1, 6).map((cat) => (
@@ -458,7 +458,7 @@ const BlogPostDetail: React.FC = () => {
                   className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white font-bold"
                 >
                   {theme === 'dark' ? <Sun size={24} className="text-yellow-400" /> : <Moon size={24} className="text-blue-500" />}
-                  {theme === 'dark' ? 'Gündüz' : 'Gece'}
+                  {theme === 'dark' ? (language === 'tr' ? 'Gündüz' : 'Light') : (language === 'tr' ? 'Gece' : 'Dark')}
                 </button>
 
                 <button
@@ -466,7 +466,7 @@ const BlogPostDetail: React.FC = () => {
                   className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white font-bold"
                 >
                   <Search size={24} className="text-blue-500" />
-                  Ara
+                  {t('blog_explore')}
                 </button>
               </div>
 
@@ -510,28 +510,28 @@ const BlogPostDetail: React.FC = () => {
           <nav className={`flex-1 px-4 ${isSidebarCollapsed ? 'overflow-visible' : 'overflow-y-auto'} no-scrollbar space-y-1`}>
             <button
                onClick={() => { haptic('light'); navigate('/'); }}
-               title="Anasayfa"
+               title={t('blog_home')}
                className={`w-full relative flex items-center gap-3 p-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 transition-all text-sm font-semibold group ${isSidebarCollapsed ? 'justify-center' : ''}`}
             >
               <Home size={20} className="group-hover:scale-110 transition-transform" />
-              {!isSidebarCollapsed && <span>Anasayfa</span>}
+              {!isSidebarCollapsed && <span>{t('blog_home')}</span>}
               {isSidebarCollapsed && (
                 <div className="absolute left-full ml-3 px-3 py-1.5 bg-slate-900 dark:bg-slate-800 text-white text-[10px] font-black uppercase tracking-widest rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity backdrop-blur-md whitespace-nowrap z-[110] shadow-2xl border border-white/10">
-                  Anasayfa
+                  {t('blog_home')}
                   <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-slate-900 dark:bg-slate-800 rotate-45 border-l border-b border-white/10"></div>
                 </div>
               )}
             </button>
             <button
                onClick={() => { haptic('light'); navigate('/blog'); }}
-               title="Blog Yazıları"
+               title={t('blog_all_articles')}
                className={`w-full relative flex items-center gap-3 p-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 transition-all text-sm font-semibold group ${isSidebarCollapsed ? 'justify-center' : ''}`}
             >
               <FileText size={20} className="group-hover:scale-110 transition-transform" />
-              {!isSidebarCollapsed && <span>Blog Yazıları</span>}
+              {!isSidebarCollapsed && <span>{t('blog_all_articles')}</span>}
               {isSidebarCollapsed && (
                 <div className="absolute left-full ml-3 px-3 py-1.5 bg-slate-900 dark:bg-slate-800 text-white text-[10px] font-black uppercase tracking-widest rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity backdrop-blur-md whitespace-nowrap z-[110] shadow-2xl border border-white/10">
-                  Blog Yazıları
+                  {t('blog_all_articles')}
                   <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-slate-900 dark:bg-slate-800 rotate-45 border-l border-b border-white/10"></div>
                 </div>
               )}
@@ -540,7 +540,7 @@ const BlogPostDetail: React.FC = () => {
             {!isSidebarCollapsed && (
               <div className="pt-6 pb-2">
                 <span className="px-3 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-600">
-                  Keşfet
+                  {t('blog_categories')}
                 </span>
               </div>
             )}
@@ -636,7 +636,7 @@ const BlogPostDetail: React.FC = () => {
               </div>
               <div className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-wider ml-auto">
                 <TrendingUp size={14} className="text-blue-500" />
-                {post.views_count || 0} Görüntülenme
+                {post.views_count || 0} {t('blog_views')}
               </div>
             </div>
 
@@ -646,12 +646,12 @@ const BlogPostDetail: React.FC = () => {
 
             <div className="flex items-center justify-between py-6 border-y border-slate-100 dark:border-white/5">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-black text-xs">
-                  {post.authorAvatar || post.author.substring(0, 2).toUpperCase()}
+                <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white p-2 shrink-0 shadow-lg shadow-blue-500/20">
+                    <Logo isIcon className="fill-white" />
                 </div>
                 <div>
                   <div className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">{post.author}</div>
-                  <div className="text-xs font-bold text-slate-400">{new Date(post.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                  <div className="text-xs font-bold text-slate-400">{new Date(post.created_at).toLocaleDateString(language === 'tr' ? 'tr-TR' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
                 </div>
               </div>
 
@@ -698,13 +698,13 @@ const BlogPostDetail: React.FC = () => {
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${isLiked ? 'bg-red-500 text-white shadow-lg' : 'bg-slate-100 dark:bg-white/5 text-slate-400 group-hover:text-red-500 group-hover:bg-red-50 dark:group-hover:bg-red-500/10'}`}>
                       <Heart size={20} className={isLiked ? 'fill-white' : ''} />
                     </div>
-                    <span className={`text-sm font-black italic ${isLiked ? 'text-red-500' : 'text-slate-500'}`}>{post.likes_count || 0} Beğeni</span>
+                    <span className={`text-sm font-black italic ${isLiked ? 'text-red-500' : 'text-slate-500'}`}>{post.likes_count || 0} {t('blog_likes')}</span>
                   </button>
                   <button className="flex items-center gap-2 group">
                     <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400 group-hover:text-blue-500 group-hover:bg-blue-50 dark:group-hover:bg-blue-500/10 transition-all">
                       <MessageCircle size={20} />
                     </div>
-                    <span className="text-sm font-black text-slate-500 italic">{comments.length} Yorum</span>
+                    <span className="text-sm font-black text-slate-500 italic">{comments.length} {t('blog_comments')}</span>
                   </button>
                 </div>
 
@@ -723,7 +723,7 @@ const BlogPostDetail: React.FC = () => {
             <section id="comments-section" className="mb-20">
               <h3 className="text-xl font-black text-slate-900 dark:text-white mb-8 italic uppercase tracking-tighter flex items-center gap-3">
                 <MessageSquare size={20} className="text-blue-500" />
-                Yorumlar <span className="text-slate-300 dark:text-slate-800">/</span> {comments.length}
+                {t('blog_comments')} <span className="text-slate-300 dark:text-slate-800">/</span> {comments.length}
               </h3>
               
               <div className="bg-white dark:bg-slate-900/40 p-6 rounded-[32px] border border-slate-100 dark:border-white/5 mb-12">
@@ -740,7 +740,7 @@ const BlogPostDetail: React.FC = () => {
                       <textarea 
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
-                        placeholder="Düşüncelerini paylaş..."
+                        placeholder={t('blog_comment_placeholder')}
                         className="comment-textarea w-full bg-transparent border-none outline-none text-slate-900 dark:text-white placeholder:text-slate-400 resize-none h-24 font-medium italic"
                       />
                     </div>
@@ -751,7 +751,7 @@ const BlogPostDetail: React.FC = () => {
                       disabled={isSubmittingComment || !newComment.trim()}
                       className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-blue-700 transition-all disabled:opacity-50 shadow-lg shadow-blue-500/20"
                     >
-                      {isSubmittingComment ? 'GÖNDERİLİYOR...' : 'GÖNDER'}
+                      {isSubmittingComment ? t('blog_sending_comment') : t('blog_submit_comment')}
                       <Send size={14} />
                     </button>
                   </div>
@@ -777,7 +777,7 @@ const BlogPostDetail: React.FC = () => {
                     <div className="flex-1 bg-slate-50 dark:bg-white/5 p-4 rounded-2xl rounded-tl-none border border-transparent group-hover:border-blue-500/20 transition-all">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">{comment.user_name}</span>
-                        <span className="text-[10px] font-bold text-slate-400">{new Date(comment.created_at).toLocaleDateString('tr-TR')}</span>
+                        <span className="text-[10px] font-bold text-slate-400">{new Date(comment.created_at).toLocaleDateString(language === 'tr' ? 'tr-TR' : 'en-US')}</span>
                       </div>
                       <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
                         {comment.content}
@@ -787,7 +787,7 @@ const BlogPostDetail: React.FC = () => {
                 ))}
                 {comments.length === 0 && (
                   <div className="py-12 text-center border-2 border-dashed border-slate-100 dark:border-white/5 rounded-[32px]">
-                    <p className="text-slate-400 font-black uppercase tracking-widest text-[10px] italic">İlk yorumu sen yap!</p>
+                    <p className="text-slate-400 font-black uppercase tracking-widest text-[10px] italic">{t('blog_no_comments')}</p>
                   </div>
                 )}
               </div>
@@ -795,17 +795,17 @@ const BlogPostDetail: React.FC = () => {
 
             {/* Author Card */}
             <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-white/5 rounded-3xl p-6 flex flex-col md:flex-row items-center gap-6">
-              <div className="w-20 h-20 rounded-full bg-blue-600 flex items-center justify-center text-white font-black text-xl shrink-0">
-                {post.authorAvatar}
+              <div className="w-20 h-20 rounded-full bg-blue-600 flex items-center justify-center text-white shrink-0 p-4">
+                <Logo isIcon className="fill-white" />
               </div>
               <div className="flex-1 text-center md:text-left">
                 <h4 className="text-xl font-black text-slate-900 dark:text-white mb-2">{post.author}</h4>
                 <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-4">
-                  BotlyHub editör ekibi olarak, Telegram ve TON ekosistemindeki en yeni fırsatları ve teknik rehberleri tarafsız bir şekilde paylaşıyoruz.
+                  {t('blog_author_desc')}
                 </p>
                 <div className="flex items-center justify-center md:justify-start gap-4">
-                  <button className="text-xs font-black text-blue-500 uppercase tracking-widest hover:underline">Takip Et</button>
-                  <button className="text-xs font-black text-blue-500 uppercase tracking-widest hover:underline">Tüm Yazıları</button>
+                  <button className="text-xs font-black text-blue-500 uppercase tracking-widest hover:underline">{t('blog_follow')}</button>
+                  <button className="text-xs font-black text-blue-500 uppercase tracking-widest hover:underline">{t('blog_all_posts')}</button>
                 </div>
               </div>
             </div>
@@ -819,7 +819,7 @@ const BlogPostDetail: React.FC = () => {
              className="w-full flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-white/10 border border-slate-100 dark:border-white/5 hover:border-blue-500/50 transition-all text-sm font-semibold group"
           >
             <Search size={18} className="group-hover:scale-110 group-hover:text-blue-500 transition-all" />
-            <span>Arama Yap</span>
+            <span>{t('blog_search_action')}</span>
             <div className="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded border border-slate-200 dark:border-white/10 opacity-50 bg-white dark:bg-slate-800">⌘K</div>
           </button>
 
@@ -829,7 +829,7 @@ const BlogPostDetail: React.FC = () => {
                 <div className="flex items-start justify-between mb-8">
                 <div>
                     <h2 className="text-4xl font-black text-slate-900 dark:text-white italic tracking-tighter"># {currentRankIndex + 1}</h2>
-                    <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-1 italic">En Popüler</p>
+                    <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-1 italic">{t('blog_most_popular')}</p>
                 </div>
                 <div className="flex items-center bg-white/50 dark:bg-black/20 rounded-full p-1 border border-slate-200/50 dark:border-white/5 translate-y-1">
                     <button 
@@ -863,7 +863,7 @@ const BlogPostDetail: React.FC = () => {
                 </div>
                 <div className="flex-1 text-left min-w-0">
                     <p className="text-[12px] font-black uppercase tracking-tight truncate italic">
-                    {popularCategories[currentRankIndex]?.label || 'Yükleniyor...'} • {popularCategories[currentRankIndex]?.engagement || 0} yorum
+                    {popularCategories[currentRankIndex]?.label || (language === 'tr' ? 'Yükleniyor...' : 'Loading...')} • {popularCategories[currentRankIndex]?.engagement || 0} {t('blog_comments').toLowerCase()}
                     </p>
                 </div>
                 </button>
@@ -871,7 +871,7 @@ const BlogPostDetail: React.FC = () => {
           )}
 
           <div className="space-y-6">
-            <h4 className="px-2 text-[10px] font-black uppercase tracking-widest text-slate-400">BENZER YAZILAR</h4>
+            <h4 className="px-2 text-[10px] font-black uppercase tracking-widest text-slate-400">{t('blog_similar_posts')}</h4>
             <div className="space-y-4">
               {similarPosts.map((p, i) => (
                 <button 
@@ -884,12 +884,12 @@ const BlogPostDetail: React.FC = () => {
                     <h5 className="text-[11px] font-black text-slate-900 dark:text-white group-hover:text-blue-500 transition-colors mb-1 line-clamp-2 italic leading-tight uppercase">
                       {p.title}
                     </h5>
-                    <div className="text-[8px] font-black text-slate-400 uppercase tracking-widest">{p.readTime || '5 Dakika'} Okuma</div>
+                    <div className="text-[8px] font-black text-slate-400 uppercase tracking-widest">{p.readTime || `5 ${t('blog_read_time')}`}</div>
                   </div>
                 </button>
               ))}
               {similarPosts.length === 0 && (
-                 <p className="text-[10px] font-bold text-slate-700 uppercase tracking-widest italic px-2">Gösterilecek benzer yazı yok.</p>
+                 <p className="text-[10px] font-bold text-slate-700 uppercase tracking-widest italic px-2">{t('blog_search_empty')}</p>
               )}
             </div>
           </div>
