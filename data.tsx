@@ -128,36 +128,36 @@ const SecurityIcon = ({ size = 20, className = "" }: { size?: number, className?
   </svg>
 );
 
-const AppSubIcon = ({ size = 24, className = "" }: { size?: number, className?: string }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+const AppSubIcon = ({ size = 24 }: { size?: number }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#ff6b6b" />
         <path d="M2 17L12 22L22 17" stroke="#ff8e53" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         <path d="M2 12L12 17L22 12" stroke="#ff8e53" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
 );
 
-const TrendIcon = ({ size = 24, className = "" }: { size?: number, className?: string }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+const TrendIcon = ({ size = 24 }: { size?: number }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M23 6L13.5 15.5L8.5 10.5L1 18" stroke="#ff6b6b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
         <path d="M17 6H23V12" stroke="#ff8e53" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
 );
 
-const EditorIcon = ({ size = 24, className = "" }: { size?: number, className?: string }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+const EditorIcon = ({ size = 24 }: { size?: number }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#ff6b6b" stroke="#ff8e53" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
 );
 
-const NewIcon = ({ size = 24, className = "" }: { size?: number, className?: string }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+const NewIcon = ({ size = 24 }: { size?: number }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="12" cy="12" r="10" stroke="#ff8e53" strokeWidth="2"/>
         <path d="M12 8V16M8 12H16" stroke="#ff6b6b" strokeWidth="2" strokeLinecap="round"/>
     </svg>
 );
 
-const AppGamesIcon = ({ size = 24, className = "" }: { size?: number, className?: string }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+const AppGamesIcon = ({ size = 24 }: { size?: number }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="2" y="6" width="20" height="12" rx="2" stroke="#ff8e53" strokeWidth="2"/>
         <path d="M6 12H10M8 10V14" stroke="#ff6b6b" strokeWidth="2" strokeLinecap="round"/>
         <circle cx="15.5" cy="10.5" r="1.5" fill="#ff6b6b"/>
@@ -165,8 +165,8 @@ const AppGamesIcon = ({ size = 24, className = "" }: { size?: number, className?
     </svg>
 );
 
-const BotIconForApps = ({ size = 24, className = "" }: { size?: number, className?: string }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+const BotIconForApps = ({ size = 24 }: { size?: number }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="3" y="11" width="18" height="10" rx="2" stroke="#ff8e53" strokeWidth="2"/>
         <circle cx="12" cy="5" r="2" stroke="#ff6b6b" strokeWidth="2"/>
         <path d="M12 7V11" stroke="#ff6b6b" strokeWidth="2"/>
@@ -174,44 +174,44 @@ const BotIconForApps = ({ size = 24, className = "" }: { size?: number, classNam
     </svg>
 );
 
-const SiteIcon = ({ size = 24, className = "" }: { size?: number, className?: string }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+const SiteIcon = ({ size = 24 }: { size?: number }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="12" cy="12" r="10" stroke="#ff8e53" strokeWidth="2"/>
         <path d="M2 12H22" stroke="#ff6b6b" strokeWidth="2"/>
         <path d="M12 2C14.5 4.5 16 8.5 16 12C16 15.5 14.5 19.5 12 22C9.5 19.5 8 15.5 8 12C8 8.5 9.5 4.5 12 2Z" stroke="#ff6b6b" strokeWidth="2"/>
     </svg>
 );
 
-const AIIconForApps = ({ size = 24, className = "" }: { size?: number, className?: string }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+const AIIconForApps = ({ size = 24 }: { size?: number }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" fill="#ff6b6b" stroke="#ff8e53" strokeWidth="1"/>
     </svg>
 );
 
-const Web3Icon = ({ size = 24, className = "" }: { size?: number, className?: string }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+const Web3Icon = ({ size = 24 }: { size?: number }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M12 2L4 7V17L12 22L20 17V7L12 2Z" stroke="#ff8e53" strokeWidth="2"/>
         <path d="M12 22V12M12 12L20 7M12 12L4 7" stroke="#ff6b6b" strokeWidth="2"/>
     </svg>
 );
 
-const EarnIcon = ({ size = 24, className = "" }: { size?: number, className?: string }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+const EarnIcon = ({ size = 24 }: { size?: number }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="12" cy="12" r="8" stroke="#ff8e53" strokeWidth="2"/>
         <path d="M12 8V16M12 12H12.01" stroke="#ff6b6b" strokeWidth="4" strokeLinecap="round"/>
         <path d="M15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12Z" stroke="#ff6b6b" strokeWidth="2"/>
     </svg>
 );
 
-const TradeIcon = ({ size = 24, className = "" }: { size?: number, className?: string }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+const TradeIcon = ({ size = 24 }: { size?: number }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M12 20V10M18 20V4M6 20V16" stroke="#ff8e53" strokeWidth="2" strokeLinecap="round"/>
         <path d="M3 20H21" stroke="#ff6b6b" strokeWidth="2" strokeLinecap="round"/>
     </svg>
 );
 
-const ArtIcon = ({ size = 24, className = "" }: { size?: number, className?: string }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+const ArtIcon = ({ size = 24 }: { size?: number }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#ff8e53" strokeWidth="2"/>
         <circle cx="7.5" cy="11.5" r="1.5" fill="#ff6b6b"/>
         <circle cx="11.5" cy="7.5" r="1.5" fill="#ff6b6b"/>
@@ -219,8 +219,8 @@ const ArtIcon = ({ size = 24, className = "" }: { size?: number, className?: str
     </svg>
 );
 
-const SocialIcon = ({ size = 24, className = "" }: { size?: number, className?: string }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+const SocialIcon = ({ size = 24 }: { size?: number }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21" stroke="#ff8e53" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
         <circle cx="9" cy="7" r="4" stroke="#ff6b6b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
         <path d="M23 21V19C22.9993 18.1137 22.7044 17.2522 22.1614 16.5523C21.6184 15.8524 20.8581 15.3516 20 15.13" stroke="#ff8e53" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -228,24 +228,24 @@ const SocialIcon = ({ size = 24, className = "" }: { size?: number, className?: 
     </svg>
 );
 
-const DevIcon = ({ size = 24, className = "" }: { size?: number, className?: string }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+const DevIcon = ({ size = 24 }: { size?: number }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M16 18L22 12L16 6" stroke="#ff6b6b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
         <path d="M8 6L2 12L8 18" stroke="#ff6b6b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
         <path d="M13 3L11 21" stroke="#ff8e53" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
 );
 
-const SaaSIcon = ({ size = 24, className = "" }: { size?: number, className?: string }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+const SaaSIcon = ({ size = 24 }: { size?: number }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="3" y="3" width="18" height="18" rx="2" stroke="#ff8e53" strokeWidth="2"/>
         <path d="M3 9H21" stroke="#ff6b6b" strokeWidth="2"/>
         <path d="M9 3V21" stroke="#ff6b6b" strokeWidth="2"/>
     </svg>
 );
 
-const PrivacyIcon = ({ size = 24, className = "" }: { size?: number, className?: string }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+const PrivacyIcon = ({ size = 24 }: { size?: number }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M12 22C12 22 20 18 20 12V5L12 2L4 5V12C4 18 12 22 12 22Z" stroke="#ff8e53" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
         <circle cx="12" cy="11" r="3" stroke="#ff6b6b" strokeWidth="2"/>
         <path d="M12 14V17" stroke="#ff6b6b" strokeWidth="2"/>

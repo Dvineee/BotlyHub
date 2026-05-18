@@ -12,7 +12,7 @@ import {
 import LoginModal from '../components/LoginModal';
 import { useTelegram } from '../hooks/useTelegram';
 import { DatabaseService } from '../services/DatabaseService';
-import { UserBot, Channel } from '../types';
+import { UserBot } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 
 const SidebarItem = ({ icon: Icon, label, path, active, badge, color, external }: any) => (
@@ -76,7 +76,6 @@ const BotManagementPanel = () => {
   const location = useLocation();
   const { user, haptic, notification, setWebAuthUser } = useTelegram();
   const [bot, setBot] = useState<UserBot | null>(null);
-  const [selectedGroup, setSelectedGroup] = useState<Channel | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
@@ -92,19 +91,6 @@ const BotManagementPanel = () => {
     };
     fetchBot();
   }, [botId, user]);
-
-  useEffect(() => {
-    const fetchGroup = async () => {
-      if (groupId && user?.id) {
-        const channels = await DatabaseService.getChannels(user.id.toString());
-        const found = channels.find(c => c.id === groupId);
-        if (found) setSelectedGroup(found);
-      } else {
-        setSelectedGroup(null);
-      }
-    };
-    fetchGroup();
-  }, [groupId, user]);
 
   if (isLoading) {
     return (
@@ -195,18 +181,16 @@ const BotManagementPanel = () => {
             </div>
 
             {/* Current Active Item (Kaju Test) */}
-            {groupId && selectedGroup ? (
+            {groupId ? (
               <div className="space-y-1">
-                <div onClick={() => navigate(`/bot-panel/${botId}/groups`)} className="px-3 py-2 flex items-center justify-between group cursor-pointer hover:bg-white/2 transition-all rounded-lg mb-2">
+                <div className="px-3 py-2 flex items-center justify-between group cursor-pointer hover:bg-white/2 transition-all rounded-lg mb-2">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full border border-white/10 overflow-hidden shrink-0 flex items-center justify-center bg-slate-800 text-white font-bold text-xs italic">
-                       {selectedGroup.icon ? <img src={selectedGroup.icon} alt={selectedGroup.name} className="w-full h-full object-cover" /> : selectedGroup.name[0].toUpperCase()}
+                    <div className="w-10 h-10 rounded-full border border-white/10 overflow-hidden shrink-0">
+                       <img src="https://botlyhub.com/kaju-logo.png" alt="Kaju" className="w-full h-full object-cover" />
                     </div>
                     <div>
-                      <h4 className="text-[14px] font-bold text-white leading-tight uppercase tracking-tight">{selectedGroup.name}</h4>
-                      <span className="text-[12px] text-slate-500 lowercase leading-tight">
-                        {selectedGroup.telegram_id.startsWith('-') ? `ID: ${selectedGroup.telegram_id}` : `@${selectedGroup.telegram_id}`}
-                      </span>
+                      <h4 className="text-[14px] font-bold text-white leading-tight uppercase tracking-tight">KAJU TEST</h4>
+                      <span className="text-[12px] text-slate-500 lowercase leading-tight">@botlyhub</span>
                     </div>
                   </div>
                   <ChevronRight size={14} className="text-slate-600" />
@@ -342,9 +326,9 @@ const BotManagementPanel = () => {
           <Routes>
             <Route index element={<NavigateToGroups botId={botId} />} />
             <Route path="groups" element={<GroupsView />} />
-            <Route path="scheduler" element={<SchedulerView />} />
-            <Route path="commands" element={<CommandsView />} />
-            <Route path="api" element={<APIView />} />
+            <Route path="scheduler" element={<EmptyModule title="Zamanlayıcı" />} />
+            <Route path="commands" element={<EmptyModule title="Komutlar" />} />
+            <Route path="api" element={<EmptyModule title="API Yönetimi" />} />
             <Route path="bot-settings" element={<BotSettingsView bot={bot} />} />
             <Route path="billing" element={<BillingView />} />
             
@@ -391,7 +375,7 @@ const NavigateToGroups = ({ botId }: any) => {
 
 const GroupSettingsView = () => {
     const [activeTab, setActiveTab] = useState('basic'); // basic or team
-    const { groupId } = useParams();
+    const groupId = '-1003360909133'; // Prototype ID from image
 
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-5xl">
@@ -801,26 +785,7 @@ const BillingView = () => {
 const GroupsView = () => {
   const { botId } = useParams();
   const navigate = useNavigate();
-  const { haptic, user } = useTelegram();
-  const [channels, setChannels] = useState<Channel[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchChannels = async () => {
-      setLoading(true);
-      try {
-        if (user?.id) {
-          const userChannels = await DatabaseService.getChannels(user.id.toString());
-          setChannels(userChannels);
-        }
-      } catch (error) {
-        console.error("Error fetching channels:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchChannels();
-  }, [user]);
+  const { haptic } = useTelegram();
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -835,32 +800,36 @@ const GroupsView = () => {
         </button>
       </div>
 
-      {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-           {[1, 2, 3].map((i) => (
-             <div key={i} className="h-32 bg-white/5 rounded-2xl animate-pulse"></div>
-           ))}
-        </div>
-      ) : channels.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {channels.map((channel) => (
-            <GroupCard 
-              key={channel.id}
-              name={channel.name} 
-              username={channel.telegram_id.startsWith('-') ? `ID: ${channel.telegram_id}` : channel.telegram_id} 
-              members={channel.memberCount.toLocaleString()} 
-              active={channel.revenueEnabled} 
-              onClick={() => { haptic('light'); navigate(`/bot-panel/${botId}/groups/${channel.id}/settings`); }} 
-            />
-          ))}
-        </div>
-      ) : (
-        <div className="bg-[#14181f] border border-white/5 rounded-[32px] p-12 text-center mb-8">
-          <Users size={48} className="text-slate-700 mx-auto mb-4" />
-          <h3 className="text-lg font-bold text-white mb-2">Henüz Grup Yok</h3>
-          <p className="text-sm text-slate-500 max-w-sm mx-auto">Botunuzu bir gruba ekleyerek ve yönetici yetkisi vererek başlayabilirsiniz.</p>
-        </div>
-      )}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <GroupCard 
+          name="Kaju Test" 
+          username="kajugroup" 
+          members="1.2k" 
+          active={true} 
+          onClick={() => { haptic('light'); navigate(`/bot-panel/${botId}/groups/kaju-test/settings`); }} 
+        />
+        <GroupCard 
+          name="Kaju Community" 
+          username="kajucomm" 
+          members="4.8k" 
+          active={true} 
+          onClick={() => { haptic('light'); navigate(`/bot-panel/${botId}/groups/kaju-comm/settings`); }} 
+        />
+        <GroupCard 
+          name="BotlyHub Haberler" 
+          username="botlyhubnews" 
+          members="8.5k" 
+          active={true} 
+          onClick={() => { haptic('light'); navigate(`/bot-panel/${botId}/groups/botlyhub-news/settings`); }} 
+        />
+        <GroupCard 
+          name="Yeni deneme" 
+          username="veriverkin" 
+          members="7" 
+          active={false} 
+          onClick={() => { haptic('light'); navigate(`/bot-panel/${botId}/groups/test-group/settings`); }} 
+        />
+      </div>
 
       <div className="bg-orange-500/5 border border-orange-500/20 rounded-3xl p-6">
         <div className="flex items-start gap-4">
@@ -1095,407 +1064,6 @@ const UsersView = () => (
     </div>
   </div>
 );
-
-const CommandsView = () => {
-    const [searchQuery, setSearchQuery] = useState('');
-    const { haptic } = useTelegram();
-
-    const botCommands = [
-        {
-          command: "!ban",
-          description: "Grubunuzdaki üyeleri yasaklamak için mesajını alıntılayarak ya da kullanıcı adı/ID numarası kullanarak komutu yazın. Birden fazla üyeyi yasaklamak için aralarında birer boşluk bırakın.",
-          usage: "!ban (@kullanıcıadı|12345) (30d|2w|10h|2m)",
-          alternatives: ["!sban (Sessiz)"],
-          notes: "Satır sonundan sonra nedenini belirtebilirsiniz."
-        },
-        {
-          command: "!unban",
-          description: "Grubunuzdaki üyelerin yasaklamasını kaldırmak için mesajını alıntılayarak ya da kullanıcı adı/ID numarası kullanarak komutu yazın. Birden fazla üyenin yasağını kaldırmak için aralarında birer boşluk bırakın.",
-          usage: "!unban (@kullanıcıadı|12345)",
-          alternatives: ["!sunban (Sessiz)"],
-          notes: "Satır sonundan sonra nedenini belirtebilirsiniz."
-        },
-        {
-          command: "!mute",
-          description: "Grubunuzdaki üyeleri susturmak için mesajını alıntılayarak ya da kullanıcı adı/ID numarası kullanarak komutu yazın. Birden fazla üyeyi sessize almak için aralarında birer boşluk bırakın.",
-          usage: "!mute (@kullanıcıadı|12345) (30d|2w|10h|2m)",
-          alternatives: ["!smute (Sessiz)"],
-          notes: "Satır sonundan sonra nedenini belirtebilirsiniz."
-        },
-        {
-          command: "!unmute",
-          description: "Grubunuzdaki susturulmuş üyelerin kısıtlamasını kaldırmak için mesajını alıntılayarak ya da kullanıcı adı/ID numarası kullanarak komutu yazın. Birden fazla üyenin sesini açmak için aralarında birer boşluk bırakın.",
-          usage: "!unmute (@kullanıcıadı|12345)",
-          notes: "Satır sonundan sonra nedenini belirtebilirsiniz."
-        },
-        {
-          command: "!kick",
-          description: "Grubunuzdaki üyeleri atmak için mesajını alıntılayarak ya da kullanıcı adı/ID numarası kullanarak komutu yazın. Birden fazla üyeyi atmak için aralarında birer boşluk bırakın.",
-          usage: "!kick (@kullanıcıadı|12345)",
-          alternatives: ["!skick (Sessiz)"],
-          notes: "Satır sonundan sonra nedenini belirtebilirsiniz."
-        },
-        {
-          command: "!readonly",
-          description: "Sadece-okuma modunu etkinleştirin. Sadece yöneticiler mesaj gönderebilir. Beyaz listedeki üyeler de mesaj gönderemez. Sadece-okuma modunu kapatmak için komutu tekrar göndermeniz yeterli.",
-          usage: "!readonly (30d|2w|10h|2m)",
-          alternatives: ["!ro", "!channelmode"]
-        },
-        {
-          command: "!warn",
-          description: "Gruptaki bir üyeyi uyarmak için alıntılayarak komutu kullanın. Uyarı sayısı 3’e (varsayılan) ulaştığında, üye gruptan yasaklanır (varsayılan).",
-          usage: "!warn (miktar=1) (neden=Yok)",
-          alternatives: ["!w"]
-        },
-        {
-          command: "!acquit",
-          description: "Bir üyenin, uyarı geçmişini temizlemek için mesajını alıntılayarak komutu yazmanız yeterli.",
-          usage: "!acquit (miktar=1) (neden=Yok)",
-          alternatives: ["!unwarn"]
-        },
-        {
-          command: "!unrestrict",
-          description: "Kısıtlanmış üyelerin tüm kısıtlamalarını kaldırıp, susturmasını açmak için mesajını alıntılayarak ya da kullanıcı adı/ID numarası kullanarak komutu yazın. Birden fazla üyenin sesini açmak için aralarında birer boşluk bırakın.",
-          usage: "!unrestrict (@kullanıcıadı|12345)",
-          alternatives: ["!un"]
-        },
-        {
-          command: "!status",
-          description: "Bir üye hakkında genel bir durum raporu görmek için mesajını alıntılayarak komutu kullanın.",
-          usage: "!status"
-        },
-        {
-          command: "!purge",
-          description: "Bir mesajı alıntılayarak komutu kullanın. Alıntıladığınız mesajdan güncel sohbete kadar bütün mesajlar silinir. Dikkatli kullanın.",
-          usage: "!purge"
-        },
-        {
-          command: "!d",
-          description: "Bir mesajı alıntılayarak süre belirleyin. Süre sonunda mesaj otomatik silinecektir. Maksimum süre 46 saattir çünkü botlar 48 saatten daha eski mesajları silemez.",
-          usage: "!d (10h|2m)",
-          alternatives: ["!sd (Sessiz)"]
-        },
-        {
-          command: "!log",
-          description: "Mevcut grubun, günlük kayıtlarının adresini gönderir.",
-          usage: "!log"
-        },
-        {
-          command: "!mod",
-          description: "Mevcut grubun, yönetim adresini gönderir.",
-          usage: "!mod"
-        },
-        {
-          command: "!cp",
-          description: "Mevcut grubun, kontrol paneli adresini gönderir.",
-          usage: "!cp",
-          alternatives: ["!cfg"]
-        },
-        {
-          command: "!pinforever",
-          description: "Bir mesajı sürekli sabitte tutmak için mesajı alıntılayarak komutu gönderin. Başka bir mesajın sabitlenmesi durumda, Combot seçtiğin mesajı tekrar sabite alacaktır. Devredışı bırakmak için alıntılamadan komutu tekrar gönderin.",
-          usage: "!pinforever",
-          alternatives: ["!pin"]
-        },
-        {
-          command: "!wtl_add",
-          description: "Herhangi bir üyeyi beyaz listeye eklemek için mesajını alıntılayıp komutu kullanın.",
-          usage: "!wtl_add",
-          alternatives: ["!wl_add", "!add_wtl", "!add_wl"]
-        },
-        {
-          command: "!wtl_del",
-          description: "Bir üyeyi beyaz listeden çıkarmak için mesajını alıntılayıp komutu gönderin.",
-          usage: "!wtl_del",
-          alternatives: ["!wl_del", "!del_wtl", "!del_wl"]
-        },
-        {
-          command: "!reload_admins",
-          description: "Yöneticiler listesini yeniler.",
-          usage: "!reload_admins",
-          alternatives: ["!r", "!reload"]
-        },
-        {
-          command: "!cdoctor",
-          description: "Combot’un, grubunuzdaki yetkilerini gösterir.",
-          usage: "!cdoctor"
-        },
-        {
-          command: "!setrank",
-          description: "Bir grup üyesini belirlenmiş bir rütbeye atamak için kullanılır. Seviye & XP sistemi etkin olmalıdır.",
-          usage: "!setrank (rank)",
-        },
-        {
-          command: "!c",
-          description: "Gerçek zamanlı kripto para piyasası verilerini gösterir. CoinMarketCap tarafından desteklenmektedir. Ücretsiz hesaplar için kullanılabilir değildir.",
-          usage: "!c (kriptopara) (kriptopara)"
-        },
-        {
-          command: "!nokeyboard",
-          description: "Sohbette bulunan aktif klavyeleri kaldırır.",
-          usage: "!nokeyboard"
-        },
-        {
-          command: "!report",
-          description: "Bir mesajı yöneticilere bildirmek için alıntılayarak komutu yazın. Rapor sistemi açık olmalıdır.",
-          usage: "!report",
-          alternatives: ["!sreport (Sessiz)"]
-        },
-        {
-          command: "!toprep",
-          description: "En iyi kullanıcıları (varsayılan 10), itibar puanlarına göre sıralanmış olarak gösterir. İtibar sistemi etkin olmalıdır. Maksimum gösterme sınırı 50.",
-          usage: "!toprep (miktar=10)"
-        },
-        {
-          command: "!bottomrep",
-          description: "En kötü kullanıcıları (varsayılan 10), itibar puanlarına göre, sıralayarak gösterir. İtibar sistemi etkin olmalı. Maksimum gösterme sınırı 50.",
-          usage: "!bottomrep (miktar=10)"
-        },
-        {
-          command: "!toplvl",
-          description: "En üst rütbeli kullanıcıları (varsayılan 10), düzeylerine göre sıralanmış olarak gösterir. Seviyeler & XP sistemi etkin olmalıdır. Maksimum gösterme sınırı 43.",
-          usage: "!toplvl (miktar=10)"
-        },
-        {
-          command: "!me",
-          description: "Mevcut itibar ve seviyenizi gösterir. Seviye & XP sistemi veya itibar sistemi etkinleştirilmelidir.",
-          usage: "!me"
-        },
-        {
-          command: "!online",
-          description: "Combot özel kanaldan, grubunuza bir mesaj iletir. Gönderiyi kaç üyenin gördüğünü görmek için görünüm sayacını kontrol edebilirsiniz.",
-          usage: "!online"
-        }
-    ];
-
-    const filteredCommands = botCommands.filter(cmd => 
-        cmd.command.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        cmd.description.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
-    return (
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-                <div>
-                   <h1 className="text-2xl font-black text-white italic uppercase tracking-tighter mb-1">Bot Komutları</h1>
-                   <p className="text-sm text-slate-500 font-medium">Botunuzda kullanabileceğiniz aktif komutlar ve açıklamaları.</p>
-                </div>
-                <div className="relative">
-                    <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
-                    <input 
-                        type="text" 
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Komut ara..." 
-                        className="bg-[#14181f] border border-white/5 rounded-2xl pl-10 pr-4 h-12 text-sm text-white outline-none focus:border-blue-500/30 w-full md:w-64 transition-all" 
-                    />
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-4 mb-12">
-                {filteredCommands.length > 0 ? (
-                    filteredCommands.map((cmd) => (
-                        <div key={cmd.command} className="bg-[#14181f] border border-white/5 rounded-[24px] p-6 hover:border-blue-500/20 transition-all group">
-                            <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6">
-                                <div className="flex-1">
-                                    <div className="flex items-center gap-3 mb-3">
-                                        <div className="bg-blue-600/10 text-blue-500 px-3 py-1 rounded-xl text-sm font-black italic">
-                                            {cmd.command}
-                                        </div>
-                                        {cmd.alternatives?.map(alt => (
-                                            <span key={alt} className="text-[10px] font-bold text-slate-600 uppercase tracking-widest border border-white/5 px-2 py-0.5 rounded-lg">
-                                                {alt}
-                                            </span>
-                                        ))}
-                                    </div>
-                                    <p className="text-sm text-slate-300 font-medium leading-relaxed mb-4">
-                                        {cmd.description}
-                                    </p>
-                                    {cmd.notes && (
-                                        <div className="flex items-center gap-2 text-amber-500/70 text-[11px] font-bold italic mb-4">
-                                            <Info size={14} />
-                                            {cmd.notes}
-                                        </div>
-                                    )}
-                                    <div className="bg-[#0f1218] rounded-xl p-4 border border-white/2">
-                                        <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest block mb-2">Kullanımı:</span>
-                                        <code className="text-blue-400 font-mono text-sm break-all">{cmd.usage}</code>
-                                    </div>
-                                </div>
-                                <div className="hidden lg:block shrink-0">
-                                    <button 
-                                        onClick={() => {
-                                            haptic('light');
-                                            navigator.clipboard.writeText(cmd.command);
-                                        }}
-                                        className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-slate-500 hover:text-white hover:bg-white/10 transition-all opacity-0 group-hover:opacity-100"
-                                        title="Komutu Kopyala"
-                                    >
-                                        <Terminal size={20} />
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    ))
-                ) : (
-                    <div className="py-20 text-center border border-dashed border-white/5 rounded-[40px]">
-                        <Search size={48} className="text-slate-800 mx-auto mb-4" />
-                        <h3 className="text-lg font-bold text-white mb-1 tracking-tight italic">Bulunamadı</h3>
-                        <p className="text-sm text-slate-600 font-medium italic italic">"{searchQuery}" aramasıyla eşleşen komut bulunamadı.</p>
-                    </div>
-                )}
-            </div>
-        </div>
-    );
-};
-
-const SchedulerView = () => {
-    const { haptic } = useTelegram();
-    const [tasks, setTasks] = useState([
-        { id: 1, title: 'Hoşgeldin Mesajı', channel: 'Kaju Community', time: 'Her gün 09:00', active: true },
-        { id: 2, title: 'Haftalık Rapor', channel: 'Kaju Test', time: 'Pazartesi 10:00', active: false },
-    ]);
-
-    return (
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex items-center justify-between mb-8">
-                <div>
-                    <h1 className="text-2xl font-black text-white italic uppercase tracking-tighter mb-1">Zamanlayıcı</h1>
-                    <p className="text-sm text-slate-500 font-medium">Belirli zamanlarda otomatik mesajlar veya görevler planlayın.</p>
-                </div>
-                <button className="h-12 px-6 flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-500/20">
-                    <Plus size={16} />
-                    Yeni Görev Planla
-                </button>
-            </div>
-
-            <div className="grid grid-cols-1 gap-4">
-                {tasks.map(task => (
-                    <div key={task.id} className="bg-[#14181f] border border-white/5 rounded-[24px] p-6 flex items-center justify-between group">
-                        <div className="flex items-center gap-6">
-                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${task.active ? 'bg-blue-600/10 text-blue-500' : 'bg-slate-800 text-slate-500'}`}>
-                                <Calendar size={24} />
-                            </div>
-                            <div>
-                                <h4 className="text-sm font-bold text-white mb-1 uppercase tracking-tight">{task.title}</h4>
-                                <div className="flex items-center gap-3">
-                                    <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{task.channel}</span>
-                                    <span className="text-slate-800">|</span>
-                                    <span className="text-[10px] text-blue-500 font-bold uppercase tracking-widest">{task.time}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <label className="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" checked={task.active} className="sr-only peer" onChange={() => {}} />
-                                <div className="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                            </label>
-                            <button className="p-2 text-slate-600 hover:text-white transition-colors">
-                                <Settings size={18} />
-                            </button>
-                        </div>
-                    </div>
-                ))}
-            </div>
-            
-            <div className="mt-8 bg-blue-500/5 border border-blue-500/10 rounded-[32px] p-8 text-center">
-                <Lightbulb size={32} className="text-blue-500 mx-auto mb-4" />
-                <h4 className="text-sm font-bold text-white mb-2 italic uppercase tracking-widest">İpucu</h4>
-                <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
-                    Zamanlanmış mesajlar için Markdown desteği mevcuttur. Mesajlarınıza butonlar veya medya ekleyebilirsiniz.
-                </p>
-            </div>
-        </div>
-    );
-};
-
-const APIView = () => {
-    const { haptic } = useTelegram();
-    const [apiKey, setApiKey] = useState('cb_live_kh892jx92j92j92j92j92j92j92j92j');
-    const [showKey, setShowKey] = useState(false);
-
-    return (
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="mb-8">
-                <h1 className="text-2xl font-black text-white italic uppercase tracking-tighter mb-1">API Yönetimi</h1>
-                <p className="text-sm text-slate-500 font-medium">Harici entegrasyonlar için API anahtarlarınızı yönetin.</p>
-            </div>
-
-            <div className="bg-[#14181f] border border-white/5 rounded-[40px] p-10 mb-8">
-                <div className="flex items-center gap-3 mb-8">
-                    <div className="w-10 h-10 rounded-2xl bg-blue-600/10 flex items-center justify-center">
-                        <Code size={20} className="text-blue-500" />
-                    </div>
-                    <h3 className="text-lg font-black text-white italic uppercase tracking-tighter">Canlı API Anahtarı</h3>
-                </div>
-
-                <div className="space-y-6">
-                    <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">API KEY</label>
-                        <div className="relative group">
-                            <input 
-                                type={showKey ? "text" : "password"} 
-                                value={apiKey} 
-                                readOnly
-                                className="w-full bg-[#0f1218] border border-white/5 rounded-2xl px-6 h-14 text-sm text-blue-400 font-mono outline-none"
-                            />
-                            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                                <button 
-                                    onClick={() => setShowKey(!showKey)}
-                                    className="p-2 text-slate-500 hover:text-white transition-colors"
-                                >
-                                    {showKey ? <X size={18} /> : <List size={18} />}
-                                </button>
-                                <button 
-                                    onClick={() => {
-                                        haptic('medium');
-                                        navigator.clipboard.writeText(apiKey);
-                                    }}
-                                    className="h-10 px-4 bg-white/5 hover:bg-white/10 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
-                                >
-                                    Kopyala
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-4 pt-4">
-                        <button className="h-12 px-6 bg-red-600/10 hover:bg-red-600/20 text-red-500 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all border border-red-500/20">
-                            Yeni Anahtar Oluştur
-                        </button>
-                        <button className="h-12 px-6 bg-white/5 hover:bg-white/10 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all border border-white/5">
-                            Web Hook Ayarları
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div className="bg-[#14181f] border border-white/5 rounded-[40px] p-10">
-                <div className="flex items-center gap-3 mb-8">
-                    <div className="w-10 h-10 rounded-2xl bg-emerald-600/10 flex items-center justify-center">
-                        <Globe size={20} className="text-emerald-500" />
-                    </div>
-                    <h3 className="text-lg font-black text-white italic uppercase tracking-tighter">İstatistikler</h3>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-mono text-[10px]">
-                    <div className="p-6 bg-[#0f1218] rounded-2xl border border-white/2">
-                        <span className="text-slate-600 block mb-1">DÜNKÜ İSTEKLER</span>
-                        <span className="text-white font-bold">142</span>
-                    </div>
-                    <div className="p-6 bg-[#0f1218] rounded-2xl border border-white/2">
-                        <span className="text-slate-600 block mb-1">BU AYKİ İSTEKLER</span>
-                        <span className="text-white font-bold">4,124</span>
-                    </div>
-                    <div className="p-6 bg-[#0f1218] rounded-2xl border border-white/2">
-                        <span className="text-slate-600 block mb-1">ORTALAMA GECİKME</span>
-                        <span className="text-emerald-500 font-bold">18ms</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
 
 const EmptyModule = ({ title }: { title?: string }) => (
   <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in">
