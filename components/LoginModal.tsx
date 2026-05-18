@@ -34,17 +34,28 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onAuth }) => {
     }
   ];
 
+  const getApiUrl = (path: string) => {
+    const baseUrl = import.meta.env.VITE_API_URL || '';
+    return `${baseUrl}${path}`;
+  };
+
   const handleRequestCode = async () => {
     if (!identifier) return;
     setIsLoading(true);
     setError('');
     try {
-        const res = await fetch('/api/auth/telegram/request-code', {
+        const res = await fetch(getApiUrl('/api/auth/telegram/request-code'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ identifier: identifier.trim() })
         });
         
+        // Handle non-JSON responses (like Vercel 404s)
+        const contentType = res.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Sunucu doğru formatta yanıt vermedi (JSON bekleniyordu). Lütfen API URL ayarlarını kontrol edin.');
+        }
+
         const data = await res.json();
         
         if (res.ok) {
@@ -58,7 +69,11 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onAuth }) => {
         }
     } catch (err: any) {
         console.error("Auth Request Error:", err);
-        setError('Sunucu bağlantısı başarısız. Lütfen internet bağlantınızı kontrol edin.');
+        if (err.message?.includes('formatta')) {
+            setError(err.message);
+        } else {
+            setError('Sunucu bağlantısı başarısız. API sunucusuna ulaşılamıyor. Lütfen internet bağlantınızı veya API URL ayarınızı kontrol edin.');
+        }
     } finally {
         setIsLoading(false);
     }
@@ -69,11 +84,17 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onAuth }) => {
     setIsLoading(true);
     setError('');
     try {
-        const res = await fetch('/api/auth/telegram/verify-code', {
+        const res = await fetch(getApiUrl('/api/auth/telegram/verify-code'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ identifier, code })
         });
+
+        const contentType = res.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Sunucu doğru formatta yanıt vermedi.');
+        }
+
         const data = await res.json();
         if (res.ok) {
             onAuth(data.user);
@@ -85,8 +106,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onAuth }) => {
         } else {
             setError(data.error || 'Geçersiz kod');
         }
-    } catch (err) {
-        setError('Doğrulama başarısız');
+    } catch (err: any) {
+        setError(err.message || 'Doğrulama başarısız');
     } finally {
         setIsLoading(false);
     }
