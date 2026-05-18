@@ -387,7 +387,6 @@ const AddProjectBanner: React.FC<{ className?: string }> = ({ className = "" }) 
 };
 
 const NavMenu = ({ 
-    isScrolled, 
     user, 
     unreadCount, 
     theme, 
@@ -400,7 +399,6 @@ const NavMenu = ({
     isLoginModalOpen,
     menuRef: parentMenuRef
 }: { 
-    isScrolled: boolean, 
     user: any, 
     unreadCount: number, 
     theme: string, 
@@ -418,6 +416,7 @@ const NavMenu = ({
     const [openMenu, setOpenMenu] = useState<'kesfet' | 'investors' | null>(null);
     const [navState, setNavState] = useState<'main' | 'bots' | 'apps'>('main');
     const [mobileModal, setMobileModal] = useState<'kesfet' | 'investors' | null>(null);
+    const [searchQuery, setSearchQuery] = useState('');
     const internalMenuRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -430,6 +429,17 @@ const NavMenu = ({
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (searchQuery.trim()) {
+            haptic('light');
+            navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+            setOpenMenu(null);
+            setMobileModal(null);
+            setNavState('main');
+        }
+    };
 
     const botsCategories = categories.filter(c => c.id !== 'apps' && c.id !== 'all');
     const appsCategories = appsSubCategories;
@@ -633,102 +643,111 @@ const NavMenu = ({
 
     return (
         <>
-        <div className="sticky top-0 z-[1] bg-white dark:bg-slate-900 border-b border-[#f7f7f7] dark:border-white/5 w-full py-2.5 md:pb-2 transition-colors" ref={internalMenuRef}>
-            <div className="max-w-7xl mx-auto px-5 sm:px-8 flex items-center justify-between">
+        <div className="sticky top-0 z-[120] bg-white dark:bg-slate-900 border-b border-[#f7f7f7] dark:border-white/5 w-full py-2.5 md:pb-2 transition-colors" ref={internalMenuRef}>
+            <div className="max-w-7xl mx-auto px-5 sm:px-8 flex items-center justify-between gap-4">
                 {/* Left Section (Logo) */}
-                <div className="hidden md:flex items-center w-48 shrink-0">
-                    {isScrolled ? (
-                        <Logo onClick={() => navigate('/')} className="cursor-pointer" />
-                    ) : null}
+                <div className="flex items-center w-auto shrink-0">
+                    <Logo onClick={() => navigate('/')} className="cursor-pointer" />
                 </div>
 
-                {/* Center Section (Navigation) */}
-                <div className="flex items-center justify-center gap-8 md:gap-14 flex-1">
-                    {/* Discover (Keşfet) */}
-                    <div 
-                        className="relative md:static"
-                        onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('kesfet'); }}
-                    >
-                        <button 
-                            onClick={() => {
-                                if (window.innerWidth < 768) {
-                                    haptic('light');
-                                    setMobileModal('kesfet');
-                                } else {
-                                    setOpenMenu(openMenu === 'kesfet' ? null : 'kesfet');
-                                }
-                            }}
-                            className={`nav-menu-item grow-0 ${openMenu === 'kesfet' ? 'text-slate-900 dark:text-white bg-blue-500/5' : 'text-slate-600 dark:text-slate-400 hover:bg-blue-500/5'}`}
-                        >
-                            Keşfet <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'kesfet' ? 'rotate-180' : ''}`} />
-                        </button>
-                    </div>
-
-                    {/* Investors (Yatırımcılar) */}
-                    <div 
-                        className="relative md:static"
-                        onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('investors'); }}
-                    >
-                        <button 
-                            onClick={() => {
-                                if (window.innerWidth < 768) {
-                                    haptic('light');
-                                    setMobileModal('investors');
-                                } else {
-                                    setOpenMenu(openMenu === 'investors' ? null : 'investors');
-                                }
-                            }}
-                            className={`nav-menu-item grow-0 ${openMenu === 'investors' ? 'text-slate-900 dark:text-white bg-emerald-500/5' : 'text-slate-600 dark:text-slate-400 hover:bg-emerald-500/5'}`}
-                        >
-                            Yatırımcılar <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'investors' ? 'rotate-180' : ''}`} />
-                        </button>
-                    </div>
-
-                    {/* Blog Link */}
+                {/* Mobile Search Button */}
+                <div className="flex lg:hidden items-center gap-2">
                     <button 
-                        onClick={() => { haptic('light'); navigate('/blog'); }}
-                        className="nav-menu-item text-slate-600 dark:text-slate-400 hover:bg-blue-500/5"
+                        onClick={() => { haptic('light'); navigate('/search'); }}
+                        className="w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-xl text-slate-500 active:scale-95 transition-all"
                     >
-                        {t('blog_title')}
+                        <Search size={18} />
                     </button>
                 </div>
 
-                {/* Profile Section */}
-                <div className="hidden md:flex items-center justify-end w-48 shrink-0">
-                    <AnimatePresence mode="wait">
-                        {isScrolled && (
-                            <motion.div 
-                                key="scrolled-actions"
-                                initial={{ opacity: 0, x: 10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: 10 }}
-                                transition={{ duration: 0.2 }}
-                                className="flex items-center gap-2 md:gap-3"
+                {/* Center Section (Navigation & Search) */}
+                <div className="hidden lg:flex items-center justify-center gap-6 flex-1">
+                    <div className="flex items-center gap-4">
+                        {/* Discover (Keşfet) */}
+                        <div 
+                            className="relative md:static"
+                            onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('kesfet'); }}
+                        >
+                            <button 
+                                onClick={() => {
+                                    if (window.innerWidth < 768) {
+                                        haptic('light');
+                                        setMobileModal('kesfet');
+                                    } else {
+                                        setOpenMenu(openMenu === 'kesfet' ? null : 'kesfet');
+                                    }
+                                }}
+                                className={`nav-menu-item grow-0 ${openMenu === 'kesfet' ? 'text-slate-900 dark:text-white bg-black/5 dark:bg-white/10' : 'text-slate-600 dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/10'}`}
                             >
-                                <button 
-                                    onClick={() => { haptic('light'); toggleTheme(); }} 
-                                    className="nav-menu-item min-w-[33px] px-2 flex items-center justify-center bg-transparent hover:bg-slate-100/50 dark:hover:bg-white/5 border border-black/5 dark:border-white/5 rounded-[10px] text-slate-900 dark:text-white active:scale-95 transition-all outline-none"
-                                >
-                                    {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
-                                </button>
+                                Keşfet <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'kesfet' ? 'rotate-180' : ''}`} />
+                            </button>
+                        </div>
 
-                                {user ? (
-                                    <>
-                                        <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="nav-menu-item w-[33px] !px-0 flex items-center justify-center bg-transparent hover:bg-slate-100/50 dark:hover:bg-white/5 border border-black/5 dark:border-white/5 rounded-[10px] text-slate-900 dark:text-white active:scale-95 transition-all">
-                                            <Wallet size={17} />
-                                        </button>
-                                        <div className="relative" ref={parentMenuRef}>
-                                            <button 
-                                              onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
-                                              className={`w-10 h-10 flex items-center justify-center border border-black/5 dark:border-white/5 text-slate-900 dark:text-white active:scale-95 transition-all relative rounded-xl shadow-sm ${isMenuOpen ? 'bg-slate-100 dark:bg-white/15' : 'bg-white/40 dark:bg-slate-900/40 hover:bg-white/60 dark:hover:bg-slate-800/60'}`}
-                                            >
-                                                <Settings size={18} strokeWidth={2.5} />
-                                                {unreadCount > 0 && (
-                                                    <div className="absolute -top-1 -right-1 min-w-[17px] h-[17px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[8px] font-black text-white flex items-center justify-center">
-                                                        {unreadCount > 9 ? '9+' : unreadCount}
-                                                    </div>
-                                                )}
-                                            </button>
+                        {/* Investors (Yatırımcılar) */}
+                        <div 
+                            className="relative md:static"
+                            onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('investors'); }}
+                        >
+                            <button 
+                                onClick={() => {
+                                    if (window.innerWidth < 768) {
+                                        haptic('light');
+                                        setMobileModal('investors');
+                                    } else {
+                                        setOpenMenu(openMenu === 'investors' ? null : 'investors');
+                                    }
+                                }}
+                                className={`nav-menu-item grow-0 ${openMenu === 'investors' ? 'text-slate-900 dark:text-white bg-black/5 dark:bg-white/10' : 'text-slate-600 dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/10'}`}
+                            >
+                                Yatırımcılar <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'investors' ? 'rotate-180' : ''}`} />
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Search Bar */}
+                    <form onSubmit={handleSearch} className="flex-1 max-w-md">
+                        <div className="relative flex items-center bg-slate-50 dark:bg-slate-800/50 border border-black/5 dark:border-white/10 rounded-xl p-1 group transition-all duration-300 shadow-sm">
+                            <Search size={16} className="ml-3 text-slate-400 group-focus-within:text-slate-900 dark:group-focus-within:text-white" />
+                            <input 
+                                type="text"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder={t('search_placeholder')}
+                                className="w-full bg-transparent border-none focus:ring-0 text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 text-slate-700 dark:text-slate-200"
+                            />
+                            <div className="pr-1">
+                                <FilterMenu />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                {/* Profile Section */}
+                <div className="flex items-center justify-end w-auto shrink-0 gap-2 md:gap-3">
+                    <button 
+                        onClick={() => { haptic('light'); toggleTheme(); }} 
+                        className="w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-white/10 border border-black/5 dark:border-white/10 rounded-xl text-slate-900 dark:text-white active:scale-95 transition-all outline-none shadow-sm"
+                    >
+                        {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                    </button>
+
+                    {user ? (
+                        <>
+                            <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-white/10 border border-black/5 dark:border-white/10 rounded-xl text-slate-900 dark:text-white active:scale-95 transition-all shadow-sm shrink-0">
+                                <Wallet size={20} />
+                            </button>
+                            <div className="relative shrink-0" ref={parentMenuRef}>
+                                <button 
+                                  onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
+                                  className={`w-10 h-10 flex items-center justify-center border border-black/5 dark:border-white/5 text-slate-900 dark:text-white active:scale-95 transition-all relative rounded-xl shadow-sm shrink-0 ${isMenuOpen ? 'bg-slate-100 dark:bg-white/15' : 'bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100/80 dark:hover:bg-white/10'}`}
+                                >
+                                    <Settings size={18} strokeWidth={2.5} />
+                                    {unreadCount > 0 && (
+                                        <div className="absolute -top-1 -right-1 min-w-[17px] h-[17px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[8px] font-black text-white flex items-center justify-center">
+                                            {unreadCount > 9 ? '9+' : unreadCount}
+                                        </div>
+                                    )}
+                                </button>
                                             {isMenuOpen && (
                                                 <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-white/5 rounded-2xl shadow-2xl p-2 z-[100] animate-in fade-in zoom-in-95 duration-200 backdrop-blur-xl">
                                                     {/* User Profile Header */}
@@ -747,6 +766,7 @@ const NavMenu = ({
                                                     </div>
 
                                                     {[
+                                                        { path: '/bot-management-panel', icon: LayoutGrid, label: 'Yönetim Paneli', raw: true },
                                                         { path: '/', icon: Store, label: 'market' },
                                                         { path: '/settings', icon: User, label: 'profile' },
                                                         { path: '/my-bots', icon: BotIcon, label: 'my_bots' },
@@ -756,7 +776,7 @@ const NavMenu = ({
                                                         <button key={i} onClick={() => { navigate(item.path); setIsMenuOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
                                                             <div className="flex items-center gap-3">
                                                                 <item.icon size={18} className="group-hover:text-slate-900 dark:group-hover:text-white transition-colors" /> 
-                                                                <span className="text-xs font-bold uppercase tracking-tight">{t(item.label)}</span>
+                                                                <span className="text-xs font-bold uppercase tracking-tight">{item.raw ? item.label : t(item.label)}</span>
                                                             </div>
                                                             {item.badge && <div className="w-2 h-2 bg-red-500 rounded-full"></div>}
                                                         </button>
@@ -790,9 +810,6 @@ const NavMenu = ({
                                         {t('home_login')}
                                     </button>
                                 )}
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
                 </div>
             </div>
 
@@ -862,7 +879,7 @@ const NavMenu = ({
                                                 }}
                                                 className="w-full flex items-center gap-4 p-4 hover:bg-slate-50 dark:hover:bg-white/5 active:bg-slate-100 dark:active:bg-white/10 transition-all rounded-2xl border border-black/5 dark:border-white/5 group mobile-menu-item"
                                             >
-                                                <div className={`mobile-menu-icon-container flex items-center justify-center rounded-xl shrink-0 ${mobileModal === 'kesfet' ? 'text-blue-500' : 'text-emerald-500'}`}>
+                                                <div className="mobile-menu-icon-container flex items-center justify-center rounded-xl shrink-0 text-slate-400 dark:text-slate-500 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
                                                     <item.icon size={22} />
                                                 </div>
                                                 <div className="flex flex-col items-start min-w-0">
@@ -1101,113 +1118,29 @@ const Home = () => {
           title={t('home_seo_title')} 
           description={t('home_seo_desc')}
       />
+
+      <NavMenu 
+          user={user}
+          unreadCount={unreadCount}
+          theme={theme}
+          toggleTheme={toggleTheme}
+          haptic={haptic}
+          isMenuOpen={isMenuOpen}
+          setIsMenuOpen={setIsMenuOpen}
+          setIsLoginModalOpen={setIsLoginModalOpen}
+          setWebAuthUser={setWebAuthUser}
+          isLoginModalOpen={isLoginModalOpen}
+          menuRef={menuRef}
+      />
+
       {/* Top Background Wrapper */}
       <div className="bg-[#00000008] dark:bg-slate-900/10">
-        {/* Top Section */}
-        <div className="w-full pt-6 md:pt-10 pb-4 shadow-[inset_0_-1px_0_0_rgba(0,0,0,0.03)] relative z-[120]">
+        {/* Top Section Padding */}
+        <div className="w-full pt-2 relative z-[1]">
           <div className="max-w-7xl mx-auto px-5 sm:px-8">
-              <div className="flex flex-wrap md:flex-nowrap items-center justify-between mb-8 px-1 gap-y-6 md:gap-x-6">
-                <div className="flex items-center order-1 md:w-48 shrink-0">
-                    <Logo onClick={() => navigate('/')} className="cursor-pointer" />
-                </div>
-
-                  <div className="w-full md:flex-1 md:max-w-2xl order-3 md:order-2 flex items-center gap-2 md:gap-3">
-                      <div className="flex-1 md:w-[330px] md:flex-none relative z-[100]">
-                          <div className="relative flex items-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl p-0.5 md:p-1 group custom-search-outline shadow-sm">
-                              <div 
-                                onClick={() => navigate('/search')} 
-                                className="flex items-center flex-1 min-w-0 cursor-pointer active:scale-[0.98] transition-transform"
-                              >
-                                  <div className="ml-2 md:ml-3 w-8 h-8 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors shrink-0">
-                                      <Search size={18} />
-                                  </div>
-                                  <div className="w-full py-2 px-3 text-[13px] text-slate-400 font-bold uppercase tracking-widest opacity-60 truncate min-w-0">
-                                      {t('search_placeholder')}
-                                  </div>
-                              </div>
-                              <div className="flex items-center gap-0.5 pr-1 shrink-0 ml-auto border-l border-black/[0.05] dark:border-white/[0.05] pl-1 relative z-[110]">
-                                  <FilterMenu />
-                              </div>
-                          </div>
-                      </div>
-                      <RouterLink 
-                          to="/settings"
-                          onClick={() => haptic('light')}
-                          className="hidden md:flex items-center gap-1 text-[13px] font-bold text-blue-500 hover:underline transition-all"
-                      >
-                          <Plus size={14} />
-                          <span style={{ fontWeight: 700 }}>{t('add_your')}</span>
-                      </RouterLink>
-                  </div>
-
-                  <div className="flex items-center gap-2 md:gap-3 order-2 md:order-3 md:w-48 justify-end ml-auto shrink-0">
-                      <button 
-                          onClick={() => { haptic('light'); toggleTheme(); }} 
-                          className="w-10 h-10 flex items-center justify-center text-slate-900 dark:text-white active:scale-95 transition-transform"
-                      >
-                          {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-                      </button>
-
-                      {user ? (
-                          <>
-                              <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="hidden sm:flex w-10 h-10 items-center justify-center text-slate-900 dark:text-white active:scale-95 transition-transform">
-                                  <Wallet size={20} />
-                              </button>
-                              <div className="relative" ref={menuRef}>
-                                  <button 
-                                    onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
-                                    className="w-10 h-10 flex items-center justify-center text-slate-900 dark:text-white active:scale-95 transition-transform relative"
-                                  >
-                                      <Menu size={22} strokeWidth={2.5} />
-                                      {unreadCount > 0 && (
-                                          <div className="absolute -top-1 -right-1 min-w-[20px] h-[20px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[9px] font-black text-white flex items-center justify-center px-1 badge-pop">
-                                              {unreadCount > 9 ? '9+' : unreadCount}
-                                          </div>
-                                      )}
-                                  </button>
-                                  {isMenuOpen && (
-                                      <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden z-[100] animate-in py-2 backdrop-blur-2xl">
-                                          {[
-                                              { path: '/', icon: Store, color: 'text-blue-500 dark:text-blue-400', label: 'market' },
-                                              { path: '/settings', icon: User, color: 'text-purple-500 dark:text-purple-400', label: 'profile' },
-                                              { path: '/my-bots', icon: BotIcon, color: 'text-emerald-500 dark:text-emerald-400', label: 'my_bots' },
-                                              { path: '/channels', icon: Megaphone, color: 'text-orange-500 dark:text-orange-400', label: 'my_channels' },
-                                              { path: '/notifications', icon: Bell, color: 'text-blue-600 dark:text-blue-500', label: 'notifications', badge: unreadCount > 0 }
-                                          ].map((item, i) => (
-                                              <button key={i} onClick={() => { navigate(item.path); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-black/5 dark:hover:bg-white/5 text-left border-b border-black/5 dark:border-white/5 last:border-0 relative">
-                                                  <item.icon size={18} className={item.color} /> 
-                                                  <span className="text-[11px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300">{t(item.label)}</span>
-                                                  {item.badge && <div className="absolute right-6 w-2.5 h-2.5 bg-red-600 rounded-full"></div>}
-                                              </button>
-                                          ))}
-                                          <button 
-                                               onClick={() => { haptic('medium'); setWebAuthUser(null); setIsMenuOpen(false); }} 
-                                               className="w-full flex items-center gap-4 px-6 py-4 hover:bg-black/5 dark:hover:bg-white/5 text-left text-red-500 dark:text-red-400 font-bold"
-                                           >
-                                               <LogOut size={18} /> 
-                                               <span className="text-[11px] font-black uppercase tracking-tight">{t('logout')}</span>
-                                           </button>
-                                      </div>
-                                  )}
-                              </div>
-                          </>
-                      ) : (
-                          <button 
-                              onClick={() => { haptic('light'); setIsLoginModalOpen(true); }}
-                              className="px-5 h-10 bg-blue-500 hover:bg-blue-600 text-white text-[13px] font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center whitespace-nowrap shadow-lg shadow-blue-500/25"
-                          >
-                              {t('login')}
-                          </button>
-                      )}
-                      <LoginModal 
-                          isOpen={isLoginModalOpen} 
-                          onClose={() => setIsLoginModalOpen(false)} 
-                          onAuth={(user) => setWebAuthUser(user)} 
-                      />
-                  </div>
-              </div>
+              {/* Optional spacer or breadcrumbs could go here */}
           </div>
-      </div>
+        </div>
         {isLoading ? (
             <div className="flex flex-col items-center justify-center py-24 gap-4"><Loader2 className="animate-spin text-blue-500" size={32} /></div>
         ) : (
@@ -1230,20 +1163,11 @@ const Home = () => {
       </div>
 
       {!isLoading && (
-        <NavMenu 
-            isScrolled={isScrolled}
-            user={user}
-            unreadCount={unreadCount}
-            theme={theme}
-            toggleTheme={toggleTheme}
-            haptic={haptic}
-            isMenuOpen={isMenuOpen}
-            setIsMenuOpen={setIsMenuOpen}
-            setIsLoginModalOpen={setIsLoginModalOpen}
-            setWebAuthUser={setWebAuthUser}
-            isLoginModalOpen={isLoginModalOpen}
-            menuRef={menuRef}
-        />
+          <LoginModal 
+              isOpen={isLoginModalOpen} 
+              onClose={() => setIsLoginModalOpen(false)} 
+              onAuth={(user) => setWebAuthUser(user)} 
+          />
       )}
 
       {/* Bottom Section */}

@@ -205,7 +205,7 @@ const NavMenu = ({
                                         setOpenMenu(openMenu === 'kesfet' ? null : 'kesfet');
                                     }
                                 }}
-                                className={`nav-menu-item grow-0 ${openMenu === 'kesfet' ? 'text-slate-900 dark:text-white bg-blue-500/5' : 'text-slate-600 dark:text-slate-400 hover:bg-blue-500/5'}`}
+                                className={`nav-menu-item grow-0 ${openMenu === 'kesfet' ? 'text-slate-900 dark:text-white bg-black/5 dark:bg-white/10' : 'text-slate-600 dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/10'}`}
                             >
                                 Keşfet <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'kesfet' ? 'rotate-180' : ''}`} />
                             </button>
@@ -225,7 +225,7 @@ const NavMenu = ({
                                         setOpenMenu(openMenu === 'investors' ? null : 'investors');
                                     }
                                 }}
-                                className={`nav-menu-item grow-0 ${openMenu === 'investors' ? 'text-slate-900 dark:text-white bg-emerald-500/5' : 'text-slate-600 dark:text-slate-400 hover:bg-emerald-500/5'}`}
+                                className={`nav-menu-item grow-0 ${openMenu === 'investors' ? 'text-slate-900 dark:text-white bg-black/5 dark:bg-white/10' : 'text-slate-600 dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/10'}`}
                             >
                                 Yatırımcılar <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'investors' ? 'rotate-180' : ''}`} />
                             </button>
@@ -235,7 +235,7 @@ const NavMenu = ({
                     {/* Search Bar */}
                     <form onSubmit={handleSearch} className="flex-1 max-w-md">
                         <div className="relative flex items-center bg-slate-50 dark:bg-slate-800/50 border border-black/5 dark:border-white/10 rounded-xl p-1 group transition-all duration-300">
-                            <Search size={16} className="ml-3 text-slate-400 group-focus-within:text-blue-500" />
+                            <Search size={16} className="ml-3 text-slate-400 group-focus-within:text-slate-900 dark:group-focus-within:text-white" />
                             <input 
                                 type="text"
                                 value={searchQuery}
@@ -287,20 +287,20 @@ const NavMenu = ({
                                         </div>
                                         
                                         <button onClick={() => { haptic('light'); navigate('/bot-management-panel'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                            <LayoutGrid size={18} className="group-hover:text-blue-500 transition-colors" />
+                                            <LayoutGrid size={18} className="group-hover:text-slate-900 dark:group-hover:text-white transition-colors" />
                                             <span className="text-xs font-bold uppercase tracking-tight">Yönetim Paneli</span>
                                         </button>
 
                                         <button onClick={() => { haptic('light'); navigate('/notifications'); setIsMenuOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
                                             <div className="flex items-center gap-3">
-                                                <Bell size={18} className="group-hover:text-orange-500 transition-colors" />
+                                                <Bell size={18} className="group-hover:text-slate-900 dark:group-hover:text-white transition-colors" />
                                                 <span className="text-xs font-bold uppercase tracking-tight">{t('notif_inbox')}</span>
                                             </div>
                                             {unreadCount > 0 && <div className="w-2 h-2 bg-red-500 rounded-full" />}
                                         </button>
 
                                         <button onClick={() => { haptic('light'); navigate('/settings'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                            <Edit3 size={18} className="group-hover:text-emerald-500 transition-colors" />
+                                            <Edit3 size={18} className="group-hover:text-slate-900 dark:group-hover:text-white transition-colors" />
                                             <span className="text-xs font-bold uppercase tracking-tight">{t('profile_settings') || 'Ayarlar'}</span>
                                         </button>
 
