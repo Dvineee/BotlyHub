@@ -12,7 +12,7 @@ import {
 import LoginModal from '../components/LoginModal';
 import { useTelegram } from '../hooks/useTelegram';
 import { DatabaseService } from '../services/DatabaseService';
-import { UserBot } from '../types';
+import { UserBot, Channel } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 
 const SidebarItem = ({ icon: Icon, label, path, active, badge, color, external }: any) => (
@@ -76,6 +76,7 @@ const BotManagementPanel = () => {
   const location = useLocation();
   const { user, haptic, notification, setWebAuthUser } = useTelegram();
   const [bot, setBot] = useState<UserBot | null>(null);
+  const [selectedGroup, setSelectedGroup] = useState<Channel | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
@@ -91,6 +92,19 @@ const BotManagementPanel = () => {
     };
     fetchBot();
   }, [botId, user]);
+
+  useEffect(() => {
+    const fetchGroup = async () => {
+      if (groupId && user?.id) {
+        const channels = await DatabaseService.getChannels(user.id.toString());
+        const found = channels.find(c => c.id === groupId);
+        if (found) setSelectedGroup(found);
+      } else {
+        setSelectedGroup(null);
+      }
+    };
+    fetchGroup();
+  }, [groupId, user]);
 
   if (isLoading) {
     return (
@@ -181,16 +195,18 @@ const BotManagementPanel = () => {
             </div>
 
             {/* Current Active Item (Kaju Test) */}
-            {groupId ? (
+            {groupId && selectedGroup ? (
               <div className="space-y-1">
-                <div className="px-3 py-2 flex items-center justify-between group cursor-pointer hover:bg-white/2 transition-all rounded-lg mb-2">
+                <div onClick={() => navigate(`/bot-panel/${botId}/groups`)} className="px-3 py-2 flex items-center justify-between group cursor-pointer hover:bg-white/2 transition-all rounded-lg mb-2">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full border border-white/10 overflow-hidden shrink-0">
-                       <img src="https://botlyhub.com/kaju-logo.png" alt="Kaju" className="w-full h-full object-cover" />
+                    <div className="w-10 h-10 rounded-full border border-white/10 overflow-hidden shrink-0 flex items-center justify-center bg-slate-800 text-white font-bold text-xs italic">
+                       {selectedGroup.icon ? <img src={selectedGroup.icon} alt={selectedGroup.name} className="w-full h-full object-cover" /> : selectedGroup.name[0].toUpperCase()}
                     </div>
                     <div>
-                      <h4 className="text-[14px] font-bold text-white leading-tight uppercase tracking-tight">KAJU TEST</h4>
-                      <span className="text-[12px] text-slate-500 lowercase leading-tight">@botlyhub</span>
+                      <h4 className="text-[14px] font-bold text-white leading-tight uppercase tracking-tight">{selectedGroup.name}</h4>
+                      <span className="text-[12px] text-slate-500 lowercase leading-tight">
+                        {selectedGroup.telegram_id.startsWith('-') ? `ID: ${selectedGroup.telegram_id}` : `@${selectedGroup.telegram_id}`}
+                      </span>
                     </div>
                   </div>
                   <ChevronRight size={14} className="text-slate-600" />
@@ -375,7 +391,7 @@ const NavigateToGroups = ({ botId }: any) => {
 
 const GroupSettingsView = () => {
     const [activeTab, setActiveTab] = useState('basic'); // basic or team
-    const groupId = '-1003360909133'; // Prototype ID from image
+    const { groupId } = useParams();
 
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-5xl">
@@ -785,7 +801,26 @@ const BillingView = () => {
 const GroupsView = () => {
   const { botId } = useParams();
   const navigate = useNavigate();
-  const { haptic } = useTelegram();
+  const { haptic, user } = useTelegram();
+  const [channels, setChannels] = useState<Channel[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchChannels = async () => {
+      setLoading(true);
+      try {
+        if (user?.id) {
+          const userChannels = await DatabaseService.getChannels(user.id.toString());
+          setChannels(userChannels);
+        }
+      } catch (error) {
+        console.error("Error fetching channels:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchChannels();
+  }, [user]);
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -800,36 +835,32 @@ const GroupsView = () => {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <GroupCard 
-          name="Kaju Test" 
-          username="kajugroup" 
-          members="1.2k" 
-          active={true} 
-          onClick={() => { haptic('light'); navigate(`/bot-panel/${botId}/groups/kaju-test/settings`); }} 
-        />
-        <GroupCard 
-          name="Kaju Community" 
-          username="kajucomm" 
-          members="4.8k" 
-          active={true} 
-          onClick={() => { haptic('light'); navigate(`/bot-panel/${botId}/groups/kaju-comm/settings`); }} 
-        />
-        <GroupCard 
-          name="BotlyHub Haberler" 
-          username="botlyhubnews" 
-          members="8.5k" 
-          active={true} 
-          onClick={() => { haptic('light'); navigate(`/bot-panel/${botId}/groups/botlyhub-news/settings`); }} 
-        />
-        <GroupCard 
-          name="Yeni deneme" 
-          username="veriverkin" 
-          members="7" 
-          active={false} 
-          onClick={() => { haptic('light'); navigate(`/bot-panel/${botId}/groups/test-group/settings`); }} 
-        />
-      </div>
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+           {[1, 2, 3].map((i) => (
+             <div key={i} className="h-32 bg-white/5 rounded-2xl animate-pulse"></div>
+           ))}
+        </div>
+      ) : channels.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {channels.map((channel) => (
+            <GroupCard 
+              key={channel.id}
+              name={channel.name} 
+              username={channel.telegram_id.startsWith('-') ? `ID: ${channel.telegram_id}` : channel.telegram_id} 
+              members={channel.memberCount.toLocaleString()} 
+              active={channel.revenueEnabled} 
+              onClick={() => { haptic('light'); navigate(`/bot-panel/${botId}/groups/${channel.id}/settings`); }} 
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="bg-[#14181f] border border-white/5 rounded-[32px] p-12 text-center mb-8">
+          <Users size={48} className="text-slate-700 mx-auto mb-4" />
+          <h3 className="text-lg font-bold text-white mb-2">Henüz Grup Yok</h3>
+          <p className="text-sm text-slate-500 max-w-sm mx-auto">Botunuzu bir gruba ekleyerek ve yönetici yetkisi vererek başlayabilirsiniz.</p>
+        </div>
+      )}
 
       <div className="bg-orange-500/5 border border-orange-500/20 rounded-3xl p-6">
         <div className="flex items-start gap-4">
