@@ -636,7 +636,7 @@ const NavMenu = ({
         <div className="sticky top-0 z-[1] bg-white dark:bg-slate-900 border-b border-[#f7f7f7] dark:border-white/5 w-full py-2.5 md:pb-2 transition-colors" ref={internalMenuRef}>
             <div className="max-w-7xl mx-auto px-5 sm:px-8 flex items-center justify-between gap-3 md:gap-4">
                 {/* Left Section (Logo) */}
-                <div className="flex items-center md:w-48 shrink-0">
+                <div className="flex items-center w-10 md:w-48 shrink-0">
                     <AnimatePresence>
                         {isScrolled && (
                             <motion.div
@@ -653,7 +653,7 @@ const NavMenu = ({
 
                 {/* Center Section (Navigation & Search) */}
                 <div className="flex items-center justify-center gap-4 md:gap-8 flex-1 min-w-0">
-                    <div className="hidden lg:flex items-center gap-6 shrink-0">
+                    <div className="flex items-center gap-2 md:gap-6 shrink-0">
                         {/* Discover (Keşfet) */}
                         <div 
                             className="relative"
@@ -670,7 +670,9 @@ const NavMenu = ({
                                 }}
                                 className={`nav-menu-item grow-0 ${openMenu === 'kesfet' ? 'text-slate-900 dark:text-white bg-blue-500/5' : 'text-slate-600 dark:text-slate-400 hover:bg-blue-500/5'}`}
                             >
-                                Keşfet <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'kesfet' ? 'rotate-180' : ''}`} />
+                                <span className="hidden sm:inline">Keşfet</span>
+                                <Compass size={16} className="sm:hidden" />
+                                <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'kesfet' ? 'rotate-180' : ''}`} />
                             </button>
                         </div>
 
@@ -690,24 +692,35 @@ const NavMenu = ({
                                 }}
                                 className={`nav-menu-item grow-0 ${openMenu === 'investors' ? 'text-slate-900 dark:text-white bg-emerald-500/5' : 'text-slate-600 dark:text-slate-400 hover:bg-emerald-500/5'}`}
                             >
-                                Yatırımcılar <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'investors' ? 'rotate-180' : ''}`} />
+                                <span className="hidden sm:inline">Yatırımcılar</span>
+                                <BarChart3 size={16} className="sm:hidden" />
+                                <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'investors' ? 'rotate-180' : ''}`} />
                             </button>
                         </div>
+
+                        {/* Blog Link */}
+                        <button 
+                            onClick={() => { haptic('light'); navigate('/blog'); }}
+                            className="nav-menu-item text-slate-600 dark:text-slate-400 hover:bg-blue-500/5 whitespace-nowrap"
+                        >
+                            <span className="hidden sm:inline">{t('blog_title')}</span>
+                            <Radio size={16} className="sm:hidden" />
+                        </button>
                     </div>
 
-                    {/* Search Bar - visible when scrolled */}
+                    {/* Search Bar - only visible when scrolled on mobile */}
                     <AnimatePresence>
                         {isScrolled && (
                             <motion.form 
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: 10 }}
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.95 }}
                                 onSubmit={(e) => {
                                     e.preventDefault();
                                     const q = (e.currentTarget.querySelector('input') as HTMLInputElement).value;
                                     if (q) navigate(`/search?q=${encodeURIComponent(q)}`);
                                 }} 
-                                className="flex flex-1 max-w-sm min-w-0"
+                                className="flex md:hidden flex-1 min-w-0"
                             >
                                 <div className="relative flex items-center bg-slate-50 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-xl p-0.5 group w-full transition-all focus-within:ring-2 focus-within:ring-blue-500/20">
                                     <Search size={14} className="ml-3 text-slate-400 group-focus-within:text-blue-500 shrink-0" />
@@ -723,17 +736,8 @@ const NavMenu = ({
                 </div>
 
                 {/* Profile Section */}
-                <div className="flex items-center justify-end md:w-48 shrink-0 gap-2 md:gap-3">
-                    <AnimatePresence mode="wait">
-                        {isScrolled && (
-                            <motion.div 
-                                key="scrolled-actions"
-                                initial={{ opacity: 0, x: 10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: 10 }}
-                                transition={{ duration: 0.2 }}
-                                className="flex items-center gap-2 md:gap-3"
-                            >
+                <div className="flex items-center justify-end w-20 sm:w-24 md:w-48 shrink-0 gap-2 md:gap-3">
+                    <div className="flex items-center gap-2 md:gap-3">
                                 <button 
                                     onClick={() => { haptic('light'); toggleTheme(); }} 
                                     className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-transparent hover:bg-slate-100/50 dark:hover:bg-white/5 border border-black/5 dark:border-white/5 rounded-[10px] text-slate-900 dark:text-white active:scale-95 transition-all outline-none"
@@ -812,9 +816,7 @@ const NavMenu = ({
                                         {t('login')}
                                     </button>
                                 )}
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
+                    </div>
                 </div>
             </div>
 
