@@ -1080,9 +1080,23 @@ const Home = () => {
         {/* Top Section */}
         <div className="w-full pt-6 md:pt-10 pb-4 shadow-[inset_0_-1px_0_0_rgba(0,0,0,0.03)] relative z-[120]">
           <div className="max-w-7xl mx-auto px-5 sm:px-8">
-              <div className="flex flex-wrap md:flex-nowrap items-center justify-between mb-8 px-1 gap-y-6 md:gap-x-6">
-                <div className="flex items-center order-1 md:w-48 shrink-0">
-                    <Logo onClick={() => navigate('/')} className="cursor-pointer" />
+              <div className="flex flex-wrap md:flex-nowrap items-center justify-between mb-8 px-1 gap-y-6 md:gap-x-10">
+                <div className="flex items-center gap-4 order-1 shrink-0">
+                    <div className="w-12 h-12 rounded-2xl overflow-hidden border-2 border-slate-200 dark:border-white/10 shadow-sm shrink-0 bg-white dark:bg-slate-800">
+                        <img 
+                            src="https://t.me/i/userpic/320/Midoloj.jpg" 
+                            className="w-full h-full object-cover" 
+                            alt="Profile" 
+                            referrerPolicy="no-referrer"
+                            onError={(e) => {
+                                (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=Midoloj&background=1e293b&color=fff&bold=true`;
+                            }}
+                        />
+                    </div>
+                    <div className="flex flex-col">
+                        <h1 className="text-xl font-black text-slate-900 dark:text-white leading-tight -mb-0.5 tracking-tight">ᗯIᑭᗴᖇՏՏ Kings</h1>
+                        <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em]">@Midoloj</span>
+                    </div>
                 </div>
 
                   <div className="w-full md:flex-1 md:max-w-2xl order-3 md:order-2 flex items-center gap-2 md:gap-3">
@@ -1124,7 +1138,7 @@ const Home = () => {
 
                       {user ? (
                           <>
-                              <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="hidden sm:flex w-10 h-10 items-center justify-center text-slate-900 dark:text-white active:scale-95 transition-transform">
+                              <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="hidden lg:flex w-10 h-10 items-center justify-center text-slate-900 dark:text-white active:scale-95 transition-transform">
                                   <Wallet size={20} />
                               </button>
                               <div className="relative" ref={menuRef}>
@@ -1140,23 +1154,23 @@ const Home = () => {
                                       )}
                                   </button>
                                   {isMenuOpen && (
-                                      <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden z-[100] animate-in py-2 backdrop-blur-2xl">
+                                      <div className="absolute right-0 top-full mt-4 w-64 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-white/5 rounded-[24px] overflow-hidden z-[150] animate-in slide-in-from-top-2 duration-200 py-2 shadow-2xl backdrop-blur-2xl">
                                           {[
-                                              { path: '/', icon: Store, color: 'text-blue-500 dark:text-blue-400', label: 'market' },
-                                              { path: '/settings', icon: User, color: 'text-purple-500 dark:text-purple-400', label: 'profile' },
-                                              { path: '/my-bots', icon: BotIcon, color: 'text-emerald-500 dark:text-emerald-400', label: 'my_bots' },
-                                              { path: '/channels', icon: Megaphone, color: 'text-orange-500 dark:text-orange-400', label: 'my_channels' },
-                                              { path: '/notifications', icon: Bell, color: 'text-blue-600 dark:text-blue-500', label: 'notifications', badge: unreadCount > 0 }
+                                              { path: '/', icon: Store, label: 'market' },
+                                              { path: '/settings', icon: User, label: 'profile' },
+                                              { path: '/my-bots', icon: BotIcon, label: 'my_bots' },
+                                              { path: '/channels', icon: Megaphone, label: 'my_channels' },
+                                              { path: '/notifications', icon: Bell, label: 'notifications', badge: unreadCount > 0 }
                                           ].map((item, i) => (
-                                              <button key={i} onClick={() => { navigate(item.path); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-black/5 dark:hover:bg-white/5 text-left border-b border-black/5 dark:border-white/5 last:border-0 relative">
-                                                  <item.icon size={18} className={item.color} /> 
-                                                  <span className="text-[11px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300">{t(item.label)}</span>
-                                                  {item.badge && <div className="absolute right-6 w-2.5 h-2.5 bg-red-600 rounded-full"></div>}
+                                              <button key={i} onClick={() => { haptic('light'); navigate(item.path); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-slate-50 dark:hover:bg-white/5 text-left border-b border-black/[0.03] dark:border-white/[0.03] last:border-0 relative group transition-colors">
+                                                  <item.icon size={18} className="text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors" /> 
+                                                  <span className="text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">{t(item.label)}</span>
+                                                  {item.badge && <div className="absolute right-6 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white dark:border-slate-900"></div>}
                                               </button>
                                           ))}
                                           <button 
                                                onClick={() => { haptic('medium'); setWebAuthUser(null); setIsMenuOpen(false); }} 
-                                               className="w-full flex items-center gap-4 px-6 py-4 hover:bg-black/5 dark:hover:bg-white/5 text-left text-red-500 dark:text-red-400 font-bold"
+                                               className="w-full flex items-center gap-4 px-6 py-4 hover:bg-red-50 dark:hover:bg-red-500/10 text-left text-red-500 font-bold transition-all border-t border-black/5 dark:border-white/5"
                                            >
                                                <LogOut size={18} /> 
                                                <span className="text-[11px] font-black uppercase tracking-tight">{t('logout')}</span>

@@ -251,14 +251,14 @@ const NavMenu = ({
                 <div className="flex items-center justify-end w-auto shrink-0 gap-2 md:gap-3">
                     <button 
                         onClick={() => { haptic('light'); toggleTheme(); }} 
-                        className="hidden md:flex nav-menu-item min-w-[33px] px-2 items-center justify-center bg-transparent hover:bg-slate-100/50 dark:hover:bg-white/5 border border-black/5 dark:border-white/5 rounded-[10px] text-slate-900 dark:text-white active:scale-95 transition-all outline-none"
+                        className="hidden lg:flex nav-menu-item min-w-[33px] px-2 items-center justify-center bg-transparent hover:bg-slate-100/50 dark:hover:bg-white/5 border border-black/5 dark:border-white/5 rounded-[10px] text-slate-900 dark:text-white active:scale-95 transition-all outline-none"
                     >
                         {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
                     </button>
 
                     {user ? (
                         <>
-                            <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="hidden sm:flex nav-menu-item w-[33px] !px-0 flex items-center justify-center bg-transparent hover:bg-slate-100/50 dark:hover:bg-white/5 border border-black/5 dark:border-white/5 rounded-[10px] text-slate-900 dark:text-white active:scale-95 transition-all">
+                            <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="hidden lg:flex nav-menu-item w-[33px] !px-0 flex items-center justify-center bg-transparent hover:bg-slate-100/50 dark:hover:bg-white/5 border border-black/5 dark:border-white/5 rounded-[10px] text-slate-900 dark:text-white active:scale-95 transition-all">
                                 <Wallet size={17} />
                             </button>
                             <div className="relative" ref={parentMenuRef}>
