@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Search, ChevronLeft, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, Send, Instagram, Youtube, Link, CheckCircle2, ChevronDown, Sun, Moon, Wallet, Menu, Plus, LogOut, Compass, Coins, BarChart3, Binoculars, Share2, Briefcase, MousePointer2, ExternalLink, ArrowLeft } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, Send, Link, CheckCircle2, ChevronDown, Sun, Moon, Wallet, Menu, Plus, LogOut, Compass, Coins, BarChart3, Binoculars, Share2, Briefcase, MousePointer2, ExternalLink, ArrowLeft } from 'lucide-react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Bot, Announcement, Notification } from '../types';
@@ -442,14 +442,14 @@ const NavMenu = ({
         setNavState('main');
     };
 
-    const discoverItems = [
+    const discoverItems: { id: string; label: string; desc: string; icon: any; action?: () => void; path?: string; }[] = [
         { id: 'bots', label: 'Botlar', desc: 'Telegram Bot Marketi', icon: BotIcon, action: () => setNavState('bots') },
         { id: 'apps', label: 'Uygulamalar', desc: 'Web3 & TMA Uygulamaları', icon: LayoutGrid, action: () => setNavState('apps') },
         { id: 'channels', label: 'Kanallar', desc: 'Popüler Telegram Kanalları', icon: Megaphone, path: '/channels' },
         { id: 'ads', label: 'Reklam', desc: 'Projenizi Öne Çıkarın', icon: Share2, path: '/settings' },
     ];
 
-    const investorItems = [
+    const investorItems: { id: string; label: string; desc: string; icon: any; action?: () => void; path?: string; }[] = [
         { id: 'exchanges', label: 'Borsalar ve Takas', desc: 'CEX & DEX Platformları', icon: BarChart3 },
         { id: 'earn', label: 'Kazanç Uygulamaları', desc: 'Pasif Gelir Fırsatları', icon: Coins },
         { id: 'tools', label: 'Yatırım Araçları', desc: 'Analiz ve Takip Araçları', icon: Briefcase },
@@ -520,7 +520,7 @@ const NavMenu = ({
                                                 className="flex items-center gap-3 p-3 hover:bg-black/[0.02] dark:hover:bg-white/5 rounded-xl transition-all group text-left border border-transparent hover:border-black/5 dark:hover:border-white/10 w-full"
                                             >
                                                 <div className="menu-icon-container !w-8 !h-8 px-0 shrink-0">
-                                                    <cat.icon size={16} className="menu-item-icon" />
+                                                    {React.createElement(cat.icon as any, { size: 16, className: "menu-item-icon" })}
                                                 </div>
                                                 <span className="text-[11px] font-bold uppercase tracking-tight menu-item-text">{t(cat.label)}</span>
                                             </button>
@@ -552,7 +552,7 @@ const NavMenu = ({
                                                 className="flex items-center gap-3 p-3 hover:bg-black/[0.02] dark:hover:bg-white/5 rounded-xl transition-all group text-left border border-transparent hover:border-black/5 dark:hover:border-white/10 w-full"
                                             >
                                                 <div className="menu-icon-container !w-8 !h-8 px-0 shrink-0">
-                                                    <cat.icon size={16} className="menu-item-icon" />
+                                                    {React.createElement(cat.icon as any, { size: 16, className: "menu-item-icon" })}
                                                 </div>
                                                 <span className="text-[11px] font-bold uppercase tracking-tight menu-item-text">{t(cat.label)}</span>
                                             </button>
@@ -627,10 +627,8 @@ const NavMenu = ({
         <div className="sticky top-0 z-[1] bg-white dark:bg-slate-900 border-b border-[#f7f7f7] dark:border-white/5 w-full py-2.5 md:pb-2 transition-colors" ref={internalMenuRef}>
             <div className="max-w-7xl mx-auto px-5 sm:px-8 flex items-center justify-between">
                 {/* Left Section (Logo) */}
-                <div className="hidden md:flex items-center w-48 shrink-0">
-                    {isScrolled ? (
-                        <Logo onClick={() => navigate('/')} className="cursor-pointer" />
-                    ) : null}
+                <div className="flex items-center w-48 shrink-0">
+                    <Logo onClick={() => navigate('/')} className="cursor-pointer" />
                 </div>
 
                 {/* Center Section (Navigation) */}
@@ -687,122 +685,119 @@ const NavMenu = ({
                 {/* Profile Section */}
                 <div className="hidden md:flex items-center justify-end w-48 shrink-0">
                     <AnimatePresence mode="wait">
-                        {isScrolled && (
-                            <motion.div 
-                                key="scrolled-actions"
-                                initial={{ opacity: 0, x: 10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: 10 }}
-                                transition={{ duration: 0.2 }}
-                                className="flex items-center gap-2 md:gap-3"
+                        <motion.div 
+                            key="scrolled-actions"
+                            initial={{ opacity: 0, x: 10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 10 }}
+                            transition={{ duration: 0.2 }}
+                            className="flex items-center gap-2 md:gap-3"
+                        >
+                            <button 
+                                onClick={() => { haptic('light'); toggleTheme(); }} 
+                                className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl text-slate-500 hover:text-blue-500 active:scale-95 transition-all outline-none"
                             >
-                                <button 
-                                    onClick={() => { haptic('light'); toggleTheme(); }} 
-                                    className="nav-menu-item min-w-[33px] px-2 flex items-center justify-center bg-transparent hover:bg-slate-100/50 dark:hover:bg-white/5 border border-black/5 dark:border-white/5 rounded-[10px] text-slate-900 dark:text-white active:scale-95 transition-all outline-none"
-                                >
-                                    {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
-                                </button>
+                                {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
+                            </button>
 
-                                {user ? (
-                                    <>
-                                        <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="nav-menu-item w-[33px] !px-0 flex items-center justify-center bg-transparent hover:bg-slate-100/50 dark:hover:bg-white/5 border border-black/5 dark:border-white/5 rounded-[10px] text-slate-900 dark:text-white active:scale-95 transition-all">
-                                            <Wallet size={17} />
-                                        </button>
-                                        <div className="relative" ref={parentMenuRef}>
-                                            <button 
-                                              onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
-                                              className={`nav-menu-item border border-black/5 dark:border-white/5 text-slate-900 dark:text-white active:scale-95 transition-all relative ${isMenuOpen ? 'bg-slate-100 dark:bg-white/10' : 'bg-transparent hover:bg-slate-100/50 dark:hover:bg-white/5'}`}
-                                            >
-                                                <Menu size={16} strokeWidth={2.5} />
-                                                <span className="hidden lg:inline">{t('home_menu') || 'Menu'}</span>
-                                                {unreadCount > 0 && (
-                                                    <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[8px] font-black text-white flex items-center justify-center px-1">
-                                                        {unreadCount > 9 ? '9+' : unreadCount}
-                                                    </div>
-                                                )}
-                                            </button>
-                                            {isMenuOpen && (
-                                                <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-white/5 rounded-2xl shadow-2xl p-2 z-[100] animate-in fade-in zoom-in-95 duration-200">
-                                                    <div className="p-4 border-b border-slate-100 dark:border-white/5 mb-2">
-                                                        <div className="flex items-center gap-3">
-                                                            {(user.photo_url || user.avatar) ? (
-                                                                <img 
-                                                                    src={user.photo_url || user.avatar} 
-                                                                    alt={user.first_name || user.name}
-                                                                    className="w-10 h-10 rounded-full object-cover"
-                                                                />
-                                                            ) : (
-                                                                <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-black">
-                                                                    {user.first_name ? user.first_name[0] : (user.name ? user.name[0] : 'U')}
-                                                                </div>
-                                                            )}
-                                                            <div className="flex flex-col min-w-0">
-                                                                <span className="text-[13px] font-bold text-slate-900 dark:text-white truncate">
-                                                                    {user.first_name ? `${user.first_name} ${user.last_name || ''}` : user.name}
-                                                                </span>
-                                                                <span className="text-[10px] text-slate-500 truncate">@{user.username || user.id}</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <button onClick={() => { haptic('light'); navigate('/'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                                        <Store size={18} className="text-blue-500 transition-colors" />
-                                                        <span className="text-xs font-bold uppercase tracking-tight">{t('market')}</span>
-                                                    </button>
-
-                                                    <button onClick={() => { haptic('light'); navigate('/settings'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                                        <User size={18} className="text-purple-500 transition-colors" />
-                                                        <span className="text-xs font-bold uppercase tracking-tight">{t('profile')}</span>
-                                                    </button>
-
-                                                    <button onClick={() => { haptic('light'); navigate('/my-bots'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                                        <BotIcon size={18} className="text-emerald-500 transition-colors" />
-                                                        <span className="text-xs font-bold uppercase tracking-tight">{t('my_bots')}</span>
-                                                    </button>
-
-                                                    <button onClick={() => { haptic('light'); navigate('/channels'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                                        <Megaphone size={18} className="text-orange-500 transition-colors" />
-                                                        <span className="text-xs font-bold uppercase tracking-tight">{t('my_channels')}</span>
-                                                    </button>
-
-                                                    <button onClick={() => { haptic('light'); navigate('/notifications'); setIsMenuOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                                        <div className="flex items-center gap-3">
-                                                            <Bell size={18} className="text-blue-600 transition-colors" />
-                                                            <span className="text-xs font-bold uppercase tracking-tight">{t('notifications')}</span>
-                                                        </div>
-                                                        {unreadCount > 0 && <div className="w-2 h-2 bg-red-500 rounded-full" />}
-                                                    </button>
-
-                                                    <div className="h-px bg-slate-100 dark:border-white/5 my-2" />
-                                                    
-                                                    <button 
-                                                        onClick={() => { 
-                                                            const confirmed = window.confirm("Çıkış yapmak istediğinize emin misiniz?");
-                                                            if (confirmed) {
-                                                                haptic('medium'); 
-                                                                setWebAuthUser(null);
-                                                                setIsMenuOpen(false); 
-                                                            }
-                                                        }} 
-                                                        className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 text-red-500 transition-all font-bold text-xs uppercase"
-                                                    >
-                                                        <LogOut size={18} /> 
-                                                        <span className="text-xs font-bold uppercase tracking-tight">{t('home_logout')}</span>
-                                                    </button>
+                            {user ? (
+                                <>
+                                    <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl text-slate-500 hover:text-blue-500 active:scale-95 transition-all outline-none">
+                                        <Wallet size={17} />
+                                    </button>
+                                    <div className="relative" ref={parentMenuRef}>
+                                        <button 
+                                          onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
+                                          className={`w-10 h-10 flex items-center justify-center rounded-xl border transition-all relative ${isMenuOpen ? 'bg-blue-500/10 border-blue-500/20 text-blue-600' : 'bg-white dark:bg-slate-900 border-black/5 dark:border-white/10 text-slate-500 hover:text-blue-500'}`}
+                                        >
+                                            <Menu size={16} strokeWidth={2.5} />
+                                            {unreadCount > 0 && (
+                                                <div className="absolute -top-1 -right-1 min-w-[16px] h-[16px] bg-red-600 rounded-full border-2 border-white dark:border-slate-900 text-[8px] font-black text-white flex items-center justify-center px-1">
+                                                    {unreadCount > 9 ? '9+' : unreadCount}
                                                 </div>
                                             )}
-                                        </div>
-                                    </>
-                                ) : (
-                                    <button 
-                                        onClick={() => { haptic('light'); setIsLoginModalOpen(true); }}
-                                        className="nav-menu-item !px-5 bg-blue-500 hover:bg-blue-600 text-white text-[13px] font-bold rounded-[10px] transition-all active:scale-95 flex items-center justify-center whitespace-nowrap shadow-lg shadow-blue-500/25 border-none"
-                                    >
-                                        {t('home_login')}
-                                    </button>
-                                )}
-                            </motion.div>
-                        )}
+                                        </button>
+                                        {isMenuOpen && (
+                                            <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-white/5 rounded-2xl shadow-2xl p-2 z-[100] animate-in fade-in zoom-in-95 duration-200">
+                                                <div className="p-4 bg-slate-50/50 dark:bg-white/5 border-b border-black/5 dark:border-white/5 rounded-t-xl mb-2">
+                                                    <div className="flex items-center gap-3">
+                                                        {(user.photo_url || user.avatar) ? (
+                                                            <img 
+                                                                src={user.photo_url || user.avatar} 
+                                                                alt={user.first_name || user.name}
+                                                                className="w-10 h-10 rounded-full object-cover border border-black/5 dark:border-white/10"
+                                                            />
+                                                        ) : (
+                                                            <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-black text-xs">
+                                                                {user.first_name ? user.first_name[0] : (user.name ? user.name[0] : 'U')}
+                                                            </div>
+                                                        )}
+                                                        <div className="flex flex-col min-w-0">
+                                                            <span className="text-[13px] font-bold text-slate-900 dark:text-white truncate">
+                                                                {user.first_name ? `${user.first_name} ${user.last_name || ''}` : user.name}
+                                                            </span>
+                                                            <span className="text-[10px] text-slate-500 truncate">@{user.username || user.id}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <button onClick={() => { haptic('light'); navigate('/'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                                    <Store size={18} className="text-blue-500 transition-colors" />
+                                                    <span className="text-xs font-bold uppercase tracking-tight">{t('market')}</span>
+                                                </button>
+
+                                                <button onClick={() => { haptic('light'); navigate('/settings'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                                    <User size={18} className="text-purple-500 transition-colors" />
+                                                    <span className="text-xs font-bold uppercase tracking-tight">{t('profile')}</span>
+                                                </button>
+
+                                                <button onClick={() => { haptic('light'); navigate('/my-bots'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                                    <BotIcon size={18} className="text-emerald-500 transition-colors" />
+                                                    <span className="text-xs font-bold uppercase tracking-tight">{t('my_bots')}</span>
+                                                </button>
+
+                                                <button onClick={() => { haptic('light'); navigate('/channels'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                                    <Megaphone size={18} className="text-orange-500 transition-colors" />
+                                                    <span className="text-xs font-bold uppercase tracking-tight">{t('my_channels')}</span>
+                                                </button>
+
+                                                <button onClick={() => { haptic('light'); navigate('/notifications'); setIsMenuOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                                    <div className="flex items-center gap-3">
+                                                        <Bell size={18} className="text-blue-600 transition-colors" />
+                                                        <span className="text-xs font-bold uppercase tracking-tight">{t('notifications')}</span>
+                                                    </div>
+                                                    {unreadCount > 0 && <div className="w-2 h-2 bg-red-500 rounded-full" />}
+                                                </button>
+
+                                                <div className="h-px bg-slate-100 dark:border-white/5 my-2" />
+                                                
+                                                <button 
+                                                    onClick={() => { 
+                                                        const confirmed = window.confirm("Çıkış yapmak istediğinize emin misiniz?");
+                                                        if (confirmed) {
+                                                            haptic('medium'); 
+                                                            setWebAuthUser(null);
+                                                            setIsMenuOpen(false); 
+                                                        }
+                                                    }} 
+                                                    className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 text-red-500 transition-all font-bold text-xs uppercase"
+                                                >
+                                                    <LogOut size={18} /> 
+                                                    <span className="text-xs font-bold uppercase tracking-tight">{t('home_logout')}</span>
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                </>
+                            ) : (
+                                <button 
+                                    onClick={() => { haptic('light'); setIsLoginModalOpen(true); }}
+                                    className="nav-menu-item !px-5 bg-blue-500 hover:bg-blue-600 text-white text-[13px] font-bold rounded-[10px] transition-all active:scale-95 flex items-center justify-center whitespace-nowrap shadow-lg shadow-blue-500/25 border-none"
+                                >
+                                    {t('home_login')}
+                                </button>
+                            )}
+                        </motion.div>
                     </AnimatePresence>
                 </div>
             </div>
@@ -874,7 +869,7 @@ const NavMenu = ({
                                                 className="w-full flex items-center gap-4 p-4 hover:bg-slate-50 dark:hover:bg-white/5 active:bg-slate-100 dark:active:bg-white/10 transition-all rounded-2xl border border-black/5 dark:border-white/5 group mobile-menu-item"
                                             >
                                                 <div className={`mobile-menu-icon-container flex items-center justify-center rounded-xl shrink-0 ${mobileModal === 'kesfet' ? 'text-blue-500' : 'text-emerald-500'}`}>
-                                                    <item.icon size={22} className="menu-item-icon" />
+                                                    {React.createElement(item.icon as any, { size: 22, className: "menu-item-icon" })}
                                                 </div>
                                                 <div className="flex flex-col items-start min-w-0">
                                                     <span className="text-[13px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider truncate w-full">
@@ -907,7 +902,7 @@ const NavMenu = ({
                                                     className="flex flex-col items-start gap-3 p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5 mobile-menu-item"
                                                 >
                                                     <div className="mobile-menu-icon-container">
-                                                        <cat.icon size={20} className="text-blue-500" />
+                                                        {React.createElement(cat.icon as any, { size: 20, className: "text-blue-500" })}
                                                     </div>
                                                     <span className="text-[10px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300">{t(cat.label)}</span>
                                                 </button>
@@ -936,7 +931,7 @@ const NavMenu = ({
                                                     className="flex flex-col items-start gap-3 p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5 mobile-menu-item"
                                                 >
                                                     <div className="mobile-menu-icon-container">
-                                                        <cat.icon size={20} className="text-emerald-500" />
+                                                        {React.createElement(cat.icon as any, { size: 20, className: "text-emerald-500" })}
                                                     </div>
                                                     <span className="text-[10px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300">{t(cat.label)}</span>
                                                 </button>
@@ -1112,113 +1107,49 @@ const Home = () => {
           title={t('home_seo_title')} 
           description={t('home_seo_desc')}
       />
-      {/* Top Background Wrapper */}
-      <div className="bg-[#00000008] dark:bg-slate-900/10">
-        {/* Top Section */}
-        <div className="w-full pt-6 md:pt-10 pb-4 shadow-[inset_0_-1px_0_0_rgba(0,0,0,0.03)] relative z-[120]">
-          <div className="max-w-7xl mx-auto px-5 sm:px-8">
-              <div className="flex flex-wrap md:flex-nowrap items-center justify-between mb-8 px-1 gap-y-6 md:gap-x-6">
-                <div className="flex items-center order-1 md:w-48 shrink-0">
-                    <Logo onClick={() => navigate('/')} className="cursor-pointer" />
-                </div>
 
-                  <div className="w-full md:flex-1 md:max-w-2xl order-3 md:order-2 flex items-center gap-2 md:gap-3">
+      {!isLoading && (
+        <NavMenu 
+            isScrolled={isScrolled}
+            user={user}
+            unreadCount={unreadCount}
+            theme={theme}
+            toggleTheme={toggleTheme}
+            haptic={haptic}
+            isMenuOpen={isMenuOpen}
+            setIsMenuOpen={setIsMenuOpen}
+            setIsLoginModalOpen={setIsLoginModalOpen}
+            setWebAuthUser={setWebAuthUser}
+            isLoginModalOpen={isLoginModalOpen}
+            menuRef={menuRef}
+        />
+      )}
+
+      <main className="flex flex-col">
+        {/* Top Section */}
+        <div className="w-full pt-6 md:pt-10 pb-4 bg-[#00000008] dark:bg-slate-900/10 shadow-[inset_0_-1px_0_0_rgba(0,0,0,0.03)] relative z-[120]">
+          <div className="max-w-7xl mx-auto px-5 sm:px-8">
+              <div className="flex flex-wrap md:flex-nowrap items-center justify-center mb-8 px-1 gap-y-6 md:gap-x-6">
+                  <div className="w-full md:flex-1 md:max-w-2xl order-3 md:order-2 flex items-center justify-center gap-2 md:gap-3">
                       <div className="flex-1 md:w-[330px] md:flex-none relative z-[100]">
-                          <div className="relative flex items-center bg-slate-50 dark:bg-slate-800/50 border border-black/5 dark:border-white/10 rounded-xl p-0.5 md:p-1 group shadow-sm">
+                          <div className="relative flex items-center bg-white dark:bg-slate-900/60 border border-black/5 dark:border-white/5 rounded-xl px-2 group transition-all focus-within:ring-2 focus-within:ring-blue-500/20 shadow-sm">
+                              <Search size={16} className="ml-2 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                               <div 
                                 onClick={() => navigate('/search')} 
-                                className="flex items-center flex-1 min-w-0 cursor-pointer active:scale-[0.98] transition-transform"
+                                className="w-full py-2.5 px-3 text-[11px] text-slate-700 dark:text-slate-200 font-bold uppercase tracking-wider truncate min-w-0 cursor-pointer active:scale-[0.98] transition-transform"
                               >
-                                  <div className="ml-2 md:ml-3 w-8 h-8 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors shrink-0">
-                                      <Search size={16} />
-                                  </div>
-                                  <div className="w-full py-2 px-3 text-[11px] text-slate-700 dark:text-slate-200 font-bold uppercase tracking-wider truncate min-w-0">
-                                      {t('search_placeholder')}
-                                  </div>
+                                  {t('search_placeholder')}
                               </div>
                               <div className="flex items-center gap-0.5 pr-1 shrink-0 ml-auto border-l border-black/[0.05] dark:border-white/[0.05] pl-1 relative z-[110]">
                                   <FilterMenu />
                               </div>
                           </div>
                       </div>
-                      <RouterLink 
-                          to="/settings"
-                          onClick={() => haptic('light')}
-                          className="hidden md:flex items-center gap-1 text-[13px] font-bold text-blue-500 hover:underline transition-all"
-                      >
-                          <Plus size={14} />
-                          <span style={{ fontWeight: 700 }}>{t('add_your')}</span>
-                      </RouterLink>
-                  </div>
-
-                  <div className="flex items-center gap-2 md:gap-3 order-2 md:order-3 md:w-48 justify-end ml-auto shrink-0">
-                      <button 
-                          onClick={() => { haptic('light'); toggleTheme(); }} 
-                          className="w-10 h-10 flex items-center justify-center text-slate-900 dark:text-white active:scale-95 transition-transform"
-                      >
-                          {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-                      </button>
-
-                      {user ? (
-                          <>
-                              <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="hidden sm:flex w-10 h-10 items-center justify-center text-slate-900 dark:text-white active:scale-95 transition-transform">
-                                  <Wallet size={20} />
-                              </button>
-                              <div className="relative" ref={menuRef}>
-                                  <button 
-                                    onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
-                                    className="w-10 h-10 flex items-center justify-center text-slate-900 dark:text-white active:scale-95 transition-transform relative"
-                                  >
-                                      <Menu size={22} strokeWidth={2.5} />
-                                      {unreadCount > 0 && (
-                                          <div className="absolute -top-1 -right-1 min-w-[20px] h-[20px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[9px] font-black text-white flex items-center justify-center px-1 badge-pop">
-                                              {unreadCount > 9 ? '9+' : unreadCount}
-                                          </div>
-                                      )}
-                                  </button>
-                                  {isMenuOpen && (
-                                      <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden z-[100] animate-in py-2 backdrop-blur-2xl">
-                                          {[
-                                              { path: '/', icon: Store, color: 'text-blue-500 dark:text-blue-400', label: 'market' },
-                                              { path: '/settings', icon: User, color: 'text-purple-500 dark:text-purple-400', label: 'profile' },
-                                              { path: '/my-bots', icon: BotIcon, color: 'text-emerald-500 dark:text-emerald-400', label: 'my_bots' },
-                                              { path: '/channels', icon: Megaphone, color: 'text-orange-500 dark:text-orange-400', label: 'my_channels' },
-                                              { path: '/notifications', icon: Bell, color: 'text-blue-600 dark:text-blue-500', label: 'notifications', badge: unreadCount > 0 }
-                                          ].map((item, i) => (
-                                              <button key={i} onClick={() => { navigate(item.path); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-black/5 dark:hover:bg-white/5 text-left border-b border-black/5 dark:border-white/5 last:border-0 relative">
-                                                  <item.icon size={18} className={item.color} /> 
-                                                  <span className="text-[11px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300">{t(item.label)}</span>
-                                                  {item.badge && <div className="absolute right-6 w-2.5 h-2.5 bg-red-600 rounded-full"></div>}
-                                              </button>
-                                          ))}
-                                          <button 
-                                               onClick={() => { haptic('medium'); setWebAuthUser(null); setIsMenuOpen(false); }} 
-                                               className="w-full flex items-center gap-4 px-6 py-4 hover:bg-black/5 dark:hover:bg-white/5 text-left text-red-500 dark:text-red-400 font-bold"
-                                           >
-                                               <LogOut size={18} /> 
-                                               <span className="text-[11px] font-black uppercase tracking-tight">{t('logout')}</span>
-                                           </button>
-                                      </div>
-                                  )}
-                              </div>
-                          </>
-                      ) : (
-                          <button 
-                              onClick={() => { haptic('light'); setIsLoginModalOpen(true); }}
-                              className="px-5 h-10 bg-blue-500 hover:bg-blue-600 text-white text-[13px] font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center whitespace-nowrap shadow-lg shadow-blue-500/25"
-                          >
-                              {t('login')}
-                          </button>
-                      )}
-                      <LoginModal 
-                          isOpen={isLoginModalOpen} 
-                          onClose={() => setIsLoginModalOpen(false)} 
-                          onAuth={(user) => setWebAuthUser(user)} 
-                      />
                   </div>
               </div>
           </div>
-      </div>
+        </div>
+
         {isLoading ? (
             <div className="flex flex-col items-center justify-center py-24 gap-4"><Loader2 className="animate-spin text-blue-500" size={32} /></div>
         ) : (
@@ -1238,24 +1169,8 @@ const Home = () => {
               )}
             </>
           )}
-      </div>
 
-      {!isLoading && (
-        <NavMenu 
-            isScrolled={isScrolled}
-            user={user}
-            unreadCount={unreadCount}
-            theme={theme}
-            toggleTheme={toggleTheme}
-            haptic={haptic}
-            isMenuOpen={isMenuOpen}
-            setIsMenuOpen={setIsMenuOpen}
-            setIsLoginModalOpen={setIsLoginModalOpen}
-            setWebAuthUser={setWebAuthUser}
-            isLoginModalOpen={isLoginModalOpen}
-            menuRef={menuRef}
-        />
-      )}
+
 
       {/* Bottom Section */}
       <div className="bg-white dark:bg-slate-950 w-full pt-10 pb-32 shadow-[0_-1px_0_0_rgba(0,0,0,0.015)]">
@@ -1621,8 +1536,9 @@ const Home = () => {
         )}
         </div>
       </div>
+    </main>
 
-      <AnimatePresence>
+    <AnimatePresence>
         {selectedAnn && (
           <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-xl" onClick={() => setSelectedAnn(null)}>
             <motion.div 
