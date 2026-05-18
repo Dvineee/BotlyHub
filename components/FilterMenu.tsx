@@ -35,10 +35,10 @@ export const FilterMenu: React.FC = () => {
 
   const options: { id: FilterType; label: string; icon: any; color: string }[] = [
     { id: 'all', label: 'Tümü', icon: FilterIcon, color: 'text-slate-400' },
-    { id: 'paid', label: 'Ücretli', icon: Zap, color: 'text-purple-500' },
-    { id: 'free', label: 'Ücretsiz', icon: Gift, color: 'text-emerald-500' },
-    { id: 'popular', label: 'En Popüler', icon: TrendingUp, color: 'text-orange-500' },
-    { id: 'bhub', label: 'BHub Orijinal', icon: Sparkles, color: 'text-blue-500' },
+    { id: 'paid', label: 'Ücretli', icon: Zap, color: 'text-slate-400' },
+    { id: 'free', label: 'Ücretsiz', icon: Gift, color: 'text-slate-400' },
+    { id: 'popular', label: 'En Popüler', icon: TrendingUp, color: 'text-slate-400' },
+    { id: 'bhub', label: 'BHub Orijinal', icon: Sparkles, color: 'text-slate-400' },
   ];
 
   useEffect(() => {

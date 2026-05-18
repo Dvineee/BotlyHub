@@ -1204,28 +1204,28 @@ const Home = () => {
                                               </div>
 
                                               <button onClick={() => { haptic('light'); navigate('/'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                                  <Store size={18} className="text-blue-500 transition-colors" />
+                                                  <Store size={18} className="text-slate-400 group-hover:text-blue-500 transition-colors" />
                                                   <span className="text-xs font-bold uppercase tracking-tight">{t('market')}</span>
                                               </button>
 
                                               <button onClick={() => { haptic('light'); navigate('/settings'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                                  <User size={18} className="text-purple-500 transition-colors" />
+                                                  <User size={18} className="text-slate-400 group-hover:text-blue-500 transition-colors" />
                                                   <span className="text-xs font-bold uppercase tracking-tight">{t('profile')}</span>
                                               </button>
 
                                               <button onClick={() => { haptic('light'); navigate('/my-bots'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                                  <BotIcon size={18} className="text-emerald-500 transition-colors" />
+                                                  <BotIcon size={18} className="text-slate-400 group-hover:text-blue-500 transition-colors" />
                                                   <span className="text-xs font-bold uppercase tracking-tight">{t('my_bots')}</span>
                                               </button>
 
                                               <button onClick={() => { haptic('light'); navigate('/channels'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                                  <Megaphone size={18} className="text-orange-500 transition-colors" />
+                                                  <Megaphone size={18} className="text-slate-400 group-hover:text-blue-500 transition-colors" />
                                                   <span className="text-xs font-bold uppercase tracking-tight">{t('my_channels')}</span>
                                               </button>
 
                                               <button onClick={() => { haptic('light'); navigate('/notifications'); setIsMenuOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
                                                   <div className="flex items-center gap-3">
-                                                      <Bell size={18} className="text-blue-600 transition-colors" />
+                                                      <Bell size={18} className="text-slate-400 group-hover:text-blue-500 transition-colors" />
                                                       <span className="text-xs font-bold uppercase tracking-tight">{t('notifications')}</span>
                                                   </div>
                                                   {unreadCount > 0 && <div className="w-2 h-2 bg-red-500 rounded-full" />}
