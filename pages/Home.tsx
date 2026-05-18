@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Search, ChevronLeft, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, Send, Instagram, Youtube, Link, CheckCircle2, ChevronDown, Sun, Moon, Wallet, Menu, Plus, LogOut, Compass, Coins, BarChart3, Binoculars, Share2, Briefcase, MousePointer2, ExternalLink, ArrowLeft } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, Send, Link, CheckCircle2, ChevronDown, Sun, Moon, Wallet, Menu, Plus, LogOut, Compass, Coins, BarChart3, Binoculars, Share2, Briefcase, MousePointer2, ExternalLink, ArrowLeft } from 'lucide-react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Bot, Announcement, Notification } from '../types';
@@ -442,18 +442,27 @@ const NavMenu = ({
         setNavState('main');
     };
 
-    const discoverItems = [
+    interface DiscoverItem {
+        id: string;
+        label: string;
+        desc: string;
+        icon: any;
+        path?: string;
+        action?: () => void;
+    }
+
+    const discoverItems: DiscoverItem[] = [
         { id: 'bots', label: 'Botlar', desc: 'Telegram Bot Marketi', icon: BotIcon, action: () => setNavState('bots') },
         { id: 'apps', label: 'Uygulamalar', desc: 'Web3 & TMA Uygulamaları', icon: LayoutGrid, action: () => setNavState('apps') },
         { id: 'channels', label: 'Kanallar', desc: 'Popüler Telegram Kanalları', icon: Megaphone, path: '/channels' },
         { id: 'ads', label: 'Reklam', desc: 'Projenizi Öne Çıkarın', icon: Share2, path: '/settings' },
     ];
 
-    const investorItems = [
-        { id: 'exchanges', label: 'Borsalar ve Takas', desc: 'CEX & DEX Platformları', icon: BarChart3 },
-        { id: 'earn', label: 'Kazanç Uygulamaları', desc: 'Pasif Gelir Fırsatları', icon: Coins },
-        { id: 'tools', label: 'Yatırım Araçları', desc: 'Analiz ve Takip Araçları', icon: Briefcase },
-        { id: 'new', label: 'Yeni Keşifler', desc: 'Gelecek Vaadeden Projeler', icon: Compass },
+    const investorItems: DiscoverItem[] = [
+        { id: 'exchanges', label: 'Borsalar ve Takas', desc: 'CEX & DEX Platformları', icon: BarChart3, path: '/search?mode=apps&category=all' },
+        { id: 'earn', label: 'Kazanç Uygulamaları', desc: 'Pasif Gelir Fırsatları', icon: Coins, path: '/search?mode=apps&category=all' },
+        { id: 'tools', label: 'Yatırım Araçları', desc: 'Analiz ve Takip Araçları', icon: Briefcase, path: '/search?mode=apps&category=all' },
+        { id: 'new', label: 'Yeni Keşifler', desc: 'Gelecek Vaadeden Projeler', icon: Compass, path: '/search?mode=apps&category=all' },
     ];
 
     const simpleLinks = [
@@ -520,7 +529,7 @@ const NavMenu = ({
                                                 className="flex items-center gap-3 p-3 hover:bg-black/[0.02] dark:hover:bg-white/5 rounded-xl transition-all group text-left border border-transparent hover:border-black/5 dark:hover:border-white/10 w-full"
                                             >
                                                 <div className="menu-icon-container !w-8 !h-8 px-0 shrink-0">
-                                                    <cat.icon size={16} className="menu-item-icon" />
+                                                    <cat.icon size={16} />
                                                 </div>
                                                 <span className="text-[11px] font-bold uppercase tracking-tight menu-item-text">{t(cat.label)}</span>
                                             </button>
@@ -552,7 +561,7 @@ const NavMenu = ({
                                                 className="flex items-center gap-3 p-3 hover:bg-black/[0.02] dark:hover:bg-white/5 rounded-xl transition-all group text-left border border-transparent hover:border-black/5 dark:hover:border-white/10 w-full"
                                             >
                                                 <div className="menu-icon-container !w-8 !h-8 px-0 shrink-0">
-                                                    <cat.icon size={16} className="menu-item-icon" />
+                                                    <cat.icon size={16} />
                                                 </div>
                                                 <span className="text-[11px] font-bold uppercase tracking-tight menu-item-text">{t(cat.label)}</span>
                                             </button>
@@ -828,7 +837,7 @@ const NavMenu = ({
                                                 className="w-full flex items-center gap-4 p-4 hover:bg-slate-50 dark:hover:bg-white/5 active:bg-slate-100 dark:active:bg-white/10 transition-all rounded-2xl border border-black/5 dark:border-white/5 group mobile-menu-item"
                                             >
                                                 <div className={`mobile-menu-icon-container flex items-center justify-center rounded-xl shrink-0 ${mobileModal === 'kesfet' ? 'text-blue-500' : 'text-emerald-500'}`}>
-                                                    <item.icon size={22} className="menu-item-icon" />
+                                                    <item.icon size={22} />
                                                 </div>
                                                 <div className="flex flex-col items-start min-w-0">
                                                     <span className="text-[13px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider truncate w-full">
@@ -861,7 +870,7 @@ const NavMenu = ({
                                                     className="flex flex-col items-start gap-3 p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5 mobile-menu-item"
                                                 >
                                                     <div className="mobile-menu-icon-container">
-                                                        <cat.icon size={20} className="text-blue-500" />
+                                                        <cat.icon size={20} />
                                                     </div>
                                                     <span className="text-[10px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300">{t(cat.label)}</span>
                                                 </button>
@@ -890,7 +899,7 @@ const NavMenu = ({
                                                     className="flex flex-col items-start gap-3 p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5 mobile-menu-item"
                                                 >
                                                     <div className="mobile-menu-icon-container">
-                                                        <cat.icon size={20} className="text-emerald-500" />
+                                                        <cat.icon size={20} />
                                                     </div>
                                                     <span className="text-[10px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300">{t(cat.label)}</span>
                                                 </button>

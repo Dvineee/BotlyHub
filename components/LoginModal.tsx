@@ -36,7 +36,10 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onAuth }) => {
 
   const getApiUrl = (path: string) => {
     const baseUrl = import.meta.env.VITE_API_URL || '';
-    return `${baseUrl}${path}`;
+    if (!baseUrl) return path;
+    const cleanBase = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+    const cleanPath = path.startsWith('/') ? path : `/${path}`;
+    return `${cleanBase}${cleanPath}`;
   };
 
   const handleRequestCode = async () => {
@@ -52,8 +55,16 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onAuth }) => {
         
         // Handle non-JSON responses (like Vercel 404s)
         const contentType = res.headers.get('content-type');
+        const url = getApiUrl('/api/auth/telegram/request-code');
+        
+        if (!res.ok && res.status === 404) {
+            throw new Error(`API endpoint bulunamadı (404). URL: ${url}. Eğer Vercel kullanıyorsanız backend sunucusunun yapılandırıldığından emin olun.`);
+        }
+
         if (!contentType || !contentType.includes('application/json')) {
-            throw new Error('Sunucu doğru formatta yanıt vermedi (JSON bekleniyordu). Lütfen API URL ayarlarını kontrol edin.');
+            const text = await res.text();
+            console.error("Non-JSON response received:", text.slice(0, 200));
+            throw new Error(`Sunucu doğru formatta yanıt vermedi (Kod: ${res.status}). Beklenen JSON, ancak farklı bir yanıt alındı. URL: ${url}`);
         }
 
         const data = await res.json();
@@ -91,8 +102,14 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onAuth }) => {
         });
 
         const contentType = res.headers.get('content-type');
+        const url = getApiUrl('/api/auth/telegram/verify-code');
+        
+        if (!res.ok && res.status === 404) {
+            throw new Error(`API endpoint bulunamadı (404). URL: ${url}`);
+        }
+
         if (!contentType || !contentType.includes('application/json')) {
-            throw new Error('Sunucu doğru formatta yanıt vermedi.');
+            throw new Error(`Sunucu doğru formatta yanıt vermedi (Kod: ${res.status}). URL: ${url}`);
         }
 
         const data = await res.json();
