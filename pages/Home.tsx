@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Search, ChevronLeft, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, Send, Link, CheckCircle2, ChevronDown, Sun, Moon, Wallet, Menu, Plus, LogOut, Compass, Coins, BarChart3, Binoculars, Share2, Briefcase, MousePointer2, ExternalLink, ArrowLeft } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, Send, Link, CheckCircle2, ChevronDown, Sun, Moon, Wallet, Menu, Plus, LogOut, Compass, Coins, BarChart3, Binoculars, Share2, Briefcase, MousePointer2, ExternalLink, ArrowLeft, Settings } from 'lucide-react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Bot, Announcement, Notification } from '../types';
@@ -720,29 +720,28 @@ const NavMenu = ({
                                         <div className="relative" ref={parentMenuRef}>
                                             <button 
                                               onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
-                                              className={`nav-menu-item border border-black/5 dark:border-white/5 text-slate-900 dark:text-white active:scale-95 transition-all relative ${isMenuOpen ? 'bg-slate-100 dark:bg-white/10' : 'bg-transparent hover:bg-slate-100/50 dark:hover:bg-white/5'}`}
+                                              className={`w-10 h-10 flex items-center justify-center border border-black/5 dark:border-white/5 text-slate-900 dark:text-white active:scale-95 transition-all relative rounded-xl shadow-sm ${isMenuOpen ? 'bg-slate-100 dark:bg-white/15' : 'bg-white/40 dark:bg-slate-900/40 hover:bg-white/60 dark:hover:bg-slate-800/60'}`}
                                             >
-                                                <Menu size={16} strokeWidth={2.5} />
-                                                <span className="hidden lg:inline">{t('home_menu') || 'Menu'}</span>
+                                                <Settings size={18} strokeWidth={2.5} />
                                                 {unreadCount > 0 && (
-                                                    <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[8px] font-black text-white flex items-center justify-center px-1">
+                                                    <div className="absolute -top-1 -right-1 min-w-[17px] h-[17px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[8px] font-black text-white flex items-center justify-center">
                                                         {unreadCount > 9 ? '9+' : unreadCount}
                                                     </div>
                                                 )}
                                             </button>
                                             {isMenuOpen && (
-                                                <div className="absolute right-0 top-full mt-4 w-64 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden z-[100] animate-in py-2 backdrop-blur-2xl shadow-2xl">
+                                                <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-white/5 rounded-2xl shadow-2xl p-2 z-[100] animate-in fade-in zoom-in-95 duration-200 backdrop-blur-xl">
                                                     {/* User Profile Header */}
-                                                    <div className="px-6 py-5 border-b border-black/5 dark:border-white/5 bg-slate-50/50 dark:bg-white/5 mb-1">
-                                                        <div className="flex items-center gap-4">
-                                                            <div className="w-11 h-11 rounded-full bg-brand flex items-center justify-center text-white text-lg font-black shrink-0 shadow-lg shadow-brand/20">
+                                                    <div className="p-4 border-b border-slate-100 dark:border-white/5 mb-2">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="w-10 h-10 rounded-full bg-brand flex items-center justify-center text-white font-black shadow-lg shadow-brand/20">
                                                                 {user.first_name ? user.first_name[0] : 'U'}
                                                             </div>
                                                             <div className="flex flex-col min-w-0">
-                                                                <span className="text-[14px] font-black text-slate-900 dark:text-white truncate leading-tight">
+                                                                <span className="text-sm font-black text-slate-900 dark:text-white truncate">
                                                                     {user.first_name} {user.last_name}
                                                                 </span>
-                                                                <span className="text-[10px] font-bold text-slate-400 truncate tracking-tight mt-0.5">@{user.username || user.id}</span>
+                                                                <span className="text-[10px] font-bold text-slate-400 truncate">@{user.username || user.id}</span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -754,18 +753,30 @@ const NavMenu = ({
                                                         { path: '/channels', icon: Megaphone, label: 'my_channels' },
                                                         { path: '/notifications', icon: Bell, label: 'notifications', badge: unreadCount > 0 }
                                                     ].map((item, i) => (
-                                                        <button key={i} onClick={() => { navigate(item.path); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-black/5 dark:hover:bg-white/5 text-left border-b border-black/5 dark:border-white/5 last:border-0 relative group">
-                                                            <item.icon size={18} className="text-slate-600 dark:text-slate-400 transition-colors" /> 
-                                                            <span className="text-[11px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">{t(item.label)}</span>
-                                                            {item.badge && <div className="absolute right-6 w-2.5 h-2.5 bg-red-600 rounded-full"></div>}
+                                                        <button key={i} onClick={() => { navigate(item.path); setIsMenuOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                                            <div className="flex items-center gap-3">
+                                                                <item.icon size={18} className="group-hover:text-slate-900 dark:group-hover:text-white transition-colors" /> 
+                                                                <span className="text-xs font-bold uppercase tracking-tight">{t(item.label)}</span>
+                                                            </div>
+                                                            {item.badge && <div className="w-2 h-2 bg-red-500 rounded-full"></div>}
                                                         </button>
                                                     ))}
+
+                                                    <div className="h-px bg-slate-100 dark:bg-white/5 my-2" />
+
                                                     <button 
-                                                        onClick={() => { haptic('medium'); setWebAuthUser(null); setIsMenuOpen(false); }} 
-                                                        className="w-full flex items-center gap-4 px-6 py-4 hover:bg-black/5 dark:hover:bg-white/5 text-left text-red-500 dark:text-red-400"
+                                                        onClick={() => { 
+                                                            const confirmed = window.confirm("Çıkış yapmak istediğinize emin misiniz?");
+                                                            if (confirmed) {
+                                                                haptic('medium'); 
+                                                                setWebAuthUser(null); 
+                                                                setIsMenuOpen(false); 
+                                                            }
+                                                        }} 
+                                                        className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 text-red-500 dark:text-red-400 transition-all group"
                                                     >
-                                                        <LogOut size={18} /> 
-                                                        <span className="text-[11px] font-black uppercase tracking-tight">{t('home_logout')}</span>
+                                                        <LogOut size={18} className="group-hover:scale-110 transition-transform" /> 
+                                                        <span className="text-xs font-bold uppercase tracking-tight">{t('home_logout')}</span>
                                                     </button>
                                                 </div>
                                             )}
