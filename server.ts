@@ -71,21 +71,21 @@ async function startServer() {
   app.set('trust proxy', true);
 
   // --- MANDATORY CORS ---
-  const allowedOrigins = [
-    'https://botlyhub.vercel.app',
-    'https://botlyhub.com',
-    /\.run\.app$/ // Matches AI Studio dev urls
-  ];
-
   app.use(cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (like mobile apps or curl)
       if (!origin) return callback(null, true);
       
-      const isAllowed = allowedOrigins.some(allowed => {
-        if (allowed instanceof RegExp) return allowed.test(origin);
-        return allowed === origin;
-      });
+      const allowedOrigins = [
+        'https://botlyhub.vercel.app',
+        'https://botlyhub.com',
+        'http://localhost:3000',
+        'http://localhost:5173'
+      ];
+
+      const isAllowed = allowedOrigins.includes(origin) || 
+                       origin.endsWith('.run.app') || 
+                       origin.endsWith('.vercel.app');
 
       if (isAllowed || process.env.NODE_ENV !== 'production') {
         callback(null, true);
@@ -95,13 +95,13 @@ async function startServer() {
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+    preflightContinue: false,
+    optionsSuccessStatus: 204
   }));
 
+  // Log requests for debugging
   app.use((req, res, next) => {
-    if (req.method === 'OPTIONS') {
-        return res.sendStatus(200);
-    }
     console.log(`[REQUEST] ${req.method} ${req.url} - Origin: ${req.get('Origin')}`);
     next();
   });

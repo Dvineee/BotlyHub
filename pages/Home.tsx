@@ -16,6 +16,7 @@ import { useTheme } from '../ThemeContext';
 import Logo from '../components/Logo';
 import { SEO } from '../components/SEO';
 import LoginModal from '../components/LoginModal';
+import Header from '../components/Header';
 
 const iconMap: Record<string, any> = {
   Sparkles, Megaphone, Zap, Gift, Star, Info, BotIcon, Heart, Bell, Shield
@@ -1204,19 +1205,9 @@ const Home = () => {
       </div>
 
       {!isLoading && (
-        <NavMenu 
-            isScrolled={isScrolled}
-            user={user}
+        <Header 
+            showLogo={isScrolled} 
             unreadCount={unreadCount}
-            theme={theme}
-            toggleTheme={toggleTheme}
-            haptic={haptic}
-            isMenuOpen={isMenuOpen}
-            setIsMenuOpen={setIsMenuOpen}
-            setIsLoginModalOpen={setIsLoginModalOpen}
-            setWebAuthUser={setWebAuthUser}
-            isLoginModalOpen={isLoginModalOpen}
-            menuRef={menuRef}
         />
       )}
 

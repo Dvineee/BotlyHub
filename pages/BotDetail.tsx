@@ -10,6 +10,7 @@ import {
   Sun, Moon, Wallet, Menu, ExternalLink, Coins, Briefcase, Compass, LogOut, Plus
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import Header from '../components/Header';
 import { useNavigate, useParams, Link as RouterLink } from 'react-router-dom';
 import { Bot, Channel, User, Notification } from '../types';
 import { categories } from '../data';
@@ -31,375 +32,6 @@ const getLiveBotIcon = (bot: Bot) => {
         if (username) return `https://t.me/i/userpic/320/${username}.jpg`;
     }
     return bot.icon || `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=1e293b&color=fff&bold=true`;
-};
-
-const NavMenu = ({ 
-    user, 
-    unreadCount, 
-    theme, 
-    toggleTheme, 
-    haptic, 
-    isMenuOpen, 
-    setIsMenuOpen, 
-    setIsLoginModalOpen, 
-    setWebAuthUser, 
-    isLoginModalOpen,
-    menuRef: parentMenuRef
-}: { 
-    user: any, 
-    unreadCount: number, 
-    theme: string, 
-    toggleTheme: () => void, 
-    haptic: any, 
-    isMenuOpen: boolean, 
-    setIsMenuOpen: (v: boolean) => void,
-    setIsLoginModalOpen: (v: boolean) => void,
-    setWebAuthUser: (v: any) => void,
-    isLoginModalOpen: boolean,
-    menuRef: React.RefObject<HTMLDivElement>
-}) => {
-    const { t } = useTranslation();
-    const navigate = useNavigate();
-    const [openMenu, setOpenMenu] = useState<'kesfet' | 'investors' | null>(null);
-    const [mobileModal, setMobileModal] = useState<'kesfet' | 'investors' | null>(null);
-    const [searchQuery, setSearchQuery] = useState('');
-    const internalMenuRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (internalMenuRef.current && !internalMenuRef.current.contains(event.target as Node)) {
-                setOpenMenu(null);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
-
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (searchQuery.trim()) {
-            haptic('light');
-            navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
-            setOpenMenu(null);
-            setMobileModal(null);
-        }
-    };
-
-    const discoverItems: { id: string; label: string; desc: string; icon: any; action?: () => void; path?: string; }[] = [
-        { id: 'bots', label: 'Botlar', desc: 'Telegram Bot Marketi', icon: BotIcon, action: () => { navigate('/search?mode=bots&category=all'); setOpenMenu(null); setMobileModal(null); } },
-        { id: 'apps', label: 'Uygulamalar', desc: 'Web3 & TMA Uygulamaları', icon: LayoutGrid, action: () => { navigate('/search?mode=apps&category=all'); setOpenMenu(null); setMobileModal(null); } },
-        { id: 'channels', label: 'Kanallar', desc: 'Popüler Telegram Kanalları', icon: Megaphone, path: '/channels' },
-        { id: 'ads', label: 'Reklam', desc: 'Projenizi Öne Çıkarın', icon: Share2, path: '/settings' },
-    ];
-
-    const investorItems: { id: string; label: string; desc: string; icon: any; action?: () => void; path?: string; }[] = [
-        { id: 'exchanges', label: 'Borsalar ve Takas', desc: 'CEX & DEX Platformları', icon: BarChart3 },
-        { id: 'earn', label: 'Kazanç Uygulamaları', desc: 'Pasif Gelir Fırsatları', icon: Coins },
-        { id: 'tools', label: 'Yatırım Araçları', desc: 'Analiz ve Takip Araçları', icon: Briefcase },
-        { id: 'new', label: 'Yeni Keşifler', desc: 'Gelecek Vaadeden Projeler', icon: Compass },
-    ];
-
-    const simpleLinks = [
-        { label: 'Hızlı Link 1', path: '#' },
-        { label: 'Hızlı Link 2', path: '#' },
-        { label: 'Hızlı Link 3', path: '#' },
-    ];
-
-    const renderMegaMenuContent = () => {
-        if (openMenu === 'kesfet') {
-            return (
-                <div className="max-w-5xl mx-auto px-6 grid grid-cols-12 gap-8">
-                    <div className="col-span-8">
-                        <div className="grid grid-cols-2 gap-4">
-                            {discoverItems.map(item => (
-                                <button 
-                                    key={item.id}
-                                    onClick={() => {
-                                        if (item.action) item.action();
-                                        else if (item.path) { navigate(item.path); setOpenMenu(null); }
-                                    }}
-                                    className="flex items-center gap-4 p-4 hover:bg-black/[0.02] dark:hover:bg-white/5 rounded-2xl transition-all group border border-transparent hover:border-black/5 dark:hover:border-white/10 text-left w-full"
-                                >
-                                    <div className="menu-icon-container shrink-0">
-                                        <item.icon size={20} className="menu-item-icon" />
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-[14px] font-semibold menu-item-text">{item.label}</span>
-                                        <span className="text-[12px] text-slate-500 dark:text-slate-400 font-normal">{item.desc}</span>
-                                    </div>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            );
-        }
-
-        if (openMenu === 'investors') {
-            return (
-                <div className="max-w-5xl mx-auto px-6 grid grid-cols-12 gap-8">
-                    <div className="col-span-8">
-                        <div className="grid grid-cols-2 gap-4">
-                            {investorItems.map(item => (
-                                <button 
-                                    key={item.id}
-                                    className="flex items-center gap-4 p-4 hover:bg-black/[0.02] dark:hover:bg-white/5 rounded-2xl transition-all group border border-transparent hover:border-black/5 dark:hover:border-white/10 text-left w-full"
-                                >
-                                    <div className="menu-icon-container shrink-0">
-                                        <item.icon size={20} className="menu-item-icon" />
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-[14px] font-semibold menu-item-text">{item.label}</span>
-                                        <span className="text-[12px] text-slate-500 dark:text-slate-400 font-normal">{item.desc}</span>
-                                    </div>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            );
-        }
-    };
-
-    return (
-        <>
-        <div className="sticky top-0 z-[100] bg-white dark:bg-slate-900 border-b border-[#f7f7f7] dark:border-white/5 w-full py-2.5 md:pb-2 transition-colors" ref={internalMenuRef}>
-            <div className="max-w-7xl mx-auto px-5 sm:px-8 flex items-center justify-between gap-3 md:gap-4">
-                {/* Left Section (Logo) */}
-                <div className="flex items-center w-auto shrink-0">
-                    <Logo onClick={() => navigate('/')} className="cursor-pointer" />
-                </div>
-
-                {/* Mobile Search Button */}
-                <div className="flex md:hidden flex-1 justify-center">
-                    <button 
-                        onClick={() => { haptic('light'); navigate('/search'); }}
-                        className="w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-slate-800/50 border border-black/5 dark:border-white/10 rounded-xl text-slate-500 active:scale-95 transition-all"
-                    >
-                        <Search size={20} />
-                    </button>
-                </div>
-
-                {/* Center Section (Navigation & Search) */}
-                <div className="hidden md:flex items-center justify-center gap-8 md:gap-10 flex-1">
-                    <div className="flex items-center gap-6">
-                        {/* Discover (Keşfet) */}
-                        <div 
-                            className="relative md:static"
-                            onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('kesfet'); }}
-                        >
-                            <button 
-                                onClick={() => {
-                                    if (window.innerWidth < 768) {
-                                        haptic('light');
-                                        setMobileModal('kesfet');
-                                    } else {
-                                        setOpenMenu(openMenu === 'kesfet' ? null : 'kesfet');
-                                    }
-                                }}
-                                className={`nav-menu-item grow-0 ${openMenu === 'kesfet' ? 'text-slate-900 dark:text-white bg-blue-500/5' : 'text-slate-600 dark:text-slate-400 hover:bg-blue-500/5'}`}
-                            >
-                                Keşfet <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'kesfet' ? 'rotate-180' : ''}`} />
-                            </button>
-                        </div>
-
-                        {/* Investors (Yatırımcılar) */}
-                        <div 
-                            className="relative md:static"
-                            onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('investors'); }}
-                        >
-                            <button 
-                                onClick={() => {
-                                    if (window.innerWidth < 768) {
-                                        haptic('light');
-                                        setMobileModal('investors');
-                                    } else {
-                                        setOpenMenu(openMenu === 'investors' ? null : 'investors');
-                                    }
-                                }}
-                                className={`nav-menu-item grow-0 ${openMenu === 'investors' ? 'text-slate-900 dark:text-white bg-emerald-500/5' : 'text-slate-600 dark:text-slate-400 hover:bg-emerald-500/5'}`}
-                            >
-                                Yatırımcılar <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'investors' ? 'rotate-180' : ''}`} />
-                            </button>
-                        </div>
-
-                        {/* Blog Link */}
-                        <button 
-                            onClick={() => { haptic('light'); navigate('/blog'); }}
-                            className="nav-menu-item text-slate-600 dark:text-slate-400 hover:bg-blue-500/5 whitespace-nowrap"
-                        >
-                            {t('blog_title')}
-                        </button>
-                    </div>
-
-                    {/* Search Bar */}
-                    <form onSubmit={handleSearch} className="flex-1 max-w-sm">
-                        <div className="relative flex items-center bg-slate-50 dark:bg-slate-800/50 border border-black/5 dark:border-white/10 rounded-xl p-1 group">
-                            <Search size={16} className="ml-2 text-slate-400 group-focus-within:text-blue-500" />
-                            <input 
-                                type="text"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder={t('search_placeholder')}
-                                className="w-full bg-transparent border-none focus:ring-0 text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 text-slate-700 dark:text-slate-200"
-                            />
-                        </div>
-                    </form>
-                </div>
-
-                {/* Profile Section */}
-                <div className="flex items-center justify-end w-auto shrink-0 gap-2 md:gap-3">
-                    <button 
-                        onClick={() => { haptic('light'); toggleTheme(); }} 
-                        className="hidden md:flex nav-menu-item min-w-[33px] px-2 items-center justify-center bg-transparent hover:bg-slate-100/50 dark:hover:bg-white/5 border border-black/5 dark:border-white/5 rounded-[10px] text-slate-900 dark:text-white active:scale-95 transition-all outline-none"
-                    >
-                        {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
-                    </button>
-
-                    {user ? (
-                        <>
-                            <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="hidden sm:flex nav-menu-item w-[33px] !px-0 flex items-center justify-center bg-transparent hover:bg-slate-100/50 dark:hover:bg-white/5 border border-black/5 dark:border-white/5 rounded-[10px] text-slate-900 dark:text-white active:scale-95 transition-all">
-                                <Wallet size={17} />
-                            </button>
-                            <div className="relative" ref={parentMenuRef}>
-                                <button 
-                                  onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
-                                  className={`nav-menu-item border border-black/5 dark:border-white/5 text-slate-900 dark:text-white active:scale-95 transition-all relative ${isMenuOpen ? 'bg-slate-100 dark:bg-white/10' : 'bg-transparent hover:bg-slate-100/50 dark:hover:bg-white/5'}`}
-                                >
-                                    <Menu size={16} strokeWidth={2.5} />
-                                    <span className="hidden lg:inline">{t('home_menu') || 'Menu'}</span>
-                                    {unreadCount > 0 && (
-                                        <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[8px] font-black text-white flex items-center justify-center px-1">
-                                            {unreadCount > 9 ? '9+' : unreadCount}
-                                        </div>
-                                    )}
-                                </button>
-                                {isMenuOpen && (
-                                    <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-white/5 rounded-2xl shadow-2xl p-2 z-[100] animate-in fade-in zoom-in-95 duration-200">
-                                        <div className="p-4 border-b border-slate-100 dark:border-white/5 mb-2">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-black">
-                                                    {user.first_name ? user.first_name[0] : 'U'}
-                                                </div>
-                                                <div className="flex flex-col min-w-0">
-                                                    <span className="text-[13px] font-bold text-slate-900 dark:text-white truncate">
-                                                        {user.first_name} {user.last_name}
-                                                    </span>
-                                                    <span className="text-[10px] text-slate-500 truncate">@{user.username || user.id}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <button onClick={() => { haptic('light'); navigate('/notifications'); setIsMenuOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                            <div className="flex items-center gap-3">
-                                                <Bell size={18} className="group-hover:text-blue-500 transition-colors" />
-                                                <span className="text-xs font-bold uppercase tracking-tight">{t('notif_inbox')}</span>
-                                            </div>
-                                            {unreadCount > 0 && <div className="w-2 h-2 bg-red-500 rounded-full" />}
-                                        </button>
-
-                                        <button onClick={() => { haptic('light'); navigate('/settings'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                            <Plus size={18} className="group-hover:text-emerald-500 transition-colors" />
-                                            <span className="text-xs font-bold uppercase tracking-tight">{t('add_project')}</span>
-                                        </button>
-
-                                        <div className="h-px bg-slate-100 dark:border-white/5 my-2" />
-
-                                        <button onClick={() => { 
-                                            const confirmed = window.confirm("Çıkış yapmak istediğinize emin misiniz?");
-                                            if (confirmed) {
-                                                haptic('medium'); 
-                                                setWebAuthUser(null);
-                                                setIsMenuOpen(false); 
-                                            }
-                                        }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 text-red-500 transition-all font-bold text-xs uppercase">
-                                            <LogOut size={18} />
-                                            {t('home_logout')}
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        </>
-                    ) : (
-                        <button 
-                            onClick={() => { haptic('light'); setIsLoginModalOpen(true); }}
-                            className="nav-menu-item bg-blue-600 hover:bg-blue-700 text-white border-none text-[10px] font-black uppercase tracking-widest px-4 md:px-6 shadow-lg shadow-blue-500/20 active:scale-95 transition-all whitespace-nowrap"
-                        >
-                            {t('home_login')}
-                        </button>
-                    )}
-                </div>
-            </div>
-
-            {/* Desktop Mega Menu Overlay */}
-            <AnimatePresence>
-                {openMenu && (
-                    <motion.div 
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        className="absolute top-full left-0 w-full bg-white dark:bg-slate-900 border-b border-black/5 dark:border-white/5 shadow-2xl py-8 hidden md:block"
-                        onMouseLeave={() => setOpenMenu(null)}
-                    >
-                        {renderMegaMenuContent()}
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </div>
-
-        {/* Mobile Mega Menus */}
-        <AnimatePresence>
-            {mobileModal && (
-                <div className="fixed inset-0 z-[200] md:hidden">
-                    <motion.div 
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={() => setMobileModal(null)}
-                        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-                    />
-                    <motion.div 
-                        initial={{ y: '100%' }}
-                        animate={{ y: 0 }}
-                        exit={{ y: '100%' }}
-                        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                        className="absolute bottom-0 left-0 w-full bg-white dark:bg-slate-900 rounded-t-[32px] p-6 max-h-[85vh] overflow-y-auto"
-                    >
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase italic">
-                                {mobileModal === 'kesfet' ? 'Keşfet' : 'Yatırımcılar'}
-                            </h3>
-                            <button onClick={() => setMobileModal(null)} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-500">
-                                <X size={20} />
-                            </button>
-                        </div>
-
-                        <div className="grid grid-cols-1 gap-3">
-                            {(mobileModal === 'kesfet' ? discoverItems : investorItems).map(item => (
-                                <button 
-                                    key={item.id}
-                                    onClick={() => {
-                                        if (item.action) item.action();
-                                        else if (item.path) { navigate(item.path); setMobileModal(null); }
-                                    }}
-                                    className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-white/5 rounded-2xl text-left"
-                                >
-                                    <div className="w-12 h-12 bg-white dark:bg-slate-800 rounded-xl flex items-center justify-center shadow-sm text-blue-500">
-                                        <item.icon size={24} />
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-base font-bold text-slate-900 dark:text-white">{item.label}</span>
-                                        <span className="text-xs text-slate-500 dark:text-slate-400">{item.desc}</span>
-                                    </div>
-                                </button>
-                            ))}
-                        </div>
-                    </motion.div>
-                </div>
-            )}
-        </AnimatePresence>
-        </>
-    );
 };
 
 const BotDetail = () => {
@@ -424,12 +56,9 @@ const BotDetail = () => {
   const [userRating, setUserRating] = useState<number | null>(null);
   const [hoverRating, setHoverRating] = useState<number | null>(null);
   const [isRating, setIsRating] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const menuRef = useRef<HTMLDivElement>(null);
   
   const screenshotScroll = useDraggableScroll();
   
@@ -449,7 +78,7 @@ const BotDetail = () => {
             
             // Log bot view
             await DatabaseService.logActivity(userId, 'system', 'bot_view', 'Bot İnceleme', `${data.name} botu detayları görüntülendi.`);
-
+ 
             // Get notifications for unread count
             DatabaseService.getNotifications(userId).then(notes => {
                 const unread = notes.filter(n => !n.isRead).length;
@@ -459,23 +88,18 @@ const BotDetail = () => {
     } catch (e) { console.error(e); }
     finally { setIsLoading(false); }
   }, [slug, user?.id]);
-
+ 
   useEffect(() => {
     fetchBotData();
-    const handleClickOutside = (event: MouseEvent) => {
-        if (menuRef.current && !menuRef.current.contains(event.target as Node)) setIsMenuOpen(false);
-    };
-
+ 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') closeLightbox();
       if (e.key === 'ArrowRight') nextImage(null as any);
       if (e.key === 'ArrowLeft') prevImage(null as any);
     };
-
-    document.addEventListener('mousedown', handleClickOutside);
+ 
     window.addEventListener('keydown', handleKeyDown);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [fetchBotData, slug]);
@@ -670,19 +294,7 @@ const BotDetail = () => {
         ]}
     />
     <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-200 pb-40 animate-in fade-in transition-colors duration-300 bot-detail-page">
-      <NavMenu 
-        user={user} 
-        unreadCount={unreadCount} 
-        theme={theme} 
-        toggleTheme={toggleTheme} 
-        haptic={haptic}
-        isMenuOpen={isMenuOpen}
-        setIsMenuOpen={setIsMenuOpen}
-        setIsLoginModalOpen={setIsLoginModalOpen}
-        setWebAuthUser={setWebAuthUser}
-        isLoginModalOpen={isLoginModalOpen}
-        menuRef={menuRef}
-      />
+      <Header showSearch={true} unreadCount={unreadCount} />
       <div className="max-w-7xl mx-auto px-5 sm:px-8 md:px-10">
         <div className="lg:grid lg:grid-cols-[1fr_320px] lg:gap-16 overflow-visible pt-10">
           <div className="lg:col-start-1 min-w-0">
