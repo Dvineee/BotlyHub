@@ -634,67 +634,96 @@ const NavMenu = ({
     return (
         <>
         <div className="sticky top-0 z-[1] bg-white dark:bg-slate-900 border-b border-[#f7f7f7] dark:border-white/5 w-full py-2.5 md:pb-2 transition-colors" ref={internalMenuRef}>
-            <div className="max-w-7xl mx-auto px-5 sm:px-8 flex items-center justify-between">
+            <div className="max-w-7xl mx-auto px-5 sm:px-8 flex items-center justify-between gap-3 md:gap-4">
                 {/* Left Section (Logo) */}
-                <div className="hidden md:flex items-center w-48 shrink-0">
-                    {isScrolled ? (
-                        <Logo onClick={() => navigate('/')} className="cursor-pointer" />
-                    ) : null}
+                <div className="flex items-center md:w-48 shrink-0">
+                    <AnimatePresence>
+                        {isScrolled && (
+                            <motion.div
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -10 }}
+                                className="hidden md:block"
+                            >
+                                <Logo onClick={() => navigate('/')} className="cursor-pointer" />
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
 
-                {/* Center Section (Navigation) */}
-                <div className="flex items-center justify-center gap-8 md:gap-14 flex-1">
-                    {/* Discover (Keşfet) */}
-                    <div 
-                        className="relative md:static"
-                        onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('kesfet'); }}
-                    >
-                        <button 
-                            onClick={() => {
-                                if (window.innerWidth < 768) {
-                                    haptic('light');
-                                    setMobileModal('kesfet');
-                                } else {
-                                    setOpenMenu(openMenu === 'kesfet' ? null : 'kesfet');
-                                }
-                            }}
-                            className={`nav-menu-item grow-0 ${openMenu === 'kesfet' ? 'text-slate-900 dark:text-white bg-blue-500/5' : 'text-slate-600 dark:text-slate-400 hover:bg-blue-500/5'}`}
+                {/* Center Section (Navigation & Search) */}
+                <div className="flex items-center justify-center gap-4 md:gap-8 flex-1 min-w-0">
+                    <div className="hidden lg:flex items-center gap-6 shrink-0">
+                        {/* Discover (Keşfet) */}
+                        <div 
+                            className="relative"
+                            onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('kesfet'); }}
                         >
-                            Keşfet <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'kesfet' ? 'rotate-180' : ''}`} />
-                        </button>
+                            <button 
+                                onClick={() => {
+                                    if (window.innerWidth < 768) {
+                                        haptic('light');
+                                        setMobileModal('kesfet');
+                                    } else {
+                                        setOpenMenu(openMenu === 'kesfet' ? null : 'kesfet');
+                                    }
+                                }}
+                                className={`nav-menu-item grow-0 ${openMenu === 'kesfet' ? 'text-slate-900 dark:text-white bg-blue-500/5' : 'text-slate-600 dark:text-slate-400 hover:bg-blue-500/5'}`}
+                            >
+                                Keşfet <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'kesfet' ? 'rotate-180' : ''}`} />
+                            </button>
+                        </div>
+
+                        {/* Investors (Yatırımcılar) */}
+                        <div 
+                            className="relative"
+                            onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('investors'); }}
+                        >
+                            <button 
+                                onClick={() => {
+                                    if (window.innerWidth < 768) {
+                                        haptic('light');
+                                        setMobileModal('investors');
+                                    } else {
+                                        setOpenMenu(openMenu === 'investors' ? null : 'investors');
+                                    }
+                                }}
+                                className={`nav-menu-item grow-0 ${openMenu === 'investors' ? 'text-slate-900 dark:text-white bg-emerald-500/5' : 'text-slate-600 dark:text-slate-400 hover:bg-emerald-500/5'}`}
+                            >
+                                Yatırımcılar <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'investors' ? 'rotate-180' : ''}`} />
+                            </button>
+                        </div>
                     </div>
 
-                    {/* Investors (Yatırımcılar) */}
-                    <div 
-                        className="relative md:static"
-                        onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('investors'); }}
-                    >
-                        <button 
-                            onClick={() => {
-                                if (window.innerWidth < 768) {
-                                    haptic('light');
-                                    setMobileModal('investors');
-                                } else {
-                                    setOpenMenu(openMenu === 'investors' ? null : 'investors');
-                                }
-                            }}
-                            className={`nav-menu-item grow-0 ${openMenu === 'investors' ? 'text-slate-900 dark:text-white bg-emerald-500/5' : 'text-slate-600 dark:text-slate-400 hover:bg-emerald-500/5'}`}
-                        >
-                            Yatırımcılar <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'investors' ? 'rotate-180' : ''}`} />
-                        </button>
-                    </div>
-
-                    {/* Blog Link */}
-                    <button 
-                        onClick={() => { haptic('light'); navigate('/blog'); }}
-                        className="nav-menu-item text-slate-600 dark:text-slate-400 hover:bg-blue-500/5"
-                    >
-                        {t('blog_title')}
-                    </button>
+                    {/* Search Bar - visible when scrolled */}
+                    <AnimatePresence>
+                        {isScrolled && (
+                            <motion.form 
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 10 }}
+                                onSubmit={(e) => {
+                                    e.preventDefault();
+                                    const q = (e.currentTarget.querySelector('input') as HTMLInputElement).value;
+                                    if (q) navigate(`/search?q=${encodeURIComponent(q)}`);
+                                }} 
+                                className="flex flex-1 max-w-sm min-w-0"
+                            >
+                                <div className="relative flex items-center bg-slate-50 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-xl p-0.5 group w-full transition-all focus-within:ring-2 focus-within:ring-blue-500/20">
+                                    <Search size={14} className="ml-3 text-slate-400 group-focus-within:text-blue-500 shrink-0" />
+                                    <input 
+                                        type="text"
+                                        placeholder={t('search_placeholder')}
+                                        className="w-full bg-transparent border-none focus:ring-0 text-[11px] font-bold uppercase tracking-wider px-3 py-2 text-slate-700 dark:text-slate-200 placeholder:text-slate-500"
+                                    />
+                                </div>
+                            </motion.form>
+                        )}
+                    </AnimatePresence>
                 </div>
 
                 {/* Profile Section */}
-                <div className="hidden md:flex items-center justify-end w-auto shrink-0">
+                <div className="flex items-center justify-end md:w-48 shrink-0 gap-2 md:gap-3">
                     <AnimatePresence mode="wait">
                         {isScrolled && (
                             <motion.div 
@@ -707,23 +736,22 @@ const NavMenu = ({
                             >
                                 <button 
                                     onClick={() => { haptic('light'); toggleTheme(); }} 
-                                    className="nav-menu-item min-w-[33px] px-2 flex items-center justify-center bg-transparent hover:bg-slate-100/50 dark:hover:bg-white/5 border border-black/5 dark:border-white/5 rounded-[10px] text-slate-900 dark:text-white active:scale-95 transition-all outline-none"
+                                    className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-transparent hover:bg-slate-100/50 dark:hover:bg-white/5 border border-black/5 dark:border-white/5 rounded-[10px] text-slate-900 dark:text-white active:scale-95 transition-all outline-none"
                                 >
                                     {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
                                 </button>
 
                                 {user ? (
                                     <>
-                                        <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="nav-menu-item w-[33px] !px-0 flex items-center justify-center bg-transparent hover:bg-slate-100/50 dark:hover:bg-white/5 border border-black/5 dark:border-white/5 rounded-[10px] text-slate-900 dark:text-white active:scale-95 transition-all">
+                                        <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="hidden sm:flex w-8 h-8 md:w-10 md:h-10 items-center justify-center bg-transparent hover:bg-slate-100/50 dark:hover:bg-white/5 border border-black/5 dark:border-white/5 rounded-[10px] text-slate-900 dark:text-white active:scale-95 transition-all">
                                             <Wallet size={17} />
                                         </button>
                                         <div className="relative" ref={parentMenuRef}>
                                             <button 
                                               onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
-                                              className={`nav-menu-item border border-black/5 dark:border-white/5 text-slate-900 dark:text-white active:scale-95 transition-all relative ${isMenuOpen ? 'bg-slate-100 dark:bg-white/10' : 'bg-transparent hover:bg-slate-100/50 dark:hover:bg-white/5'}`}
+                                              className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center border border-black/5 dark:border-white/5 rounded-[10px] text-slate-900 dark:text-white active:scale-95 transition-all relative ${isMenuOpen ? 'bg-slate-100 dark:bg-white/10' : 'bg-transparent hover:bg-slate-100/50 dark:hover:bg-white/5'}`}
                                             >
                                                 <Menu size={16} strokeWidth={2.5} />
-                                                <span className="hidden lg:inline">{t('home_menu') || 'Menu'}</span>
                                                 {unreadCount > 0 && (
                                                     <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[8px] font-black text-white flex items-center justify-center px-1">
                                                         {unreadCount > 9 ? '9+' : unreadCount}
@@ -746,13 +774,12 @@ const NavMenu = ({
                                                         </div>
                                                     </div>
                                                     {[
-                                                        { path: '/', icon: Store, label: 'market' },
-                                                        { path: '/settings', icon: User, label: 'profile' },
+                                                        { path: '/notifications', icon: Bell, label: 'notif_inbox', badge: unreadCount > 0 },
+                                                        { path: '/settings', icon: Plus, label: 'add_project' },
                                                         { path: '/my-bots', icon: BotIcon, label: 'my_bots' },
-                                                        { path: '/channels', icon: Megaphone, label: 'my_channels' },
-                                                        { path: '/notifications', icon: Bell, label: 'notifications', badge: unreadCount > 0 }
+                                                        { path: '/settings', icon: User, label: 'profile' },
                                                     ].map((item, i) => (
-                                                        <button key={i} onClick={() => { navigate(item.path); setIsMenuOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group relative">
+                                                        <button key={i} onClick={() => { navigate(item.path); setIsMenuOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group relative border-none bg-transparent">
                                                             <div className="flex items-center gap-3">
                                                                 <item.icon size={18} className="text-slate-400 group-hover:text-blue-500 transition-colors" /> 
                                                                 <span className="text-xs font-bold uppercase tracking-tight">{t(item.label)}</span>
@@ -762,8 +789,13 @@ const NavMenu = ({
                                                     ))}
                                                     <div className="h-px bg-slate-100 dark:bg-white/5 my-2" />
                                                     <button 
-                                                        onClick={() => { haptic('medium'); setWebAuthUser(null); setIsMenuOpen(false); }} 
-                                                        className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 text-red-500 transition-all font-bold text-xs uppercase"
+                                                        onClick={() => { 
+                                                            const hc = window.confirm(t('logout_confirm') || 'Çıkış yapmak istediğinize emin misiniz?');
+                                                            if (hc) {
+                                                                haptic('medium'); setWebAuthUser(null); setIsMenuOpen(false); 
+                                                            }
+                                                        }} 
+                                                        className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 text-red-500 transition-all font-bold text-xs uppercase bg-transparent border-none"
                                                     >
                                                         <LogOut size={18} /> 
                                                         {t('home_logout')}
@@ -775,9 +807,9 @@ const NavMenu = ({
                                 ) : (
                                     <button 
                                         onClick={() => { haptic('light'); setIsLoginModalOpen(true); }}
-                                        className="nav-menu-item !px-5 bg-blue-500 hover:bg-blue-600 text-white text-[13px] font-bold rounded-[10px] transition-all active:scale-95 flex items-center justify-center whitespace-nowrap shadow-lg shadow-blue-500/25 border-none"
+                                        className="h-9 px-5 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all active:scale-95 flex items-center justify-center whitespace-nowrap shadow-lg shadow-blue-500/20 border-none"
                                     >
-                                        {t('home_login')}
+                                        {t('login')}
                                     </button>
                                 )}
                             </motion.div>
@@ -1109,11 +1141,11 @@ const Home = () => {
                                   const q = (e.target as any).querySelector('input')?.value;
                                   if (q) navigate(`/search?q=${encodeURIComponent(q)}`);
                               }}>
-                                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-brand transition-colors" size={18} />
+                                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={16} />
                                   <input 
                                       type="text"
                                       placeholder={t('search_placeholder')}
-                                      className="w-full h-11 bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-2xl pl-12 pr-4 text-[13px] md:text-sm text-slate-900 dark:text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition-all font-bold uppercase tracking-widest shadow-sm"
+                                      className="w-full h-10 bg-slate-50 dark:bg-slate-800/50 border border-black/5 dark:border-white/10 rounded-xl pl-10 pr-4 text-[11px] text-slate-900 dark:text-white placeholder:text-slate-500 focus:outline-none focus:ring-0 font-bold uppercase tracking-widest shadow-sm transition-all"
                                   />
                               </form>
                           </div>
