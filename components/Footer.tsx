@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Send, ChevronRight, Share2 } from 'lucide-react';
+import { Send, Github, ChevronRight, Share2 } from 'lucide-react';
 import Logo from './Logo';
 import { useTelegram } from '../hooks/useTelegram';
 import { useNavigate } from 'react-router-dom';

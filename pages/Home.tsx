@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Search, ChevronLeft, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, Send, Link, CheckCircle2, ChevronDown, Sun, Moon, Wallet, Menu, Plus, LogOut, Compass, Coins, BarChart3, Binoculars, Share2, Briefcase, MousePointer2, ExternalLink, ArrowLeft } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, Send, Instagram, Youtube, Link, CheckCircle2, ChevronDown, Sun, Moon, Wallet, Menu, Plus, LogOut, Compass, Coins, BarChart3, Binoculars, Share2, Briefcase, MousePointer2, ExternalLink, ArrowLeft } from 'lucide-react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Bot, Announcement, Notification } from '../types';
@@ -418,7 +418,6 @@ const NavMenu = ({
     const [openMenu, setOpenMenu] = useState<'kesfet' | 'investors' | null>(null);
     const [navState, setNavState] = useState<'main' | 'bots' | 'apps'>('main');
     const [mobileModal, setMobileModal] = useState<'kesfet' | 'investors' | null>(null);
-    const [searchQuery, setSearchQuery] = useState('');
     const internalMenuRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -432,16 +431,6 @@ const NavMenu = ({
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (searchQuery.trim()) {
-            haptic('light');
-            navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
-            setOpenMenu(null);
-            setMobileModal(null);
-        }
-    };
-
     const botsCategories = categories.filter(c => c.id !== 'apps' && c.id !== 'all');
     const appsCategories = appsSubCategories;
 
@@ -453,14 +442,14 @@ const NavMenu = ({
         setNavState('main');
     };
 
-    const discoverItems: { id: string; label: string; desc: string; icon: any; action?: () => void; path?: string; }[] = [
+    const discoverItems = [
         { id: 'bots', label: 'Botlar', desc: 'Telegram Bot Marketi', icon: BotIcon, action: () => setNavState('bots') },
         { id: 'apps', label: 'Uygulamalar', desc: 'Web3 & TMA Uygulamaları', icon: LayoutGrid, action: () => setNavState('apps') },
         { id: 'channels', label: 'Kanallar', desc: 'Popüler Telegram Kanalları', icon: Megaphone, path: '/channels' },
         { id: 'ads', label: 'Reklam', desc: 'Projenizi Öne Çıkarın', icon: Share2, path: '/settings' },
     ];
 
-    const investorItems: { id: string; label: string; desc: string; icon: any; action?: () => void; path?: string; }[] = [
+    const investorItems = [
         { id: 'exchanges', label: 'Borsalar ve Takas', desc: 'CEX & DEX Platformları', icon: BarChart3 },
         { id: 'earn', label: 'Kazanç Uygulamaları', desc: 'Pasif Gelir Fırsatları', icon: Coins },
         { id: 'tools', label: 'Yatırım Araçları', desc: 'Analiz ve Takip Araçları', icon: Briefcase },
@@ -584,9 +573,7 @@ const NavMenu = ({
                                 className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-blue-500 transition-all font-bold text-xs uppercase group"
                             >
                                 {link.label}
-                                <div className="opacity-0 group-hover:opacity-100 transition-all">
-                                    <ExternalLink size={14} />
-                                </div>
+                                <ExternalLink size={14} className="opacity-0 group-hover:opacity-100 transition-all" />
                             </a>
                         ))}
                     </div>
@@ -626,9 +613,7 @@ const NavMenu = ({
                                 className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-emerald-500 transition-all font-bold text-xs uppercase group"
                             >
                                 {link.label}
-                                <div className="opacity-0 group-hover:opacity-100 transition-all">
-                                    <ExternalLink size={14} />
-                                </div>
+                                <ExternalLink size={14} className="opacity-0 group-hover:opacity-100 transition-all" />
                             </a>
                         ))}
                     </div>
@@ -639,33 +624,18 @@ const NavMenu = ({
 
     return (
         <>
-        <div className={`sticky top-0 z-[100] bg-white dark:bg-slate-900 border-b border-[#f7f7f7] dark:border-white/5 w-full py-2.5 md:pb-2 transition-colors ${isScrolled ? 'shadow-sm' : ''}`} ref={internalMenuRef}>
-            <div className="max-w-7xl mx-auto px-5 sm:px-8 flex items-center justify-between gap-3 md:gap-4">
+        <div className="sticky top-0 z-[1] bg-white dark:bg-slate-900 border-b border-[#f7f7f7] dark:border-white/5 w-full py-2.5 md:pb-2 transition-colors" ref={internalMenuRef}>
+            <div className="max-w-7xl mx-auto px-5 sm:px-8 flex items-center justify-between">
                 {/* Left Section (Logo) */}
-                <div className="flex items-center w-auto shrink-0">
+                <div className="hidden md:flex items-center w-48 shrink-0">
                     {isScrolled ? (
                         <Logo onClick={() => navigate('/')} className="cursor-pointer" />
-                    ) : (
-                        <div className="w-10 h-10 md:hidden" /> // Mobile spacer
-                    )}
+                    ) : null}
                 </div>
 
-                {/* Mobile Search Button */}
-                <div className="flex md:hidden flex-1 justify-center">
-                    {isScrolled && (
-                        <button 
-                            onClick={() => { haptic('light'); navigate('/search'); }}
-                            className="w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-slate-800/50 border border-black/5 dark:border-white/10 rounded-xl text-slate-500 active:scale-95 transition-all"
-                        >
-                            <Search size={20} />
-                        </button>
-                    )}
-                </div>
-
-                {/* Center Section (Navigation & Search) */}
+                {/* Center Section (Navigation) */}
                 <div className="flex items-center justify-center gap-8 md:gap-14 flex-1">
-                    <div className="hidden md:flex items-center gap-8 lg:gap-14">
-                        {/* Discover (Keşfet) */}
+                    {/* Discover (Keşfet) */}
                     <div 
                         className="relative md:static"
                         onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('kesfet'); }}
@@ -705,36 +675,19 @@ const NavMenu = ({
                         </button>
                     </div>
 
-                        {/* Blog Link */}
-                        <button 
-                            onClick={() => { haptic('light'); navigate('/blog'); }}
-                            className="nav-menu-item text-slate-600 dark:text-slate-400 hover:bg-blue-500/5 whitespace-nowrap"
-                        >
-                            {t('blog_title')}
-                        </button>
-                    </div>
-
-                    {/* Search Bar - Only visible when scrolled */}
-                    {isScrolled && (
-                        <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-sm ml-4">
-                            <div className="relative flex items-center bg-slate-50 dark:bg-slate-800/50 border border-black/5 dark:border-white/10 rounded-xl p-1 group w-full">
-                                <Search size={16} className="ml-2 text-slate-400 group-focus-within:text-blue-500" />
-                                <input 
-                                    type="text"
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    placeholder={t('search_placeholder')}
-                                    className="w-full bg-transparent border-none focus:ring-0 text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 text-slate-700 dark:text-slate-200"
-                                />
-                            </div>
-                        </form>
-                    )}
+                    {/* Blog Link */}
+                    <button 
+                        onClick={() => { haptic('light'); navigate('/blog'); }}
+                        className="nav-menu-item text-slate-600 dark:text-slate-400 hover:bg-blue-500/5"
+                    >
+                        {t('blog_title')}
+                    </button>
                 </div>
 
                 {/* Profile Section */}
-                <div className="flex items-center justify-end w-auto md:w-48 shrink-0 gap-2 md:gap-3 ml-auto">
+                <div className="hidden md:flex items-center justify-end w-48 shrink-0">
                     <AnimatePresence mode="wait">
-                        {(isScrolled || window.innerWidth < 768) && (
+                        {isScrolled && (
                             <motion.div 
                                 key="scrolled-actions"
                                 initial={{ opacity: 0, x: 10 }}
@@ -1125,13 +1078,13 @@ const Home = () => {
 
                   <div className="w-full md:flex-1 md:max-w-2xl order-3 md:order-2 flex items-center gap-2 md:gap-3">
                       <div className="flex-1 md:w-[330px] md:flex-none relative z-[100]">
-                          <div className="relative flex items-center bg-slate-50 dark:bg-slate-800/50 border border-black/5 dark:border-white/10 rounded-xl p-0.5 md:p-1 group custom-search-outline shadow-sm">
+                          <div className="relative flex items-center bg-slate-50 dark:bg-slate-800/50 border border-black/5 dark:border-white/10 rounded-xl p-0.5 md:p-1 group shadow-sm">
                               <div 
                                 onClick={() => navigate('/search')} 
                                 className="flex items-center flex-1 min-w-0 cursor-pointer active:scale-[0.98] transition-transform"
                               >
                                   <div className="ml-2 md:ml-3 w-8 h-8 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors shrink-0">
-                                      <Search size={18} />
+                                      <Search size={16} />
                                   </div>
                                   <div className="w-full py-2 px-3 text-[11px] text-slate-700 dark:text-slate-200 font-bold uppercase tracking-wider truncate min-w-0">
                                       {t('search_placeholder')}
