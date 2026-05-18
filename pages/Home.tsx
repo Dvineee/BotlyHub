@@ -722,26 +722,72 @@ const NavMenu = ({
                                                 )}
                                             </button>
                                             {isMenuOpen && (
-                                                <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden z-[100] animate-in py-2 backdrop-blur-2xl shadow-2xl">
-                                                    {[
-                                                        { path: '/', icon: Store, color: 'text-blue-500 dark:text-blue-400', label: 'market' },
-                                                        { path: '/settings', icon: User, color: 'text-purple-500 dark:text-purple-400', label: 'profile' },
-                                                        { path: '/my-bots', icon: BotIcon, color: 'text-emerald-500 dark:text-emerald-400', label: 'my_bots' },
-                                                        { path: '/channels', icon: Megaphone, color: 'text-orange-500 dark:text-orange-400', label: 'my_channels' },
-                                                        { path: '/notifications', icon: Bell, color: 'text-blue-600 dark:text-blue-500', label: 'notifications', badge: unreadCount > 0 }
-                                                    ].map((item, i) => (
-                                                        <button key={i} onClick={() => { navigate(item.path); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-black/5 dark:hover:bg-white/5 text-left border-b border-black/5 dark:border-white/5 last:border-0 relative">
-                                                            <item.icon size={18} className={item.color} /> 
-                                                            <span className="text-[11px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300">{t(item.label)}</span>
-                                                            {item.badge && <div className="absolute right-6 w-2.5 h-2.5 bg-red-600 rounded-full"></div>}
-                                                        </button>
-                                                    ))}
+                                                <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-white/5 rounded-2xl shadow-2xl p-2 z-[100] animate-in fade-in zoom-in-95 duration-200">
+                                                    <div className="p-4 border-b border-slate-100 dark:border-white/5 mb-2">
+                                                        <div className="flex items-center gap-3">
+                                                            {(user.photo_url || user.avatar) ? (
+                                                                <img 
+                                                                    src={user.photo_url || user.avatar} 
+                                                                    alt={user.first_name || user.name}
+                                                                    className="w-10 h-10 rounded-full object-cover"
+                                                                />
+                                                            ) : (
+                                                                <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-black">
+                                                                    {user.first_name ? user.first_name[0] : (user.name ? user.name[0] : 'U')}
+                                                                </div>
+                                                            )}
+                                                            <div className="flex flex-col min-w-0">
+                                                                <span className="text-[13px] font-bold text-slate-900 dark:text-white truncate">
+                                                                    {user.first_name ? `${user.first_name} ${user.last_name || ''}` : user.name}
+                                                                </span>
+                                                                <span className="text-[10px] text-slate-500 truncate">@{user.username || user.id}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <button onClick={() => { haptic('light'); navigate('/'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                                        <Store size={18} className="text-blue-500 transition-colors" />
+                                                        <span className="text-xs font-bold uppercase tracking-tight">{t('market')}</span>
+                                                    </button>
+
+                                                    <button onClick={() => { haptic('light'); navigate('/settings'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                                        <User size={18} className="text-purple-500 transition-colors" />
+                                                        <span className="text-xs font-bold uppercase tracking-tight">{t('profile')}</span>
+                                                    </button>
+
+                                                    <button onClick={() => { haptic('light'); navigate('/my-bots'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                                        <BotIcon size={18} className="text-emerald-500 transition-colors" />
+                                                        <span className="text-xs font-bold uppercase tracking-tight">{t('my_bots')}</span>
+                                                    </button>
+
+                                                    <button onClick={() => { haptic('light'); navigate('/channels'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                                        <Megaphone size={18} className="text-orange-500 transition-colors" />
+                                                        <span className="text-xs font-bold uppercase tracking-tight">{t('my_channels')}</span>
+                                                    </button>
+
+                                                    <button onClick={() => { haptic('light'); navigate('/notifications'); setIsMenuOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                                        <div className="flex items-center gap-3">
+                                                            <Bell size={18} className="text-blue-600 transition-colors" />
+                                                            <span className="text-xs font-bold uppercase tracking-tight">{t('notifications')}</span>
+                                                        </div>
+                                                        {unreadCount > 0 && <div className="w-2 h-2 bg-red-500 rounded-full" />}
+                                                    </button>
+
+                                                    <div className="h-px bg-slate-100 dark:border-white/5 my-2" />
+                                                    
                                                     <button 
-                                                        onClick={() => { haptic('medium'); setWebAuthUser(null); setIsMenuOpen(false); }} 
-                                                        className="w-full flex items-center gap-4 px-6 py-4 hover:bg-black/5 dark:hover:bg-white/5 text-left text-red-500 dark:text-red-400"
+                                                        onClick={() => { 
+                                                            const confirmed = window.confirm("Çıkış yapmak istediğinize emin misiniz?");
+                                                            if (confirmed) {
+                                                                haptic('medium'); 
+                                                                setWebAuthUser(null);
+                                                                setIsMenuOpen(false); 
+                                                            }
+                                                        }} 
+                                                        className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 text-red-500 transition-all font-bold text-xs uppercase"
                                                     >
                                                         <LogOut size={18} /> 
-                                                        <span className="text-[11px] font-black uppercase tracking-tight">{t('home_logout')}</span>
+                                                        <span className="text-xs font-bold uppercase tracking-tight">{t('home_logout')}</span>
                                                     </button>
                                                 </div>
                                             )}

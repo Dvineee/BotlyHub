@@ -76,14 +76,14 @@ export const FilterMenu: React.FC = () => {
             initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            className="absolute right-0 mt-3 w-56 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden z-[150] py-2 backdrop-blur-2xl shadow-2xl"
+            className="absolute right-0 mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-white/5 rounded-2xl shadow-2xl p-2 z-[150] animate-in fade-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="px-5 py-2 border-b border-black/5 dark:border-white/5 flex items-center justify-between">
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Filtrele</span>
+            <div className="px-4 py-3 border-b border-slate-100 dark:border-white/5 mb-2 flex items-center justify-between">
+              <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Filtrele</span>
               <button 
                 onClick={(e) => { e.stopPropagation(); setIsOpen(false); }} 
-                className="text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-white/5 text-slate-400 transition-colors"
               >
                 <X size={14} />
               </button>
@@ -92,12 +92,12 @@ export const FilterMenu: React.FC = () => {
               <button
                 key={opt.id}
                 onClick={(e) => { e.stopPropagation(); handleSelect(opt.id); }}
-                className="w-full flex items-center justify-between px-5 py-4 hover:bg-black/5 dark:hover:bg-white/5 text-left transition-colors group"
+                className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-left transition-all group"
               >
-                <div className="flex items-center gap-4">
-                  <opt.icon size={16} className={`${opt.color} ${activeFilter === opt.id ? 'opacity-100' : 'opacity-60 group-hover:opacity-100'}`} />
-                  <span className={`text-[11px] font-black uppercase tracking-tight ${
-                    activeFilter === opt.id ? 'text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300'
+                <div className="flex items-center gap-3">
+                  <opt.icon size={18} className={`${opt.color} ${activeFilter === opt.id ? 'opacity-100' : 'opacity-60 group-hover:opacity-100'}`} />
+                  <span className={`text-xs font-bold uppercase tracking-tight ${
+                    activeFilter === opt.id ? 'text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white'
                   }`}>
                     {opt.label}
                   </span>
