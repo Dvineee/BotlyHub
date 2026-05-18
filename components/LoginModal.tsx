@@ -35,7 +35,13 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onAuth }) => {
   ];
 
   const getApiUrl = (path: string) => {
-    const baseUrl = import.meta.env.VITE_API_URL || '';
+    const isRunApp = window.location.origin.includes('.run.app');
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    
+    const baseUrl = import.meta.env.VITE_API_URL || ((isRunApp || isLocal) 
+      ? '' 
+      : 'https://ais-pre-ubzg6ohqwxfncnjxhzi3nj-16842427189.europe-west2.run.app');
+      
     if (!baseUrl) return path;
     const cleanBase = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
     const cleanPath = path.startsWith('/') ? path : `/${path}`;
