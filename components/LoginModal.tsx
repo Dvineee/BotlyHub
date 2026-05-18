@@ -34,45 +34,17 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onAuth }) => {
     }
   ];
 
-  const getApiUrl = (path: string) => {
-    const isRunApp = window.location.origin.includes('.run.app');
-    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    
-    const baseUrl = import.meta.env.VITE_API_URL || ((isRunApp || isLocal) 
-      ? '' 
-      : 'https://ais-pre-ubzg6ohqwxfncnjxhzi3nj-16842427189.europe-west2.run.app');
-      
-    if (!baseUrl) return path;
-    const cleanBase = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
-    const cleanPath = path.startsWith('/') ? path : `/${path}`;
-    return `${cleanBase}${cleanPath}`;
-  };
-
   const handleRequestCode = async () => {
     if (!identifier) return;
     setIsLoading(true);
     setError('');
     try {
-        const res = await fetch(getApiUrl('/api/auth/telegram/request-code'), {
+        const res = await fetch('/api/auth/telegram/request-code', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ identifier: identifier.trim() })
         });
         
-        // Handle non-JSON responses (like Vercel 404s)
-        const contentType = res.headers.get('content-type');
-        const url = getApiUrl('/api/auth/telegram/request-code');
-        
-        if (!res.ok && res.status === 404) {
-            throw new Error(`API endpoint bulunamadı (404). URL: ${url}. Eğer Vercel kullanıyorsanız backend sunucusunun yapılandırıldığından emin olun.`);
-        }
-
-        if (!contentType || !contentType.includes('application/json')) {
-            const text = await res.text();
-            console.error("Non-JSON response received:", text.slice(0, 200));
-            throw new Error(`Sunucu doğru formatta yanıt vermedi (Kod: ${res.status}). Beklenen JSON, ancak farklı bir yanıt alındı. URL: ${url}`);
-        }
-
         const data = await res.json();
         
         if (res.ok) {
@@ -86,11 +58,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onAuth }) => {
         }
     } catch (err: any) {
         console.error("Auth Request Error:", err);
-        if (err.message?.includes('formatta')) {
-            setError(err.message);
-        } else {
-            setError('Sunucu bağlantısı başarısız. API sunucusuna ulaşılamıyor. Lütfen internet bağlantınızı veya API URL ayarınızı kontrol edin.');
-        }
+        setError('Sunucu bağlantısı başarısız. Lütfen internet bağlantınızı kontrol edin.');
     } finally {
         setIsLoading(false);
     }
@@ -101,23 +69,11 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onAuth }) => {
     setIsLoading(true);
     setError('');
     try {
-        const res = await fetch(getApiUrl('/api/auth/telegram/verify-code'), {
+        const res = await fetch('/api/auth/telegram/verify-code', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ identifier, code })
         });
-
-        const contentType = res.headers.get('content-type');
-        const url = getApiUrl('/api/auth/telegram/verify-code');
-        
-        if (!res.ok && res.status === 404) {
-            throw new Error(`API endpoint bulunamadı (404). URL: ${url}`);
-        }
-
-        if (!contentType || !contentType.includes('application/json')) {
-            throw new Error(`Sunucu doğru formatta yanıt vermedi (Kod: ${res.status}). URL: ${url}`);
-        }
-
         const data = await res.json();
         if (res.ok) {
             onAuth(data.user);
@@ -129,8 +85,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onAuth }) => {
         } else {
             setError(data.error || 'Geçersiz kod');
         }
-    } catch (err: any) {
-        setError(err.message || 'Doğrulama başarısız');
+    } catch (err) {
+        setError('Doğrulama başarısız');
     } finally {
         setIsLoading(false);
     }

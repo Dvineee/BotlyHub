@@ -71,21 +71,21 @@ async function startServer() {
   app.set('trust proxy', true);
 
   // --- MANDATORY CORS ---
+  const allowedOrigins = [
+    'https://botlyhub.vercel.app',
+    'https://botlyhub.com',
+    /\.run\.app$/ // Matches AI Studio dev urls
+  ];
+
   app.use(cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (like mobile apps or curl)
       if (!origin) return callback(null, true);
       
-      const allowedOrigins = [
-        'https://botlyhub.vercel.app',
-        'https://botlyhub.com',
-        'http://localhost:3000',
-        'http://localhost:5173'
-      ];
-
-      const isAllowed = allowedOrigins.includes(origin) || 
-                       origin.endsWith('.run.app') || 
-                       origin.endsWith('.vercel.app');
+      const isAllowed = allowedOrigins.some(allowed => {
+        if (allowed instanceof RegExp) return allowed.test(origin);
+        return allowed === origin;
+      });
 
       if (isAllowed || process.env.NODE_ENV !== 'production') {
         callback(null, true);
@@ -95,13 +95,13 @@ async function startServer() {
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
-    preflightContinue: false,
-    optionsSuccessStatus: 204
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
   }));
 
-  // Log requests for debugging
   app.use((req, res, next) => {
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(200);
+    }
     console.log(`[REQUEST] ${req.method} ${req.url} - Origin: ${req.get('Origin')}`);
     next();
   });
@@ -153,34 +153,21 @@ async function startServer() {
   // 0. Telegram Auth Code Request
   app.post("/api/auth/telegram/request-code", authLimiter, async (req, res) => {
     let { identifier } = req.body;
-    console.log(`[AUTH] Request code for identifier: ${identifier}`);
-    
-    if (!identifier) {
-        console.warn("[AUTH] Missing identifier in request body");
-        return res.status(400).json({ error: "Identifier required" });
-    }
+    if (!identifier) return res.status(400).json({ error: "Identifier required" });
 
     identifier = identifier.trim();
     let chatId = identifier;
 
     // Resolve username to chat_id if necessary
     if (identifier.startsWith('@') || isNaN(Number(identifier))) {
-      console.log(`[AUTH] Resolving username: ${identifier}`);
-      try {
-        const user = await DatabaseService.getUserByUsername(identifier);
-        if (user) {
-          chatId = user.id;
-          console.log(`[AUTH] Resolved to chatId: ${chatId}`);
-        } else {
-          console.warn(`[AUTH] Username ${identifier} not found in database`);
-          return res.status(400).json({ 
-            error: "Kullanıcı bulunamadı. Lütfen önce botumuza (@BotlyHubBOT) /start komutunu gönderin.",
-            detail: "Username not found in database. User must interact with the bot first."
-          });
-        }
-      } catch (dbErr) {
-        console.error("[AUTH] Database error while resolving username:", dbErr);
-        return res.status(500).json({ error: "Veritabanı bağlantı hatası." });
+      const user = await DatabaseService.getUserByUsername(identifier);
+      if (user) {
+        chatId = user.id;
+      } else {
+        return res.status(400).json({ 
+          error: "Kullanıcı bulunamadı. Lütfen önce botumuza (@BotlyHubBOT) /start komutunu gönderin.",
+          detail: "Username not found in database. User must interact with the bot first."
+        });
       }
     }
 
@@ -190,12 +177,10 @@ async function startServer() {
     const botToken = process.env.TELEGRAM_AUTH_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN;
 
     if (!botToken) {
-      console.error("[AUTH] TELEGRAM_BOT_TOKEN is missing in environment");
-      return res.status(500).json({ error: "Bot token not configured on server" });
+      return res.status(500).json({ error: "Bot token not configured" });
     }
 
     try {
-      console.log(`[AUTH] Sending message to Telegram for chatId: ${chatId}`);
       const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -208,10 +193,9 @@ async function startServer() {
 
       const result = await response.json() as any;
       if (result.ok) {
-        console.log(`[AUTH] Code sent successfully to ${chatId}`);
         res.json({ success: true, message: "Code sent via Telegram" });
       } else {
-        console.error("[AUTH] Telegram API error:", result);
+        console.error("[AUTH] Telegram error:", result);
         let errorMsg = `Kod gönderilemedi. Lütfen Telegram botumuzu (@${process.env.TELEGRAM_AUTH_BOT_USERNAME || 'BotlyHubBot'}) başlattığınızdan emin olun.`;
         
         if (result.description?.includes('chat not found')) {
@@ -224,7 +208,7 @@ async function startServer() {
         });
       }
     } catch (err: any) {
-      console.error("[AUTH] Request code network/fetch error:", err);
+      console.error("[AUTH] Request code error:", err);
       res.status(500).json({ error: "Sunucu hatası, lütfen tekrar deneyin." });
     }
   });
