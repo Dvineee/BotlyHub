@@ -230,9 +230,11 @@ const BlogPage: React.FC = () => {
             <nav className="flex-1 space-y-4 overflow-y-auto no-scrollbar">
               <button
                  onClick={() => { haptic('light'); navigate('/'); }}
-                 className="w-full flex items-center gap-3 p-3.5 rounded-2xl bg-slate-50 dark:bg-white/5 text-base font-bold"
+                 className="w-full flex items-center gap-3 p-3.5 rounded-2xl text-base font-bold mobile-menu-item"
               >
-                <Home size={22} className="text-blue-500" />
+                <div className="mobile-menu-icon-container flex items-center justify-center rounded-xl shrink-0">
+                  <Home size={22} className="text-blue-500" />
+                </div>
                 {t('blog_home')}
               </button>
 
@@ -243,17 +245,18 @@ const BlogPage: React.FC = () => {
                   <button
                     key={cat.id}
                     onClick={() => { haptic('light'); setActiveCategory(cat.id); setIsMobileMenuOpen(false); }}
-                    className={`w-full flex items-center justify-between p-3.5 rounded-2xl transition-all text-sm font-bold ${
+                    className={`w-full flex items-center justify-between p-3.5 rounded-2xl transition-all text-sm font-bold mobile-menu-item ${
                       activeCategory === cat.id 
-                      ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/30' 
-                      : 'bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-slate-400'
+                      ? 'text-slate-900 dark:text-white' 
+                      : 'text-slate-600 dark:text-slate-400'
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <cat.icon size={20} className={activeCategory === cat.id ? 'text-white' : 'text-slate-400'} />
+                      <div className="mobile-menu-icon-container flex items-center justify-center rounded-xl shrink-0">
+                        <cat.icon size={22} className={activeCategory === cat.id ? 'text-[#2563eb]' : 'text-slate-400'} />
+                      </div>
                       {t(cat.translationKey)}
                     </div>
-                    {activeCategory === cat.id && <ChevronRight size={18} />}
                   </button>
                 ))}
               </div>
@@ -285,7 +288,6 @@ const BlogPage: React.FC = () => {
                  </div>
                ) : (
                  <div className="mobile-menu-profile bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-500/10 dark:to-blue-500/10 rounded-2xl border border-blue-100/50 dark:border-blue-500/20">
-                    <p className="text-[11px] text-blue-700/70 dark:text-blue-400/70 mb-3 leading-relaxed">{t('blog_login_desc')}</p>
                     <button onClick={() => { haptic('light'); navigate('/login'); }} className="w-full mobile-login-btn bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2">
                       <User size={16} />
                       {t('login')}
@@ -293,29 +295,35 @@ const BlogPage: React.FC = () => {
                  </div>
                )}
 
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 gap-1.5 mt-auto">
                 <button
                   onClick={() => { haptic('light'); toggleTheme(); }}
-                  className="flex flex-col items-center justify-center gap-1.5 mobile-menu-actions-btn rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white"
+                  className="flex items-center gap-1.5 p-2 mobile-menu-actions-btn rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white justify-center"
                 >
-                  {theme === 'dark' ? <Sun size={20} className="text-yellow-400" /> : <Moon size={20} className="text-blue-500" />}
-                  <span className="text-[10px] font-bold uppercase tracking-widest">{theme === 'dark' ? t('blog_day_mode') : t('blog_night_mode')}</span>
+                  <div className="shrink-0 flex items-center justify-center">
+                    {theme === 'dark' ? <Sun size={14} className="text-yellow-400" /> : <Moon size={14} className="text-blue-500" />}
+                  </div>
+                  <span className="text-[8px] font-black uppercase tracking-tight truncate">{theme === 'dark' ? t('blog_day_mode').split(' ')[0] : t('blog_night_mode').split(' ')[0]}</span>
                 </button>
 
                 <button
                   onClick={() => { haptic('light'); setIsSearchModalOpen(true); setIsMobileMenuOpen(false); }}
-                  className="flex flex-col items-center justify-center gap-1.5 mobile-menu-actions-btn rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white"
+                  className="flex items-center gap-1.5 p-2 mobile-menu-actions-btn rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white justify-center"
                 >
-                  <Search size={20} className="text-blue-500" />
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{t('blog_explore')}</span>
+                  <div className="shrink-0 flex items-center justify-center">
+                    <Search size={14} className="text-blue-500" />
+                  </div>
+                  <span className="text-[8px] font-black uppercase tracking-tight text-slate-400 truncate">{t('blog_explore')}</span>
                 </button>
 
                 <button
                   onClick={() => { haptic('light'); setIsLangPickerOpen(true); }}
-                  className="flex flex-col items-center justify-center gap-1.5 mobile-menu-actions-btn rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white"
+                  className="flex items-center gap-1.5 p-2 mobile-menu-actions-btn rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white justify-center"
                 >
-                  <Globe size={20} className="text-slate-400" />
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{t('blog_lang_selection').split(' ')[0]}</span>
+                  <div className="shrink-0 flex items-center justify-center">
+                    <Globe size={14} className="text-slate-400" />
+                  </div>
+                  <span className="text-[8px] font-black uppercase tracking-tight text-slate-400 truncate">{t('blog_lang_selection').split(' ')[0]}</span>
                 </button>
               </div>
             </div>

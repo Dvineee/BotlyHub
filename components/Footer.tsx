@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Send, Twitter, Github, ChevronRight } from 'lucide-react';
+import { Send, Github, ChevronRight, Share2 } from 'lucide-react';
 import Logo from './Logo';
 import { useTelegram } from '../hooks/useTelegram';
 import { useNavigate } from 'react-router-dom';
@@ -47,7 +47,7 @@ const Footer: React.FC = () => {
             <h4 className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-[0.3em] font-mono">{t('footer_contact')}</h4>
             <div className="flex flex-col gap-3">
                 <a href="https://t.me/botlyhub" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[11px] font-bold text-slate-400 hover:text-blue-500 uppercase tracking-widest transition-colors"><Send size={14} /> {t('footer_tg_announcement')}</a>
-                <a href="#" className="flex items-center gap-2 text-[11px] font-bold text-slate-400 hover:text-blue-500 uppercase tracking-widest transition-colors"><Twitter size={14} /> {t('footer_twitter')}</a>
+                <a href="#" className="flex items-center gap-2 text-[11px] font-bold text-slate-400 hover:text-blue-500 uppercase tracking-widest transition-colors"><Share2 size={14} /> {t('footer_twitter')}</a>
             </div>
         </div>
       </div>

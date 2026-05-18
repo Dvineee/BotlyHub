@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Bell, Edit3, Download, ExternalLink, ShieldCheck, Loader2, Info, AlertCircle } from 'lucide-react';
+import { X, Bell, Edit3, Download, ExternalLink, ShieldCheck, Loader2, Info, AlertCircle, Send, LogIn } from 'lucide-react';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -181,7 +181,12 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onAuth }) => {
                                 onClick={handleRequestCode}
                                 className="w-full h-11 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20"
                             >
-                                {isLoading ? <Loader2 className="animate-spin" size={16} /> : 'Kod Gönder'}
+                                {isLoading ? <Loader2 className="animate-spin" size={16} /> : (
+                                    <>
+                                        <Send size={16} />
+                                        <span className="hidden sm:inline">Kod Gönder</span>
+                                    </>
+                                )}
                             </button>
                         </div>
                     ) : (
@@ -204,7 +209,12 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onAuth }) => {
                                 onClick={handleVerifyCode}
                                 className="w-full h-11 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20"
                             >
-                                {isLoading ? <Loader2 className="animate-spin" size={16} /> : 'Giriş Yap'}
+                                {isLoading ? <Loader2 className="animate-spin" size={16} /> : (
+                                    <>
+                                        <LogIn size={16} />
+                                        <span className="hidden sm:inline">Giriş Yap</span>
+                                    </>
+                                )}
                             </button>
                             <button 
                                 onClick={() => setStep('request')}
