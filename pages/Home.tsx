@@ -653,60 +653,69 @@ const NavMenu = ({
 
                 {/* Center Section (Navigation & Search) */}
                 <div className="flex items-center justify-center gap-4 md:gap-8 flex-1 min-w-0">
-                    <div className="flex items-center gap-2 md:gap-6 shrink-0">
-                        {/* Discover (Keşfet) */}
-                        <div 
-                            className="relative"
-                            onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('kesfet'); }}
-                        >
-                            <button 
-                                onClick={() => {
-                                    if (window.innerWidth < 768) {
-                                        haptic('light');
-                                        setMobileModal('kesfet');
-                                    } else {
-                                        setOpenMenu(openMenu === 'kesfet' ? null : 'kesfet');
-                                    }
-                                }}
-                                className={`nav-menu-item grow-0 ${openMenu === 'kesfet' ? 'text-slate-900 dark:text-white bg-blue-500/5' : 'text-slate-600 dark:text-slate-400 hover:bg-blue-500/5'}`}
+                    <AnimatePresence>
+                        {isScrolled && (
+                            <motion.div 
+                                initial={{ opacity: 0, y: 5 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 5 }}
+                                className="flex items-center gap-2 md:gap-6 shrink-0"
                             >
-                                <span className="hidden sm:inline">Keşfet</span>
-                                <Compass size={16} className="sm:hidden" />
-                                <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'kesfet' ? 'rotate-180' : ''}`} />
-                            </button>
-                        </div>
+                                {/* Discover (Keşfet) */}
+                                <div 
+                                    className="relative"
+                                    onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('kesfet'); }}
+                                >
+                                    <button 
+                                        onClick={() => {
+                                            if (window.innerWidth < 768) {
+                                                haptic('light');
+                                                setMobileModal('kesfet');
+                                            } else {
+                                                setOpenMenu(openMenu === 'kesfet' ? null : 'kesfet');
+                                            }
+                                        }}
+                                        className={`nav-menu-item grow-0 ${openMenu === 'kesfet' ? 'text-slate-900 dark:text-white bg-blue-500/5' : 'text-slate-600 dark:text-slate-400 hover:bg-blue-500/5'}`}
+                                    >
+                                        <span className="hidden sm:inline">Keşfet</span>
+                                        <Compass size={16} className="sm:hidden" />
+                                        <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'kesfet' ? 'rotate-180' : ''}`} />
+                                    </button>
+                                </div>
 
-                        {/* Investors (Yatırımcılar) */}
-                        <div 
-                            className="relative"
-                            onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('investors'); }}
-                        >
-                            <button 
-                                onClick={() => {
-                                    if (window.innerWidth < 768) {
-                                        haptic('light');
-                                        setMobileModal('investors');
-                                    } else {
-                                        setOpenMenu(openMenu === 'investors' ? null : 'investors');
-                                    }
-                                }}
-                                className={`nav-menu-item grow-0 ${openMenu === 'investors' ? 'text-slate-900 dark:text-white bg-emerald-500/5' : 'text-slate-600 dark:text-slate-400 hover:bg-emerald-500/5'}`}
-                            >
-                                <span className="hidden sm:inline">Yatırımcılar</span>
-                                <BarChart3 size={16} className="sm:hidden" />
-                                <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'investors' ? 'rotate-180' : ''}`} />
-                            </button>
-                        </div>
+                                {/* Investors (Yatırımcılar) */}
+                                <div 
+                                    className="relative"
+                                    onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('investors'); }}
+                                >
+                                    <button 
+                                        onClick={() => {
+                                            if (window.innerWidth < 768) {
+                                                haptic('light');
+                                                setMobileModal('investors');
+                                            } else {
+                                                setOpenMenu(openMenu === 'investors' ? null : 'investors');
+                                            }
+                                        }}
+                                        className={`nav-menu-item grow-0 ${openMenu === 'investors' ? 'text-slate-900 dark:text-white bg-emerald-500/5' : 'text-slate-600 dark:text-slate-400 hover:bg-emerald-500/5'}`}
+                                    >
+                                        <span className="hidden sm:inline">Yatırımcılar</span>
+                                        <BarChart3 size={16} className="sm:hidden" />
+                                        <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'investors' ? 'rotate-180' : ''}`} />
+                                    </button>
+                                </div>
 
-                        {/* Blog Link */}
-                        <button 
-                            onClick={() => { haptic('light'); navigate('/blog'); }}
-                            className="nav-menu-item text-slate-600 dark:text-slate-400 hover:bg-blue-500/5 whitespace-nowrap"
-                        >
-                            <span className="hidden sm:inline">{t('blog_title')}</span>
-                            <Radio size={16} className="sm:hidden" />
-                        </button>
-                    </div>
+                                {/* Blog Link */}
+                                <button 
+                                    onClick={() => { haptic('light'); navigate('/blog'); }}
+                                    className="nav-menu-item text-slate-600 dark:text-slate-400 hover:bg-blue-500/5 whitespace-nowrap"
+                                >
+                                    <span className="hidden sm:inline">{t('blog_title')}</span>
+                                    <Radio size={16} className="sm:hidden" />
+                                </button>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
 
                     {/* Search Bar - only visible when scrolled on mobile */}
                     <AnimatePresence>
@@ -736,8 +745,15 @@ const NavMenu = ({
                 </div>
 
                 {/* Profile Section */}
-                <div className="flex items-center justify-end w-20 sm:w-24 md:w-48 shrink-0 gap-2 md:gap-3">
-                    <div className="flex items-center gap-2 md:gap-3">
+                <div className="flex items-center justify-end w-10 sm:w-24 md:w-48 shrink-0 gap-2 md:gap-3">
+                    <AnimatePresence>
+                        {isScrolled && (
+                            <motion.div 
+                                initial={{ opacity: 0, x: 10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: 10 }}
+                                className="flex items-center gap-2 md:gap-3"
+                            >
                                 <button 
                                     onClick={() => { haptic('light'); toggleTheme(); }} 
                                     className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-transparent hover:bg-slate-100/50 dark:hover:bg-white/5 border border-black/5 dark:border-white/5 rounded-[10px] text-slate-900 dark:text-white active:scale-95 transition-all outline-none"
@@ -783,7 +799,7 @@ const NavMenu = ({
                                                         { path: '/my-bots', icon: BotIcon, label: 'my_bots' },
                                                         { path: '/settings', icon: User, label: 'profile' },
                                                     ].map((item, i) => (
-                                                        <button key={i} onClick={() => { navigate(item.path); setIsMenuOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group relative border-none bg-transparent">
+                                                        <button key={i} onClick={() => { navigate(item.path); setIsMenuOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group relative border-none bg-transparent shadow-none">
                                                             <div className="flex items-center gap-3">
                                                                 <item.icon size={18} className="text-slate-400 group-hover:text-blue-500 transition-colors" /> 
                                                                 <span className="text-xs font-bold uppercase tracking-tight">{t(item.label)}</span>
@@ -791,7 +807,7 @@ const NavMenu = ({
                                                             {item.badge && <div className="w-2 h-2 bg-red-600 rounded-full"></div>}
                                                         </button>
                                                     ))}
-                                                    <div className="h-px bg-slate-100 dark:bg-white/5 my-2" />
+                                                    <div className="h-px bg-slate-100 dark:border-white/5 my-2" />
                                                     <button 
                                                         onClick={() => { 
                                                             const hc = window.confirm(t('logout_confirm') || 'Çıkış yapmak istediğinize emin misiniz?');
@@ -799,7 +815,7 @@ const NavMenu = ({
                                                                 haptic('medium'); setWebAuthUser(null); setIsMenuOpen(false); 
                                                             }
                                                         }} 
-                                                        className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 text-red-500 transition-all font-bold text-xs uppercase bg-transparent border-none"
+                                                        className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 text-red-500 transition-all font-bold text-xs uppercase bg-transparent border-none shadow-none"
                                                     >
                                                         <LogOut size={18} /> 
                                                         {t('home_logout')}
@@ -816,7 +832,9 @@ const NavMenu = ({
                                         {t('login')}
                                     </button>
                                 )}
-                    </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
             </div>
 
