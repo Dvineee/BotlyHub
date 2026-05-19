@@ -354,71 +354,7 @@ const NavMenu = ({
                             {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
                         </button>
 
-                        {user ? (
-                            <>
-                                <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="nav-menu-item w-[33px] !px-0 flex items-center justify-center bg-transparent hover:bg-slate-100/50 dark:hover:bg-white/5 border border-black/5 dark:border-white/5 rounded-[10px] text-slate-900 dark:text-white active:scale-95 transition-all">
-                                    <Wallet size={17} />
-                                </button>
-                                <div className="relative" ref={parentMenuRef}>
-                                    <button 
-                                      onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
-                                      className={`nav-menu-item border border-black/5 dark:border-white/5 text-slate-900 dark:text-white active:scale-95 transition-all relative ${isMenuOpen ? 'bg-slate-100 dark:bg-white/10' : 'bg-transparent hover:bg-slate-100/50 dark:hover:bg-white/5'}`}
-                                    >
-                                        <Menu size={16} strokeWidth={2.5} />
-                                        <span className="hidden lg:inline">{t('home_menu') || 'Menu'}</span>
-                                        {unreadCount > 0 && (
-                                            <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[8px] font-black text-white flex items-center justify-center px-1">
-                                                {unreadCount > 9 ? '9+' : unreadCount}
-                                            </div>
-                                        )}
-                                    </button>
-                                    {isMenuOpen && (
-                                        <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-white/5 rounded-2xl shadow-2xl p-2 z-[100] animate-in fade-in zoom-in-95 duration-200">
-                                            <div className="p-4 border-b border-slate-100 dark:border-white/5 mb-2">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-black">
-                                                        {user.first_name ? user.first_name[0] : 'U'}
-                                                    </div>
-                                                    <div className="flex flex-col min-w-0">
-                                                        <span className="text-[13px] font-bold text-slate-900 dark:text-white truncate">
-                                                            {user.first_name} {user.last_name}
-                                                        </span>
-                                                        <span className="text-[10px] text-slate-500 truncate">@{user.username || user.id}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            
-                                            <button onClick={() => { haptic('light'); navigate('/notifications'); setIsMenuOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                                <div className="flex items-center gap-3">
-                                                    <Bell size={18} className="group-hover:text-blue-500 transition-colors" />
-                                                    <span className="text-xs font-bold uppercase tracking-tight">{t('notif_inbox')}</span>
-                                                </div>
-                                                {unreadCount > 0 && <div className="w-2 h-2 bg-red-500 rounded-full" />}
-                                            </button>
-
-                                            <button onClick={() => { haptic('light'); navigate('/settings'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                                <Plus size={18} className="group-hover:text-emerald-500 transition-colors" />
-                                                <span className="text-xs font-bold uppercase tracking-tight">{t('add_project')}</span>
-                                            </button>
-
-                                            <div className="h-px bg-slate-100 dark:border-white/5 my-2" />
-
-                                            <button onClick={() => { 
-                                                const confirmed = window.confirm("Çıkış yapmak istediğinize emin misiniz?");
-                                                if (confirmed) {
-                                                    haptic('medium'); 
-                                                    setWebAuthUser(null);
-                                                    setIsMenuOpen(false); 
-                                                }
-                                            }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 text-red-500 transition-all font-bold text-xs uppercase">
-                                                <LogOut size={18} />
-                                                {t('home_logout')}
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
-                            </>
-                        ) : (
+                        {user ? null : (
                             <button 
                                 onClick={() => { haptic('light'); setIsLoginModalOpen(true); }}
                                 className="nav-menu-item bg-blue-600 hover:bg-blue-700 text-white border-none text-[11px] font-black uppercase tracking-widest px-6 shadow-lg shadow-blue-500/20 active:scale-95 transition-all"
