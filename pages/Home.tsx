@@ -707,23 +707,23 @@ const NavMenu = ({
                             >
                                 <button 
                                     onClick={() => { haptic('light'); toggleTheme(); }} 
-                                    className="nav-menu-item min-w-[33px] px-2 flex items-center justify-center bg-transparent hover:bg-slate-100/50 dark:hover:bg-white/5 border border-black/5 dark:border-white/5 rounded-[10px] text-slate-900 dark:text-white active:scale-95 transition-all outline-none"
+                                    className="w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 border border-black/5 dark:border-white/5 rounded-xl text-slate-900 dark:text-white active:scale-95 transition-all outline-none shrink-0"
                                 >
-                                    {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
+                                    {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
                                 </button>
 
                                 {user ? (
                                     <>
-                                        <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="nav-menu-item w-[33px] !px-0 flex items-center justify-center bg-transparent hover:bg-slate-100/50 dark:hover:bg-white/5 border border-black/5 dark:border-white/5 rounded-[10px] text-slate-900 dark:text-white active:scale-95 transition-all">
-                                            <Wallet size={17} />
+                                        <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 border border-black/5 dark:border-white/5 rounded-xl text-slate-900 dark:text-white active:scale-95 transition-all shrink-0">
+                                            <Wallet size={18} />
                                         </button>
                                         <div className="relative" ref={parentMenuRef}>
                                             <button 
                                               onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
-                                              className={`nav-menu-item border border-black/5 dark:border-white/5 text-slate-900 dark:text-white active:scale-95 transition-all relative ${isMenuOpen ? 'bg-slate-100 dark:bg-white/10' : 'bg-transparent hover:bg-slate-100/50 dark:hover:bg-white/5'}`}
+                                              className={`h-10 px-3 flex items-center gap-2 border border-black/5 dark:border-white/5 text-slate-900 dark:text-white rounded-xl active:scale-95 transition-all relative ${isMenuOpen ? 'bg-slate-100 dark:bg-white/10' : 'bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10'}`}
                                             >
                                                 <Menu size={16} strokeWidth={2.5} />
-                                                <span className="hidden lg:inline">{t('home_menu') || 'Menu'}</span>
+                                                <span className="hidden lg:inline text-[13px] font-bold">{t('home_menu') || 'Menu'}</span>
                                                 {unreadCount > 0 && (
                                                     <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[8px] font-black text-white flex items-center justify-center px-1">
                                                         {unreadCount > 9 ? '9+' : unreadCount}
@@ -1153,10 +1153,10 @@ const Home = () => {
                       <RouterLink 
                           to="/settings"
                           onClick={() => haptic('light')}
-                          className="hidden md:flex items-center gap-1 text-[13px] font-bold text-blue-500 hover:underline transition-all"
+                          className="hidden md:flex items-center gap-1.5 px-3 h-10 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 text-[13px] font-bold transition-all active:scale-95 whitespace-nowrap"
                       >
                           <Plus size={14} />
-                          <span style={{ fontWeight: 700 }}>{t('add_your')}</span>
+                          <span style={{ fontWeight: 800 }}>{t('add_your')}</span>
                       </RouterLink>
                   </div>
 
@@ -1164,17 +1164,17 @@ const Home = () => {
                       {!isScrolled && (
                           user ? (
                               <>
-                                  <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="hidden sm:flex w-10 h-10 items-center justify-center text-slate-900 dark:text-white active:scale-95 transition-transform">
-                                      <Wallet size={20} />
+                                  <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="hidden sm:flex w-10 h-10 items-center justify-center text-slate-900 dark:text-white bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-xl active:scale-95 transition-all outline-none">
+                                      <Wallet size={18} />
                                   </button>
                                   <div className="relative" ref={menuRef}>
                                       <button 
                                         onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
-                                        className="w-10 h-10 flex items-center justify-center text-slate-900 dark:text-white active:scale-95 transition-transform relative"
+                                        className="w-10 h-10 flex items-center justify-center text-slate-900 dark:text-white bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-xl active:scale-95 transition-all relative outline-none"
                                       >
-                                              <Menu size={16} strokeWidth={2.5} />
+                                               <Menu size={16} strokeWidth={2.5} />
                                           {unreadCount > 0 && (
-                                              <div className="absolute -top-1 -right-1 min-w-[20px] h-[20px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[9px] font-black text-white flex items-center justify-center px-1 badge-pop">
+                                              <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[8px] font-black text-white flex items-center justify-center px-1 badge-pop">
                                                   {unreadCount > 9 ? '9+' : unreadCount}
                                               </div>
                                           )}
@@ -1264,9 +1264,9 @@ const Home = () => {
                       {!isScrolled && (
                           <button 
                               onClick={() => { haptic('light'); toggleTheme(); }} 
-                              className="w-10 h-10 flex items-center justify-center text-slate-900 dark:text-white active:scale-95 transition-transform"
+                              className="w-10 h-10 flex items-center justify-center text-slate-900 dark:text-white bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-xl active:scale-95 transition-all outline-none"
                           >
-                              {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+                              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
                           </button>
                       )}
                   </div>
