@@ -703,7 +703,7 @@ const NavMenu = ({
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: 10 }}
                                 transition={{ duration: 0.2 }}
-                                className="flex items-center gap-2 md:gap-3"
+                                className="hidden md:flex items-center gap-2 md:gap-3"
                             >
                                 <button 
                                     onClick={() => { haptic('light'); toggleTheme(); }} 
@@ -1160,9 +1160,8 @@ const Home = () => {
                       </RouterLink>
                   </div>
 
-                  <div className="flex items-center gap-2 md:gap-3 order-2 md:order-3 md:w-48 justify-end ml-auto shrink-0">
-                      {!isScrolled && (
-                          user ? (
+                  <div className={`flex items-center gap-2 md:gap-3 order-2 md:order-3 md:w-48 justify-end ml-auto shrink-0 ${isScrolled ? 'md:hidden' : ''}`}>
+                      {user ? (
                               <>
                                   <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="hidden sm:flex w-10 h-10 items-center justify-center text-slate-900 dark:text-white bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-xl active:scale-95 transition-all outline-none">
                                       <Wallet size={18} />
@@ -1259,23 +1258,21 @@ const Home = () => {
                                   {t('login')}
                               </button>
                           )
-                      )}
+                      }
                       
-                      {!isScrolled && (
-                          <button 
-                              onClick={() => { haptic('light'); toggleTheme(); }} 
-                              className="w-10 h-10 flex items-center justify-center text-slate-900 dark:text-white bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-xl active:scale-95 transition-all outline-none"
-                          >
-                              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-                          </button>
-                      )}
+                      <button 
+                          onClick={() => { haptic('light'); toggleTheme(); }} 
+                          className="w-10 h-10 flex items-center justify-center text-slate-900 dark:text-white bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-xl active:scale-95 transition-all outline-none"
+                      >
+                          {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                      </button>
                   </div>
-                      <LoginModal 
-                          isOpen={isLoginModalOpen} 
-                          onClose={() => setIsLoginModalOpen(false)} 
-                          onAuth={(user) => setWebAuthUser(user)} 
-                      />
-                  </div>
+                  <LoginModal 
+                      isOpen={isLoginModalOpen} 
+                      onClose={() => setIsLoginModalOpen(false)} 
+                      onAuth={(user) => setWebAuthUser(user)} 
+                  />
+                </div>
               </div>
           </div>
       </div>
