@@ -1133,7 +1133,7 @@ const Home = () => {
 
                   <div className="w-full md:flex-1 md:max-w-2xl order-3 md:order-2 flex items-center gap-2 md:gap-3">
                       <div className="flex-1 md:w-[330px] md:flex-none relative z-[100]">
-                          <div className="relative flex items-center bg-slate-50 dark:bg-slate-800/50 border border-black/5 dark:border-white/10 rounded-xl p-0.5 md:p-1 group shadow-sm">
+                          <div className="relative flex items-center bg-slate-50 dark:bg-slate-800/50 border border-black/5 dark:border-white/10 rounded-xl p-0.5 group shadow-sm">
                               <div 
                                 onClick={() => navigate('/search')} 
                                 className="flex items-center flex-1 min-w-0 cursor-pointer active:scale-[0.98] transition-transform"
