@@ -3,4 +3,4 @@ const isLocal = window.location.hostname === 'localhost' || window.location.host
 
 export const API_BASE_URL = (isRunApp || isLocal) 
   ? '' 
-  : 'https://ais-pre-ubzg6ohqwxfncnjxhzi3nj-16842427189.europe-west2.run.app';
+  : 'https://botlyhub.onrender.com';
