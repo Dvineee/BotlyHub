@@ -29,7 +29,10 @@ import UserPanel from './pages/UserPanel';
 import ReferralPage from './pages/ReferralPage';
 import BlogPage from './pages/BlogPage';
 import BlogPostDetail from './pages/BlogPostDetail';
+import Statistics from './pages/Statistics';
+import UserProfile from './pages/UserProfile';
 import BotManagementPanel from './pages/BotManagementPanel';
+import QAForum from './pages/QAForum';
 import ScrollToTop from './components/ScrollToTop';
 import Footer from './components/Footer';
 import BottomNav from './components/BottomNav';
@@ -170,7 +173,7 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
     return () => tg.BackButton.offClick(handleBack);
   }, [location.pathname, navigate, isAdminPath]);
 
-  const hideBottomNav = isPanelPath || location.pathname.includes('/bot/') || location.pathname.includes('/payment/') || location.pathname.includes('/bot-panel/');
+  const hideBottomNav = isPanelPath || location.pathname.includes('/bot/') || location.pathname.includes('/payment/') || location.pathname.includes('/bot-panel/') || location.pathname.startsWith('/qa') || location.pathname.startsWith('/blog');
 
   return (
     <div className={`${isPanelPath ? 'dark bg-slate-950' : 'bg-slate-50 dark:bg-slate-950'} flex flex-col min-h-screen transition-colors duration-300`}>
@@ -203,6 +206,8 @@ export default function App() {
           <Route path="/search" element={<SearchPage />} />
           <Route path="/bot/:slug" element={<BotDetail />} />
           <Route path="/payment/:slug" element={<Payment />} />
+          <Route path="/profile" element={<UserProfile />} />
+          <Route path="/user/:id" element={<UserProfile />} />
           <Route path="/settings" element={<ProfileSettings />} />
           <Route path="/account-settings" element={<AccountSettings />} />
           <Route path="/my-bots" element={<MyBots />} />
@@ -217,6 +222,8 @@ export default function App() {
           <Route path="/referral" element={<ReferralPage />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/blog/:slug" element={<BlogPostDetail />} />
+          <Route path="/stats" element={<Statistics />} />
+          <Route path="/qa" element={<QAForum />} />
           <Route path="/bot-panel/:botId/*" element={<BotManagementPanel />} />
         </Routes>
       </TelegramWrapper>

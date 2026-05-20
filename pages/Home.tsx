@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Search, ChevronLeft, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, Send, Link, CheckCircle2, ChevronDown, Sun, Moon, Wallet, Menu, Plus, LogOut, Compass, Coins, BarChart3, Binoculars, Share2, Briefcase, MousePointer2, ExternalLink, ArrowLeft } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, Send, Link, CheckCircle2, ChevronDown, Sun, Moon, Wallet, Menu, Plus, LogOut, Compass, Coins, BarChart3, Binoculars, Share2, Briefcase, MousePointer2, ExternalLink, ArrowLeft, MessageSquare } from 'lucide-react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { Bot, Announcement, Notification } from '../types';
+import { Bot, Announcement, Notification, BlogPost } from '../types';
 import { categories, appsSubCategories } from '../data';
 import { useTranslation } from '../TranslationContext';
 import { DatabaseService } from '../services/DatabaseService';
@@ -332,9 +332,6 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonR
                 </div>
 
             </div>
-        </div>
-        <div className="bg-slate-100 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700/50 text-slate-400 group-hover:text-white group-hover:bg-blue-600 group-hover:border-blue-500 transition-all">
-            <ChevronRight size={18} />
         </div>
     </div>
   );
@@ -722,8 +719,13 @@ const NavMenu = ({
                                               onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
                                               className={`h-10 px-3 flex items-center gap-2 border border-black/5 dark:border-white/5 text-slate-900 dark:text-white rounded-xl active:scale-95 transition-all relative ${isMenuOpen ? 'bg-slate-100 dark:bg-white/10' : 'bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10'}`}
                                             >
-                                                <Menu size={16} strokeWidth={2.5} />
-                                                <span className="hidden lg:inline text-[13px] font-bold">{t('home_menu') || 'Menu'}</span>
+                                                <span className="block md:hidden text-[11px] font-black uppercase tracking-wide">
+                                                    {(user.username || user.first_name || user.name || '').slice(0, 5)}{(user.username || user.first_name || user.name || '').length > 5 ? '..' : ''}
+                                                </span>
+                                                <span className="hidden md:block text-[11px] font-black uppercase tracking-wide">
+                                                    {user.username || user.first_name || user.name || ''}
+                                                </span>
+                                                <ChevronDown size={12} className={`text-slate-400 dark:text-slate-500 transition-transform duration-200 ${isMenuOpen ? 'rotate-180' : ''}`} />
                                                 {unreadCount > 0 && (
                                                     <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[8px] font-black text-white flex items-center justify-center px-1">
                                                         {unreadCount > 9 ? '9+' : unreadCount}
@@ -755,31 +757,36 @@ const NavMenu = ({
                                                     </div>
 
                                                     <button onClick={() => { haptic('light'); navigate('/'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                                        <Store size={18} className="text-blue-500 transition-colors" />
+                                                        <Store size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
                                                         <span className="text-xs font-bold uppercase tracking-tight">{t('market')}</span>
                                                     </button>
 
-                                                    <button onClick={() => { haptic('light'); navigate('/settings'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                                        <User size={18} className="text-purple-500 transition-colors" />
+                                                    <button onClick={() => { haptic('light'); navigate('/profile'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                                        <User size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
                                                         <span className="text-xs font-bold uppercase tracking-tight">{t('profile')}</span>
                                                     </button>
 
                                                     <button onClick={() => { haptic('light'); navigate('/my-bots'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                                        <BotIcon size={18} className="text-emerald-500 transition-colors" />
+                                                        <BotIcon size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
                                                         <span className="text-xs font-bold uppercase tracking-tight">{t('my_bots')}</span>
                                                     </button>
 
                                                     <button onClick={() => { haptic('light'); navigate('/channels'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                                        <Megaphone size={18} className="text-orange-500 transition-colors" />
+                                                        <Megaphone size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
                                                         <span className="text-xs font-bold uppercase tracking-tight">{t('my_channels')}</span>
                                                     </button>
 
                                                     <button onClick={() => { haptic('light'); navigate('/notifications'); setIsMenuOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
                                                         <div className="flex items-center gap-3">
-                                                            <Bell size={18} className="text-blue-600 transition-colors" />
+                                                            <Bell size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
                                                             <span className="text-xs font-bold uppercase tracking-tight">{t('notifications')}</span>
                                                         </div>
                                                         {unreadCount > 0 && <div className="w-2 h-2 bg-red-500 rounded-full" />}
+                                                    </button>
+
+                                                    <button onClick={() => { haptic('light'); navigate('/qa'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                                        <MessageSquare size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                                        <span className="text-xs font-bold uppercase tracking-tight">Soru Cevap & Q&A</span>
                                                     </button>
 
                                                     <div className="h-px bg-slate-100 dark:border-white/5 my-2" />
@@ -999,6 +1006,7 @@ const Home = () => {
   const { activeFilter } = useFilter();
   const [selectedAppsCategory, setSelectedAppsCategory] = useState('all');
   const [selectedBotsCategory, setSelectedBotsCategory] = useState('all');
+  const [homeBlogs, setHomeBlogs] = useState<BlogPost[]>([]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -1026,16 +1034,18 @@ const Home = () => {
   }, [bots, activeFilter]);
 
   const loadData = useCallback(async () => {
-    // İlk yüklemede sadece botları ve duyuruları çek, fiyatı arka planda güncelle
-    const [botData, annData] = await Promise.all([
+    // İlk yüklemede sadece botları, duyuruları ve son blogları çek, fiyatı arka planda güncelle
+    const [botData, annData, blogData] = await Promise.all([
         DatabaseService.getBots(),
-        DatabaseService.getAnnouncements()
+        DatabaseService.getAnnouncements(),
+        DatabaseService.getBlogs(3)
     ]);
     
     setBots(botData);
     if (annData.length > 0) {
         setAnnouncements(annData.filter(a => a.is_active));
     }
+    setHomeBlogs(blogData);
     setIsLoading(false);
 
     // Fiyat ve bildirimleri arka planda çek
@@ -1133,7 +1143,7 @@ const Home = () => {
 
                   <div className="w-full md:flex-1 md:max-w-2xl order-3 md:order-2 flex items-center gap-2 md:gap-3">
                       <div className="flex-1 md:w-[330px] md:flex-none relative z-[100]">
-                          <div className="relative flex items-center bg-slate-50 dark:bg-slate-800/50 border border-black/5 dark:border-white/10 rounded-xl p-0.5 group shadow-sm">
+                          <div className="relative flex items-center bg-slate-50 dark:bg-slate-800/50 border border-black/5 dark:border-white/10 rounded-xl group shadow-sm">
                               <div 
                                 onClick={() => navigate('/search')} 
                                 className="flex items-center flex-1 min-w-0 cursor-pointer active:scale-[0.98] transition-transform"
@@ -1156,116 +1166,127 @@ const Home = () => {
                           className="hidden md:flex items-center gap-1.5 px-3 h-10 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 text-[13px] font-bold transition-all active:scale-95 whitespace-nowrap"
                       >
                           <Plus size={14} />
-                          <span style={{ fontWeight: 800 }}>{t('add_your')}</span>
+                          <span style={{ fontWeight: 600 }}>{t('add_your')}</span>
                       </RouterLink>
                   </div>
 
                   <div className={`flex items-center gap-2 md:gap-3 order-2 md:order-3 md:w-48 justify-end ml-auto shrink-0 ${isScrolled ? 'md:hidden' : ''}`}>
-                      {user ? (
-                              <>
-                                  <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="hidden sm:flex w-10 h-10 items-center justify-center text-slate-900 dark:text-white bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-xl active:scale-95 transition-all outline-none">
-                                      <Wallet size={18} />
-                                  </button>
-                                  <div className="relative" ref={menuRef}>
-                                      <button 
-                                        onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
-                                        className="w-10 h-10 flex items-center justify-center text-slate-900 dark:text-white bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-xl active:scale-95 transition-all relative outline-none"
-                                      >
-                                               <Menu size={16} strokeWidth={2.5} />
-                                          {unreadCount > 0 && (
-                                              <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[8px] font-black text-white flex items-center justify-center px-1 badge-pop">
-                                                  {unreadCount > 9 ? '9+' : unreadCount}
-                                              </div>
-                                          )}
-                                      </button>
-                                      {isMenuOpen && (
-                                          <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-white/5 rounded-2xl shadow-2xl p-2 z-[100] animate-in fade-in zoom-in-95 duration-200">
-                                              <div className="p-4 border-b border-slate-100 dark:border-white/5 mb-2">
-                                                  <div className="flex items-center gap-3">
-                                                      {(user.photo_url || user.avatar) ? (
-                                                          <img 
-                                                              src={user.photo_url || user.avatar} 
-                                                              alt={user.first_name || user.name}
-                                                              className="w-10 h-10 rounded-full object-cover"
-                                                          />
-                                                      ) : (
-                                                          <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-black">
-                                                              {user.first_name ? user.first_name[0] : (user.name ? user.name[0] : 'U')}
-                                                          </div>
-                                                      )}
-                                                      <div className="flex flex-col min-w-0">
-                                                          <span className="text-[13px] font-bold text-slate-900 dark:text-white truncate">
-                                                              {user.first_name ? `${user.first_name} ${user.last_name || ''}` : user.name}
-                                                          </span>
-                                                          <span className="text-[10px] text-slate-500 truncate">@{user.username || user.id}</span>
-                                                      </div>
-                                                  </div>
-                                              </div>
-
-                                              <button onClick={() => { haptic('light'); navigate('/'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                                  <Store size={18} className="text-slate-400 group-hover:text-blue-500 transition-colors" />
-                                                  <span className="text-xs font-bold uppercase tracking-tight">{t('market')}</span>
-                                              </button>
-
-                                              <button onClick={() => { haptic('light'); navigate('/settings'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                                  <User size={18} className="text-slate-400 group-hover:text-blue-500 transition-colors" />
-                                                  <span className="text-xs font-bold uppercase tracking-tight">{t('profile')}</span>
-                                              </button>
-
-                                              <button onClick={() => { haptic('light'); navigate('/my-bots'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                                  <BotIcon size={18} className="text-slate-400 group-hover:text-blue-500 transition-colors" />
-                                                  <span className="text-xs font-bold uppercase tracking-tight">{t('my_bots')}</span>
-                                              </button>
-
-                                              <button onClick={() => { haptic('light'); navigate('/channels'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                                  <Megaphone size={18} className="text-slate-400 group-hover:text-blue-500 transition-colors" />
-                                                  <span className="text-xs font-bold uppercase tracking-tight">{t('my_channels')}</span>
-                                              </button>
-
-                                              <button onClick={() => { haptic('light'); navigate('/notifications'); setIsMenuOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                                  <div className="flex items-center gap-3">
-                                                      <Bell size={18} className="text-slate-400 group-hover:text-blue-500 transition-colors" />
-                                                      <span className="text-xs font-bold uppercase tracking-tight">{t('notifications')}</span>
-                                                  </div>
-                                                  {unreadCount > 0 && <div className="w-2 h-2 bg-red-500 rounded-full" />}
-                                              </button>
-
-                                              <div className="h-px bg-slate-100 dark:border-white/5 my-2" />
-                                              
-                                              <button 
-                                                  onClick={() => { 
-                                                      const confirmed = window.confirm("Çıkış yapmak istediğinize emin misiniz?");
-                                                      if (confirmed) {
-                                                          haptic('medium'); 
-                                                          setWebAuthUser(null);
-                                                          setIsMenuOpen(false); 
-                                                      }
-                                                  }} 
-                                                  className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 text-red-500 transition-all font-bold text-xs uppercase"
-                                              >
-                                                  <LogOut size={18} /> 
-                                                  <span className="text-xs font-bold uppercase tracking-tight">{t('home_logout')}</span>
-                                              </button>
-                                          </div>
-                                      )}
-                                  </div>
-                              </>
-                          ) : (
-                              <button 
-                                  onClick={() => { haptic('light'); setIsLoginModalOpen(true); }}
-                                  className="px-5 h-10 bg-blue-500 hover:bg-blue-600 text-white text-[13px] font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center whitespace-nowrap shadow-lg shadow-blue-500/25"
-                              >
-                                  {t('login')}
-                              </button>
-                          )
-                      }
-                      
                       <button 
                           onClick={() => { haptic('light'); toggleTheme(); }} 
                           className="w-10 h-10 flex items-center justify-center text-slate-900 dark:text-white bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-xl active:scale-95 transition-all outline-none"
                       >
                           {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
                       </button>
+
+                      {user && (
+                          <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="hidden sm:flex w-10 h-10 items-center justify-center text-slate-900 dark:text-white bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-xl active:scale-95 transition-all outline-none">
+                              <Wallet size={18} />
+                          </button>
+                      )}
+
+                      {user ? (
+                          <div className="relative" ref={menuRef}>
+                              <button 
+                                onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
+                                className="h-10 px-3 flex items-center justify-center gap-1.5 text-slate-900 dark:text-white bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-xl active:scale-95 transition-all relative outline-none select-none"
+                              >
+                                       <span className="block md:hidden text-[11px] font-black uppercase tracking-wide">
+                                           {(user.username || user.first_name || user.name || '').slice(0, 5)}{(user.username || user.first_name || user.name || '').length > 5 ? '..' : ''}
+                                       </span>
+                                       <span className="hidden md:block text-[11px] font-black uppercase tracking-wide">
+                                           {user.username || user.first_name || user.name || ''}
+                                       </span>
+                                       <ChevronDown size={12} className={`text-slate-400 dark:text-slate-500 transition-transform duration-200 ${isMenuOpen ? 'rotate-180' : ''}`} />
+                                  {unreadCount > 0 && (
+                                      <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[8px] font-black text-white flex items-center justify-center px-1 badge-pop">
+                                          {unreadCount > 9 ? '9+' : unreadCount}
+                                      </div>
+                                  )}
+                              </button>
+                              {isMenuOpen && (
+                                  <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-white/5 rounded-2xl shadow-2xl p-2 z-[100] animate-in fade-in zoom-in-95 duration-200">
+                                      <div className="p-4 border-b border-slate-100 dark:border-white/5 mb-2">
+                                          <div className="flex items-center gap-3">
+                                              {(user.photo_url || user.avatar) ? (
+                                                  <img 
+                                                      src={user.photo_url || user.avatar} 
+                                                      alt={user.first_name || user.name}
+                                                      className="w-10 h-10 rounded-full object-cover"
+                                                  />
+                                              ) : (
+                                                  <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-black">
+                                                      {user.first_name ? user.first_name[0] : (user.name ? user.name[0] : 'U')}
+                                                  </div>
+                                              )}
+                                              <div className="flex flex-col min-w-0">
+                                                  <span className="text-[13px] font-bold text-slate-900 dark:text-white truncate">
+                                                      {user.first_name ? `${user.first_name} ${user.last_name || ''}` : user.name}
+                                                  </span>
+                                                  <span className="text-[10px] text-slate-500 truncate">@{user.username || user.id}</span>
+                                              </div>
+                                          </div>
+                                      </div>
+
+                                      <button onClick={() => { haptic('light'); navigate('/'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                          <Store size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                          <span className="text-xs font-bold uppercase tracking-tight">{t('market')}</span>
+                                      </button>
+
+                                      <button onClick={() => { haptic('light'); navigate('/profile'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                          <User size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                          <span className="text-xs font-bold uppercase tracking-tight">{t('profile')}</span>
+                                      </button>
+
+                                      <button onClick={() => { haptic('light'); navigate('/my-bots'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                          <BotIcon size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                          <span className="text-xs font-bold uppercase tracking-tight">{t('my_bots')}</span>
+                                      </button>
+
+                                      <button onClick={() => { haptic('light'); navigate('/channels'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                          <Megaphone size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                          <span className="text-xs font-bold uppercase tracking-tight">{t('my_channels')}</span>
+                                      </button>
+
+                                      <button onClick={() => { haptic('light'); navigate('/notifications'); setIsMenuOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                          <div className="flex items-center gap-3">
+                                              <Bell size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                              <span className="text-xs font-bold uppercase tracking-tight">{t('notifications')}</span>
+                                          </div>
+                                          {unreadCount > 0 && <div className="w-2 h-2 bg-red-500 rounded-full" />}
+                                      </button>
+
+                                      <button onClick={() => { haptic('light'); navigate('/qa'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                          <MessageSquare size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                          <span className="text-xs font-bold uppercase tracking-tight">{t('qa_forum') || 'Soru Cevap Forumu'}</span>
+                                      </button>
+
+                                      <div className="h-px bg-slate-100 dark:border-white/5 my-2" />
+                                      
+                                      <button 
+                                          onClick={() => { 
+                                              const confirmed = window.confirm("Çıkış yapmak istediğinize emin misiniz?");
+                                              if (confirmed) {
+                                                  haptic('medium'); 
+                                                  setWebAuthUser(null);
+                                                  setIsMenuOpen(false); 
+                                              }
+                                          }} 
+                                          className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 text-red-500 transition-all font-bold text-xs uppercase"
+                                      >
+                                          <LogOut size={18} /> 
+                                          <span className="text-xs font-bold uppercase tracking-tight">{t('home_logout')}</span>
+                                      </button>
+                                  </div>
+                              )}
+                          </div>
+                      ) : (
+                          <button 
+                              onClick={() => { haptic('light'); setIsLoginModalOpen(true); }}
+                              className="px-5 h-10 bg-blue-500 hover:bg-blue-600 text-white text-[13px] font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center whitespace-nowrap shadow-lg shadow-blue-500/25"
+                          >
+                              {t('login')}
+                          </button>
+                      )}
                   </div>
                   <LoginModal 
                       isOpen={isLoginModalOpen} 
@@ -1577,6 +1598,84 @@ const Home = () => {
                     )}
                 </motion.div>
             </AnimatePresence>
+
+            {homeBlogs.length > 0 && (
+                <div className="mt-24 mb-16 pt-16 border-t border-black/[0.03] dark:border-white/[0.03]">
+                    <div className="flex items-center justify-between mb-8">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-[2px] bg-blue-500"></div>
+                            <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight uppercase italic">
+                                {t('blog_title')}
+                            </h2>
+                        </div>
+                        <button 
+                            onClick={() => { haptic('light'); navigate('/blog'); }}
+                            className="text-[11px] font-bold text-slate-400 hover:text-blue-500 uppercase tracking-widest transition-colors flex items-center gap-1.5"
+                        >
+                            {t('blog_all_articles')}
+                            <ChevronRight size={14} />
+                        </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+                        {homeBlogs.map((post) => (
+                            <div 
+                                key={post.id}
+                                onClick={() => { haptic('light'); navigate(`/blog/${post.slug || post.id}`); }}
+                                className="group cursor-pointer flex flex-col bg-slate-50 dark:bg-slate-900/10 border border-black/5 dark:border-white/5 rounded-3xl overflow-hidden hover:border-blue-500/20 hover:scale-[1.01] transition-all duration-300"
+                            >
+                                <div className="aspect-video relative overflow-hidden bg-slate-100 dark:bg-white/5">
+                                    {post.image ? (
+                                        <img 
+                                            src={post.image} 
+                                            alt={post.title} 
+                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                                            referrerPolicy="no-referrer"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-600/10 to-indigo-600/10 text-blue-500">
+                                            <Sparkles size={24} />
+                                        </div>
+                                    )}
+                                    <div className="absolute top-4 left-4">
+                                        <span className="bg-white/90 dark:bg-slate-950/90 backdrop-blur-md text-slate-900 dark:text-white text-[8px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border border-black/5 dark:border-white/5">
+                                            {post.category}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="p-5 flex-1 flex flex-col justify-between">
+                                    <div>
+                                        <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-tight line-clamp-2 mb-2 group-hover:text-blue-500 transition-colors duration-300">
+                                            {post.title}
+                                        </h3>
+                                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed italic line-clamp-2 mb-4">
+                                            {post.excerpt || post.content.replace(/<[^>]*>/g, '').slice(0, 100) + '...'}
+                                        </p>
+                                    </div>
+
+                                    <div className="flex items-center justify-between pt-3 border-t border-black/[0.03] dark:border-white/[0.03]">
+                                        <div className="flex items-center gap-2 max-w-[70%]">
+                                            <div className="w-6 h-6 rounded-full overflow-hidden bg-slate-100 dark:bg-white/5 border border-black/5 dark:border-white/10 shrink-0">
+                                                <img 
+                                                    src={post.authorAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(post.author)}&background=334155&color=fff&bold=true`} 
+                                                    alt="" 
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            </div>
+                                            <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 truncate">
+                                                {post.author}
+                                            </span>
+                                        </div>
+                                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tight shrink-0">
+                                            {post.readTime || '5 dk'}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             <div className="mt-20 mb-20 px-4 max-w-4xl mx-auto border-t border-black/[0.03] dark:border-white/[0.03] pt-20">
                 <div className="prose prose-slate dark:prose-invert max-w-none">

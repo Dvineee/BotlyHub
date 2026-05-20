@@ -95,7 +95,7 @@ body {
   }
 
   .font-bold {
-    font-weight: 600 !important;
+    font-weight: 500 !important;
   }
 
   .font-black {
@@ -298,7 +298,7 @@ span.text-\[10px\].font-black.text-slate-500.dark\:text-slate-400.uppercase.trac
 }
 
 .font-bold {
-    font-weight: 600;
+    font-weight: 500 !important;
 }
 
 .group:hover .group-hover\:border-blue-500 {
@@ -440,6 +440,7 @@ html:not(.dark) .text-slate-400 {
 
 .bg-slate-50 {
     --tw-bg-opacity: 1;
+    background-color: rgb(255 255 255);
 }
 
 .mb-3 {
@@ -612,7 +613,7 @@ p.text-\[10px\].text-slate-400.dark\:text-slate-500.font-medium.uppercase.tracki
 }
 .hover\:bg-slate-50:hover {
     --tw-bg-opacity: 1;
-    background-color: #f2f2f2;
+    background-color: rgb(255 255 255 / 8%) !important;
 }
 span.text-\[10px\].font-black.uppercase.tracking-tight {
     cursor: pointer;
@@ -641,6 +642,11 @@ button.w-full.flex.items-center.gap-3.px-4.py-3.hover\:bg-slate-50.dark\:hover\:
     color: #2F88FF !important;
     background-color: #ffffff00 !important;
     --tw-border-opacity: 1;
+}
+
+.text-xs {
+    font-size: 0.87rem !important;
+    line-height: 1rem !important;
 }
 
 .aspect-\[9\/19\] {
@@ -745,7 +751,11 @@ h2.text-lg.sm\:text-xl.font-extrabold.text-slate-900.dark\:text-white.tracking-t
 }
 
 .pb-4 {
-    padding-bottom: 0rem !important;
+    padding-bottom: 0.5rem !important;
+}
+
+.pb-5 {
+    padding-bottom: 0.75rem;
 }
 
 .home-page .px-5, .search-page .px-5 {
@@ -1007,7 +1017,7 @@ h2.text-lg.sm\:text-xl.font-extrabold.text-slate-900.dark\:text-white.tracking-t
 }
 
 .tracking-wider {
-    font-size: 13px;
+    font-size: 14px;
     letter-spacing: 0em;
 }
 
@@ -1114,8 +1124,8 @@ span, div, input {
     }
     
     .mobile-menu-icon-container svg {
-        width: 16px !important;
-        height: 16px !important;
+        width: 19px !important;
+        height: 19px !important;
     }
 
     .flex.items-center.justify-center.gap-2 {
@@ -1242,7 +1252,7 @@ span, div, input {
         padding-bottom: 0.2rem !important;
     }
     .md\:gap-14 {
-        gap: 2rem !important;
+        gap: 1rem !important;
     }
 }
 
@@ -1370,4 +1380,25 @@ span, div, input {
         margin-top: 0px;
         display: flex;
     }
+}
+
+@media (max-width: 767px) {
+    .text-\[13px\] {
+        font-size: 13px !important;
+    }
+    .px-5 {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }
+}
+
+@media (min-width: 768px) {
+    .md\:pt-10 {
+        padding-top: 1.5rem;
+    }
+}
+
+.hover\:text-blue-500:hover {
+    --tw-text-opacity: 1;
+    color: rgb(0 0 0);
 }

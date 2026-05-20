@@ -1225,6 +1225,24 @@ export class DatabaseService {
     return data || [];
   }
 
+  static async getUserBlogComments(userId: string): Promise<BlogComment[]> {
+    try {
+      const { data, error } = await supabase
+          .from('blog_comments')
+          .select('*')
+          .eq('user_id', userId.toString())
+          .order('created_at', { ascending: false });
+      if (error) {
+          console.error("getUserBlogComments Error:", error);
+          return [];
+      }
+      return data || [];
+    } catch (e) {
+      console.error("getUserBlogComments e:", e);
+      return [];
+    }
+  }
+
   static async addBlogComment(comment: Partial<BlogComment>) {
     const { error } = await supabase.from('blog_comments').insert([comment]);
     if (error) throw error;

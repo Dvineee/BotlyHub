@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 import crypto from "crypto";
 import { rateLimit } from "express-rate-limit";
 import { z } from "zod";
+import fs from "fs";
 import { DatabaseService, supabase } from "./services/DatabaseService";
 import { TonService } from "./services/TonService";
 import { SecurityUtils } from "./services/SecurityUtils";
@@ -148,6 +149,260 @@ async function startServer() {
   app.get("/api/health", (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.json({ status: "ok", time: new Date().toISOString() });
+  });
+
+  // --- DISCUSSION FORUM FILE PERSISTENCE ---
+  const DISCUSSIONS_FILE = path.join(process.cwd(), "discussions.json");
+
+  function readDiscussions(): any[] {
+    try {
+      if (!fs.existsSync(DISCUSSIONS_FILE)) {
+        const initialSeed = [
+          {
+            id: "discussion-1",
+            title: "Combot bugün neden bu kadar geçiş işlemleri yapıyor?",
+            content: "Özellikle bugün kombo bayağı kanalda geçmeye çalışıyor. Başlattım ama yine de yanıtlar geç veren kanalda bu sorun yaşayan başka kimse var mı? Sadece bende olup olmadığını merak ediyorum.",
+            author_id: "user-seyyid",
+            author_name: "Seyyid Ahmed Şah",
+            author_avatar: "https://ui-avatars.com/api/?name=Seyyid+Ahmed+Sah&background=020617&color=fff",
+            author_bio: "Merhaba, ben Ahmer. Yazılım Mühendisliği öğrencisi ve tam yığın geliştiriciyim.",
+            created_at: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
+            tags: [
+              { type: "bot", id: "combot", name: "Combot" },
+              { type: "general", id: "giriş", name: "giriş" }
+            ],
+            upvotes_count: 25,
+            upvoted_users: ["user-demo1", "user-demo2"],
+            comments_count: 57,
+            comments: [
+              {
+                id: "comment-1",
+                topic_id: "discussion-1",
+                author_id: "user-amrit",
+                author_name: "Amrit Raj",
+                author_avatar: "https://ui-avatars.com/api/?name=Amrit+Raj&background=6d28d9&color=fff",
+                author_bio: "Kod, düşünmenin görünür kalıntısından başka bir şey değildir.",
+                content: "Ben de aynı şekilde yaşıyorum, Combot sunucularında yoğunluk var sanırım. Bazı kanallarda gecikmeler yaşanıyor.",
+                created_at: new Date(Date.now() - 15 * 60 * 60 * 1000).toISOString(),
+                likes_count: 12
+              }
+            ]
+          },
+          {
+            id: "discussion-2",
+            title: "İlk programlama diliniz neydi?",
+            content: "HTML ve CSS ile başladım ama dürüst olmak gerekirse JavaScript'i çözmeye çalışırken kendimi aptal gibi hissettim. Ekrana bakarak çok fazla zaman harcadım. Peki siz ilk olarak neyi öğrenmeye çalıştınız? Devam ettiniz mi yoksa bir hafta sonra bıraktınız mı?",
+            author_id: "user-seyyid",
+            author_name: "Seyyid Ahmed Şah",
+            author_avatar: "https://ui-avatars.com/api/?name=Seyyid+Ahmed+Sah&background=020617&color=fff",
+            author_bio: "Merhaba, ben Ahmer. Yazılım Mühendisliği öğrencisi ve tam yığın geliştiriciyim.",
+            created_at: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
+            tags: [
+              { type: "general", id: "programlama", name: "programlama" },
+              { type: "bot", id: "combot", name: "Combot" }
+            ],
+            upvotes_count: 14,
+            upvoted_users: ["user-demo1"],
+            comments_count: 1,
+            comments: [
+              {
+                id: "comment-2",
+                topic_id: "discussion-2",
+                author_id: "user-amrit",
+                author_name: "Amrit Raj",
+                author_avatar: "https://ui-avatars.com/api/?name=Amrit+Raj&background=6d28d9&color=fff",
+                author_bio: "Kod, düşünmenin görünür kalıntısından başka bir şey değildir.",
+                content: "Ben de aynı şekilde, HTML ve CSS ile başladım ama JS öğrenmeye başlayınca asıl sorunlar ortaya çıktı ve bakış açım tamamen değişti.",
+                created_at: new Date(Date.now() - 15 * 60 * 60 * 1000).toISOString(),
+                likes_count: 5
+              }
+            ]
+          }
+        ];
+        fs.writeFileSync(DISCUSSIONS_FILE, JSON.stringify(initialSeed, null, 2), "utf8");
+        return initialSeed;
+      }
+      const data = fs.readFileSync(DISCUSSIONS_FILE, "utf8");
+      return JSON.parse(data);
+    } catch (error) {
+      console.error("Error reading discussions file:", error);
+      return [];
+    }
+  }
+
+  function writeDiscussions(discussions: any[]) {
+    try {
+      fs.writeFileSync(DISCUSSIONS_FILE, JSON.stringify(discussions, null, 2), "utf8");
+    } catch (error) {
+      console.error("Error writing discussions file:", error);
+    }
+  }
+
+  // Q&A GET Discussions
+  app.get("/api/qa/discussions", (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    try {
+      const discussions = readDiscussions();
+      const filter = req.query.filter || 'all'; // 'son', 'week', 'month', 'all'
+      const tagFilter = req.query.tag; // hashtag filter
+
+      let filtered = [...discussions];
+
+      // Tag filter
+      if (tagFilter) {
+        const tagLower = String(tagFilter).toLowerCase().replace('#', '').trim();
+        filtered = filtered.filter(d => 
+          d.tags?.some((t: any) => t.name.toLowerCase() === tagLower || t.id.toLowerCase() === tagLower)
+        );
+      }
+
+      const now = Date.now();
+      // Date filter
+      if (filter === 'week') {
+        const weekAgo = now - 7 * 24 * 60 * 60 * 1000;
+        filtered = filtered.filter(d => new Date(d.created_at).getTime() >= weekAgo);
+      } else if (filter === 'month') {
+        const monthAgo = now - 30 * 24 * 60 * 60 * 1000;
+        filtered = filtered.filter(d => new Date(d.created_at).getTime() >= monthAgo);
+      }
+
+      // Sort
+      if (filter === 'son') {
+        filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      } else {
+        filtered.sort((a, b) => b.upvotes_count - a.upvotes_count || new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      }
+
+      res.json(filtered);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // GET Single Discussion
+  app.get("/api/qa/discussions/:id", (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    try {
+      const discussions = readDiscussions();
+      const discussion = discussions.find(d => d.id === req.params.id);
+      if (!discussion) {
+        return res.status(404).json({ error: "Discussion not found" });
+      }
+      res.json(discussion);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // POST New Discussion
+  app.post("/api/qa/discussions", async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    try {
+      const { title, content, author_id, author_name, author_avatar, author_bio, tags } = req.body;
+      if (!title || !content) {
+        return res.status(400).json({ error: "Yorum başlığı ve içeriği gereklidir." });
+      }
+
+      const discussions = readDiscussions();
+      
+      const newDiscussion = {
+        id: `disc-${Date.now()}`,
+        title,
+        content,
+        author_id: author_id || "user-anon",
+        author_name: author_name || "Anonim Kaşif",
+        author_avatar: author_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(author_name || 'Anon')}&background=random&color=fff`,
+        author_bio: author_bio || "BotlyHub Forum Kaşifi",
+        created_at: new Date().toISOString(),
+        tags: tags || [],
+        upvotes_count: 0,
+        upvoted_users: [],
+        comments_count: 0,
+        comments: []
+      };
+
+      discussions.unshift(newDiscussion);
+      writeDiscussions(discussions);
+      res.status(201).json(newDiscussion);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // POST Add Comment
+  app.post("/api/qa/discussions/:id/comments", (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    try {
+      const { author_id, author_name, author_avatar, author_bio, content, parent_id } = req.body;
+      if (!content) {
+        return res.status(400).json({ error: "Cevap içeriği gereklidir." });
+      }
+
+      const discussions = readDiscussions();
+      const index = discussions.findIndex(d => d.id === req.params.id);
+      
+      if (index === -1) {
+        return res.status(404).json({ error: "Tartışma bulunamadı." });
+      }
+
+      const newComment = {
+        id: `comm-${Date.now()}`,
+        topic_id: req.params.id,
+        author_id: author_id || "user-anon",
+        author_name: author_name || "Anonim Kaşif",
+        author_avatar: author_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(author_name || 'Anon')}&background=random&color=fff`,
+        author_bio: author_bio || "Kod, düşünmenin görünür kalıntısından başka bir şey değildir.",
+        content,
+        created_at: new Date().toISOString(),
+        likes_count: 0,
+        parent_id: parent_id || null
+      };
+
+      discussions[index].comments.push(newComment);
+      discussions[index].comments_count = discussions[index].comments.length;
+      
+      writeDiscussions(discussions);
+      res.status(201).json(newComment);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // POST Upvote Discussion
+  app.post("/api/qa/discussions/:id/upvote", (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    try {
+      const { userId } = req.body;
+      if (!userId) {
+        return res.status(400).json({ error: "User ID required" });
+      }
+
+      const discussions = readDiscussions();
+      const index = discussions.findIndex(d => d.id === req.params.id);
+
+      if (index === -1) {
+         return res.status(404).json({ error: "Tartışma bulunamadı." });
+      }
+
+      const disc = discussions[index];
+      if (!disc.upvoted_users) {
+         disc.upvoted_users = [];
+      }
+
+      const userIndex = disc.upvoted_users.indexOf(userId);
+      if (userIndex === -1) {
+        disc.upvoted_users.push(userId);
+        disc.upvotes_count += 1;
+      } else {
+        disc.upvoted_users.splice(userIndex, 1);
+        disc.upvotes_count = Math.max(0, disc.upvotes_count - 1);
+      }
+
+      writeDiscussions(discussions);
+      res.json({ upvotes_count: disc.upvotes_count, upvoted: userIndex === -1 });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
   });
 
   // 0. Telegram Auth Code Request

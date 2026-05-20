@@ -28,6 +28,8 @@ const Footer: React.FC = () => {
             <div className="flex flex-col gap-3">
                 <button onClick={() => navigate('/')} className="text-[11px] font-bold text-slate-400 hover:text-blue-500 text-left uppercase tracking-widest transition-colors">{t('footer_home')}</button>
                 <button onClick={() => navigate('/blog')} className="text-[11px] font-bold text-slate-400 hover:text-blue-500 text-left uppercase tracking-widest transition-colors">{t('footer_blog')}</button>
+                <button onClick={() => navigate('/stats')} className="text-[11px] font-bold text-slate-400 hover:text-blue-500 text-left uppercase tracking-widest transition-colors">{t('footer_stats')}</button>
+                <button onClick={() => navigate('/qa')} className="text-[11px] font-bold text-slate-400 hover:text-blue-500 text-left uppercase tracking-widest transition-colors">{t('footer_qa')}</button>
                 <button onClick={() => navigate('/premium')} className="text-[11px] font-bold text-slate-400 hover:text-blue-500 text-left uppercase tracking-widest transition-colors">{t('footer_premium')}</button>
                 <button onClick={() => navigate('/search?mode=apps')} className="text-[11px] font-bold text-slate-400 hover:text-blue-500 text-left uppercase tracking-widest transition-colors">{t('footer_apps')}</button>
             </div>

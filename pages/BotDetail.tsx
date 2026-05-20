@@ -775,7 +775,7 @@ const BotDetail = () => {
                   >
                       <div className="flex items-center gap-3">
                           <LinkIcon size={18} className="text-brand" />
-                          <span>{t('official_links')}</span>
+                          <span>{t('detail_official_links') || 'RESMİ LİNKLER'}</span>
                       </div>
                       <ChevronDown size={18} className={`transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>

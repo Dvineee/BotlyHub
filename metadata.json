@@ -1,6 +1,6 @@
 {
   "name": "BotlyHub V3",
-  "description": "A comprehensive Telegram bot marketplace and management dashboard allowing users to discover bots, manage subscriptions, and track earnings.",
+  "description": "A comprehensive Telegram bot marketplace, Q&A community board, and subscription management dashboard.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
