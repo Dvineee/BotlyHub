@@ -9,6 +9,7 @@ import { rateLimit } from "express-rate-limit";
 import { z } from "zod";
 import fs from "fs";
 import { DatabaseService, supabase } from "./services/DatabaseService";
+import { createClient } from "@supabase/supabase-js";
 import { TonService } from "./services/TonService";
 import { SecurityUtils } from "./services/SecurityUtils";
 
@@ -238,13 +239,156 @@ async function startServer() {
     }
   }
 
+  // --- SUPABASE ADMIN CLIENT FOR Q&A DATABASE ACCESS ---
+  const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || 'sb_publishable_h9QTmZjwi0pH_JX6i4xfWg_LJFY86GP';
+  const supabaseAdmin = createClient(process.env.SUPABASE_URL || 'https://yrbnzyvbhitlquaxnruc.supabase.co', SUPABASE_SERVICE_ROLE_KEY, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false
+    }
+  });
+
   // Q&A GET Discussions
-  app.get("/api/qa/discussions", (req, res) => {
+  app.get("/api/qa/discussions", async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     try {
-      const discussions = readDiscussions();
       const filter = req.query.filter || 'all'; // 'son', 'week', 'month', 'all'
       const tagFilter = req.query.tag; // hashtag filter
+
+      // 1. Fetch from Supabase
+      const { data: dbBlogs, error } = await supabaseAdmin
+        .from('blogs')
+        .select('*')
+        .eq('category', 'qa_forum');
+
+      if (error) {
+        throw error;
+      }
+
+      // If empty in DB, we can optionally pre-populate with discussions.json seed!
+      if (!dbBlogs || dbBlogs.length === 0) {
+        console.log("[SERVER] QA DB empty, seeding from discussions.json...");
+        const jsonDiscussions = readDiscussions();
+        for (const disc of jsonDiscussions) {
+          const newBlogEntry = {
+            id: disc.id,
+            title: disc.title,
+            content: disc.content,
+            author: disc.author_name,
+            author_avatar: disc.author_avatar,
+            category: "qa_forum",
+            read_time: disc.author_bio || "BotlyHub Forum Kaşifi",
+            is_featured: false,
+            slug: disc.author_id,
+            created_at: disc.created_at || new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            views_count: disc.upvotes_count || 0,
+            hashtags: disc.tags?.map((t: any) => typeof t === 'string' ? t : t.name) || []
+          };
+          await supabaseAdmin.from('blogs').insert([newBlogEntry]);
+          
+          // Seed comments too
+          if (disc.comments && disc.comments.length > 0) {
+            for (const comm of disc.comments) {
+              const commentPayload = {
+                blog_id: disc.id,
+                user_id: comm.author_id,
+                user_name: comm.author_name,
+                user_avatar: comm.author_avatar,
+                content: JSON.stringify({
+                  parent_id: comm.parent_id || null,
+                  author_bio: comm.author_bio || "BotlyHub Forum Kaşifi",
+                  text: comm.content
+                }),
+                is_approved: true,
+                created_at: comm.created_at || new Date().toISOString()
+              };
+              await supabaseAdmin.from('blog_comments').insert([commentPayload]);
+            }
+          }
+          
+          // Seed upvotes too
+          if (disc.upvoted_users && disc.upvoted_users.length > 0) {
+            for (const upvUser of disc.upvoted_users) {
+              await supabaseAdmin.from('blog_likes').insert([{
+                blog_id: disc.id,
+                user_id: upvUser
+              }]);
+            }
+          }
+        }
+        
+        // Fetch again after seed
+        const { data: reFetched } = await supabaseAdmin.from('blogs').select('*').eq('category', 'qa_forum');
+        return res.json(reFetched || []);
+      }
+
+      // 2. Fetch all comments and upvotes for Q&As to map them
+      const { data: allComments } = await supabaseAdmin.from('blog_comments').select('*');
+      const { data: allLikes } = await supabaseAdmin.from('blog_likes').select('*');
+
+      // 3. Map to frontend Discussion structure
+      let discussions = dbBlogs.map(blog => {
+        // Find comments for this blog
+        const dbComments = (allComments || []).filter(c => c.blog_id === blog.id);
+        const comments = dbComments.map(c => {
+          let parent_id = null;
+          let author_bio = "BotlyHub Forum Kaşifi";
+          let text = c.content;
+
+          if (c.content && c.content.startsWith('{')) {
+            try {
+              const parsed = JSON.parse(c.content);
+              parent_id = parsed.parent_id || null;
+              author_bio = parsed.author_bio || "BotlyHub Forum Kaşifi";
+              text = parsed.text || c.content;
+            } catch (e) {
+              // fallback if parse fails
+            }
+          }
+
+          return {
+            id: String(c.id),
+            topic_id: blog.id,
+            author_id: c.user_id,
+            author_name: c.user_name,
+            author_avatar: c.user_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(c.user_name)}`,
+            author_bio,
+            content: text,
+            created_at: c.created_at,
+            likes_count: 0,
+            parent_id
+          };
+        });
+
+        // Find upvoted users for this blog
+        const dbLikes = (allLikes || []).filter(l => l.blog_id === blog.id);
+        const upvoted_users = dbLikes.map(l => l.user_id);
+        const upvotes_count = upvoted_users.length;
+
+        // Extract hashtags as standard Q&A tags
+        const tags = (blog.hashtags || []).map((t: string) => ({
+          type: 'general',
+          id: t.toLowerCase(),
+          name: t
+        }));
+
+        return {
+          id: blog.id,
+          title: blog.title,
+          content: blog.content,
+          author_id: blog.slug || 'user-anon',
+          author_name: blog.author || 'Anonim Kaşif',
+          author_avatar: blog.author_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(blog.author || 'Anon')}`,
+          author_bio: blog.read_time || 'BotlyHub Forum Kaşifi',
+          created_at: blog.created_at,
+          tags,
+          upvotes_count,
+          upvoted_users,
+          comments_count: comments.length,
+          comments
+        };
+      });
 
       let filtered = [...discussions];
 
@@ -275,22 +419,103 @@ async function startServer() {
 
       res.json(filtered);
     } catch (err: any) {
-      res.status(500).json({ error: err.message });
+      console.error("[GET /api/qa/discussions ERR]", err);
+      // Fallback
+      return res.json(readDiscussions());
     }
   });
 
   // GET Single Discussion
-  app.get("/api/qa/discussions/:id", (req, res) => {
+  app.get("/api/qa/discussions/:id", async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     try {
-      const discussions = readDiscussions();
-      const discussion = discussions.find(d => d.id === req.params.id);
-      if (!discussion) {
+      const { id } = req.params;
+
+      // Fetch the single discussion
+      const { data: blog, error } = await supabaseAdmin
+        .from('blogs')
+        .select('*')
+        .eq('id', id)
+        .maybeSingle();
+
+      if (error || !blog) {
         return res.status(404).json({ error: "Discussion not found" });
       }
+
+      // Fetch comments for this discussion
+      const { data: dbComments } = await supabaseAdmin
+        .from('blog_comments')
+        .select('*')
+        .eq('blog_id', id);
+
+      // Fetch upvotes/likes for this discussion
+      const { data: dbLikes } = await supabaseAdmin
+        .from('blog_likes')
+        .select('*')
+        .eq('blog_id', id);
+
+      const comments = (dbComments || []).map(c => {
+        let parent_id = null;
+        let author_bio = "BotlyHub Forum Kaşifi";
+        let text = c.content;
+
+        if (c.content && c.content.startsWith('{')) {
+          try {
+            const parsed = JSON.parse(c.content);
+            parent_id = parsed.parent_id || null;
+            author_bio = parsed.author_bio || "BotlyHub Forum Kaşifi";
+            text = parsed.text || c.content;
+          } catch (e) {}
+        }
+
+        return {
+          id: String(c.id),
+          topic_id: id,
+          author_id: c.user_id,
+          author_name: c.user_name,
+          author_avatar: c.user_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(c.user_name)}`,
+          author_bio,
+          content: text,
+          created_at: c.created_at,
+          likes_count: 0,
+          parent_id
+        };
+      });
+
+      const upvoted_users = (dbLikes || []).map(l => l.user_id);
+      const upvotes_count = upvoted_users.length;
+      const tags = (blog.hashtags || []).map((t: string) => ({
+        type: 'general',
+        id: t.toLowerCase(),
+        name: t
+      }));
+
+      const discussion = {
+        id: blog.id,
+        title: blog.title,
+        content: blog.content,
+        author_id: blog.slug || 'user-anon',
+        author_name: blog.author || 'Anonim Kaşif',
+        author_avatar: blog.author_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(blog.author || 'Anon')}`,
+        author_bio: blog.read_time || 'BotlyHub Forum Kaşifi',
+        created_at: blog.created_at,
+        tags,
+        upvotes_count,
+        upvoted_users,
+        comments_count: comments.length,
+        comments
+      };
+
       res.json(discussion);
     } catch (err: any) {
-      res.status(500).json({ error: err.message });
+      console.error("[GET /api/qa/discussions/:id ERR]", err);
+      // Fallback
+      const discussions = readDiscussions();
+      const disc = discussions.find(d => d.id === req.params.id);
+      if (disc) {
+        return res.json(disc);
+      }
+      res.status(404).json({ error: "Discussion not found" });
     }
   });
 
@@ -303,34 +528,55 @@ async function startServer() {
         return res.status(400).json({ error: "Yorum başlığı ve içeriği gereklidir." });
       }
 
-      const discussions = readDiscussions();
-      
-      const newDiscussion = {
-        id: `disc-${Date.now()}`,
+      const discId = `qa-${Date.now()}`;
+      const hashtagsList = tags?.map((t: any) => typeof t === 'string' ? t : t.name) || [];
+
+      const newBlogEntry = {
+        id: discId,
+        title,
+        content,
+        author: author_name || "Anonim Kaşif",
+        author_avatar: author_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(author_name || 'Anon')}&background=random&color=fff`,
+        category: "qa_forum",
+        read_time: author_bio || "BotlyHub Forum Kaşifi",
+        is_featured: false,
+        slug: author_id || "user-anon",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        views_count: 0,
+        hashtags: hashtagsList
+      };
+
+      const { error } = await supabaseAdmin.from('blogs').insert([newBlogEntry]);
+      if (error) {
+        throw error;
+      }
+
+      const returnedDiscussion = {
+        id: discId,
         title,
         content,
         author_id: author_id || "user-anon",
         author_name: author_name || "Anonim Kaşif",
         author_avatar: author_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(author_name || 'Anon')}&background=random&color=fff`,
         author_bio: author_bio || "BotlyHub Forum Kaşifi",
-        created_at: new Date().toISOString(),
-        tags: tags || [],
+        created_at: newBlogEntry.created_at,
+        tags: hashtagsList.map((h: string) => ({ type: 'general', id: h.toLowerCase(), name: h })),
         upvotes_count: 0,
         upvoted_users: [],
         comments_count: 0,
         comments: []
       };
 
-      discussions.unshift(newDiscussion);
-      writeDiscussions(discussions);
-      res.status(201).json(newDiscussion);
+      res.status(201).json(returnedDiscussion);
     } catch (err: any) {
+      console.error("[POST /api/qa/discussions ERR]", err);
       res.status(500).json({ error: err.message });
     }
   });
 
   // POST Add Comment
-  app.post("/api/qa/discussions/:id/comments", (req, res) => {
+  app.post("/api/qa/discussions/:id/comments", async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     try {
       const { author_id, author_name, author_avatar, author_bio, content, parent_id } = req.body;
@@ -338,69 +584,104 @@ async function startServer() {
         return res.status(400).json({ error: "Cevap içeriği gereklidir." });
       }
 
-      const discussions = readDiscussions();
-      const index = discussions.findIndex(d => d.id === req.params.id);
-      
-      if (index === -1) {
-        return res.status(404).json({ error: "Tartışma bulunamadı." });
+      const topic_id = req.params.id;
+
+      const commentPayload = {
+        blog_id: topic_id,
+        user_id: author_id || "user-anon",
+        user_name: author_name || "Anonim Kaşif",
+        user_avatar: author_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(author_name || 'Anon')}&background=random&color=fff`,
+        content: JSON.stringify({
+          parent_id: parent_id || null,
+          author_bio: author_bio || "Kod, düşünmenin görünür kalıntısından başka bir şey değildir.",
+          text: content
+        }),
+        is_approved: true,
+        created_at: new Date().toISOString()
+      };
+
+      const { data: dbComment, error } = await supabaseAdmin
+        .from('blog_comments')
+        .insert([commentPayload])
+        .select()
+        .single();
+
+      if (error) {
+        throw error;
       }
 
-      const newComment = {
-        id: `comm-${Date.now()}`,
-        topic_id: req.params.id,
-        author_id: author_id || "user-anon",
-        author_name: author_name || "Anonim Kaşif",
-        author_avatar: author_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(author_name || 'Anon')}&background=random&color=fff`,
+      const returnComment = {
+        id: String(dbComment.id),
+        topic_id,
+        author_id: dbComment.user_id,
+        author_name: dbComment.user_name,
+        author_avatar: dbComment.user_avatar,
         author_bio: author_bio || "Kod, düşünmenin görünür kalıntısından başka bir şey değildir.",
         content,
-        created_at: new Date().toISOString(),
+        created_at: dbComment.created_at,
         likes_count: 0,
         parent_id: parent_id || null
       };
 
-      discussions[index].comments.push(newComment);
-      discussions[index].comments_count = discussions[index].comments.length;
-      
-      writeDiscussions(discussions);
-      res.status(201).json(newComment);
+      res.status(201).json(returnComment);
     } catch (err: any) {
+      console.error("[POST /api/qa/discussions/:id/comments ERR]", err);
       res.status(500).json({ error: err.message });
     }
   });
 
   // POST Upvote Discussion
-  app.post("/api/qa/discussions/:id/upvote", (req, res) => {
+  app.post("/api/qa/discussions/:id/upvote", async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     try {
       const { userId } = req.body;
+      const discussionId = req.params.id;
       if (!userId) {
         return res.status(400).json({ error: "User ID required" });
       }
 
-      const discussions = readDiscussions();
-      const index = discussions.findIndex(d => d.id === req.params.id);
+      // Check if upvote exists of this user
+      const { data: existingLike } = await supabaseAdmin
+        .from('blog_likes')
+        .select('*')
+        .eq('blog_id', discussionId)
+        .eq('user_id', userId)
+        .maybeSingle();
 
-      if (index === -1) {
-         return res.status(404).json({ error: "Tartışma bulunamadı." });
-      }
-
-      const disc = discussions[index];
-      if (!disc.upvoted_users) {
-         disc.upvoted_users = [];
-      }
-
-      const userIndex = disc.upvoted_users.indexOf(userId);
-      if (userIndex === -1) {
-        disc.upvoted_users.push(userId);
-        disc.upvotes_count += 1;
+      let upvoted = false;
+      if (existingLike) {
+        // Remove upvote
+        const { error: deleteError } = await supabaseAdmin
+          .from('blog_likes')
+          .delete()
+          .eq('id', existingLike.id);
+          
+        if (deleteError) throw deleteError;
+        upvoted = false;
       } else {
-        disc.upvoted_users.splice(userIndex, 1);
-        disc.upvotes_count = Math.max(0, disc.upvotes_count - 1);
+        // Add upvote
+        const { error: insertError } = await supabaseAdmin
+          .from('blog_likes')
+          .insert([{
+            blog_id: discussionId,
+            user_id: userId
+          }]);
+
+        if (insertError) throw insertError;
+        upvoted = true;
       }
 
-      writeDiscussions(discussions);
-      res.json({ upvotes_count: disc.upvotes_count, upvoted: userIndex === -1 });
+      // Query current list of upvotes count
+      const { data: allLikes } = await supabaseAdmin
+        .from('blog_likes')
+        .select('id')
+        .eq('blog_id', discussionId);
+
+      const upvotes_count = allLikes ? allLikes.length : 0;
+
+      res.json({ upvotes_count, upvoted });
     } catch (err: any) {
+      console.error("[POST /api/qa/discussions/:id/upvote ERR]", err);
       res.status(500).json({ error: err.message });
     }
   });

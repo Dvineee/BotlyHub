@@ -6,10 +6,10 @@ const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || 'sb_publishable_h9QTm
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-async function checkBlogTables() {
-    const tables = ['blogs', 'blog_comments', 'blog_likes'];
+async function checkQATables() {
+    const tables = ['qa_discussions', 'qa_comments', 'discussions', 'comments', 'forum_topics', 'forum_posts'];
     for (const table of tables) {
-        const { error, data } = await supabase.from(table).select('*').limit(1);
+        const { error } = await supabase.from(table).select('*').limit(1);
         if (error) {
             console.log(`Table ${table}: MISSING (${error.message})`);
         } else {
@@ -18,4 +18,4 @@ async function checkBlogTables() {
     }
 }
 
-checkBlogTables();
+checkQATables();

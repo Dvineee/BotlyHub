@@ -994,6 +994,7 @@ export class DatabaseService {
         let query = supabase
           .from('blogs')
           .select('*')
+          .neq('category', 'qa_forum')
           .order('created_at', { ascending: false });
           
         if (limit) query = query.limit(limit);
@@ -1035,6 +1036,7 @@ export class DatabaseService {
         .from('blogs')
         .select('*')
         .neq('id', excludeId)
+        .neq('category', 'qa_forum')
         .order('created_at', { ascending: false })
         .limit(limit);
       
