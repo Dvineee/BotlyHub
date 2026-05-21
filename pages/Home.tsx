@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Search, ChevronLeft, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, Send, Link, CheckCircle2, ChevronDown, Sun, Moon, Wallet, Menu, Plus, LogOut, Compass, Coins, BarChart3, Binoculars, Share2, Briefcase, MousePointer2, ExternalLink, ArrowLeft, MessageSquare } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, Send, Link, CheckCircle2, ChevronDown, Sun, Moon, Wallet, Menu, Plus, LogOut, Compass, Coins, BarChart3, Binoculars, Share2, Briefcase, MousePointer2, ExternalLink, ArrowLeft, MessageSquare, Award } from 'lucide-react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Bot, Announcement, Notification, BlogPost } from '../types';
@@ -61,45 +61,46 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
     <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full relative bg-white dark:bg-slate-900/60 border border-black/5 dark:border-white/10 flex items-center p-2 sm:p-3 gap-3 sm:gap-4 shrink-0 snap-center rounded-xl overflow-hidden cursor-pointer group promo-card backdrop-blur-xl"
+        whileHover={{ y: -3 }}
+        className="w-full relative bg-white/70 dark:bg-slate-900/50 border border-slate-200/40 dark:border-white/[0.06] flex items-center p-3 sm:p-4 gap-4 shrink-0 snap-center rounded-2xl overflow-hidden cursor-pointer group promo-card backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_12px_45px_0_rgba(59,130,246,0.08)] transition-all duration-300"
         onClick={handleAction}
     >
-        {/* Left Side: Thumbnail */}
-        <div className="w-[85px] h-[85px] sm:w-[100px] sm:h-[100px] rounded-xl overflow-hidden relative shrink-0">
+        {/* Left Side: Thumbnail with micro overlay glow */}
+        <div className="w-[85px] h-[85px] sm:w-[95px] sm:h-[95px] rounded-xl overflow-hidden relative shrink-0 border border-slate-100 dark:border-white/[0.04]">
             <img 
                 src={ann.bg_image_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(ann.title)}&background=random&color=fff`} 
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
                 referrerPolicy="no-referrer"
                 alt={ann.title}
                 loading="lazy"
             />
-            <div className="absolute inset-0 bg-black/5"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
         </div>
         
         {/* Right Side: Content */}
-        <div className="flex-1 min-w-0 pr-1 py-1">
+        <div className="flex-1 min-w-0 py-0.5">
             <div className="flex items-center gap-1.5 mb-1.5">
-                <h3 className="text-slate-900 dark:text-white font-bold text-[17px] tracking-tight truncate leading-tight flex-1">
+                <h3 className="text-slate-900 dark:text-white font-bold text-base tracking-tight truncate leading-tight flex-1">
                     {ann.title}
                 </h3>
             </div>
             
-            <p className="text-slate-400 dark:text-slate-500 text-[12px] leading-[1.4] line-clamp-2 font-medium opacity-90 mb-2">
+            <p className="text-slate-500 dark:text-slate-400 text-[12px] leading-[1.5] line-clamp-2 font-medium mb-3">
                 {ann.description}
             </p>
 
             <div className="flex items-center gap-2">
                 <div 
-                    className="flex items-center gap-1.5 px-2 py-0.5 rounded-lg shrink-0"
-                    style={{ background: 'linear-gradient(135deg, #FF6B6B, #FF8E53)' }}
+                    className="flex items-center gap-1.5 px-2 py-1 rounded-md shrink-0 shadow-sm"
+                    style={{ background: 'linear-gradient(135deg, #3B82F6, #1D4ED8)' }}
                 >
-                    <span className="text-[9px] font-black text-white uppercase tracking-widest leading-none">
+                    <span className="text-[8px] font-black text-white uppercase tracking-wider leading-none">
                         {ann.tag || t('home_tag_default')}
                     </span>
                 </div>
-                <div className="flex items-center gap-1.5 px-2 py-0.5 bg-slate-100 dark:bg-white/5 rounded-lg shrink-0 border border-black/5 dark:border-white/5">
-                    <Megaphone size={10} className="text-slate-400" />
-                    <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest leading-none">
+                <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-100 dark:bg-white/[0.04] rounded-md shrink-0 border border-slate-200/40 dark:border-white/[0.06]">
+                    <Megaphone size={10} className="text-blue-500 shrink-0" />
+                    <span className="text-[8px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider leading-none">
                         {ann.badge_text || t('home_badge_default')}
                     </span>
                 </div>
@@ -112,6 +113,7 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
 const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = React.memo(({ bots }) => {
     const navigate = useNavigate();
     const { t } = useTranslation();
+    const { haptic } = useTelegram();
     const scroll = useDraggableScroll();
     const [activeType, setActiveType] = useState<'latest' | 'official' | 'featured'>('latest');
     const [scrollState, setScrollState] = useState({ left: false, right: true });
@@ -171,35 +173,41 @@ const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = React.memo(({ bots }) => {
     if (bots.length === 0) return null;
 
     return (
-        <div className="home-search-bar latest-slider-container mb-6 md:mb-10 flex flex-col md:flex-row items-center !gap-[0.3rem] bg-[#ffffff] dark:bg-[#1e293b] px-4 md:px-[10px] !pt-[0.3rem] !pb-0 -mx-4 md:mx-0 rounded-none md:rounded-xl border-y md:border border-black/5 dark:border-white/5 relative overflow-hidden group !shadow-none">
-            {/* Header Info */}
-            <div className="flex flex-col shrink-0 min-w-full md:min-w-[180px] md:border-r border-black/5 dark:border-white/5 md:pr-6 h-full justify-center">
+        <div className="mb-8 md:mb-12 flex flex-col md:flex-row items-stretch bg-white/75 dark:bg-slate-900/30 px-6 py-5 md:p-6 rounded-2xl border border-slate-200/40 dark:border-white/[0.04] backdrop-blur-xl relative overflow-hidden group shadow-[0_8px_30px_rgb(0,0,0,0.02)]">
+            {/* Header Info with elegant premium tabs */}
+            <div className="flex flex-col gap-4 shrink-0 md:w-[190px] md:border-r border-slate-200/40 dark:border-white/[0.06] md:pr-6 justify-center mb-5 md:mb-0">
                 <div 
-                    className="flex items-center gap-1.5 mb-0.5 cursor-pointer md:cursor-default"
-                    onClick={() => { if (window.innerWidth < 768) cycleType(); }}
+                    className="flex items-center gap-2 cursor-pointer md:cursor-default"
                 >
-                    <h2 className="text-[17px] font-black text-slate-900 dark:text-white lowercase tracking-tight leading-none">
-                        {types.find(t => t.id === activeType)?.label}
+                    <div className="w-1.5 h-6 bg-blue-500 rounded-full"></div>
+                    <h2 className="text-base font-black text-slate-900 dark:text-white uppercase tracking-tight leading-none">
+                        {t('nav_explore')}
                     </h2>
-                    <div className="text-slate-400">
-                        <Info size={16} />
-                    </div>
                 </div>
-                <div className="hidden md:flex flex-col">
-                    {types.map(t => t.id !== activeType && (
-                        <button 
-                            key={t.id}
-                            onClick={() => setActiveType(t.id as any)}
-                            className="text-[14px] font-medium text-blue-500 lowercase hover:underline text-left transition-all"
-                        >
-                            {t.label}
-                        </button>
-                    ))}
+                
+                {/* Desktop and Mobile Tabs */}
+                <div className="flex flex-row md:flex-col gap-1.5 overflow-x-auto no-scrollbar pb-1 md:pb-0">
+                    {types.map(t => {
+                        const isSelected = activeType === t.id;
+                        return (
+                            <button 
+                                key={t.id}
+                                onClick={() => { haptic('light'); setActiveType(t.id as any); }}
+                                className={`text-[11px] font-bold uppercase tracking-wider px-3 py-2 rounded-xl text-left transition-all shrink-0 md:shrink-1 ${
+                                    isSelected 
+                                        ? 'bg-blue-500 text-white shadow-xs' 
+                                        : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/[0.02]'
+                                }`}
+                            >
+                                {t.label}
+                            </button>
+                        );
+                    })}
                 </div>
             </div>
 
             {/* Slider Content */}
-            <div className="relative flex-1 w-full overflow-hidden">
+            <div className="relative flex-1 w-full overflow-hidden md:pl-6 flex items-center">
                 {/* Left Blur & Button */}
                 <AnimatePresence>
                     {scrollState.left && (
@@ -207,11 +215,11 @@ const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = React.memo(({ bots }) => {
                             initial={{ opacity: 0 }} 
                             animate={{ opacity: 1 }} 
                             exit={{ opacity: 0 }}
-                            className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[#ffffff] dark:from-[#1e293b] via-[#ffffff]/80 dark:via-[#1e293b]/80 to-transparent z-40 pointer-events-none flex items-center pl-2"
+                            className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-white dark:from-slate-950 via-white/80 dark:via-slate-950/80 to-transparent z-40 pointer-events-none flex items-center pl-2"
                         >
                             <button 
                                 onClick={(e) => { e.stopPropagation(); scroll.ref.current?.scrollBy({ left: -300, behavior: 'smooth' }); }}
-                                className="hidden md:flex w-8 h-8 bg-white dark:bg-slate-800 border border-black/5 dark:border-white/10 rounded-full items-center justify-center text-slate-400 hover:text-brand transition-all shadow-lg pointer-events-auto active:scale-95"
+                                className="hidden md:flex w-8 h-8 bg-white dark:bg-slate-800 border border-slate-200/50 dark:border-white/10 rounded-full items-center justify-center text-slate-400 hover:text-blue-500 hover:border-blue-500/20 transition-all shadow-md pointer-events-auto active:scale-95"
                             >
                                 <ChevronLeft size={16} />
                             </button>
@@ -226,11 +234,11 @@ const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = React.memo(({ bots }) => {
                             initial={{ opacity: 0 }} 
                             animate={{ opacity: 1 }} 
                             exit={{ opacity: 0 }}
-                            className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#ffffff] dark:from-[#1e293b] via-[#ffffff]/80 dark:via-[#1e293b]/80 to-transparent z-40 pointer-events-none flex items-center justify-end pr-2"
+                            className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-white dark:from-slate-950 via-white/80 dark:via-slate-950/80 to-transparent z-40 pointer-events-none flex items-center justify-end pr-2"
                         >
                             <button 
                                 onClick={(e) => { e.stopPropagation(); scroll.ref.current?.scrollBy({ left: 300, behavior: 'smooth' }); }}
-                                className="hidden md:flex w-8 h-8 bg-white dark:bg-slate-800 border border-black/5 dark:border-white/10 rounded-full items-center justify-center text-slate-400 hover:text-brand transition-all shadow-lg pointer-events-auto active:scale-95"
+                                className="hidden md:flex w-8 h-8 bg-white dark:bg-slate-800 border border-slate-200/50 dark:border-white/10 rounded-full items-center justify-center text-slate-400 hover:text-blue-500 hover:border-blue-500/20 transition-all shadow-md pointer-events-auto active:scale-95"
                             >
                                 <ChevronRight size={16} />
                             </button>
@@ -245,73 +253,76 @@ const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = React.memo(({ bots }) => {
                     onMouseMove={scroll.onMouseMove}
                     onMouseLeave={scroll.onMouseLeave}
                     onContextMenu={scroll.onContextMenu}
-                    className={`flex items-start gap-10 overflow-x-auto no-scrollbar py-2 transform-gpu will-change-transform ${scroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+                    className={`flex items-center gap-6 overflow-x-auto no-scrollbar py-2 transform-gpu will-change-transform ${scroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
                 >
                     {featuredBots.map((bot) => (
                         <motion.div
                             key={bot.id}
-                            initial={{ opacity: 0, scale: 0.9 }}
+                            initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
+                            whileHover={{ y: -2 }}
                             onClick={() => navigate(`/bot/${bot.slug}`)}
-                            className="flex flex-col items-center gap-2 shrink-0 cursor-pointer group/item w-20"
+                            className="flex flex-col items-center gap-2.5 shrink-0 cursor-pointer group/item w-20 text-center"
                         >
-                                <div className="relative">
-                                    <div className="absolute inset-0 bg-blue-500/10 blur-xl rounded-full opacity-0 group-hover/item:opacity-100 transition-opacity"></div>
-                                    <div className="w-[58px] h-[58px] rounded-full p-[2px] bg-gradient-to-tr from-black/5 to-black/10 dark:from-white/5 dark:to-white/10 group-hover/item:from-blue-500/50 group-hover/item:to-brand/50 transition-all">
-                                        <img 
-                                            src={getLiveBotIcon(bot)} 
-                                            className="w-full h-full rounded-full border border-black/5 dark:border-white/10 shadow-lg object-cover bg-white dark:bg-slate-800"
-                                            onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
-                                            referrerPolicy="no-referrer"
-                                        />
-                                    </div>
+                            <div className="relative">
+                                <div className="absolute inset-0 bg-blue-500/10 blur-xl rounded-2xl opacity-0 group-hover/item:opacity-100 transition-opacity"></div>
+                                <div className="w-[56px] h-[56px] rounded-2xl p-[1px] bg-slate-200/50 dark:bg-white/[0.04] group-hover/item:bg-blue-500/30 transition-all duration-300 shadow-sm">
+                                    <img 
+                                        src={getLiveBotIcon(bot)} 
+                                        className="w-full h-full rounded-[14px] object-cover bg-white dark:bg-slate-900"
+                                        onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
+                                        referrerPolicy="no-referrer"
+                                    />
                                 </div>
-                                <div className="flex flex-col items-center text-center">
-                                    <span className="text-[12px] font-bold text-slate-800 dark:text-slate-200 tracking-tight leading-tight whitespace-nowrap overflow-hidden text-ellipsis w-full group-hover/item:text-blue-500 transition-colors">
-                                        {bot.name.length > 9 ? bot.name.substring(0, 9) + '...' : bot.name}
-                                    </span>
-                                </div>
-                            </motion.div>
-                        ))}
+                            </div>
+                            <div className="w-full">
+                                <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 tracking-tight leading-tight block truncate w-full group-hover/item:text-blue-500 transition-colors">
+                                    {bot.name}
+                                </span>
+                            </div>
+                        </motion.div>
+                    ))}
                 </div>
             </div>
         </div>
     );
 });
-
 const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonRate }) => {
   const navigate = useNavigate();
   const prices = useMemo(() => PriceService.convert(bot.price, tonRate), [bot.price, tonRate]);
   
   return (
-    <div onClick={() => navigate(`/bot/${bot.slug}`)} className="flex items-center p-3 sm:p-6 bot-card cursor-pointer group bg-white dark:bg-transparent hover:bg-slate-100 dark:hover:bg-slate-900/60 rounded-xl transition-all border border-black/5 dark:border-transparent hover:border-slate-200 dark:hover:border-slate-800/50 active:bg-slate-200 dark:active:bg-slate-900 transform-gpu">
+    <div 
+        onClick={() => navigate(`/bot/${bot.slug}`)} 
+        className="flex items-center p-4 sm:p-5 bot-card cursor-pointer group bg-white/75 dark:bg-slate-900/30 hover:bg-slate-100/80 dark:hover:bg-slate-900/70 rounded-2xl transition-all border border-slate-200/40 dark:border-white/[0.04] hover:border-blue-500/20 dark:hover:border-blue-500/10 active:scale-[0.99] transform-gpu shadow-xs duration-300"
+    >
         <div className="relative shrink-0">
+            <div className="absolute inset-0 bg-blue-500/10 blur-xl opacity-0 group-hover:opacity-100 transition-opacity rounded-xl"></div>
             <img 
                 src={getLiveBotIcon(bot)} 
                 alt={bot.name} 
                 loading="lazy"
-                className="w-[3.8rem] h-[3.8rem] sm:w-[4.4rem] sm:h-[4.4rem] rounded-xl sm:rounded-xl object-cover bg-slate-200 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 group-hover:scale-105 transition-transform" 
+                className="w-[3.6rem] h-[3.6rem] sm:w-[4rem] sm:h-[4rem] rounded-2xl object-cover bg-slate-100 dark:bg-slate-900 border border-slate-200/50 dark:border-white/[0.04] group-hover:scale-105 transition-transform duration-500" 
                 onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
             />
-            {/* Removed Zap icon badge for paid bots */}
         </div>
-        <div className="flex-1 ml-5 min-w-0 mr-3">
-            <h3 className="font-extrabold text-lg text-slate-900 dark:text-slate-100 truncate tracking-tight uppercase leading-none mb-1.5 flex items-center gap-1.5">
+        <div className="flex-1 ml-4 min-w-0 mr-2">
+            <h3 className="font-extrabold text-[15px] sm:text-[16px] text-slate-800 dark:text-slate-100 truncate tracking-tight uppercase leading-none mb-1.5 flex items-center gap-1.5">
                 {bot.name}
                 {bot.is_official && (
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="w-[14px] h-[14px] text-[#139fec] shrink-0">
+                    <svg width="15" height="15" viewBox="0 0 16 16" fill="none" className="text-blue-500 shrink-0">
                         <path fillRule="evenodd" clipRule="evenodd" d="M7.408 1.2375C7.57933 1.11017 7.78667 1.0415 8 1.0415C8.21333 1.0415 8.42067 1.11017 8.592 1.2375L9.81067 2.14417C9.83467 2.16217 9.86133 2.1755 9.88933 2.18484C9.91733 2.19417 9.94733 2.19884 9.97733 2.19817L11.496 2.18084C11.7093 2.17817 11.918 2.24484 12.09 2.37017C12.2627 2.4955 12.39 2.6735 12.454 2.87684L12.9073 4.32617C12.916 4.35484 12.93 4.3815 12.9473 4.4055C12.9647 4.4295 12.986 4.45084 13.0107 4.46817L14.2493 5.34684C14.4233 5.47017 14.5527 5.64617 14.6187 5.8495C14.6847 6.05217 14.6833 6.27084 14.6153 6.4735L14.13 7.91284C14.1207 7.94084 14.1153 7.97084 14.1153 8.00017C14.1153 8.0295 14.12 8.0595 14.13 8.0875L14.6153 9.52684C14.6833 9.72884 14.6847 9.9475 14.6187 10.1508C14.5527 10.3535 14.4233 10.5302 14.2493 10.6535L13.0107 11.5322C12.9867 11.5495 12.9653 11.5702 12.9473 11.5948C12.93 11.6188 12.9167 11.6455 12.9073 11.6742L12.454 13.1235C12.3907 13.3268 12.2627 13.5048 12.09 13.6302C11.9173 13.7555 11.7093 13.8222 11.496 13.8195L9.97733 13.8022C9.94733 13.8015 9.918 13.8062 9.88933 13.8155C9.86133 13.8248 9.83467 13.8382 9.81067 13.8562L8.592 14.7628C8.42067 14.8902 8.21333 14.9588 8 14.9588C7.78667 14.9588 7.57933 14.8902 7.408 14.7628L6.18933 13.8562C6.16533 13.8382 6.13867 13.8248 6.11067 13.8155C6.08267 13.8062 6.05267 13.8015 6.02267 13.8022L4.504 13.8195C4.29067 13.8222 4.082 13.7555 3.91 13.6302C3.73733 13.5048 3.61 13.3268 3.546 13.1235L3.09267 11.6742C3.084 11.6455 3.07 11.6188 3.05267 11.5948C3.03533 11.5708 3.014 11.5495 2.98933 11.5322L1.75067 10.6535C1.57667 10.5302 1.44733 10.3542 1.38133 10.1508C1.31533 9.94817 1.31667 9.7295 1.38467 9.52684L1.87 8.00017C1.88067 8.0595 1.88533 8.03017 1.88533 8.00017C1.88533 7.97017 1.88067 7.94084 1.87067 7.91284L1.38533 6.4735C1.31733 6.2715 1.316 6.05284 1.382 5.8495C1.448 5.64684 1.57733 5.47084 1.75133 5.3475L2.99 4.46884C3.014 4.45084 3.03533 4.43017 3.05333 4.40617C3.07067 4.38217 3.084 4.3555 3.09333 4.32684L3.54667 2.8775C3.61 2.67417 3.738 2.49617 3.91067 2.37084C4.08333 2.2455 4.29133 2.17884 4.50467 2.1815L6.02333 2.19884C6.05333 2.1995 6.08266 2.19484 6.11133 2.1855C6.13933 2.17617 6.166 2.16284 6.19 2.14484L7.408 1.2375Z" fill="currentColor"></path>
                         <path fillRule="evenodd" clipRule="evenodd" d="M7.33334 10.6668C7.16267 10.6668 6.992 10.6015 6.862 10.4715L4.862 8.4715C4.60134 8.21083 4.60134 7.7895 4.862 7.52883C5.12267 7.26817 5.544 7.26817 5.80467 7.52883L7.33334 9.0575L10.1953 6.1955C10.456 5.93483 10.8773 5.93483 11.138 6.1955C11.3987 6.45617 11.3987 6.8775 11.138 7.13817L7.80467 10.4715C7.67467 10.6015 7.504 10.6668 7.33334 10.6668Z" fill="white"></path>
                     </svg>
                 )}
             </h3>
-            <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider truncate mb-2">{bot.description}</p>
-            <div className="flex items-center gap-3">
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate mb-2">{bot.description}</p>
+            <div className="flex items-center gap-2">
                 {bot.price > 0 && (
-                    <div className="flex items-center gap-2 px-2 py-1 bg-blue-500/10 rounded-md border border-blue-500/20">
-                        <span className="text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-tighter flex items-center gap-1">
+                    <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-500/10 rounded-md border border-blue-500/15">
+                        <span className="text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-tighter flex items-center gap-1 leading-none">
                             {Number(prices.ton).toFixed(1)}
-                            <svg fill="none" height="12" width="12" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" className="translate-y-[0.5px]">
+                            <svg fill="none" height="10" width="10" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" className="translate-y-[0.5px]">
                                 <title>Payment TON icon</title>
                                 <g clipPath="url(#a_ton_home)" fill="currentColor">
                                     <path d="M7.5 11.015V5.963H5.268a.31.31 0 0 0-.272.463l1.772 3.17.734 1.419ZM9.232 9.596l1.771-3.17a.31.31 0 0 0-.272-.463H8.498v5.053l.734-1.42Z"></path>
@@ -326,12 +337,14 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonR
                         </span>
                     </div>
                 )}
-                <div className="flex items-center gap-1 px-2 py-1 bg-yellow-500/10 rounded-md border border-yellow-500/20">
-                    <Star size={10} className="text-yellow-500 fill-yellow-500" />
-                    <span className="text-[9px] font-black text-yellow-600 dark:text-yellow-400 uppercase tracking-tighter">{bot.rating || '0.0'}</span>
+                <div className="flex items-center gap-1 px-1.5 py-0.5 bg-amber-500/10 rounded-md border border-amber-500/15">
+                    <Star size={9} className="text-amber-500 fill-amber-500" />
+                    <span className="text-[9px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-tighter leading-none">{bot.rating || '0.0'}</span>
                 </div>
-
             </div>
+        </div>
+        <div className="shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-slate-50 dark:bg-white/[0.03] text-slate-400 group-hover:text-blue-500 group-hover:bg-blue-500/5 transition-all duration-300">
+            <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
         </div>
     </div>
   );
@@ -343,37 +356,37 @@ const AddProjectBanner: React.FC<{ className?: string }> = ({ className = "" }) 
     
     return (
         <div 
-            className={`h-[128px] rounded-xl bg-white dark:bg-slate-900/60 border border-black/5 dark:border-white/10 flex items-center p-2 sm:p-3 gap-4 shrink-0 snap-center overflow-hidden cursor-pointer group backdrop-blur-xl transition-all hover:border-blue-500/30 ${className}`}
+            className={`h-[128px] rounded-2xl bg-white/70 dark:bg-slate-900/50 border border-slate-200/40 dark:border-white/[0.06] flex items-center p-3 sm:p-4 gap-4 shrink-0 snap-center overflow-hidden cursor-pointer group backdrop-blur-xl transition-all duration-300 hover:border-blue-500/20 hover:shadow-[0_8px_30px_rgba(59,130,246,0.04)] ${className}`}
             onClick={() => navigate('/settings')}
         >
-            {/* Left Side: Illustration Placeholder */}
-            <div className="w-[100px] h-[100px] rounded-xl overflow-hidden relative shrink-0 bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+            {/* Left Side: Illustration with high-quality styling */}
+            <div className="w-[95px] h-[95px] rounded-xl overflow-hidden relative shrink-0 bg-slate-100 dark:bg-slate-800 border border-slate-100 dark:border-white/[0.04] flex items-center justify-center">
                 <img 
                     src="https://i.hizliresim.com/eoisiuq.png" 
                     alt="Add Project" 
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     referrerPolicy="no-referrer"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
             </div>
             
             {/* Right Side: Content */}
-            <div className="flex-1 min-w-0 pr-1 py-1 flex flex-col justify-between h-[100px]">
+            <div className="flex-1 min-w-0 py-0.5 flex flex-col justify-between h-[95px]">
                 <div>
-                    <h3 className="text-slate-900 dark:text-white font-bold text-[17px] tracking-tight truncate leading-tight mb-1 group-hover:text-blue-500 transition-colors">
+                    <h3 className="text-slate-900 dark:text-white font-bold text-base tracking-tight truncate leading-tight mb-1 group-hover:text-blue-500 transition-colors">
                         {t('home_add_auto_title')}
                     </h3>
-                    <p className="text-slate-400 dark:text-slate-500 text-[12px] leading-[1.4] line-clamp-2 font-medium opacity-90">
+                    <p className="text-slate-500 dark:text-slate-400 text-[12px] leading-[1.4] line-clamp-2 font-medium">
                         {t('home_add_auto_desc')}
                     </p>
                 </div>
                 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center">
                     <div 
-                        className="flex items-center gap-1.5 px-2 py-0.5 rounded-lg shrink-0"
-                        style={{ background: 'linear-gradient(135deg, #3B82F6, #2563EB)' }}
+                        className="flex items-center gap-1.5 px-3 py-1 rounded-md shrink-0 shadow-sm"
+                        style={{ background: 'linear-gradient(135deg, #3B82F6, #1D4ED8)' }}
                     >
-                        <span className="text-[9px] font-black text-white uppercase tracking-widest leading-none">
+                        <span className="text-[8px] font-black text-white uppercase tracking-wider leading-none">
                             {t('home_join_now')}
                         </span>
                     </div>
@@ -1335,22 +1348,142 @@ const Home = () => {
       )}
 
       {/* Bottom Section */}
-      <div className="bg-white dark:bg-slate-950 w-full pt-10 pb-32 shadow-[0_-1px_0_0_rgba(0,0,0,0.015)]">
-          <div className="max-w-7xl mx-auto px-5 sm:px-8">
+      <div className="bg-slate-50/50 dark:bg-slate-950/80 w-full pt-12 pb-32 relative overflow-hidden border-t border-slate-200/20 dark:border-white/[0.02]">
+          {/* Futuristic ambient background glows */}
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-500/[0.03] dark:bg-blue-500/[0.02] rounded-full blur-3xl pointer-events-none"></div>
+          <div className="absolute top-10 right-[10%] w-[350px] h-[350px] bg-indigo-500/[0.04] dark:bg-indigo-500/[0.02] rounded-full blur-3xl pointer-events-none"></div>
+          <div className="absolute bottom-20 left-[5%] w-[300px] h-[300px] bg-sky-500/[0.03] dark:bg-sky-500/[0.01] rounded-full blur-3xl pointer-events-none"></div>
+
+          <div className="max-w-7xl mx-auto px-5 sm:px-8 relative z-10">
               {!isLoading && (
                   <>
-                    <div className="mb-10 sm:mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700 text-center">
-                        <h1 className="mobile-hero-title font-bold tracking-[-0.035em] md:leading-none leading-tight text-slate-900 dark:text-white">
-                            {t('home_hero_title').includes(':') ? (
-                                <>
-                                    {t('home_hero_title').split(':')[0]}: <span className="text-blue-500">{t('home_hero_title').split(':')[1]?.trim()}</span>
-                                </>
-                            ) : t('home_hero_title')}
-                        </h1>
-                        <p className="mt-6 text-slate-500 dark:text-slate-400 text-sm md:hero-desc font-medium max-w-2xl mx-auto uppercase tracking-widest italic">
-                            {t('home_hero_desc')}
-                        </p>
+                    {/* Premium Split Hero Section */}
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center mb-16 sm:mb-28 animate-in fade-in slide-in-from-bottom-6 duration-1000">
+                        {/* Left Side: Editorial Typography & Search CTA */}
+                        <div className="lg:col-span-7 text-left space-y-6 sm:space-y-8">
+                            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/10 dark:bg-blue-500/5 border border-blue-500/25 dark:border-blue-500/10 shadow-[0_4px_15px_rgba(59,130,246,0.06)]">
+                                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping"></span>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400">
+                                    ✦ TÜRKİYE'NİN EN ÖNCÜ TELEGRAM REHBERİ
+                                </span>
+                            </div>
+                            
+                            <div className="space-y-4">
+                                <h1 className="text-4xl sm:text-5xl lg:text-6.5xl font-black tracking-[-0.04em] leading-[1.05] text-slate-900 dark:text-white-pure">
+                                    {t('home_hero_title').includes(':') ? (
+                                        <>
+                                            {t('home_hero_title').split(':')[0]}: <span className="bg-gradient-to-r from-blue-500 via-indigo-500 to-sky-500 bg-clip-text text-transparent">{t('home_hero_title').split(':')[1]?.trim()}</span>
+                                        </>
+                                    ) : t('home_hero_title')}
+                                </h1>
+                                <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 font-medium leading-relaxed max-w-xl">
+                                    {t('home_hero_desc')}
+                                </p>
+                            </div>
+
+                            {/* Active Premium Search Bar inside Hero */}
+                            <div 
+                                onClick={() => navigate('/search')} 
+                                className="max-w-md relative group cursor-pointer bg-white/80 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-900/80 border border-slate-200/40 dark:border-white/[0.04] p-3 rounded-2xl flex items-center gap-3 transition-all duration-300 shadow-[0_4px_25px_rgba(0,0,0,0.015)] hover:shadow-[0_15px_45px_rgba(59,130,246,0.09)] hover:border-blue-500/25"
+                            >
+                                <div className="p-2.5 ml-1 rounded-xl bg-blue-500 text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-all">
+                                    <Search size={16} />
+                                </div>
+                                <span className="text-xs sm:text-sm font-semibold text-slate-400 dark:text-slate-500 flex-1">
+                                    Keşfetmek istediğiniz Telegram botunu yazın...
+                                </span>
+                                <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-white/[0.04] text-[10px] font-black text-slate-400 dark:text-slate-500 tracking-wider">
+                                    ARA <ChevronRight size={10} className="translate-y-[0.5px] group-hover:translate-x-0.5 transition-transform" />
+                                </div>
+                            </div>
+
+                            {/* Key Stats Badges */}
+                            <div className="pt-4 grid grid-cols-3 gap-6 max-w-lg border-t border-slate-200/50 dark:border-white/[0.04]">
+                                <div>
+                                    <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-tight bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">140+</div>
+                                    <div className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-widest text-slate-400 mt-1">Aktif Proje</div>
+                                </div>
+                                <div>
+                                    <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-tight bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">85+</div>
+                                    <div className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-widest text-slate-400 mt-1">Doğrulanmış Dev</div>
+                                </div>
+                                <div>
+                                    <div className="text-xl sm:text-2xl font-black text-blue-500 dark:text-blue-400 tracking-tight leading-tight">TON</div>
+                                    <div className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-widest text-slate-400 mt-1">Ecosystem Hazır</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Right Side: Bento Spotlight Dashboard Panel */}
+                        <div className="lg:col-span-5 h-full flex items-center justify-center">
+                            <div className="relative w-full max-w-sm bg-gradient-to-b from-white to-slate-50 dark:from-slate-900 dark:to-slate-950 p-6 rounded-3xl border border-slate-200/50 dark:border-white/[0.06] shadow-xl overflow-hidden backdrop-blur-xl group hover:shadow-[0_20px_50px_rgba(59,130,246,0.06)] hover:border-blue-500/15 transition-all duration-300">
+                                <div className="absolute top-0 right-0 -mr-16 -mt-16 w-44 h-44 bg-blue-500/10 dark:bg-blue-500/15 rounded-full blur-3xl pointer-events-none group-hover:bg-blue-500/20 transition-all"></div>
+                                <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-32 h-32 bg-indigo-500/5 dark:bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
+
+                                {/* Header Row */}
+                                <div className="flex items-center justify-between mb-6">
+                                    <div className="flex items-center gap-2">
+                                        <Award size={14} className="text-amber-500 fill-amber-500/20" />
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">
+                                            Öne Çıkan Spotlight
+                                        </span>
+                                    </div>
+                                    <span className="text-[8px] font-black uppercase tracking-widest px-2.5 py-1 bg-blue-500/10 dark:bg-blue-500/5 text-blue-600 dark:text-blue-400 border border-blue-500/20 dark:border-blue-500/10 rounded-md">
+                                        HAFTANIN EN İYİSİ
+                                    </span>
+                                </div>
+
+                                {/* Body Row: Curated Showcase of an elegant Telegram Bot mockup */}
+                                <div className="space-y-5">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 p-[1px] shadow-md shrink-0">
+                                            <div className="w-full h-full rounded-[15px] bg-slate-900 flex items-center justify-center">
+                                                <Sparkles size={22} className="text-white-pure animate-pulse" />
+                                            </div>
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <h4 className="font-black text-base text-slate-900 dark:text-white tracking-tight uppercase leading-tight mb-1">
+                                                Botly Premium AI
+                                            </h4>
+                                            <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate leading-none font-medium">
+                                                Entegre Yapay Zeka & Sinyal Robotu
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Embedded Interactive Performance Stats */}
+                                    <div className="bg-slate-100/50 dark:bg-white/[0.01] border border-slate-200/50 dark:border-white/[0.02] p-4.5 rounded-2xl space-y-3.5 shadow-xs">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500">Kullanıcı Oyu:</span>
+                                            <div className="flex items-center gap-1 bg-white dark:bg-white/5 px-2 py-0.5 rounded-lg border border-black/[0.03] dark:border-white/5">
+                                                <Star size={10} className="text-amber-500 fill-amber-500" />
+                                                <span className="text-[11px] font-black text-slate-800 dark:text-slate-200">4.9 / 5.0</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500">Popülarite:</span>
+                                            <span className="text-[11px] font-black text-blue-500 bg-blue-500/5 px-2 py-0.5 rounded-lg border border-blue-500/10">✦ %98 Çok Aktif</span>
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500">TON Ücreti:</span>
+                                            <span className="text-[11px] font-black text-slate-800 dark:text-slate-200">Ücretsiz Deneme</span>
+                                        </div>
+                                        <div className="w-full bg-slate-200 dark:bg-white/5 h-1.5 rounded-full overflow-hidden">
+                                            <div className="bg-blue-500 h-full w-[94%] rounded-full shadow-xs" />
+                                        </div>
+                                    </div>
+
+                                    <button 
+                                        onClick={() => navigate('/search?q=AI')}
+                                        className="w-full py-3 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-950 font-black text-[10px] uppercase tracking-widest active:scale-98 transition-all hover:opacity-95 flex items-center justify-center gap-2 group shadow-lg shadow-black/[0.1] dark:shadow-white/[0.02]"
+                                    >
+                                        PROJEYİ İNCELE <ChevronRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
 
                     <AnimatePresence mode="wait">
                 <motion.div 
@@ -1373,53 +1506,65 @@ const Home = () => {
                         }
 
                         return (
-                            <div className="mt-10 mb-10 space-y-6">
-                                <div className="flex flex-col gap-6 overflow-hidden">
-                                    <div 
-                                        className="flex flex-col gap-1 cursor-pointer group shrink-0"
-                                        onClick={() => navigate(`/search?mode=apps&category=all`)}
-                                    >
+                            <div className="mt-14 mb-14 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                                <div className="flex flex-col gap-5 overflow-hidden">
+                                    <div className="flex flex-col gap-1.5 md:gap-2">
                                         <div className="flex items-center gap-2">
-                                            <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight uppercase italic text-blue-500">
-                                                APPS
-                                            </h2>
-                                            <span className="text-sm font-bold text-slate-400 dark:text-slate-600 ml-1">
-                                                {data.total}
-                                            </span>
-                                            <ChevronRight size={16} className="text-slate-300 dark:text-slate-700 group-hover:translate-x-1 transition-transform" />
+                                            <span className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.6)] animate-pulse"></span>
+                                            <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">TMA UYGULAMA REHBERİ</span>
                                         </div>
-                                        <p className="hidden sm:block text-[0.86rem] text-slate-400 dark:text-slate-600 font-normal leading-relaxed">
+                                        <div 
+                                            className="flex flex-wrap items-baseline gap-2.5 cursor-pointer group shrink-0"
+                                            onClick={() => navigate(`/search?mode=apps&category=all`)}
+                                        >
+                                            <h2 className="text-2xl sm:text-3xl lg:text-3.5xl font-black text-slate-900 dark:text-white tracking-[-0.035em] uppercase hover:text-blue-500 transition-colors flex items-center gap-2">
+                                                TMA Uygulamaları
+                                                <ChevronRight size={20} className="text-slate-300 dark:text-slate-700 group-hover:translate-x-1 transition-transform shrink-0" />
+                                            </h2>
+                                            <span className="text-xs font-black bg-blue-500/10 text-blue-600 dark:text-blue-400 px-3 py-0.5 rounded-full tracking-wider leading-none">
+                                                {data.total} Proje
+                                            </span>
+                                        </div>
+                                        <p className="hidden sm:block text-xs sm:text-[13px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed max-w-xl">
                                             {t('home_apps_desc')}
                                         </p>
                                     </div>
 
                                     {/* Top 3 Featured Cards for this section */}
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2 animate-in fade-in slide-in-from-bottom-2 duration-700">
-                                        {featuredBots.map((bot) => (
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-2 animate-in fade-in slide-in-from-bottom-3 duration-1000">
+                                        {featuredBots.map((bot, idx) => (
                                             <div 
                                                 key={bot.id} 
-                                                onClick={() => navigate(`/bot/${bot.slug}`)}
-                                                className="flex items-center justify-between p-4 rounded-xl border border-black/[0.05] dark:border-white/[0.08] hover:border-blue-500/20 transition-all cursor-pointer group hover:scale-[1.01] bg-[#00000008] dark:bg-white/[0.03]"
+                                                onClick={() => { haptic('light'); navigate(`/bot/${bot.slug}`); }}
+                                                className="flex items-center justify-between p-4.5 rounded-2xl border border-slate-200/40 dark:border-white/[0.04] bg-white/80 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-900/80 shadow-[0_4px_25px_rgba(0,0,0,0.015)] hover:shadow-[0_12px_45px_rgba(59,130,246,0.08)] hover:border-blue-500/25 dark:hover:border-blue-500/15 transition-all duration-300 cursor-pointer group hover:-translate-y-1"
                                             >
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-12 h-12 featured-bot-card-img flex items-center justify-center p-[1px] overflow-hidden shrink-0">
-                                                        <img 
-                                                            src={getLiveBotIcon(bot)} 
-                                                            className="w-full h-full object-cover bg-white featured-bot-card-img" 
-                                                            alt=""
-                                                            onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
-                                                        />
+                                                <div className="flex items-center gap-4 min-w-0">
+                                                    <div className="relative shrink-0">
+                                                        <div className="absolute -top-2 -left-2 w-5.5 h-5.5 rounded-full bg-slate-900 dark:bg-slate-800 text-white font-black text-[9px] flex items-center justify-center border border-slate-200/20 z-10 italic shadow-sm">
+                                                            #{idx + 1}
+                                                        </div>
+                                                        <div className="w-12 h-12 rounded-2xl p-[1px] bg-slate-200/50 dark:bg-white/[0.04] group-hover:bg-blue-500/20 transition-all duration-300 overflow-hidden flex items-center justify-center">
+                                                            <img 
+                                                                src={getLiveBotIcon(bot)} 
+                                                                className="w-full h-full object-cover rounded-[14px]" 
+                                                                alt={bot.name}
+                                                                onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
+                                                            />
+                                                        </div>
                                                     </div>
                                                     <div className="flex flex-col min-w-0">
-                                                        <div className="flex items-center gap-1">
-                                                            <span className="text-lg font-black text-slate-900 dark:text-white tracking-tight truncate leading-tight">{bot.name}</span>
-                                                            <CheckCircle2 size={14} className="text-blue-500 fill-blue-500/10 shrink-0" />
+                                                        <div className="flex items-center gap-1.5 mb-0.5">
+                                                            <span className="text-sm font-black text-slate-800 dark:text-slate-100 tracking-tight truncate leading-none">{bot.name}</span>
+                                                            <CheckCircle2 size={13} className="text-blue-500 fill-blue-500/5 shrink-0" />
                                                         </div>
-                                                        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold line-clamp-1 uppercase tracking-tight">{bot.description}</span>
+                                                        <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium line-clamp-1 leading-none">{bot.description}</span>
                                                     </div>
                                                 </div>
-                                                <div className="text-2xl font-black text-slate-900 dark:text-white mr-1 shrink-0 italic">
-                                                    {bot.rating || '0.0'}
+                                                <div className="flex items-center gap-1.5 shrink-0 pl-2">
+                                                    <Star size={11} className="text-amber-500 fill-amber-500 shrink-0" />
+                                                    <span className="text-sm font-black text-slate-900 dark:text-white-pure italic">
+                                                        {bot.rating || '0.0'}
+                                                    </span>
                                                 </div>
                                             </div>
                                         ))}
@@ -1432,10 +1577,10 @@ const Home = () => {
                                         onMouseMove={catScroll.onMouseMove}
                                         onMouseLeave={catScroll.onMouseLeave}
                                         onContextMenu={catScroll.onContextMenu}
-                                        className="category-filter-container no-scrollbar relative z-0"
+                                        className="category-filter-container no-scrollbar relative z-0 mt-2"
                                     >
                                         <button 
-                                            className={`category-filter-item cursor-pointer hover:text-blue-500 transition-all whitespace-nowrap outline-none focus-visible:ring-2 ring-blue-500/50 rounded-lg px-4 py-2 text-sm font-medium border ${selectedAppsCategory === 'all' ? 'text-blue-500 border-blue-500 bg-blue-500/5 font-black' : 'text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:hover:bg-white/5'}`}
+                                            className={`category-filter-item cursor-pointer hover:text-blue-500 transition-all whitespace-nowrap outline-none focus-visible:ring-2 ring-blue-500/50 rounded-xl px-4 py-2 text-xs font-black uppercase tracking-wider border ${selectedAppsCategory === 'all' ? 'text-blue-500 border-blue-500/30 bg-blue-500/10 dark:bg-blue-500/5 font-black' : 'text-slate-500 dark:text-slate-400 border-slate-200/50 dark:border-white/[0.04] bg-white/50 dark:bg-slate-900/20 hover:bg-slate-100 dark:hover:bg-white/5'}`}
                                             onClick={() => { haptic('light'); setSelectedAppsCategory('all'); }}
                                         >
                                             {t('home_all')}
@@ -1443,7 +1588,7 @@ const Home = () => {
                                         {appsSubCategories.map((subCat) => (
                                             <button 
                                                 key={subCat.id} 
-                                                className={`category-filter-item cursor-pointer hover:text-blue-500 transition-all whitespace-nowrap outline-none focus-visible:ring-2 ring-blue-500/50 rounded-lg px-4 py-2 text-sm font-medium border ${selectedAppsCategory === subCat.id ? 'text-blue-500 border-blue-500 bg-blue-500/5 font-black' : 'text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:hover:bg-white/5'}`}
+                                                className={`category-filter-item cursor-pointer hover:text-blue-500 transition-all whitespace-nowrap outline-none focus-visible:ring-2 ring-blue-500/50 rounded-xl px-4 py-2 text-xs font-black uppercase tracking-wider border ${selectedAppsCategory === subCat.id ? 'text-blue-500 border-blue-500/30 bg-blue-500/10 dark:bg-blue-500/5 font-black' : 'text-slate-500 dark:text-slate-400 border-slate-200/50 dark:border-white/[0.04] bg-white/50 dark:bg-slate-900/20 hover:bg-slate-100 dark:hover:bg-white/5'}`}
                                                 onClick={() => { haptic('light'); setSelectedAppsCategory(subCat.id); }}
                                             >
                                                 {t(subCat.label)}
@@ -1491,53 +1636,65 @@ const Home = () => {
                         }
 
                         return (
-                            <div className="mt-20 mb-10 space-y-6">
-                                <div className="flex flex-col gap-6 overflow-hidden">
-                                    <div 
-                                        className="flex flex-col gap-1 cursor-pointer group shrink-0"
-                                        onClick={() => navigate(`/search?mode=bots&category=all`)}
-                                    >
+                            <div className="mt-20 mb-10 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                                <div className="flex flex-col gap-5 overflow-hidden">
+                                    <div className="flex flex-col gap-1.5 md:gap-2">
                                         <div className="flex items-center gap-2">
-                                            <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight uppercase italic">
-                                                BOTS
-                                            </h2>
-                                            <span className="text-sm font-bold text-slate-400 dark:text-slate-600 ml-1">
-                                                {data.total}
-                                            </span>
-                                            <ChevronRight size={16} className="text-slate-300 dark:text-slate-700 group-hover:translate-x-1 transition-transform" />
+                                            <span className="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.6)] animate-pulse"></span>
+                                            <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">AYRIŞTIRILMIŞ YAPAY ZEKA VE SERVİSLER</span>
                                         </div>
-                                        <p className="hidden sm:block text-[0.86rem] text-slate-400 dark:text-slate-600 font-normal leading-relaxed">
+                                        <div 
+                                            className="flex flex-wrap items-baseline gap-2.5 cursor-pointer group shrink-0"
+                                            onClick={() => navigate(`/search?mode=bots&category=all`)}
+                                        >
+                                            <h2 className="text-2xl sm:text-3xl lg:text-3.5xl font-black text-slate-900 dark:text-white-pure tracking-[-0.035em] uppercase hover:text-indigo-500 transition-colors flex items-center gap-2">
+                                                TELEGRAM BOTLARI
+                                                <ChevronRight size={20} className="text-slate-300 dark:text-slate-700 group-hover:translate-x-1 transition-transform shrink-0" />
+                                            </h2>
+                                            <span className="text-xs font-black bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 px-3 py-0.5 rounded-full tracking-wider leading-none">
+                                                {data.total} Proje
+                                            </span>
+                                        </div>
+                                        <p className="hidden sm:block text-xs sm:text-[13px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed max-w-xl">
                                             {t('home_bots_desc')}
                                         </p>
                                     </div>
 
                                     {/* Top 3 Featured Cards for this section */}
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2 animate-in fade-in slide-in-from-bottom-2 duration-700">
-                                        {featuredBots.map((bot) => (
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-2 animate-in fade-in slide-in-from-bottom-3 duration-1000">
+                                        {featuredBots.map((bot, idx) => (
                                             <div 
                                                 key={bot.id} 
-                                                onClick={() => navigate(`/bot/${bot.slug}`)}
-                                                className="flex items-center justify-between p-4 rounded-xl border border-black/[0.05] dark:border-white/[0.08] hover:border-blue-500/20 transition-all cursor-pointer group hover:scale-[1.01] bg-[#00000008] dark:bg-white/[0.03]"
+                                                onClick={() => { haptic('light'); navigate(`/bot/${bot.slug}`); }}
+                                                className="flex items-center justify-between p-4.5 rounded-2xl border border-slate-200/40 dark:border-white/[0.04] bg-white/80 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-900/80 shadow-[0_4px_25px_rgba(0,0,0,0.015)] hover:shadow-[0_12px_45px_rgba(99,102,241,0.08)] hover:border-indigo-500/25 dark:hover:border-indigo-500/15 transition-all duration-300 cursor-pointer group hover:-translate-y-1"
                                             >
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-12 h-12 featured-bot-card-img flex items-center justify-center p-[1px] overflow-hidden shrink-0">
-                                                        <img 
-                                                            src={getLiveBotIcon(bot)} 
-                                                            className="w-full h-full object-cover bg-white featured-bot-card-img" 
-                                                            alt=""
-                                                            onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
-                                                        />
+                                                <div className="flex items-center gap-4 min-w-0">
+                                                    <div className="relative shrink-0">
+                                                        <div className="absolute -top-2 -left-2 w-5.5 h-5.5 rounded-full bg-slate-900 dark:bg-slate-800 text-white font-black text-[9px] flex items-center justify-center border border-slate-200/20 z-10 italic shadow-sm">
+                                                            #{idx + 1}
+                                                        </div>
+                                                        <div className="w-12 h-12 rounded-2xl p-[1px] bg-slate-200/50 dark:bg-white/[0.04] group-hover:bg-indigo-500/20 transition-all duration-300 overflow-hidden flex items-center justify-center">
+                                                            <img 
+                                                                src={getLiveBotIcon(bot)} 
+                                                                className="w-full h-full object-cover rounded-[14px]" 
+                                                                alt={bot.name}
+                                                                onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
+                                                            />
+                                                        </div>
                                                     </div>
                                                     <div className="flex flex-col min-w-0">
-                                                        <div className="flex items-center gap-1">
-                                                            <span className="text-lg font-black text-slate-900 dark:text-white tracking-tight truncate leading-tight">{bot.name}</span>
-                                                            <CheckCircle2 size={14} className="text-blue-500 fill-blue-500/10 shrink-0" />
+                                                        <div className="flex items-center gap-1.5 mb-0.5">
+                                                            <span className="text-sm font-black text-slate-800 dark:text-slate-100 tracking-tight truncate leading-none">{bot.name}</span>
+                                                            <CheckCircle2 size={13} className="text-blue-500 fill-blue-500/5 shrink-0" />
                                                         </div>
-                                                        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold line-clamp-1 uppercase tracking-tight">{bot.description}</span>
+                                                        <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium line-clamp-1 leading-none">{bot.description}</span>
                                                     </div>
                                                 </div>
-                                                <div className="text-2xl font-black text-slate-900 dark:text-white mr-1 shrink-0 italic">
-                                                    {bot.rating || '0.0'}
+                                                <div className="flex items-center gap-1.5 shrink-0 pl-2">
+                                                    <Star size={11} className="text-amber-500 fill-amber-500 shrink-0" />
+                                                    <span className="text-sm font-black text-slate-900 dark:text-white-pure italic">
+                                                        {bot.rating || '0.0'}
+                                                    </span>
                                                 </div>
                                             </div>
                                         ))}
@@ -1550,10 +1707,10 @@ const Home = () => {
                                         onMouseMove={botsCatScroll.onMouseMove}
                                         onMouseLeave={botsCatScroll.onMouseLeave}
                                         onContextMenu={botsCatScroll.onContextMenu}
-                                        className="category-filter-container no-scrollbar relative z-0"
+                                        className="category-filter-container no-scrollbar relative z-0 mt-2"
                                     >
                                         <button 
-                                            className={`category-filter-item cursor-pointer hover:text-blue-500 transition-all whitespace-nowrap outline-none focus-visible:ring-2 ring-blue-500/50 rounded-lg px-4 py-2 text-sm font-medium border ${selectedBotsCategory === 'all' ? 'text-blue-500 border-blue-500 bg-blue-500/5 font-black' : 'text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:hover:bg-white/5'}`}
+                                            className={`category-filter-item cursor-pointer hover:text-indigo-500 transition-all whitespace-nowrap outline-none focus-visible:ring-2 ring-indigo-500/50 rounded-xl px-4 py-2 text-xs font-black uppercase tracking-wider border ${selectedBotsCategory === 'all' ? 'text-indigo-500 border-indigo-500/30 bg-indigo-500/10 dark:bg-indigo-500/5 font-black' : 'text-slate-500 dark:text-slate-400 border-slate-200/50 dark:border-white/[0.04] bg-white/50 dark:bg-slate-900/20 hover:bg-slate-100 dark:hover:bg-white/5'}`}
                                             onClick={() => { haptic('light'); setSelectedBotsCategory('all'); }}
                                         >
                                             {t('home_all')}
@@ -1561,7 +1718,7 @@ const Home = () => {
                                         {botsCategories.map((cat) => (
                                             <button 
                                                 key={cat.id} 
-                                                className={`category-filter-item cursor-pointer hover:text-blue-500 transition-all whitespace-nowrap outline-none focus-visible:ring-2 ring-blue-500/50 rounded-lg px-4 py-2 text-sm font-medium border ${selectedBotsCategory === cat.id ? 'text-blue-500 border-blue-500 bg-blue-500/5 font-black' : 'text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:hover:bg-white/5'}`}
+                                                className={`category-filter-item cursor-pointer hover:text-indigo-500 transition-all whitespace-nowrap outline-none focus-visible:ring-2 ring-indigo-500/50 rounded-xl px-4 py-2 text-xs font-black uppercase tracking-wider border ${selectedBotsCategory === cat.id ? 'text-indigo-500 border-indigo-500/30 bg-indigo-500/10 dark:bg-indigo-500/5 font-black' : 'text-slate-500 dark:text-slate-400 border-slate-200/50 dark:border-white/[0.04] bg-white/50 dark:bg-slate-900/20 hover:bg-slate-100 dark:hover:bg-white/5'}`}
                                                 onClick={() => { haptic('light'); setSelectedBotsCategory(cat.id); }}
                                             >
                                                 {t(cat.label)}
