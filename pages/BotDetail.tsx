@@ -763,7 +763,7 @@ const BotDetail = () => {
       </div>
 
         <div className="w-full md:w-auto md:min-w-[320px] lg:hidden px-6">
-            <div className="flex flex-col bg-white dark:bg-slate-900 border border-black/5 dark:border-white/5 p-4 rounded-xl stats-card-bg mb-4">
+            <div className="flex flex-col premium-card p-4 mb-4">
                 <div className="flex items-center justify-between">
                     <div className="flex flex-col items-center flex-1">
                         <span className="text-slate-900 dark:text-white font-bold text-base">{bot.rating || '0.0'} <Star size={12} className="inline mb-1 fill-yellow-500 text-yellow-500" /></span>
@@ -1148,7 +1148,7 @@ const BotDetail = () => {
               </div>
 
               <div className="w-full">
-                  <div className="flex flex-col bg-white dark:bg-slate-900/60 rounded-xl border border-black/5 dark:border-white/5 backdrop-blur-xl overflow-hidden fancy-glass-card stats-card-bg">
+                  <div className="premium-card flex flex-col overflow-hidden">
                       <div className="flex items-center justify-between p-6">
                           <div className="flex flex-col items-center flex-1 border-r border-black/5 dark:border-white/5">
                               <span className="text-slate-900 dark:text-white font-bold text-base">{bot.rating || '0.0'} <Star size={12} className="inline mb-1 fill-yellow-500 text-yellow-500" /></span>
