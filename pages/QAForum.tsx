@@ -58,12 +58,20 @@ export default function QAForum() {
   const { t } = useTranslation();
   const { theme, toggleTheme } = useTheme();
 
+  // Helper to format names to starting with @ and telegram-style
+  const formatDisplayAuthor = (name: string) => {
+    if (!name) return '@anon';
+    const trimmed = name.trim();
+    if (trimmed.startsWith('@')) return trimmed;
+    return `@${trimmed.toLowerCase().replace(/\s+/g, '')}`;
+  };
+
   // Active current user session details
   const currentUser = {
     id: user?.id?.toString() || 'user-active-session',
-    name: `${user?.first_name || user?.name || 'Kenan'} ${user?.last_name || ''}`.trim(),
+    name: user?.username ? `@${user.username}` : `@${(user?.first_name || user?.name || 'Kenan').toLowerCase().replace(/\s+/g, '')}`,
     avatar: user?.photo_url || user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.first_name || user?.name || 'Kenan')}&background=0f172a&color=fff`,
-    bio: 'BotlyHub Kaşifi'
+    bio: ''
   };
 
   // State Management
@@ -925,7 +933,7 @@ export default function QAForum() {
                                       referrerPolicy="no-referrer"
                                     />
                                     <span className="text-xs font-bold text-slate-600 dark:text-slate-400 group-hover/author:text-indigo-500 transition-colors">
-                                      {topic.author_name}
+                                      {formatDisplayAuthor(topic.author_name)}
                                     </span>
                                   </div>
                                   <span className="text-[10px] text-slate-350 dark:text-slate-650">•</span>
@@ -981,7 +989,7 @@ export default function QAForum() {
                                   </div>
                                   <span className="text-xs text-slate-400 font-medium">
                                     {topic.comments_count > 0 
-                                      ? `${topic.comments?.[0]?.author_name || 'Birisi'} ve ${topic.comments_count} kişi daha yorum yaptı.`
+                                      ? `${formatDisplayAuthor(topic.comments?.[0]?.author_name || 'Birisi')} ve ${topic.comments_count} kişi daha yorum yaptı.`
                                       : 'Henüz cevap yazılmamış.'
                                     }
                                   </span>
@@ -1050,11 +1058,8 @@ export default function QAForum() {
                           />
                           <div>
                             <h3 className="text-sm font-black text-slate-850 dark:text-white leading-tight group-hover/author-detail:text-indigo-500 transition-colors">
-                              {activeTopic.author_name}
+                              {formatDisplayAuthor(activeTopic.author_name)}
                             </h3>
-                            <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate max-w-[200px] sm:max-w-[400px]">
-                              {activeTopic.author_bio || 'Meraklı BotlyHub forum üyesi.'}
-                            </p>
                           </div>
                         </div>
                         <span className="text-xs text-slate-400 font-medium shrink-0">
@@ -1206,7 +1211,7 @@ export default function QAForum() {
                                           }}
                                           className="text-xs font-black text-slate-850 dark:text-white cursor-pointer hover:text-indigo-500 transition-colors"
                                         >
-                                          {comment.author_name}
+                                          {formatDisplayAuthor(comment.author_name)}
                                         </span>
                                         <span className="text-[10px] text-slate-400 font-medium font-mono">
                                           {formatTimeRelative(comment.created_at)}
@@ -1238,7 +1243,7 @@ export default function QAForum() {
                                     <div className="mt-3 ml-11 bg-slate-50/60 dark:bg-slate-900/40 p-3 rounded-2xl border border-slate-250/20 dark:border-slate-800/30 flex flex-col gap-2 shadow-xs">
                                       <div className="flex items-center justify-between">
                                         <span className="text-[10px] font-black text-indigo-500 dark:text-indigo-450 uppercase tracking-widest font-mono">
-                                          @{comment.author_name} kullanıcısına yanıt veriyorsunuz
+                                          {formatDisplayAuthor(comment.author_name)} kullanıcısına yanıt veriyorsunuz
                                         </span>
                                       </div>
                                       <textarea 
@@ -1295,7 +1300,7 @@ export default function QAForum() {
                                                 }}
                                                 className="text-[11px] font-black text-slate-850 dark:text-slate-200 cursor-pointer hover:text-indigo-500 transition-colors"
                                               >
-                                                {reply.author_name}
+                                                {formatDisplayAuthor(reply.author_name)}
                                               </span>
                                               <span className="text-[9px] text-slate-400 font-medium font-mono">
                                                 {formatTimeRelative(reply.created_at)}
@@ -1311,7 +1316,7 @@ export default function QAForum() {
                                                 onClick={() => {
                                                   haptic('light');
                                                   setActiveReplyCommentId(comment.id);
-                                                  setReplyText(`@${reply.author_name} `);
+                                                  setReplyText(`${formatDisplayAuthor(reply.author_name)} `);
                                                 }}
                                                 className="text-[9px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors flex items-center gap-1"
                                               >
