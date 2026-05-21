@@ -4,8 +4,8 @@
 @import url('https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap');
 
 :root {
-  --font-main: "Inter", "Satoshi", -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-  --font-headers: "Satoshi", "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  --font-main: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  --font-headers: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
 }
 
 body {
@@ -95,11 +95,11 @@ body {
   }
 
   .font-bold {
-    font-weight: 700 !important;
+    font-weight: 500 !important;
   }
 
   .font-black {
-    font-weight: 850 !important;
+    font-weight: 500 !important;
   }
 
   #root {
@@ -200,7 +200,7 @@ input, textarea, select {
 }
 
 .text-\[8px\] {
-    font-size: 9px;
+    font-size: 10px;
 }
 
 .featured-bot-card-img {
@@ -209,13 +209,15 @@ input, textarea, select {
 }
 
 .text-\[10px\] {
-    font-size: 11px !important;
+    font-size: 13px !important;
 }
 
-/* Supported uppercase styles */
+.uppercase {
+    text-transform: none !important;
+}
 
 .text-\[13px\] {
-    font-size: 13px !important;
+    font-size: 15px;
 }
 
 .sponsored-badge {
@@ -296,7 +298,7 @@ span.text-\[10px\].font-black.text-slate-500.dark\:text-slate-400.uppercase.trac
 }
 
 .font-bold {
-    font-weight: 700 !important;
+    font-weight: 500 !important;
 }
 
 .group:hover .group-hover\:border-blue-500 {
@@ -571,7 +573,7 @@ span.text-\[10px\].font-bold.text-slate-500.dark\:text-slate-400.uppercase.track
 }
 
 .font-extrabold {
-    font-weight: 800 !important;
+    font-weight: 500;
 }
 .text-lg {
     font-size: 1rem;
@@ -624,7 +626,7 @@ span.text-\[10px\].font-black.uppercase.tracking-tight {
     transition: background-color .3s ease;
 }
 .font-black {
-    font-weight: 850 !important;
+    font-weight: 500 !important;
 }
 button.w-full.flex.items-center.gap-3.px-4.py-3.hover\:bg-slate-50.dark\:hover\:bg-white\/5.rounded-xl.transition-colors.text-left {
     border-radius: 12px;
@@ -1398,99 +1400,5 @@ span, div, input {
 
 .hover\:text-blue-500:hover {
     --tw-text-opacity: 1;
-    color: rgb(47, 136, 255);
+    color: rgb(0 0 0);
 }
-
-/* -----------------------------------------
-   PREMIUM SAAS & DYOR.IO VISUAL POLISH SYSTEM
-   ----------------------------------------- */
-
-/* Premium Glass & Soft Shadow Card Structure */
-.premium-card {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  border-radius: 16px;
-  box-shadow: 
-    0 4px 6px -1px rgba(0, 0, 0, 0.02), 
-    0 2px 4px -1px rgba(0, 0, 0, 0.01),
-    inset 0 1px 1px rgba(255, 255, 255, 0.82);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.dark .premium-card {
-  background: rgba(15, 23, 42, 0.5);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.035);
-  border-radius: 16px;
-  box-shadow: 
-    0 4px 20px rgba(0, 0, 0, 0.3), 
-    inset 0 1px 0px rgba(255, 255, 255, 0.04);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.premium-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 
-    0 12px 20px -4px rgba(0, 0, 0, 0.04), 
-    0 4px 12px -2px rgba(0, 0, 0, 0.02),
-    inset 0 1px 1px rgba(255, 255, 255, 0.95);
-  border-color: rgba(47, 136, 255, 0.25);
-}
-
-.dark .premium-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 
-    0 20px 25px -5px rgba(0, 0, 0, 0.45), 
-    0 8px 10px -6px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0px rgba(255, 255, 255, 0.07);
-  border-color: rgba(47, 136, 255, 0.3);
-}
-
-/* Typography Enhancements for Institutional-Grade Vibe */
-.premium-title {
-  letter-spacing: -0.04em !important;
-  font-family: var(--font-headers) !important;
-  font-weight: 800 !important;
-}
-
-/* Micro Badge */
-.premium-badge {
-  font-size: 9px !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.12em !important;
-  text-transform: uppercase !important;
-  background: rgba(0, 0, 0, 0.03);
-  color: #1a1e35;
-  border: 1px solid rgba(0, 0, 0, 0.04);
-  padding: 3px 8px !important;
-  border-radius: 6px;
-}
-
-.dark .premium-badge {
-  background: rgba(255, 255, 255, 0.04);
-  color: #cad1e3;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-/* Subtle pulse glow for status elements */
-.pulse-glow-blue {
-  box-shadow: 0 0 12px rgba(47, 136, 255, 0.3);
-  animation: glowPulseBlue 2s infinite ease-in-out;
-}
-
-@keyframes glowPulseBlue {
-  0%, 100% { box-shadow: 0 0 8px rgba(47, 136, 255, 0.25); }
-  50% { box-shadow: 0 0 16px rgba(47, 136, 255, 0.5); }
-}
-
-/* Fine border outline overlays */
-.outline-light {
-  outline: 1px solid rgba(0, 0, 0, 0.035);
-}
-.dark .outline-light {
-  outline: 1px solid rgba(255, 255, 255, 0.03);
-}
-

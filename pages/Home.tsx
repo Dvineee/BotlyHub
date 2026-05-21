@@ -1399,7 +1399,7 @@ const Home = () => {
                                             <div 
                                                 key={bot.id} 
                                                 onClick={() => navigate(`/bot/${bot.slug}`)}
-                                                className="premium-card flex items-center justify-between p-4 cursor-pointer group hover:scale-[1.01]"
+                                                className="flex items-center justify-between p-4 rounded-xl border border-black/[0.05] dark:border-white/[0.08] hover:border-blue-500/20 transition-all cursor-pointer group hover:scale-[1.01] bg-[#00000008] dark:bg-white/[0.03]"
                                             >
                                                 <div className="flex items-center gap-4">
                                                     <div className="w-12 h-12 featured-bot-card-img flex items-center justify-center p-[1px] overflow-hidden shrink-0">
@@ -1517,7 +1517,7 @@ const Home = () => {
                                             <div 
                                                 key={bot.id} 
                                                 onClick={() => navigate(`/bot/${bot.slug}`)}
-                                                className="premium-card flex items-center justify-between p-4 cursor-pointer group hover:scale-[1.01]"
+                                                className="flex items-center justify-between p-4 rounded-xl border border-black/[0.05] dark:border-white/[0.08] hover:border-blue-500/20 transition-all cursor-pointer group hover:scale-[1.01] bg-[#00000008] dark:bg-white/[0.03]"
                                             >
                                                 <div className="flex items-center gap-4">
                                                     <div className="w-12 h-12 featured-bot-card-img flex items-center justify-center p-[1px] overflow-hidden shrink-0">
@@ -1622,7 +1622,7 @@ const Home = () => {
                             <div 
                                 key={post.id}
                                 onClick={() => { haptic('light'); navigate(`/blog/${post.slug || post.id}`); }}
-                                className="group cursor-pointer flex flex-col premium-card overflow-hidden hover:scale-[1.01] transition-all duration-300"
+                                className="group cursor-pointer flex flex-col bg-slate-50 dark:bg-slate-900/10 border border-black/5 dark:border-white/5 rounded-3xl overflow-hidden hover:border-blue-500/20 hover:scale-[1.01] transition-all duration-300"
                             >
                                 <div className="aspect-video relative overflow-hidden bg-slate-100 dark:bg-white/5">
                                     {post.image ? (
