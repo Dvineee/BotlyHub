@@ -1573,7 +1573,11 @@ export class DatabaseService {
           };
         });
       } else if (dbComs) {
-        allComments = dbComs;
+        allComments = dbComs.map((c: any) => ({
+          ...c,
+          id: String(c.id),
+          parent_id: c.parent_id ? String(c.parent_id) : null
+        }));
       }
 
       // 3. Fetch upvotes
@@ -1793,7 +1797,7 @@ export class DatabaseService {
         content: inserted.content,
         created_at: inserted.created_at,
         likes_count: 0,
-        parent_id: inserted.parent_id
+        parent_id: inserted.parent_id ? String(inserted.parent_id) : null
       };
     }
   }
