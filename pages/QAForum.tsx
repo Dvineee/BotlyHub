@@ -142,15 +142,8 @@ export default function QAForum() {
   const fetchTopics = async (filter = selectedFilter, selectTag?: string) => {
     setLoading(true);
     try {
-      let url = `${API_BASE_URL}/api/qa/discussions?filter=${filter}`;
-      if (selectTag) {
-        url += `&tag=${encodeURIComponent(selectTag)}`;
-      }
-      const res = await fetch(url);
-      if (res.ok) {
-        const data = await res.json();
-        setTopics(data);
-      }
+      const data = await DatabaseService.getQADiscussions(filter, selectTag);
+      setTopics(data);
     } catch (err) {
       console.error('Failed to fetch topics:', err);
     } finally {
@@ -207,47 +200,40 @@ export default function QAForum() {
     haptic('light');
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/qa/discussions/${topicId}/upvote`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: currentUser.id })
-      });
+      const data = await DatabaseService.toggleQAUpvote(topicId, currentUser.id.toString());
 
-      if (res.ok) {
-        const data = await res.json();
-        // Update topics list state
-        setTopics(prev => prev.map(topic => {
-          if (topic.id === topicId) {
-            const hasUpvoted = topic.upvoted_users?.includes(currentUser.id);
-            const updatedUsers = hasUpvoted 
-              ? topic.upvoted_users.filter(id => id !== currentUser.id)
-              : [...(topic.upvoted_users || []), currentUser.id];
-            
-            return {
-              ...topic,
-              upvotes_count: data.upvotes_count,
-              upvoted_users: updatedUsers
-            };
-          }
-          return topic;
-        }));
-
-        // Update active topic if in detail view
-        if (activeTopic && activeTopic.id === topicId) {
-          setActiveTopic(prev => {
-            if (!prev) return null;
-            const hasUpvoted = prev.upvoted_users?.includes(currentUser.id);
-            const updatedUsers = hasUpvoted
-              ? prev.upvoted_users.filter(id => id !== currentUser.id)
-              : [...(prev.upvoted_users || []), currentUser.id];
-            
-            return {
-              ...prev,
-              upvotes_count: data.upvotes_count,
-              upvoted_users: updatedUsers
-            };
-          });
+      // Update topics list state
+      setTopics(prev => prev.map(topic => {
+        if (topic.id === topicId) {
+          const hasUpvoted = topic.upvoted_users?.includes(currentUser.id);
+          const updatedUsers = hasUpvoted 
+            ? topic.upvoted_users.filter(id => id !== currentUser.id)
+            : [...(topic.upvoted_users || []), currentUser.id];
+          
+          return {
+            ...topic,
+            upvotes_count: data.upvotes_count,
+            upvoted_users: updatedUsers
+          };
         }
+        return topic;
+      }));
+
+      // Update active topic if in detail view
+      if (activeTopic && activeTopic.id === topicId) {
+        setActiveTopic(prev => {
+          if (!prev) return null;
+          const hasUpvoted = prev.upvoted_users?.includes(currentUser.id);
+          const updatedUsers = hasUpvoted
+            ? prev.upvoted_users.filter(id => id !== currentUser.id)
+            : [...(prev.upvoted_users || []), currentUser.id];
+          
+          return {
+            ...prev,
+            upvotes_count: data.upvotes_count,
+            upvoted_users: updatedUsers
+          };
+        });
       }
     } catch (err) {
       console.error('Upvote failed:', err);
@@ -261,38 +247,31 @@ export default function QAForum() {
     haptic('medium');
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/qa/discussions/${activeTopic.id}/comments`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          author_id: currentUser.id,
-          author_name: currentUser.name,
-          author_avatar: currentUser.avatar,
-          author_bio: currentUser.bio,
-          content: textToSubmit,
-          parent_id: parentId
-        })
+      const newComment = await DatabaseService.submitQAComment(activeTopic.id, {
+        author_id: currentUser.id,
+        author_name: currentUser.name,
+        author_avatar: currentUser.avatar,
+        author_bio: currentUser.bio,
+        content: textToSubmit,
+        parent_id: parentId
       });
 
-      if (res.ok) {
-        const newComment = await res.json();
-        setActiveTopic(prev => {
-          if (!prev) return null;
-          return {
-            ...prev,
-            comments_count: prev.comments_count + 1,
-            comments: [...(prev.comments || []), newComment]
-          };
-        });
-        if (parentId) {
-          setReplyText('');
-          setActiveReplyCommentId(null);
-        } else {
-          setCommentText('');
-        }
-        // Refresh feed list in background
-        fetchTopics(selectedFilter);
+      setActiveTopic(prev => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          comments_count: prev.comments_count + 1,
+          comments: [...(prev.comments || []), newComment]
+        };
+      });
+      if (parentId) {
+        setReplyText('');
+        setActiveReplyCommentId(null);
+      } else {
+        setCommentText('');
       }
+      // Refresh feed list in background
+      fetchTopics(selectedFilter);
     } catch (err) {
       console.error('Failed to add comment:', err);
     }
@@ -304,27 +283,21 @@ export default function QAForum() {
     haptic('medium');
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/qa/discussions`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: newTitle,
-          content: newContent,
-          author_id: currentUser.id,
-          author_name: currentUser.name,
-          author_avatar: currentUser.avatar,
-          author_bio: currentUser.bio,
-          tags: selectedTags
-        })
+      await DatabaseService.createQADiscussion({
+        title: newTitle,
+        content: newContent,
+        author_id: currentUser.id,
+        author_name: currentUser.name,
+        author_avatar: currentUser.avatar,
+        author_bio: currentUser.bio,
+        tags: selectedTags
       });
 
-      if (res.ok) {
-        setShowCreateModal(false);
-        setNewTitle('');
-        setNewContent('');
-        setSelectedTags([]);
-        fetchTopics('son'); // Switch sorting to Show latest first
-      }
+      setShowCreateModal(false);
+      setNewTitle('');
+      setNewContent('');
+      setSelectedTags([]);
+      fetchTopics('son'); // Switch sorting to Show latest first
     } catch (err) {
       console.error('Creating topic failed:', err);
     }

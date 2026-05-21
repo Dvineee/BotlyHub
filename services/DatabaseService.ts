@@ -1516,4 +1516,358 @@ export class DatabaseService {
     if (error) throw error;
     return tx;
   }
+
+  // --- Q&A DISCUSSIONS (DIRECT CLIENT-SIDE ACCESS) ---
+  static async getQADiscussions(filter: string = 'all', tag?: string) {
+    try {
+      let dbDiscussions = [];
+      const { data: dbBlogs, error } = await supabase
+        .from('qa_discussions')
+        .select('*');
+
+      if (error) {
+        if (error.message.includes('relation "public.qa_discussions" does not exist') || error.message.includes('not found')) {
+          console.warn("qa_discussions table missing. Fallback to blogs.");
+          const { data: fallbackBlogs, error: fbError } = await supabase
+            .from('blogs')
+            .select('*')
+            .eq('category', 'qa_forum');
+          if (fbError) throw fbError;
+          dbDiscussions = fallbackBlogs || [];
+        } else {
+          throw error;
+        }
+      } else {
+        dbDiscussions = dbBlogs || [];
+      }
+
+      // 2. Fetch comments with broad-field structure
+      let allComments: any[] = [];
+      const { data: dbComs, error: comsError } = await supabase.from('qa_comments').select('*');
+      if (comsError) {
+        const { data: blogComs } = await supabase.from('blog_comments').select('*');
+        allComments = (blogComs || []).map((c: any) => {
+          let parent_id = null;
+          let author_bio = "BotlyHub Forum Kaşifi";
+          let text = c.content;
+
+          if (c.content && c.content.startsWith('{')) {
+            try {
+              const parsed = JSON.parse(c.content);
+              parent_id = parsed.parent_id || null;
+              author_bio = parsed.author_bio || "BotlyHub Forum Kaşifi";
+              text = parsed.text || c.content;
+            } catch (e) {}
+          }
+
+          return {
+            id: String(c.id),
+            topic_id: c.blog_id,
+            author_id: c.user_id,
+            author_name: c.user_name,
+            author_avatar: c.user_avatar,
+            author_bio,
+            content: text,
+            created_at: c.created_at,
+            parent_id
+          };
+        });
+      } else if (dbComs) {
+        allComments = dbComs;
+      }
+
+      // 3. Fetch upvotes
+      let allLikes = [];
+      const { data: dbLikes, error: likesError } = await supabase.from('qa_upvotes').select('*');
+      if (likesError) {
+        const { data: blogLikes } = await supabase.from('blog_likes').select('*');
+        allLikes = (blogLikes || []).map((l: any) => ({
+          discussion_id: l.blog_id,
+          user_id: l.user_id
+        }));
+      } else if (dbLikes) {
+        allLikes = dbLikes;
+      }
+
+      // 4. Map to final structure
+      let discussions = dbDiscussions.map((item: any) => {
+        const topicId = item.id;
+        const topicComments = allComments.filter((c: any) => c.topic_id === topicId || c.blog_id === topicId);
+        const topicLikes = allLikes.filter((l: any) => l.discussion_id === topicId || l.blog_id === topicId);
+        const upvoted_users = topicLikes.map((l: any) => l.user_id);
+        const upvotes_count = upvoted_users.length;
+
+        const rawTags = item.tags || item.hashtags || [];
+        const tags = rawTags.map((t: string) => ({
+          type: 'general',
+          id: t.toLowerCase(),
+          name: t
+        }));
+
+        return {
+          id: item.id,
+          title: item.title,
+          content: item.content,
+          author_id: item.author_id || item.slug || 'user-anon',
+          author_name: item.author_name || item.author || 'Anonim Kaşif',
+          author_avatar: item.author_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.author_name || item.author || 'Anon')}`,
+          author_bio: item.author_bio || item.read_time || 'BotlyHub Forum Kaşifi',
+          created_at: item.created_at,
+          tags,
+          upvotes_count,
+          upvoted_users,
+          comments_count: topicComments.length,
+          comments: topicComments
+        };
+      });
+
+      let filtered = [...discussions];
+
+      if (tag) {
+        const tagLower = String(tag).toLowerCase().replace('#', '').trim();
+        filtered = filtered.filter(d => 
+          d.tags?.some((t: any) => t.name.toLowerCase() === tagLower || t.id.toLowerCase() === tagLower)
+        );
+      }
+
+      const now = Date.now();
+      if (filter === 'week') {
+        const weekAgo = now - 7 * 24 * 60 * 60 * 1000;
+        filtered = filtered.filter(d => new Date(d.created_at).getTime() >= weekAgo);
+      } else if (filter === 'month') {
+        const monthAgo = now - 30 * 24 * 60 * 60 * 1000;
+        filtered = filtered.filter(d => new Date(d.created_at).getTime() >= monthAgo);
+      }
+
+      if (filter === 'son') {
+        filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      } else {
+        filtered.sort((a, b) => b.upvotes_count - a.upvotes_count || new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      }
+
+      return filtered;
+    } catch (e) {
+      console.error("getQADiscussions error:", e);
+      return [];
+    }
+  }
+
+  static async createQADiscussion(topic: {
+    title: string;
+    content: string;
+    author_id: any;
+    author_name: string;
+    author_avatar?: string;
+    author_bio?: string;
+    tags: any[];
+  }) {
+    const discId = `qa-${Date.now()}`;
+    const hashtagsList = (topic.tags || []).map((t: any) => typeof t === 'string' ? t : (t?.name || t?.id || ''));
+
+    const newQaEntry = {
+      id: discId,
+      title: topic.title,
+      content: topic.content,
+      author_id: topic.author_id ? topic.author_id.toString() : "user-anon",
+      author_name: topic.author_name || "Anonim Kaşif",
+      author_avatar: topic.author_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(topic.author_name || 'Anon')}&background=random&color=fff`,
+      author_bio: topic.author_bio || "BotlyHub Forum Kaşifi",
+      tags: hashtagsList,
+      views_count: 0,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+
+    const { error } = await supabase.from('qa_discussions').insert([newQaEntry]);
+    if (error) {
+      if (error.message.includes('relation "public.qa_discussions" does not exist') || error.message.includes('not found')) {
+        const newBlogEntry = {
+          id: discId,
+          title: topic.title,
+          content: topic.content,
+          author: topic.author_name || "Anonim Kaşif",
+          author_avatar: topic.author_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(topic.author_name || 'Anon')}&background=random&color=fff`,
+          category: "qa_forum",
+          read_time: topic.author_bio || "BotlyHub Forum Kaşifi",
+          is_featured: false,
+          slug: topic.author_id ? topic.author_id.toString() : "user-anon",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          views_count: 0,
+          hashtags: hashtagsList
+        };
+        const { error: blogErr } = await supabase.from('blogs').insert([newBlogEntry]);
+        if (blogErr) throw blogErr;
+      } else {
+        throw error;
+      }
+    }
+
+    return {
+      id: discId,
+      title: topic.title,
+      content: topic.content,
+      author_id: newQaEntry.author_id,
+      author_name: newQaEntry.author_name,
+      author_avatar: newQaEntry.author_avatar,
+      author_bio: newQaEntry.author_bio,
+      created_at: newQaEntry.created_at,
+      tags: hashtagsList.map((h: string) => ({ type: 'general', id: h.toLowerCase(), name: h })),
+      upvotes_count: 0,
+      upvoted_users: [],
+      comments_count: 0,
+      comments: []
+    };
+  }
+
+  static async submitQAComment(topicId: string, comment: {
+    author_id: any;
+    author_name: string;
+    author_avatar?: string;
+    author_bio?: string;
+    content: string;
+    parent_id?: string | null;
+  }) {
+    const qaCommentPayload = {
+      topic_id: topicId,
+      author_id: comment.author_id ? comment.author_id.toString() : "user-anon",
+      author_name: comment.author_name || "Anonim Kaşif",
+      author_avatar: comment.author_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.author_name || 'Anon')}&background=random&color=fff`,
+      author_bio: comment.author_bio || "Kod, düşünmenin görünür kalıntısından başka bir şey değildir.",
+      content: comment.content,
+      parent_id: comment.parent_id || null,
+      created_at: new Date().toISOString()
+    };
+
+    const { data: dbQaComment, error } = await supabase
+      .from('qa_comments')
+      .insert([qaCommentPayload])
+      .select()
+      .maybeSingle();
+
+    if (error && (error.message.includes('relation "public.qa_comments" does not exist') || error.message.includes('not found'))) {
+      const blogCommentPayload = {
+        blog_id: topicId,
+        user_id: comment.author_id ? comment.author_id.toString() : "user-anon",
+        user_name: comment.author_name || "Anonim Kaşif",
+        user_avatar: comment.author_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.author_name || 'Anon')}&background=random&color=fff`,
+        content: JSON.stringify({
+          parent_id: comment.parent_id || null,
+          author_bio: comment.author_bio || "Kod, düşünmenin görünür kalıntısından Threaded.",
+          text: comment.content
+        }),
+        is_approved: true,
+        created_at: new Date().toISOString()
+      };
+      const { data: dbBlogComment, error: blogErr } = await supabase
+        .from('blog_comments')
+        .insert([blogCommentPayload])
+        .select()
+        .single();
+
+      if (blogErr) throw blogErr;
+
+      return {
+        id: String(dbBlogComment.id),
+        topic_id: topicId,
+        author_id: dbBlogComment.user_id,
+        author_name: dbBlogComment.user_name,
+        author_avatar: dbBlogComment.user_avatar,
+        author_bio: comment.author_bio || "Kod, düşünmenin görünür kalıntısından başka bir şey değildir.",
+        content: comment.content,
+        created_at: dbBlogComment.created_at,
+        likes_count: 0,
+        parent_id: comment.parent_id || null
+      };
+    } else if (error) {
+      throw error;
+    } else {
+      const inserted = dbQaComment || qaCommentPayload;
+      return {
+        id: String(inserted.id || `comment-${Date.now()}`),
+        topic_id: topicId,
+        author_id: inserted.author_id,
+        author_name: inserted.author_name,
+        author_avatar: inserted.author_avatar,
+        author_bio: inserted.author_bio,
+        content: inserted.content,
+        created_at: inserted.created_at,
+        likes_count: 0,
+        parent_id: inserted.parent_id
+      };
+    }
+  }
+
+  static async toggleQAUpvote(discussionId: string, userId: string) {
+    const { data: existingQaLike, error: qaFetchError } = await supabase
+      .from('qa_upvotes')
+      .select('*')
+      .eq('discussion_id', discussionId)
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    let upvoted = false;
+    let upvotes_count = 0;
+
+    if (qaFetchError && (qaFetchError.message.includes('relation "public.qa_upvotes" does not exist') || qaFetchError.message.includes('not found'))) {
+      const { data: existingBlogLike } = await supabase
+        .from('blog_likes')
+        .select('*')
+        .eq('blog_id', discussionId)
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (existingBlogLike) {
+        const { error: deleteError } = await supabase
+          .from('blog_likes')
+          .delete()
+          .eq('id', existingBlogLike.id);
+        if (deleteError) throw deleteError;
+        upvoted = false;
+      } else {
+        const { error: insertError } = await supabase
+          .from('blog_likes')
+          .insert([{
+            blog_id: discussionId,
+            user_id: userId
+          }]);
+        if (insertError) throw insertError;
+        upvoted = true;
+      }
+
+      const { data: allBlogLikes } = await supabase
+        .from('blog_likes')
+        .select('id')
+        .eq('blog_id', discussionId);
+
+      upvotes_count = allBlogLikes ? allBlogLikes.length : 0;
+    } else {
+      if (existingQaLike) {
+        const { error: deleteError } = await supabase
+          .from('qa_upvotes')
+          .delete()
+          .eq('id', existingQaLike.id);
+        if (deleteError) throw deleteError;
+        upvoted = false;
+      } else {
+        const { error: insertError } = await supabase
+          .from('qa_upvotes')
+          .insert([{
+            discussion_id: discussionId,
+            user_id: userId
+          }]);
+        if (insertError) throw insertError;
+        upvoted = true;
+      }
+
+      const { data: allQaLikes } = await supabase
+        .from('qa_upvotes')
+        .select('id')
+        .eq('discussion_id', discussionId);
+
+      upvotes_count = allQaLikes ? allQaLikes.length : 0;
+    }
+
+    return { upvotes_count, upvoted };
+  }
 }
