@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { Loader2, Megaphone } from 'lucide-react';
-import { PageLoader } from './components/PageLoader';
 import { DatabaseService } from './services/DatabaseService';
 import { useTelegram } from './hooks/useTelegram';
 import { User } from './types';
@@ -57,13 +56,6 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
       const savedTheme = localStorage.getItem('theme') || 'dark';
       root.classList.remove('light', 'dark');
       root.classList.add(savedTheme);
-    }
-
-    // Remove the static loader from index.html once the app is ready
-    const loader = document.getElementById('loader');
-    if (loader) {
-      loader.style.opacity = '0';
-      setTimeout(() => loader.remove(), 300);
     }
 
     DatabaseService.init();
