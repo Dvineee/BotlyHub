@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Search, ChevronLeft, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, Send, Link, CheckCircle2, ChevronDown, Sun, Moon, Wallet, Menu, Plus, LogOut, Compass, Coins, BarChart3, Binoculars, Share2, Briefcase, MousePointer2, ExternalLink, ArrowLeft, MessageSquare } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, Send, Link, CheckCircle2, ChevronDown, Sun, Moon, Wallet, Menu, Plus, LogOut, Compass, Coins, BarChart3, Binoculars, Share2, Briefcase, MousePointer2, ExternalLink, ArrowLeft, MessageSquare, SlidersHorizontal, Sliders } from 'lucide-react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Bot, Announcement, Notification, BlogPost } from '../types';
@@ -395,7 +395,13 @@ const NavMenu = ({
     setIsLoginModalOpen, 
     setWebAuthUser, 
     isLoginModalOpen,
-    menuRef: parentMenuRef
+    menuRef: parentMenuRef,
+    openMenu,
+    setOpenMenu,
+    navState,
+    setNavState,
+    mobileModal,
+    setMobileModal
 }: { 
     isScrolled: boolean, 
     user: any, 
@@ -408,13 +414,16 @@ const NavMenu = ({
     setIsLoginModalOpen: (v: boolean) => void,
     setWebAuthUser: (v: any) => void,
     isLoginModalOpen: boolean,
-    menuRef: React.RefObject<HTMLDivElement>
+    menuRef: React.RefObject<HTMLDivElement>,
+    openMenu: 'kesfet' | 'investors' | null,
+    setOpenMenu: (v: 'kesfet' | 'investors' | null) => void,
+    navState: 'main' | 'bots' | 'apps',
+    setNavState: (v: 'main' | 'bots' | 'apps') => void,
+    mobileModal: 'kesfet' | 'investors' | null,
+    setMobileModal: (v: 'kesfet' | 'investors' | null) => void
 }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const [openMenu, setOpenMenu] = useState<'kesfet' | 'investors' | null>(null);
-    const [navState, setNavState] = useState<'main' | 'bots' | 'apps'>('main');
-    const [mobileModal, setMobileModal] = useState<'kesfet' | 'investors' | null>(null);
     const internalMenuRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -1047,6 +1056,9 @@ const Home = () => {
   const { toggleTheme, theme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [openMenu, setOpenMenu] = useState<'kesfet' | 'investors' | null>(null);
+  const [navState, setNavState] = useState<'main' | 'bots' | 'apps'>('main');
+  const [mobileModal, setMobileModal] = useState<'kesfet' | 'investors' | null>(null);
   const [bots, setBots] = useState<Bot[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -1184,7 +1196,7 @@ const Home = () => {
           description={t('home_seo_desc')}
       />
       {/* Top Background Wrapper */}
-      <div className="bg-[#00000008] dark:bg-slate-900/10">
+      <div className="bg-white dark:bg-slate-950">
         {/* Top Section */}
         <div className="w-full pt-6 md:pt-10 pb-4 shadow-[inset_0_-1px_0_0_rgba(0,0,0,0.03)] relative z-[120]">
           <div className="max-w-7xl mx-auto px-5 sm:px-8">
@@ -1193,24 +1205,52 @@ const Home = () => {
                     <Logo onClick={() => navigate('/')} className="cursor-pointer" />
                 </div>
 
-                  <div className="w-full md:flex-1 md:max-w-2xl order-3 md:order-2 flex items-center gap-2 md:gap-3 font-sans">
-                      <div className="flex-1 md:w-[330px] md:flex-none relative z-[100]">
-                          <div className="relative flex items-center bg-transparent border border-black/10 dark:border-white/20 rounded-xl group shadow-sm transition-all">
+                  <div className="w-full md:flex-1 md:max-w-4xl order-3 md:order-2 flex items-center gap-4 lg:gap-8 font-sans">
+                      {/* Search Bar Container */}
+                      <div className="flex-1 md:max-w-[280px] lg:max-w-[320px] relative z-[100]">
+                          <div className="relative flex items-center bg-[#eeefef] dark:bg-slate-800 rounded-xl group transition-all h-[42px] px-3.5">
                               <div 
                                 onClick={() => navigate('/search')} 
                                 className="flex items-center flex-1 min-w-0 cursor-pointer active:scale-[0.98] transition-transform"
                               >
-                                  <div className="ml-2 md:ml-3 w-8 h-8 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors shrink-0">
-                                      <Search size={16} />
+                                  <div className="text-slate-500 hover:text-blue-500 transition-colors shrink-0 mr-2">
+                                      <SlidersHorizontal size={18} />
                                   </div>
-                                  <div className="w-full py-2 px-3 text-[11px] text-slate-700 dark:text-slate-200 font-bold uppercase tracking-wider truncate min-w-0">
-                                      {t('search_placeholder')}
+                                  <div className="w-full text-[13px] text-slate-600 dark:text-slate-350 font-bold truncate min-w-0">
+                                      Herşeyi ara
                                   </div>
-                              </div>
-                              <div className="flex items-center gap-0.5 pr-1 shrink-0 ml-auto border-l border-black/[0.05] dark:border-white/[0.05] pl-1 relative z-[110]">
-                                  <FilterMenu />
                               </div>
                           </div>
+                      </div>
+
+                      {/* Header Navigation Links (Keşfet, Yatırımcılar, Blog) */}
+                      <div className="hidden md:flex items-center gap-5 lg:gap-7 shrink-0">
+                          {/* Keşfet */}
+                          <button 
+                              onClick={() => { haptic('light'); navigate('/search'); }}
+                              className="nav-menu-item text-[#000000] dark:text-white hover:opacity-80 flex items-center gap-1.5 transition-all font-bold text-[14px]"
+                          >
+                              <Gift size={16} className="text-[#3b82f6] dark:text-blue-400 shrink-0" />
+                              <span>Keşfet</span>
+                          </button>
+
+                          {/* Yatırımcılar */}
+                          <button 
+                              onClick={() => { haptic('light'); navigate('/search'); }}
+                              className="nav-menu-item text-[#000000] dark:text-white hover:opacity-80 flex items-center gap-1.5 transition-all font-bold text-[14px]"
+                          >
+                              <Moon size={16} className="text-[#10b981] dark:text-emerald-400 shrink-0 rotate-[15deg]" />
+                              <span>Yatırımcılar</span>
+                          </button>
+
+                          {/* Blog */}
+                          <button 
+                              onClick={() => { haptic('light'); navigate('/blog'); }}
+                              className="nav-menu-item text-[#000000] dark:text-white hover:opacity-80 flex items-center gap-1.5 transition-all font-bold text-[14px]"
+                          >
+                              <Star size={16} className="text-[#eab308] dark:text-yellow-400 shrink-0 fill-[#eab308] dark:fill-yellow-400" />
+                              <span>Blog</span>
+                          </button>
                       </div>
                   </div>
 
@@ -1218,6 +1258,15 @@ const Home = () => {
                       {user && (
                           <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="hidden sm:flex w-10 h-10 items-center justify-center text-slate-900 dark:text-white bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-xl active:scale-95 transition-all outline-none">
                               <Wallet size={18} />
+                          </button>
+                      )}
+
+                      {!user && (
+                          <button 
+                              onClick={() => { haptic('light'); setIsLoginModalOpen(true); }}
+                              className="px-5 h-10 bg-blue-500 hover:bg-blue-600 text-white text-[13px] font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center whitespace-nowrap shadow-lg shadow-blue-500/25"
+                          >
+                              {t('login')}
                           </button>
                       )}
 
@@ -1373,15 +1422,6 @@ const Home = () => {
                               </div>
                           )}
                       </div>
-
-                      {!user && (
-                          <button 
-                              onClick={() => { haptic('light'); setIsLoginModalOpen(true); }}
-                              className="px-5 h-10 bg-blue-500 hover:bg-blue-600 text-white text-[13px] font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center whitespace-nowrap shadow-lg shadow-blue-500/25"
-                          >
-                              {t('login')}
-                          </button>
-                      )}
                   </div>
                   <LoginModal 
                       isOpen={isLoginModalOpen} 
@@ -1426,6 +1466,12 @@ const Home = () => {
             setWebAuthUser={setWebAuthUser}
             isLoginModalOpen={isLoginModalOpen}
             menuRef={menuRef}
+            openMenu={openMenu}
+            setOpenMenu={setOpenMenu}
+            navState={navState}
+            setNavState={setNavState}
+            mobileModal={mobileModal}
+            setMobileModal={setMobileModal}
         />
       )}
 
