@@ -14,6 +14,7 @@ import { SEO } from '../components/SEO';
 import { useTheme } from '../ThemeContext';
 import Logo from '../components/Logo';
 import { categories, appsSubCategories } from '../data';
+import { API_BASE_URL } from '../constants';
 
 interface QTag {
   type: 'bot' | 'channel' | 'general';
@@ -141,10 +142,7 @@ export default function QAForum() {
   const fetchTopics = async (filter = selectedFilter, selectTag?: string) => {
     setLoading(true);
     try {
-      const baseUrl = window.location.origin.includes('localhost') || window.location.origin.includes('run.app') 
-        ? window.location.origin 
-        : '';
-      let url = `${baseUrl}/api/qa/discussions?filter=${filter}`;
+      let url = `${API_BASE_URL}/api/qa/discussions?filter=${filter}`;
       if (selectTag) {
         url += `&tag=${encodeURIComponent(selectTag)}`;
       }
@@ -209,10 +207,7 @@ export default function QAForum() {
     haptic('light');
 
     try {
-      const baseUrl = window.location.origin.includes('localhost') || window.location.origin.includes('run.app') 
-        ? window.location.origin 
-        : '';
-      const res = await fetch(`${baseUrl}/api/qa/discussions/${topicId}/upvote`, {
+      const res = await fetch(`${API_BASE_URL}/api/qa/discussions/${topicId}/upvote`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: currentUser.id })
@@ -266,10 +261,7 @@ export default function QAForum() {
     haptic('medium');
 
     try {
-      const baseUrl = window.location.origin.includes('localhost') || window.location.origin.includes('run.app') 
-        ? window.location.origin 
-        : '';
-      const res = await fetch(`${baseUrl}/api/qa/discussions/${activeTopic.id}/comments`, {
+      const res = await fetch(`${API_BASE_URL}/api/qa/discussions/${activeTopic.id}/comments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -312,10 +304,7 @@ export default function QAForum() {
     haptic('medium');
 
     try {
-      const baseUrl = window.location.origin.includes('localhost') || window.location.origin.includes('run.app') 
-        ? window.location.origin 
-        : '';
-      const res = await fetch(`${baseUrl}/api/qa/discussions`, {
+      const res = await fetch(`${API_BASE_URL}/api/qa/discussions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

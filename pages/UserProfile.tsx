@@ -29,6 +29,7 @@ import { useTheme } from '../ThemeContext';
 import { DatabaseService } from '../services/DatabaseService';
 import { SEO } from '../components/SEO';
 import { Bot, BlogComment, BlogPost } from '../types';
+import { API_BASE_URL } from '../constants';
 
 function formatRelativeTime(dateString: string): string {
     try {
@@ -196,10 +197,7 @@ export default function UserProfile() {
 
                 // Fetch Q&A Discussions to extract user's created topics or comments
                 try {
-                    const baseUrl = window.location.origin.includes('localhost') || window.location.origin.includes('run.app') 
-                        ? window.location.origin 
-                        : '';
-                    const qaRes = await fetch(`${baseUrl}/api/qa/discussions`);
+                    const qaRes = await fetch(`${API_BASE_URL}/api/qa/discussions`);
                     if (qaRes && qaRes.ok) {
                         const qaTopicsList = await qaRes.json();
                         

@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { API_BASE_URL } from '../constants';
 import { X, Bell, Edit3, Download, ExternalLink, ShieldCheck, Loader2, Info, AlertCircle, Send, LogIn } from 'lucide-react';
 
 interface LoginModalProps {
@@ -39,7 +40,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onAuth }) => {
     setIsLoading(true);
     setError('');
     try {
-        const res = await fetch('/api/auth/telegram/request-code', {
+        const res = await fetch(`${API_BASE_URL}/api/auth/telegram/request-code`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ identifier: identifier.trim() })
@@ -69,7 +70,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onAuth }) => {
     setIsLoading(true);
     setError('');
     try {
-        const res = await fetch('/api/auth/telegram/verify-code', {
+        const res = await fetch(`${API_BASE_URL}/api/auth/telegram/verify-code`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ identifier, code })
