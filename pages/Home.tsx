@@ -289,41 +289,83 @@ const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = React.memo(({ bots }) => {
 });
 const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonRate }) => {
   const navigate = useNavigate();
+  const { haptic } = useTelegram();
   const prices = useMemo(() => PriceService.convert(bot.price, tonRate), [bot.price, tonRate]);
-  
+
+  // Generate a distinct, beautiful gradient based on the bot's name to act as a premium banner (Getgems-style)
+  const premiumBannerGradient = useMemo(() => {
+    const gradients = [
+      'from-blue-600 via-indigo-600 to-violet-600By',
+      'from-emerald-600 via-teal-600 to-cyan-600',
+      'from-rose-600 via-pink-600 to-indigo-600',
+      'from-amber-500 via-orange-600 to-rose-600',
+      'from-indigo-600 via-purple-600 to-pink-600',
+      'from-blue-600 via-sky-600 to-cyan-500',
+      'from-fuchsia-600 via-purple-600 to-indigo-600',
+      'from-slate-800 via-slate-900 to-slate-950',
+    ];
+    let sum = 0;
+    for (let i = 0; i < bot.name.length; i++) {
+      sum += bot.name.charCodeAt(i);
+    }
+    return gradients[sum % gradients.length];
+  }, [bot.name]);
+
   return (
     <div 
-        onClick={() => navigate(`/bot/${bot.slug}`)} 
-        className="flex items-center p-4 sm:p-5 bot-card cursor-pointer group bg-white/75 dark:bg-slate-900/30 hover:bg-slate-100/80 dark:hover:bg-slate-900/70 rounded-2xl transition-all border border-slate-200/40 dark:border-white/[0.04] hover:border-blue-500/20 dark:hover:border-blue-500/10 active:scale-[0.99] transform-gpu shadow-xs duration-300"
+        onClick={() => { haptic('light'); navigate(`/bot/${bot.slug}`); }} 
+        className="group relative flex flex-col rounded-3xl overflow-hidden cursor-pointer bg-white/80 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-900/80 border border-slate-200/40 dark:border-white/[0.04] hover:border-blue-500/25 dark:hover:border-blue-500/15 shadow-[0_4px_30px_rgba(0,0,0,0.015)] hover:shadow-[0_20px_50px_rgba(59,130,246,0.08)] transition-all duration-300 transform hover:-translate-y-1 w-full"
     >
-        <div className="relative shrink-0">
-            <div className="absolute inset-0 bg-blue-500/10 blur-xl opacity-0 group-hover:opacity-100 transition-opacity rounded-xl"></div>
-            <img 
-                src={getLiveBotIcon(bot)} 
-                alt={bot.name} 
-                loading="lazy"
-                className="w-[3.6rem] h-[3.6rem] sm:w-[4rem] sm:h-[4rem] rounded-2xl object-cover bg-slate-100 dark:bg-slate-900 border border-slate-200/50 dark:border-white/[0.04] group-hover:scale-105 transition-transform duration-500" 
-                onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
-            />
+        {/* Banner Artwork Segment */}
+        <div className={`h-24 w-full bg-gradient-to-r ${premiumBannerGradient} relative overflow-hidden shrink-0`}>
+            {/* Ambient overlay grid pattern */}
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:10px_10px] pointer-events-none"></div>
+            {/* Top right floating badge */}
+            <div className="absolute top-3 right-3 flex items-center gap-1 bg-black/30 backdrop-blur-md border border-white/10 px-2 py-0.5 rounded-full text-[9px] font-black text-white tracking-widest uppercase">
+                {bot.price > 0 ? 'PREMIUM' : 'FREE'}
+            </div>
         </div>
-        <div className="flex-1 ml-4 min-w-0 mr-2">
-            <h3 className="font-extrabold text-[15px] sm:text-[16px] text-slate-800 dark:text-slate-100 truncate tracking-tight uppercase leading-none mb-1.5 flex items-center gap-1.5">
-                {bot.name}
-                {bot.is_official && (
-                    <svg width="15" height="15" viewBox="0 0 16 16" fill="none" className="text-blue-500 shrink-0">
-                        <path fillRule="evenodd" clipRule="evenodd" d="M7.408 1.2375C7.57933 1.11017 7.78667 1.0415 8 1.0415C8.21333 1.0415 8.42067 1.11017 8.592 1.2375L9.81067 2.14417C9.83467 2.16217 9.86133 2.1755 9.88933 2.18484C9.91733 2.19417 9.94733 2.19884 9.97733 2.19817L11.496 2.18084C11.7093 2.17817 11.918 2.24484 12.09 2.37017C12.2627 2.4955 12.39 2.6735 12.454 2.87684L12.9073 4.32617C12.916 4.35484 12.93 4.3815 12.9473 4.4055C12.9647 4.4295 12.986 4.45084 13.0107 4.46817L14.2493 5.34684C14.4233 5.47017 14.5527 5.64617 14.6187 5.8495C14.6847 6.05217 14.6833 6.27084 14.6153 6.4735L14.13 7.91284C14.1207 7.94084 14.1153 7.97084 14.1153 8.00017C14.1153 8.0295 14.12 8.0595 14.13 8.0875L14.6153 9.52684C14.6833 9.72884 14.6847 9.9475 14.6187 10.1508C14.5527 10.3535 14.4233 10.5302 14.2493 10.6535L13.0107 11.5322C12.9867 11.5495 12.9653 11.5702 12.9473 11.5948C12.93 11.6188 12.9167 11.6455 12.9073 11.6742L12.454 13.1235C12.3907 13.3268 12.2627 13.5048 12.09 13.6302C11.9173 13.7555 11.7093 13.8222 11.496 13.8195L9.97733 13.8022C9.94733 13.8015 9.918 13.8062 9.88933 13.8155C9.86133 13.8248 9.83467 13.8382 9.81067 13.8562L8.592 14.7628C8.42067 14.8902 8.21333 14.9588 8 14.9588C7.78667 14.9588 7.57933 14.8902 7.408 14.7628L6.18933 13.8562C6.16533 13.8382 6.13867 13.8248 6.11067 13.8155C6.08267 13.8062 6.05267 13.8015 6.02267 13.8022L4.504 13.8195C4.29067 13.8222 4.082 13.7555 3.91 13.6302C3.73733 13.5048 3.61 13.3268 3.546 13.1235L3.09267 11.6742C3.084 11.6455 3.07 11.6188 3.05267 11.5948C3.03533 11.5708 3.014 11.5495 2.98933 11.5322L1.75067 10.6535C1.57667 10.5302 1.44733 10.3542 1.38133 10.1508C1.31533 9.94817 1.31667 9.7295 1.38467 9.52684L1.87 8.00017C1.88067 8.0595 1.88533 8.03017 1.88533 8.00017C1.88533 7.97017 1.88067 7.94084 1.87067 7.91284L1.38533 6.4735C1.31733 6.2715 1.316 6.05284 1.382 5.8495C1.448 5.64684 1.57733 5.47084 1.75133 5.3475L2.99 4.46884C3.014 4.45084 3.03533 4.43017 3.05333 4.40617C3.07067 4.38217 3.084 4.3555 3.09333 4.32684L3.54667 2.8775C3.61 2.67417 3.738 2.49617 3.91067 2.37084C4.08333 2.2455 4.29133 2.17884 4.50467 2.1815L6.02333 2.19884C6.05333 2.1995 6.08266 2.19484 6.11133 2.1855C6.13933 2.17617 6.166 2.16284 6.19 2.14484L7.408 1.2375Z" fill="currentColor"></path>
-                        <path fillRule="evenodd" clipRule="evenodd" d="M7.33334 10.6668C7.16267 10.6668 6.992 10.6015 6.862 10.4715L4.862 8.4715C4.60134 8.21083 4.60134 7.7895 4.862 7.52883C5.12267 7.26817 5.544 7.26817 5.80467 7.52883L7.33334 9.0575L10.1953 6.1955C10.456 5.93483 10.8773 5.93483 11.138 6.1955C11.3987 6.45617 11.3987 6.8775 11.138 7.13817L7.80467 10.4715C7.67467 10.6015 7.504 10.6668 7.33334 10.6668Z" fill="white"></path>
-                    </svg>
-                )}
-            </h3>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate mb-2">{bot.description}</p>
-            <div className="flex items-center gap-2">
-                {bot.price > 0 && (
-                    <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-500/10 rounded-md border border-blue-500/15">
-                        <span className="text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-tighter flex items-center gap-1 leading-none">
-                            {Number(prices.ton).toFixed(1)}
-                            <svg fill="none" height="10" width="10" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" className="translate-y-[0.5px]">
-                                <title>Payment TON icon</title>
+
+        {/* Content Body */}
+        <div className="px-5 pb-5 pt-0 relative flex-1 flex flex-col justify-between">
+            {/* Avatar overlapping the banner */}
+            <div className="relative -mt-10 mb-3 ml-1 shrink-0">
+                <div className="w-16 h-16 rounded-2xl p-[3px] bg-white dark:bg-slate-950 border border-slate-200/50 dark:border-white/[0.1] shadow-lg overflow-hidden group-hover:scale-105 transition-transform duration-300">
+                    <img 
+                        src={getLiveBotIcon(bot)} 
+                        alt={bot.name} 
+                        loading="lazy"
+                        className="w-full h-full object-cover rounded-[12px] bg-slate-50 dark:bg-slate-900" 
+                        onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
+                    />
+                </div>
+            </div>
+
+            {/* Information Info Rows */}
+            <div className="space-y-1 min-w-0 flex-1 mb-4">
+                <div className="flex items-center gap-1.5 min-w-0">
+                    <h3 className="font-extrabold text-[15px] sm:text-[16px] text-slate-800 dark:text-slate-100 truncate tracking-tight uppercase leading-none">
+                        {bot.name}
+                    </h3>
+                    {bot.is_official && (
+                        <CheckCircle2 size={14} className="text-blue-500 fill-blue-500/10 shrink-0" />
+                    )}
+                </div>
+                <p className="text-[11px] text-slate-400 dark:text-[#8E99A8] font-medium line-clamp-2 leading-normal h-8">
+                    {bot.description}
+                </p>
+            </div>
+
+            {/* Price & Performance Stats Box */}
+            <div className="bg-slate-50 dark:bg-slate-950/40 border border-slate-200/40 dark:border-white/[0.04] p-3 rounded-2xl flex items-center justify-between gap-2 shrink-0">
+                <div className="flex flex-col">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-[#B0B7C3] dark:text-[#5F6774] mb-0.5">FİYAT</span>
+                    {bot.price > 0 ? (
+                        <div className="flex items-center gap-1">
+                            <span className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-tight flex items-center gap-1 leading-none">
+                                {Number(prices.ton).toFixed(1)}
+                            </span>
+                            <svg fill="none" height="12" width="12" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" className="text-blue-500">
                                 <g clipPath="url(#a_ton_home)" fill="currentColor">
                                     <path d="M7.5 11.015V5.963H5.268a.31.31 0 0 0-.272.463l1.772 3.17.734 1.419ZM9.232 9.596l1.771-3.17a.31.31 0 0 0-.272-.463H8.498v5.053l.734-1.42Z"></path>
                                     <path clipRule="evenodd" d="M16 8.5a8 8 0 1 1-16 0 8 8 0 0 1 16 0ZM5.268 4.965h5.464c1.004 0 1.64 1.085 1.136 1.96l-3.372 5.844a.572.572 0 0 1-.992 0L4.132 6.925c-.505-.876.132-1.96 1.136-1.96Z" fillRule="evenodd"></path>
@@ -334,17 +376,20 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonR
                                     </clipPath>
                                 </defs>
                             </svg>
-                        </span>
+                        </div>
+                    ) : (
+                        <span className="text-xs font-black text-emerald-500 tracking-tight uppercase leading-none">ÜCRETSİZ</span>
+                    )}
+                </div>
+
+                <div className="flex flex-col items-end">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-[#B0B7C3] dark:text-[#5F6774] mb-0.5">PUAN</span>
+                    <div className="flex items-center gap-1 bg-amber-500/10 dark:bg-amber-500/5 border border-amber-500/20 px-2 py-0.5 rounded-lg">
+                        <Star size={10} className="text-amber-500 fill-amber-500" />
+                        <span className="text-xs font-black text-amber-600 dark:text-amber-400 leading-none">{bot.rating || '0.0'}</span>
                     </div>
-                )}
-                <div className="flex items-center gap-1 px-1.5 py-0.5 bg-amber-500/10 rounded-md border border-amber-500/15">
-                    <Star size={9} className="text-amber-500 fill-amber-500" />
-                    <span className="text-[9px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-tighter leading-none">{bot.rating || '0.0'}</span>
                 </div>
             </div>
-        </div>
-        <div className="shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-slate-50 dark:bg-white/[0.03] text-slate-400 group-hover:text-blue-500 group-hover:bg-blue-500/5 transition-all duration-300">
-            <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
         </div>
     </div>
   );
@@ -1595,19 +1640,14 @@ const Home = () => {
                                             </button>
                                         ))}
                                     </div>
-                                </div>
-                                
-                                <div className="relative -mx-4 px-4 overflow-hidden">
-                                    <div className="flex gap-3 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory pb-4">
-                                        {botChunks.map((chunk, chunkIdx) => (
-                                            <div key={chunkIdx} className="flex flex-col gap-3 min-w-[88vw] sm:min-w-[400px] snap-center first:pl-2">
-                                                {chunk.map(bot => (
-                                                    <div key={bot.id} className="w-full h-full">
-                                                        <BotCard bot={bot} tonRate={tonRate} />
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        ))}
+                                    <div className="relative -mx-4 px-4 overflow-hidden mt-6">
+                                        <div className="flex gap-4.5 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory pb-6 pt-2">
+                                            {sliderBots.map(bot => (
+                                                <div key={bot.id} className="min-w-[280px] sm:min-w-[320px] max-w-[320px] snap-center shrink-0">
+                                                    <BotCard bot={bot} tonRate={tonRate} />
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
 
@@ -1725,19 +1765,14 @@ const Home = () => {
                                             </button>
                                         ))}
                                     </div>
-                                </div>
-                                
-                                <div className="relative -mx-4 px-4 overflow-hidden">
-                                    <div className="flex gap-3 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory pb-4">
-                                        {botChunks.map((chunk, chunkIdx) => (
-                                            <div key={chunkIdx} className="flex flex-col gap-3 min-w-[88vw] sm:min-w-[400px] snap-center first:pl-2">
-                                                {chunk.map(bot => (
-                                                    <div key={bot.id} className="w-full h-full">
-                                                        <BotCard bot={bot} tonRate={tonRate} />
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        ))}
+                                    <div className="relative -mx-4 px-4 overflow-hidden mt-6">
+                                        <div className="flex gap-4.5 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory pb-6 pt-2">
+                                            {sliderBots.map(bot => (
+                                                <div key={bot.id} className="min-w-[280px] sm:min-w-[320px] max-w-[320px] snap-center shrink-0">
+                                                    <BotCard bot={bot} tonRate={tonRate} />
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
 
