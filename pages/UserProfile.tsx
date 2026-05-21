@@ -1031,30 +1031,6 @@ export default function UserProfile() {
                             {/* Content Form Scrollable */}
                             <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar">
                                 
-                                {/* Photo Url */}
-                                <div>
-                                    <label className="text-[10px] font-mono font-black text-slate-400 uppercase tracking-widest block mb-1.5">
-                                        PROFIL FOTOĞRAFI URL'Sİ
-                                    </label>
-                                    <input 
-                                        type="text" 
-                                        placeholder="Görsel bağlantı adresi girin..."
-                                        value={editAvatar}
-                                        onChange={(e) => setEditAvatar(e.target.value)}
-                                        className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/40 dark:border-slate-800/50 rounded-2xl text-xs font-medium text-slate-800 dark:text-slate-100 outline-none focus:border-indigo-500 transition-all"
-                                    />
-                                    <button 
-                                        type="button"
-                                        onClick={() => {
-                                            haptic('light');
-                                            setEditAvatar(`https://ui-avatars.com/api/?name=${encodeURIComponent(editName)}&background=random&color=fff&size=200`);
-                                        }}
-                                        className="mt-1.5 text-[8px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest hover:underline"
-                                    >
-                                        Adımdan otomatik üret
-                                    </button>
-                                </div>
-
                                 {/* Display Name */}
                                 <div>
                                     <label className="text-[10px] font-mono font-black text-slate-400 uppercase tracking-widest block mb-1.5">
@@ -1085,40 +1061,6 @@ export default function UserProfile() {
                                     <span className="text-[8px] text-slate-400 block text-right mt-1 font-mono uppercase">
                                         Max 180 Karakter
                                     </span>
-                                </div>
-
-                                {/* Telegram username handles */}
-                                <div>
-                                    <label className="text-[10px] font-mono font-black text-slate-400 uppercase tracking-widest block mb-1.5">
-                                        TELEGRAM KULLANICI ADI (SÖZLEŞMELER İÇİN)
-                                    </label>
-                                    <div className="relative">
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-bold">@</span>
-                                        <input 
-                                            type="text" 
-                                            placeholder="kullanici_adi"
-                                            value={editTelegram.replace('@', '')}
-                                            onChange={(e) => setEditTelegram(e.target.value)}
-                                            className="w-full pl-8 pr-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/40 dark:border-slate-800/50 rounded-2xl text-xs font-bold text-slate-800 dark:text-slate-100 outline-none focus:border-indigo-500 transition-all"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* X/Twitter handles */}
-                                <div>
-                                    <label className="text-[10px] font-mono font-black text-slate-400 uppercase tracking-widest block mb-1.5">
-                                        TWITTER / X USERNAME
-                                    </label>
-                                    <div className="relative">
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-bold">x.com/</span>
-                                        <input 
-                                            type="text" 
-                                            placeholder="kullanici_adi"
-                                            value={editTwitter.replace(/.*x\.com\//, '').replace('@', '')}
-                                            onChange={(e) => setEditTwitter(e.target.value)}
-                                            className="w-full pl-16 pr-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/40 dark:border-slate-800/50 rounded-2xl text-xs font-bold text-slate-800 dark:text-slate-100 outline-none focus:border-indigo-500 transition-all"
-                                        />
-                                    </div>
                                 </div>
 
 							</div>
