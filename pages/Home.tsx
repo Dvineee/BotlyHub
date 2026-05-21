@@ -702,38 +702,40 @@ const NavMenu = ({
                                 transition={{ duration: 0.2 }}
                                 className="hidden md:flex items-center gap-2 md:gap-3"
                             >
-                                <button 
-                                    onClick={() => { haptic('light'); toggleTheme(); }} 
-                                    className="w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 border border-black/5 dark:border-white/5 rounded-xl text-slate-900 dark:text-white active:scale-95 transition-all outline-none shrink-0"
-                                >
-                                    {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-                                </button>
+                                {user && (
+                                    <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 border border-black/5 dark:border-white/5 rounded-xl text-slate-900 dark:text-white active:scale-95 transition-all outline-none shrink-0">
+                                        <Wallet size={18} />
+                                    </button>
+                                )}
 
-                                {user ? (
-                                    <>
-                                        <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 border border-black/5 dark:border-white/5 rounded-xl text-slate-900 dark:text-white active:scale-95 transition-all shrink-0">
-                                            <Wallet size={18} />
-                                        </button>
-                                        <div className="relative" ref={parentMenuRef}>
-                                            <button 
-                                              onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
-                                              className={`h-10 px-3 flex items-center gap-2 border border-black/5 dark:border-white/5 text-slate-900 dark:text-white rounded-xl active:scale-95 transition-all relative ${isMenuOpen ? 'bg-slate-100 dark:bg-white/10' : 'bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10'}`}
-                                            >
+                                <div className="relative font-sans" ref={parentMenuRef}>
+                                    <button 
+                                      onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
+                                      className={`h-10 px-3 flex items-center gap-2 border border-black/5 dark:border-white/5 text-slate-900 dark:text-white rounded-xl active:scale-95 transition-all relative ${isMenuOpen ? 'bg-slate-100 dark:bg-white/10' : 'bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10'}`}
+                                    >
+                                        {user ? (
+                                            <>
                                                 <span className="block md:hidden text-[11px] font-black uppercase tracking-wide">
                                                     {(user.username || user.first_name || user.name || '').slice(0, 5)}{(user.username || user.first_name || user.name || '').length > 5 ? '..' : ''}
                                                 </span>
                                                 <span className="hidden md:block text-[11px] font-black uppercase tracking-wide">
                                                     {user.username || user.first_name || user.name || ''}
                                                 </span>
-                                                <ChevronDown size={12} className={`text-slate-400 dark:text-slate-500 transition-transform duration-200 ${isMenuOpen ? 'rotate-180' : ''}`} />
-                                                {unreadCount > 0 && (
-                                                    <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[8px] font-black text-white flex items-center justify-center px-1">
-                                                        {unreadCount > 9 ? '9+' : unreadCount}
-                                                    </div>
-                                                )}
-                                            </button>
-                                            {isMenuOpen && (
-                                                <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-white/5 rounded-2xl shadow-2xl p-2 z-[100] animate-in fade-in zoom-in-95 duration-200">
+                                            </>
+                                        ) : (
+                                            <Menu size={18} className="text-slate-700 dark:text-slate-300" />
+                                        )}
+                                        <ChevronDown size={12} className={`text-slate-400 dark:text-slate-500 transition-transform duration-200 ${isMenuOpen ? 'rotate-180' : ''}`} />
+                                        {user && unreadCount > 0 && (
+                                            <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[8px] font-black text-white flex items-center justify-center px-1">
+                                                {unreadCount > 9 ? '9+' : unreadCount}
+                                            </div>
+                                        )}
+                                    </button>
+                                    {isMenuOpen && (
+                                        <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-white/5 rounded-2xl shadow-2xl p-2 z-[100] animate-in fade-in zoom-in-95 duration-200">
+                                            {user ? (
+                                                <>
                                                     <div className="p-4 border-b border-slate-100 dark:border-white/5 mb-2">
                                                         <div className="flex items-center gap-3">
                                                             {(user.photo_url || user.avatar) ? (
@@ -790,6 +792,28 @@ const NavMenu = ({
                                                     </button>
 
                                                     <div className="h-px bg-slate-100 dark:border-white/5 my-2" />
+
+                                                    {/* Gece Modu & Add Your inside dropdown */}
+                                                    <button onClick={() => { haptic('light'); toggleTheme(); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                                        {theme === 'dark' ? (
+                                                            <>
+                                                                <Sun size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                                                <span className="text-xs font-bold uppercase tracking-tight">{t('light_mode') || 'Gündüz Modu'}</span>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <Moon size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                                                <span className="text-xs font-bold uppercase tracking-tight">{t('dark_mode') || 'Gece Modu'}</span>
+                                                            </>
+                                                        )}
+                                                    </button>
+
+                                                    <button onClick={() => { haptic('light'); navigate('/settings'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                                        <Plus size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                                        <span className="text-xs font-bold uppercase tracking-tight">{t('add_your')}</span>
+                                                    </button>
+
+                                                    <div className="h-px bg-slate-100 dark:border-white/5 my-2" />
                                                     
                                                     <button 
                                                         onClick={() => { 
@@ -805,11 +829,39 @@ const NavMenu = ({
                                                         <LogOut size={18} /> 
                                                         <span className="text-xs font-bold uppercase tracking-tight">{t('home_logout')}</span>
                                                     </button>
-                                                </div>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <button onClick={() => { haptic('light'); setIsLoginModalOpen(true); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 transition-all group font-bold">
+                                                        <User size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300" />
+                                                        <span className="text-xs font-bold uppercase tracking-tight">{t('login')}</span>
+                                                    </button>
+
+                                                    <button onClick={() => { haptic('light'); toggleTheme(); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                                        {theme === 'dark' ? (
+                                                            <>
+                                                                <Sun size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                                                <span className="text-xs font-bold uppercase tracking-tight">{t('light_mode') || 'Gündüz Modu'}</span>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <Moon size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                                                <span className="text-xs font-bold uppercase tracking-tight">{t('dark_mode') || 'Gece Modu'}</span>
+                                                            </>
+                                                        )}
+                                                    </button>
+
+                                                    <button onClick={() => { haptic('light'); navigate('/settings'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                                        <Plus size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                                        <span className="text-xs font-bold uppercase tracking-tight">{t('add_your')}</span>
+                                                    </button>
+                                                </>
                                             )}
                                         </div>
-                                    </>
-                                ) : (
+                                    )}
+                                </div>
+
+                                {!user && (
                                     <button 
                                         onClick={() => { haptic('light'); setIsLoginModalOpen(true); }}
                                         className="nav-menu-item !px-5 bg-blue-500 hover:bg-blue-600 text-white text-[13px] font-bold rounded-[10px] transition-all active:scale-95 flex items-center justify-center whitespace-nowrap shadow-lg shadow-blue-500/25 border-none"
@@ -1141,9 +1193,9 @@ const Home = () => {
                     <Logo onClick={() => navigate('/')} className="cursor-pointer" />
                 </div>
 
-                  <div className="w-full md:flex-1 md:max-w-2xl order-3 md:order-2 flex items-center gap-2 md:gap-3">
+                  <div className="w-full md:flex-1 md:max-w-2xl order-3 md:order-2 flex items-center gap-2 md:gap-3 font-sans">
                       <div className="flex-1 md:w-[330px] md:flex-none relative z-[100]">
-                          <div className="relative flex items-center bg-slate-50 dark:bg-slate-800/50 border border-black/5 dark:border-white/10 rounded-xl group shadow-sm">
+                          <div className="relative flex items-center bg-transparent border border-black/10 dark:border-white/20 rounded-xl group shadow-sm transition-all">
                               <div 
                                 onClick={() => navigate('/search')} 
                                 className="flex items-center flex-1 min-w-0 cursor-pointer active:scale-[0.98] transition-transform"
@@ -1160,126 +1212,169 @@ const Home = () => {
                               </div>
                           </div>
                       </div>
-                      <RouterLink 
-                          to="/settings"
-                          onClick={() => haptic('light')}
-                          className="hidden md:flex items-center gap-1.5 px-3 h-10 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 text-[13px] font-bold transition-all active:scale-95 whitespace-nowrap"
-                      >
-                          <Plus size={14} />
-                          <span style={{ fontWeight: 600 }}>{t('add_your')}</span>
-                      </RouterLink>
                   </div>
 
-                  <div className={`flex items-center gap-2 md:gap-3 order-2 md:order-3 md:w-48 justify-end ml-auto shrink-0 ${isScrolled ? 'md:hidden' : ''}`}>
-                      <button 
-                          onClick={() => { haptic('light'); toggleTheme(); }} 
-                          className="w-10 h-10 flex items-center justify-center text-slate-900 dark:text-white bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-xl active:scale-95 transition-all outline-none"
-                      >
-                          {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-                      </button>
-
+                  <div className={`flex items-center gap-2 md:gap-3 order-2 md:order-3 md:w-48 justify-end ml-auto shrink-0 ${isScrolled ? 'md:hidden' : ''} font-sans`}>
                       {user && (
                           <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="hidden sm:flex w-10 h-10 items-center justify-center text-slate-900 dark:text-white bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-xl active:scale-95 transition-all outline-none">
                               <Wallet size={18} />
                           </button>
                       )}
 
-                      {user ? (
-                          <div className="relative" ref={menuRef}>
-                              <button 
-                                onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
-                                className="h-10 px-3 flex items-center justify-center gap-1.5 text-slate-900 dark:text-white bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-xl active:scale-95 transition-all relative outline-none select-none"
-                              >
+                      <div className="relative" ref={menuRef}>
+                          <button 
+                            onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
+                            className="h-10 px-3 flex items-center justify-center gap-1.5 text-slate-900 dark:text-white bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 border border-black/5 dark:border-white/5 rounded-xl active:scale-95 transition-all relative outline-none select-none"
+                          >
+                               {user ? (
+                                   <>
                                        <span className="block md:hidden text-[11px] font-black uppercase tracking-wide">
                                            {(user.username || user.first_name || user.name || '').slice(0, 5)}{(user.username || user.first_name || user.name || '').length > 5 ? '..' : ''}
                                        </span>
                                        <span className="hidden md:block text-[11px] font-black uppercase tracking-wide">
                                            {user.username || user.first_name || user.name || ''}
                                        </span>
-                                       <ChevronDown size={12} className={`text-slate-400 dark:text-slate-500 transition-transform duration-200 ${isMenuOpen ? 'rotate-180' : ''}`} />
-                                  {unreadCount > 0 && (
-                                      <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[8px] font-black text-white flex items-center justify-center px-1 badge-pop">
-                                          {unreadCount > 9 ? '9+' : unreadCount}
-                                      </div>
-                                  )}
-                              </button>
-                              {isMenuOpen && (
-                                  <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-white/5 rounded-2xl shadow-2xl p-2 z-[100] animate-in fade-in zoom-in-95 duration-200">
-                                      <div className="p-4 border-b border-slate-100 dark:border-white/5 mb-2">
-                                          <div className="flex items-center gap-3">
-                                              {(user.photo_url || user.avatar) ? (
-                                                  <img 
-                                                      src={user.photo_url || user.avatar} 
-                                                      alt={user.first_name || user.name}
-                                                      className="w-10 h-10 rounded-full object-cover"
-                                                  />
-                                              ) : (
-                                                  <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-black">
-                                                      {user.first_name ? user.first_name[0] : (user.name ? user.name[0] : 'U')}
-                                                  </div>
-                                              )}
-                                              <div className="flex flex-col min-w-0">
-                                                  <span className="text-[13px] font-bold text-slate-900 dark:text-white truncate">
-                                                      {user.first_name ? `${user.first_name} ${user.last_name || ''}` : user.name}
-                                                  </span>
-                                                  <span className="text-[10px] text-slate-500 truncate">@{user.username || user.id}</span>
-                                              </div>
-                                          </div>
-                                      </div>
-
-                                      <button onClick={() => { haptic('light'); navigate('/'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                          <Store size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                          <span className="text-xs font-bold uppercase tracking-tight">{t('market')}</span>
-                                      </button>
-
-                                      <button onClick={() => { haptic('light'); navigate('/profile'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                          <User size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                          <span className="text-xs font-bold uppercase tracking-tight">{t('profile')}</span>
-                                      </button>
-
-                                      <button onClick={() => { haptic('light'); navigate('/my-bots'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                          <BotIcon size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                          <span className="text-xs font-bold uppercase tracking-tight">{t('my_bots')}</span>
-                                      </button>
-
-                                      <button onClick={() => { haptic('light'); navigate('/channels'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                          <Megaphone size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                          <span className="text-xs font-bold uppercase tracking-tight">{t('my_channels')}</span>
-                                      </button>
-
-                                      <button onClick={() => { haptic('light'); navigate('/notifications'); setIsMenuOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                          <div className="flex items-center gap-3">
-                                              <Bell size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                              <span className="text-xs font-bold uppercase tracking-tight">{t('notifications')}</span>
-                                          </div>
-                                          {unreadCount > 0 && <div className="w-2 h-2 bg-red-500 rounded-full" />}
-                                      </button>
-
-                                      <button onClick={() => { haptic('light'); navigate('/qa'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                          <MessageSquare size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                          <span className="text-xs font-bold uppercase tracking-tight">{t('qa_forum') || 'Soru Cevap Forumu'}</span>
-                                      </button>
-
-                                      <div className="h-px bg-slate-100 dark:border-white/5 my-2" />
-                                      
-                                      <button 
-                                          onClick={() => { 
-                                              const confirmed = window.confirm("Çıkış yapmak istediğinize emin misiniz?");
-                                              if (confirmed) {
-                                                  haptic('medium'); 
-                                                  setWebAuthUser(null);
-                                                  setIsMenuOpen(false); 
-                                              }
-                                          }} 
-                                          className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 text-red-500 transition-all font-bold text-xs uppercase"
-                                      >
-                                          <LogOut size={18} /> 
-                                          <span className="text-xs font-bold uppercase tracking-tight">{t('home_logout')}</span>
-                                      </button>
+                                   </>
+                               ) : (
+                                   <Menu size={18} className="text-slate-700 dark:text-slate-300" />
+                               )}
+                               <ChevronDown size={12} className={`text-slate-400 dark:text-slate-500 transition-transform duration-200 ${isMenuOpen ? 'rotate-180' : ''}`} />
+                              {user && unreadCount > 0 && (
+                                  <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[8px] font-black text-white flex items-center justify-center px-1 badge-pop">
+                                      {unreadCount > 9 ? '9+' : unreadCount}
                                   </div>
                               )}
-                          </div>
-                      ) : (
+                          </button>
+                          {isMenuOpen && (
+                              <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-white/5 rounded-2xl shadow-2xl p-2 z-[100] animate-in fade-in zoom-in-95 duration-200">
+                                  {user ? (
+                                      <>
+                                          <div className="p-4 border-b border-slate-100 dark:border-white/5 mb-2">
+                                              <div className="flex items-center gap-3">
+                                                  {(user.photo_url || user.avatar) ? (
+                                                      <img 
+                                                          src={user.photo_url || user.avatar} 
+                                                          alt={user.first_name || user.name}
+                                                          className="w-10 h-10 rounded-full object-cover"
+                                                      />
+                                                  ) : (
+                                                      <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-black">
+                                                          {user.first_name ? user.first_name[0] : (user.name ? user.name[0] : 'U')}
+                                                      </div>
+                                                  )}
+                                                  <div className="flex flex-col min-w-0">
+                                                      <span className="text-[13px] font-bold text-slate-900 dark:text-white truncate">
+                                                          {user.first_name ? `${user.first_name} ${user.last_name || ''}` : user.name}
+                                                      </span>
+                                                      <span className="text-[10px] text-slate-500 truncate">@{user.username || user.id}</span>
+                                                  </div>
+                                              </div>
+                                          </div>
+
+                                          <button onClick={() => { haptic('light'); navigate('/'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                              <Store size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                              <span className="text-xs font-bold uppercase tracking-tight">{t('market')}</span>
+                                          </button>
+
+                                          <button onClick={() => { haptic('light'); navigate('/profile'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                              <User size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                              <span className="text-xs font-bold uppercase tracking-tight">{t('profile')}</span>
+                                          </button>
+
+                                          <button onClick={() => { haptic('light'); navigate('/my-bots'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                              <BotIcon size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                              <span className="text-xs font-bold uppercase tracking-tight">{t('my_bots')}</span>
+                                          </button>
+
+                                          <button onClick={() => { haptic('light'); navigate('/channels'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                              <Megaphone size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                              <span className="text-xs font-bold uppercase tracking-tight">{t('my_channels')}</span>
+                                          </button>
+
+                                          <button onClick={() => { haptic('light'); navigate('/notifications'); setIsMenuOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                              <div className="flex items-center gap-3">
+                                                  <Bell size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                                  <span className="text-xs font-bold uppercase tracking-tight">{t('notifications')}</span>
+                                              </div>
+                                              {unreadCount > 0 && <div className="w-2 h-2 bg-red-500 rounded-full" />}
+                                          </button>
+
+                                          <button onClick={() => { haptic('light'); navigate('/qa'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                              <MessageSquare size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                              <span className="text-xs font-bold uppercase tracking-tight">{t('qa_forum') || 'Soru Cevap Forumu'}</span>
+                                          </button>
+
+                                          <div className="h-px bg-slate-100 dark:border-white/5 my-2" />
+
+                                          {/* Night Mode & Add Your inside dropdown */}
+                                          <button onClick={() => { haptic('light'); toggleTheme(); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                              {theme === 'dark' ? (
+                                                  <>
+                                                      <Sun size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                                      <span className="text-xs font-bold uppercase tracking-tight">{t('light_mode') || 'Gündüz Modu'}</span>
+                                                  </>
+                                              ) : (
+                                                  <>
+                                                      <Moon size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                                      <span className="text-xs font-bold uppercase tracking-tight">{t('dark_mode') || 'Gece Modu'}</span>
+                                                  </>
+                                              )}
+                                          </button>
+
+                                          <button onClick={() => { haptic('light'); navigate('/settings'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                              <Plus size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                              <span className="text-xs font-bold uppercase tracking-tight">{t('add_your')}</span>
+                                          </button>
+
+                                          <div className="h-px bg-slate-100 dark:border-white/5 my-2" />
+                                          
+                                          <button 
+                                              onClick={() => { 
+                                                  const confirmed = window.confirm("Çıkış yapmak istediğinize emin misiniz?");
+                                                  if (confirmed) {
+                                                      haptic('medium'); 
+                                                      setWebAuthUser(null);
+                                                      setIsMenuOpen(false); 
+                                                  }
+                                              }} 
+                                              className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 text-red-500 transition-all font-bold text-xs uppercase"
+                                          >
+                                              <LogOut size={18} /> 
+                                              <span className="text-xs font-bold uppercase tracking-tight">{t('home_logout')}</span>
+                                          </button>
+                                      </>
+                                  ) : (
+                                      <>
+                                          <button onClick={() => { haptic('light'); setIsLoginModalOpen(true); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 transition-all group font-bold">
+                                              <User size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300" />
+                                              <span className="text-xs font-bold uppercase tracking-tight">{t('login')}</span>
+                                          </button>
+
+                                          <button onClick={() => { haptic('light'); toggleTheme(); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                              {theme === 'dark' ? (
+                                                  <>
+                                                      <Sun size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                                      <span className="text-xs font-bold uppercase tracking-tight">{t('light_mode') || 'Gündüz Modu'}</span>
+                                                  </>
+                                              ) : (
+                                                  <>
+                                                      <Moon size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                                      <span className="text-xs font-bold uppercase tracking-tight">{t('dark_mode') || 'Gece Modu'}</span>
+                                                  </>
+                                              )}
+                                          </button>
+
+                                          <button onClick={() => { haptic('light'); navigate('/settings'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                              <Plus size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                              <span className="text-xs font-bold uppercase tracking-tight">{t('add_your')}</span>
+                                          </button>
+                                      </>
+                                  )}
+                              </div>
+                          )}
+                      </div>
+
+                      {!user && (
                           <button 
                               onClick={() => { haptic('light'); setIsLoginModalOpen(true); }}
                               className="px-5 h-10 bg-blue-500 hover:bg-blue-600 text-white text-[13px] font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center whitespace-nowrap shadow-lg shadow-blue-500/25"
