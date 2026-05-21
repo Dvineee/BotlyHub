@@ -15,6 +15,7 @@ import { useTheme } from '../ThemeContext';
 import Logo from '../components/Logo';
 import { categories, appsSubCategories } from '../data';
 import { API_BASE_URL } from '../constants';
+import LoginModal from '../components/LoginModal';
 
 interface QTag {
   type: 'bot' | 'channel' | 'general';
@@ -89,6 +90,7 @@ export default function QAForum() {
   // Profile Dropdown state
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const menuRef = React.useRef<HTMLDivElement>(null);
 
   // Modals & Panels
@@ -205,6 +207,14 @@ export default function QAForum() {
   // Upvote Handler
   const handleUpvote = async (topicId: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
+    
+    if (!user || !user.id || user.id === 'guest_user') {
+      haptic('heavy');
+      alert("Beğenmek için lütfen giriş yapın.");
+      setIsLoginModalOpen(true);
+      return;
+    }
+    
     haptic('light');
 
     try {
@@ -252,6 +262,14 @@ export default function QAForum() {
   const handleAddComment = async (parentId: string | null = null, inlineText: string = '') => {
     const textToSubmit = parentId ? inlineText : commentText;
     if (!textToSubmit.trim() || !activeTopic) return;
+    
+    if (!user || !user.id || user.id === 'guest_user') {
+      haptic('heavy');
+      alert("Yorum yazmak veya cevap vermek için lütfen giriş yapın.");
+      setIsLoginModalOpen(true);
+      return;
+    }
+    
     haptic('medium');
 
     try {
@@ -288,6 +306,14 @@ export default function QAForum() {
   // Create New Topic Submit
   const handleCreateTopic = async () => {
     if (!newTitle.trim() || !newContent.trim()) return;
+    
+    if (!user || !user.id || user.id === 'guest_user') {
+      haptic('heavy');
+      alert("Soru sormak veya tartışma başlatmak için lütfen giriş yapın.");
+      setIsLoginModalOpen(true);
+      return;
+    }
+    
     haptic('medium');
 
     try {
@@ -694,93 +720,102 @@ export default function QAForum() {
                 {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
               </button>
 
-              <div className="relative" ref={menuRef}>
+              {!user || !user.id || user.id === 'guest_user' ? (
                 <button 
-                  onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }}
-                  className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 bg-slate-50 dark:bg-slate-900 border border-slate-200/40 dark:border-slate-800/20 rounded-xl transition-all active:scale-95 duration-150 shadow-xs"
+                  onClick={() => { haptic('light'); setIsLoginModalOpen(true); }}
+                  className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white border-none text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-blue-500/20 active:scale-95 transition-all whitespace-nowrap"
                 >
-                  <img 
-                    src={currentUser.avatar} 
-                    className="w-5 h-5 rounded-full object-cover"
-                    alt=""
-                    referrerPolicy="no-referrer"
-                  />
-                  <span className="max-w-[70px] sm:max-w-[100px] truncate">{currentUser.name}</span>
-                  <ChevronDown size={12} className={`text-slate-400 dark:text-slate-500 transition-transform duration-200 ${isMenuOpen ? 'rotate-180' : ''}`} />
+                  {t('home_login')}
                 </button>
-
-              {isMenuOpen && (
-                <div className="absolute right-0 top-full mt-2 w-60 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-2xl shadow-2xl p-2 z-[100] animate-in fade-in zoom-in-95 duration-200">
-                  <div className="p-4 border-b border-slate-100 dark:border-white/5 mb-2">
-                    <div className="flex items-center gap-3">
-                      <img 
-                        src={currentUser.avatar} 
-                        alt={currentUser.name}
-                        className="w-10 h-10 rounded-full object-cover"
-                        referrerPolicy="no-referrer"
-                      />
-                      <div className="flex flex-col min-w-0">
-                        <span className="text-[13px] font-bold text-slate-900 dark:text-white truncate">
-                          {currentUser.name}
-                        </span>
-                        <span className="text-[10px] text-slate-500 truncate">@{user?.username || currentUser.id}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <button onClick={() => { haptic('light'); navigate('/'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group text-left">
-                    <Store size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                    <span className="text-xs font-bold uppercase tracking-tight">{t('market')}</span>
-                  </button>
-
-                  <button onClick={() => { haptic('light'); navigate('/profile'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group text-left">
-                    <User size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                    <span className="text-xs font-bold uppercase tracking-tight">{t('profile')}</span>
-                  </button>
-
-                  <button onClick={() => { haptic('light'); navigate('/my-bots'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group text-left">
-                    <BotIcon size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                    <span className="text-xs font-bold uppercase tracking-tight">{t('my_bots')}</span>
-                  </button>
-
-                  <button onClick={() => { haptic('light'); navigate('/channels'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group text-left">
-                    <Megaphone size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                    <span className="text-xs font-bold uppercase tracking-tight">{t('my_channels')}</span>
-                  </button>
-
-                  <button onClick={() => { haptic('light'); navigate('/notifications'); setIsMenuOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group text-left">
-                    <div className="flex items-center gap-3">
-                      <Bell size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                      <span className="text-xs font-bold uppercase tracking-tight">{t('notifications')}</span>
-                    </div>
-                    {unreadCount > 0 && <div className="w-2 h-2 bg-red-500 rounded-full" />}
-                  </button>
-
-                  <button onClick={() => { haptic('light'); navigate('/qa'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group text-left">
-                    <MessageSquare size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                    <span className="text-xs font-bold uppercase tracking-tight">{t('qa_forum') || 'Soru Cevap Forumu'}</span>
-                  </button>
-
-                  <div className="h-px bg-slate-100 dark:border-white/5 my-2" />
-                  
+              ) : (
+                <div className="relative" ref={menuRef}>
                   <button 
-                    onClick={() => { 
-                      const confirmed = window.confirm("Çıkış yapmak istediğinize emin misiniz?");
-                      if (confirmed) {
-                        haptic('medium'); 
-                        setWebAuthUser(null);
-                        setIsMenuOpen(false); 
-                        navigate('/');
-                      }
-                    }} 
-                    className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 text-red-500 transition-all font-bold text-xs uppercase text-left"
+                    onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }}
+                    className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 bg-slate-50 dark:bg-slate-900 border border-slate-200/40 dark:border-slate-800/20 rounded-xl transition-all active:scale-95 duration-150 shadow-xs"
                   >
-                    <LogOut size={18} /> 
-                    <span className="text-xs font-bold uppercase tracking-tight">{t('home_logout')}</span>
+                    <img 
+                      src={currentUser.avatar} 
+                      className="w-5 h-5 rounded-full object-cover"
+                      alt=""
+                      referrerPolicy="no-referrer"
+                    />
+                    <span className="max-w-[70px] sm:max-w-[100px] truncate">{currentUser.name}</span>
+                    <ChevronDown size={12} className={`text-slate-400 dark:text-slate-500 transition-transform duration-200 ${isMenuOpen ? 'rotate-180' : ''}`} />
                   </button>
+
+                  {isMenuOpen && (
+                    <div className="absolute right-0 top-full mt-2 w-60 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-2xl shadow-2xl p-2 z-[100] animate-in fade-in zoom-in-95 duration-200">
+                      <div className="p-4 border-b border-slate-100 dark:border-white/5 mb-2">
+                        <div className="flex items-center gap-3">
+                          <img 
+                            src={currentUser.avatar} 
+                            alt={currentUser.name}
+                            className="w-10 h-10 rounded-full object-cover"
+                            referrerPolicy="no-referrer"
+                          />
+                          <div className="flex flex-col min-w-0">
+                            <span className="text-[13px] font-bold text-slate-900 dark:text-white truncate">
+                              {currentUser.name}
+                            </span>
+                            <span className="text-[10px] text-slate-500 truncate">@{user?.username || currentUser.id}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <button onClick={() => { haptic('light'); navigate('/'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group text-left">
+                        <Store size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                        <span className="text-xs font-bold uppercase tracking-tight">{t('market')}</span>
+                      </button>
+
+                      <button onClick={() => { haptic('light'); navigate('/profile'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group text-left">
+                        <User size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                        <span className="text-xs font-bold uppercase tracking-tight">{t('profile')}</span>
+                      </button>
+
+                      <button onClick={() => { haptic('light'); navigate('/my-bots'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group text-left">
+                        <BotIcon size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                        <span className="text-xs font-bold uppercase tracking-tight">{t('my_bots')}</span>
+                      </button>
+
+                      <button onClick={() => { haptic('light'); navigate('/channels'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group text-left">
+                        <Megaphone size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                        <span className="text-xs font-bold uppercase tracking-tight">{t('my_channels')}</span>
+                      </button>
+
+                      <button onClick={() => { haptic('light'); navigate('/notifications'); setIsMenuOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group text-left">
+                        <div className="flex items-center gap-3">
+                          <Bell size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                          <span className="text-xs font-bold uppercase tracking-tight">{t('notifications')}</span>
+                        </div>
+                        {unreadCount > 0 && <div className="w-2 h-2 bg-red-500 rounded-full" />}
+                      </button>
+
+                      <button onClick={() => { haptic('light'); navigate('/qa'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group text-left">
+                        <MessageSquare size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                        <span className="text-xs font-bold uppercase tracking-tight">{t('qa_forum') || 'Soru Cevap Forumu'}</span>
+                      </button>
+
+                      <div className="h-px bg-slate-100 dark:border-white/5 my-2" />
+                      
+                      <button 
+                        onClick={() => { 
+                          const confirmed = window.confirm("Çıkış yapmak istediğinize emin misiniz?");
+                          if (confirmed) {
+                            haptic('medium'); 
+                            setWebAuthUser(null);
+                            setIsMenuOpen(false); 
+                            navigate('/');
+                          }
+                        }} 
+                        className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 text-red-500 transition-all font-bold text-xs uppercase text-left"
+                      >
+                        <LogOut size={18} /> 
+                        <span className="text-xs font-bold uppercase tracking-tight">{t('home_logout')}</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
-            </div>
           </div>
           </div>
         </div>
@@ -1680,6 +1715,11 @@ export default function QAForum() {
           </div>
         )}
       </AnimatePresence>
+      <LoginModal 
+        isOpen={isLoginModalOpen} 
+        onClose={() => setIsLoginModalOpen(false)} 
+        onAuth={(webUser) => setWebAuthUser(webUser)}
+      />
     </div>
   );
 }

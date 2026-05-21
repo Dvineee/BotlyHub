@@ -461,14 +461,22 @@ const BotDetail = () => {
           return;
       }
       
+      if (!user || !user.id || user.id === 'guest_user') {
+          haptic('heavy');
+          notification('error');
+          alert("Kütüphaneye eklemek veya satın almak için lütfen giriş yapın.");
+          setIsLoginModalOpen(true);
+          return;
+      }
+      
       if (bot.price === 0) {
           setIsProcessing(true);
           try {
-              const userData = user || { id: 'guest_user', first_name: 'User' };
+              const userData = user;
               
               const syncData: Partial<User> = {
                   id: userData.id.toString(),
-                  name: `${userData.first_name} ${userData.last_name || ''}`.trim(),
+                  name: `${userData.first_name || ''} ${userData.last_name || ''}`.trim() || userData.username || 'User',
                   username: userData.username || 'user',
                   role: 'User',
                   status: 'Active',
@@ -503,10 +511,17 @@ const BotDetail = () => {
       } else {
           navigate(`/payment/${bot.slug}`);
       }
-  }, [isProcessing, bot, isOwned, haptic, tg, user, notification, setShowGuide, navigate]);
+  }, [isProcessing, bot, isOwned, haptic, tg, user, notification, setShowGuide, navigate, setIsLoginModalOpen]);
 
   const handleAiAnalysis = async () => {
     if (!bot || isAiLoading) return;
+    if (!user || !user.id || user.id === 'guest_user') {
+      haptic('heavy');
+      notification('error');
+      alert("Yapay zeka analizini kullanmak için lütfen giriş yapın.");
+      setIsLoginModalOpen(true);
+      return;
+    }
     setIsAiLoading(true);
     try {
       const response = await GeminiService.analyzeBot(bot);
@@ -542,10 +557,11 @@ const BotDetail = () => {
     console.log("handleRate called with:", rating);
     if (isRating) return;
     
-    if (!user?.id) {
+    if (!user || !user.id || user.id === 'guest_user') {
         notification('error');
-        if (tg?.showAlert) tg.showAlert("Puan vermek için giriş yapmış olmalısınız.");
-        else alert("Puan vermek için giriş yapmış olmalısınız.");
+        haptic('heavy');
+        alert("Puan vermek için lütfen önce giriş yapın.");
+        setIsLoginModalOpen(true);
         return;
     }
 
