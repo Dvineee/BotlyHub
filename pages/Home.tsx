@@ -129,41 +129,7 @@ const CloverVisual = React.memo(() => (
   </div>
 ));
 
-export const visualPromos: Announcement[] = [
-  {
-    id: "promo-stars",
-    title: "Save 30% on Stars",
-    description: "Buy Stars 30% cheaper than inside Telegram",
-    button_text: "Get Stars",
-    button_link: "https://t.me/stars",
-    icon_name: "stars",
-    color_scheme: "yellow",
-    is_active: true,
-    action_type: "link"
-  },
-  {
-    id: "promo-ton",
-    title: "Add TON to your balance",
-    description: "Buy TON via the P2P Market in Wallet",
-    button_text: "Open",
-    button_link: "https://t.me/wallet",
-    icon_name: "ton",
-    color_scheme: "blue",
-    is_active: true,
-    action_type: "link"
-  },
-  {
-    id: "promo-clover",
-    title: "Pay only 1% of Gift's price",
-    description: "Buy offchain gifts & stickers via Lucky Buy or get Gems",
-    button_text: "Lucky Buy",
-    button_link: "https://t.me/luckybuy",
-    icon_name: "clover",
-    color_scheme: "green",
-    is_active: true,
-    action_type: "link"
-  }
-];
+export const visualPromos: Announcement[] = [];
 
 const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) => void }> = React.memo(({ ann, onShowPopup }) => {
   const navigate = useNavigate();
