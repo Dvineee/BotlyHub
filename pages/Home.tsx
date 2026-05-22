@@ -1360,15 +1360,31 @@ const Home = () => {
   }, [loadData]);
 
   const categorizedBots = useMemo(() => {
-    const result: Record<string, { featured: Bot[], slider: Bot[], total: number }> = {};
+    const result: Record<string, { featured: { bot: Bot, label: string }[], slider: Bot[], total: number }> = {};
     const baseBots = [...filteredBots].sort((a, b) => (b.views || 0) - (a.views || 0));
 
     // Apps section
     const allApps = baseBots.filter(b => Array.isArray(b.category) ? b.category.includes('apps') : b.category === 'apps');
     
-    // Top 3 (Overall most popular apps)
-    const appsFeatured = allApps.slice(0, 3);
+    // Market, Özel, Seçilen mapping for Apps
+    const marketApps = allApps.filter(b => b.promoted_type !== 'featured' && !b.is_official);
+    const ozelApps = allApps.filter(b => b.promoted_type === 'featured');
+    const secilenApps = allApps.filter(b => b.is_official || b.promoted_type === 'official');
     
+    const appsFeaturedList: { bot: Bot, label: string }[] = [];
+    marketApps.slice(0, 2).forEach(bot => appsFeaturedList.push({ bot, label: 'Market' }));
+    ozelApps.slice(0, 2).forEach(bot => appsFeaturedList.push({ bot, label: 'Özel' }));
+    secilenApps.slice(0, 2).forEach(bot => appsFeaturedList.push({ bot, label: 'Seçilen' }));
+    
+    if (appsFeaturedList.length < 3) {
+        allApps.slice(0, 3).forEach((bot, i) => {
+            if (!appsFeaturedList.some(x => x.bot.id === bot.id)) {
+                const labels = ['Market', 'Özel', 'Seçilen'];
+                appsFeaturedList.push({ bot, label: labels[i % 3] });
+            }
+        });
+    }
+
     // Slider/List (Popular apps in selected category)
     let appsForList = allApps;
     if (selectedAppsCategory !== 'all') {
@@ -1382,7 +1398,7 @@ const Home = () => {
 
     if (allApps.length > 0) {
         result['apps'] = {
-            featured: appsFeatured,
+            featured: appsFeaturedList,
             slider: appsSlider,
             total: allApps.length
         };
@@ -1391,9 +1407,25 @@ const Home = () => {
     // Bots section (everything else)
     const allBots = baseBots.filter(b => Array.isArray(b.category) ? !b.category.includes('apps') : b.category !== 'apps');
     
-    // Top 3 (Overall most popular bots)
-    const botsFeatured = allBots.slice(0, 3);
+    // Market, Özel, Seçilen mapping for Bots
+    const marketBots = allBots.filter(b => b.promoted_type !== 'featured' && !b.is_official);
+    const ozelBots = allBots.filter(b => b.promoted_type === 'featured');
+    const secilenBots = allBots.filter(b => b.is_official || b.promoted_type === 'official');
     
+    const botsFeaturedList: { bot: Bot, label: string }[] = [];
+    marketBots.slice(0, 2).forEach(bot => botsFeaturedList.push({ bot, label: 'Market' }));
+    ozelBots.slice(0, 2).forEach(bot => botsFeaturedList.push({ bot, label: 'Özel' }));
+    secilenBots.slice(0, 2).forEach(bot => botsFeaturedList.push({ bot, label: 'Seçilen' }));
+    
+    if (botsFeaturedList.length < 3) {
+        allBots.slice(0, 3).forEach((bot, i) => {
+            if (!botsFeaturedList.some(x => x.bot.id === bot.id)) {
+                const labels = ['Market', 'Özel', 'Seçilen'];
+                botsFeaturedList.push({ bot, label: labels[i % 3] });
+            }
+        });
+    }
+
     // Slider/List (Popular bots in selected category)
     let botsForList = allBots;
     if (selectedBotsCategory !== 'all') {
@@ -1407,7 +1439,7 @@ const Home = () => {
 
     if (allBots.length > 0) {
         result['bots'] = {
-            featured: botsFeatured,
+            featured: botsFeaturedList,
             slider: botsSlider,
             total: allBots.length
         };
@@ -2008,12 +2040,12 @@ const Home = () => {
                                     </div>
 
                                     {/* Top 3 Featured Cards for this section */}
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2 animate-in fade-in slide-in-from-bottom-2 duration-700">
-                                        {featuredBots.map((bot) => (
+                                    <div className="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth pb-3 mb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
+                                        {featuredBots.map(({ bot }) => (
                                             <div 
                                                 key={bot.id} 
                                                 onClick={() => navigate(`/bot/${bot.slug}`)}
-                                                className="flex items-center justify-between p-4 rounded-xl border border-black/[0.05] dark:border-white/[0.08] hover:border-blue-500/20 transition-all cursor-pointer group hover:scale-[1.01] bg-[#00000008] dark:bg-white/[0.03]"
+                                                className={`flex items-center justify-between p-4 rounded-xl border border-black/[0.05] dark:border-white/[0.08] hover:border-blue-500/20 transition-all cursor-pointer group hover:scale-[1.01] bg-[#00000008] dark:bg-white/[0.03] min-w-[280px] sm:min-w-[320px] shrink-0 relative ${featuredBots.length <= 3 ? 'md:flex-1 md:min-w-0' : 'md:w-[calc(33.333%-11px)]'}`}
                                             >
                                                 <div className="flex items-center gap-4">
                                                     <div className="w-12 h-12 featured-bot-card-img flex items-center justify-center p-[1px] overflow-hidden shrink-0">
@@ -2139,12 +2171,12 @@ const Home = () => {
                                     </div>
 
                                     {/* Top 3 Featured Cards for this section */}
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2 animate-in fade-in slide-in-from-bottom-2 duration-700">
-                                        {featuredBots.map((bot) => (
+                                    <div className="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth pb-3 mb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
+                                        {featuredBots.map(({ bot }) => (
                                             <div 
                                                 key={bot.id} 
                                                 onClick={() => navigate(`/bot/${bot.slug}`)}
-                                                className="flex items-center justify-between p-4 rounded-xl border border-black/[0.05] dark:border-white/[0.08] hover:border-blue-500/20 transition-all cursor-pointer group hover:scale-[1.01] bg-[#00000008] dark:bg-white/[0.03]"
+                                                className={`flex items-center justify-between p-4 rounded-xl border border-black/[0.05] dark:border-white/[0.08] hover:border-blue-500/20 transition-all cursor-pointer group hover:scale-[1.01] bg-[#00000008] dark:bg-white/[0.03] min-w-[280px] sm:min-w-[320px] shrink-0 relative ${featuredBots.length <= 3 ? 'md:flex-1 md:min-w-0' : 'md:w-[calc(33.333%-11px)]'}`}
                                             >
                                                 <div className="flex items-center gap-4">
                                                     <div className="w-12 h-12 featured-bot-card-img flex items-center justify-center p-[1px] overflow-hidden shrink-0">

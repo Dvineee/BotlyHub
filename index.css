@@ -1469,4 +1469,22 @@ span, div, input {
     color: rgb(147 148 149);
 }
 
+.category-filter-item {
+    padding: 7px 12px;
+    border: 1px solid #0000000d;
+    margin-right: 12px;
+    border-radius: 10px;
+    color: #0000008a;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    transition: all .2s ease;
+    -webkit-user-select: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+    border-color: #00000026;
+    background-color: #00000000;
+}
+
 
