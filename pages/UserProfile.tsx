@@ -197,20 +197,10 @@ export default function UserProfile() {
 
                 // Fetch Q&A Discussions to extract user's created topics or comments
                 try {
-                    let qaTopicsList = [];
-                    try {
-                        const qaRes = await fetch(`${API_BASE_URL}/api/qa/discussions`);
-                        if (qaRes && qaRes.ok) {
-                            qaTopicsList = await qaRes.json();
-                        } else {
-                            throw new Error("API response not ok");
-                        }
-                    } catch (fetchErr) {
-                        console.warn("Raw QA fetch failed, falling back to DatabaseService:", fetchErr);
-                        qaTopicsList = await DatabaseService.getQADiscussions();
-                    }
-
-                    if (qaTopicsList && Array.isArray(qaTopicsList)) {
+                    const qaRes = await fetch(`${API_BASE_URL}/api/qa/discussions`);
+                    if (qaRes && qaRes.ok) {
+                        const qaTopicsList = await qaRes.json();
+                        
                         // User's own Q&A questions (topics)
                         const ownTopics = qaTopicsList.filter((t: any) => t.author_id === uData.id.toString());
                         setUserQaTopics(ownTopics);
@@ -626,9 +616,9 @@ export default function UserProfile() {
                                         <div className="space-y-4">
                                             {libraryBots.length > 0 ? (
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                    {libraryBots.map((bot, idx) => (
+                                                    {libraryBots.map(bot => (
                                                         <div 
-                                                            key={`${bot.id}-${idx}`} 
+                                                            key={bot.id} 
                                                             className="flex items-center justify-between p-4 bg-white dark:bg-slate-900/60 border border-slate-200/55 dark:border-slate-800/40 rounded-3xl hover:border-indigo-500/20 hover:bg-slate-50 dark:hover:bg-slate-900/40 hover:shadow-sm transition-all group relative overflow-hidden"
                                                         >
                                                             {/* Clicking the bot takes user to the description detail view */}

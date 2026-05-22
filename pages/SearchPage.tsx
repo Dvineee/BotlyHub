@@ -670,7 +670,7 @@ const SearchPage = () => {
             <div className="flex justify-center py-24"><Loader2 className="animate-spin text-blue-500" /></div>
         ) : filteredBots.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-in slide-in-from-bottom-4">
-                {filteredBots.map((bot, idx) => <BotCard key={`${bot.id}-${idx}`} bot={bot} tonRate={tonRate} />)}
+                {filteredBots.map(bot => <BotCard key={bot.id} bot={bot} tonRate={tonRate} />)}
             </div>
         ) : (
             <div className="py-24 text-center">
