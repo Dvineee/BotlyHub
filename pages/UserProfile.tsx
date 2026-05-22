@@ -626,9 +626,9 @@ export default function UserProfile() {
                                         <div className="space-y-4">
                                             {libraryBots.length > 0 ? (
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                    {libraryBots.map(bot => (
+                                                    {libraryBots.map((bot, idx) => (
                                                         <div 
-                                                            key={bot.id} 
+                                                            key={`${bot.id}-${idx}`} 
                                                             className="flex items-center justify-between p-4 bg-white dark:bg-slate-900/60 border border-slate-200/55 dark:border-slate-800/40 rounded-3xl hover:border-indigo-500/20 hover:bg-slate-50 dark:hover:bg-slate-900/40 hover:shadow-sm transition-all group relative overflow-hidden"
                                                         >
                                                             {/* Clicking the bot takes user to the description detail view */}
