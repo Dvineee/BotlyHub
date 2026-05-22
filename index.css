@@ -1417,6 +1417,36 @@ span, div, input {
 }
 
 .text-slate-500 {
-    --tw-text-opacity: 1;
-    color: #8a8a93;
+    color: #00000066;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: -0.13px;
+    line-height: 1.43;
+    display: -webkit-box !important;
+    overflow: hidden !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 1 !important;
+    text-overflow: ellipsis !important;
+    white-space: unset !important;
+    word-break: break-word !important;
 }
+
+@media (min-width: 640px) {
+    .sm\:w-\[54px\] {
+        width: 48px;
+    }
+}
+
+@media (min-width: 640px) {
+    .sm\:h-\[54px\] {
+        height: 48px;
+    }
+}
+
+.bg-\[\#00000008\] {
+    background-color: #f3f3f5;
+}
+.font-\[900\], .font-black {
+    font-weight: 600;
+}
+
