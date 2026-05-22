@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Search, ChevronLeft, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, Send, Link, CheckCircle2, ChevronDown, Sun, Moon, Wallet, Menu, Plus, LogOut, Compass, Coins, BarChart3, Binoculars, Share2, Briefcase, MousePointer2, ExternalLink, ArrowLeft, MessageSquare, SlidersHorizontal, Sliders } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, Send, Link, CheckCircle2, ChevronDown, Sun, Moon, Wallet, Menu, Plus, LogOut, Compass, Coins, BarChart3, Binoculars, Share2, Briefcase, MousePointer2, ExternalLink, ArrowUpRight, ArrowLeft, MessageSquare, SlidersHorizontal, Sliders } from 'lucide-react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Bot, Announcement, Notification, BlogPost } from '../types';
@@ -31,6 +31,140 @@ const getLiveBotIcon = (bot: Bot) => {
 
 
 
+const StarSVG = React.memo(({ className, size = 24 }: { className?: string, size?: number }) => (
+  <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+  </svg>
+));
+
+const StarVisual = React.memo(() => (
+  <div className="absolute right-[-15px] sm:right-[-6px] top-1/2 -translate-y-1/2 w-[160px] h-[160px] sm:w-[180px] sm:h-[180px] flex items-center justify-center pointer-events-none select-none overflow-visible">
+    <div className="absolute inset-0 rounded-full blur-2xl opacity-60 pointer-events-none animate-pulse" style={{ background: 'radial-gradient(circle, rgba(245,158,11,0.25) 0%, transparent 70%)' }} />
+    
+    <div className="absolute -translate-x-12 -translate-y-2 scale-75 -rotate-12 text-amber-300 dark:text-amber-500/40 opacity-70 group-hover:scale-80 transition-transform duration-500">
+      <StarSVG size={45} />
+    </div>
+
+    <div className="absolute translate-x-14 translate-y-4 scale-60 rotate-[22deg] text-amber-300 dark:text-amber-500/30 opacity-60">
+      <StarSVG size={40} />
+    </div>
+
+    <div className="absolute z-10 scale-100 rotate-6 text-[#ffaf02] drop-shadow-[0_8px_20px_rgba(245,158,11,0.4)] group-hover:scale-105 group-hover:rotate-[12deg] transition-all duration-500">
+      <StarSVG size={85} />
+    </div>
+
+    <div className="absolute -translate-x-12 translate-y-12 text-amber-400/90 scale-75 animate-bounce duration-[3000ms]">
+      <StarSVG size={14} />
+    </div>
+    <div className="absolute translate-x-10 -translate-y-12 text-amber-400 opacity-95">
+      <StarSVG size={16} />
+    </div>
+
+    <div className="absolute z-20 translate-x-[24px] translate-y-[20px] bg-[#ff3b30] text-white text-[11px] font-black px-2.5 py-0.5 rounded-full shadow-lg shadow-red-500/40 rotate-[8deg] tracking-tight">
+      -30%
+    </div>
+  </div>
+));
+
+const TonCoin = React.memo(({ className, size = 48 }: { className?: string, size?: number }) => (
+  <div className={`relative flex items-center justify-center rounded-full bg-gradient-to-br from-[#2f80ed] to-[#0088cc] shadow-xl text-white border border-white/20 select-none ${className}`} style={{ width: size, height: size }}>
+    <svg width={size * 0.55} height={size * 0.55} viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="11" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M50 85 L15 35 L85 35 Z" fill="none" />
+      <path d="M50 35 L50 85" />
+    </svg>
+  </div>
+));
+
+const TonVisual = React.memo(() => (
+  <div className="absolute right-[-15px] sm:right-[-6px] top-1/2 -translate-y-1/2 w-[160px] h-[160px] sm:w-[180px] sm:h-[180px] flex items-center justify-center pointer-events-none select-none overflow-visible">
+    <div className="absolute inset-0 rounded-full blur-2xl opacity-60 pointer-events-none animate-pulse" style={{ background: 'radial-gradient(circle, rgba(56,189,248,0.25) 0%, transparent 70%)' }} />
+    
+    <div className="absolute z-10 translate-x-5 translate-y-14 rotate-[-30deg] scale-90 shadow-xl opacity-90 group-hover:translate-y-12 transition-all duration-500">
+      <TonCoin size={50} />
+    </div>
+
+    <div className="absolute z-20 -translate-x-4 -translate-y-4 rotate-[15deg] scale-115 drop-shadow-[0_8px_20px_rgba(47,128,237,0.4)] group-hover:scale-120 group-hover:rotate-[20deg] transition-all duration-500">
+      <TonCoin size={58} />
+    </div>
+
+    <div className="absolute z-0 translate-x-12 -translate-y-8 rotate-[35deg] scale-75 opacity-60 group-hover:-translate-y-10 transition-all duration-500">
+      <TonCoin size={42} />
+    </div>
+
+    <div className="absolute -translate-x-14 translate-y-6 text-sky-400 scale-75">
+      <StarSVG size={18} />
+    </div>
+    <div className="absolute translate-x-12 translate-y-8 text-amber-300 scale-90">
+      <StarSVG size={16} />
+    </div>
+    <div className="absolute translate-x-4 -translate-y-14 text-amber-400 scale-75 animate-bounce">
+      <StarSVG size={12} />
+    </div>
+  </div>
+));
+
+const CloverVisual = React.memo(() => (
+  <div className="absolute right-[-15px] sm:right-[-6px] top-1/2 -translate-y-1/2 w-[160px] h-[160px] sm:w-[180px] sm:h-[180px] flex items-center justify-center pointer-events-none select-none overflow-visible">
+    <div className="absolute inset-0 rounded-full blur-2xl opacity-60 pointer-events-none animate-pulse" style={{ background: 'radial-gradient(circle, rgba(52,199,89,0.25) 0%, transparent 70%)' }} />
+    
+    <div className="absolute z-10 w-[95px] h-[95px] sm:w-[105px] sm:h-[105px] rounded-full bg-gradient-to-tr from-[#34c759] to-[#2eb850] flex items-center justify-center shadow-2xl border-4 border-white dark:border-slate-800 drop-shadow-[0_12px_24px_rgba(52,199,89,0.35)] group-hover:scale-105 group-hover:rotate-[8deg] transition-all duration-500">
+      <svg width="52" height="52" viewBox="0 0 24 24" fill="currentColor" className="text-white">
+        <path d="M12 9c.5-1.5 2-2.5 3.5-2.5s2.5 1 2.5 2.5c0 1.5-1 3-2.5 3.5C14 13 12.5 12 12 9zm0 6c-.5 1.5-2 2.5-3.5 2.5S6 16.5 6 15c0-1.5 1-3 2.5-3.5 1.5-.5 3 .5 3.5 3.5zm0-6c-.5-1.5-2-2.5-3.5-2.5S6 7.5 6 9c0 1.5 1 3 2.5 3.5 1.5.5 3-.5 3.5-3.5zm0 6c.5 1.5 2 2.5 3.5 2.5s2.5-1 2.5-2.5c0-1.5-1-3-2.5-3.5-1.5-.5-3 .5-3.5 3.5z" />
+        <path d="M12 12c.5 1.5 1 3.5.5 5.5-.5 2-1.5 3.5-2.5 4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      </svg>
+    </div>
+
+    <div className="absolute -translate-x-14 -translate-y-8 text-[#34c759] opacity-80">
+      <StarSVG size={18} />
+    </div>
+    <div className="absolute translate-x-14 translate-y-8 text-emerald-400 opacity-80">
+      <StarSVG size={16} />
+    </div>
+    <div className="absolute translate-x-14 -translate-y-10 text-emerald-300 opacity-60">
+      <StarSVG size={12} />
+    </div>
+    <div className="absolute -translate-x-10 translate-y-12 text-[#248a3d] opacity-80 animate-bounce">
+      <StarSVG size={14} />
+    </div>
+  </div>
+));
+
+export const visualPromos: Announcement[] = [
+  {
+    id: "promo-stars",
+    title: "Save 30% on Stars",
+    description: "Buy Stars 30% cheaper than inside Telegram",
+    button_text: "Get Stars",
+    button_link: "https://t.me/stars",
+    icon_name: "stars",
+    color_scheme: "yellow",
+    is_active: true,
+    action_type: "link"
+  },
+  {
+    id: "promo-ton",
+    title: "Add TON to your balance",
+    description: "Buy TON via the P2P Market in Wallet",
+    button_text: "Open",
+    button_link: "https://t.me/wallet",
+    icon_name: "ton",
+    color_scheme: "blue",
+    is_active: true,
+    action_type: "link"
+  },
+  {
+    id: "promo-clover",
+    title: "Pay only 1% of Gift's price",
+    description: "Buy offchain gifts & stickers via Lucky Buy or get Gems",
+    button_text: "Lucky Buy",
+    button_link: "https://t.me/luckybuy",
+    icon_name: "clover",
+    color_scheme: "green",
+    is_active: true,
+    action_type: "link"
+  }
+];
+
 const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) => void }> = React.memo(({ ann, onShowPopup }) => {
   const navigate = useNavigate();
   const { haptic } = useTelegram();
@@ -57,53 +191,63 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
     }
   };
 
+  const isStars = ann.id === 'promo-stars' || ann.icon_name === 'stars' || ann.title.toLowerCase().includes('stars');
+  const isTon = ann.id === 'promo-ton' || ann.icon_name === 'ton' || ann.title.toLowerCase().includes('ton');
+  const isClover = ann.id === 'promo-clover' || ann.icon_name === 'clover' || ann.title.toLowerCase().includes('clover') || ann.title.toLowerCase().includes('gift') || ann.description.toLowerCase().includes('gift') || ann.description.toLowerCase().includes('lucky buy');
+
+  let cardBgClass = "bg-[#f4f7f5] dark:bg-[#1a231d] border-[#e5ece8]/50 dark:border-white/5";
+  let btnClass = "bg-[#34c759] hover:bg-[#2eb850] text-white shadow-emerald-500/10";
+
+  if (isStars) {
+    cardBgClass = "bg-[#fbf7ee] dark:bg-[#201d16] border-[#f3eccf]/50 dark:border-white/5";
+    btnClass = "bg-[#ff9f0a] hover:bg-[#e08a00] text-white shadow-orange-500/10";
+  } else if (isTon) {
+    cardBgClass = "bg-[#f1f6fb] dark:bg-[#151c24] border-[#e3ebf4]/50 dark:border-white/5";
+    btnClass = "bg-[#2f80ed] hover:bg-[#1b6cd5] text-white shadow-blue-500/10";
+  }
+
   return (
     <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full relative bg-white dark:bg-slate-900/60 border border-black/5 dark:border-white/10 flex items-center p-2 sm:p-3 gap-3 sm:gap-4 shrink-0 snap-center rounded-xl overflow-hidden cursor-pointer group promo-card backdrop-blur-xl"
         onClick={handleAction}
+        className={`w-full h-[185px] sm:h-[195px] shrink-0 rounded-[24px] border border-solid p-6 pb-5 sm:p-7 sm:pb-6 relative overflow-hidden flex flex-col justify-between cursor-pointer select-none transition-all duration-305 hover:shadow-lg dark:hover:shadow-black/20 group backdrop-blur-md ${cardBgClass}`}
     >
-        {/* Left Side: Thumbnail */}
-        <div className="w-[85px] h-[85px] sm:w-[100px] sm:h-[100px] rounded-xl overflow-hidden relative shrink-0">
-            <img 
-                src={ann.bg_image_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(ann.title)}&background=random&color=fff`} 
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
-                referrerPolicy="no-referrer"
-                alt={ann.title}
-                loading="lazy"
-            />
-            <div className="absolute inset-0 bg-black/5"></div>
-        </div>
-        
-        {/* Right Side: Content */}
-        <div className="flex-1 min-w-0 pr-1 py-1">
-            <div className="flex items-center gap-1.5 mb-1.5">
-                <h3 className="text-slate-900 dark:text-white font-bold text-[17px] tracking-tight truncate leading-tight flex-1">
+        <div className="z-10 max-w-[58%] sm:max-w-[52%] flex flex-col items-start h-full justify-between">
+            <div className="flex flex-col gap-1.5">
+                <h3 className="text-[#0f172a] dark:text-white font-[900] text-[15px] sm:text-[17px] tracking-tight leading-snug font-sans group-hover:text-black dark:group-hover:text-slate-100 transition-colors">
                     {ann.title}
                 </h3>
+                <p className="text-[#64748b] dark:text-slate-400 text-[11px] sm:text-[12px] leading-snug sm:leading-[1.4] font-medium line-clamp-3">
+                    {ann.description}
+                </p>
             </div>
-            
-            <p className="text-slate-400 dark:text-slate-500 text-[12px] leading-[1.4] line-clamp-2 font-medium opacity-90 mb-2">
-                {ann.description}
-            </p>
 
-            <div className="flex items-center gap-2">
-                <div 
-                    className="flex items-center gap-1.5 px-2 py-0.5 rounded-lg shrink-0"
-                    style={{ background: 'linear-gradient(135deg, #FF6B6B, #FF8E53)' }}
-                >
-                    <span className="text-[9px] font-black text-white uppercase tracking-widest leading-none">
-                        {ann.tag || t('home_tag_default')}
-                    </span>
+            <button 
+                onClick={handleAction}
+                className={`flex items-center gap-1.5 px-[15px] py-[7px] sm:px-[18px] sm:py-[8px] rounded-full text-xs sm:text-[13px] font-[900] tracking-wide transition-all active:scale-95 shadow-md ${btnClass}`}
+            >
+                <ArrowUpRight size={14} strokeWidth={3} className="shrink-0 scale-105" />
+                <span>{ann.button_text}</span>
+            </button>
+        </div>
+
+        <div className="absolute right-0 top-0 bottom-0 w-[42%] overflow-visible">
+            {isStars && <StarVisual />}
+            {isTon && <TonVisual />}
+            {isClover && <CloverVisual />}
+            
+            {!isStars && !isTon && !isClover && ann.bg_image_url && (
+                <div className="absolute right-[16px] top-1/2 -translate-y-1/2 w-[110px] h-[110px] rounded-[22px] overflow-hidden border border-black/5 dark:border-white/10 shadow-lg shrink-0 pointer-events-none">
+                    <img 
+                        src={ann.bg_image_url} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                        referrerPolicy="no-referrer"
+                        alt="" 
+                        loading="lazy"
+                    />
                 </div>
-                <div className="flex items-center gap-1.5 px-2 py-0.5 bg-slate-100 dark:bg-white/5 rounded-lg shrink-0 border border-black/5 dark:border-white/5">
-                    <Megaphone size={10} className="text-slate-400" />
-                    <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest leading-none">
-                        {ann.badge_text || t('home_badge_default')}
-                    </span>
-                </div>
-            </div>
+            )}
         </div>
     </motion.div>
   );
@@ -1060,7 +1204,7 @@ const Home = () => {
   const [navState, setNavState] = useState<'main' | 'bots' | 'apps'>('main');
   const [mobileModal, setMobileModal] = useState<'kesfet' | 'investors' | null>(null);
   const [bots, setBots] = useState<Bot[]>([]);
-  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [announcements, setAnnouncements] = useState<Announcement[]>(visualPromos);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [tonRate, setTonRate] = useState(250);
@@ -1106,9 +1250,12 @@ const Home = () => {
     ]);
     
     setBots(botData);
-    if (annData.length > 0) {
-        setAnnouncements(annData.filter(a => a.is_active));
-    }
+    const activeAnns = annData.filter(a => a.is_active);
+    const combinedAnns = [
+        ...visualPromos,
+        ...activeAnns.filter(dbAnn => !visualPromos.some(vp => vp.title.toLowerCase() === dbAnn.title.toLowerCase() || vp.id === dbAnn.id))
+    ];
+    setAnnouncements(combinedAnns);
     setHomeBlogs(blogData);
     setIsLoading(false);
 
@@ -1699,16 +1846,12 @@ const Home = () => {
         ) : (
             <>
               {announcements.length > 0 && (
-                  <div className="min-h-[150px] pb-5 flex flex-col lg:flex-row justify-center items-center gap-6 pt-3 max-w-7xl mx-auto w-full overflow-hidden px-4 sm:px-8">
-                      <div className="w-full sm:max-w-[480px] lg:w-[480px] shrink h-[118px]">
-                          <AnnouncementsCarousel 
-                              announcements={announcements} 
-                              scroll={annScroll} 
-                              onShowPopup={(a) => setSelectedAnn(a)} 
-                          />
-                      </div>
-                      {/* PC & Tablet: Show banner next to announcement on larger screens */}
-                      <AddProjectBanner className="hidden lg:flex lg:w-[480px] shrink-0 h-[118px]" />
+                  <div className="pb-8 pt-4 max-w-7xl mx-auto w-full px-5 sm:px-8 overflow-hidden select-none animate-in fade-in duration-500">
+                      <AnnouncementsCarousel 
+                          announcements={announcements} 
+                          scroll={annScroll} 
+                          onShowPopup={(a) => setSelectedAnn(a)} 
+                      />
                   </div>
               )}
             </>
@@ -2414,6 +2557,7 @@ const AnnouncementsCarousel: React.FC<{
     onShowPopup: (ann: Announcement) => void 
 }> = React.memo(({ announcements, scroll, onShowPopup }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
+    const { t } = useTranslation();
 
     const handleScroll = useCallback(() => {
         if (scroll.ref.current) {
@@ -2428,7 +2572,7 @@ const AnnouncementsCarousel: React.FC<{
     useEffect(() => {
         const el = scroll.ref.current;
         if (el) {
-            el.addEventListener('scroll', handleScroll);
+            el.addEventListener('scroll', handleScroll, { passive: true });
             return () => el.removeEventListener('scroll', handleScroll);
         }
     }, [handleScroll, scroll.ref]);
@@ -2437,7 +2581,7 @@ const AnnouncementsCarousel: React.FC<{
         if (announcements.length <= 1) return;
 
         const interval = setInterval(() => {
-            if (scroll.ref.current && !scroll.isDragging) {
+            if (window.innerWidth < 768 && scroll.ref.current && !scroll.isDragging) {
                 const nextIndex = (currentIndex + 1) % announcements.length;
                 const width = scroll.ref.current.offsetWidth;
                 scroll.ref.current.scrollTo({
@@ -2451,43 +2595,47 @@ const AnnouncementsCarousel: React.FC<{
     }, [currentIndex, announcements.length, scroll.isDragging, scroll.ref]);
 
     return (
-        <div className="relative h-full">
-            <div 
-                ref={scroll.ref}
-                onMouseDown={scroll.onMouseDown}
-                onMouseUp={scroll.onMouseUp}
-                onMouseMove={scroll.onMouseMove}
-                onMouseLeave={scroll.onMouseLeave}
-                onContextMenu={scroll.onContextMenu}
-                className={`flex overflow-x-auto no-scrollbar h-full snap-x snap-mandatory ${scroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
-            >
-                {announcements.map(ann => (
-                    <div key={ann.id} className="w-full shrink-0 snap-center px-4 sm:px-0">
-                        <PromoCard ann={ann} onShowPopup={onShowPopup} />
-                    </div>
-                ))}
+        <div className="w-full flex flex-col gap-4">
+            <div className="flex items-center gap-2 px-1">
+                <h2 className="text-[19px] sm:text-[21px] font-[900] text-slate-900 dark:text-white tracking-widest uppercase italic font-sans leading-none">
+                    {t('home_promotions_title') || 'İlginizi Çekebilir'}
+                </h2>
+                <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-slate-800 px-1.5 py-0.5 rounded-md uppercase tracking-widest bg-slate-50 dark:bg-white/5 font-sans leading-none h-5 flex items-center">
+                    Ad promo
+                </span>
             </div>
-            
-            {announcements.length > 1 && (
-                <div className="absolute bottom-5 left-[58px] sm:left-[62px] -translate-x-1/2 flex items-center gap-1 z-10 pointer-events-none">
-                    {announcements.map((_, i) => (
-                        <button 
-                            key={i} 
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                if (scroll.ref.current) {
-                                    const width = scroll.ref.current.offsetWidth;
-                                    scroll.ref.current.scrollTo({
-                                        left: i * width,
-                                        behavior: 'smooth'
-                                    });
-                                }
-                            }}
-                            className={`h-1 rounded-full transition-all duration-300 shadow-lg cursor-pointer outline-hidden pointer-events-auto ${i === currentIndex ? 'w-4 bg-white' : 'w-1 bg-white/50 hover:bg-white/80'}`} 
-                        />
+
+            <div className="relative">
+                <div 
+                    ref={scroll.ref}
+                    onMouseDown={scroll.onMouseDown}
+                    onMouseUp={scroll.onMouseUp}
+                    onMouseMove={scroll.onMouseMove}
+                    onMouseLeave={scroll.onMouseLeave}
+                    onContextMenu={scroll.onContextMenu}
+                    className={`flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 overflow-x-auto md:overflow-x-visible no-scrollbar pb-3 scroll-smooth snap-x snap-mandatory ${scroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+                >
+                    {announcements.map((ann) => (
+                        <div 
+                            key={ann.id} 
+                            className="w-[84vw] sm:w-[50vw] md:w-full shrink-0 snap-center"
+                        >
+                            <PromoCard ann={ann} onShowPopup={onShowPopup} />
+                        </div>
                     ))}
                 </div>
-            )}
+
+                {announcements.length > 1 && (
+                    <div className="md:hidden flex justify-center items-center gap-1.5 mt-3 pointer-events-none">
+                        {announcements.map((_, i) => (
+                            <div 
+                                key={i} 
+                                className={`h-1.5 rounded-full transition-all duration-300 ${i === currentIndex ? 'w-4 bg-slate-800 dark:bg-white' : 'w-1.5 bg-slate-300 dark:bg-slate-700'}`} 
+                            />
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
     );
 });
