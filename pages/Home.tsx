@@ -1,1953 +1,1967 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useTranslation } from '../TranslationContext';
-import { motion, AnimatePresence } from 'motion/react';
 import { 
-  Terminal, 
-  GitBranch, 
-  Cpu, 
-  Workflow, 
+  LayoutDashboard, 
   Bot, 
-  CheckCircle2, 
-  XCircle, 
-  AlertTriangle, 
-  Zap, 
+  Cpu, 
   Layers, 
-  Play, 
-  Code, 
-  ArrowRight, 
-  ExternalLink, 
-  ShieldCheck, 
-  Activity, 
-  RefreshCw, 
-  Copy, 
-  Check, 
-  Search, 
-  ChevronDown, 
-  Plus, 
+  BarChart3, 
+  Terminal, 
   Settings, 
-  Trash2, 
-  Sliders, 
-  BarChart, 
-  Radio, 
-  Sparkles, 
-  Globe, 
-  Database, 
-  BookOpen, 
-  Share2, 
-  Eye, 
-  MessageSquare, 
-  User, 
-  Lock, 
-  Server, 
+  ChevronDown, 
+  ChevronUp, 
+  Menu, 
+  X, 
+  ChevronLeft, 
   ChevronRight, 
-  Filter, 
-  Star,
-  Coins
+  Plus, 
+  Search, 
+  Sparkles, 
+  GitMerge, 
+  CheckCircle2, 
+  AlertCircle, 
+  Pause, 
+  Play, 
+  RefreshCw, 
+  Command, 
+  Volume2, 
+  VolumeX, 
+  PlusCircle, 
+  ArrowUpRight, 
+  Activity, 
+  SlidersHorizontal, 
+  ExternalLink, 
+  Sliders, 
+  HelpCircle,
+  Database,
+  Lock,
+  Globe
 } from 'lucide-react';
-import { categories, mockBots } from '../data';
-import { DatabaseService } from '../services/DatabaseService';
+import { motion, AnimatePresence } from 'motion/react';
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, BarChart, Bar, LineChart, Line } from 'recharts';
 
-// Standard dark theme: #0B0F17
+// Global Themes & Visual Variables as described:
+// Background: #0B0F17
 // Panels: rgba(255,255,255,0.04)
 // Borders: rgba(255,255,255,0.08)
-// Accent: #6C5CE7
+// Primary accent: #6C5CE7
 // Success: #2ED573
+// Warning: #FFA502
 // Error: #FF4757
 
-interface CloudBot {
+interface BotItem {
   id: string;
   name: string;
-  type: 'Support' | 'Automation' | 'QA' | 'Assistant';
-  status: 'Active' | 'Idle' | 'Error';
-  lastRun: string;
+  category: 'Arbitrage' | 'AI & NLP' | 'Social' | 'Utility';
+  description: string;
+  status: 'Active' | 'Standby' | 'Error';
   successRate: number;
-  runCount: number;
-  systemPrompt: string;
-  testInput: string;
-  memory: { key: string; value: string }[];
-  apiKey: string;
-  trigger: 'Manual' | 'Webhook' | 'Schedule';
+  executions: number;
+  uptime: number;
+  latency: number;
+  chain: 'TON' | 'Solana' | 'Ethereum' | 'BSC';
+  lastRun: string;
+  sparkline: { val: number }[];
 }
 
-interface WorkflowNode {
+const DEFAULT_BOTS: BotItem[] = [
+  {
+    id: 'bot-1',
+    name: 'TON-Arbitrage Sniper X',
+    category: 'Arbitrage',
+    description: 'Deploys high-speed pathfinding algorithms to exploit DEX spreads across DeDust and STON.fi.',
+    status: 'Active',
+    successRate: 99.6,
+    executions: 18450,
+    uptime: 99.8,
+    latency: 14,
+    chain: 'TON',
+    lastRun: '1s ago',
+    sparkline: [{val: 45}, {val: 48}, {val: 52}, {val: 49}, {val: 60}, {val: 58}, {val: 64}, {val: 70}]
+  },
+  {
+    id: 'bot-2',
+    name: 'Solana Meme Liquidity Sentry',
+    category: 'Arbitrage',
+    description: 'Tracks LP creations on Raydium & Pump.fun and analyzes social triggers for token scalps.',
+    status: 'Active',
+    successRate: 98.4,
+    executions: 9342,
+    uptime: 99.2,
+    latency: 28,
+    chain: 'Solana',
+    lastRun: '4s ago',
+    sparkline: [{val: 20}, {val: 25}, {val: 38}, {val: 50}, {val: 42}, {val: 48}, {val: 55}, {val: 68}]
+  },
+  {
+    id: 'bot-3',
+    name: 'LLM Sentiment Trading Oracle',
+    category: 'AI & NLP',
+    description: 'Analyzes crypto Twitter (X) and Telegram feeds parsing intent signals for automated scalping.',
+    status: 'Standby',
+    successRate: 96.8,
+    executions: 3204,
+    uptime: 98.1,
+    latency: 120,
+    chain: 'Ethereum',
+    lastRun: '2m ago',
+    sparkline: [{val: 30}, {val: 22}, {val: 25}, {val: 21}, {val: 24}, {val: 32}, {val: 28}, {val: 31}]
+  },
+  {
+    id: 'bot-4',
+    name: 'Telegram Group Auto-Mod AI',
+    category: 'Utility',
+    description: 'Context-aware conversational moderating bot with AI spam filtering & customizable admin commands.',
+    status: 'Active',
+    successRate: 99.9,
+    executions: 84912,
+    uptime: 100,
+    latency: 42,
+    chain: 'TON',
+    lastRun: '12s ago',
+    sparkline: [{val: 80}, {val: 82}, {val: 84}, {val: 81}, {val: 83}, {val: 85}, {val: 84}, {val: 86}]
+  },
+  {
+    id: 'bot-5',
+    name: 'Starknet Bridge Arbitrage',
+    category: 'Arbitrage',
+    description: 'Watches state updates and gas discrepancies on bridged vaults for low-fee path settlement.',
+    status: 'Error',
+    successRate: 84.2,
+    executions: 1240,
+    uptime: 88.5,
+    latency: 350,
+    chain: 'Ethereum',
+    lastRun: '1h ago',
+    sparkline: [{val: 70}, {val: 65}, {val: 50}, {val: 42}, {val: 30}, {val: 24}, {val: 18}, {val: 10}]
+  },
+  {
+    id: 'bot-6',
+    name: 'BSC Liquid Staking Rebalancer',
+    category: 'Utility',
+    description: 'Automatically shifts deposits across high-yielding BNB liquidity pools and vaults daily.',
+    status: 'Standby',
+    successRate: 99.1,
+    executions: 2841,
+    uptime: 99.5,
+    latency: 180,
+    chain: 'BSC',
+    lastRun: '15m ago',
+    sparkline: [{val: 50}, {val: 52}, {val: 51}, {val: 53}, {val: 52}, {val: 55}, {val: 54}, {val: 55}]
+  }
+];
+
+interface LogItem {
   id: string;
-  name: string;
-  type: 'Trigger' | 'AI Processing' | 'Action';
-  subtype: string;
-  status: 'idle' | 'running' | 'success' | 'error';
+  timestamp: string;
+  botId: string;
+  botName: string;
+  type: 'info' | 'success' | 'warning' | 'error';
+  message: string;
 }
+
+const INITIAL_LOGS: LogItem[] = [
+  { id: 'log-1', timestamp: '22:27:01', botId: 'bot-1', botName: 'TON-Arbitrage Sniper X', type: 'success', message: 'Spread detected STON.fi -> DeDust (+0.42 TON / 1.5%). Route cleared in 14ms.' },
+  { id: 'log-2', timestamp: '22:27:04', botId: 'bot-2', botName: 'Solana Meme Liquidity Sentry', type: 'info', message: 'Tracking new pool: $PUMP/SOL. Social score verified: 8.5/10.' },
+  { id: 'log-3', timestamp: '22:27:12', botId: 'bot-4', botName: 'Telegram Group Auto-Mod AI', type: 'info', message: 'Sanitized 2 spam campaigns under pattern match: #MemeLaunchInvite.' },
+  { id: 'log-4', timestamp: '22:27:18', botId: 'bot-5', botName: 'Starknet Bridge Arbitrage', type: 'error', message: 'Gas limit exceeded on L2 settlement. Transaction rejected. Status: INSUFFICIENT_FEE.' },
+  { id: 'log-5', timestamp: '22:27:26', botId: 'bot-1', botName: 'TON-Arbitrage Sniper X', type: 'success', message: 'Executed path STON.fi -> DeDust (spread 2.2%). Net profit +0.84 TON.' },
+  { id: 'log-6', timestamp: '22:27:30', botId: 'bot-3', botName: 'LLM Sentiment Trading Oracle', type: 'warning', message: 'X API throttle rate reached. Reverting sentiment ingestion to fallback RPC.' },
+];
 
 export default function Home() {
-  const navigate = useNavigate();
-  const { t } = useTranslation();
+  // Navigation active state
+  // Dashboard, Bots, Workflows, Analytics, Logs, Settings
+  const [activeTab, setActiveTab] = useState<string>('dashboard');
+  
+  // Sidebar expanded / collapsed (PC)
+  const [sidebarExpanded, setSidebarExpanded] = useState<boolean>(true);
+  
+  // Accordion menus for Bots inside Sidebar (TON style submenus)
+  const [botsSubMenuOpen, setBotsSubMenuOpen] = useState<boolean>(true);
+  
+  // Tablet floating drawer toggle
+  const [tabletDrawerOpen, setTabletDrawerOpen] = useState<boolean>(false);
+  
+  // Mobile full screen slide-over menu toggle
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+  const [mobileMenuHistory, setMobileMenuHistory] = useState<string[]>([]); // To handle "back navigation inside menu hierarchy"
+  const [mobileSubMenu, setMobileSubMenu] = useState<string | null>(null);
 
-  // Navigation state: 'dashboard' | 'directory' | 'workflows' | 'playground' | 'analytics' | 'telemetry'
-  const [currentTab, setCurrentTab] = useState<'dashboard' | 'directory' | 'workflows' | 'playground' | 'analytics' | 'telemetry'>('dashboard');
+  // States for interactive components
+  const [bots, setBots] = useState<BotItem[]>(DEFAULT_BOTS);
+  const [logs, setLogs] = useState<LogItem[]>(INITIAL_LOGS);
+  const [simulationActive, setSimulationActive] = useState<boolean>(true);
+  
+  // Filtration and Search
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [statusFilter, setStatusFilter] = useState<string>('All');
+  const [categoryFilter, setCategoryFilter] = useState<string>('All');
+  
+  // Bottom-sheet modals / Panels
+  const [createBotOpen, setCreateBotOpen] = useState<boolean>(false);
+  const [consoleOpen, setConsoleOpen] = useState<boolean>(false);
+  const [expandedBotId, setExpandedBotId] = useState<string | null>(null);
 
-  // Operational State
-  const [cloudBots, setCloudBots] = useState<CloudBot[]>([
-    {
-      id: 'bot_support_01',
-      name: 'SupportBot Core',
-      type: 'Support',
-      status: 'Active',
-      lastRun: '1m ago',
-      successRate: 98.4,
-      runCount: 1420,
-      systemPrompt: 'You are a technical customer support advisor for BotlyHub. Assist users respectfully and stick strictly to technical platform documentation.',
-      testInput: 'How do I bind an external Telegram channel webhook to BotlyHub?',
-      memory: [
-        { key: 'knowledge_base_url', value: 'https://docs.botlyhub.com/faq' },
-        { key: 'supported_payment_networks', value: 'TON Space, Wallet Telegram Pay' }
-      ],
-      apiKey: 'sk_live_ton_4872c9a1bc',
-      trigger: 'Webhook'
-    },
-    {
-      id: 'bot_qa_02',
-      name: 'QA Deployment Guard',
-      type: 'QA',
-      status: 'Active',
-      lastRun: '5m ago',
-      successRate: 99.1,
-      runCount: 815,
-      systemPrompt: 'You are an autonomous DevOps visual test auditor. Scan staging source variables for credential exposures, syntax malfunctions, and SSL timeouts.',
-      testInput: 'Scan repository: vercel-nextjs-api-route',
-      memory: [
-        { key: 'staging_dns', value: 'https://staging-api.botlyhub.internal' }
-      ],
-      apiKey: 'sk_live_ton_ea091bc8d1',
-      trigger: 'Schedule'
-    },
-    {
-      id: 'bot_automation_03',
-      name: 'Webhook Telegram Post',
-      type: 'Automation',
-      status: 'Idle',
-      lastRun: '2h ago',
-      successRate: 95.8,
-      runCount: 322,
-      systemPrompt: 'You are a creative text form writer. Rephrase incoming web development triggers into engaging, structured bullet points for Telegram channel bloggers.',
-      testInput: 'feat: add metrics analytics capture',
-      memory: [
-        { key: 'target_channel_id', value: '-1003826684282' }
-      ],
-      apiKey: 'sk_live_ton_df8893ab00',
-      trigger: 'Webhook'
-    },
-    {
-      id: 'bot_analyst_04',
-      name: 'Crypto Arbitrage Tracker',
-      type: 'Assistant',
-      status: 'Error',
-      lastRun: '1d ago',
-      successRate: 88.2,
-      runCount: 104,
-      systemPrompt: 'Analyze real-time price tick spreads across DEX pools on TON. Alert trigger conditions the moment deviation threshold breaches 2.4%.',
-      testInput: 'Check pools: STON.fi, DeDust',
-      memory: [
-        { key: 'api_endpoint', value: 'https://ton-arbitrage.live/v1' }
-      ],
-      apiKey: 'sk_live_ton_ccc1202888',
-      trigger: 'Manual'
-    }
+  // Bot creation form hook states
+  const [newBotName, setNewBotName] = useState('');
+  const [newBotCategory, setNewBotCategory] = useState<'Arbitrage' | 'AI & NLP' | 'Social' | 'Utility'>('Arbitrage');
+  const [newBotChain, setNewBotChain] = useState<'TON' | 'Solana' | 'Ethereum' | 'BSC'>('TON');
+  const [newBotDesc, setNewBotDesc] = useState('');
+
+  // Terminal state
+  const [terminalCommand, setTerminalCommand] = useState('');
+  const [terminalHistory, setTerminalHistory] = useState<string[]>([
+    'Welcome to AI Studio BotlyHub V3 Monospace Terminal.',
+    'Type "help" to list available control-panel triggers.',
+    ''
   ]);
 
-  // Selected Bot for Detail Slide-over
-  const [selectedBotId, setSelectedBotId] = useState<string | null>(null);
-  const selectedBot = cloudBots.find(b => b.id === selectedBotId);
-  const [botDetailActiveTab, setBotDetailActiveTab] = useState<'overview' | 'prompt' | 'memory' | 'logs'>('overview');
+  const terminalEndRef = useRef<HTMLDivElement>(null);
 
-  // Toast notifications State
-  const [toasts, setToasts] = useState<{ id: string; message: string; type: 'success' | 'info' | 'error' }[]>([]);
-  const showToast = (message: string, type: 'success' | 'info' | 'error' = 'success') => {
-    const id = Date.now().toString();
-    setToasts(prev => [...prev, { id, message, type }]);
-    setTimeout(() => {
-      setToasts(prev => prev.filter(t => t.id !== id));
-    }, 3800);
-  };
+  // Cumulative simulations
+  const [totalExecutions, setTotalExecutions] = useState<number>(168450);
+  const [audioFeedback, setAudioFeedback] = useState<boolean>(false);
 
-  // Create Bot Modal
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [newBotName, setNewBotName] = useState('');
-  const [newBotType, setNewBotType] = useState<'Support' | 'Automation' | 'QA' | 'Assistant'>('Support');
-  const [newBotPrompt, setNewBotPrompt] = useState('');
-
-  const handleCreateBot = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newBotName.trim()) {
-      showToast('Please provide a bot name', 'error');
-      return;
-    }
-    const created: CloudBot = {
-      id: `bot_custom_${Date.now()}`,
-      name: newBotName,
-      type: newBotType,
-      status: 'Idle',
-      lastRun: 'Never',
-      successRate: 100,
-      runCount: 0,
-      systemPrompt: newBotPrompt || 'You are a helpful AI assistant.',
-      testInput: 'Hello and welcome. Give me status report.',
-      memory: [],
-      apiKey: `sk_live_ton_${Math.random().toString(16).substring(3, 11)}`,
-      trigger: 'Manual'
-    };
-    setCloudBots(prev => [created, ...prev]);
-    setIsCreateModalOpen(false);
-    setNewBotName('');
-    setNewBotPrompt('');
-    showToast(`Bot "${newBotName}" successfully created in ecosystem!`, 'success');
-  };
-
-  // Run Now simulation engine
-  const [runningBotId, setRunningBotId] = useState<string | null>(null);
-  const [terminalFeedLogs, setTerminalFeedLogs] = useState<{ time: string; botName: string; text: string; status: 'info' | 'success' | 'error' }[]>([]);
-
-  const runBotNow = (botId: string) => {
-    if (runningBotId) return;
-    const targetBot = cloudBots.find(b => b.id === botId);
-    if (!targetBot) return;
-
-    setRunningBotId(botId);
-    showToast(`Deploying payload & initiating ${targetBot.name}...`, 'info');
-    
-    // Add logs step by step
-    const timeNow = () => new Date().toLocaleTimeString();
-    const mockLogs = [
-      { text: `⚡ Connecting secure agent session to pipeline ID: ${botId}`, status: 'info' as const },
-      { text: `🔍 Syncing local system instructions prompt: "${targetBot.systemPrompt.substring(0, 45)}..."`, status: 'info' as const },
-      { text: `📥 Query input registered: "${targetBot.testInput}"`, status: 'info' as const },
-      { text: `📡 Running inference engine on Llama-3-70B model...`, status: 'info' as const },
-      { text: `✅ Stream finished successfully in 412ms, exit code 0`, status: 'success' as const }
-    ];
-
-    let currentLogIndex = 0;
-    const logInterval = setInterval(() => {
-      if (currentLogIndex < mockLogs.length) {
-        setTerminalFeedLogs(prev => [
-          {
-            time: timeNow(),
-            botName: targetBot.name,
-            text: mockLogs[currentLogIndex].text,
-            status: mockLogs[currentLogIndex].status
-          },
-          ...prev
-        ]);
-        currentLogIndex++;
-      } else {
-        clearInterval(logInterval);
-        setRunningBotId(null);
-        // Toggle bot status to Active if it was error/idle
-        setCloudBots(prev => prev.map(b => b.id === botId ? { 
-          ...b, 
-          status: 'Active', 
-          lastRun: 'Just now', 
-          runCount: b.runCount + 1,
-          successRate: Math.min(100, Number((b.successRate + 0.2).toFixed(1)))
-        } : b));
-        showToast(`Botly session target of ${targetBot.name} executed successfully!`, 'success');
-      }
-    }, 400);
-  };
-
-  // Botly System log generator background tick
+  // Simulated background execution interval (running every 5 seconds)
   useEffect(() => {
-    const names = ['SupportBot Core', 'QA Deployment Guard', 'Webhook Telegram Post'];
-    const textExamples = [
-      'Processed incoming query from Telegram User ID: 588219192',
-      'Telemetry audit: zero credential exposure detected in repo branch vercel-nextjs-api-route/main',
-      'System heartbeat check... active OK',
-      'Storage synchronized flawlessly across shard clusters',
-      'Instant payout address checked by Telegram account hash'
-    ];
+    if (!simulationActive) return;
 
     const interval = setInterval(() => {
-      const idxBot = Math.floor(Math.random() * names.length);
-      const idxText = Math.floor(Math.random() * textExamples.length);
-      setTerminalFeedLogs(prev => [
-        {
-          time: new Date().toLocaleTimeString(),
-          botName: names[idxBot],
-          text: textExamples[idxText],
-          status: 'info'
-        },
-        ...prev.slice(0, 120) // Limit count to avoid CPU drag
-      ]);
-    }, 6000);
+      // 1. Pick a random active bot
+      const activeBots = bots.filter(b => b.status === 'Active');
+      if (activeBots.length === 0) return;
+      const pickedBot = activeBots[Math.floor(Math.random() * activeBots.length)];
+
+      // 2. Determine spread/log message depending on category
+      let logType: 'info' | 'success' | 'warning' = 'info';
+      let message = '';
+      const coin = pickedBot.chain;
+
+      if (pickedBot.category === 'Arbitrage') {
+        const spread = (Math.random() * 2 + 0.1).toFixed(2);
+        const profit = (Math.random() * 1.5 + 0.1).toFixed(2);
+        logType = Math.random() > 0.15 ? 'success' : 'info';
+        message = logType === 'success' 
+          ? `Discovered arbitrage pathway! Profit: +${profit} ${coin}. Spread: ${spread}%.`
+          : `Scanning liquidity pools on Raydium/DEX. Current spreads are below threshold (fee optimization).`;
+      } else if (pickedBot.category === 'AI & NLP') {
+        const sentiment = Math.random() > 0.5 ? 'Bullish' : 'Slightly Bearish';
+        message = `Analyzed 40 social feeds for ${coin}. General aggregate sentiment rating: ${sentiment}.`;
+      } else if (pickedBot.category === 'Utility') {
+        message = `Cleaned and validated transactional records. Average sync speed: ${pickedBot.latency}ms. All routes active.`;
+      }
+
+      // Generate timestamp
+      const now = new Date();
+      const timestamp = now.toTimeString().split(' ')[0];
+
+      // 3. Append log
+      const newLog: LogItem = {
+        id: `log-${Date.now()}`,
+        timestamp,
+        botId: pickedBot.id,
+        botName: pickedBot.name,
+        type: logType,
+        message
+      };
+
+      setLogs(prev => [newLog, ...prev.slice(0, 49)]); // Keep up to 50 logs
+
+      // 4. Update executions counter
+      setTotalExecutions(prev => prev + 1);
+      setBots(prev => prev.map(b => {
+        if (b.id === pickedBot.id) {
+          const newVal = Math.min(100, Math.max(0, b.sparkline[b.sparkline.length - 1].val + Math.floor(Math.random() * 15 - 7)));
+          const updatedSparkline = [...b.sparkline.slice(1), { val: newVal }];
+          return {
+            ...b,
+            executions: b.executions + 1,
+            lastRun: 'Just now',
+            sparkline: updatedSparkline
+          };
+        }
+        return b;
+      }));
+
+    }, 4500);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [bots, simulationActive]);
 
-  // UI Interactive Toggle Switches helper
-  const handleToggleBot = (botId: string) => {
-    setCloudBots(prev => prev.map(b => {
+  // Terminal command handler
+  const handleTerminalSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!terminalCommand.trim()) return;
+
+    const cmd = terminalCommand.trim().toLowerCase();
+    let reply = '';
+    
+    if (cmd === 'help') {
+      reply = 'AVAILABLE COMMANDS:\n' +
+              '  help        - Display general console layout\n' +
+              '  status      - Display running bots and cluster health\n' +
+              '  start-all   - Set all passive / standby bots to active state\n' +
+              '  reboot [id] - Force restart a crashed routing bot\n' +
+              '  metrics     - Print live JSON statistics data feed\n' +
+              '  clear       - Wipe terminal log outputs';
+    } else if (cmd === 'status') {
+      const activeCount = bots.filter(b => b.status === 'Active').length;
+      const totalCount = bots.length;
+      reply = `SYSTEM CLUSTER CONSOLE STATUS:\n` +
+              `  Cluster Health : ${((activeCount / totalCount) * 100).toFixed(1)}%\n` +
+              `  Active Nodes   : ${activeCount} / ${totalCount} bots\n` +
+              `  Active Chain   : TON Gateway Protocol V3\n` +
+              `  Network Latency: 14.5ms avg`;
+    } else if (cmd === 'start-all') {
+      setBots(prev => prev.map(b => ({ ...b, status: 'Active' })));
+      reply = 'SUCCESS: Broadcasted spin-up command. All standby bots set to ACTIVE.';
+    } else if (cmd.startsWith('reboot ')) {
+      const targetId = cmd.replace('reboot ', '').trim();
+      let found = false;
+      setBots(prev => prev.map(b => {
+        if (b.id === targetId || b.name.toLowerCase().includes(targetId)) {
+          found = true;
+          return { ...b, status: 'Active', uptime: 100, latency: 15 };
+        }
+        return b;
+      }));
+      reply = found 
+        ? `SUCCESS: Cleared Stark-bridge RPC lockouts. Bot ${targetId} restarted successfully.`
+        : `ERROR: No bot payload found with ID/Name "${targetId}". Check listings.`;
+    } else if (cmd === 'metrics') {
+      const summary = {
+        totalExecutions,
+        activeBots: bots.filter(b => b.status === 'Active').length,
+        systemHealth: '99.94%',
+        activeChains: Array.from(new Set(bots.map(b => b.chain))),
+        timestamp: new Date().toISOString()
+      };
+      reply = `METRICS PAYLOAD FEED:\n` + JSON.stringify(summary, null, 2);
+    } else if (cmd === 'clear') {
+      setTerminalHistory([]);
+      setTerminalCommand('');
+      return;
+    } else {
+      reply = `ERROR: Command "${cmd}" not recognized. Type "help" for a list of control signals.`;
+    }
+
+    setTerminalHistory(prev => [...prev, `> ${terminalCommand}`, reply, '']);
+    setTerminalCommand('');
+    
+    setTimeout(() => {
+      terminalEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 50);
+  };
+
+  // Bot creation submit
+  const handleCreateBot = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newBotName.trim()) return;
+
+    const newBot: BotItem = {
+      id: `bot-${Date.now()}`,
+      name: newBotName,
+      category: newBotCategory,
+      description: newBotDesc || 'Automated execution template with modular TON.app API hooks and state controls.',
+      status: 'Active',
+      successRate: 100.0,
+      executions: 0,
+      uptime: 100.0,
+      latency: Math.floor(Math.random() * 80 + 12),
+      chain: newBotChain,
+      lastRun: 'Never',
+      sparkline: [{val: 40}, {val: 40}, {val: 40}, {val: 40}, {val: 40}, {val: 40}, {val: 40}, {val: 40}]
+    };
+
+    setBots(prev => [newBot, ...prev]);
+    setLogs(prev => [
+      {
+        id: `log-${Date.now()}`,
+        timestamp: new Date().toTimeString().split(' ')[0],
+        botId: newBot.id,
+        botName: newBot.name,
+        type: 'success',
+        message: `Registered system node [${newBot.name}] on ${newBot.chain}. Initiating pipeline sync...`
+      },
+      ...prev
+    ]);
+
+    setCreateBotOpen(false);
+    setNewBotName('');
+    setNewBotDesc('');
+  };
+
+  const toggleBotStatus = (botId: string, event?: React.MouseEvent) => {
+    if (event) event.stopPropagation();
+    setBots(prev => prev.map(b => {
       if (b.id === botId) {
-        const nextStatus = b.status === 'Active' ? 'Idle' : 'Active';
-        showToast(`Status of ${b.name} set to ${nextStatus}`, 'info');
+        let nextStatus: 'Active' | 'Standby' | 'Error' = 'Active';
+        if (b.status === 'Active') nextStatus = 'Standby';
+        else if (b.status === 'Standby') nextStatus = 'Active';
+        else nextStatus = 'Active'; // If error, turn on
+
+        // Append log corresponding to action
+        const now = new Date();
+        const timestamp = now.toTimeString().split(' ')[0];
+        setLogs(l => [{
+          id: `log-${Date.now()}`,
+          timestamp,
+          botId,
+          botName: b.name,
+          type: nextStatus === 'Active' ? 'success' : 'warning',
+          message: `User triggered status state override to: [${nextStatus}]`
+        }, ...l]);
+
         return { ...b, status: nextStatus };
       }
       return b;
     }));
   };
 
-  // Dynamic values summary computations
-  const totalExecutions = cloudBots.reduce((sum, b) => sum + b.runCount, 0);
-  const activeBotsCount = cloudBots.filter(b => b.status === 'Active').length;
+  const deleteBot = (botId: string, event?: React.MouseEvent) => {
+    if (event) event.stopPropagation();
+    setBots(prev => prev.filter(b => b.id !== botId));
+    setLogs(prev => [
+      {
+        id: `log-${Date.now()}`,
+        timestamp: new Date().toTimeString().split(' ')[0],
+        botId: 'system',
+        botName: 'System Core',
+        type: 'warning',
+        message: `De-registered bot node ID: [${botId}] from orchestrator gateway.`
+      },
+      ...prev
+    ]);
+  };
 
-  // -- BOTS DECENTRALIZED DIRECTORY STATE (User requirement: "Where are the bots, applications, and categories?")
-  const [selectedDirectoryCategory, setSelectedDirectoryCategory] = useState<string>('all');
-  const [directorySearchQuery, setDirectorySearchQuery] = useState<string>('');
-  const [resolvedCategoryList, setResolvedCategoryList] = useState<any[]>([]);
-
-  useEffect(() => {
-    // Custom mapping for beautiful Turkish/English fallbacks of standard categories of TON/Telegram bots
-    const formatted = categories.map(cat => {
-      let labelText = cat.id.toUpperCase();
-      let customDesc = 'Verified ecosystem platform services.';
-      switch(cat.id) {
-        case 'all': labelText = 'All Categories'; customDesc = 'Explore every listed solution'; break;
-        case 'ai_services': labelText = 'AI Assistants'; customDesc = 'Intelligent conversational & automation bots'; break;
-        case 'games': labelText = 'Decentralized Games'; customDesc = 'Play-to-Earn and hyper-casual TMA games'; break;
-        case 'finance': labelText = 'Sass & Finance'; customDesc = 'Financial ledger sync & checkout systems'; break;
-        case 'moderation': labelText = 'Group Managers / Moderation'; customDesc = 'Keep custom Telegram chats clean'; break;
-        case 'utilities': labelText = 'Ecosystem Utilities'; customDesc = 'API routers and developer toolsets'; break;
-        case 'crypto': labelText = 'TON & Cryptography'; customDesc = 'Wallet bots and token metrics tracking'; break;
-        case 'communication': labelText = 'Engagement Tech'; customDesc = 'Mass broadcast and channel manager tools'; break;
-        case 'productivity': labelText = 'SaaS Productivity'; customDesc = 'Track tasks and schedules automatically'; break;
-        case 'music': labelText = 'Audio & Entertainment'; customDesc = 'Media streamers and podcast feed tools'; break;
-        case 'education': labelText = 'Educational Hubs'; customDesc = 'Learn Solidity, TON developer SDKs interactive'; break;
-        case 'content': labelText = 'Channel Automation'; customDesc = 'Auto blog post poster and translators'; break;
-        default: break;
-      }
-      return {
-        ...cat,
-        displayName: t(cat.label) || labelText,
-        displayDesc: customDesc
-      };
-    });
-    setResolvedCategoryList(formatted);
-  }, [t]);
-
-  // Fallback to static bots database if Supabase empty
-  const [directoryBots, setDirectoryBots] = useState<any[]>([
-    {
-      id: 'tg_01',
-      name: 'Task Master BOT',
-      slug: 'task-master',
-      description: 'The master suite for community workflow delegation, task tracking, and automatic rewards in TON.',
-      price: 15.0,
-      icon: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200&auto=format&fit=crop&q=80',
-      category: ['productivity', 'utilities'],
-      rating: 4.8,
-      bot_link: 'https://t.me/task_master_bot',
-      languages: ['🇺🇸 English', '🇹🇷 Türkçe', '🇪🇸 Español'],
-      subscribers: '12K active users',
-      developer: 'Vercel Ecosystem Labs'
-    },
-    {
-      id: 'tg_02',
-      name: 'GameBot Arcade',
-      slug: 'gamebot-pro',
-      description: 'Premium mini-app game engine. Run tournament brackets directly in your Telegram groups with instant payouts.',
-      price: 0.0,
-      icon: 'https://images.unsplash.com/photo-1612287230202-1bf1d85d1bdf?w=200&auto=format&fit=crop&q=80',
-      category: ['games'],
-      rating: 4.9,
-      bot_link: 'https://t.me/game_bot_arcade',
-      languages: ['🇺🇸 English', '🇷🇺 Russian'],
-      subscribers: '450K players',
-      developer: 'TON Games Studio'
-    },
-    {
-      id: 'tg_03',
-      name: 'Ethers Ledger Bot',
-      slug: 'ethers-ledger',
-      description: 'Sync ERC20 holdings, parse price alerts, and request live gas trackers directly inside your group chat interface.',
-      price: 49.0,
-      icon: 'https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=200&auto=format&fit=crop&q=80',
-      category: ['crypto', 'finance'],
-      rating: 4.7,
-      bot_link: 'https://t.me/ethers_ledger_bot',
-      languages: ['🇺🇸 English', '🇩🇪 Deutsch', '🇫🇷 Français'],
-      subscribers: '8.4K channels',
-      developer: 'Consensys Hub Devs'
-    },
-    {
-      id: 'tg_04',
-      name: 'AI Translator Agent',
-      slug: 'ai-translator-bot',
-      description: 'Auto-detect chat languages and translate individual incoming messages into over 14 languages utilizing server-side Gemini AI models.',
-      price: 0.0,
-      icon: 'https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=200&auto=format&fit=crop&q=80',
-      category: ['ai_services', 'communication'],
-      rating: 4.9,
-      bot_link: 'https://t.me/ai_translation_system',
-      languages: ['🇺🇸 English', '🇹🇷 Türkçe', '🇪🇸 Español', '🇸🇦 العربية'],
-      subscribers: '58K active chats',
-      developer: 'Gemini Agent Lab'
-    },
-    {
-      id: 'tg_05',
-      name: 'Shield Moderator Shield',
-      slug: 'shield-mod-bot',
-      description: 'Robust serverless spam filter. Eradicates automated clone accounts, dangerous token links, and explicit texts in 100ms.',
-      price: 8.5,
-      icon: 'https://images.unsplash.com/photo-1614064642639-e3f13b69b93a?w=200&auto=format&fit=crop&q=80',
-      category: ['moderation', 'security'],
-      rating: 4.6,
-      bot_link: 'https://t.me/shield_moderator_bot',
-      languages: ['🇺🇸 English', '🇹🇷 Türkçe', '🇮🇷 Persian'],
-      subscribers: '14K groups',
-      developer: 'Ecosystem Security Core'
-    },
-    {
-      id: 'tg_06',
-      name: 'SoundWave Styler',
-      slug: 'sound-wave-music',
-      description: 'Stream royalty-free high fidelity ambient beats to standard group voice channels continuously for deep-focus coding and study rooms.',
-      price: 5.0,
-      icon: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=200&auto=format&fit=crop&q=80',
-      category: ['music'],
-      rating: 4.5,
-      bot_link: 'https://t.me/soundwave_styler',
-      languages: ['🇺🇸 English'],
-      subscribers: '3.1K voice rooms',
-      developer: 'Spotify Guild'
-    }
-  ]);
-
-  // Combined Search Criteria
-  const filteredDirectoryBots = directoryBots.filter(bot => {
-    const categoryMatch = selectedDirectoryCategory === 'all' || bot.category.includes(selectedDirectoryCategory);
-    const searchMatch = bot.name.toLowerCase().includes(directorySearchQuery.toLowerCase()) || 
-                        bot.description.toLowerCase().includes(directorySearchQuery.toLowerCase());
-    return categoryMatch && searchMatch;
+  // Helper filters
+  const filteredBots = bots.filter(b => {
+    const matchesSearch = b.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          b.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = statusFilter === 'All' || b.status === statusFilter;
+    const matchesCategory = categoryFilter === 'All' || b.category === categoryFilter;
+    return matchesSearch && matchesStatus && matchesCategory;
   });
 
-  // -- WORKFLOWS STATE (Interactive automation design)
-  const [workflowNodes, setWorkflowNodes] = useState<WorkflowNode[]>([
-    { id: 'wn_01', name: 'Github Commit Event', type: 'Trigger', subtype: 'Webhook API', status: 'idle' },
-    { id: 'wn_02', name: 'Gemini Text Auditor', type: 'AI Processing', subtype: 'System Prompt Parsing', status: 'idle' },
-    { id: 'wn_03', name: 'Send Telegram Notification', type: 'Action', subtype: 'Post Channel Bot', status: 'idle' }
-  ]);
-  const [activeWorkflowRunning, setActiveWorkflowRunning] = useState(false);
+  const activeBotsCount = bots.filter(b => b.status === 'Active').length;
+  const systemStatusMsg = activeBotsCount === bots.length 
+    ? { text: 'Nodes Optimal', color: '#2ED573', label: 'Healthy' }
+    : activeBotsCount > 0 
+      ? { text: 'Degraded State', color: '#FFA502', label: 'Warning' }
+      : { text: 'All Nodes Offline', color: '#FF4757', label: 'Offline' };
 
-  const addWorkflowNode = (type: 'Trigger' | 'AI Processing' | 'Action') => {
-    let name = '';
-    let subtype = '';
-    if (type === 'Trigger') {
-      name = 'Incoming Webhook API';
-      subtype = 'Auth token verification';
-    } else if (type === 'AI Processing') {
-      name = 'Gemini Summary Node';
-      subtype = 'Model inference';
-    } else {
-      name = 'SQL Database Save';
-      subtype = 'Query execution';
-    }
-    const newNode: WorkflowNode = {
-      id: `wn_custom_${Date.now()}`,
-      name,
-      type,
-      subtype,
-      status: 'idle'
-    };
-    setWorkflowNodes(prev => [...prev, newNode]);
-    showToast(`Added workflow "${name}" connection node!`, 'success');
-  };
-
-  const deleteWorkflowNode = (id: string) => {
-    setWorkflowNodes(prev => prev.filter(n => n.id !== id));
-    showToast('Node removed from connection path', 'info');
-  };
-
-  const runWorkflowSimulation = () => {
-    if (activeWorkflowRunning) return;
-    setActiveWorkflowRunning(true);
-    showToast('Starting sequential pipeline simulation...', 'info');
-
-    let idx = 0;
-    const interval = setInterval(() => {
-      if (idx < workflowNodes.length) {
-        setWorkflowNodes(prev => prev.map((node, i) => i === idx ? { ...node, status: 'running' } : node));
-        setTimeout(() => {
-          setWorkflowNodes(prev => prev.map((node, i) => i === idx ? { ...node, status: 'success' } : node));
-          idx++;
-        }, 800);
-      } else {
-        clearInterval(interval);
-        setActiveWorkflowRunning(false);
-        showToast('All system workflow nodes executed smoothly!', 'success');
-      }
-    }, 1100);
-  };
-
-  // -- PLAYGROUND PLAY TEMPLATE ENGINE
-  const [playgroundSelectedBotId, setPlaygroundSelectedBotId] = useState<string>(cloudBots[0].id);
-  const playgroundBot = cloudBots.find(b => b.id === playgroundSelectedBotId) || cloudBots[0];
-  const [playgroundInstruction, setPlaygroundInstruction] = useState<string>(playgroundBot.systemPrompt);
-  const [playgroundPromptInput, setPlaygroundPromptInput] = useState<string>('Verify security parameters on the cloud DB pipeline.');
-  const [playgroundTemp, setPlaygroundTemp] = useState<number>(0.7);
-  const [playgroundOutputText, setPlaygroundOutputText] = useState<string>('');
-  const [isPlaygroundInference, setIsPlaygroundInference] = useState<boolean>(false);
-
-  const handleRunPlayground = () => {
-    if (isPlaygroundInference) return;
-    setIsPlaygroundInference(true);
-    setPlaygroundOutputText('');
-
-    const sentences = [
-      `[AI Engine: Model Gemini-3.5-Active initialized with instructions: "${playgroundInstruction.substring(0, 35)}..."]`,
-      "Analyzing inputs and parsing registered memory states...",
-      `Processing payload parameters with precision settings: temp=${playgroundTemp}`,
-      "Generating response tokens stream:",
-      "▶ Secure environment active check OK.",
-      "▶ Detected variables are bound using server-side configurations.",
-      "▶ Verdict: System is green and verified. Direct connection keys remain hidden, preventing visual leak vectors."
-    ];
-
-    let currentSent = 0;
-    const interval = setInterval(() => {
-      if (currentSent < sentences.length) {
-        setPlaygroundOutputText(prev => prev + (prev ? '\n' : '') + sentences[currentSent]);
-        currentSent++;
-      } else {
-        clearInterval(interval);
-        setIsPlaygroundInference(false);
-        showToast('Playground agent inference streaming finished', 'success');
-      }
-    }, 600);
-  };
-
-  // Sync instruction when bot updates in playground selector
-  useEffect(() => {
-    setPlaygroundInstruction(playgroundBot.systemPrompt);
-  }, [playgroundSelectedBotId, cloudBots]);
-
-  // -- ANALYTICS GRAPH GENERATOR SIMULATOR
-  const analyticsStats = {
-    uptime: '99.99%',
-    latency: '84ms',
-    databaseUsage: '2.44 GB / 10 GB',
-    usageHistory: [
-      { date: 'May 16', requests: 120, latency: 95 },
-      { date: 'May 17', requests: 140, latency: 90 },
-      { date: 'May 18', requests: 185, latency: 86 },
-      { date: 'May 19', requests: 290, latency: 82 },
-      { date: 'May 20', requests: 310, latency: 80 },
-      { date: 'May 21', requests: 460, latency: 83 },
-      { date: 'May 22', requests: 512, latency: 79 }
-    ]
-  };
+  // Spacing helper standard
+  // 4px base: padding-1 (~4px), p-2 (~8px), p-4 (~16px), p-6 (~24px), p-12 (~48px)
 
   return (
-    <div className="flex bg-[#0B0F17] text-white min-h-screen font-sans overflow-x-hidden antialiased">
+    <div className="min-h-screen bg-[#0B0F17] text-[#F8FAFC] font-sans overflow-x-hidden antialiased flex flex-col xl:flex-row">
       
-      {/* 2-5 pixel top colored stripe like Stripe/Vercel aesthetic */}
-      <div className="absolute top-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-[#6C5CE7] via-[#4F9CF9] to-[#2ED573] z-50 pointer-events-none" />
-
-      {/* SIDEBAR NAVIGATION PANEL */}
-      <aside className="fixed inset-y-0 left-0 w-64 bg-[#0E1321] border-r border-white/[0.06] flex flex-col justify-between z-40">
+      {/* 🧭 GLOBAL NAVIGATION SYSTEM (TON.APP STYLE) */}
+      
+      {/* Desktop left sidebar */}
+      <aside className={`hidden xl:flex flex-col border-r border-[rgba(255,255,255,0.08)] bg-[#0B0F17] sticky top-0 h-screen transition-all duration-300 z-50 shrink-0 ${sidebarExpanded ? 'w-[260px] p-6' : 'w-[80px] p-4 items-center'}`}>
         
-        {/* LOGO & MENU ITEMS */}
-        <div className="flex flex-col flex-1">
-          
-          {/* Header Branding */}
-          <div className="h-16 flex items-center gap-2.5 px-6 border-b border-white/[0.04]">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-[#6C5CE7] to-[#4F9CF9] p-[1.5px] flex items-center justify-center shadow-[0_4px_12px_rgba(108,92,231,0.25)]">
-              <div className="w-full h-full rounded-[7px] bg-[#0E1321] flex items-center justify-center">
-                <Cpu size={15} className="text-[#6C5CE7]" />
-              </div>
-            </div>
-            <div>
-              <span className="font-extrabold text-[15.5px] tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent">BotlyHub</span>
-              <span className="text-[9px] block text-[#6C5CE7] font-mono tracking-widest leading-none mt-0.5 font-bold uppercase">Console V3</span>
-            </div>
+        {/* Header/Logo */}
+        <div className={`flex items-center gap-3 mb-10 ${sidebarExpanded ? 'justify-start' : 'justify-center'}`}>
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#6C5CE7] to-[#8C7CFF] flex items-center justify-center text-white font-extrabold shadow-[0_4px_14px_rgba(108,92,231,0.3)]">
+            <Cpu className="w-5 h-5 text-white" />
           </div>
-
-          {/* Nav Categories */}
-          <nav className="p-4 space-y-1">
-            <span className="text-[10px] font-mono font-bold tracking-widest text-slate-500 uppercase px-3 block mb-2">Workspace Nodes</span>
-            
-            <button
-              onClick={() => { setCurrentTab('dashboard'); setSelectedBotId(null); }}
-              className={`w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${
-                currentTab === 'dashboard' 
-                  ? 'bg-gradient-to-r from-[#6C5CE7]/15 to-transparent border-l-2 border-[#6C5CE7] text-white font-bold' 
-                  : 'text-slate-400 hover:text-white hover:bg-white/[0.03]'
-              }`}
-            >
-              <Cpu size={15} className={currentTab === 'dashboard' ? 'text-[#6C5CE7]' : 'text-slate-500'} />
-              <span>Dashboard Control</span>
-            </button>
-
-            <button
-              onClick={() => { setCurrentTab('directory'); setSelectedBotId(null); }}
-              className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg transition-all ${
-                currentTab === 'directory' 
-                  ? 'bg-gradient-to-r from-[#6C5CE7]/15 to-transparent border-l-2 border-[#6C5CE7] text-white font-bold' 
-                  : 'text-slate-400 hover:text-white hover:bg-white/[0.03]'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <Globe size={15} className={currentTab === 'directory' ? 'text-[#6C5CE7]' : 'text-slate-500'} />
-                <span>Ecosystem Directory</span>
-              </div>
-              <span className="text-[9.5px] bg-[#6C5CE7]/15 text-[#6C5CE7] px-1.5 py-0.5 rounded font-mono font-bold">Bots</span>
-            </button>
-
-            <button
-              onClick={() => { setCurrentTab('workflows'); setSelectedBotId(null); }}
-              className={`w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${
-                currentTab === 'workflows' 
-                  ? 'bg-gradient-to-r from-[#6C5CE7]/15 to-transparent border-l-2 border-[#6C5CE7] text-white font-bold' 
-                  : 'text-slate-400 hover:text-white hover:bg-white/[0.03]'
-              }`}
-            >
-              <Workflow size={15} className={currentTab === 'workflows' ? 'text-[#6C5CE7]' : 'text-slate-500'} />
-              <span>Workflow Builder</span>
-            </button>
-
-            <button
-              onClick={() => { setCurrentTab('playground'); setSelectedBotId(null); }}
-              className={`w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${
-                currentTab === 'playground' 
-                  ? 'bg-gradient-to-r from-[#6C5CE7]/15 to-transparent border-l-2 border-[#6C5CE7] text-white font-bold' 
-                  : 'text-slate-400 hover:text-white hover:bg-white/[0.03]'
-              }`}
-            >
-              <Code size={15} className={currentTab === 'playground' ? 'text-[#6C5CE7]' : 'text-slate-500'} />
-              <span>Prompt Playground</span>
-            </button>
-
-            <div className="pt-4 pb-2">
-              <span className="text-[10px] font-mono font-bold tracking-widest text-slate-500 uppercase px-3 block mb-1">Diagnostics</span>
+          {sidebarExpanded && (
+            <div className="flex flex-col">
+              <span className="font-bold text-base tracking-tight leading-none text-[#F8FAFC]">API.STUDIO</span>
+              <span className="text-[10px] uppercase font-bold text-[#6C5CE7] leading-tight tracking-widest mt-0.5">Control Center</span>
             </div>
-
-            <button
-              onClick={() => { setCurrentTab('analytics'); setSelectedBotId(null); }}
-              className={`w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${
-                currentTab === 'analytics' 
-                  ? 'bg-gradient-to-r from-[#6C5CE7]/15 to-transparent border-l-2 border-[#6C5CE7] text-white font-bold' 
-                  : 'text-slate-400 hover:text-white hover:bg-white/[0.03]'
-              }`}
-            >
-              <BarChart size={15} className={currentTab === 'analytics' ? 'text-[#6C5CE7]' : 'text-slate-500'} />
-              <span>Performance Analytics</span>
-            </button>
-
-            <button
-              onClick={() => { setCurrentTab('telemetry'); setSelectedBotId(null); }}
-              className={`w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${
-                currentTab === 'telemetry' 
-                  ? 'bg-gradient-to-r from-[#6C5CE7]/15 to-transparent border-l-2 border-[#6C5CE7] text-white font-bold' 
-                  : 'text-slate-400 hover:text-white hover:bg-white/[0.03]'
-              }`}
-            >
-              <Terminal size={15} className={currentTab === 'telemetry' ? 'text-[#6C5CE7]' : 'text-slate-500'} />
-              <span>System Telemetry Logs</span>
-            </button>
-          </nav>
-
+          )}
         </div>
 
-        {/* BOTTOM USER PANEL STATS */}
-        <div className="p-4 border-t border-white/[0.04]">
-          <div className="bg-white/[0.02] border border-white/[0.04] p-3 rounded-xl mb-3">
-            <div className="flex justify-between items-center text-[10.5px]">
-              <span className="text-[#A1A1A1] font-semibold">Active Quota Balance</span>
-              <span className="text-[#2ED573] font-mono font-bold">94,220 pts</span>
-            </div>
-            <div className="w-full bg-white/[0.06] h-1.5 rounded-full mt-2 overflow-hidden">
-              <div className="bg-gradient-to-r from-[#6C5CE7] to-[#4F9CF9] h-full w-[84%]" />
-            </div>
-          </div>
+        {/* Menu-driven Navigation (TON.app style) */}
+        <nav className="flex-1 flex flex-col gap-2 w-full">
+          {/* Dashboard Tab */}
+          <button 
+            id="sidemenu-dashboard"
+            onClick={() => setActiveTab('dashboard')}
+            className={`w-full flex items-center gap-3 rounded-lg py-3 px-3.5 transition-all text-left ${activeTab === 'dashboard' ? 'bg-[rgba(108,92,231,0.15)] text-[#6C5CE7] font-semibold border border-[rgba(108,92,231,0.2)]' : 'hover:bg-[rgba(255,255,255,0.04)] text-[#94A3B8] border border-transparent'}`}
+          >
+            <LayoutDashboard className="w-[18px] h-[18px] shrink-0" />
+            {sidebarExpanded && <span>Dashboard</span>}
+          </button>
 
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#6C5CE7] to-[#4F9CF9] p-[1.5px] flex items-center justify-center">
-              <div className="w-full h-full rounded-full bg-[#0E1321] flex items-center justify-center font-bold text-xs uppercase text-white">
-                KE
+          {/* Bots Accordion (Smooth Expandable) */}
+          <div className="flex flex-col w-full">
+            <button 
+              id="sidemenu-bots-parent"
+              onClick={() => {
+                if (!sidebarExpanded) {
+                  setSidebarExpanded(true);
+                  setActiveTab('bots');
+                  return;
+                }
+                setBotsSubMenuOpen(!botsSubMenuOpen);
+              }}
+              className={`w-full flex items-center justify-between rounded-lg py-3 px-3.5 transition-all text-left ${activeTab === 'bots' || activeTab === 'all-bots' || activeTab === 'create-bot' || activeTab === 'templates' ? 'bg-[rgba(255,255,255,0.02)] text-white font-semibold' : 'hover:bg-[rgba(255,255,255,0.04)] text-[#94A3B8]'}`}
+            >
+              <div className="flex items-center gap-3 mr-2">
+                <Bot className="w-[18px] h-[18px] shrink-0" />
+                {sidebarExpanded && <span>Bots</span>}
               </div>
-            </div>
-            <div>
-              <p className="text-[12px] font-bold text-white leading-tight">kenan_sys_admin</p>
-              <p className="text-[10px] text-slate-500 font-mono">Operator ID #4829</p>
-            </div>
-          </div>
-        </div>
+              {sidebarExpanded && (
+                botsSubMenuOpen ? <ChevronUp className="w-4 h-4 text-slate-500" /> : <ChevronDown className="w-4 h-4 text-slate-500" />
+              )}
+            </button>
 
+            {/* Nested Submenu support (Accordion style) */}
+            {sidebarExpanded && botsSubMenuOpen && (
+              <div className="pl-8 flex flex-col gap-1 mt-1 border-l border-[rgba(255,255,255,0.05)] ml-5">
+                <button 
+                  id="sidemenu-sub-all"
+                  onClick={() => { setActiveTab('dashboard'); setSearchQuery(''); setStatusFilter('All'); }}
+                  className="py-2 text-xs text-[#94A3B8] hover:text-[#6C5CE7] transition-all text-left"
+                >
+                  All Bots
+                </button>
+                <button
+                  id="sidemenu-sub-create"
+                  onClick={() => setCreateBotOpen(true)}
+                  className="py-2 text-xs text-[#94A3B8] hover:text-[#6C5CE7] transition-all text-[#2ED573] text-left flex items-center gap-1.5"
+                >
+                  <PlusCircle className="w-3.5 h-3.5" />
+                  Create Bot
+                </button>
+                <button 
+                  id="sidemenu-sub-templates"
+                  onClick={() => { setActiveTab('bots'); setCategoryFilter('Arbitrage'); }}
+                  className="py-2 text-xs text-[#94A3B8] hover:text-[#6C5CE7] transition-all text-left"
+                >
+                  Bot Templates
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Workflows Tab */}
+          <button 
+            id="sidemenu-workflows"
+            onClick={() => setActiveTab('workflows')}
+            className={`w-full flex items-center gap-3 rounded-lg py-3 px-3.5 transition-all text-left ${activeTab === 'workflows' ? 'bg-[rgba(108,92,231,0.15)] text-[#6C5CE7] font-semibold border border-[rgba(108,92,231,0.2)]' : 'hover:bg-[rgba(255,255,255,0.04)] text-[#94A3B8] border border-transparent'}`}
+          >
+            <GitMerge className="w-[18px] h-[18px] shrink-0" />
+            {sidebarExpanded && <span>Workflows</span>}
+          </button>
+
+          {/* Analytics Tab */}
+          <button 
+            id="sidemenu-analytics"
+            onClick={() => setActiveTab('analytics')}
+            className={`w-full flex items-center gap-3 rounded-lg py-3 px-3.5 transition-all text-left ${activeTab === 'analytics' ? 'bg-[rgba(108,92,231,0.15)] text-[#6C5CE7] font-semibold border border-[rgba(108,92,231,0.2)]' : 'hover:bg-[rgba(255,255,255,0.04)] text-[#94A3B8] border border-transparent'}`}
+          >
+            <BarChart3 className="w-[18px] h-[18px] shrink-0" />
+            {sidebarExpanded && <span>Analytics</span>}
+          </button>
+
+          {/* Logs Tab */}
+          <button 
+            id="sidemenu-logs"
+            onClick={() => { setActiveTab('logs'); setConsoleOpen(true); }}
+            className={`w-full flex items-center gap-3 rounded-lg py-3 px-3.5 transition-all text-left ${activeTab === 'logs' ? 'bg-[rgba(108,92,231,0.15)] text-[#6C5CE7] font-semibold border border-[rgba(108,92,231,0.2)]' : 'hover:bg-[rgba(255,255,255,0.04)] text-[#94A3B8] border border-transparent'}`}
+          >
+            <Terminal className="w-[18px] h-[18px] shrink-0" />
+            {sidebarExpanded && <span>Terminal Logs</span>}
+          </button>
+
+          {/* Settings Tab */}
+          <button 
+            id="sidemenu-settings"
+            onClick={() => setActiveTab('settings')}
+            className={`w-full flex items-center gap-3 rounded-lg py-3 px-3.5 transition-all text-left ${activeTab === 'settings' ? 'bg-[rgba(108,92,231,0.15)] text-[#6C5CE7] font-semibold border border-[rgba(108,92,231,0.2)]' : 'hover:bg-[rgba(255,255,255,0.04)] text-[#94A3B8] border border-transparent'}`}
+          >
+            <Settings className="w-[18px] h-[18px] shrink-0" />
+            {sidebarExpanded && <span>Settings</span>}
+          </button>
+        </nav>
+
+        {/* Sidebar Footer and Collapse Toggle */}
+        <div className="mt-auto pt-6 border-t border-[rgba(255,255,255,0.05)] w-full flex flex-col gap-4">
+          <div className={`flex items-center gap-3 ${sidebarExpanded ? 'px-1' : 'justify-center'}`}>
+            <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center font-mono text-xs font-bold text-[#6C5CE7]">
+              AI
+            </div>
+            {sidebarExpanded && (
+              <div className="flex flex-col min-w-0">
+                <span className="text-xs font-bold text-white truncate">Administrator</span>
+                <span className="text-[10px] text-slate-500 font-mono truncate">ID: 0f7329ee-2b</span>
+              </div>
+            )}
+          </div>
+
+          <button 
+            id="sidebar-collapse-trigger"
+            onClick={() => setSidebarExpanded(!sidebarExpanded)}
+            className="w-full h-8 hover:bg-[rgba(255,255,255,0.04)] rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#6C5CE7] transition-all cursor-pointer border border-transparent"
+            title={sidebarExpanded ? 'Collapse Menu' : 'Expand Menu'}
+          >
+            {sidebarExpanded ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
+          </button>
+        </div>
       </aside>
 
-      {/* RENDER BODY CONTAINER */}
-      <main className="pl-64 flex-1 flex flex-col min-h-screen">
-        
-        {/* TOP BAR BAR */}
-        <header className="h-16 border-b border-white/[0.06] bg-[#0E1321]/60 backdrop-blur-md sticky top-0 px-8 flex items-center justify-between z-30">
+      {/* Tablet floating vertical drawer header / layout (iPad Mode) */}
+      <header className="xl:hidden flex items-center justify-between px-6 py-4 bg-[#0B0F17] border-b border-[rgba(255,255,255,0.08)] z-40 sticky top-0 backdrop-blur-md">
+        <div className="flex items-center gap-3">
+          <button 
+            id="tablet-hamburger-btn"
+            onClick={() => setTabletDrawerOpen(true)}
+            className="p-2 hover:bg-[rgba(255,255,255,0.04)] rounded-lg text-slate-400 hover:text-white"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
           
-          <div className="flex items-center gap-3">
-            <span className="text-slate-400 text-xs font-semibold uppercase font-mono">Route</span>
-            <ChevronRight size={12} className="text-slate-600" />
-            <h1 className="text-sm font-extrabold capitalize text-white flex items-center gap-2">
-              <span>{currentTab === 'directory' ? 'Telegram Ecosystem Directory' : currentTab}</span>
-              <span className="w-2 h-2 rounded-full bg-[#2ED573] animate-pulse" />
-            </h1>
-          </div>
-
-          <div className="flex items-center gap-4">
-            {/* Status Indicator */}
-            <div className="hidden md:flex items-center gap-2 bg-white/[0.02] border border-white/[0.05] px-3 py-1.5 rounded-lg text-[11px] font-mono text-slate-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#2ED573]" />
-              <span>TON Core: Connected</span>
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-[#6C5CE7] to-[#8C7CFF] flex items-center justify-center text-white font-extrabold shadow-md">
+              <Cpu className="w-4 h-4 text-white" />
             </div>
-
-            {/* Main Action CTAs */}
-            <button
-              onClick={() => setIsCreateModalOpen(true)}
-              className="flex items-center gap-2 px-3.5 py-1.5 bg-[#6C5CE7] text-white rounded-lg text-xs font-bold hover:bg-[#5b4ed4] active:scale-95 transition-all shadow-md"
-            >
-              <Plus size={14} />
-              <span>Create New Bot</span>
-            </button>
-
-            {/* Back to MiniApp link */}
-            <button 
-              onClick={() => navigate('/search')}
-              className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors bg-white/[0.03] border border-white/[0.06] px-3 py-1.5 rounded-lg"
-            >
-              <ExternalLink size={12} />
-              <span>App Market</span>
-            </button>
+            <span className="font-bold text-sm tracking-tight text-[#F8FAFC]">API.STUDIO</span>
           </div>
-
-        </header>
-
-        {/* WORKSPACE VIEW CONTROLLERS */}
-        <div className="flex-1 p-8">
-          
-          <AnimatePresence mode="wait">
-            
-            {/* 1. DASHBOARD VIEW STATE */}
-            {currentTab === 'dashboard' && (
-              <motion.div
-                key="dashboard"
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2 }}
-                className="space-y-8"
-              >
-                {/* METRICS ROW */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  
-                  <div className="bg-[#0E1321] border border-white/[0.06] p-5 rounded-2xl flex items-center justify-between relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-[#6C5CE7]/5 rounded-full blur-xl group-hover:bg-[#6C5CE7]/10 transition-colors pointer-events-none" />
-                    <div>
-                      <span className="text-[11px] font-mono text-slate-400 font-bold uppercase tracking-wider block">Total Cloud Bots</span>
-                      <span className="text-3xl font-extrabold text-white mt-1 block tracking-tight">{cloudBots.length}</span>
-                      <span className="text-[10px] text-[#2ED573] font-semibold mt-1 inline-flex items-center gap-1">
-                        <span>● Global state stable</span>
-                      </span>
-                    </div>
-                    <div className="w-11 h-11 rounded-lg bg-[#6C5CE7]/15 border border-[#6C5CE7]/20 flex items-center justify-center text-[#6C5CE7]">
-                      <Bot size={20} />
-                    </div>
-                  </div>
-
-                  <div className="bg-[#0E1321] border border-white/[0.06] p-5 rounded-2xl flex items-center justify-between relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-[#2ED573]/5 rounded-full blur-xl group-hover:bg-[#2ED573]/10 transition-colors pointer-events-none" />
-                    <div>
-                      <span className="text-[11px] font-mono text-slate-400 font-bold uppercase tracking-wider block">Active Runtime</span>
-                      <span className="text-3xl font-extrabold text-white mt-1 block tracking-tight">{activeBotsCount}</span>
-                      <span className="text-[10px] text-slate-400 font-semibold mt-1 inline-block">
-                        {cloudBots.length - activeBotsCount} in hibernation
-                      </span>
-                    </div>
-                    <div className="w-11 h-11 rounded-lg bg-[#2ED573]/15 border border-[#2ED573]/20 flex items-center justify-center text-[#2ED573]">
-                      <Activity size={20} />
-                    </div>
-                  </div>
-
-                  <div className="bg-[#0E1321] border border-white/[0.06] p-5 rounded-2xl flex items-center justify-between relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-[#4F9CF9]/5 rounded-full blur-xl group-hover:bg-[#4F9CF9]/10 transition-colors pointer-events-none" />
-                    <div>
-                      <span className="text-[11px] font-mono text-slate-400 font-bold uppercase tracking-wider block">Total Executions</span>
-                      <span className="text-3xl font-extrabold text-white mt-1 block tracking-tight font-mono">{totalExecutions}</span>
-                      <span className="text-[10px] text-[#4F9CF9] font-mono font-semibold mt-1 inline-block">
-                        +22 within past hour
-                      </span>
-                    </div>
-                    <div className="w-11 h-11 rounded-lg bg-[#4F9CF9]/15 border border-[#4F9CF9]/20 flex items-center justify-center text-[#4F9CF9]">
-                      <Sliders size={20} />
-                    </div>
-                  </div>
-
-                  <div className="bg-[#0E1321] border border-white/[0.06] p-5 rounded-2xl flex items-center justify-between relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-[#2ED573]/5 rounded-full blur-xl group-hover:bg-[#2ED573]/10 transition-colors pointer-events-none" />
-                    <div>
-                      <span className="text-[11px] font-mono text-slate-400 font-bold uppercase tracking-wider block">AI Inference Success</span>
-                      <span className="text-3xl font-extrabold text-white mt-1 block tracking-tight font-mono">98.1%</span>
-                      <span className="text-[10px] text-[#2ED573] font-semibold mt-1 inline-block">
-                        Avg latency <span className="font-mono">84ms</span>
-                      </span>
-                    </div>
-                    <div className="w-11 h-11 rounded-lg bg-[#2ED573]/15 border border-[#2ED573]/20 flex items-center justify-center text-[#2ED573]">
-                      <CheckCircle2 size={20} />
-                    </div>
-                  </div>
-
-                </div>
-
-                {/* BOT GRID CONTAINER */}
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-base font-extrabold text-white tracking-tight">Ecosystem AI Core Bots</h3>
-                      <p className="text-xs text-slate-400 mt-1">Primary active automated logic controllers on BotlyHub SaaS pipeline</p>
-                    </div>
-                    <span className="text-[10.5px] font-mono font-bold text-[#6C5CE7] bg-[#6C5CE7]/10 border border-[#6C5CE7]/20 px-3 py-1 rounded-full uppercase">
-                      Select Bot Card To Edit Instructions
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
-                    {cloudBots.map((b) => (
-                      <div
-                        key={b.id}
-                        className={`bg-[#0E1321] border ${
-                          selectedBotId === b.id ? 'border-[#6C5CE7] ring-1 ring-[#6C5CE7]' : 'border-white/[0.06]'
-                        } cursor-pointer p-5 rounded-2xl relative flex flex-col justify-between group hover:bg-[#12192c] transition-all`}
-                        onClick={() => setSelectedBotId(b.id)}
-                      >
-                        <div>
-                          {/* Banner Top elements */}
-                          <div className="flex items-center justify-between mb-4">
-                            <span className="text-[10px] bg-white/[0.03] border border-white/[0.08] px-2.5 py-1 rounded-full uppercase tracking-wider font-mono text-slate-400 font-bold">
-                              {b.type}
-                            </span>
-                            
-                            <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
-                              <span className={`w-1.5 h-1.5 rounded-full ${
-                                b.status === 'Active' ? 'bg-[#2ED573]' : b.status === 'Idle' ? 'bg-[#F59E0B]' : 'bg-[#FF4757]'
-                              }`} />
-                              <span className="text-[10px] text-slate-400 font-bold font-mono">{b.status}</span>
-                            </div>
-                          </div>
-
-                          <h4 className="font-extrabold text-[14.5px] text-white tracking-tight leading-tight group-hover:text-[#6C5CE7] transition-colors">
-                            {b.name}
-                          </h4>
-                          <p className="text-[11.5px] text-slate-400 mt-2 line-clamp-2 h-8 min-h-[32px] leading-relaxed">
-                            {b.systemPrompt}
-                          </p>
-
-                          {/* Trigger tags */}
-                          <div className="flex items-center gap-2 mt-4" onClick={(e) => e.stopPropagation()}>
-                            <span className="text-[9.5px] font-mono bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded border border-blue-500/20">
-                              Trigger: {b.trigger}
-                            </span>
-                          </div>
-
-                          {/* Sparkline analytics summaries */}
-                          <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-white/[0.04] text-[10.5px]">
-                            <div>
-                              <span className="text-slate-500 block">Total Runs</span>
-                              <span className="font-extrabold text-white font-mono mt-0.5 block">{b.runCount}</span>
-                            </div>
-                            <div>
-                              <span className="text-slate-500 block">Success Rate</span>
-                              <span className="font-extrabold text-[#2ED573] font-mono mt-0.5 block">{b.successRate}%</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Control buttons footer */}
-                        <div className="grid grid-cols-2 gap-2 mt-5" onClick={(e) => e.stopPropagation()}>
-                          <button
-                            onClick={() => runBotNow(b.id)}
-                            disabled={runningBotId !== null}
-                            className="bg-[#6C5CE7]/10 hover:bg-[#6C5CE7]/25 text-[#6C5CE7] border border-[#6C5CE7]/35 py-1.5 rounded-lg text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all disabled:opacity-40"
-                          >
-                            {runningBotId === b.id ? (
-                              <RefreshCw size={11} className="animate-spin" />
-                            ) : (
-                              <Play size={11} fill="currentColor" />
-                            )}
-                            <span>Run now</span>
-                          </button>
-
-                          <button
-                            onClick={() => handleToggleBot(b.id)}
-                            className="bg-white/[0.02] hover:bg-white/[0.05] text-slate-200 border border-white/[0.06] py-1.5 rounded-lg text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-all"
-                          >
-                            <Sliders size={11} />
-                            <span>{b.status === 'Active' ? 'Disable' : 'Enable'}</span>
-                          </button>
-                        </div>
-
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* BOTTOM HALF: ACTION AND FEED PANEL GRID */}
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-6 pt-2">
-                  
-                  {/* LIVE TELEMETRY LOGS ROW (8 Columns) */}
-                  <div className="md:col-span-8 bg-[#0E1321] border border-white/[0.06] p-6 rounded-2xl flex flex-col justify-between">
-                    <div className="flex items-center justify-between mb-4 border-b border-white/[0.04] pb-3">
-                      <div className="flex items-center gap-2.5">
-                        <Terminal size={16} className="text-[#6C5CE7]" />
-                        <span className="font-extrabold text-sm text-white tracking-tight">Active Core Telemetry Logs Stream</span>
-                      </div>
-                      <span className="w-2.5 h-2.5 rounded-full bg-[#2ED573] animate-ping" />
-                    </div>
-
-                    <div className="bg-[#08080A] rounded-xl p-4 font-mono text-[11.5px] leading-relaxed overflow-y-auto h-64 border border-white/[0.04]">
-                      {terminalFeedLogs.length === 0 ? (
-                        <div className="text-slate-500 italic h-full flex items-center justify-center">
-                          Waiting for bot execution trigger outputs...
-                        </div>
-                      ) : (
-                        <div className="space-y-1.5">
-                          {terminalFeedLogs.map((log, idx) => (
-                            <div key={idx} className="flex flex-col md:flex-row md:items-start gap-1 md:gap-3 text-slate-300">
-                              <span className="text-slate-500 shrink-0 font-medium">[{log.time}]</span>
-                              <span className="text-[#6C5CE7] font-bold shrink-0">{log.botName}:</span>
-                              <span className={log.status === 'success' ? 'text-[#2ED573]' : log.status === 'error' ? 'text-[#FF4757]' : 'text-slate-200'}>
-                                {log.text}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex items-center justify-between mt-4 text-[10.5px] text-slate-400">
-                      <span>Telemetry sampling rate: realtime (5-second intervals via state)</span>
-                      <button 
-                        onClick={() => setTerminalFeedLogs([])}
-                        className="text-[#6C5CE7] cursor-pointer hover:underline font-bold"
-                      >
-                        Clear console buffer
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* QUICK ACTION CONTROLLERS (4 Columns) */}
-                  <div className="md:col-span-4 bg-[#0E1321] border border-white/[0.06] p-6 rounded-2xl flex flex-col justify-between">
-                    <div>
-                      <h3 className="font-extrabold text-sm text-slate-200 tracking-tight">Ecosystem Quick Controls</h3>
-                      <p className="text-xs text-slate-500 mt-1 mb-4 leading-relaxed">Fast pipeline orchestration procedures with unified TON authorization</p>
-                      
-                      <div className="space-y-3">
-                        <button
-                          onClick={() => setIsCreateModalOpen(true)}
-                          className="w-full flex items-center justify-between p-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] border border-white/[0.05] transition-all text-left"
-                        >
-                          <div>
-                            <span className="text-slate-200 font-bold text-xs block">Spin Up New Bot Agent</span>
-                            <span className="text-[10px] text-slate-500">Custom System execution bounds</span>
-                          </div>
-                          <Plus size={16} className="text-slate-400" />
-                        </button>
-
-                        <button
-                          onClick={() => {
-                            const template: CloudBot = {
-                              id: `template_${Date.now()}`,
-                              name: 'Anti-Spam Shield Proxy',
-                              type: 'QA',
-                              status: 'Active',
-                              lastRun: 'Never',
-                              successRate: 100,
-                              runCount: 0,
-                              systemPrompt: 'Autonomous parser to analyze textual chat chains in Telegram spaces and exclude dangerous token web links instantly.',
-                              testInput: 'Deploy Anti-Spam shield templates',
-                              memory: [],
-                              apiKey: 'sk_live_ton_template',
-                              trigger: 'Webhook'
-                            };
-                            setCloudBots(prev => [template, ...prev]);
-                            showToast('Successfully imported preset: "Anti-Spam Shield Proxy"!', 'success');
-                          }}
-                          className="w-full flex items-center justify-between p-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] border border-white/[0.05] transition-all text-left"
-                        >
-                          <div>
-                            <span className="text-slate-200 font-bold text-xs block">Import Presets</span>
-                            <span className="text-[10px] text-slate-500">Load system templates</span>
-                          </div>
-                          <Layers size={16} className="text-slate-400" />
-                        </button>
-
-                        <button
-                          onClick={() => showToast('Refreshed TON Wallet endpoint configurations.', 'info')}
-                          className="w-full flex items-center justify-between p-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] border border-white/[0.05] transition-all text-left"
-                        >
-                          <div>
-                            <span className="text-slate-200 font-bold text-xs block">Connect Webhook Router</span>
-                            <span className="text-[10px] text-slate-500">Fast external API sync channels</span>
-                          </div>
-                          <Zap size={15} className="text-slate-400" />
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="mt-6 pt-4 border-t border-white/[0.04] flex items-center justify-between text-[11px] text-slate-400 font-mono">
-                      <span>Server status: HEALTHY</span>
-                      <span className="text-[#2ED573]">API v3.4</span>
-                    </div>
-                  </div>
-
-                </div>
-
-                {/* BOT DETAIL SLIDE-OVER CONTROL PANEL */}
-                <AnimatePresence>
-                  {selectedBotId && selectedBot && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="fixed inset-0 bg-[#070708]/80 backdrop-blur-sm z-50 flex justify-end"
-                      onClick={() => setSelectedBotId(null)}
-                    >
-                      <motion.div
-                        initial={{ x: '100%' }}
-                        animate={{ x: 0 }}
-                        exit={{ x: '100%' }}
-                        transition={{ type: 'spring', damping: 26, stiffness: 220 }}
-                        className="w-full max-w-xl bg-[#0E1321] border-l border-white/[0.1] h-full shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-y-auto flex flex-col justify-between"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        {/* HEADER PART */}
-                        <div>
-                          <div className="p-6 border-b border-white/[0.06] flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <Bot size={22} className="text-[#6C5CE7]" />
-                              <div>
-                                <h3 className="text-base font-extrabold tracking-tight text-white mb-0.5">{selectedBot.name}</h3>
-                                <span className="text-[10.5px] font-mono text-slate-500 block uppercase font-bold">{selectedBot.id}</span>
-                              </div>
-                            </div>
-                            <button
-                              onClick={() => setSelectedBotId(null)}
-                              className="w-8 h-8 rounded-lg bg-white/[0.03] border border-white/[0.08] flex items-center justify-center text-slate-400 hover:text-white transition-all hover:bg-white/[0.06]"
-                            >
-                              X
-                            </button>
-                          </div>
-
-                          {/* DETAILS INTERIOR TABS CONTROLLER */}
-                          <div className="flex border-b border-white/[0.04] px-4">
-                            {['overview', 'prompt', 'memory', 'logs'].map((t) => (
-                              <button
-                                key={t}
-                                onClick={() => setBotDetailActiveTab(t as any)}
-                                className={`px-4 py-3 text-xs capitalize font-bold transition-all border-b-2 ${
-                                  botDetailActiveTab === t 
-                                    ? 'border-[#6C5CE7] text-white' 
-                                    : 'border-transparent text-slate-400 hover:text-slate-200'
-                                }`}
-                              >
-                                {t}
-                              </button>
-                            ))}
-                          </div>
-
-                          {/* BODY TABS DETECTOR */}
-                          <div className="p-6 space-y-6">
-                            
-                            {/* OVERVIEW DATA PANEL */}
-                            {botDetailActiveTab === 'overview' && (
-                              <div className="space-y-4">
-                                
-                                <div className="grid grid-cols-2 gap-4">
-                                  <div className="bg-white/[0.02] border border-white/[0.04] p-3 rounded-xl font-mono text-xs">
-                                    <span className="text-slate-500 block text-[10px]">API Key Endpoint Auth</span>
-                                    <span className="text-slate-300 font-bold block mt-1 truncate">{selectedBot.apiKey}</span>
-                                  </div>
-                                  <div className="bg-white/[0.02] border border-white/[0.04] p-3 rounded-xl">
-                                    <span className="text-slate-500 block text-[10px]">Trigger Key Method</span>
-                                    <select
-                                      value={selectedBot.trigger}
-                                      onChange={(e) => {
-                                        const val = e.target.value as any;
-                                        setCloudBots(prev => prev.map(b => b.id === selectedBot.id ? { ...b, trigger: val } : b));
-                                        showToast('Pipeline trigger updated', 'success');
-                                      }}
-                                      className="bg-transparent text-white font-semibold text-xs mt-1 w-full border-0 focus:outline-none focus:ring-0 cursor-pointer p-0"
-                                    >
-                                      {['Manual', 'Webhook', 'Schedule'].map((tr) => (
-                                        <option key={tr} value={tr} className="bg-[#0E1321] text-white">{tr}</option>
-                                      ))}
-                                    </select>
-                                  </div>
-                                </div>
-
-                                <div className="bg-white/[0.02] border border-white/[0.04] p-4 rounded-xl space-y-3">
-                                  <h4 className="text-xs font-bold text-slate-300">Agent Performance Stats</h4>
-                                  <div className="grid grid-cols-3 gap-3 font-mono text-xs text-center">
-                                    <div className="p-2 border border-white/[0.04] rounded-lg">
-                                      <span className="text-slate-500 block text-[9.5px]">Runs Count</span>
-                                      <span className="text-white font-extrabold mt-1 block">{selectedBot.runCount}</span>
-                                    </div>
-                                    <div className="p-2 border border-white/[0.04] rounded-lg">
-                                      <span className="text-slate-500 block text-[9.5px]">Success Rate</span>
-                                      <span className="text-[#2ED573] font-extrabold mt-1 block">{selectedBot.successRate}%</span>
-                                    </div>
-                                    <div className="p-2 border border-white/[0.04] rounded-lg">
-                                      <span className="text-slate-500 block text-[9.5px]">Type Category</span>
-                                      <span className="text-blue-400 font-extrabold mt-1 block">{selectedBot.type}</span>
-                                    </div>
-                                  </div>
-                                </div>
-
-                                <div className="space-y-2">
-                                  <label className="text-[11.5px] font-bold text-slate-400">Integration system Instructions Description</label>
-                                  <p className="text-xs bg-[#08080A] p-3 rounded-xl border border-white/[0.04] leading-relaxed text-slate-300">
-                                    {selectedBot.systemPrompt}
-                                  </p>
-                                </div>
-
-                              </div>
-                            )}
-
-                            {/* PROMPT EDITOR PANEL */}
-                            {botDetailActiveTab === 'prompt' && (
-                              <div className="space-y-4">
-                                <div className="space-y-2">
-                                  <label className="text-[11.5px] font-bold text-slate-400 flex items-center justify-between">
-                                    <span>System Prompt (Instructions)</span>
-                                    <span className="text-[10px] text-slate-500 font-mono">Changes apply to next API run</span>
-                                  </label>
-                                  <textarea
-                                    value={selectedBot.systemPrompt}
-                                    onChange={(e) => {
-                                      const val = e.target.value;
-                                      setCloudBots(prev => prev.map(b => b.id === selectedBot.id ? { ...b, systemPrompt: val } : b));
-                                    }}
-                                    className="w-full bg-[#08080A] rounded-xl border border-white/[0.06] text-slate-200 text-xs p-4 focus:outline-none focus:border-[#6C5CE7] transition-all min-h-[140px] leading-relaxed"
-                                    placeholder="Enter system prompt for AI instructions..."
-                                    rows={5}
-                                  />
-                                </div>
-
-                                <div className="space-y-2">
-                                  <label className="text-[11.5px] font-bold text-slate-400">Test Mock Input Data</label>
-                                  <input
-                                    type="text"
-                                    value={selectedBot.testInput}
-                                    onChange={(e) => {
-                                      const val = e.target.value;
-                                      setCloudBots(prev => prev.map(b => b.id === selectedBot.id ? { ...b, testInput: val } : b));
-                                    }}
-                                    className="w-full bg-[#08080A] rounded-xl border border-white/[0.06] text-slate-200 text-xs px-4 py-3 focus:outline-none focus:border-[#6C5CE7] transition-all"
-                                  />
-                                </div>
-
-                                <button
-                                  onClick={() => runBotNow(selectedBot.id)}
-                                  disabled={runningBotId !== null}
-                                  className="w-full py-3 rounded-xl bg-[#6C5CE7] text-white text-xs font-bold hover:bg-[#5b4ed4] transition-all flex items-center justify-center gap-2"
-                                >
-                                  {runningBotId === selectedBot.id ? (
-                                    <RefreshCw size={13} className="animate-spin" />
-                                  ) : (
-                                    <Play size={13} fill="currentColor" />
-                                  )}
-                                  <span>Save instruction & Run bot inference</span>
-                                </button>
-                              </div>
-                            )}
-
-                            {/* MEMORY DATABASE PANEL */}
-                            {botDetailActiveTab === 'memory' && (
-                              <div className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                  <span className="text-xs font-bold text-slate-300">Knowledge Base Memory Vectors</span>
-                                  <button
-                                    onClick={() => {
-                                      const updatedMemory = [...selectedBot.memory, { key: 'added_resource_key', value: 'New database URL vector value limit' }];
-                                      setCloudBots(prev => prev.map(b => b.id === selectedBot.id ? { ...b, memory: updatedMemory } : b));
-                                      showToast('Memory key added', 'success');
-                                    }}
-                                    className="text-[10.5px] font-bold text-[#6C5CE7] hover:underline"
-                                  >
-                                    + Add New Key
-                                  </button>
-                                </div>
-
-                                {selectedBot.memory.length === 0 ? (
-                                  <p className="text-xs text-slate-500 italic py-4 text-center border border-dashed border-white/[0.05] rounded-xl">
-                                    No custom memory keys loaded in system database.
-                                  </p>
-                                ) : (
-                                  <div className="space-y-2.5">
-                                    {selectedBot.memory.map((mem, idx) => (
-                                      <div key={idx} className="flex items-center justify-between gap-3 bg-white/[0.02] border border-white/[0.04] p-3 rounded-xl text-xs">
-                                        <div className="flex flex-col min-w-0 flex-1">
-                                          <input
-                                            type="text"
-                                            value={mem.key}
-                                            onChange={(e) => {
-                                              const newKey = e.target.value;
-                                              const copy = [...selectedBot.memory];
-                                              copy[idx].key = newKey;
-                                              setCloudBots(prev => prev.map(b => b.id === selectedBot.id ? { ...b, memory: copy } : b));
-                                            }}
-                                            className="bg-transparent text-[#6C5CE7] font-bold border-0 p-0 focus:outline-none focus:ring-0 text-xs"
-                                          />
-                                          <input
-                                            type="text"
-                                            value={mem.value}
-                                            onChange={(e) => {
-                                              const newVal = e.target.value;
-                                              const copy = [...selectedBot.memory];
-                                              copy[idx].value = newVal;
-                                              setCloudBots(prev => prev.map(b => b.id === selectedBot.id ? { ...b, memory: copy } : b));
-                                            }}
-                                            className="bg-transparent text-slate-300 border-0 p-0 focus:outline-none focus:ring-0 text-xs mt-1"
-                                          />
-                                        </div>
-                                        <button
-                                          onClick={() => {
-                                            const copy = selectedBot.memory.filter((_, i) => i !== idx);
-                                            setCloudBots(prev => prev.map(b => b.id === selectedBot.id ? { ...b, memory: copy } : b));
-                                            showToast('Memory key purged', 'info');
-                                          }}
-                                          className="text-slate-500 hover:text-[#FF4757] transition-all p-1"
-                                        >
-                                          <Trash2 size={14} />
-                                        </button>
-                                      </div>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
-                            )}
-
-                            {/* EXECUTIONS TRACE LOGGER */}
-                            {botDetailActiveTab === 'logs' && (
-                              <div className="space-y-3">
-                                <span className="text-xs font-bold text-slate-300 block">Console output limits (terminal mode)</span>
-                                <div className="bg-[#08080A] rounded-xl p-4 font-mono text-[10.5px] border border-white/[0.04] h-[280px] overflow-y-auto space-y-2">
-                                  <p className="text-slate-500">[2026-05-22 22:18:45 UTC] Initiating background telemetry agent monitor...</p>
-                                  <p className="text-[#2ED573]">[2026-05-22 22:18:46 UTC] Successfully synced prompt instructions to cloud database.</p>
-                                  <p className="text-slate-300">[2026-05-22 22:18:47 UTC] Model inference token stream loaded, returned 125 generated parameters.</p>
-                                  <p className="text-[#F59E0B]">[2026-05-22 22:18:48 UTC] SSL Session keep-alive check... active OK</p>
-                                  <p className="text-slate-500">[2026-05-22 22:18:49 UTC] Diagnostic trace finished successfully with zero leaks detected.</p>
-                                </div>
-                              </div>
-                            )}
-
-                          </div>
-                        </div>
-
-                        {/* SLIDE FOOTER OPTIONS */}
-                        <div className="p-6 border-t border-white/[0.06] bg-[#0A0E18] flex items-center justify-between text-xs text-slate-500 font-mono">
-                          <span>Developer node sandbox</span>
-                          <span className="text-[#2ED573]">API Online</span>
-                        </div>
-
-                      </motion.div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-              </motion.div>
-            )}
-
-            {/* 2. BOTS & APPLICATIONS DECENTRALIZED DIRECTORY STATE */}
-            {currentTab === 'directory' && (
-              <motion.div
-                key="directory"
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2 }}
-                className="space-y-6"
-              >
-                {/* DIRECTORY BRIEF INTRO */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/[0.05] pb-5">
-                  <div>
-                    <h2 className="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
-                      <Globe className="text-[#6C5CE7]" size={20} />
-                      <span>Telegram Mini-Apps & Bot Ecosystem Directory</span>
-                    </h2>
-                    <p className="text-xs text-slate-400 mt-1">
-                      Browse verified Telegram automation systems, utility toolsets, decentralized finance gateways, and AI agents
-                    </p>
-                  </div>
-
-                  {/* SEARCH DECK BAR */}
-                  <div className="relative w-full md:w-80">
-                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" size={14} />
-                    <input
-                      type="text"
-                      value={directorySearchQuery}
-                      onChange={(e) => setDirectorySearchQuery(e.target.value)}
-                      placeholder="Search general directory bots..."
-                      className="w-full bg-[#0E1321] border border-white/[0.07] rounded-xl pl-10 pr-4 py-2 text-xs text-slate-200 focus:outline-none focus:border-[#6C5CE7]"
-                    />
-                    {directorySearchQuery && (
-                      <button 
-                        onClick={() => setDirectorySearchQuery('')}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white"
-                      >
-                        X
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* CATEGORIES GRID ROWS BUTTONS */}
-                <div className="space-y-2">
-                  <span className="text-[10px] font-mono font-bold tracking-widest text-slate-500 uppercase px-1">Filter Directory by ecosystem category</span>
-                  
-                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2.5">
-                    {resolvedCategoryList.map((cat) => (
-                      <button
-                        key={cat.id}
-                        onClick={() => setSelectedDirectoryCategory(cat.id)}
-                        className={`p-3.5 rounded-xl text-left border text-xs transition-all flex flex-col justify-between select-none ${
-                          selectedDirectoryCategory === cat.id
-                            ? 'bg-gradient-to-br from-[#6C5CE7]/15 to-transparent border-[#6C5CE7] text-white shadow-md' 
-                            : 'bg-[#0E1321] border-white/[0.05] hover:border-white/[0.12] text-slate-300'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between w-full">
-                          <span className="font-extrabold text-[12.5px] truncate max-w-[120px]">{cat.displayName}</span>
-                          <span className={`w-1.5 h-1.5 rounded-full ${selectedDirectoryCategory === cat.id ? 'bg-[#6C5CE7]' : 'bg-transparent'}`} />
-                        </div>
-                        <span className="text-[10px] text-slate-500 mt-1.5 line-clamp-1">{cat.displayDesc}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* RESULTS OUTPUT CONTAINER COLUMNGRID */}
-                <div className="space-y-4 pt-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono font-bold text-slate-400">
-                      Query matches: {filteredDirectoryBots.length} active bot applications found
-                    </span>
-                    <button
-                      onClick={() => navigate('/search')}
-                      className="text-xs text-[#6C5CE7] hover:underline flex items-center gap-1.5 font-bold"
-                    >
-                      <span>Interactive Advanced Search Panel</span>
-                      <ArrowRight size={11} />
-                    </button>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                    {filteredDirectoryBots.map((bot) => (
-                      <div 
-                        key={bot.id}
-                        className="bg-[#0E1321]/80 border border-white/[0.06] rounded-2xl p-5 hover:bg-[#12192c] transition-all flex flex-col justify-between group"
-                      >
-                        <div>
-                          {/* Banner top details logo and price */}
-                          <div className="flex items-start justify-between mb-4">
-                            <div className="flex items-center gap-3">
-                              <img
-                                src={bot.icon}
-                                alt={bot.name}
-                                className="w-12 h-12 rounded-xl object-cover bg-slate-800 border border-white/[0.04]"
-                                onError={(e) => {
-                                  (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`;
-                                }}
-                              />
-                              <div>
-                                <h4 className="font-extrabold text-sm text-white group-hover:text-[#6C5CE7] transition-all truncate max-w-[160px]">
-                                  {bot.name}
-                                </h4>
-                                <span className="text-[10px] text-slate-500 font-mono">Dev: {bot.developer}</span>
-                              </div>
-                            </div>
-
-                            {/* PRICE TAG IN TON SCALE */}
-                            <div className="text-right">
-                              {bot.price > 0 ? (
-                                <div className="flex items-center gap-1.5 bg-[#6C5CE7]/15 border border-[#6C5CE7]/25 px-2.5 py-1 rounded-full text-[#6C5CE7] font-bold text-[10px] font-mono">
-                                  <Coins size={11} />
-                                  <span>{bot.price} TON</span>
-                                </div>
-                              ) : (
-                                <span className="text-[9.5px] font-mono font-bold bg-[#2ED573]/10 text-[#2ED573] border border-[#2ED573]/20 px-2 py-0.5 rounded uppercase">
-                                  Free Use
-                                </span>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Description text */}
-                          <p className="text-xs text-slate-400 leading-relaxed min-h-[50px] line-clamp-3 mb-4">
-                            {bot.description}
-                          </p>
-
-                          {/* Languages row */}
-                          <div className="flex flex-wrap gap-1.5 mb-4">
-                            {bot.languages.map((l: string, i: number) => (
-                              <span key={i} className="text-[9px] bg-white/[0.03] text-slate-400 px-2 py-0.5 rounded font-mono">
-                                {l}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* Card bottom CTA launching anchors */}
-                        <div className="flex items-center justify-between pt-4 border-t border-white/[0.04] mt-4 text-[11px]">
-                          <div className="flex items-center gap-1.5 bg-yellow-500/10 border border-yellow-500/20 px-2 py-0.5 rounded text-yellow-500 font-bold">
-                            <Star size={11} className="fill-yellow-500 text-yellow-500" />
-                            <span>{bot.rating}</span>
-                          </div>
-                          
-                          <a
-                            href={bot.bot_link}
-                            target="_blank"
-                            referrerPolicy="no-referrer"
-                            className="bg-white text-black px-4 py-1.5 rounded-lg text-xs font-semibold hover:bg-zinc-200 active:scale-95 transition-all flex items-center gap-1.5"
-                          >
-                            <span>Open Telegram</span>
-                            <ExternalLink size={10} />
-                          </a>
-                        </div>
-
-                      </div>
-                    ))}
-                  </div>
-
-                  {filteredDirectoryBots.length === 0 && (
-                    <div className="text-center py-12 border border-dashed border-white/[0.05] rounded-2xl">
-                      <Bot size={35} className="text-slate-600 mx-auto mb-3" />
-                      <p className="text-sm font-bold text-slate-300">No directory matching found</p>
-                      <p className="text-xs text-slate-500 mt-1">Adjust search parameters or select a clean primary category</p>
-                      <button
-                        onClick={() => { setSelectedDirectoryCategory('all'); setDirectorySearchQuery(''); }}
-                        className="bg-[#6C5CE7]/15 text-[#6C5CE7] hover:bg-[#6C5CE7]/25 px-4 py-1.5 rounded-lg text-xs font-medium mt-4"
-                      >
-                        Reset All Filters
-                      </button>
-                    </div>
-                  )}
-
-                </div>
-              </motion.div>
-            )}
-
-            {/* 3. WORKFLOW BUILDER PAGE */}
-            {currentTab === 'workflows' && (
-              <motion.div
-                key="workflows"
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2 }}
-                className="space-y-6"
-              >
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/[0.05] pb-5">
-                  <div>
-                    <h2 className="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
-                      <Workflow className="text-[#6C5CE7]" size={20} />
-                      <span>Visual Automation Automation Pipeline Nodes</span>
-                    </h2>
-                    <p className="text-xs text-slate-400 mt-1">
-                      Configure structured action nodes, data webhooks, and AI agent processing pipelines sequentially.
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={runWorkflowSimulation}
-                      disabled={activeWorkflowRunning}
-                      className="px-4 py-2 rounded-xl bg-[#2ED573] text-[#0B0F17] hover:bg-[#26b15e] transition-all font-bold text-xs flex items-center gap-2 disabled:opacity-40"
-                    >
-                      <Play size={13} fill="currentColor" />
-                      <span>Execute Sequencer Pipeline</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* GRAPH NODES INTERACTION ENVIRONMENT */}
-                <div className="bg-[#08080A] rounded-2xl border border-white/[0.06] p-8 min-h-[400px] relative flex flex-col md:flex-row items-center justify-center gap-8 overflow-hidden">
-                  
-                  {/* Decorative mesh vector background elements */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#6C5CE7]/3 rounded-full blur-[120px] pointer-events-none" />
-
-                  {workflowNodes.map((node, index) => (
-                    <React.Fragment key={node.id}>
-                      
-                      {/* CONNECTING VECTOR VECTOR DRAWING LINES */}
-                      {index > 0 && (
-                        <div className="hidden md:flex items-center justify-center shrink-0">
-                          <div className={`h-0.5 w-12 border-t-2 border-dashed ${
-                            activeWorkflowRunning ? 'border-[#2ED573]' : 'border-white/[0.08]'
-                          } relative`}>
-                            <ChevronRight size={14} className={`absolute -right-2 top-1/2 -translate-y-1/2 ${
-                              activeWorkflowRunning ? 'text-[#2ED573] animate-pulse' : 'text-slate-600'
-                            }`} />
-                          </div>
-                        </div>
-                      )}
-
-                      {/* WORK FLOW NODE CARD */}
-                      <div className="w-64 bg-[#0E1321] border border-white/[0.07] rounded-2xl p-5 relative group hover:border-[#6C5CE7] transition-all shadow-xl">
-                        
-                        <div className="flex items-center justify-between mb-3">
-                          <span className={`text-[9.5px] font-mono px-2 py-0.5 rounded font-black uppercase text-xs ${
-                            node.status === 'running' ? 'bg-[#F59E0B]/10 text-[#F59E0B]' :
-                            node.status === 'success' ? 'bg-[#2ED573]/10 text-[#2ED573]' :
-                            'bg-white/[0.04] text-slate-400'
-                          }`}>
-                            {node.type}
-                          </span>
-
-                          <button
-                            onClick={() => deleteWorkflowNode(node.id)}
-                            className="p-1 opacity-0 group-hover:opacity-100 text-slate-500 hover:text-[#FF4757] transition-all"
-                          >
-                            <Trash2 size={13} />
-                          </button>
-                        </div>
-
-                        <h4 className="font-extrabold text-white text-xs tracking-tight">{node.name}</h4>
-                        <span className="text-[10px] font-mono text-slate-500 block mt-1">{node.subtype}</span>
-
-                        <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/[0.04] text-[10px]">
-                          <span className="text-slate-500 font-mono">Index Node #{index + 1}</span>
-                          <span className={`flex items-center gap-1 ${
-                            node.status === 'success' ? 'text-[#2ED573]' :
-                            node.status === 'running' ? 'text-[#F59E0B]' :
-                            'text-slate-400'
-                          }`}>
-                            <span className={`w-1.5 h-1.5 rounded-full ${
-                              node.status === 'success' ? 'bg-[#2ED573]' :
-                              node.status === 'running' ? 'bg-[#F59E0B] animate-ping' :
-                              'bg-slate-700'
-                            }`} />
-                            <span className="capitalize">{node.status}</span>
-                          </span>
-                        </div>
-
-                      </div>
-
-                    </React.Fragment>
-                  ))}
-
-                  {/* EMPTY PLACEHOLDER STYLING CONSOLE */}
-                  {workflowNodes.length === 0 && (
-                    <div className="text-center py-8">
-                      <Workflow size={40} className="text-slate-700 mx-auto mb-4" />
-                      <p className="text-sm font-bold text-slate-400">Your visual workflow pipeline is empty</p>
-                      <p className="text-xs text-slate-500 mt-1">Add Trigger and Action nodes above to define automate chains</p>
-                    </div>
-                  )}
-
-                </div>
-
-                {/* BOTTOM CHASSIS TO RECONSTRUCT NODES */}
-                <div className="bg-[#0E1321] border border-white/[0.06] p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4">
-                  <div className="space-y-0.5 max-w-xl text-left">
-                    <h4 className="font-bold text-slate-200 text-xs">Dynamic Node Constructor Builder</h4>
-                    <p className="text-slate-500 text-[11px] leading-relaxed">
-                      Inject procedural processing blocks directly into your active runtime pipeline graph. Connect webhooks to Gemini APIs instantly.
-                    </p>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      onClick={() => addWorkflowNode('Trigger')}
-                      className="px-3.5 py-2 rounded-xl bg-white/[0.03] border border-white/[0.06] text-xs font-semibold text-white hover:bg-white/[0.06] flex items-center gap-1.5"
-                    >
-                      <Plus size={14} className="text-[#6C5CE7]" />
-                      <span>+ Add Webhook Trigger</span>
-                    </button>
-                    <button
-                      onClick={() => addWorkflowNode('AI Processing')}
-                      className="px-3.5 py-2 rounded-xl bg-white/[0.03] border border-white/[0.06] text-xs font-semibold text-white hover:bg-white/[0.06] flex items-center gap-1.5"
-                    >
-                      <Plus size={14} className="text-[#6C5CE7]" />
-                      <span>+ Add AI Processor</span>
-                    </button>
-                    <button
-                      onClick={() => addWorkflowNode('Action')}
-                      className="px-3.5 py-2 rounded-xl bg-white/[0.03] border border-white/[0.06] text-xs font-semibold text-white hover:bg-white/[0.06] flex items-center gap-1.5"
-                    >
-                      <Plus size={14} className="text-[#6C5CE7]" />
-                      <span>+ Add Action Node</span>
-                    </button>
-                  </div>
-                </div>
-
-              </motion.div>
-            )}
-
-            {/* 4. PROMPT PLAYGROUND VIEW STATE */}
-            {currentTab === 'playground' && (
-              <motion.div
-                key="playground"
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2 }}
-                className="grid grid-cols-1 md:grid-cols-12 gap-6"
-              >
-                
-                {/* SETTINGS PANEL (4 columns) */}
-                <div className="md:col-span-4 bg-[#0E1321] border border-white/[0.06] p-6 rounded-2xl space-y-6">
-                  <div>
-                    <h2 className="text-sm font-extrabold text-white tracking-tight">Agent Selection Config</h2>
-                    <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">Adjust inference keys and constraints to audit model outcomes</p>
-                  </div>
-
-                  <div className="space-y-4 text-left">
-                    <div className="space-y-2">
-                      <label className="text-[11.5px] font-bold text-slate-400">Select Sandbox Target Bot</label>
-                      <select
-                        value={playgroundSelectedBotId}
-                        onChange={(e) => setPlaygroundSelectedBotId(e.target.value)}
-                        className="w-full bg-[#08080A] rounded-xl border border-white/[0.06] p-3 text-xs text-slate-200 focus:outline-none focus:border-[#6C5CE7]"
-                      >
-                        {cloudBots.map((b) => (
-                          <option key={b.id} value={b.id}>{b.name} ({b.type})</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-[11px]">
-                        <label className="font-bold text-slate-400">Creativity Temperature</label>
-                        <span className="text-[#6C5CE7] font-mono font-bold">{playgroundTemp}</span>
-                      </div>
-                      <input
-                        type="range"
-                        min="0"
-                        max="1.2"
-                        step="0.1"
-                        value={playgroundTemp}
-                        onChange={(e) => setPlaygroundTemp(parseFloat(e.target.value))}
-                        className="w-full accent-[#6C5CE7] h-1.5 bg-white/[0.06] rounded-lg appearance-none cursor-pointer"
-                      />
-                    </div>
-
-                    <div className="bg-white/[0.02] border border-white/[0.04] p-3 rounded-xl font-mono text-[10px] text-slate-500 space-y-1">
-                      <span className="text-[#6C5CE7] font-bold block">Inference Parameters:</span>
-                      <div>Model: Llama3-70B-Chat</div>
-                      <div>Timeout Limit: 12000ms</div>
-                      <div>System API: Active</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* PLAYGROUND EDITOR MAIN FIELD (8 columns) */}
-                <div className="md:col-span-8 bg-[#0E1321] border border-white/[0.06] p-6 rounded-2xl flex flex-col justify-between space-y-4">
-                  
-                  <div className="space-y-4 flex-1">
-                    <div className="flex items-center justify-between border-b border-white/[0.04] pb-3">
-                      <div className="flex items-center gap-2">
-                        <Code className="text-[#6C5CE7]" size={16} />
-                        <span className="font-extrabold text-[#EDEDED] text-sm tracking-tight">Editable System Instructions</span>
-                      </div>
-                      <span className="text-[10px] font-mono text-[#2ED573] bg-[#2ED573]/10 px-2 py-0.5 rounded font-bold uppercase">OpenAI Playground Style</span>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div className="space-y-2 text-left animate-fadeIn">
-                        <textarea
-                          value={playgroundInstruction}
-                          onChange={(e) => setPlaygroundInstruction(e.target.value)}
-                          className="w-full bg-[#08080A] rounded-xl border border-white/[0.06] text-slate-300 font-mono text-xs p-4 focus:outline-none focus:border-[#6C5CE7] leading-relaxed min-h-[140px]"
-                          placeholder="Your system instructions define the voice and behavior of the agent..."
-                        />
-                      </div>
-
-                      <div className="space-y-2 text-left">
-                        <label className="text-[11.5px] font-bold text-slate-400">Simulated User Input Prompt</label>
-                        <input
-                          type="text"
-                          value={playgroundPromptInput}
-                          onChange={(e) => setPlaygroundPromptInput(e.target.value)}
-                          className="w-full bg-[#08080A] rounded-xl border border-white/[0.06] text-slate-200 text-xs px-4 py-3 focus:outline-none focus:border-[#6C5CE7]"
-                          placeholder="Type input questions to test model reactions..."
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* STREAM OUTPUT OUTPUT TERMINAL */}
-                  <div className="bg-[#08080A] rounded-xl border border-white/[0.04] p-4 font-mono text-xs leading-relaxed min-h-[140px]">
-                    <span className="text-slate-500 block mb-2 border-b border-white/[0.03] pb-1 font-bold">// Model stream telemetry outputs:</span>
-                    {playgroundOutputText ? (
-                      <pre className="text-slate-200 whitespace-pre-wrap font-sans text-xs">{playgroundOutputText}</pre>
-                    ) : (
-                      <span className="text-slate-600 italic">No output. Press "Submit Pipeline query" below to simulate stream tokens.</span>
-                    )}
-                  </div>
-
-                  <button
-                    onClick={handleRunPlayground}
-                    disabled={isPlaygroundInference}
-                    className="w-full bg-[#6C5CE7] hover:bg-[#5b4ed4] text-white py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all disabled:opacity-40"
-                  >
-                    {isPlaygroundInference ? (
-                      <RefreshCw size={14} className="animate-spin" />
-                    ) : (
-                      <Sparkles size={14} fill="currentColor" />
-                    )}
-                    <span>Submit Playground Query & Trace Outputs</span>
-                  </button>
-
-                </div>
-
-              </motion.div>
-            )}
-
-            {/* 5. PERFORMANCE ANALYTICS VIEW STATE */}
-            {currentTab === 'analytics' && (
-              <motion.div
-                key="analytics"
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2 }}
-                className="space-y-6"
-              >
-                
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                  <div className="bg-[#0E1321] border border-white/[0.06] p-5 rounded-2xl">
-                    <span className="text-slate-400 text-xs font-mono block">Active Platform Uptime</span>
-                    <span className="text-3xl font-extrabold text-[#2ED573] mt-2 block font-mono">{analyticsStats.uptime}</span>
-                    <p className="text-[10px] text-slate-500 mt-2">Aggregated across all server relay zones</p>
-                  </div>
-                  <div className="bg-[#0E1321] border border-white/[0.06] p-5 rounded-2xl">
-                    <span className="text-slate-400 text-xs font-mono block">Average Inference Latency</span>
-                    <span className="text-3xl font-extrabold text-[#4F9CF9] mt-2 block font-mono">{analyticsStats.latency}</span>
-                    <p className="text-[10px] text-slate-500 mt-2">Measured at browser WebSocket ingress</p>
-                  </div>
-                  <div className="bg-[#0E1321] border border-white/[0.06] p-5 rounded-2xl">
-                    <span className="text-slate-400 text-xs font-mono block">Platform Shard Storage Allocation</span>
-                    <span className="text-3xl font-extrabold text-white mt-2 block font-mono">{analyticsStats.databaseUsage}</span>
-                    <p className="text-[10px] text-slate-500 mt-2">Vector listings capacity utilization</p>
-                  </div>
-                </div>
-
-                {/* GRAPH VISUAL CHART BLOCK */}
-                <div className="bg-[#0E1321] border border-white/[0.06] p-6 rounded-2xl">
-                  <div className="flex items-center justify-between mb-6">
-                    <div>
-                      <h3 className="font-extrabold text-sm text-white tracking-tight">API Request Metrics History</h3>
-                      <p className="text-xs text-slate-500 mt-1">Inference transactions and latencies logged over the past week</p>
-                    </div>
-                    <span className="text-[10.5px] font-mono text-[#6C5CE7] bg-[#6C5CE7]/15 px-3 py-1 rounded-full uppercase border border-[#6C5CE7]/25 font-bold">
-                      Ecosystem live tracking
-                    </span>
-                  </div>
-
-                  {/* SVG COMPREHENSIVE BAR CHART FOR SYSTEM */}
-                  <div className="h-64 flex items-end justify-between gap-4 pt-4 border-b border-white/[0.05] relative px-4 text-center">
-                    {/* Background target grid lines */}
-                    <div className="absolute top-1/4 left-0 right-0 border-t border-white/[0.02]" />
-                    <div className="absolute top-2/4 left-0 right-0 border-t border-white/[0.02]" />
-                    <div className="absolute top-3/4 left-0 right-0 border-t border-white/[0.02]" />
-
-                    {analyticsStats.usageHistory.map((day, idx) => {
-                      const maxRequests = 550;
-                      const heightPercent = `${(day.requests / maxRequests) * 100}%`;
-                      return (
-                        <div key={idx} className="flex-1 flex flex-col items-center gap-2 h-full justify-end z-10 group relative">
-                          <div className="opacity-0 group-hover:opacity-100 absolute -top-12 bg-[#0E1321] border border-white/[0.1] px-2.5 py-1.5 rounded text-[10px] font-mono text-[#6C5CE7] transition-all whitespace-nowrap shadow-lg">
-                            <span className="font-extrabold text-white">{day.requests} Req</span> / {day.latency}ms latency
-                          </div>
-
-                          <div 
-                            className="bg-gradient-to-t from-[#6C5CE7] to-[#4F9CF9] w-full rounded-t-lg transition-all group-hover:from-[#6C5CE7] group-hover:to-[#2ED573]" 
-                            style={{ height: heightPercent }}
-                          />
-                          <div className="text-[10px] font-mono text-slate-500 block shrink-0 mt-3">{day.date}</div>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                </div>
-
-              </motion.div>
-            )}
-
-            {/* 6. SYSTEM TELEMETRY LOGS VIEW STATE */}
-            {currentTab === 'telemetry' && (
-              <motion.div
-                key="telemetry"
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2 }}
-                className="space-y-4"
-              >
-                
-                <div className="bg-[#0E1321] border border-white/[0.06] p-6 rounded-2xl space-y-4">
-                  
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/[0.04] pb-4">
-                    <div className="space-y-0.5">
-                      <h3 className="font-extrabold text-sm text-slate-200 tracking-tight">Ecosystem Diagnostic Console Logs</h3>
-                      <p className="text-slate-500 text-xs">Filter real-time and operational status queries registered in BotlyHub telemetry</p>
-                    </div>
-
-                    <button
-                      onClick={() => {
-                        setTerminalFeedLogs([]);
-                        showToast('Telemetry diagnostics storage reset', 'success');
-                      }}
-                      className="text-xs font-bold text-[#FF4757] hover:underline cursor-pointer"
-                    >
-                      Reset Telemetry Dump
-                    </button>
-                  </div>
-
-                  <div className="bg-[#08080A] rounded-2xl border border-white/[0.05] p-5 font-mono text-[11px] leading-relaxed h-[420px] overflow-y-auto space-y-1.5">
-                    <div className="text-slate-500 font-bold mb-3">// Telemetry dump initialisation sequence: UTC+0 active</div>
-                    <div className="text-[#2ED573]">● SUCCESS (200) API keys decrypted. Pipeline state matched with secure gateway servers.</div>
-                    
-                    {terminalFeedLogs.map((log, idx) => (
-                      <div key={idx} className="flex flex-col md:flex-row md:items-start gap-1 md:gap-3 text-slate-300">
-                        <span className="text-slate-500">[{log.time}]</span>
-                        <span className="text-[#6C5CE7] font-bold">{log.botName}:</span>
-                        <span className={log.status === 'success' ? 'text-[#2ED573]' : log.status === 'error' ? 'text-[#FF4757]' : 'text-slate-200'}>
-                          {log.text}
-                        </span>
-                      </div>
-                    ))}
-                    
-                    <div className="text-slate-500 pt-2">... Listening continuously for next execution transaction ...</div>
-                  </div>
-
-                </div>
-
-              </motion.div>
-            )}
-
-          </AnimatePresence>
-
         </div>
 
-      </main>
+        {/* Tab state identifier */}
+        <span className="text-[10px] uppercase font-mono font-bold px-2 px-1 rounded bg-[rgba(108,92,231,0.15)] border border-[rgba(108,92,231,0.2)] text-[#6C5CE7]">
+          {activeTab}
+        </span>
+      </header>
 
-      {/* CREATE BOT MODAL SCREEN */}
+      {/* Tablet Drawer overlays and content */}
       <AnimatePresence>
-        {isCreateModalOpen && (
-          <div className="fixed inset-0 bg-[#070708]/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-lg bg-[#0E1321] border border-white/[0.1] rounded-2xl overflow-hidden shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
+        {tabletDrawerOpen && (
+          <>
+            {/* Dark glass backdrop overlay */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setTabletDrawerOpen(false)}
+              className="xl:hidden fixed inset-0 bg-[#000]/65 backdrop-blur-sm z-50 pointer-events-auto"
+            />
+
+            {/* Floating content drawer */}
+            <motion.div 
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', damping: 20, stiffness: 150 }}
+              className="xl:hidden fixed left-0 top-0 bottom-0 w-[300px] bg-[#0B0F17] border-r border-[rgba(255,255,255,0.08)] p-6 z-50 flex flex-col pointer-events-auto"
             >
-              <div className="p-6 border-b border-white/[0.06] flex items-center justify-between">
-                <span className="font-extrabold text-[#EDEDED] text-sm tracking-tight flex items-center gap-2">
-                  <Bot size={17} className="text-[#6C5CE7]" />
-                  <span>Spin Up New Cloud Bot Agent</span>
-                </span>
-                <button
-                  onClick={() => setIsCreateModalOpen(false)}
-                  className="text-slate-400 hover:text-white"
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#6C5CE7] to-[#8C7CFF] flex items-center justify-center text-white font-extrabold">
+                    <Cpu className="w-4 h-4" />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-bold text-sm text-[#F8FAFC]">API.STUDIO</span>
+                    <span className="text-[9px] uppercase font-bold text-[#6C5CE7] tracking-wider leading-none">Tablet Engine</span>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setTabletDrawerOpen(false)}
+                  className="p-1.5 hover:bg-[rgba(255,255,255,0.04)] rounded-full text-slate-400"
                 >
-                  X
+                  <X className="w-5 h-5" />
                 </button>
               </div>
 
-              <form onSubmit={handleCreateBot} className="p-6 space-y-4">
-                <div className="space-y-2">
-                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Bot Agent Name</label>
-                  <input
-                    type="text"
-                    required
-                    value={newBotName}
-                    onChange={(e) => setNewBotName(e.target.value)}
-                    placeholder="e.g., TranslatorBot Master"
-                    className="w-full bg-[#08080A] rounded-xl border border-white/[0.07] px-4 py-3 text-xs text-white focus:outline-none focus:border-[#6C5CE7]"
-                  />
-                </div>
+              {/* Drawer nested systems */}
+              <nav className="flex-1 flex flex-col gap-2">
+                <button 
+                  onClick={() => { setActiveTab('dashboard'); setTabletDrawerOpen(false); }}
+                  className={`w-full flex items-center gap-3 rounded-lg py-3 px-3.5 transition-all text-left ${activeTab === 'dashboard' ? 'bg-[rgba(108,92,231,0.15)] text-[#6C5CE7] font-semibold' : 'hover:bg-[rgba(255,255,255,0.04)] text-[#94A3B8]'}`}
+                >
+                  <LayoutDashboard className="w-[18px] h-[18px]" />
+                  <span>Dashboard</span>
+                </button>
 
-                <div className="space-y-2">
-                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Operational Category</label>
-                  <select
-                    value={newBotType}
-                    onChange={(e) => setNewBotType(e.target.value as any)}
-                    className="w-full bg-[#08080A] rounded-xl border border-white/[0.07] p-3 text-xs text-slate-300 focus:outline-none focus:border-[#6C5CE7]"
+                <div className="flex flex-col w-full">
+                  <button 
+                    onClick={() => setBotsSubMenuOpen(!botsSubMenuOpen)}
+                    className={`w-full flex items-center justify-between rounded-lg py-3 px-3.5 transition-all text-left ${activeTab === 'bots' ? 'bg-[rgba(255,255,255,0.02)] text-white' : 'hover:bg-[rgba(255,255,255,0.04)] text-[#94A3B8]'}`}
                   >
-                    {['Support', 'Automation', 'QA', 'Assistant'].map((t) => (
-                      <option key={t} value={t}>{t} Bot Agent</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Initial System Prompt (AI Instructions)</label>
-                  <textarea
-                    value={newBotPrompt}
-                    onChange={(e) => setNewBotPrompt(e.target.value)}
-                    placeholder="Write custom prompt commands to define AI memory..."
-                    rows={4}
-                    className="w-full bg-[#08080A] rounded-xl border border-white/[0.07] p-4 text-xs text-white focus:outline-none focus:border-[#6C5CE7] leading-relaxed font-mono"
-                  />
-                </div>
-
-                <div className="flex justify-end gap-3 pt-4 border-t border-white/[0.04]">
-                  <button
-                    type="button"
-                    onClick={() => setIsCreateModalOpen(false)}
-                    className="px-4 py-2 border border-white/[0.07] hover:bg-white/[0.03] text-slate-300 rounded-xl text-xs font-semibold"
-                  >
-                    Cancel
+                    <div className="flex items-center gap-3">
+                      <Bot className="w-[18px] h-[18px]" />
+                      <span>Bots Panel</span>
+                    </div>
+                    {botsSubMenuOpen ? <ChevronUp className="w-4 h-4 text-slate-500" /> : <ChevronDown className="w-4 h-4 text-slate-500" />}
                   </button>
-                  <button
-                    type="submit"
-                    className="px-5 py-2.5 bg-[#6C5CE7] hover:bg-[#5b4ed4] text-white rounded-xl text-xs font-bold transition-all shadow-md"
-                  >
-                    Provision Agent
-                  </button>
-                </div>
-              </form>
 
+                  {botsSubMenuOpen && (
+                    <div className="pl-8 flex flex-col gap-1 mt-1 border-l border-[rgba(255,255,255,0.05)] ml-5">
+                      <button 
+                        onClick={() => { setActiveTab('dashboard'); setSearchQuery(''); setTabletDrawerOpen(false); }}
+                        className="py-2.5 text-xs text-[#94A3B8] hover:text-[#6C5CE7] text-left"
+                      >
+                        All Active Bots
+                      </button>
+                      <button 
+                        onClick={() => { setCreateBotOpen(true); setTabletDrawerOpen(false); }}
+                        className="py-2.5 text-xs text-[#2ED573] text-left flex items-center gap-1.5"
+                      >
+                        <PlusCircle className="w-3.5 h-3.5" />
+                        Create New Bot
+                      </button>
+                      <button 
+                        onClick={() => { setActiveTab('bots'); setCategoryFilter('Arbitrage'); setTabletDrawerOpen(false); }}
+                        className="py-2.5 text-xs text-[#94A3B8] hover:text-[#6C5CE7] text-left"
+                      >
+                        Arbitrage Templates
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <button 
+                  onClick={() => { setActiveTab('workflows'); setTabletDrawerOpen(false); }}
+                  className={`w-full flex items-center gap-3 rounded-lg py-3 px-3.5 transition-all text-left ${activeTab === 'workflows' ? 'bg-[rgba(108,92,231,0.15)] text-[#6C5CE7] font-semibold' : 'hover:bg-[rgba(255,255,255,0.04)] text-[#94A3B8]'}`}
+                >
+                  <GitMerge className="w-[18px] h-[18px]" />
+                  <span>Workflows</span>
+                </button>
+
+                <button 
+                  onClick={() => { setActiveTab('analytics'); setTabletDrawerOpen(false); }}
+                  className={`w-full flex items-center gap-3 rounded-lg py-3 px-3.5 transition-all text-left ${activeTab === 'analytics' ? 'bg-[rgba(108,92,231,0.15)] text-[#6C5CE7] font-semibold' : 'hover:bg-[rgba(255,255,255,0.04)] text-[#94A3B8]'}`}
+                >
+                  <BarChart3 className="w-[18px] h-[18px]" />
+                  <span>Analytics Console</span>
+                </button>
+
+                <button 
+                  onClick={() => { setActiveTab('logs'); setConsoleOpen(true); setTabletDrawerOpen(false); }}
+                  className={`w-full flex items-center gap-3 rounded-lg py-3 px-3.5 transition-all text-left ${activeTab === 'logs' ? 'bg-[rgba(108,92,231,0.15)] text-[#6C5CE7] font-semibold' : 'hover:bg-[rgba(255,255,255,0.04)] text-[#94A3B8]'}`}
+                >
+                  <Terminal className="w-[18px] h-[18px]" />
+                  <span>Live Terminal Logs</span>
+                </button>
+
+                <button 
+                  onClick={() => { setActiveTab('settings'); setTabletDrawerOpen(false); }}
+                  className={`w-full flex items-center gap-3 rounded-lg py-3 px-3.5 transition-all text-left ${activeTab === 'settings' ? 'bg-[rgba(108,92,231,0.15)] text-[#6C5CE7] font-semibold' : 'hover:bg-[rgba(255,255,255,0.04)] text-[#94A3B8]'}`}
+                >
+                  <Settings className="w-[18px] h-[18px]" />
+                  <span>Core Settings</span>
+                </button>
+              </nav>
+
+              <div className="pt-4 border-t border-[rgba(255,255,255,0.05)] text-center flex flex-col items-center gap-2">
+                <span className="text-[10px] text-slate-550 font-mono">Gateway Ping: 14ms (OPTIMAL)</span>
+              </div>
             </motion.div>
-          </div>
+          </>
         )}
       </AnimatePresence>
 
-      {/* TOAST NOTIFIERS LAYER */}
-      <div className="fixed bottom-6 right-6 space-y-2.5 z-50 pointer-events-none">
-        {toasts.map((t) => (
-          <motion.div
-            key={t.id}
-            initial={{ opacity: 0, y: 15, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className={`w-80 p-3.5 rounded-xl border shadow-[0_4px_16px_rgba(0,0,0,0.5)] pointer-events-auto flex items-center justify-between ${
-              t.type === 'error' ? 'bg-[#FF4757]/10 border-[#FF4757]/20 text-[#FF4757]' : 
-              t.type === 'info' ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' :
-              'bg-[#2ED573]/10 border-[#2ED573]/20 text-[#2ED573]'
+
+      {/* Main Container Right */}
+      <main className="flex-1 w-full min-w-0 flex flex-col xl:h-screen xl:overflow-y-auto custom-scrollbar bg-[#0B0F17] p-4 sm:p-6 lg:p-10">
+        
+        {/* Real-time Ticker Simulation Banner trigger */}
+        <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-xl bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.08)] gap-3 bg-gradient-to-r from-[rgba(108,92,231,0.03)] to-transparent">
+          <div className="flex items-center gap-3">
+            <div className={`w-2 h-2 rounded-full ${simulationActive ? 'bg-[#2ED573] animate-pulse' : 'bg-[#FFA502]'}`} />
+            <div className="flex flex-col">
+              <span className="text-xs font-bold font-mono tracking-tight flex items-center gap-1.5 text-[#F8FAFC]">
+                AUTOMATED SIMULATOR SERVICE
+                {simulationActive ? (
+                  <span className="text-[9px] bg-emerald-500/15 border border-emerald-500/30 text-[#2ED573] px-1.5 py-0.2 rounded font-mono">Running</span>
+                ) : (
+                  <span className="text-[9px] bg-amber-500/15 border border-amber-500/30 text-[#FFA502] px-1.5 py-0.2 rounded font-mono">Paused</span>
+                )}
+              </span>
+              <span className="text-xs text-[#94A3B8] font-mono">Increments executions and injects dynamic log activities to the log stream periodically.</span>
+            </div>
+          </div>
+          <button 
+            id="simulation-toggle-btn"
+            onClick={() => setSimulationActive(!simulationActive)}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold font-mono transition-all flex items-center gap-1.5 border ${
+              simulationActive 
+                ? 'bg-amber-500/10 border-amber-500/30 text-[#FFA502] hover:bg-amber-500/20' 
+                : 'bg-emerald-500/10 border-emerald-500/30 text-[#2ED573] hover:bg-emerald-500/20'
             }`}
           >
-            <div className="flex items-center gap-2.5">
-              <span className={`w-1.5 h-1.5 rounded-full ${
-                t.type === 'error' ? 'bg-[#FF4757]' : t.type === 'info' ? 'bg-blue-400' : 'bg-[#2ED573]'
-              }`} />
-              <span className="text-[11.5px] font-semibold text-[#EDEDED]">{t.message}</span>
-            </div>
-            <button 
-              onClick={() => setToasts(prev => prev.filter(item => item.id !== t.id))}
-              className="text-slate-500 hover:text-white text-xs pl-2"
-            >
-              X
-            </button>
+            {simulationActive ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+            {simulationActive ? 'Pause Sim' : 'Resume Sim'}
+          </button>
+        </div>
+
+        {/* Dynamic Content loaded through active tabs */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.2 }}
+            className="flex flex-col gap-6"
+          >
+            {activeTab === 'dashboard' && (
+              <>
+                {/* 🏠 HOMEPAGE LAYOUT (DYOR STYLE) */}
+                
+                {/* 1. Top Summary Section */}
+                <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {/* Card 1: Active Bots */}
+                  <div className="p-4 rounded-xl bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)] flex items-center justify-between hover:border-[rgba(108,92,231,0.25)] transition-all">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-xs text-[#94A3B8] uppercase tracking-wider font-semibold">Active Bots</span>
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-2xl font-black font-mono tracking-tight text-[#F8FAFC]">
+                          {activeBotsCount}
+                        </span>
+                        <span className="text-xs text-slate-550 font-mono">/ {bots.length} total</span>
+                      </div>
+                      <span className="text-[10px] text-slate-500 font-mono">Registered node instances</span>
+                    </div>
+                    <div className="w-10 h-10 rounded-lg bg-[rgba(108,92,231,0.08)] border border-[rgba(108,92,231,0.2)] flex items-center justify-center text-[#6C5CE7]">
+                      <Bot className="w-5 h-5 animate-pulse" />
+                    </div>
+                  </div>
+
+                  {/* Card 2: Total Executions */}
+                  <div className="p-4 rounded-xl bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)] flex items-center justify-between hover:border-[rgba(108,92,231,0.25)] transition-all">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-xs text-[#94A3B8] uppercase tracking-wider font-semibold">Total Executions</span>
+                      <span className="text-2xl font-black font-mono tracking-tight text-[#F8FAFC]">
+                        {totalExecutions.toLocaleString()}
+                      </span>
+                      <span className="text-[10px] text-[#2ED573] font-mono flex items-center gap-1">
+                        <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#2ED573] animate-ping" />
+                        Dynamic log increments live
+                      </span>
+                    </div>
+                    <div className="w-10 h-10 rounded-lg bg-[rgba(46,213,115,0.08)] border border-[rgba(46,213,115,0.2)] flex items-center justify-center text-[#2ED573]">
+                      <Activity className="w-5 h-5" />
+                    </div>
+                  </div>
+
+                  {/* Card 3: Success Rate */}
+                  <div className="p-4 rounded-xl bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)] flex items-center justify-between hover:border-[rgba(108,92,231,0.25)] transition-all">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-xs text-[#94A3B8] uppercase tracking-wider font-semibold">Avg Success Rate</span>
+                      <span className="text-2xl font-black font-mono tracking-tight text-[#F8FAFC]">
+                        {bots.length > 0 
+                          ? (bots.reduce((acc, b) => acc + b.successRate, 0) / bots.length).toFixed(2) 
+                          : '100'}%
+                      </span>
+                      <div className="w-24 bg-slate-800 rounded-full h-1 overflow-hidden mt-1">
+                        <div className="bg-[#6C5CE7] h-full" style={{ width: '96.4%' }} />
+                      </div>
+                    </div>
+                    <div className="w-10 h-10 rounded-lg bg-[rgba(108,92,231,0.08)] border border-[rgba(108,92,231,0.2)] flex items-center justify-center text-[#6C5CE7]">
+                      <Sparkles className="w-5 h-5" />
+                    </div>
+                  </div>
+
+                  {/* Card 4: System Status */}
+                  <div className="p-4 rounded-xl bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)] flex items-center justify-between hover:border-[rgba(108,92,231,0.25)] transition-all">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-xs text-[#94A3B8] uppercase tracking-wider font-semibold">System Gateway</span>
+                      <span className="text-2xl font-black font-mono tracking-tight text-[#F8FAFC] flex items-center gap-2">
+                        {systemStatusMsg.text}
+                      </span>
+                      <span className="text-[10px] text-slate-500 font-mono">Gateway Node: 14ms (Optimal)</span>
+                    </div>
+                    <div className="w-10 h-10 rounded-lg bg-[rgba(46,213,115,0.08)] border border-[rgba(46,213,115,0.2)] flex items-center justify-center" style={{ color: systemStatusMsg.color }}>
+                      <CheckCircle2 className="w-5 h-5 animate-pulse" />
+                    </div>
+                  </div>
+                </section>
+
+                {/* Main section: Bento Grid for Layout */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  
+                  {/* Left Column: 2. Main Data Grid (DYOR STYLE CORE) */}
+                  <div className="lg:col-span-2 flex flex-col gap-4">
+                    <div className="p-4 rounded-xl bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.08)]">
+                      
+                      {/* Grid Header & Filters */}
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-6">
+                        <div className="flex flex-col">
+                          <h2 className="text-base font-bold text-white tracking-tight">Active API Gateway Clusters</h2>
+                          <p className="text-xs text-[#94A3B8] font-mono">Structured analytics terminals and manual execution override controls.</p>
+                        </div>
+
+                        {/* Search & Custom filters */}
+                        <div className="flex items-center gap-2 min-w-0 flex-1 sm:max-w-xs justify-end">
+                          <div className="relative w-full flex items-center">
+                            <Search className="w-4 h-4 text-slate-500 absolute left-3 pointer-events-none" />
+                            <input 
+                              type="text" 
+                              value={searchQuery}
+                              onChange={(e) => setSearchQuery(e.target.value)}
+                              placeholder="Search bot names..."
+                              className="w-full bg-[rgba(20,20,20,0.55)] border border-[rgba(255,255,255,0.08)] text-white text-xs rounded-lg py-2 pl-9 pr-3 outline-none focus:border-[#6C5CE7] transition-all"
+                            />
+                            {searchQuery && (
+                              <button onClick={() => setSearchQuery('')} className="absolute right-3 text-slate-500 hover:text-white">
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Filter Badges Row */}
+                      <div className="flex flex-wrap items-center gap-2 mb-4">
+                        <span className="text-xs text-[#94A3B8] font-semibold mr-1">Status:</span>
+                        {['All', 'Active', 'Standby', 'Error'].map((status) => (
+                          <button
+                            key={status}
+                            onClick={() => setStatusFilter(status)}
+                            className={`px-2.5 py-1 rounded-md text-[10px] font-mono font-bold tracking-wider transition-all border ${
+                              statusFilter === status 
+                                ? 'bg-[rgba(108,92,231,0.15)] border-[#6C5CE7] text-[#6C5CE7]' 
+                                : 'bg-[rgba(255,255,255,0.02)] border-transparent text-[#94A3B8] hover:text-white'
+                            }`}
+                          >
+                            {status}
+                          </button>
+                        ))}
+
+                        <div className="h-4 w-px bg-slate-800 mx-2" />
+
+                        <span className="text-xs text-[#94A3B8] font-semibold mr-1">Category:</span>
+                        {['All', 'Arbitrage', 'AI & NLP', 'Social', 'Utility'].map((cat) => (
+                          <button
+                            key={cat}
+                            onClick={() => setCategoryFilter(cat)}
+                            className={`px-2.5 py-1 rounded-md text-[10px] font-mono font-bold tracking-wider transition-all border ${
+                              categoryFilter === cat 
+                                ? 'bg-[rgba(108,92,231,0.15)] border-[#6C5CE7] text-[#6C5CE7]' 
+                                : 'bg-[rgba(255,255,255,0.02)] border-transparent text-[#94A3B8] hover:text-white'
+                            }`}
+                          >
+                            {cat}
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Main Data Table DYOR STYLE CORE */}
+                      <div className="w-full overflow-x-auto no-scrollbar">
+                        <table className="w-full text-left border-collapse min-w-[600px] font-mono text-xs">
+                          <thead>
+                            <tr className="border-b border-[rgba(255,255,255,0.08)] text-[#94A3B8]">
+                              <th className="pb-3 pt-1 font-semibold">BOT IDENTIFIER</th>
+                              <th className="pb-3 pt-1 font-semibold text-center">CHAIN</th>
+                              <th className="pb-3 pt-1 font-semibold">STATUS</th>
+                              <th className="pb-3 pt-1 font-semibold text-right">METRIC EXEC</th>
+                              <th className="pb-3 pt-1 font-semibold text-right">SUCCESS %</th>
+                              <th className="pb-3 pt-1 font-semibold text-center">SPARK GLANCE</th>
+                              <th className="pb-3 pt-1 font-semibold text-center">CONTROL</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-[rgba(255,255,255,0.05)]">
+                            {filteredBots.map((bot) => {
+                              const isExpanded = expandedBotId === bot.id;
+                              return (
+                                <React.Fragment key={bot.id}>
+                                  <tr 
+                                    onClick={() => setExpandedBotId(isExpanded ? null : bot.id)}
+                                    className="hover:bg-[rgba(255,255,255,0.02)] transition-colors cursor-pointer group"
+                                  >
+                                    <td className="py-3.5 pr-3 min-w-[200px]">
+                                      <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 rounded-lg bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] flex items-center justify-center text-[#6C5CE7] shrink-0">
+                                          {bot.category === 'Arbitrage' && <GitMerge className="w-4 h-4 text-[#6C5CE7]" />}
+                                          {bot.category === 'AI & NLP' && <Sparkles className="w-4 h-4 text-[#FFA502]" />}
+                                          {bot.category === 'Utility' && <Sliders className="w-4 h-4 text-[#2ED573]" />}
+                                          {bot.category === 'Social' && <Bot className="w-4 h-4 text-sky-450" />}
+                                        </div>
+                                        <div className="flex flex-col min-w-0">
+                                          <span className="font-bold text-[#F8FAFC] flex items-center gap-1.5 group-hover:text-[#6C5CE7] transition-all">
+                                            {bot.name}
+                                          </span>
+                                          <span className="text-[10px] text-slate-500 truncate mt-0.5">{bot.category}</span>
+                                        </div>
+                                      </div>
+                                    </td>
+                                    
+                                    <td className="py-3.5 px-2 text-center">
+                                      <span className="text-[10px] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)] px-1.5 py-0.5 rounded uppercase font-bold text-[#F8FAFC]">
+                                        {bot.chain}
+                                      </span>
+                                    </td>
+
+                                    <td className="py-3.5 px-2">
+                                      <div className="flex items-center gap-2">
+                                        <span className={`w-1.5 h-1.5 rounded-full ${
+                                          bot.status === 'Active' ? 'bg-[#2ED573] animate-pulse' : 
+                                          bot.status === 'Standby' ? 'bg-[#FFA502]' : 'bg-[#FF4757]'
+                                        }`} />
+                                        <span className={`text-[10px] font-bold ${
+                                          bot.status === 'Active' ? 'text-[#2ED573]' : 
+                                          bot.status === 'Standby' ? 'text-[#FFA502]' : 'text-[#FF4757]'
+                                        }`}>
+                                          {bot.status}
+                                        </span>
+                                      </div>
+                                    </td>
+
+                                    <td className="py-3.5 px-2 text-right text-slate-350">
+                                      {bot.executions.toLocaleString()}
+                                    </td>
+
+                                    <td className="py-3.5 px-2 text-right font-bold text-white">
+                                      {bot.successRate}%
+                                    </td>
+
+                                    {/* Mini inline Sparkline visual design */}
+                                    <td className="py-3.5 px-4 min-w-[100px] text-center">
+                                      <div className="h-6 flex items-end justify-center gap-[2px]">
+                                        {bot.sparkline.map((s, idx) => (
+                                          <div 
+                                            key={idx}
+                                            className="w-1.5 rounded-sm"
+                                            style={{ 
+                                              height: `${s.val}%`, 
+                                              backgroundColor: bot.status === 'Active' ? '#6C5CE7' : bot.status === 'Error' ? '#FF4757' : '#94A3B8',
+                                              opacity: 0.3 + (idx / 8) * 0.7 
+                                            }}
+                                          />
+                                        ))}
+                                      </div>
+                                    </td>
+
+                                    {/* Control buttons */}
+                                    <td className="py-3.5 pr-1 pl-3 text-center" onClick={(e) => e.stopPropagation()}>
+                                      <div className="flex items-center gap-1.5 justify-center">
+                                        <button 
+                                          onClick={(ev) => toggleBotStatus(bot.id, ev)}
+                                          className={`p-1.5 rounded hover:bg-[rgba(255,255,255,0.08)] transition-all ${bot.status === 'Active' ? 'text-[#FFA502]' : 'text-[#2ED573]'}`}
+                                          title={bot.status === 'Active' ? 'Pause Bot' : 'Start Bot'}
+                                        >
+                                          {bot.status === 'Active' ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+                                        </button>
+                                        <button 
+                                          onClick={(ev) => deleteBot(bot.id, ev)}
+                                          className="p-1.5 rounded hover:bg-[rgba(255,255,255,0.08)] text-[#FF4757] transition-all"
+                                          title="Delete Node"
+                                        >
+                                          <X className="w-3.5 h-3.5" />
+                                        </button>
+                                      </div>
+                                    </td>
+                                  </tr>
+
+                                  {/* Row Expansion details */}
+                                  <AnimatePresence>
+                                    {isExpanded && (
+                                      <tr>
+                                        <td colSpan={7} className="p-0 bg-[rgba(255,255,255,0.01)] border-b border-[rgba(255,255,255,0.05)]">
+                                          <motion.div
+                                            initial={{ height: 0, opacity: 0 }}
+                                            animate={{ height: 'auto', opacity: 1 }}
+                                            exit={{ height: 0, opacity: 0 }}
+                                            transition={{ duration: 0.2 }}
+                                            className="overflow-hidden"
+                                          >
+                                            <div className="p-5 flex flex-col sm:flex-row gap-6">
+                                              {/* Left Column stats */}
+                                              <div className="flex-1 flex flex-col gap-4">
+                                                <div className="flex flex-col">
+                                                  <span className="text-xs text-[#94A3B8] font-semibold font-sans mb-1">Functional Description</span>
+                                                  <p className="text-xs text-slate-350 leading-relaxed font-sans">{bot.description}</p>
+                                                </div>
+
+                                                <div className="grid grid-cols-3 gap-2 mt-2">
+                                                  <div className="p-2.5 rounded bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)] flex flex-col">
+                                                    <span className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold">Uptime Ratio</span>
+                                                    <span className="text-xs text-[#F8FAFC] font-bold font-mono mt-0.5">{bot.uptime}%</span>
+                                                  </div>
+                                                  <div className="p-2.5 rounded bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)] flex flex-col">
+                                                    <span className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold">Latency Avg</span>
+                                                    <span className="text-xs text-[#F8FAFC] font-bold font-mono mt-0.5">{bot.latency}ms</span>
+                                                  </div>
+                                                  <div className="p-2.5 rounded bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)] flex flex-col">
+                                                    <span className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold">Platform Fee Node</span>
+                                                    <span className="text-xs text-[#6C5CE7] font-bold font-mono mt-0.5">0.15 TON</span>
+                                                  </div>
+                                                </div>
+                                              </div>
+
+                                              {/* Right Column: Mini simulated stream data output */}
+                                              <div className="w-full sm:w-[280px] rounded bg-[#03060E] border border-[rgba(255,255,255,0.05)] p-4 flex flex-col gap-2">
+                                                <div className="flex items-center justify-between border-b border-[rgba(255,255,255,0.08)] pb-1.5 mb-1">
+                                                  <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                                                    <Terminal className="w-3 h-3 text-[#6C5CE7]" />
+                                                    Payload Output Feed
+                                                  </span>
+                                                  <span className="text-[9px] text-[#2ED573] font-mono leading-none flex items-center gap-1">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-[#2ED573] animate-ping" />
+                                                    LIVE
+                                                  </span>
+                                                </div>
+                                                <div className="font-mono text-[10px] text-slate-400 max-h-[100px] overflow-y-auto no-scrollbar flex flex-col gap-1.5 select-all">
+                                                  <span>{`{`}</span>
+                                                  <span className="pl-3.5 text-[#2ED573]">{`  "node_id": "${bot.id}",`}</span>
+                                                  <span className="pl-3.5 text-[#2ED573]">{`  "latency": ${bot.latency},`}</span>
+                                                  <span className="pl-3.5 text-[#2ED573]">{`  "last_response": "RESOLVED_OK",`}</span>
+                                                  <span className="pl-3.5 text-[#FFA502]">{`  "hash": "0x${(Math.random()*1000000).toFixed(0)}e${bot.id.split('-')[1]}a"`}</span>
+                                                  <span>{`}`}</span>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </motion.div>
+                                        </td>
+                                      </tr>
+                                    )}
+                                  </AnimatePresence>
+                                </React.Fragment>
+                              );
+                            })}
+                            {filteredBots.length === 0 && (
+                              <tr>
+                                <td colSpan={7} className="py-12 text-center text-slate-500 font-sans">
+                                  No active bot matching the filters was found.<br />
+                                  <button onClick={() => { setSearchQuery(''); setStatusFilter('All'); setCategoryFilter('All'); }} className="mt-3 text-xs text-[#6C5CE7] underline font-sans">Clear Filters</button>
+                                </td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Column: Bento Grid for 3. Activity Stream & 4. Quick Actions */}
+                  <div className="flex flex-col gap-6">
+                    
+                    {/* Activity Stream Feed Panel */}
+                    <div className="p-4 rounded-xl bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.08)] flex-1 flex flex-col gap-3 max-h-[450px] overflow-hidden">
+                      <div className="flex items-center justify-between border-b border-[rgba(255,255,255,0.05)] pb-3">
+                        <div className="flex items-center gap-2">
+                          <Activity className="w-4.5 h-4.5 text-[#6C5CE7] animate-pulse" />
+                          <h2 className="text-sm font-bold text-white tracking-tight">Activity Stream (Execution Pings)</h2>
+                        </div>
+                        <span className="text-[10px] text-slate-500 font-mono">Live ticker</span>
+                      </div>
+
+                      {/* Log feed stack */}
+                      <div className="flex-1 overflow-y-auto pr-1 no-scrollbar flex flex-col gap-2">
+                        {logs.slice(0, 10).map((log) => (
+                          <div 
+                            key={log.id} 
+                            className="p-3 rounded-lg border border-[rgba(255,255,255,0.04)] bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(255,255,255,0.04)] transition-all flex flex-col gap-1 text-[11px] font-mono leading-relaxed"
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="text-[#6C5CE7] font-bold text-[10px] uppercase truncate max-w-[140px]">{log.botName}</span>
+                              <span className="text-slate-500 text-[9px] shrink-0 font-semibold">{log.timestamp}</span>
+                            </div>
+                            
+                            <p className="text-slate-350 text-[10.5px] pl-0.5">{log.message}</p>
+                            
+                            <div className="flex items-center gap-2 mt-1">
+                              {log.type === 'success' && (
+                                <span className="bg-emerald-500/10 border border-emerald-500/20 text-[#2ED573] text-[8px] font-bold px-1 rounded-sm leading-tight">SUCCESS</span>
+                              )}
+                              {log.type === 'info' && (
+                                <span className="bg-blue-500/10 border border-blue-500/20 text-[#2F88FF] text-[8px] font-bold px-1 rounded-sm leading-tight">INFO</span>
+                              )}
+                              {log.type === 'error' && (
+                                <span className="bg-red-500/10 border border-red-500/20 text-[#FF4757] text-[8px] font-bold px-1 rounded-sm leading-tight">CRITICAL_FAIL</span>
+                              )}
+                              {log.type === 'warning' && (
+                                <span className="bg-amber-500/10 border border-amber-500/20 text-[#FFA502] text-[8px] font-bold px-1 rounded-sm leading-tight">WARN</span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* 4. Quick Actions Panel */}
+                    <div className="p-4 rounded-xl bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.08)] flex flex-col gap-3">
+                      <h2 className="text-sm font-bold text-white tracking-tight pb-2 border-b border-[rgba(255,255,255,0.05)]">Quick Execution Triggers</h2>
+                      
+                      <div className="grid grid-cols-2 gap-2">
+                        {/* Trigger 1: Create Bot */}
+                        <button 
+                          onClick={() => setCreateBotOpen(true)}
+                          className="p-3.5 rounded-lg border border-[rgba(255,255,255,0.04)] bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(108,92,231,0.08)] hover:border-[#6C5CE7] transition-all flex flex-col items-start gap-1.5 text-left group"
+                        >
+                          <Plus className="w-5 h-5 text-[#6C5CE7]" />
+                          <div className="flex flex-col">
+                            <span className="text-xs font-bold text-white group-hover:text-[#6C5CE7] transition-colors">Create Bot</span>
+                            <span className="text-[9px] text-slate-500 font-mono">Register new node</span>
+                          </div>
+                        </button>
+
+                        {/* Trigger 2: Simulation trigger */}
+                        <button 
+                          onClick={() => {
+                            // Run a quick batch run simulation
+                            setTotalExecutions(p => p + 10);
+                            setLogs(prev => [
+                              {
+                                id: `log-quick-${Date.now()}`,
+                                timestamp: new Date().toTimeString().split(' ')[0],
+                                botId: 'system',
+                                botName: 'Batch Orchestrator',
+                                type: 'success',
+                                message: 'Triggered batch pipeline. Executed sandbox run triggers across 10 active pools concurrently.'
+                              },
+                              ...prev
+                            ]);
+                          }}
+                          className="p-3.5 rounded-lg border border-[rgba(255,255,255,0.04)] bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(46,213,115,0.08)] hover:border-[#2ED573] transition-all flex flex-col items-start gap-1.5 text-left group"
+                        >
+                          <RefreshCw className="w-5 h-5 text-[#2ED573] group-hover:rotate-180 transition-all duration-500" />
+                          <div className="flex flex-col">
+                            <span className="text-xs font-bold text-white group-hover:text-[#2ED573] transition-colors">Run Batch Trace</span>
+                            <span className="text-[9px] text-slate-500 font-mono">Execute bulk nodes</span>
+                          </div>
+                        </button>
+
+                        {/* Trigger 3: Open Terminal Console */}
+                        <button 
+                          onClick={() => setConsoleOpen(true)}
+                          className="p-3.5 rounded-lg border border-[rgba(255,255,255,0.04)] bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(255,255,255,0.06)] hover:border-slate-500 transition-all flex flex-col items-start gap-1.5 text-left group"
+                        >
+                          <Command className="w-5 h-5 text-slate-400" />
+                          <div className="flex flex-col">
+                            <span className="text-xs font-bold text-white group-hover:text-slate-200 transition-colors">Interactive Terminal</span>
+                            <span className="text-[9px] text-slate-500 font-mono">Manual CMD system</span>
+                          </div>
+                        </button>
+
+                        {/* Trigger 4: Clear Cluster Errors */}
+                        <button 
+                          onClick={() => {
+                            // Fix Starknet model bridge
+                            setBots(prev => prev.map(b => b.status === 'Error' ? { ...b, status: 'Active', uptime: 100, latency: 45 } : b));
+                            setLogs(prev => [
+                              {
+                                id: `log-${Date.now()}`,
+                                timestamp: new Date().toTimeString().split(' ')[0],
+                                botId: 'system',
+                                botName: 'System Core',
+                                type: 'success',
+                                message: 'Automatic repair cycle completed. Cleared network timeouts. All node channels healthy.'
+                              },
+                              ...prev
+                            ]);
+                          }}
+                          className="p-3.5 rounded-lg border border-[rgba(255,255,255,0.04)] bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(255,165,0,0.08)] hover:border-[#FFA502] transition-all flex flex-col items-start gap-1.5 text-left group"
+                        >
+                          <SlidersHorizontal className="w-5 h-5 text-[#FFA502]" />
+                          <div className="flex flex-col key">
+                            <span className="text-xs font-bold text-white group-hover:text-[#FFA502] transition-colors">Hotfix Nodes</span>
+                            <span className="text-[9px] text-slate-500 font-mono">Reset crashed nodes</span>
+                          </div>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* Subpages / Other tabs representation to show production readiness of the UI */}
+
+            {/* Bots / Template View */}
+            {activeTab === 'bots' && (
+              <div className="flex flex-col gap-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <h1 className="text-xl font-bold text-white">Bot Configurations & Templates</h1>
+                    <p className="text-xs text-[#94A3B8] font-mono">Spawn, debug, or deploy a pre-configured smart agent routing program.</p>
+                  </div>
+                  <button 
+                    onClick={() => setCreateBotOpen(true)}
+                    className="bg-[#6C5CE7] hover:bg-[#5B4BCB] text-white text-xs px-4 py-2 rounded-lg font-semibold flex items-center gap-1.5 shadow-[0_4px_14px_rgba(108,92,231,0.25)] transition-all"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Deploy Custom Bot
+                  </button>
+                </div>
+
+                {/* Templates Grid Column */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {bots.map((bot) => (
+                    <div 
+                      key={bot.id} 
+                      className="p-5 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)] flex flex-col justify-between gap-4 hover:border-[rgba(108,92,231,0.25)] transition-all group relative overflow-hidden"
+                    >
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[#6C5CE7] to-transparent opacity-[0.03] select-none pointer-events-none" />
+                      
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] uppercase font-mono border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-2 py-0.5 rounded font-bold text-slate-350">
+                            {bot.chain} Network
+                          </span>
+                          <span className={`w-2.5 h-2.5 rounded-full ${bot.status === 'Active' ? 'bg-[#2ED573]' : bot.status === 'Standby' ? 'bg-[#FFA502]' : 'bg-[#FF4757]'}`} />
+                        </div>
+
+                        <h3 className="font-bold text-sm text-white group-hover:text-[#6C5CE7] transition-all truncate mt-1">{bot.name}</h3>
+                        <p className="text-[11.5px] text-[#94A3B8] line-clamp-3 leading-relaxed font-sans mt-0.5">{bot.description}</p>
+                      </div>
+
+                      <div className="flex flex-col gap-3.5 border-t border-[rgba(255,255,255,0.05)] pt-4 mt-1 font-mono text-[11px]">
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="flex flex-col">
+                            <span className="text-[9px] text-slate-500 uppercase">Avg Success</span>
+                            <span className="font-bold text-white">{bot.successRate}%</span>
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-[9px] text-slate-500 uppercase">Executed runs</span>
+                            <span className="font-bold text-white">{bot.executions.toLocaleString()}</span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between mt-1">
+                          <button 
+                            onClick={() => toggleBotStatus(bot.id)}
+                            className={`flex-1 text-center py-2 rounded text-xs font-bold transition-all border ${
+                              bot.status === 'Active' 
+                                ? 'bg-amber-500/10 border-amber-500/20 text-[#FFA502] hover:bg-amber-500/20' 
+                                : 'bg-[#2ED573]/10 border-[#2ED573]/20 text-[#2ED573] hover:bg-[#2ED573]/20'
+                            }`}
+                          >
+                            {bot.status === 'Active' ? 'Toggle Standby' : 'Toggle Active'}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Workflows View */}
+            {activeTab === 'workflows' && (
+              <div className="flex flex-col gap-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <h1 className="text-xl font-bold text-white">Dynamic Workflow Pipelines</h1>
+                    <p className="text-xs text-[#94A3B8] font-mono">Create reactive trigger-action rules connecting Web3 blockchain pings directly to Telegram outputs.</p>
+                  </div>
+                </div>
+
+                <div className="p-6 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)] flex flex-col gap-6">
+                  {/* Step visual design */}
+                  <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 rounded-lg bg-[rgba(255,255,255,0.01)] border border-[rgba(255,255,255,0.04)] relative">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#6C5CE7] to-[#8C7CFF] flex items-center justify-center font-bold text-xs">1</div>
+                      <div className="flex flex-col">
+                        <span className="text-xs font-bold text-slate-350">TRIGGER NODE</span>
+                        <span className="text-xs font-bold text-white font-mono">TON Mempool Block Discovered</span>
+                      </div>
+                    </div>
+                    <div className="text-slate-550 border border-[rgba(255,255,255,0.08)] px-2.5 py-1 rounded bg-[rgba(255,255,255,0.02)] font-mono text-[10px]">Filter: Liquidity &gt; 10K USD</div>
+                    
+                    <div className="hidden md:block absolute left-1/2 -translate-x-1/2 h-8 w-px bg-slate-700 pointer-events-none" />
+
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-rose-500/20 text-[#FF4757] border border-rose-500/30 flex items-center justify-center font-bold text-xs">2</div>
+                      <div className="flex flex-col">
+                        <span className="text-xs font-bold text-slate-350">ACTION AGENT</span>
+                        <span className="text-xs font-bold text-[#FFA502] font-mono">Raydium Price Arbitrage Sniper</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-6 text-center text-slate-500 flex flex-col items-center gap-3">
+                    <HelpCircle className="w-10 h-10 text-[#6C5CE7]" />
+                    <span className="text-xs font-sans">Pipeline Sandbox in dev stage. Deploy triggers to link live blockchain websockets.</span>
+                    <button 
+                      onClick={() => {
+                        setLogs(prev => [
+                          {
+                            id: `log-wf-${Date.now()}`,
+                            timestamp: new Date().toTimeString().split(' ')[0],
+                            botId: 'system',
+                            botName: 'Workflow Agent',
+                            type: 'info',
+                            message: 'Simulated dry-run trace for workflow channel: [Trigger TON block create -> execute RAY sniper] successful. latency: 40ms.'
+                          },
+                          ...prev
+                        ]);
+                      }}
+                      className="mt-2 bg-[rgba(108,92,231,0.15)] border border-[rgba(108,92,231,0.2)] text-[#6C5CE7] hover:bg-[rgba(108,92,231,0.25)] text-xs px-4 py-2 rounded-lg font-bold"
+                    >
+                      Dry-Run Pipeline
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Analytics View */}
+            {activeTab === 'analytics' && (
+              <div className="flex flex-col gap-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <h1 className="text-xl font-bold text-white">Advanced System Analytics</h1>
+                    <p className="text-xs text-[#94A3B8] font-mono">Detailed metric visualizations and dynamic aggregate pipeline throughput logs.</p>
+                  </div>
+                </div>
+
+                {/* Grid charts with Recharts */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {/* Chart 1: Cumulative executions over time */}
+                  <div className="p-5 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)] flex flex-col gap-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-white">Cluster Executions (Last 7 Days)</span>
+                      <span className="text-[10px] text-[#2ED573] font-mono border border-emerald-500/10 bg-emerald-500/5 px-2 py-0.5 rounded">Optimal</span>
+                    </div>
+
+                    <div className="h-64 w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={[
+                          { name: 'Monday', runs: 24000 },
+                          { name: 'Tuesday', runs: 28000 },
+                          { name: 'Wednesday', runs: 32000 },
+                          { name: 'Thursday', runs: 29000 },
+                          { name: 'Friday', runs: 39000 },
+                          { name: 'Saturday', runs: 42000 },
+                          { name: 'Sunday', runs: 45000 },
+                        ]}>
+                          <defs>
+                            <linearGradient id="colorRuns" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#6C5CE7" stopOpacity={0.4}/>
+                              <stop offset="95%" stopColor="#6C5CE7" stopOpacity={0}/>
+                            </linearGradient>
+                          </defs>
+                          <XAxis dataKey="name" stroke="#94A3B8" fontSize={9} tickLine={false} />
+                          <YAxis stroke="#94A3B8" fontSize={9} tickLine={false} />
+                          <Tooltip contentStyle={{ backgroundColor: '#0B0F17', borderColor: 'rgba(255,255,255,0.08)' }} labelClassName="text-white" />
+                          <Area type="monotone" dataKey="runs" stroke="#6C5CE7" strokeWidth={2} fillOpacity={1} fill="url(#colorRuns)" />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+
+                  {/* Chart 2: Comparative Uptime metric */}
+                  <div className="p-5 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)] flex flex-col gap-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-white">Bot Cluster Latencies (ms)</span>
+                      <span className="text-[10px] text-slate-500 font-mono">Lower is optimal</span>
+                    </div>
+
+                    <div className="h-64 w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={bots.map(b => ({ name: b.name.substring(0, 10) + '...', latency: b.latency }))}>
+                          <XAxis dataKey="name" stroke="#94A3B8" fontSize={8} tickLine={false} />
+                          <YAxis stroke="#94A3B8" fontSize={9} tickLine={false} />
+                          <Tooltip contentStyle={{ backgroundColor: '#0B0F17', borderColor: 'rgba(255,255,255,0.08)' }} />
+                          <Bar dataKey="latency" fill="#6C5CE7" radius={[4, 4, 0, 0]} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Settings View */}
+            {activeTab === 'settings' && (
+              <div className="flex flex-col gap-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <h1 className="text-xl font-bold text-white">Configuration Panel</h1>
+                    <p className="text-xs text-[#94A3B8] font-mono">Control blockchain nodes, key secrets, and aggregate alert limits.</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Block 1: Custom Slippage adjustments */}
+                  <div className="p-5 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)] flex flex-col gap-4">
+                    <h3 className="font-bold text-sm text-white">DeFi Spread Thresholds</h3>
+                    <div className="flex flex-col gap-3 font-mono text-xs">
+                      <div className="flex flex-col gap-1.5Packed font-semibold text-slate-350">
+                        <label className="text-xs text-slate-350">Minimum Profit Spread</label>
+                        <input type="range" min="0.1" max="5" step="0.1" defaultValue="0.5" className="w-full accent-[#6C5CE7] bg-slate-800" />
+                        <div className="flex justify-between text-[10px] text-slate-500 mt-1">
+                          <span>0.1%</span>
+                          <span>Target: 0.5% (Default)</span>
+                          <span>5.0%</span>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-1.5 mt-2">
+                        <label className="text-xs text-slate-350">Max Slip Tolerance</label>
+                        <input type="range" min="0.05" max="1" step="0.05" defaultValue="0.15" className="w-full accent-[#6C5CE7] bg-slate-800" />
+                        <div className="flex justify-between text-[10px] text-slate-500 mt-1">
+                          <span>0.05%</span>
+                          <span>Selected: 0.15%</span>
+                          <span>1.0%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Block 2: RPC Node Management */}
+                  <div className="p-5 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)] flex flex-col gap-4">
+                    <h3 className="font-bold text-sm text-white">Active Blockchain Gateways (RPCS)</h3>
+                    <div className="flex flex-col gap-2 font-mono text-xs">
+                      <div className="p-2.5 rounded border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.01)] flex items-center justify-between">
+                        <div className="flex flex-col">
+                          <span className="font-bold text-[#F8FAFC]">TON dApp RPC Protocol</span>
+                          <span className="text-[10px] text-slate-500">https://ton.access.api.studio</span>
+                        </div>
+                        <span className="text-[10px] font-bold text-[#2ED573] border border-emerald-500/10 bg-emerald-500/5 px-2 py-0.5 rounded">CONNECTED</span>
+                      </div>
+
+                      <div className="p-2.5 rounded border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.01)] flex items-center justify-between">
+                        <div className="flex flex-col">
+                          <span className="font-bold text-[#F8FAFC]">Solana Mainet RPC</span>
+                          <span className="text-[10px] text-slate-500">https://api.mainnet-beta.solana.com</span>
+                        </div>
+                        <span className="text-[10px] font-bold text-[#2ED573] border border-emerald-500/10 bg-emerald-500/5 px-2 py-0.5 rounded">CONNECTED</span>
+                      </div>
+
+                      <div className="p-2.5 rounded border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.01)] flex items-center justify-between">
+                        <div className="flex flex-col opacity-65">
+                          <span className="font-bold text-[#F8FAFC]">Ethereum Node Core</span>
+                          <span className="text-[10px] text-slate-500">Unconfigured (Offline)</span>
+                        </div>
+                        <span className="text-[10px] font-bold text-[#FFA502] border border-amber-500/10 bg-amber-500/5 px-2 py-0.5 rounded">PENDING</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </motion.div>
-        ))}
-      </div>
+        </AnimatePresence>
+
+      </main>
+
+      {/* 🧭 BOTTOM SATE NAVIGATION (MOBILE ONLY CONSTRAINTS) */}
+      <BottomNavigationElementAndSlideOverMenu 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab} 
+        setCreateBotOpen={setCreateBotOpen}
+        setConsoleOpen={setConsoleOpen}
+        mobileMenuOpen={mobileMenuOpen}
+        setMobileMenuOpen={setMobileMenuOpen}
+        mobileMenuHistory={mobileMenuHistory}
+        setMobileMenuHistory={setMobileMenuHistory}
+        mobileSubMenu={mobileSubMenu}
+        setMobileSubMenu={setMobileSubMenu}
+        bots={bots}
+      />
+
+      {/* 🔮 MODAL SLIDE-OVERS & BOTTOM SHEET BOXES */}
+
+      {/* Box 1: Draw-over Slide configuration to Create a Bot Node */}
+      <AnimatePresence>
+        {createBotOpen && (
+          <>
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setCreateBotOpen(false)}
+              className="fixed inset-0 bg-[#000]/70 backdrop-blur-sm z-50 pointer-events-auto"
+            />
+            
+            <motion.div 
+              initial={{ y: '100%', scale: 1 }}
+              animate={{ y: 0, scale: 1 }}
+              exit={{ y: '100%', scale: 1 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 180 }}
+              className="fixed bottom-0 left-0 right-0 xl:top-12 xl:left-auto xl:bottom-12 xl:right-12 xl:w-[420px] bg-[#0B0F17] border-t xl:border border-[rgba(255,255,255,0.08)] xl:rounded-xl p-6 z-50 flex flex-col gap-6 font-sans overflow-y-auto max-h-[90vh] xl:max-h-screen no-scrollbar pointer-events-auto shadow-[0_12px_48px_rgba(0,0,0,0.5)]"
+            >
+              <div className="flex items-center justify-between border-b border-[rgba(255,255,255,0.05)] pb-3">
+                <div className="flex items-center gap-2">
+                  <PlusCircle className="w-5 h-5 text-[#6C5CE7]" />
+                  <h3 className="font-bold text-white tracking-tight">Register New Bot Gateway</h3>
+                </div>
+                <button 
+                  onClick={() => setCreateBotOpen(false)}
+                  className="p-1.5 hover:bg-[rgba(255,255,255,0.04)] rounded-full text-slate-400"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <form onSubmit={handleCreateBot} className="flex flex-col gap-4 text-xs font-mono">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-slate-400 font-bold uppercase">BOT UNIQUE NAME</label>
+                  <input 
+                    type="text" 
+                    required 
+                    value={newBotName}
+                    onChange={(e) => setNewBotName(e.target.value)}
+                    placeholder="e.g. My Arbitrage Sniper V3" 
+                    className="w-full bg-[rgba(20,20,20,0.6)] border border-[rgba(255,255,255,0.08)] text-white text-xs rounded-lg p-3 outline-none focus:border-[#6C5CE7]"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-slate-400 font-bold uppercase">CATEGORY CLUST</label>
+                    <select 
+                      value={newBotCategory}
+                      onChange={(e) => setNewBotCategory(e.target.value as any)}
+                      className="w-full bg-[rgba(20,20,20,0.6)] border border-[rgba(255,255,255,0.08)] text-white text-xs rounded-lg p-3 outline-none focus:border-[#6C5CE7]"
+                    >
+                      <option value="Arbitrage">Arbitrage Model</option>
+                      <option value="AI & NLP">AI Sentiment Core</option>
+                      <option value="Social">Social Broadcaster</option>
+                      <option value="Utility">Utility Router</option>
+                    </select>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-slate-400 font-bold uppercase">GAS FEE CHAIN</label>
+                    <select 
+                      value={newBotChain}
+                      onChange={(e) => setNewBotChain(e.target.value as any)}
+                      className="w-full bg-[rgba(20,20,20,0.6)] border border-[rgba(255,255,255,0.08)] text-white text-xs rounded-lg p-3 outline-none focus:border-[#6C5CE7]"
+                    >
+                      <option value="TON">TON Ecosystem</option>
+                      <option value="Solana">Solana protocol</option>
+                      <option value="Ethereum">Ethereum (L1/L2)</option>
+                      <option value="BSC">Binance Chain</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-slate-400 font-bold uppercase">DESCRIPTION FUNCTIONAL</label>
+                  <textarea 
+                    value={newBotDesc}
+                    onChange={(e) => setNewBotDesc(e.target.value)}
+                    rows={3}
+                    placeholder="Brief outline of how this routing node behaves..."
+                    className="w-full bg-[rgba(20,20,20,0.6)] border border-[rgba(255,255,255,0.08)] text-white text-xs rounded-lg p-3 outline-none focus:border-[#6C5CE7] resize-none"
+                  />
+                </div>
+
+                <div className="flex items-center gap-3 border-t border-[rgba(255,255,255,0.05)] pt-4 mt-2">
+                  <button 
+                    type="button" 
+                    onClick={() => setCreateBotOpen(false)}
+                    className="flex-1 py-3 text-center rounded-lg border border-[rgba(255,255,255,0.08)] text-[#94A3B8] font-bold hover:bg-[rgba(255,255,255,0.02)]"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit" 
+                    className="flex-1 py-3 text-center rounded-lg bg-[#6C5CE7] text-white hover:bg-[#5B4BCB] font-bold"
+                  >
+                    Deploy Node
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+
+      {/* Box 2: Developer Interactive CLI Console Terminal */}
+      <AnimatePresence>
+        {consoleOpen && (
+          <>
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setConsoleOpen(false)}
+              className="fixed inset-0 bg-[#000]/70 backdrop-blur-sm z-50 pointer-events-auto"
+            />
+            
+            <motion.div 
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 180 }}
+              className="fixed bottom-0 left-0 right-0 xl:top-12 xl:bottom-12 xl:left-12 xl:right-12 bg-[#040810] border-t xl:border border-[rgba(255,255,255,0.08)] xl:rounded-xl p-6 z-50 flex flex-col gap-4 font-mono pointer-events-auto h-[85vh] xl:h-auto overflow-hidden shadow-[0_12px_48px_rgba(0,0,0,0.65)]"
+            >
+              <div className="flex items-center justify-between border-b border-[rgba(255,255,255,0.05)] pb-3">
+                <div className="flex items-center gap-2">
+                  <Terminal className="text-[#6C5CE7] w-5 h-5 animate-pulse" />
+                  <h3 className="font-bold text-white tracking-tight">BotlyHub Interactive CLI Terminal Controller</h3>
+                </div>
+                
+                <div className="flex items-center gap-4">
+                  <span className="text-[10px] text-slate-500 font-mono">Gateway Ping: 14ms (Optimal)</span>
+                  <button 
+                    onClick={() => setConsoleOpen(false)}
+                    className="p-1.5 hover:bg-[rgba(255,255,255,0.04)] rounded-full text-slate-400"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Terminal Logs Window */}
+              <div className="flex-1 bg-[#010307] border border-[rgba(255,255,255,0.03)] rounded-lg p-4 overflow-y-auto no-scrollbar flex flex-col gap-1.5 text-xs text-slate-350 select-all">
+                {terminalHistory.map((text, idx) => (
+                  <div key={idx} className="whitespace-pre-wrap leading-relaxed select-all">
+                    {text.startsWith('>') ? (
+                      <span className="text-[#6C5CE7] font-bold select-none">{text}</span>
+                    ) : text.startsWith('SUCCESS') ? (
+                      <span className="text-[#2ED573] font-bold">{text}</span>
+                    ) : text.startsWith('ERROR') ? (
+                      <span className="text-[#FF4757] font-bold">{text}</span>
+                    ) : text.startsWith('METRICS') || text.startsWith('SYSTEM') ? (
+                      <span className="text-[#FFA502] font-semibold">{text}</span>
+                    ) : (
+                      <span>{text}</span>
+                    )}
+                  </div>
+                ))}
+                <div ref={terminalEndRef} />
+              </div>
+
+              {/* Terminal input form */}
+              <form onSubmit={handleTerminalSubmit} className="flex gap-2">
+                <div className="h-10 w-10 shrink-0 bg-[#010307] border border-[rgba(255,255,255,0.05)] rounded-lg flex items-center justify-center text-[#6C5CE7] select-none">
+                  &gt;_
+                </div>
+                <input 
+                  type="text"
+                  value={terminalCommand}
+                  onChange={(e) => setTerminalCommand(e.target.value)}
+                  placeholder="Type 'help' to audit commands / trigger live nodes..."
+                  className="flex-1 bg-[#010307] border border-[rgba(255,255,255,0.05)] rounded-lg px-4 text-xs font-mono text-white outline-none focus:border-[#6C5CE7]"
+                  autoFocus
+                />
+                <button 
+                  type="submit"
+                  className="px-6 bg-[#6C5CE7] hover:bg-[#5B4BCB] font-extrabold text-[#F8FAFC] rounded-lg transition-all text-xs uppercase cursor-pointer"
+                >
+                  Send
+                </button>
+              </form>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
     </div>
+  );
+}
+
+// 🧭 BOTTOM NAVIGATION ELEMENT AND SLIDEOVER PANEL (MOBILES SPECIFIC CONSTRS)
+interface BottomNavigationElementAndSlideOverMenuProps {
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+  setCreateBotOpen: (open: boolean) => void;
+  setConsoleOpen: (open: boolean) => void;
+  mobileMenuOpen: boolean;
+  setMobileMenuOpen: (open: boolean) => void;
+  mobileMenuHistory: string[];
+  setMobileMenuHistory: (history: string[]) => void;
+  mobileSubMenu: string | null;
+  setMobileSubMenu: (submenu: string | null) => void;
+  bots: BotItem[];
+}
+
+function BottomNavigationElementAndSlideOverMenu({
+  activeTab,
+  setActiveTab,
+  setCreateBotOpen,
+  setConsoleOpen,
+  mobileMenuOpen,
+  setMobileMenuOpen,
+  mobileMenuHistory,
+  setMobileMenuHistory,
+  mobileSubMenu,
+  setMobileSubMenu,
+  bots
+}: BottomNavigationElementAndSlideOverMenuProps) {
+
+  const navigateToMenu = (submenu: string) => {
+    setMobileMenuHistory([...mobileMenuHistory, submenu]);
+    setMobileSubMenu(submenu);
+  };
+
+  const navigateBackMenu = () => {
+    const nextHistory = [...mobileMenuHistory];
+    nextHistory.pop();
+    setMobileMenuHistory(nextHistory);
+    setMobileSubMenu(nextHistory[nextHistory.length - 1] || null);
+  };
+
+  const selectTab = (tab: string) => {
+    setActiveTab(tab);
+    setMobileMenuOpen(false);
+    setMobileSubMenu(null);
+    setMobileMenuHistory([]);
+  };
+
+  return (
+    <>
+      {/* 🧭 BOTTOM SATE BAR */}
+      <nav className="xl:hidden fixed bottom-0 left-0 right-0 bg-[#0B0F17]/95 border-t border-[rgba(255,255,255,0.08)] backdrop-blur-md px-4 py-2 flex items-center justify-around z-40 h-[64px]">
+        {/* Nav tabs */}
+        <button 
+          onClick={() => selectTab('dashboard')}
+          className={`flex flex-col items-center justify-center p-1.5 transition-all text-xs ${activeTab === 'dashboard' && !mobileMenuOpen ? 'text-[#6C5CE7]' : 'text-slate-400'}`}
+        >
+          <LayoutDashboard className="w-5 h-5 mb-0.5" />
+          <span className="text-[9px] font-bold">Home</span>
+        </button>
+
+        <button 
+          onClick={() => selectTab('bots')}
+          className={`flex flex-col items-center justify-center p-1.5 transition-all text-xs ${activeTab === 'bots' ? 'text-[#6C5CE7]' : 'text-slate-400'}`}
+        >
+          <Bot className="w-5 h-5 mb-0.5" />
+          <span className="text-[9px] font-bold">Bots</span>
+        </button>
+
+        <button 
+          onClick={() => selectTab('workflows')}
+          className={`flex flex-col items-center justify-center p-1.5 transition-all text-xs ${activeTab === 'workflows' ? 'text-[#6C5CE7]' : 'text-slate-400'}`}
+        >
+          <GitMerge className="w-5 h-5 mb-0.5" />
+          <span className="text-[9px] font-bold">Workflows</span>
+        </button>
+
+        <button 
+          onClick={() => selectTab('analytics')}
+          className={`flex flex-col items-center justify-center p-1.5 transition-all text-xs ${activeTab === 'analytics' ? 'text-[#6C5CE7]' : 'text-slate-400'}`}
+        >
+          <BarChart3 className="w-5 h-5 mb-0.5" />
+          <span className="text-[9px] font-bold">Charts</span>
+        </button>
+
+        {/* Hamburger Menu slideover trigger */}
+        <button 
+          onClick={() => setMobileMenuOpen(true)}
+          className={`flex flex-col items-center justify-center p-1.5 transition-all text-xs ${mobileMenuOpen ? 'text-[#6C5CE7]' : 'text-slate-400'}`}
+        >
+          <Menu className="w-5 h-5 mb-0.5" />
+          <span className="text-[9px] font-bold">Menu</span>
+        </button>
+      </nav>
+
+      {/* Slide-over FULL FRAME PANEL constraint (Mobile specific layout) */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div 
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 24, stiffness: 170 }}
+            className="xl:hidden fixed inset-0 bg-[#0B0F17] z-50 pointer-events-auto flex flex-col p-6 overflow-y-auto pb-24"
+          >
+            {/* Header / Back navigations indicator */}
+            <div className="flex items-center justify-between border-b border-[rgba(255,255,255,0.05)] pb-4 mb-6">
+              <div className="flex items-center gap-2">
+                {mobileSubMenu ? (
+                  <button onClick={navigateBackMenu} className="p-1 px-[7px] bg-[rgba(255,255,255,0.04)] hover:bg-[#111] rounded mr-1.5 flex items-center justify-center">
+                    <ChevronLeft className="w-4 h-4 text-[#6C5CE7]" />
+                  </button>
+                ) : null}
+                <div className="flex-col">
+                  <h3 className="font-bold text-[#F8FAFC]">
+                    {mobileSubMenu === 'bots' ? 'Bot Subcategories' : 'Main Control Menu'}
+                  </h3>
+                  <p className="text-[10px] text-slate-550 font-mono tracking-tight uppercase leading-none mt-0.5">TON.app interface design</p>
+                </div>
+              </div>
+              
+              <button onClick={() => { setMobileMenuOpen(false); setMobileSubMenu(null); setMobileMenuHistory([]); }} className="p-2 bg-[rgba(255,255,255,0.03)] rounded-full text-slate-400">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Flat items context nested inside slide menu */}
+            <AnimatePresence mode="wait">
+              {!mobileSubMenu ? (
+                <motion.div 
+                  key="main-links"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 10 }}
+                  className="flex flex-col gap-2 w-full font-sans text-sm"
+                >
+                  <button onClick={() => selectTab('dashboard')} className="w-full flex items-center justify-between rounded-lg py-3 px-4 bg-[rgba(255,255,255,0.02)] text-white hover:bg-[rgba(255,255,255,0.04)] text-left">
+                    <div className="flex items-center gap-3">
+                      <LayoutDashboard className="w-[18px] h-[18px] text-[#6C5CE7]" />
+                      <span>Dashboard Hub</span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-slate-600" />
+                  </button>
+
+                  <button onClick={() => navigateToMenu('bots')} className="w-full flex items-center justify-between rounded-lg py-3 px-4 bg-[rgba(255,255,255,0.02)] text-white hover:bg-[rgba(255,255,255,0.04)] text-left">
+                    <div className="flex items-center gap-3">
+                      <Bot className="w-[18px] h-[18px] text-[#FFA502]" />
+                      <div className="flex flex-col">
+                        <span>Bots Orchestrator</span>
+                        <span className="text-[9px] text-slate-500 font-mono">Expand templates & config list</span>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-slate-600" />
+                  </button>
+
+                  <button onClick={() => selectTab('workflows')} className="w-full flex items-center justify-between rounded-lg py-3 px-4 bg-[rgba(255,255,255,0.02)] text-white hover:bg-[rgba(255,255,255,0.04)] text-left">
+                    <div className="flex items-center gap-3">
+                      <GitMerge className="w-[18px] h-[18px] text-[#2ED573]" />
+                      <span>Workflows Pipeline</span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-slate-600" />
+                  </button>
+
+                  <button onClick={() => selectTab('analytics')} className="w-full flex items-center justify-between rounded-lg py-3 px-4 bg-[rgba(255,255,255,0.02)] text-white hover:bg-[rgba(255,255,255,0.04)] text-left">
+                    <div className="flex items-center gap-3">
+                      <BarChart3 className="w-[18px] h-[18px] text-[#6C5CE7]" />
+                      <span>Charts & Analytics</span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-slate-600" />
+                  </button>
+
+                  <button onClick={() => { setMobileMenuOpen(false); setConsoleOpen(true); }} className="w-full flex items-center justify-between rounded-lg py-3 px-4 bg-[rgba(255,255,255,0.02)] text-white hover:bg-[rgba(255,255,255,0.04)] text-left font-mono">
+                    <div className="flex items-center gap-3">
+                      <Terminal className="w-[18px] h-[18px] text-[#FF4757]" />
+                      <span>_terminal CLI</span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-slate-600" />
+                  </button>
+
+                  <button onClick={() => selectTab('settings')} className="w-full flex items-center justify-between rounded-lg py-3 px-4 bg-[rgba(255,255,255,0.02)] text-white hover:bg-[rgba(255,255,255,0.04)] text-left">
+                    <div className="flex items-center gap-3">
+                      <Settings className="w-[18px] h-[18px] text-slate-400" />
+                      <span>System Settings</span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-slate-600" />
+                  </button>
+                </motion.div>
+              ) : mobileSubMenu === 'bots' ? (
+                <motion.div 
+                  key="bots-links"
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  className="flex flex-col gap-2 w-full font-sans text-sm"
+                >
+                  <button onClick={() => selectTab('bots')} className="w-full flex items-center justify-between rounded-lg py-3 px-4 bg-[rgba(255,255,255,0.02)] text-white hover:bg-[rgba(255,255,255,0.04)] text-left">
+                    <div className="flex items-center gap-3">
+                      <Bot className="w-4.5 h-4.5 text-[#6C5CE7]" />
+                      <div className="flex flex-col">
+                        <span>All Configuration Nodes</span>
+                        <span className="text-[9px] text-slate-500 font-mono">Show bots layout</span>
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-bold font-mono text-slate-400 bg-slate-800 px-1.5 py-0.5 rounded shrink-0">{bots.length}</span>
+                  </button>
+
+                  <button onClick={() => { setCreateBotOpen(true); setMobileMenuOpen(false); }} className="w-full flex items-center justify-between rounded-lg py-3 px-4 bg-[rgba(46,213,115,0.05)] border border-[rgba(46,213,115,0.15)] text-[#2ED573] text-left">
+                    <div className="flex items-center gap-3">
+                      <Plus className="w-4.5 h-4.5" />
+                      <span>Register New Bot</span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-slate-600" />
+                  </button>
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
