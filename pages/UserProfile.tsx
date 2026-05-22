@@ -197,10 +197,20 @@ export default function UserProfile() {
 
                 // Fetch Q&A Discussions to extract user's created topics or comments
                 try {
-                    const qaRes = await fetch(`${API_BASE_URL}/api/qa/discussions`);
-                    if (qaRes && qaRes.ok) {
-                        const qaTopicsList = await qaRes.json();
-                        
+                    let qaTopicsList = [];
+                    try {
+                        const qaRes = await fetch(`${API_BASE_URL}/api/qa/discussions`);
+                        if (qaRes && qaRes.ok) {
+                            qaTopicsList = await qaRes.json();
+                        } else {
+                            throw new Error("API response not ok");
+                        }
+                    } catch (fetchErr) {
+                        console.warn("Raw QA fetch failed, falling back to DatabaseService:", fetchErr);
+                        qaTopicsList = await DatabaseService.getQADiscussions();
+                    }
+
+                    if (qaTopicsList && Array.isArray(qaTopicsList)) {
                         // User's own Q&A questions (topics)
                         const ownTopics = qaTopicsList.filter((t: any) => t.author_id === uData.id.toString());
                         setUserQaTopics(ownTopics);

@@ -452,7 +452,7 @@ const CategoryBotCard: React.FC<{ bot: Bot, rank: number }> = React.memo(({ bot,
   return (
     <div 
       onClick={() => navigate(`/bot/${bot.slug}`)} 
-      className="flex items-center cursor-pointer group hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-all rounded-[16px] p-2 -m-2 select-none active:scale-[0.98] transform-gpu"
+      className="flex items-center cursor-pointer group premium-card rounded-[16px] p-4 select-none active:scale-[0.98] transform-gpu"
     >
         <div className="relative shrink-0 select-none">
             <img 
@@ -466,7 +466,7 @@ const CategoryBotCard: React.FC<{ bot: Bot, rank: number }> = React.memo(({ bot,
                 {rank}
             </div>
         </div>
-        <div className="flex-1 ml-4 sm:ml-4.5 min-w-0 pr-1 select-none">
+        <div className="flex-1 ml-4 min-w-0 pr-1 select-none">
             <h3 className="font-extrabold text-[14px] sm:text-[15.5px] text-slate-900 dark:text-slate-50 font-sans tracking-tight leading-tight mb-1 flex items-center gap-1">
                 <span className="truncate">{bot.name}</span>
                 {bot.is_official && (
@@ -1635,14 +1635,20 @@ const Home = () => {
       />
       {/* Top Background Wrapper (Sticky Header on Desktop and Mobile) */}
       <div 
-        className="sticky top-0 z-[120] bg-white dark:bg-slate-950 border-b border-black/[0.03] dark:border-white/5 transition-all shadow-sm"
+        className="sticky top-0 z-[120] bg-white/80 dark:bg-slate-950/85 transition-all shadow-sm"
+        style={{ 
+          height: '64px', 
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          borderBottom: '1px solid rgba(255,255,255,.06)'
+        }}
         onMouseLeave={() => { setOpenMenu(null); setNavState('main'); }}
       >
         {/* Top Section */}
-        <div className="w-full py-4 relative z-[120]">
-          <div className="max-w-7xl mx-auto px-5 sm:px-8">
-              <div className="flex flex-wrap md:flex-nowrap items-center justify-between px-1 gap-y-4 md:gap-x-6">
-                <div className="flex items-center order-1 md:w-36 lg:w-48 shrink-0">
+        <div className="w-full h-full flex items-center relative z-[120]">
+          <div className="max-w-7xl mx-auto px-5 sm:px-8 w-full">
+              <div className="flex flex-wrap md:flex-nowrap items-center justify-between px-1 gap-y-4 md:gap-x-12">
+                <div className="flex items-center order-1 md:w-44 lg:w-56 shrink-0">
                     <Logo onClick={() => navigate('/')} className="cursor-pointer" />
                 </div>
 
@@ -2019,38 +2025,6 @@ const Home = () => {
                                         </p>
                                     </div>
 
-                                    {/* Top 3 Featured Cards for this section */}
-                                    <div className="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth pb-3 mb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
-                                        {featuredBots.map(({ bot }) => (
-                                            <div 
-                                                key={bot.id} 
-                                                onClick={() => navigate(`/bot/${bot.slug}`)}
-                                                className={`flex items-center justify-between p-4 rounded-xl border border-black/[0.05] dark:border-white/[0.08] hover:border-blue-500/20 transition-all cursor-pointer group hover:scale-[1.01] bg-[#00000008] dark:bg-white/[0.03] min-w-[280px] sm:min-w-[320px] shrink-0 relative ${featuredBots.length <= 3 ? 'md:flex-1 md:min-w-0' : 'md:w-[calc(33.333%-11px)]'}`}
-                                            >
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-12 h-12 featured-bot-card-img flex items-center justify-center p-[1px] overflow-hidden shrink-0">
-                                                        <img 
-                                                            src={getLiveBotIcon(bot)} 
-                                                            className="w-full h-full object-cover bg-white featured-bot-card-img" 
-                                                            alt=""
-                                                            onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
-                                                        />
-                                                    </div>
-                                                    <div className="flex flex-col min-w-0">
-                                                        <div className="flex items-center gap-1">
-                                                            <span className="text-lg font-black text-slate-900 dark:text-white tracking-tight truncate leading-tight">{bot.name}</span>
-                                                            <CheckCircle2 size={14} className="text-blue-500 fill-blue-500/10 shrink-0" />
-                                                        </div>
-                                                        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold line-clamp-1 uppercase tracking-tight">{bot.description}</span>
-                                                    </div>
-                                                </div>
-                                                <div className="text-2xl font-black text-slate-900 dark:text-white mr-1 shrink-0 italic">
-                                                    {bot.rating || '0.0'}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-
                                     <div 
                                         ref={catScroll.ref}
                                         onMouseDown={catScroll.onMouseDown}
@@ -2085,7 +2059,7 @@ const Home = () => {
                                             {/* Desktop Grid Layout (sm and up) */}
                                             <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-7 px-1 py-2">
                                                 {displayedBots.map((bot, idx) => (
-                                                    <CategoryBotCard key={bot.id} bot={bot} rank={idx + 1} />
+                                                    <CategoryBotCard key={`${bot.id}-${idx}-desktop-apps`} bot={bot} rank={idx + 1} />
                                                 ))}
                                             </div>
 
@@ -2095,7 +2069,7 @@ const Home = () => {
                                                     {getMobileColumns(sliderBots).map((col, colIdx) => (
                                                         <div key={colIdx} className="flex flex-col gap-5 min-w-[85vw] snap-center first:pl-2">
                                                             {col.map(({ bot, rank }) => (
-                                                                <CategoryBotCard key={bot.id} bot={bot} rank={rank} />
+                                                                <CategoryBotCard key={`${bot.id}-${rank}-mobile-apps`} bot={bot} rank={rank} />
                                                             ))}
                                                         </div>
                                                     ))}
@@ -2146,38 +2120,6 @@ const Home = () => {
                                         </p>
                                     </div>
 
-                                    {/* Top 3 Featured Cards for this section */}
-                                    <div className="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth pb-3 mb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
-                                        {featuredBots.map(({ bot }) => (
-                                            <div 
-                                                key={bot.id} 
-                                                onClick={() => navigate(`/bot/${bot.slug}`)}
-                                                className={`flex items-center justify-between p-4 rounded-xl border border-black/[0.05] dark:border-white/[0.08] hover:border-blue-500/20 transition-all cursor-pointer group hover:scale-[1.01] bg-[#00000008] dark:bg-white/[0.03] min-w-[280px] sm:min-w-[320px] shrink-0 relative ${featuredBots.length <= 3 ? 'md:flex-1 md:min-w-0' : 'md:w-[calc(33.333%-11px)]'}`}
-                                            >
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-12 h-12 featured-bot-card-img flex items-center justify-center p-[1px] overflow-hidden shrink-0">
-                                                        <img 
-                                                            src={getLiveBotIcon(bot)} 
-                                                            className="w-full h-full object-cover bg-white featured-bot-card-img" 
-                                                            alt=""
-                                                            onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
-                                                        />
-                                                    </div>
-                                                    <div className="flex flex-col min-w-0">
-                                                        <div className="flex items-center gap-1">
-                                                            <span className="text-lg font-black text-slate-900 dark:text-white tracking-tight truncate leading-tight">{bot.name}</span>
-                                                            <CheckCircle2 size={14} className="text-blue-500 fill-blue-500/10 shrink-0" />
-                                                        </div>
-                                                        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold line-clamp-1 uppercase tracking-tight">{bot.description}</span>
-                                                    </div>
-                                                </div>
-                                                <div className="text-2xl font-black text-slate-900 dark:text-white mr-1 shrink-0 italic">
-                                                    {bot.rating || '0.0'}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-
                                     <div 
                                         ref={botsCatScroll.ref}
                                         onMouseDown={botsCatScroll.onMouseDown}
@@ -2212,7 +2154,7 @@ const Home = () => {
                                             {/* Desktop Grid Layout (sm and up) */}
                                             <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-7 px-1 py-2">
                                                 {displayedBots.map((bot, idx) => (
-                                                    <CategoryBotCard key={bot.id} bot={bot} rank={idx + 1} />
+                                                    <CategoryBotCard key={`${bot.id}-${idx}-desktop-bots`} bot={bot} rank={idx + 1} />
                                                 ))}
                                             </div>
 
@@ -2222,7 +2164,7 @@ const Home = () => {
                                                     {getMobileColumns(sliderBots).map((col, colIdx) => (
                                                         <div key={colIdx} className="flex flex-col gap-5 min-w-[85vw] snap-center first:pl-2">
                                                             {col.map(({ bot, rank }) => (
-                                                                <CategoryBotCard key={bot.id} bot={bot} rank={rank} />
+                                                                <CategoryBotCard key={`${bot.id}-${rank}-mobile-bots`} bot={bot} rank={rank} />
                                                             ))}
                                                         </div>
                                                     ))}
