@@ -485,7 +485,7 @@ const CategoryBotCard: React.FC<{ bot: Bot, rank: number }> = React.memo(({ bot,
 });
 
 const getMobileColumns = (bots: Bot[]) => {
-  const list = bots.slice(0, 9);
+  const list = bots.slice(0, 12);
   const cols = [];
   
   if (list.length <= 3) {
@@ -502,7 +502,7 @@ const getMobileColumns = (bots: Bot[]) => {
       if (row2[i]) colItems.push({ bot: row2[i], rank: i + 4 });
       cols.push(colItems);
     }
-  } else {
+  } else if (list.length <= 9) {
     const row1 = list.slice(0, 3);
     const row2 = list.slice(3, 6);
     const row3 = list.slice(6, 9);
@@ -512,6 +512,20 @@ const getMobileColumns = (bots: Bot[]) => {
       if (row1[i]) colItems.push({ bot: row1[i], rank: i + 1 });
       if (row2[i]) colItems.push({ bot: row2[i], rank: i + 4 });
       if (row3[i]) colItems.push({ bot: row3[i], rank: i + 7 });
+      cols.push(colItems);
+    }
+  } else {
+    // 10 to 12 bots -> distribute dynamically into 3 rows of up to 4 items each
+    const colsCount = Math.ceil(list.length / 3); // 4 for length=12
+    const row1 = list.slice(0, colsCount);
+    const row2 = list.slice(colsCount, colsCount * 2);
+    const row3 = list.slice(colsCount * 2);
+    
+    for (let i = 0; i < colsCount; i++) {
+      const colItems = [];
+      if (row1[i]) colItems.push({ bot: row1[i], rank: i + 1 });
+      if (row2[i]) colItems.push({ bot: row2[i], rank: i + 1 + colsCount });
+      if (row3[i]) colItems.push({ bot: row3[i], rank: i + 1 + colsCount * 2 });
       cols.push(colItems);
     }
   }
@@ -1360,7 +1374,7 @@ const Home = () => {
                 : b.category === selectedAppsCategory
         );
     }
-    const appsSlider = appsForList.slice(0, 9); // Limit to 9 as requested
+    const appsSlider = appsForList.slice(0, 12); // Limit to 12 as requested
 
     if (allApps.length > 0) {
         result['apps'] = {
@@ -1401,7 +1415,7 @@ const Home = () => {
                 : b.category === selectedBotsCategory
         );
     }
-    const botsSlider = botsForList.slice(0, 9); // Limit to 9 as requested
+    const botsSlider = botsForList.slice(0, 12); // Limit to 12 as requested
 
     if (allBots.length > 0) {
         result['bots'] = {
@@ -2065,7 +2079,7 @@ const Home = () => {
                                 </div>
                                 
                                 {(() => {
-                                    const displayedBots = sliderBots.slice(0, 9);
+                                    const displayedBots = sliderBots.slice(0, 12);
                                     return (
                                         <>
                                             {/* Desktop Grid Layout (sm and up) */}
@@ -2090,10 +2104,6 @@ const Home = () => {
                                         </>
                                     );
                                 })()}
-
-                                <div className="mt-8">
-                                    <FeaturedBotsSlider bots={bots.filter(b => Array.isArray(b.category) ? b.category.includes('apps') : b.category === 'apps')} />
-                                </div>
                             </div>
                         );
                     })()}
@@ -2196,7 +2206,7 @@ const Home = () => {
                                 </div>
                                 
                                 {(() => {
-                                    const displayedBots = sliderBots.slice(0, 9);
+                                    const displayedBots = sliderBots.slice(0, 12);
                                     return (
                                         <>
                                             {/* Desktop Grid Layout (sm and up) */}
@@ -2221,10 +2231,6 @@ const Home = () => {
                                         </>
                                     );
                                 })()}
-
-                                <div className="mt-8">
-                                    <FeaturedBotsSlider bots={bots.filter(b => Array.isArray(b.category) ? !b.category.includes('apps') : b.category !== 'apps')} />
-                                </div>
                             </div>
                         );
                     })()}
