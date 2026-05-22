@@ -1189,72 +1189,281 @@ const Home = () => {
     return result;
   }, [filteredBots, selectedAppsCategory, selectedBotsCategory]);
 
+  interface MenuItem {
+      id: string;
+      label: string;
+      desc: string;
+      icon: any;
+      action?: () => void;
+      path?: string;
+  }
+
+  const discoverItems: MenuItem[] = [
+      { id: 'bots', label: 'Botlar', desc: 'Telegram Bot Marketi', icon: BotIcon, action: () => setNavState('bots') },
+      { id: 'apps', label: 'Uygulamalar', desc: 'Web3 & TMA Uygulamaları', icon: LayoutGrid, action: () => setNavState('apps') },
+      { id: 'channels', label: 'Kanallar', desc: 'Popüler Telegram Kanalları', icon: Megaphone, path: '/channels' },
+      { id: 'ads', label: 'Reklam', desc: 'Projenizi Öne Çıkarın', icon: Share2, path: '/settings' },
+  ];
+
+  const investorItems: MenuItem[] = [
+      { id: 'exchanges', label: 'Borsalar ve Takas', desc: 'CEX & DEX Platformları', icon: BarChart3 },
+      { id: 'earn', label: 'Kazanç Uygulamaları', desc: 'Pasif Gelir Fırsatları', icon: Coins },
+      { id: 'tools', label: 'Yatırım Araçları', desc: 'Analiz ve Takip Araçları', icon: Briefcase },
+      { id: 'new', label: 'Yeni Keşifler', desc: 'Gelecek Vaadeden Projeler', icon: Compass },
+  ];
+
+  const simpleLinks = [
+      { label: 'Hızlı Link 1', path: '#' },
+      { label: 'Hızlı Link 2', path: '#' },
+      { label: 'Hızlı Link 3', path: '#' },
+  ];
+
+  const appsCategories = appsSubCategories;
+
+  const handleCategoryClick = (catId: string, mode: 'bots' | 'apps') => {
+      haptic('light');
+      navigate(`/search?mode=${mode}&category=${catId}`);
+      setOpenMenu(null);
+      setMobileModal(null);
+      setNavState('main');
+  };
+
+  const renderMegaMenuContent = () => {
+      if (openMenu === 'kesfet') {
+          return (
+              <div className="max-w-5xl mx-auto px-6 grid grid-cols-12 gap-8">
+                  <div className="col-span-8">
+                      <AnimatePresence mode="wait">
+                          {navState === 'main' ? (
+                              <motion.div 
+                                  key="main"
+                                  initial={{ opacity: 0, x: -20 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  exit={{ opacity: 0, x: -20 }}
+                                  className="grid grid-cols-2 gap-4"
+                              >
+                                  {discoverItems.map(item => (
+                                      <button 
+                                          key={item.id}
+                                          onClick={() => {
+                                              if (item.action) item.action();
+                                              else if (item.path) { navigate(item.path); setOpenMenu(null); }
+                                          }}
+                                          className="flex items-center gap-4 p-4 hover:bg-black/[0.02] dark:hover:bg-white/5 rounded-2xl transition-all group border border-transparent hover:border-black/5 dark:hover:border-white/10 text-left w-full"
+                                      >
+                                          <div className="menu-icon-container shrink-0 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
+                                              <item.icon size={20} />
+                                          </div>
+                                          <div className="flex flex-col">
+                                              <span className="text-[14px] font-semibold menu-item-text">{item.label}</span>
+                                              <span className="text-[12px] text-slate-500 dark:text-slate-400 font-normal">{item.desc}</span>
+                                          </div>
+                                      </button>
+                                  ))}
+                              </motion.div>
+                          ) : navState === 'bots' ? (
+                              <motion.div 
+                                  key="bots"
+                                  initial={{ opacity: 0, x: 20 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  exit={{ opacity: 0, x: 20 }}
+                                  className="flex flex-col gap-6"
+                              >
+                                  <div className="flex items-center gap-4 mb-2">
+                                      <button 
+                                          onClick={() => setNavState('main')}
+                                          className="p-2 hover:bg-white/10 rounded-full text-slate-500 transition-colors"
+                                      >
+                                          <ArrowLeft size={20} />
+                                      </button>
+                                      <h3 className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-tight">Bot Kategorileri</h3>
+                                  </div>
+                                  <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                                      {botsCategories.map(cat => (
+                                          <button 
+                                              key={cat.id}
+                                              onClick={() => handleCategoryClick(cat.id, 'bots')}
+                                              className="flex items-center gap-3 p-3 hover:bg-black/[0.02] dark:hover:bg-white/5 rounded-xl transition-all group text-left border border-transparent hover:border-black/5 dark:hover:border-white/10 w-full"
+                                          >
+                                              <div className="menu-icon-container !w-8 !h-8 px-0 shrink-0 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
+                                                  <cat.icon size={16} />
+                                              </div>
+                                              <span className="text-[11px] font-bold uppercase tracking-tight menu-item-text">{t(cat.label)}</span>
+                                          </button>
+                                      ))}
+                                  </div>
+                              </motion.div>
+                          ) : (
+                              <motion.div 
+                                  key="apps"
+                                  initial={{ opacity: 0, x: 20 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  exit={{ opacity: 0, x: 20 }}
+                                  className="flex flex-col gap-6"
+                              >
+                                  <div className="flex items-center gap-4 mb-2">
+                                      <button 
+                                          onClick={() => setNavState('main')}
+                                          className="p-2 hover:bg-white/10 rounded-full text-slate-500 transition-colors"
+                                      >
+                                          <ArrowLeft size={20} />
+                                      </button>
+                                      <h3 className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-tight">Uygulama Kategorileri</h3>
+                                  </div>
+                                  <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                                      {appsCategories.map(cat => (
+                                          <button 
+                                              key={cat.id}
+                                              onClick={() => handleCategoryClick(cat.id, 'apps')}
+                                              className="flex items-center gap-3 p-3 hover:bg-black/[0.02] dark:hover:bg-white/5 rounded-xl transition-all group text-left border border-transparent hover:border-black/5 dark:hover:border-white/10 w-full"
+                                          >
+                                              <div className="menu-icon-container !w-8 !h-8 px-0 shrink-0 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
+                                                  <cat.icon size={16} />
+                                              </div>
+                                              <span className="text-[11px] font-bold uppercase tracking-tight menu-item-text">{t(cat.label)}</span>
+                                          </button>
+                                      ))}
+                                  </div>
+                              </motion.div>
+                          )}
+                      </AnimatePresence>
+                  </div>
+                  <div className="col-span-4 border-l border-black/5 dark:border-white/5 pl-8 flex flex-col justify-center gap-3">
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-600 mb-2">Hızlı Bağlantılar</span>
+                      {simpleLinks.map((link, i) => (
+                          <a 
+                              key={i}
+                              href={link.path}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-blue-500 transition-all font-bold text-xs uppercase group"
+                          >
+                              {link.label}
+                              <ExternalLink size={14} className="opacity-0 group-hover:opacity-100 transition-all" />
+                          </a>
+                      ))}
+                  </div>
+              </div>
+          );
+      }
+
+      if (openMenu === 'investors') {
+          return (
+              <div className="max-w-5xl mx-auto px-6 grid grid-cols-12 gap-8">
+                  <div className="col-span-8">
+                      <div className="grid grid-cols-2 gap-4">
+                          {investorItems.map(item => (
+                              <button 
+                                  key={item.id}
+                                  className="flex items-center gap-4 p-4 hover:bg-black/[0.02] dark:hover:bg-white/5 rounded-2xl transition-all group border border-transparent hover:border-black/5 dark:hover:border-white/10 text-left w-full"
+                              >
+                                  <div className="menu-icon-container shrink-0 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
+                                      <item.icon size={20} />
+                                  </div>
+                                  <div className="flex flex-col">
+                                      <span className="text-[14px] font-semibold menu-item-text">{item.label}</span>
+                                      <span className="text-[12px] text-slate-500 dark:text-slate-400 font-normal">{item.desc}</span>
+                                  </div>
+                              </button>
+                          ))}
+                      </div>
+                  </div>
+                  <div className="col-span-4 border-l border-black/5 dark:border-white/5 pl-8 flex flex-col justify-center gap-3">
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-600 mb-2">Yatırım Linkleri</span>
+                      {simpleLinks.map((link, i) => (
+                          <a 
+                              key={i}
+                              href={link.path}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-emerald-500 transition-all font-bold text-xs uppercase group"
+                          >
+                              {link.label}
+                              <ExternalLink size={14} className="opacity-0 group-hover:opacity-100 transition-all" />
+                          </a>
+                      ))}
+                  </div>
+              </div>
+          );
+      }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-200 animate-in transition-colors duration-300 home-page">
       <SEO 
           title={t('home_seo_title')} 
           description={t('home_seo_desc')}
       />
-      {/* Top Background Wrapper */}
-      <div className="bg-white dark:bg-slate-950">
+      {/* Top Background Wrapper (Sticky Header on Desktop and Mobile) */}
+      <div 
+        className="sticky top-0 z-[120] bg-white dark:bg-slate-950 border-b border-black/[0.03] dark:border-white/5 transition-all shadow-sm"
+        onMouseLeave={() => { setOpenMenu(null); setNavState('main'); }}
+      >
         {/* Top Section */}
-        <div className="w-full pt-6 md:pt-10 pb-4 shadow-[inset_0_-1px_0_0_rgba(0,0,0,0.03)] relative z-[120]">
+        <div className="w-full py-4 relative z-[120]">
           <div className="max-w-7xl mx-auto px-5 sm:px-8">
-              <div className="flex flex-wrap md:flex-nowrap items-center justify-between mb-8 px-1 gap-y-6 md:gap-x-6">
-                <div className="flex items-center order-1 md:w-48 shrink-0">
+              <div className="flex flex-wrap md:flex-nowrap items-center justify-between px-1 gap-y-4 md:gap-x-6">
+                <div className="flex items-center order-1 md:w-36 lg:w-48 shrink-0">
                     <Logo onClick={() => navigate('/')} className="cursor-pointer" />
                 </div>
 
-                  <div className="w-full md:flex-1 md:max-w-4xl order-3 md:order-2 flex items-center gap-4 lg:gap-8 font-sans">
+                  <div className="w-full md:flex-1 md:max-w-4xl order-3 md:order-2 flex items-center gap-4 lg:gap-8 font-sans justify-center">
                       {/* Search Bar Container */}
-                      <div className="flex-1 md:max-w-[280px] lg:max-w-[320px] relative z-[100]">
-                          <div className="relative flex items-center bg-[#eeefef] dark:bg-slate-800 rounded-xl group transition-all h-[42px] px-3.5">
+                      <div className="flex-1 md:max-w-[280px] lg:max-w-[320px] relative z-[130]">
+                          <div className="relative flex items-center bg-[#eeefef] dark:bg-slate-800 rounded-xl group transition-all h-[42px] px-3">
                               <div 
                                 onClick={() => navigate('/search')} 
                                 className="flex items-center flex-1 min-w-0 cursor-pointer active:scale-[0.98] transition-transform"
                               >
-                                  <div className="text-slate-500 hover:text-blue-500 transition-colors shrink-0 mr-2">
-                                      <SlidersHorizontal size={18} />
-                                  </div>
-                                  <div className="w-full text-[13px] text-slate-600 dark:text-slate-350 font-bold truncate min-w-0">
+                                  <Search size={16} className="text-[#8e8e93] dark:text-slate-400 group-hover:text-blue-500 transition-colors shrink-0 mr-2" />
+                                  <div className="w-full text-[13px] text-[#2c2c2e] dark:text-slate-350 font-bold truncate min-w-0 tracking-wide">
                                       Herşeyi ara
                                   </div>
+                              </div>
+                              
+                              {/* Vertical Divider */}
+                              <div className="w-px h-5 bg-black/[0.08] dark:bg-white/[0.08] mx-1 shrink-0" />
+                              
+                              {/* Filter Menu */}
+                              <div className="shrink-0 relative z-[140]">
+                                  <FilterMenu />
                               </div>
                           </div>
                       </div>
 
                       {/* Header Navigation Links (Keşfet, Yatırımcılar, Blog) */}
-                      <div className="hidden md:flex items-center gap-5 lg:gap-7 shrink-0">
+                      <div className="hidden md:flex items-center gap-5 lg:gap-8 shrink-0">
                           {/* Keşfet */}
                           <button 
-                              onClick={() => { haptic('light'); navigate('/search'); }}
-                              className="nav-menu-item text-[#000000] dark:text-white hover:opacity-80 flex items-center gap-1.5 transition-all font-bold text-[14px]"
+                              onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('kesfet'); }}
+                              onClick={() => { haptic('light'); setOpenMenu(openMenu === 'kesfet' ? null : 'kesfet'); }}
+                              className={`nav-menu-item text-slate-800 dark:text-white hover:opacity-80 flex items-center gap-1 transition-all font-semibold text-[14px] select-none tracking-tight py-2 border-b-2 ${openMenu === 'kesfet' ? 'border-blue-500' : 'border-transparent'}`}
                           >
-                              <Gift size={16} className="text-[#3b82f6] dark:text-blue-400 shrink-0" />
                               <span>Keşfet</span>
+                              <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'kesfet' ? 'rotate-180' : ''}`} />
                           </button>
 
                           {/* Yatırımcılar */}
                           <button 
-                              onClick={() => { haptic('light'); navigate('/search'); }}
-                              className="nav-menu-item text-[#000000] dark:text-white hover:opacity-80 flex items-center gap-1.5 transition-all font-bold text-[14px]"
+                              onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('investors'); }}
+                              onClick={() => { haptic('light'); setOpenMenu(openMenu === 'investors' ? null : 'investors'); }}
+                              className={`nav-menu-item text-slate-800 dark:text-white hover:opacity-80 flex items-center gap-1 transition-all font-semibold text-[14px] select-none tracking-tight py-2 border-b-2 ${openMenu === 'investors' ? 'border-emerald-500' : 'border-transparent'}`}
                           >
-                              <Moon size={16} className="text-[#10b981] dark:text-emerald-400 shrink-0 rotate-[15deg]" />
                               <span>Yatırımcılar</span>
+                              <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'investors' ? 'rotate-180' : ''}`} />
                           </button>
 
                           {/* Blog */}
                           <button 
                               onClick={() => { haptic('light'); navigate('/blog'); }}
-                              className="nav-menu-item text-[#000000] dark:text-white hover:opacity-80 flex items-center gap-1.5 transition-all font-bold text-[14px]"
+                              className="nav-menu-item text-slate-800 dark:text-white hover:opacity-80 flex items-center gap-1 transition-all font-semibold text-[14px] select-none tracking-tight py-2 border-b-2 border-transparent"
                           >
-                              <Star size={16} className="text-[#eab308] dark:text-yellow-400 shrink-0 fill-[#eab308] dark:fill-yellow-400" />
                               <span>Blog</span>
                           </button>
                       </div>
                   </div>
 
-                  <div className={`flex items-center gap-2 md:gap-3 order-2 md:order-3 md:w-48 justify-end ml-auto shrink-0 ${isScrolled ? 'md:hidden' : ''} font-sans`}>
+                  <div className="flex items-center gap-2 md:gap-3 order-2 md:order-3 md:w-48 justify-end ml-auto shrink-0 font-sans">
                       {user && (
                           <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="hidden sm:flex w-10 h-10 items-center justify-center text-slate-900 dark:text-white bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-xl active:scale-95 transition-all outline-none">
                               <Wallet size={18} />
@@ -1452,28 +1661,7 @@ const Home = () => {
             </>
           )}
 
-      {!isLoading && (
-        <NavMenu 
-            isScrolled={isScrolled}
-            user={user}
-            unreadCount={unreadCount}
-            theme={theme}
-            toggleTheme={toggleTheme}
-            haptic={haptic}
-            isMenuOpen={isMenuOpen}
-            setIsMenuOpen={setIsMenuOpen}
-            setIsLoginModalOpen={setIsLoginModalOpen}
-            setWebAuthUser={setWebAuthUser}
-            isLoginModalOpen={isLoginModalOpen}
-            menuRef={menuRef}
-            openMenu={openMenu}
-            setOpenMenu={setOpenMenu}
-            navState={navState}
-            setNavState={setNavState}
-            mobileModal={mobileModal}
-            setMobileModal={setMobileModal}
-        />
-      )}
+
 
       {/* Bottom Section */}
       <div className="bg-white dark:bg-slate-950 w-full pt-10 pb-32 shadow-[0_-1px_0_0_rgba(0,0,0,0.015)]">
