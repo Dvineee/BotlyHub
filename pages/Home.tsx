@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from '../TranslationContext';
 import { 
   motion, 
   AnimatePresence 
@@ -30,6 +32,7 @@ import {
   Lock,
   MessageSquare
 } from 'lucide-react';
+import { categories } from '../data';
 
 const Github = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -52,6 +55,8 @@ const Gitlab = ({ className }: { className?: string }) => (
 // Success: #10B981, Warning: #F59E0B, Failed: #EF4444
 
 export default function Home() {
+  const navigate = useNavigate();
+  const { t } = useTranslation();
   // Navigation active anchors
   const [activeSection, setActiveSection] = useState('hero');
 
@@ -229,14 +234,20 @@ export default function Home() {
           </a>
 
           {/* Nav links similar to Vercel/Linear style dropdowns / indicators */}
-          <nav className="hidden md:flex items-center gap-8 text-[13.5px] text-[#A1A1A1] font-medium">
+          <nav className="hidden md:flex items-center gap-7 text-[13.5px] text-[#A1A1A1] font-medium">
             <a href="#how-it-works" className="hover:text-white transition-colors">How it Works</a>
             <a href="#features" className="hover:text-white transition-colors">Features</a>
-            <a href="#sandbox" className="hover:text-white transition-colors relative flex items-center gap-1.5">
-              Interactive QA Live <span className="w-1.5 h-1.5 rounded-full bg-[#7C5CFF] animate-pulse"></span>
-            </a>
+            <Link to="/search" className="flex items-center gap-1.5 text-zinc-300 hover:text-white transition-colors px-2 py-1 rounded bg-white/[0.03] border border-white/[0.05] hover:border-white/[0.12]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#7C5CFF]"></span>
+              <span>{t('nav_market') || 'Marketplace'}</span>
+            </Link>
+            <Link to="/qa" className="hover:text-white transition-colors">
+              {t('nav_qa') || t('footer_qa') || 'QA Forum'}
+            </Link>
+            <Link to="/blog" className="hover:text-white transition-colors">
+              {t('footer_blog') || 'Blog'}
+            </Link>
             <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
-            <a href="#integrations" className="hover:text-white transition-colors">Integrations</a>
           </nav>
 
           {/* Action CTAs */}
@@ -601,7 +612,85 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 4. Product Demo Section (Interactive Dashboard Mock) */}
+      {/* 4. BOT & MINI-APP ECOSYSTEM MARKETPLACE DEVELOPER PREVIEW */}
+      <section className="py-20 md:py-28 relative border-t border-white/[0.03] z-10 bg-[#08080A]">
+        <div className="absolute top-0 right-1/2 translate-x-1/2 w-[550px] h-[550px] rounded-full bg-[#4F9CF9]/5 blur-[125px] pointer-events-none" />
+        <div className="max-w-6xl mx-auto px-6">
+          
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+            <div className="max-w-2xl text-left">
+              <span className="text-[11px] font-mono font-bold tracking-widest text-[#7C5CFF] uppercase bg-[#7C5CFF]/10 border border-[#7C5CFF]/20 px-3 py-1 rounded-full">Global Directory</span>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-white mt-4 tracking-tight leading-tight">Explore the BotlyHub Telegram Ecosystem</h2>
+              <p className="text-[#A1A1A1] mt-3.5 text-sm md:text-base">
+                Discover, configure, and connect verified Telegram bots, automated channel tools, and decentralized Web3 Mini-Apps built by our developer community.
+              </p>
+            </div>
+            <div className="flex shrink-0">
+              <button 
+                onClick={() => navigate('/search')}
+                className="group flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-black text-xs font-semibold hover:bg-zinc-200 active:scale-95 transition-all shadow-[0_4px_12px_rgba(255,255,255,0.1)]"
+              >
+                <span>Browse All {categories.length - 1}+ Categories</span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            {categories
+              .filter(cat => cat.id !== 'all')
+              .slice(0, 10)
+              .map((cat, idx) => {
+                const IconComponent = cat.icon;
+                const localizedLabel = t(cat.label) || cat.id.toUpperCase();
+                return (
+                  <div
+                    key={cat.id}
+                    onClick={() => navigate(`/search?category=${cat.id}`)}
+                    className="group relative rounded-xl bg-white/[0.02] border border-white/[0.05] hover:border-white/[0.13] p-5 cursor-pointer hover:bg-white/[0.03] hover:shadow-[0_8px_30px_rgba(0,0,0,0.4)] transition-all duration-300 flex flex-col items-center text-center justify-between min-h-[140px] select-none active:scale-[0.98]"
+                  >
+                    <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#7C5CFF]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/[0.03] border border-white/[0.08] group-hover:bg-[#7C5CFF]/10 group-hover:border-[#7C5CFF]/25 text-zinc-400 group-hover:text-white transition-all duration-300 p-3 shrink-0">
+                      {IconComponent ? (
+                        <IconComponent size={24} className="group-hover:scale-110 transition-transform" />
+                      ) : (
+                        <Bot className="w-5 h-5" />
+                      )}
+                    </div>
+                    <div className="mt-4">
+                      <h4 className="text-[13px] font-bold text-slate-100 group-hover:text-white truncate">
+                        {localizedLabel}
+                      </h4>
+                      <p className="text-[10px] text-zinc-500 mt-1 uppercase font-mono tracking-wider">
+                        {cat.id} Directory
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+
+          <div className="mt-10 rounded-2xl bg-gradient-to-r from-[#7C5CFF]/10 via-transparent to-[#4F9CF9]/10 border border-white/[0.05] p-6 lg:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="text-left space-y-2">
+              <span className="text-[9.5px] font-mono font-black text-[#5BC0BE] bg-[#5BC0BE]/15 border border-[#5BC0BE]/25 px-2 py-0.5 rounded uppercase tracking-wider">Submit your app</span>
+              <h3 className="text-lg font-bold text-white">Are you a Telegram developer or community creator?</h3>
+              <p className="text-zinc-400 text-xs max-w-xl leading-relaxed">
+                List your Telegram bot, mini-app, group, or channel to gain organic distribution, build reputation rankings, and integrate instant micro-payments.
+              </p>
+            </div>
+            <button 
+              onClick={() => navigate('/u/login')}
+              className="w-full md:w-auto px-5 py-3 rounded-xl bg-white/[0.03] border border-white/[0.08] text-[#EDEDED] text-xs hover:bg-white/[0.06] font-semibold transition-all shrink-0 flex items-center justify-center gap-2"
+            >
+              <span>Add Your Bot Now</span>
+              <ExternalLink className="w-3 h-3" />
+            </button>
+          </div>
+
+        </div>
+      </section>
+
+      {/* 5. Product Demo Section (Interactive Dashboard Mock) */}
       <section id="sandbox" className="py-20 md:py-28 relative border-t border-white/[0.03] z-10 bg-[#070708]">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[#7C5CFF]/3 blur-[140px] pointer-events-none" />
         
