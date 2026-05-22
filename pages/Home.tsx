@@ -1534,6 +1534,22 @@ const Home = () => {
                                               <span className="text-xs font-bold uppercase tracking-tight">{t('market')}</span>
                                           </button>
 
+                                          <button 
+                                              onClick={() => { haptic('light'); setMobileModal('kesfet'); setIsMenuOpen(false); }} 
+                                              className="flex md:hidden w-full flex-center items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group"
+                                          >
+                                              <Compass size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                              <span className="text-xs font-bold uppercase tracking-tight">Keşfet</span>
+                                          </button>
+
+                                          <button 
+                                              onClick={() => { haptic('light'); setMobileModal('investors'); setIsMenuOpen(false); }} 
+                                              className="flex md:hidden w-full flex-center items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group"
+                                          >
+                                              <Briefcase size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                              <span className="text-xs font-bold uppercase tracking-tight">Yatırımcılar</span>
+                                          </button>
+
                                           <button onClick={() => { haptic('light'); navigate('/profile'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
                                               <User size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
                                               <span className="text-xs font-bold uppercase tracking-tight">{t('profile')}</span>
@@ -1608,6 +1624,27 @@ const Home = () => {
                                               <span className="text-xs font-bold uppercase tracking-tight">{t('login')}</span>
                                           </button>
 
+                                          <button onClick={() => { haptic('light'); navigate('/'); setIsMenuOpen(false); }} className="flex md:hidden w-full flex-center items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
+                                              <Store size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                              <span className="text-xs font-bold uppercase tracking-tight">{t('market')}</span>
+                                          </button>
+
+                                          <button 
+                                              onClick={() => { haptic('light'); setMobileModal('kesfet'); setIsMenuOpen(false); }} 
+                                              className="flex md:hidden w-full flex-center items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group"
+                                          >
+                                              <Compass size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                              <span className="text-xs font-bold uppercase tracking-tight">Keşfet</span>
+                                          </button>
+
+                                          <button 
+                                              onClick={() => { haptic('light'); setMobileModal('investors'); setIsMenuOpen(false); }} 
+                                              className="flex md:hidden w-full flex-center items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group"
+                                          >
+                                              <Briefcase size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                              <span className="text-xs font-bold uppercase tracking-tight">Yatırımcılar</span>
+                                          </button>
+
                                           <button onClick={() => { haptic('light'); toggleTheme(); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
                                               {theme === 'dark' ? (
                                                   <>
@@ -1640,6 +1677,22 @@ const Home = () => {
                 </div>
               </div>
           </div>
+          
+          {/* Desktop Mega Menu Dropdown */}
+          <AnimatePresence>
+              {openMenu && (
+                  <motion.div 
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                      className="hidden md:block absolute left-0 right-0 top-full bg-white dark:bg-slate-900/95 backdrop-blur-xl border-b border-black/5 dark:border-white/10 shadow-2xl z-[100] mega-menu-container"
+                      onMouseLeave={() => { setOpenMenu(null); setNavState('main'); }}
+                  >
+                      {renderMegaMenuContent()}
+                  </motion.div>
+              )}
+          </AnimatePresence>
       </div>
         {isLoading ? (
             <div className="flex flex-col items-center justify-center py-24 gap-4"><Loader2 className="animate-spin text-blue-500" size={32} /></div>
@@ -2205,6 +2258,151 @@ const Home = () => {
             </motion.div>
           </div>
         )}
+      </AnimatePresence>
+
+      {/* Mobile Modal for Categories */}
+      <AnimatePresence>
+          {mobileModal && (
+              <div className="fixed inset-0 z-[200] flex items-end justify-center p-0 md:hidden">
+                  <motion.div 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      onClick={() => { setMobileModal(null); setNavState('main'); }}
+                      className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"
+                  />
+                  <motion.div 
+                      initial={{ y: "100%" }}
+                      animate={{ y: 0 }}
+                      exit={{ y: "100%" }}
+                      transition={{ type: "spring", damping: 30, stiffness: 300 }}
+                      className="relative w-full bg-white dark:bg-slate-900 rounded-t-[32px] overflow-hidden pt-4 pb-12 border-t border-black/10 dark:border-white/10"
+                  >
+                      {/* Drag Handle */}
+                      <div className="w-12 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full mx-auto mb-8" />
+                      
+                      <div className="flex justify-between items-center mb-6 px-8">
+                          <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-widest uppercase italic bg-transparent border-none outline-none">
+                              {mobileModal === 'kesfet' ? 'KEŞFET' : 'YATIRIMCILAR'}
+                          </h3>
+                          <button onClick={() => { setMobileModal(null); setNavState('main'); }} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-500 active:scale-90 transition-all">
+                              <X size={20} />
+                          </button>
+                      </div>
+                      
+                      <div className="max-h-[70vh] overflow-y-auto px-6 pb-4">
+                          <AnimatePresence mode="wait">
+                              {navState === 'main' ? (
+                                  <motion.div 
+                                      key="mobile-main"
+                                      initial={{ opacity: 0, x: -20 }}
+                                      animate={{ opacity: 1, x: 0 }}
+                                      exit={{ opacity: 0, x: -20 }}
+                                      className="grid grid-cols-1 gap-3"
+                                  >
+                                      {(mobileModal === 'kesfet' ? discoverItems : investorItems).map((item) => (
+                                          <button
+                                              key={item.id}
+                                              onClick={() => {
+                                                  if (item.action) item.action();
+                                                  else if (item.path) { navigate(item.path); setMobileModal(null); }
+                                              }}
+                                              className="w-full flex items-center gap-4 p-4 hover:bg-slate-50 dark:hover:bg-white/5 active:bg-slate-100 dark:active:bg-white/10 transition-all rounded-2xl border border-black/5 dark:border-white/5 group mobile-menu-item"
+                                          >
+                                              <div className={`mobile-menu-icon-container flex items-center justify-center rounded-xl shrink-0 ${mobileModal === 'kesfet' ? 'text-blue-500' : 'text-emerald-500'}`}>
+                                                  <item.icon size={22} className="menu-item-icon" />
+                                              </div>
+                                              <div className="flex flex-col items-start min-w-0">
+                                                  <span className="text-[13px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider truncate w-full">
+                                                      {item.label}
+                                                  </span>
+                                              </div>
+                                              {item.action && <ChevronRight size={16} className="ml-auto text-slate-300 dark:text-slate-700" />}
+                                          </button>
+                                      ))}
+                                  </motion.div>
+                              ) : navState === 'bots' ? (
+                                  <motion.div 
+                                      key="mobile-bots"
+                                      initial={{ opacity: 0, x: 20 }}
+                                      animate={{ opacity: 1, x: 0 }}
+                                      exit={{ opacity: 0, x: 20 }}
+                                      className="flex flex-col gap-4"
+                                  >
+                                      <button 
+                                          onClick={() => setNavState('main')}
+                                          className="flex items-center gap-2 text-blue-500 font-black uppercase tracking-widest text-[11px] mb-2"
+                                      >
+                                          <ArrowLeft size={16} /> Geri
+                                      </button>
+                                      <div className="grid grid-cols-2 gap-3">
+                                          {botsCategories.map(cat => (
+                                              <button 
+                                                  key={cat.id}
+                                                  onClick={() => handleCategoryClick(cat.id, 'bots')}
+                                                  className="flex flex-col items-start gap-3 p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5 mobile-menu-item"
+                                              >
+                                                  <div className="mobile-menu-icon-container flex items-center justify-center text-blue-500">
+                                                      <cat.icon size={20} />
+                                                  </div>
+                                                  <span className="text-[10px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300">{t(cat.label)}</span>
+                                              </button>
+                                          ))}
+                                      </div>
+                                  </motion.div>
+                              ) : (
+                                  <motion.div 
+                                      key="mobile-apps"
+                                      initial={{ opacity: 0, x: 20 }}
+                                      animate={{ opacity: 1, x: 0 }}
+                                      exit={{ opacity: 0, x: 20 }}
+                                      className="flex flex-col gap-4"
+                                  >
+                                      <button 
+                                          onClick={() => setNavState('main')}
+                                          className="flex items-center gap-2 text-blue-500 font-black uppercase tracking-widest text-[11px] mb-2"
+                                      >
+                                          <ArrowLeft size={16} /> Geri
+                                      </button>
+                                      <div className="grid grid-cols-2 gap-3">
+                                          {appsCategories.map(cat => (
+                                              <button 
+                                                  key={cat.id}
+                                                  onClick={() => handleCategoryClick(cat.id, 'apps')}
+                                                  className="flex flex-col items-start gap-3 p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5 mobile-menu-item"
+                                              >
+                                                  <div className="mobile-menu-icon-container flex items-center justify-center text-emerald-500">
+                                                      <cat.icon size={20} />
+                                                  </div>
+                                                  <span className="text-[10px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300">{t(cat.label)}</span>
+                                              </button>
+                                          ))}
+                                      </div>
+                                  </motion.div>
+                              )}
+                          </AnimatePresence>
+                          
+                          {navState === 'main' && (
+                              <div className="mt-8 pt-6 border-t border-black/5 dark:border-white/5">
+                                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-600 block mb-4">Hızlı Bağlantılar</span>
+                                  <div className="grid grid-cols-1 gap-2">
+                                      {simpleLinks.map((link, i) => (
+                                          <a 
+                                              key={i}
+                                              href={link.path}
+                                              className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-slate-300 font-bold text-xs uppercase"
+                                          >
+                                              {link.label}
+                                              <ExternalLink size={14} />
+                                          </a>
+                                      ))}
+                                  </div>
+                              </div>
+                          )}
+                      </div>
+                  </motion.div>
+              </div>
+          )}
       </AnimatePresence>
     </div>
   );
