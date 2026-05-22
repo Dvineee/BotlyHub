@@ -519,14 +519,14 @@ const CategoryBotCard: React.FC<{ bot: Bot, rank: number }> = React.memo(({ bot,
 });
 
 const getMobileColumns = (bots: Bot[]) => {
-  const list = bots.slice(0, 6);
+  const list = bots.slice(0, 9);
   const cols = [];
   
   if (list.length <= 3) {
     for (let i = 0; i < list.length; i++) {
       cols.push([{ bot: list[i], rank: i + 1 }]);
     }
-  } else {
+  } else if (list.length <= 6) {
     const row1 = list.slice(0, 3);
     const row2 = list.slice(3, 6);
     
@@ -534,6 +534,18 @@ const getMobileColumns = (bots: Bot[]) => {
       const colItems = [];
       if (row1[i]) colItems.push({ bot: row1[i], rank: i + 1 });
       if (row2[i]) colItems.push({ bot: row2[i], rank: i + 4 });
+      cols.push(colItems);
+    }
+  } else {
+    const row1 = list.slice(0, 3);
+    const row2 = list.slice(3, 6);
+    const row3 = list.slice(6, 9);
+    
+    for (let i = 0; i < 3; i++) {
+      const colItems = [];
+      if (row1[i]) colItems.push({ bot: row1[i], rank: i + 1 });
+      if (row2[i]) colItems.push({ bot: row2[i], rank: i + 4 });
+      if (row3[i]) colItems.push({ bot: row3[i], rank: i + 7 });
       cols.push(colItems);
     }
   }
@@ -2019,7 +2031,7 @@ const Home = () => {
                                         className="category-filter-container no-scrollbar relative z-0"
                                     >
                                         <button 
-                                            className={`category-filter-item cursor-pointer hover:text-blue-500 transition-all whitespace-nowrap outline-none focus-visible:ring-2 ring-blue-500/50 rounded-lg px-4 py-2 text-sm font-medium border ${selectedAppsCategory === 'all' ? 'text-blue-500 border-blue-500 bg-blue-500/5 font-black' : 'text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:hover:bg-white/5'}`}
+                                            className={`category-filter-item ${selectedAppsCategory === 'all' ? 'active' : ''}`}
                                             onClick={() => { haptic('light'); setSelectedAppsCategory('all'); }}
                                         >
                                             {t('home_all')}
@@ -2027,7 +2039,7 @@ const Home = () => {
                                         {appsSubCategories.map((subCat) => (
                                             <button 
                                                 key={subCat.id} 
-                                                className={`category-filter-item cursor-pointer hover:text-blue-500 transition-all whitespace-nowrap outline-none focus-visible:ring-2 ring-blue-500/50 rounded-lg px-4 py-2 text-sm font-medium border ${selectedAppsCategory === subCat.id ? 'text-blue-500 border-blue-500 bg-blue-500/5 font-black' : 'text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:hover:bg-white/5'}`}
+                                                className={`category-filter-item ${selectedAppsCategory === subCat.id ? 'active' : ''}`}
                                                 onClick={() => { haptic('light'); setSelectedAppsCategory(subCat.id); }}
                                             >
                                                 {t(subCat.label)}
@@ -2037,7 +2049,7 @@ const Home = () => {
                                 </div>
                                 
                                 {(() => {
-                                    const displayedBots = sliderBots.slice(0, 6);
+                                    const displayedBots = sliderBots.slice(0, 9);
                                     return (
                                         <>
                                             {/* Desktop Grid Layout (sm and up) */}
@@ -2150,7 +2162,7 @@ const Home = () => {
                                         className="category-filter-container no-scrollbar relative z-0"
                                     >
                                         <button 
-                                            className={`category-filter-item cursor-pointer hover:text-blue-500 transition-all whitespace-nowrap outline-none focus-visible:ring-2 ring-blue-500/50 rounded-lg px-4 py-2 text-sm font-medium border ${selectedBotsCategory === 'all' ? 'text-blue-500 border-blue-500 bg-blue-500/5 font-black' : 'text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:hover:bg-white/5'}`}
+                                            className={`category-filter-item ${selectedBotsCategory === 'all' ? 'active' : ''}`}
                                             onClick={() => { haptic('light'); setSelectedBotsCategory('all'); }}
                                         >
                                             {t('home_all')}
@@ -2158,7 +2170,7 @@ const Home = () => {
                                         {botsCategories.map((cat) => (
                                             <button 
                                                 key={cat.id} 
-                                                className={`category-filter-item cursor-pointer hover:text-blue-500 transition-all whitespace-nowrap outline-none focus-visible:ring-2 ring-blue-500/50 rounded-lg px-4 py-2 text-sm font-medium border ${selectedBotsCategory === cat.id ? 'text-blue-500 border-blue-500 bg-blue-500/5 font-black' : 'text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:hover:bg-white/5'}`}
+                                                className={`category-filter-item ${selectedBotsCategory === cat.id ? 'active' : ''}`}
                                                 onClick={() => { haptic('light'); setSelectedBotsCategory(cat.id); }}
                                             >
                                                 {t(cat.label)}
@@ -2168,7 +2180,7 @@ const Home = () => {
                                 </div>
                                 
                                 {(() => {
-                                    const displayedBots = sliderBots.slice(0, 6);
+                                    const displayedBots = sliderBots.slice(0, 9);
                                     return (
                                         <>
                                             {/* Desktop Grid Layout (sm and up) */}

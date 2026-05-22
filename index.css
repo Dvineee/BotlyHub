@@ -87,7 +87,7 @@ body {
   }
 
   span, div, input {
-    font-weight: 400;
+    font-weight: 700;
   }
 
   button, a {
@@ -95,11 +95,11 @@ body {
   }
 
   .font-bold {
-    font-weight: 500 !important;
+    font-weight: 700 !important;
   }
 
   .font-black {
-    font-weight: 500 !important;
+    font-weight: 900 !important;
   }
 
   #root {
@@ -298,7 +298,7 @@ span.text-\[10px\].font-black.text-slate-500.dark\:text-slate-400.uppercase.trac
 }
 
 .font-bold {
-    font-weight: 500 !important;
+    font-weight: 700 !important;
 }
 
 .group:hover .group-hover\:border-blue-500 {
@@ -449,10 +449,10 @@ html:not(.dark) .text-slate-400 {
     margin-bottom: 0.5rem;
 }
 
-.space-y-6 > :not([hidden]) ~ :not([hidden]) {
-    gap: 0.5em;
+.space-y-6>:not([hidden])~:not([hidden]) {
+    gap: 2em;
     --tw-space-y-reverse: 0;
-    margin-top: calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));
+    margin-top: calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));
     margin-bottom: calc(1.5rem * var(--tw-space-y-reverse));
 }
 
@@ -626,7 +626,7 @@ span.text-\[10px\].font-black.uppercase.tracking-tight {
     transition: background-color .3s ease;
 }
 .font-black {
-    font-weight: 500 !important;
+    font-weight: 900 !important;
 }
 button.w-full.flex.items-center.gap-3.px-4.py-3.hover\:bg-slate-50.dark\:hover\:bg-white\/5.rounded-xl.transition-colors.text-left {
     border-radius: 12px;
@@ -933,10 +933,10 @@ h2.text-lg.sm\:text-xl.font-extrabold.text-slate-900.dark\:text-white.tracking-t
     border: 1px solid #0000000d;
     margin-right: 12px;
     border-radius: 10px;
-    color: #0006;
+    color: #0000008a;
     cursor: pointer;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
     line-height: 20px;
     transition: all .2s ease;
     -webkit-user-select: none;
@@ -948,20 +948,19 @@ h2.text-lg.sm\:text-xl.font-extrabold.text-slate-900.dark\:text-white.tracking-t
 
 .dark .category-filter-item {
     padding: 7px 12px;
-    border: 1px solid #0000000d;
+    border: 1px solid #ffffff0d;
     margin-right: 12px;
     border-radius: 10px;
-    color: #0006;
+    color: #ffffff8a;
     cursor: pointer;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
     line-height: 20px;
     transition: all .2s ease;
     -webkit-user-select: none;
     white-space: nowrap;
     flex-shrink: 0;
     border-color: #ffffff0d;
-    color: #fff6;
     background-color: #ffffff08;
 }
 .category-filter-item:hover {
@@ -1092,7 +1091,7 @@ img[src$=".png"] {
 }
 
 span, div, input {
-    font-weight: 400;
+    font-weight: 700;
 }
 
 @media (min-width: 640px) {
@@ -1285,7 +1284,7 @@ span, div, input {
 }
 
 .font-normal {
-    font-weight: 500;
+    font-weight: 400;
 }
 
 .max-w-7xl.mx-auto.px-5.sm\:px-8.flex.items-center.justify-between {

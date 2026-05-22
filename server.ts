@@ -18,8 +18,13 @@ dotenv.config();
 console.log(`[SERVER] Supabase URL: ${process.env.SUPABASE_URL ? 'Configured' : 'Missing'}`);
 console.log(`[SERVER] Supabase Key: ${process.env.SUPABASE_ANON_KEY ? 'Configured' : 'Missing'}`);
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __filename = typeof import.meta !== 'undefined' && import.meta.url
+  ? fileURLToPath(import.meta.url)
+  : (typeof __filename !== 'undefined' ? __filename : '');
+
+const __dirname = typeof import.meta !== 'undefined' && import.meta.url
+  ? path.dirname(__filename)
+  : (typeof __dirname !== 'undefined' ? __dirname : '');
 
 // --- SECURITY MIDDLEWARE ---
 
