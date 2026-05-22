@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Search, ChevronLeft, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, Send, Link, CheckCircle2, ChevronDown, Sun, Moon, Wallet, Menu, Plus, LogOut, Compass, Coins, BarChart3, Binoculars, Share2, Briefcase, MousePointer2, ExternalLink, ArrowUpRight, ArrowLeft, MessageSquare, SlidersHorizontal, Sliders } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, Send, Link, CheckCircle2, ChevronDown, Sun, Moon, Wallet, Menu, Plus, LogOut, Compass, Coins, BarChart3, Binoculars, Share2, Briefcase, MousePointer2, ExternalLink, ArrowUpRight, ArrowLeft, MessageSquare, SlidersHorizontal, Sliders, Settings } from 'lucide-react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Bot, Announcement, Notification, BlogPost } from '../types';
@@ -937,19 +937,28 @@ const NavMenu = ({
                                       onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
                                       className={`h-10 px-3 flex items-center gap-2 border border-black/5 dark:border-white/5 text-slate-900 dark:text-white rounded-xl active:scale-95 transition-all relative ${isMenuOpen ? 'bg-slate-100 dark:bg-white/10' : 'bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10'}`}
                                     >
-                                        {user ? (
-                                            <>
-                                                <span className="block md:hidden text-[11px] font-black uppercase tracking-wide">
-                                                    {(user.username || user.first_name || user.name || '').slice(0, 5)}{(user.username || user.first_name || user.name || '').length > 5 ? '..' : ''}
-                                                </span>
-                                                <span className="hidden md:block text-[11px] font-black uppercase tracking-wide">
-                                                    {user.username || user.first_name || user.name || ''}
-                                                </span>
-                                            </>
-                                        ) : (
-                                            <Menu size={18} className="text-slate-700 dark:text-slate-300" />
-                                        )}
-                                        <ChevronDown size={12} className={`text-slate-400 dark:text-slate-500 transition-transform duration-200 ${isMenuOpen ? 'rotate-180' : ''}`} />
+                                         <div className="flex md:hidden items-center gap-1.5">
+                                             {user ? (
+                                                 <span className="text-[11px] font-black uppercase tracking-wide">
+                                                     {(user.username || user.first_name || user.name || '').slice(0, 5)}{(user.username || user.first_name || user.name || '').length > 5 ? '..' : ''}
+                                                 </span>
+                                             ) : (
+                                                 <Menu size={18} className="text-slate-700 dark:text-slate-300" />
+                                             )}
+                                             <ChevronDown size={12} className={`text-slate-400 dark:text-slate-500 transition-transform duration-200 ${isMenuOpen ? 'rotate-180' : ''}`} />
+                                         </div>
+                                         <div className="hidden md:flex items-center gap-1.5">
+                                             {user ? (
+                                                 <>
+                                                     <span className="text-[11px] font-black uppercase tracking-wide">
+                                                         {user.username || user.first_name || user.name || ''}
+                                                     </span>
+                                                     <ChevronDown size={12} className={`text-slate-400 dark:text-slate-500 transition-transform duration-200 ${isMenuOpen ? 'rotate-180' : ''}`} />
+                                                 </>
+                                             ) : (
+                                                 <Settings size={18} className="text-slate-700 dark:text-slate-300" />
+                                             )}
+                                         </div>
                                         {user && unreadCount > 0 && (
                                             <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[8px] font-black text-white flex items-center justify-center px-1">
                                                 {unreadCount > 9 ? '9+' : unreadCount}
@@ -1702,19 +1711,28 @@ const Home = () => {
                             onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
                             className="h-10 px-3 flex items-center justify-center gap-1.5 text-slate-900 dark:text-white bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 border border-black/5 dark:border-white/5 rounded-xl active:scale-95 transition-all relative outline-none select-none"
                           >
-                               {user ? (
-                                   <>
-                                       <span className="block md:hidden text-[11px] font-black uppercase tracking-wide">
-                                           {(user.username || user.first_name || user.name || '').slice(0, 5)}{(user.username || user.first_name || user.name || '').length > 5 ? '..' : ''}
-                                       </span>
-                                       <span className="hidden md:block text-[11px] font-black uppercase tracking-wide">
-                                           {user.username || user.first_name || user.name || ''}
-                                       </span>
-                                   </>
-                               ) : (
-                                   <Menu size={18} className="text-slate-700 dark:text-slate-300" />
-                               )}
-                               <ChevronDown size={12} className={`text-slate-400 dark:text-slate-500 transition-transform duration-200 ${isMenuOpen ? 'rotate-180' : ''}`} />
+                                <div className="flex md:hidden items-center gap-1.5">
+                                    {user ? (
+                                        <span className="text-[11px] font-black uppercase tracking-wide">
+                                            {(user.username || user.first_name || user.name || '').slice(0, 5)}{(user.username || user.first_name || user.name || '').length > 5 ? '..' : ''}
+                                        </span>
+                                    ) : (
+                                        <Menu size={18} className="text-slate-700 dark:text-slate-300" />
+                                    )}
+                                    <ChevronDown size={12} className={`text-slate-400 dark:text-slate-500 transition-transform duration-200 ${isMenuOpen ? 'rotate-180' : ''}`} />
+                                </div>
+                                <div className="hidden md:flex items-center gap-1.5">
+                                    {user ? (
+                                        <>
+                                            <span className="text-[11px] font-black uppercase tracking-wide">
+                                                {user.username || user.first_name || user.name || ''}
+                                            </span>
+                                            <ChevronDown size={12} className={`text-slate-400 dark:text-slate-500 transition-transform duration-200 ${isMenuOpen ? 'rotate-180' : ''}`} />
+                                        </>
+                                    ) : (
+                                        <Settings size={18} className="text-slate-700 dark:text-slate-300" />
+                                    )}
+                                </div>
                               {user && unreadCount > 0 && (
                                   <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[8px] font-black text-white flex items-center justify-center px-1 badge-pop">
                                       {unreadCount > 9 ? '9+' : unreadCount}

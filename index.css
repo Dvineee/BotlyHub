@@ -591,6 +591,10 @@ p.text-\[10px\].text-slate-400.dark\:text-slate-500.font-medium.uppercase.tracki
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -1%;
 }
 
 .dark\:bg-slate-900\/60:is(.dark *) {
@@ -1417,18 +1421,12 @@ span, div, input {
 }
 
 .text-slate-500 {
-    color: #00000066;
+    color: #0006;
     font-size: 14px;
     font-weight: 500;
-    letter-spacing: -0.13px;
+    letter-spacing: -.13px;
     line-height: 1.43;
-    display: -webkit-box !important;
-    overflow: hidden !important;
     -webkit-box-orient: vertical !important;
-    -webkit-line-clamp: 1 !important;
-    text-overflow: ellipsis !important;
-    white-space: unset !important;
-    word-break: break-word !important;
 }
 
 @media (min-width: 640px) {
@@ -1449,4 +1447,26 @@ span, div, input {
 .font-\[900\], .font-black {
     font-weight: 600;
 }
+
+.border-emerald-500 {
+    border-color: transparent !important;
+}
+
+.border-b-2 {
+    border-bottom-width: 0px !important;
+}
+
+.hover\:bg-slate-50:hover {
+    --tw-bg-opacity: 1;
+    background-color: #1313140a !important;
+}
+.max-w-7xl {
+    max-width: 90rem;
+}
+
+.text-\[\#2c2c2e\] {
+    --tw-text-opacity: 1;
+    color: rgb(147 148 149);
+}
+
 
