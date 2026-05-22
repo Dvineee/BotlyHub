@@ -1,10 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from '../TranslationContext';
-import { 
-  motion, 
-  AnimatePresence 
-} from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   Terminal, 
   GitBranch, 
@@ -14,7 +11,6 @@ import {
   CheckCircle2, 
   XCircle, 
   AlertTriangle, 
-  GitPullRequest, 
   Zap, 
   Layers, 
   Play, 
@@ -22,1336 +18,1935 @@ import {
   ArrowRight, 
   ExternalLink, 
   ShieldCheck, 
-  Activity,
-  Maximize2,
-  RefreshCw,
-  Copy,
-  Check,
-  Search,
-  ChevronDown,
-  Lock,
-  MessageSquare
+  Activity, 
+  RefreshCw, 
+  Copy, 
+  Check, 
+  Search, 
+  ChevronDown, 
+  Plus, 
+  Settings, 
+  Trash2, 
+  Sliders, 
+  BarChart, 
+  Radio, 
+  Sparkles, 
+  Globe, 
+  Database, 
+  BookOpen, 
+  Share2, 
+  Eye, 
+  MessageSquare, 
+  User, 
+  Lock, 
+  Server, 
+  ChevronRight, 
+  Filter, 
+  Star,
+  Coins
 } from 'lucide-react';
-import { categories } from '../data';
+import { categories, mockBots } from '../data';
+import { DatabaseService } from '../services/DatabaseService';
 
-const Github = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
-    <path d="M9 18c-4.51 2-5-2-7-2" />
-  </svg>
-);
-
-const Gitlab = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="m22 13.29-1.93-5.94a1.35 1.35 0 0 0-.58-.69 1.41 1.41 0 0 0-.91-.12 1.39 1.39 0 0 0-.69.46 1.35 1.35 0 0 0-.25.8l-.29 3a7.33 7.33 0 0 1-1.07 3 .75.75 0 0 1-.84.29 11.2 11.2 0 0 0-7.08 0 .75.75 0 0 1-.84-.29 7.36 7.36 0 0 1-1.07-3l-.29-3a1.34 1.34 0 0 0-.25-.8 1.37 1.37 0 0 0-.69-.46 1.41 1.41 0 0 0-.91.12 1.36 1.36 0 0 0-.58.69L2 13.29a1.72 1.72 0 0 0 .58 1.8l7.65 5.52a1.71 1.71 0 0 0 2 0l7.65-5.52a1.72 1.72 0 0 0 .62-1.8z" />
-  </svg>
-);
-
-// Color Palette Definition for Code Reference:
-// Background: #0A0A0A
-// Cards: rgba(255,255,255,0.04)
+// Standard dark theme: #0B0F17
+// Panels: rgba(255,255,255,0.04)
 // Borders: rgba(255,255,255,0.08)
-// Accent: #7C5CFF (Botly Purple) or #4F9CF9 (Dev Blue)
-// Success: #10B981, Warning: #F59E0B, Failed: #EF4444
+// Accent: #6C5CE7
+// Success: #2ED573
+// Error: #FF4757
+
+interface CloudBot {
+  id: string;
+  name: string;
+  type: 'Support' | 'Automation' | 'QA' | 'Assistant';
+  status: 'Active' | 'Idle' | 'Error';
+  lastRun: string;
+  successRate: number;
+  runCount: number;
+  systemPrompt: string;
+  testInput: string;
+  memory: { key: string; value: string }[];
+  apiKey: string;
+  trigger: 'Manual' | 'Webhook' | 'Schedule';
+}
+
+interface WorkflowNode {
+  id: string;
+  name: string;
+  type: 'Trigger' | 'AI Processing' | 'Action';
+  subtype: string;
+  status: 'idle' | 'running' | 'success' | 'error';
+}
 
 export default function Home() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  // Navigation active anchors
-  const [activeSection, setActiveSection] = useState('hero');
 
-  // Interactive QA Sandbox States
-  const [selectedRepo, setSelectedRepo] = useState('vercel-nextjs-api');
-  const [selectedBranch, setSelectedBranch] = useState('main');
-  const [isTestRunning, setIsTestRunning] = useState(false);
-  const [currentTestStep, setCurrentTestStep] = useState(0);
-  const [testOutput, setTestOutput] = useState<string[]>([]);
-  const [testResultState, setTestResultState] = useState<'idle' | 'running' | 'success' | 'warning' | 'failed'>('idle');
-  const [activeTab, setActiveTab] = useState<'logger' | 'scenarios' | 'visual' | 'recommendation'>('logger');
-  const [isCopied, setIsCopied] = useState(false);
-  const [cliCopied, setCliCopied] = useState(false);
+  // Navigation state: 'dashboard' | 'directory' | 'workflows' | 'playground' | 'analytics' | 'telemetry'
+  const [currentTab, setCurrentTab] = useState<'dashboard' | 'directory' | 'workflows' | 'playground' | 'analytics' | 'telemetry'>('dashboard');
 
-  // Pricing Interval State
-  const [pricingInterval, setPricingInterval] = useState<'monthly' | 'yearly'>('monthly');
+  // Operational State
+  const [cloudBots, setCloudBots] = useState<CloudBot[]>([
+    {
+      id: 'bot_support_01',
+      name: 'SupportBot Core',
+      type: 'Support',
+      status: 'Active',
+      lastRun: '1m ago',
+      successRate: 98.4,
+      runCount: 1420,
+      systemPrompt: 'You are a technical customer support advisor for BotlyHub. Assist users respectfully and stick strictly to technical platform documentation.',
+      testInput: 'How do I bind an external Telegram channel webhook to BotlyHub?',
+      memory: [
+        { key: 'knowledge_base_url', value: 'https://docs.botlyhub.com/faq' },
+        { key: 'supported_payment_networks', value: 'TON Space, Wallet Telegram Pay' }
+      ],
+      apiKey: 'sk_live_ton_4872c9a1bc',
+      trigger: 'Webhook'
+    },
+    {
+      id: 'bot_qa_02',
+      name: 'QA Deployment Guard',
+      type: 'QA',
+      status: 'Active',
+      lastRun: '5m ago',
+      successRate: 99.1,
+      runCount: 815,
+      systemPrompt: 'You are an autonomous DevOps visual test auditor. Scan staging source variables for credential exposures, syntax malfunctions, and SSL timeouts.',
+      testInput: 'Scan repository: vercel-nextjs-api-route',
+      memory: [
+        { key: 'staging_dns', value: 'https://staging-api.botlyhub.internal' }
+      ],
+      apiKey: 'sk_live_ton_ea091bc8d1',
+      trigger: 'Schedule'
+    },
+    {
+      id: 'bot_automation_03',
+      name: 'Webhook Telegram Post',
+      type: 'Automation',
+      status: 'Idle',
+      lastRun: '2h ago',
+      successRate: 95.8,
+      runCount: 322,
+      systemPrompt: 'You are a creative text form writer. Rephrase incoming web development triggers into engaging, structured bullet points for Telegram channel bloggers.',
+      testInput: 'feat: add metrics analytics capture',
+      memory: [
+        { key: 'target_channel_id', value: '-1003826684282' }
+      ],
+      apiKey: 'sk_live_ton_df8893ab00',
+      trigger: 'Webhook'
+    },
+    {
+      id: 'bot_analyst_04',
+      name: 'Crypto Arbitrage Tracker',
+      type: 'Assistant',
+      status: 'Error',
+      lastRun: '1d ago',
+      successRate: 88.2,
+      runCount: 104,
+      systemPrompt: 'Analyze real-time price tick spreads across DEX pools on TON. Alert trigger conditions the moment deviation threshold breaches 2.4%.',
+      testInput: 'Check pools: STON.fi, DeDust',
+      memory: [
+        { key: 'api_endpoint', value: 'https://ton-arbitrage.live/v1' }
+      ],
+      apiKey: 'sk_live_ton_ccc1202888',
+      trigger: 'Manual'
+    }
+  ]);
 
-  // FAQ toggles
-  const [faqOpen, setFaqOpen] = useState<Record<number, boolean>>({
-    0: true,
-  });
+  // Selected Bot for Detail Slide-over
+  const [selectedBotId, setSelectedBotId] = useState<string | null>(null);
+  const selectedBot = cloudBots.find(b => b.id === selectedBotId);
+  const [botDetailActiveTab, setBotDetailActiveTab] = useState<'overview' | 'prompt' | 'memory' | 'logs'>('overview');
 
-  // Keep track of scroll positions for scroll-spy or nav borders
-  const [isScrolled, setIsScrolled] = useState(false);
+  // Toast notifications State
+  const [toasts, setToasts] = useState<{ id: string; message: string; type: 'success' | 'info' | 'error' }[]>([]);
+  const showToast = (message: string, type: 'success' | 'info' | 'error' = 'success') => {
+    const id = Date.now().toString();
+    setToasts(prev => [...prev, { id, message, type }]);
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id));
+    }, 3800);
+  };
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+  // Create Bot Modal
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [newBotName, setNewBotName] = useState('');
+  const [newBotType, setNewBotType] = useState<'Support' | 'Automation' | 'QA' | 'Assistant'>('Support');
+  const [newBotPrompt, setNewBotPrompt] = useState('');
+
+  const handleCreateBot = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newBotName.trim()) {
+      showToast('Please provide a bot name', 'error');
+      return;
+    }
+    const created: CloudBot = {
+      id: `bot_custom_${Date.now()}`,
+      name: newBotName,
+      type: newBotType,
+      status: 'Idle',
+      lastRun: 'Never',
+      successRate: 100,
+      runCount: 0,
+      systemPrompt: newBotPrompt || 'You are a helpful AI assistant.',
+      testInput: 'Hello and welcome. Give me status report.',
+      memory: [],
+      apiKey: `sk_live_ton_${Math.random().toString(16).substring(3, 11)}`,
+      trigger: 'Manual'
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    setCloudBots(prev => [created, ...prev]);
+    setIsCreateModalOpen(false);
+    setNewBotName('');
+    setNewBotPrompt('');
+    showToast(`Bot "${newBotName}" successfully created in ecosystem!`, 'success');
+  };
+
+  // Run Now simulation engine
+  const [runningBotId, setRunningBotId] = useState<string | null>(null);
+  const [terminalFeedLogs, setTerminalFeedLogs] = useState<{ time: string; botName: string; text: string; status: 'info' | 'success' | 'error' }[]>([]);
+
+  const runBotNow = (botId: string) => {
+    if (runningBotId) return;
+    const targetBot = cloudBots.find(b => b.id === botId);
+    if (!targetBot) return;
+
+    setRunningBotId(botId);
+    showToast(`Deploying payload & initiating ${targetBot.name}...`, 'info');
+    
+    // Add logs step by step
+    const timeNow = () => new Date().toLocaleTimeString();
+    const mockLogs = [
+      { text: `⚡ Connecting secure agent session to pipeline ID: ${botId}`, status: 'info' as const },
+      { text: `🔍 Syncing local system instructions prompt: "${targetBot.systemPrompt.substring(0, 45)}..."`, status: 'info' as const },
+      { text: `📥 Query input registered: "${targetBot.testInput}"`, status: 'info' as const },
+      { text: `📡 Running inference engine on Llama-3-70B model...`, status: 'info' as const },
+      { text: `✅ Stream finished successfully in 412ms, exit code 0`, status: 'success' as const }
+    ];
+
+    let currentLogIndex = 0;
+    const logInterval = setInterval(() => {
+      if (currentLogIndex < mockLogs.length) {
+        setTerminalFeedLogs(prev => [
+          {
+            time: timeNow(),
+            botName: targetBot.name,
+            text: mockLogs[currentLogIndex].text,
+            status: mockLogs[currentLogIndex].status
+          },
+          ...prev
+        ]);
+        currentLogIndex++;
+      } else {
+        clearInterval(logInterval);
+        setRunningBotId(null);
+        // Toggle bot status to Active if it was error/idle
+        setCloudBots(prev => prev.map(b => b.id === botId ? { 
+          ...b, 
+          status: 'Active', 
+          lastRun: 'Just now', 
+          runCount: b.runCount + 1,
+          successRate: Math.min(100, Number((b.successRate + 0.2).toFixed(1)))
+        } : b));
+        showToast(`Botly session target of ${targetBot.name} executed successfully!`, 'success');
+      }
+    }, 400);
+  };
+
+  // Botly System log generator background tick
+  useEffect(() => {
+    const names = ['SupportBot Core', 'QA Deployment Guard', 'Webhook Telegram Post'];
+    const textExamples = [
+      'Processed incoming query from Telegram User ID: 588219192',
+      'Telemetry audit: zero credential exposure detected in repo branch vercel-nextjs-api-route/main',
+      'System heartbeat check... active OK',
+      'Storage synchronized flawlessly across shard clusters',
+      'Instant payout address checked by Telegram account hash'
+    ];
+
+    const interval = setInterval(() => {
+      const idxBot = Math.floor(Math.random() * names.length);
+      const idxText = Math.floor(Math.random() * textExamples.length);
+      setTerminalFeedLogs(prev => [
+        {
+          time: new Date().toLocaleTimeString(),
+          botName: names[idxBot],
+          text: textExamples[idxText],
+          status: 'info'
+        },
+        ...prev.slice(0, 120) // Limit count to avoid CPU drag
+      ]);
+    }, 6000);
+
+    return () => clearInterval(interval);
   }, []);
 
-  // Repository database mock structure
-  const repos = {
-    'vercel-nextjs-api': {
-      branches: ['main', 'developer-route', 'hotfix/api-headers'],
-      commits: {
-        'main': { hash: 'f87a13c', msg: 'Merge branch "dev/supabase-sync"', time: '2m ago' },
-        'developer-route': { hash: 'c2e5b71', msg: 'feat: add metrics analytics capture', time: '1h ago' },
-        'hotfix/api-headers': { hash: 'a1b7e09', msg: 'fix: bypass caching policy on staging', time: '4h ago' }
+  // UI Interactive Toggle Switches helper
+  const handleToggleBot = (botId: string) => {
+    setCloudBots(prev => prev.map(b => {
+      if (b.id === botId) {
+        const nextStatus = b.status === 'Active' ? 'Idle' : 'Active';
+        showToast(`Status of ${b.name} set to ${nextStatus}`, 'info');
+        return { ...b, status: nextStatus };
       }
-    },
-    'supabase-dashboard': {
-      branches: ['main', 'feature/realtime-feed', 'bugfix/auth-leak'],
-      commits: {
-        'main': { hash: 'e571c84', msg: 'doc: update API route guides', time: '10m ago' },
-        'feature/realtime-feed': { hash: 'b9bd7e1', msg: 'feat: add websockets trigger for active row updates', time: '2h ago' },
-        'bugfix/auth-leak': { hash: 'd9e075c', msg: 'security: revoke token on session expiration hook', time: '1d ago' }
-      }
-    },
-    'linear-clone-app': {
-      branches: ['main', 'feature/kanban-drag', 'refactor/optimistic-ui'],
-      commits: {
-        'main': { hash: '9b0c2e4', msg: 'chore: bump dev dependencies', time: '30m ago' },
-        'feature/kanban-drag': { hash: '5c81de3', msg: 'feat: drag and drop with keyboard support', time: '5h ago' },
-        'refactor/optimistic-ui': { hash: '1a2b3c4', msg: 'refactor: use query cache for instant board updates', time: '2d ago' }
-      }
-    }
+      return b;
+    }));
   };
 
-  // Run a interactive simulation of BotlyHub's pipeline
-  const handleTriggerQAFeedback = () => {
-    if (isTestRunning) return;
-    
-    setIsTestRunning(true);
-    setTestResultState('running');
-    setCurrentTestStep(0);
-    setActiveTab('logger');
-    
-    const logs: string[] = [];
-    const pushLog = (msg: string, delay: number) => {
-      return new Promise<void>((resolve) => {
-        setTimeout(() => {
-          logs.push(msg);
-          setTestOutput([...logs]);
-          resolve();
-        }, delay);
-      });
-    };
+  // Dynamic values summary computations
+  const totalExecutions = cloudBots.reduce((sum, b) => sum + b.runCount, 0);
+  const activeBotsCount = cloudBots.filter(b => b.status === 'Active').length;
 
-    const runLogs = async () => {
-      setTestOutput([]);
-      await pushLog(`⚡ [botlyhub-pipeline] initialising pipeline client for ${selectedRepo}/${selectedBranch}`, 250);
-      await pushLog(`🚀 [botlyhub-pipeline] matched commit ${repos[selectedRepo as keyof typeof repos].commits[selectedBranch as 'main'].hash} (${repos[selectedRepo as keyof typeof repos].commits[selectedBranch as 'main'].msg})`, 450);
-      await pushLog(`📦 [botlyhub-pipeline] scanning environment secrets... valid`, 400);
-      await pushLog(`🔍 [botlyhub-ai] step 1/3: performing syntactic and pattern audit`, 500);
-      
-      // Syntax phase specific warnings
-      if (selectedBranch === 'hotfix/api-headers') {
-        await pushLog(`⚠️  [botlyhub-ai] warning: insecure staging wildcard headers detected in api/headers.ts [line 47]`, 600);
-      } else if (selectedBranch === 'bugfix/auth-leak') {
-        await pushLog(`🚨  [botlyhub-ai] danger: high risk session leak detected in useSession.ts [line 114]. Auth token cache not evicted upon logOut() invocation`, 650);
-      } else {
-        await pushLog(`✅  [botlyhub-ai] no core syntactic issues or static security leaks detected`, 500);
-      }
-
-      setCurrentTestStep(1);
-      await pushLog(`🧠 [botlyhub-ai] step 2/3: dynamically generating 14 automated integration scenarios`, 600);
-      await pushLog(`🧪 [botlyhub-ai] scenario gen: 4 authentication flows, 6 state transitions, 4 data mutating requests`, 400);
-      
-      setCurrentTestStep(2);
-      await pushLog(`🌐 [botlyhub-crawler] step 3/3: spawning headless chromium cluster (E2E simulation)`, 600);
-      await pushLog(`🤖 [botlyhub-crawler] running test: 'simulating standard login with delayed network latency'`, 450);
-      
-      if (selectedBranch === 'bugfix/auth-leak') {
-        await pushLog(`❌  [botlyhub-crawler] test 'session cache purge on logout' failed: local storage token retained after exit signal dispatch`, 700);
-        await pushLog(`📊  [botlyhub-pipeline] run failed: 13 passed, 0 warnings, 1 failed.`, 300);
-        setTestResultState('failed');
-      } else if (selectedBranch === 'hotfix/api-headers') {
-        await pushLog(`⚠️  [botlyhub-crawler] test 'visual layout integrity under responsive boundaries' warning: button element overlap on 320px screen width`, 700);
-        await pushLog(`📊  [botlyhub-pipeline] run completed with warning: 13 passed, 1 warning, 0 failed.`, 300);
-        setTestResultState('warning');
-        setActiveTab('visual');
-      } else if (selectedBranch === 'feature/realtime-feed') {
-        await pushLog(`ℹ️  [botlyhub-crawler] telemetry: websocket connection speed 180ms within threshold`, 500);
-        await pushLog(`✅  [botlyhub-pipeline] run passed flawlessly: 14 passed, 0 warnings, 0 failed.`, 300);
-        setTestResultState('success');
-        setActiveTab('recommendation');
-      } else {
-        await pushLog(`✅  [botlyhub-pipeline] run passed flawlessly: 14 passed, 0 warnings, 0 failed.`, 600);
-        setTestResultState('success');
-      }
-      
-      setIsTestRunning(false);
-    };
-
-    runLogs();
-  };
-
-  // Reset demo block
-  const resetDemoState = () => {
-    setIsTestRunning(false);
-    setTestOutput([]);
-    setTestResultState('idle');
-    setCurrentTestStep(0);
-  };
+  // -- BOTS DECENTRALIZED DIRECTORY STATE (User requirement: "Where are the bots, applications, and categories?")
+  const [selectedDirectoryCategory, setSelectedDirectoryCategory] = useState<string>('all');
+  const [directorySearchQuery, setDirectorySearchQuery] = useState<string>('');
+  const [resolvedCategoryList, setResolvedCategoryList] = useState<any[]>([]);
 
   useEffect(() => {
-    resetDemoState();
-  }, [selectedRepo, selectedBranch]);
+    // Custom mapping for beautiful Turkish/English fallbacks of standard categories of TON/Telegram bots
+    const formatted = categories.map(cat => {
+      let labelText = cat.id.toUpperCase();
+      let customDesc = 'Verified ecosystem platform services.';
+      switch(cat.id) {
+        case 'all': labelText = 'All Categories'; customDesc = 'Explore every listed solution'; break;
+        case 'ai_services': labelText = 'AI Assistants'; customDesc = 'Intelligent conversational & automation bots'; break;
+        case 'games': labelText = 'Decentralized Games'; customDesc = 'Play-to-Earn and hyper-casual TMA games'; break;
+        case 'finance': labelText = 'Sass & Finance'; customDesc = 'Financial ledger sync & checkout systems'; break;
+        case 'moderation': labelText = 'Group Managers / Moderation'; customDesc = 'Keep custom Telegram chats clean'; break;
+        case 'utilities': labelText = 'Ecosystem Utilities'; customDesc = 'API routers and developer toolsets'; break;
+        case 'crypto': labelText = 'TON & Cryptography'; customDesc = 'Wallet bots and token metrics tracking'; break;
+        case 'communication': labelText = 'Engagement Tech'; customDesc = 'Mass broadcast and channel manager tools'; break;
+        case 'productivity': labelText = 'SaaS Productivity'; customDesc = 'Track tasks and schedules automatically'; break;
+        case 'music': labelText = 'Audio & Entertainment'; customDesc = 'Media streamers and podcast feed tools'; break;
+        case 'education': labelText = 'Educational Hubs'; customDesc = 'Learn Solidity, TON developer SDKs interactive'; break;
+        case 'content': labelText = 'Channel Automation'; customDesc = 'Auto blog post poster and translators'; break;
+        default: break;
+      }
+      return {
+        ...cat,
+        displayName: t(cat.label) || labelText,
+        displayDesc: customDesc
+      };
+    });
+    setResolvedCategoryList(formatted);
+  }, [t]);
 
-  // Copy CLI command utils
-  const handleCopyCLI = () => {
-    navigator.clipboard.writeText('npm i -g @botlyhub/cli && botlyhub init');
-    setCliCopied(true);
-    setTimeout(() => setCliCopied(false), 2000);
+  // Fallback to static bots database if Supabase empty
+  const [directoryBots, setDirectoryBots] = useState<any[]>([
+    {
+      id: 'tg_01',
+      name: 'Task Master BOT',
+      slug: 'task-master',
+      description: 'The master suite for community workflow delegation, task tracking, and automatic rewards in TON.',
+      price: 15.0,
+      icon: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200&auto=format&fit=crop&q=80',
+      category: ['productivity', 'utilities'],
+      rating: 4.8,
+      bot_link: 'https://t.me/task_master_bot',
+      languages: ['🇺🇸 English', '🇹🇷 Türkçe', '🇪🇸 Español'],
+      subscribers: '12K active users',
+      developer: 'Vercel Ecosystem Labs'
+    },
+    {
+      id: 'tg_02',
+      name: 'GameBot Arcade',
+      slug: 'gamebot-pro',
+      description: 'Premium mini-app game engine. Run tournament brackets directly in your Telegram groups with instant payouts.',
+      price: 0.0,
+      icon: 'https://images.unsplash.com/photo-1612287230202-1bf1d85d1bdf?w=200&auto=format&fit=crop&q=80',
+      category: ['games'],
+      rating: 4.9,
+      bot_link: 'https://t.me/game_bot_arcade',
+      languages: ['🇺🇸 English', '🇷🇺 Russian'],
+      subscribers: '450K players',
+      developer: 'TON Games Studio'
+    },
+    {
+      id: 'tg_03',
+      name: 'Ethers Ledger Bot',
+      slug: 'ethers-ledger',
+      description: 'Sync ERC20 holdings, parse price alerts, and request live gas trackers directly inside your group chat interface.',
+      price: 49.0,
+      icon: 'https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=200&auto=format&fit=crop&q=80',
+      category: ['crypto', 'finance'],
+      rating: 4.7,
+      bot_link: 'https://t.me/ethers_ledger_bot',
+      languages: ['🇺🇸 English', '🇩🇪 Deutsch', '🇫🇷 Français'],
+      subscribers: '8.4K channels',
+      developer: 'Consensys Hub Devs'
+    },
+    {
+      id: 'tg_04',
+      name: 'AI Translator Agent',
+      slug: 'ai-translator-bot',
+      description: 'Auto-detect chat languages and translate individual incoming messages into over 14 languages utilizing server-side Gemini AI models.',
+      price: 0.0,
+      icon: 'https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=200&auto=format&fit=crop&q=80',
+      category: ['ai_services', 'communication'],
+      rating: 4.9,
+      bot_link: 'https://t.me/ai_translation_system',
+      languages: ['🇺🇸 English', '🇹🇷 Türkçe', '🇪🇸 Español', '🇸🇦 العربية'],
+      subscribers: '58K active chats',
+      developer: 'Gemini Agent Lab'
+    },
+    {
+      id: 'tg_05',
+      name: 'Shield Moderator Shield',
+      slug: 'shield-mod-bot',
+      description: 'Robust serverless spam filter. Eradicates automated clone accounts, dangerous token links, and explicit texts in 100ms.',
+      price: 8.5,
+      icon: 'https://images.unsplash.com/photo-1614064642639-e3f13b69b93a?w=200&auto=format&fit=crop&q=80',
+      category: ['moderation', 'security'],
+      rating: 4.6,
+      bot_link: 'https://t.me/shield_moderator_bot',
+      languages: ['🇺🇸 English', '🇹🇷 Türkçe', '🇮🇷 Persian'],
+      subscribers: '14K groups',
+      developer: 'Ecosystem Security Core'
+    },
+    {
+      id: 'tg_06',
+      name: 'SoundWave Styler',
+      slug: 'sound-wave-music',
+      description: 'Stream royalty-free high fidelity ambient beats to standard group voice channels continuously for deep-focus coding and study rooms.',
+      price: 5.0,
+      icon: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=200&auto=format&fit=crop&q=80',
+      category: ['music'],
+      rating: 4.5,
+      bot_link: 'https://t.me/soundwave_styler',
+      languages: ['🇺🇸 English'],
+      subscribers: '3.1K voice rooms',
+      developer: 'Spotify Guild'
+    }
+  ]);
+
+  // Combined Search Criteria
+  const filteredDirectoryBots = directoryBots.filter(bot => {
+    const categoryMatch = selectedDirectoryCategory === 'all' || bot.category.includes(selectedDirectoryCategory);
+    const searchMatch = bot.name.toLowerCase().includes(directorySearchQuery.toLowerCase()) || 
+                        bot.description.toLowerCase().includes(directorySearchQuery.toLowerCase());
+    return categoryMatch && searchMatch;
+  });
+
+  // -- WORKFLOWS STATE (Interactive automation design)
+  const [workflowNodes, setWorkflowNodes] = useState<WorkflowNode[]>([
+    { id: 'wn_01', name: 'Github Commit Event', type: 'Trigger', subtype: 'Webhook API', status: 'idle' },
+    { id: 'wn_02', name: 'Gemini Text Auditor', type: 'AI Processing', subtype: 'System Prompt Parsing', status: 'idle' },
+    { id: 'wn_03', name: 'Send Telegram Notification', type: 'Action', subtype: 'Post Channel Bot', status: 'idle' }
+  ]);
+  const [activeWorkflowRunning, setActiveWorkflowRunning] = useState(false);
+
+  const addWorkflowNode = (type: 'Trigger' | 'AI Processing' | 'Action') => {
+    let name = '';
+    let subtype = '';
+    if (type === 'Trigger') {
+      name = 'Incoming Webhook API';
+      subtype = 'Auth token verification';
+    } else if (type === 'AI Processing') {
+      name = 'Gemini Summary Node';
+      subtype = 'Model inference';
+    } else {
+      name = 'SQL Database Save';
+      subtype = 'Query execution';
+    }
+    const newNode: WorkflowNode = {
+      id: `wn_custom_${Date.now()}`,
+      name,
+      type,
+      subtype,
+      status: 'idle'
+    };
+    setWorkflowNodes(prev => [...prev, newNode]);
+    showToast(`Added workflow "${name}" connection node!`, 'success');
+  };
+
+  const deleteWorkflowNode = (id: string) => {
+    setWorkflowNodes(prev => prev.filter(n => n.id !== id));
+    showToast('Node removed from connection path', 'info');
+  };
+
+  const runWorkflowSimulation = () => {
+    if (activeWorkflowRunning) return;
+    setActiveWorkflowRunning(true);
+    showToast('Starting sequential pipeline simulation...', 'info');
+
+    let idx = 0;
+    const interval = setInterval(() => {
+      if (idx < workflowNodes.length) {
+        setWorkflowNodes(prev => prev.map((node, i) => i === idx ? { ...node, status: 'running' } : node));
+        setTimeout(() => {
+          setWorkflowNodes(prev => prev.map((node, i) => i === idx ? { ...node, status: 'success' } : node));
+          idx++;
+        }, 800);
+      } else {
+        clearInterval(interval);
+        setActiveWorkflowRunning(false);
+        showToast('All system workflow nodes executed smoothly!', 'success');
+      }
+    }, 1100);
+  };
+
+  // -- PLAYGROUND PLAY TEMPLATE ENGINE
+  const [playgroundSelectedBotId, setPlaygroundSelectedBotId] = useState<string>(cloudBots[0].id);
+  const playgroundBot = cloudBots.find(b => b.id === playgroundSelectedBotId) || cloudBots[0];
+  const [playgroundInstruction, setPlaygroundInstruction] = useState<string>(playgroundBot.systemPrompt);
+  const [playgroundPromptInput, setPlaygroundPromptInput] = useState<string>('Verify security parameters on the cloud DB pipeline.');
+  const [playgroundTemp, setPlaygroundTemp] = useState<number>(0.7);
+  const [playgroundOutputText, setPlaygroundOutputText] = useState<string>('');
+  const [isPlaygroundInference, setIsPlaygroundInference] = useState<boolean>(false);
+
+  const handleRunPlayground = () => {
+    if (isPlaygroundInference) return;
+    setIsPlaygroundInference(true);
+    setPlaygroundOutputText('');
+
+    const sentences = [
+      `[AI Engine: Model Gemini-3.5-Active initialized with instructions: "${playgroundInstruction.substring(0, 35)}..."]`,
+      "Analyzing inputs and parsing registered memory states...",
+      `Processing payload parameters with precision settings: temp=${playgroundTemp}`,
+      "Generating response tokens stream:",
+      "▶ Secure environment active check OK.",
+      "▶ Detected variables are bound using server-side configurations.",
+      "▶ Verdict: System is green and verified. Direct connection keys remain hidden, preventing visual leak vectors."
+    ];
+
+    let currentSent = 0;
+    const interval = setInterval(() => {
+      if (currentSent < sentences.length) {
+        setPlaygroundOutputText(prev => prev + (prev ? '\n' : '') + sentences[currentSent]);
+        currentSent++;
+      } else {
+        clearInterval(interval);
+        setIsPlaygroundInference(false);
+        showToast('Playground agent inference streaming finished', 'success');
+      }
+    }, 600);
+  };
+
+  // Sync instruction when bot updates in playground selector
+  useEffect(() => {
+    setPlaygroundInstruction(playgroundBot.systemPrompt);
+  }, [playgroundSelectedBotId, cloudBots]);
+
+  // -- ANALYTICS GRAPH GENERATOR SIMULATOR
+  const analyticsStats = {
+    uptime: '99.99%',
+    latency: '84ms',
+    databaseUsage: '2.44 GB / 10 GB',
+    usageHistory: [
+      { date: 'May 16', requests: 120, latency: 95 },
+      { date: 'May 17', requests: 140, latency: 90 },
+      { date: 'May 18', requests: 185, latency: 86 },
+      { date: 'May 19', requests: 290, latency: 82 },
+      { date: 'May 20', requests: 310, latency: 80 },
+      { date: 'May 21', requests: 460, latency: 83 },
+      { date: 'May 22', requests: 512, latency: 79 }
+    ]
   };
 
   return (
-    <div className="bg-[#0A0A0A] text-[#EDEDED] font-sans overflow-x-hidden min-h-screen">
+    <div className="flex bg-[#0B0F17] text-white min-h-screen font-sans overflow-x-hidden antialiased">
       
-      {/* GLOW BACKGROUND ORBITS */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[600px] pointer-events-none overflow-hidden z-0">
-        <div className="absolute top-[-10%] left-[10%] w-[350px] h-[350px] rounded-full bg-[#7C5CFF]/10 blur-[130px]" />
-        <div className="absolute top-[25%] right-[15%] w-[450px] h-[450px] rounded-full bg-[#4F9CF9]/10 blur-[150px]" />
-        <div className="absolute top-[5%] left-1/2 -translate-x-1/2 w-[800px] h-[1px] bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
-      </div>
+      {/* 2-5 pixel top colored stripe like Stripe/Vercel aesthetic */}
+      <div className="absolute top-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-[#6C5CE7] via-[#4F9CF9] to-[#2ED573] z-50 pointer-events-none" />
 
-      {/* HEADER NAVIGATION */}
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-[#0A0A0A]/85 backdrop-blur-md border-b border-white/[0.06] py-3' : 'bg-transparent py-5'}`}>
-        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+      {/* SIDEBAR NAVIGATION PANEL */}
+      <aside className="fixed inset-y-0 left-0 w-64 bg-[#0E1321] border-r border-white/[0.06] flex flex-col justify-between z-40">
+        
+        {/* LOGO & MENU ITEMS */}
+        <div className="flex flex-col flex-1">
           
-          {/* Logo with Dev aesthetics */}
-          <a href="#" className="flex items-center gap-2.5 group">
-            <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-[#7C5CFF] to-[#4F9CF9] p-[1.5px] shadow-[0_0_15px_rgba(124,92,255,0.3)] group-hover:shadow-[0_0_20px_rgba(124,92,255,0.5)] transition-all duration-300">
-              <div className="flex items-center justify-center w-full h-full rounded-[6px] bg-[#0A0A0A]">
-                <Bot className="w-4.5 h-4.5 text-[#EDEDED] group-hover:text-white transition-colors" />
+          {/* Header Branding */}
+          <div className="h-16 flex items-center gap-2.5 px-6 border-b border-white/[0.04]">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-[#6C5CE7] to-[#4F9CF9] p-[1.5px] flex items-center justify-center shadow-[0_4px_12px_rgba(108,92,231,0.25)]">
+              <div className="w-full h-full rounded-[7px] bg-[#0E1321] flex items-center justify-center">
+                <Cpu size={15} className="text-[#6C5CE7]" />
               </div>
             </div>
-            <span className="text-[17px] font-bold tracking-tight text-white group-hover:text-slate-100 font-sans">
-              Botly<span className="text-[#7C5CFF]">Hub</span>
-            </span>
-            <div className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] bg-[#7C5CFF]/15 border border-[#7C5CFF]/30 text-[#7C5CFF] rounded font-mono font-medium">v3.0</div>
-          </a>
+            <div>
+              <span className="font-extrabold text-[15.5px] tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent">BotlyHub</span>
+              <span className="text-[9px] block text-[#6C5CE7] font-mono tracking-widest leading-none mt-0.5 font-bold uppercase">Console V3</span>
+            </div>
+          </div>
 
-          {/* Nav links similar to Vercel/Linear style dropdowns / indicators */}
-          <nav className="hidden md:flex items-center gap-7 text-[13.5px] text-[#A1A1A1] font-medium">
-            <a href="#how-it-works" className="hover:text-white transition-colors">How it Works</a>
-            <a href="#features" className="hover:text-white transition-colors">Features</a>
-            <Link to="/search" className="flex items-center gap-1.5 text-zinc-300 hover:text-white transition-colors px-2 py-1 rounded bg-white/[0.03] border border-white/[0.05] hover:border-white/[0.12]">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#7C5CFF]"></span>
-              <span>{t('nav_market') || 'Marketplace'}</span>
-            </Link>
-            <Link to="/qa" className="hover:text-white transition-colors">
-              {t('nav_qa') || t('footer_qa') || 'QA Forum'}
-            </Link>
-            <Link to="/blog" className="hover:text-white transition-colors">
-              {t('footer_blog') || 'Blog'}
-            </Link>
-            <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
+          {/* Nav Categories */}
+          <nav className="p-4 space-y-1">
+            <span className="text-[10px] font-mono font-bold tracking-widest text-slate-500 uppercase px-3 block mb-2">Workspace Nodes</span>
+            
+            <button
+              onClick={() => { setCurrentTab('dashboard'); setSelectedBotId(null); }}
+              className={`w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${
+                currentTab === 'dashboard' 
+                  ? 'bg-gradient-to-r from-[#6C5CE7]/15 to-transparent border-l-2 border-[#6C5CE7] text-white font-bold' 
+                  : 'text-slate-400 hover:text-white hover:bg-white/[0.03]'
+              }`}
+            >
+              <Cpu size={15} className={currentTab === 'dashboard' ? 'text-[#6C5CE7]' : 'text-slate-500'} />
+              <span>Dashboard Control</span>
+            </button>
+
+            <button
+              onClick={() => { setCurrentTab('directory'); setSelectedBotId(null); }}
+              className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg transition-all ${
+                currentTab === 'directory' 
+                  ? 'bg-gradient-to-r from-[#6C5CE7]/15 to-transparent border-l-2 border-[#6C5CE7] text-white font-bold' 
+                  : 'text-slate-400 hover:text-white hover:bg-white/[0.03]'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <Globe size={15} className={currentTab === 'directory' ? 'text-[#6C5CE7]' : 'text-slate-500'} />
+                <span>Ecosystem Directory</span>
+              </div>
+              <span className="text-[9.5px] bg-[#6C5CE7]/15 text-[#6C5CE7] px-1.5 py-0.5 rounded font-mono font-bold">Bots</span>
+            </button>
+
+            <button
+              onClick={() => { setCurrentTab('workflows'); setSelectedBotId(null); }}
+              className={`w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${
+                currentTab === 'workflows' 
+                  ? 'bg-gradient-to-r from-[#6C5CE7]/15 to-transparent border-l-2 border-[#6C5CE7] text-white font-bold' 
+                  : 'text-slate-400 hover:text-white hover:bg-white/[0.03]'
+              }`}
+            >
+              <Workflow size={15} className={currentTab === 'workflows' ? 'text-[#6C5CE7]' : 'text-slate-500'} />
+              <span>Workflow Builder</span>
+            </button>
+
+            <button
+              onClick={() => { setCurrentTab('playground'); setSelectedBotId(null); }}
+              className={`w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${
+                currentTab === 'playground' 
+                  ? 'bg-gradient-to-r from-[#6C5CE7]/15 to-transparent border-l-2 border-[#6C5CE7] text-white font-bold' 
+                  : 'text-slate-400 hover:text-white hover:bg-white/[0.03]'
+              }`}
+            >
+              <Code size={15} className={currentTab === 'playground' ? 'text-[#6C5CE7]' : 'text-slate-500'} />
+              <span>Prompt Playground</span>
+            </button>
+
+            <div className="pt-4 pb-2">
+              <span className="text-[10px] font-mono font-bold tracking-widest text-slate-500 uppercase px-3 block mb-1">Diagnostics</span>
+            </div>
+
+            <button
+              onClick={() => { setCurrentTab('analytics'); setSelectedBotId(null); }}
+              className={`w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${
+                currentTab === 'analytics' 
+                  ? 'bg-gradient-to-r from-[#6C5CE7]/15 to-transparent border-l-2 border-[#6C5CE7] text-white font-bold' 
+                  : 'text-slate-400 hover:text-white hover:bg-white/[0.03]'
+              }`}
+            >
+              <BarChart size={15} className={currentTab === 'analytics' ? 'text-[#6C5CE7]' : 'text-slate-500'} />
+              <span>Performance Analytics</span>
+            </button>
+
+            <button
+              onClick={() => { setCurrentTab('telemetry'); setSelectedBotId(null); }}
+              className={`w-full flex items-center gap-3 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${
+                currentTab === 'telemetry' 
+                  ? 'bg-gradient-to-r from-[#6C5CE7]/15 to-transparent border-l-2 border-[#6C5CE7] text-white font-bold' 
+                  : 'text-slate-400 hover:text-white hover:bg-white/[0.03]'
+              }`}
+            >
+              <Terminal size={15} className={currentTab === 'telemetry' ? 'text-[#6C5CE7]' : 'text-slate-500'} />
+              <span>System Telemetry Logs</span>
+            </button>
           </nav>
 
-          {/* Action CTAs */}
-          <div className="flex items-center gap-4">
-            <a href="#sandbox" className="hidden lg:flex items-center gap-1.5 text-[13px] font-mono text-zinc-400 hover:text-white px-3 py-1.5 rounded-md bg-white/[0.02] border border-white/[0.05] hover:border-white/[0.1] transition-all">
-              <Terminal className="w-3.5 h-3.5" />
-              <span>npx run botlyhub</span>
-            </a>
-            <a href="#sandbox" className="px-4 py-1.5 rounded-lg bg-white text-black text-[13px] font-semibold hover:bg-[#EDEDED] active:scale-95 transition-all shadow-[0_4px_12px_rgba(255,255,255,0.15)]">
-              Get Started
-            </a>
+        </div>
+
+        {/* BOTTOM USER PANEL STATS */}
+        <div className="p-4 border-t border-white/[0.04]">
+          <div className="bg-white/[0.02] border border-white/[0.04] p-3 rounded-xl mb-3">
+            <div className="flex justify-between items-center text-[10.5px]">
+              <span className="text-[#A1A1A1] font-semibold">Active Quota Balance</span>
+              <span className="text-[#2ED573] font-mono font-bold">94,220 pts</span>
+            </div>
+            <div className="w-full bg-white/[0.06] h-1.5 rounded-full mt-2 overflow-hidden">
+              <div className="bg-gradient-to-r from-[#6C5CE7] to-[#4F9CF9] h-full w-[84%]" />
+            </div>
           </div>
 
-        </div>
-      </header>
-
-      {/* Hero Section */}
-      <section id="hero" className="relative pt-32 pb-24 md:pt-40 md:pb-36 overflow-hidden z-10">
-        <div className="max-w-5xl mx-auto px-6 text-center flex flex-col items-center">
-          
-          {/* Announcement pill with soft background and tiny gradient indicator */}
-          <motion.div 
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2.5 px-3.5 py-1 rounded-full bg-white/[0.03] border border-white/[0.06] text-[12px] font-medium text-zinc-300 hover:border-white/[0.12] transition-colors cursor-pointer mb-8"
-          >
-            <span className="flex h-2 w-2 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#7C5CFF] opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#7C5CFF]"></span>
-            </span>
-            <span className="text-zinc-400">Automated QA Sandbox running live.</span>
-            <span className="text-white hover:text-[#7C5CFF] flex items-center gap-0.5 font-semibold">Try simulation <ArrowRight className="w-3 h-3" /></span>
-          </motion.div>
-
-          {/* Big headline */}
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.1 }}
-            className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white mb-6 leading-[1.1] font-sans"
-          >
-            Automated AI QA <br />
-            <span className="bg-gradient-to-r from-white via-white to-zinc-500 bg-clip-text text-transparent">for every deploy</span>
-          </motion.h1>
-
-          {/* Subtext */}
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="text-[15px] sm:text-[17px] md:text-[19px] text-[#A1A1A1] max-w-2xl leading-relaxed mb-10 font-medium"
-          >
-            BotlyHub runs intelligent tests, detects bugs, and validates your product before it reaches production. Fully integrated with your deployment timeline.
-          </motion.p>
-
-          {/* Hero CTAs */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.3 }}
-            className="flex flex-col sm:flex-row items-center gap-4 mb-16"
-          >
-            <a href="#sandbox" className="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#7C5CFF] text-white hover:bg-[#6A47FF] hover:shadow-[0_0_20px_rgba(124,92,255,0.4)] active:scale-[0.98] transition-all duration-200 text-sm font-semibold text-center">
-              Get Started for Free
-            </a>
-            <a href="#docs" className="w-full sm:w-auto px-6 py-3 rounded-xl bg-white/[0.03] border border-white/[0.08] text-[#EDEDED] text-sm hover:bg-white/[0.06] font-semibold text-center transition-all">
-              View Docs
-            </a>
-          </motion.div>
-
-          {/* PRODUCT PREVIEW PANEL (Terminal / Dashboard style) */}
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="w-full max-w-4xl rounded-2xl bg-gradient-to-b from-white/[0.06] to-white/[0.02] border border-white/[0.08] p-1 shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-10"
-          >
-            <div className="rounded-[12px] bg-[#0C0C0E] overflow-hidden">
-              
-              {/* Fake Window Header */}
-              <div className="flex items-center justify-between px-4 py-3 bg-[#111114] border-b border-white/[0.05] select-none">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-red-500/30 border border-red-500/10" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-500/25 border border-yellow-500/10" />
-                  <div className="w-3 h-3 rounded-full bg-green-500/20 border border-green-500/10" />
-                  <span className="text-[11px] text-[#71717A] ml-2 font-mono">botlyhub.yml</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="px-2 py-0.5 rounded bg-white/[0.03] text-[#7C5CFF] font-mono text-[10px] border border-white/[0.05] flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse"></span> Staging Validated
-                  </div>
-                </div>
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#6C5CE7] to-[#4F9CF9] p-[1.5px] flex items-center justify-center">
+              <div className="w-full h-full rounded-full bg-[#0E1321] flex items-center justify-center font-bold text-xs uppercase text-white">
+                KE
               </div>
-
-              {/* Inside Window (Dynamic CI pipeline mock) */}
-              <div className="grid grid-cols-1 md:grid-cols-12 md:divide-x md:divide-white/[0.05] text-left">
-                
-                {/* Left col: File tree & parameters */}
-                <div className="md:col-span-4 p-4 space-y-4">
-                  <div>
-                    <span className="text-[10px] font-mono font-bold text-[#A1A1A1] block tracking-widest uppercase mb-2">Automated QA Triggers</span>
-                    <div className="space-y-1.5">
-                      <div className="flex items-center justify-between text-[12.5px] px-2.5 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.04] text-zinc-300">
-                        <span className="flex items-center gap-2"><GitBranch className="w-3.5 h-3.5 text-zinc-500" /> on.push</span>
-                        <span className="text-zinc-500 font-mono text-[11px]">[main, dev]</span>
-                      </div>
-                      <div className="flex items-center justify-between text-[12.5px] px-2.5 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.04] text-zinc-300">
-                        <span className="flex items-center gap-2"><GitPullRequest className="w-3.5 h-3.5 text-zinc-500" /> on.pull_request</span>
-                        <span className="text-zinc-500 font-mono text-[11px]">[opened, sync]</span>
-                      </div>
-                      <div className="flex items-center justify-between text-[12.5px] px-2.5 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.04] text-zinc-300 text-zinc-500 line-through">
-                        <span className="flex items-center gap-2"><Layers className="w-3.5 h-3.5 opacity-60" /> on.manual_deploy</span>
-                        <span className="text-zinc-500 font-mono text-[11px]">[admin]</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <span className="text-[10px] font-mono font-bold text-[#A1A1A1] block tracking-widest uppercase mb-2">AI QA Core Suite</span>
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2 text-[12px] text-zinc-400">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981] shrink-0" />
-                        <span>Static code parsing with LLM</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-[12px] text-zinc-400">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981] shrink-0" />
-                        <span>Dynamic scenario synthesising</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-[12px] text-zinc-400">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981] shrink-0" />
-                        <span>E2E Chromium bot testing (live logs)</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-[12px] text-zinc-400">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981] shrink-0" />
-                        <span>Visual regression check screenshot diffs</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right col: Running terminal script */}
-                <div className="md:col-span-8 p-4 bg-[#09090A]/95 flex flex-col justify-between font-mono text-[12px] min-h-[220px]">
-                  <div className="space-y-1.5 max-h-[190px] overflow-y-auto no-scrollbar scroll-smooth">
-                    <p className="text-[#A1A1A1]">$ npx run botlyhub-e2e --repo=demo-site</p>
-                    <p className="text-zinc-500">Initializing workspace...</p>
-                    <p className="text-emerald-400">✔ GitHub token authenticated</p>
-                    <p className="text-zinc-300">✔ Read configuration botlyhub.yml</p>
-                    <p className="text-purple-400">🤖 AI matching codebase dependencies: React 18, Supabase db Client</p>
-                    <p className="text-[#f1f6fb]">🤖 AI generated 14 functional E2E tests targetting '/api/*' routes</p>
-                    <p className="text-zinc-400">--- Running tests ---</p>
-                    <p className="text-[#10B981]">✔ GET /api/health (24ms) - Status 200</p>
-                    <p className="text-[#10B981]">✔ POST /api/payment/create-order (112ms) - Expected invoice output verified</p>
-                    <p className="text-[#F59E0B]">⚠ Visual layout width limit exceeded on viewport width 360px (Login Modal)</p>
-                    <p className="text-[#EDEDED]">Execution finished in 4.27s.</p>
-                  </div>
-
-                  <div className="mt-4 pt-3 border-t border-white/[0.04] flex items-center justify-between text-zinc-500 text-[11px]">
-                    <span>CLI tool: @botlyhub/cli v3.0</span>
-                    <span className="text-[#10B981] font-bold">13/14 tests passed</span>
-                  </div>
-                </div>
-
-              </div>
-
             </div>
-          </motion.div>
-
+            <div>
+              <p className="text-[12px] font-bold text-white leading-tight">kenan_sys_admin</p>
+              <p className="text-[10px] text-slate-500 font-mono">Operator ID #4829</p>
+            </div>
+          </div>
         </div>
-      </section>
 
-      {/* 2. How it works */}
-      <section id="how-it-works" className="py-20 md:py-28 relative border-t border-white/[0.03] z-10 bg-[#070708]">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(124,92,255,0.02),transparent)] pointer-events-none" />
+      </aside>
+
+      {/* RENDER BODY CONTAINER */}
+      <main className="pl-64 flex-1 flex flex-col min-h-screen">
         
-        <div className="max-w-6xl mx-auto px-6">
-          
-          <div className="text-center max-w-2xl mx-auto mb-16 md:mb-20">
-            <span className="text-[11px] font-mono font-bold tracking-widest text-[#7C5CFF]/90 uppercase bg-[#7C5CFF]/10 border border-[#7C5CFF]/20 px-3 py-1 rounded-full">Automated Pipeline</span>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-white mt-4 tracking-tight leading-tight">3 simple steps to total production safety</h2>
-            <p className="text-[#A1A1A1] mt-3.5 text-sm md:text-base">We automate the critical path between code push and live deployment checks instantly.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-            
-            {/* CARD 1 */}
-            <div className="relative rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.12] p-6 hover:shadow-[0_8px_30px_rgba(0,0,0,0.4)] transition-all duration-300 group">
-              <div className="absolute top-[-1px] left-6 right-6 h-[1px] bg-gradient-to-r from-transparent via-[#7C5CFF]/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/[0.03] border border-white/[0.08] text-white group-hover:bg-[#7C5CFF]/15 group-hover:border-[#7C5CFF]/30 transition-all mb-6">
-                <Github className="w-5 h-5 text-zinc-300 group-hover:text-[#7C5CFF] transition-colors" />
-              </div>
-              <span className="text-zinc-500 font-mono text-[13px] block mb-2">01 / REPOSITORY SYNC</span>
-              <h3 className="text-[18px] font-bold text-white mb-2 leading-tight group-hover:text-[#7C5CFF] transition-colors">Connect your repository</h3>
-              <p className="text-[13.5px] text-[#A1A1A1] leading-relaxed">
-                Connect your Github or GitLab organization with our native GitHub App. BotlyHub maps the file structures, routing mechanisms, and API models automatically within seconds.
-              </p>
-            </div>
-
-            {/* CARD 2 */}
-            <div className="relative rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.12] p-6 hover:shadow-[0_8px_30px_rgba(0,0,0,0.4)] transition-all duration-300 group">
-              <div className="absolute top-[-1px] left-6 right-6 h-[1px] bg-gradient-to-r from-transparent via-[#4F9CF9]/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/[0.03] border border-white/[0.08] text-white group-hover:bg-[#4F9CF9]/15 group-hover:border-[#4F9CF9]/30 transition-all mb-6">
-                <Cpu className="w-5 h-5 text-zinc-300 group-hover:text-[#4F9CF9] transition-colors" />
-              </div>
-              <span className="text-zinc-500 font-mono text-[13px] block mb-2">02 / AI SCENARIO SYNTHESIS</span>
-              <h3 className="text-[18px] font-bold text-white mb-2 leading-tight group-hover:text-[#4F9CF9] transition-colors">AI generates test scenarios</h3>
-              <p className="text-[13.5px] text-[#A1A1A1] leading-relaxed">
-                Our model reads your PR diff, automatically targets database triggers & forms, and designs end-to-end integration workflows with multi-user simulation scenarios dynamically. No manual scripting ever.
-              </p>
-            </div>
-
-            {/* CARD 3 */}
-            <div className="relative rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.12] p-6 hover:shadow-[0_8px_30px_rgba(0,0,0,0.4)] transition-all duration-300 group">
-              <div className="absolute top-[-1px] left-6 right-6 h-[1px] bg-gradient-to-r from-transparent via-[#7C5CFF]/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/[0.03] border border-white/[0.08] text-white group-hover:bg-[#7C5CFF]/15 group-hover:border-[#7C5CFF]/30 transition-all mb-6">
-                <Workflow className="w-5 h-5 text-zinc-300 group-hover:text-[#7C5CFF] transition-colors" />
-              </div>
-              <span className="text-zinc-500 font-mono text-[13px] block mb-2">03 / CONTINUOUS STAGING CHECKS</span>
-              <h3 className="text-[18px] font-bold text-white mb-2 leading-tight group-hover:text-[#7C5CFF] transition-colors">Runs QA and reports</h3>
-              <p className="text-[13.5px] text-[#A1A1A1] leading-relaxed">
-                Every code commit triggering a push, pull request, or stage deploy immediately kicks off BotlyHub simulation cycles. Failures block the deployment gate, and issues are commented directly inline on GitHub.
-              </p>
-            </div>
-
-          </div>
-
-        </div>
-      </section>
-
-      {/* 3. Features Section (Grid Layout) */}
-      <section id="features" className="py-20 md:py-28 relative border-t border-white/[0.03] z-10 bg-[#0A0A0B]">
-        <div className="max-w-6xl mx-auto px-6">
-          
-          <div className="text-center max-w-2xl mx-auto mb-16 md:mb-20">
-            <span className="text-[11px] font-mono font-bold tracking-widest text-[#4F9CF9]/90 uppercase bg-[#4F9CF9]/10 border border-[#4F9CF9]/20 px-3 py-1 rounded-full">Feature Capabilities</span>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-white mt-4 tracking-tight leading-tight">Advanced QA Engine For Dev Teams</h2>
-            <p className="text-[#A1A1A1] mt-3.5 text-sm md:text-base">Comprehensive validation layers engineered and polished for modern, zero-downtime platforms.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-            
-            {/* Feature 1: AI Test Generation (Double Wide - 8cols) */}
-            <div className="md:col-span-8 relative rounded-2xl bg-white/[0.02] border border-white/[0.06] p-6 hover:border-white/[0.1] transition-all duration-300 group flex flex-col justify-between overflow-hidden min-h-[280px]">
-              <div className="absolute top-0 right-[-10%] w-[250px] h-[250px] bg-[#7C5CFF]/5 rounded-full blur-[80px] pointer-events-none" />
-              <div className="space-y-3 max-w-md">
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#7C5CFF]/10 border border-[#7C5CFF]/25 text-[#7C5CFF]">
-                    <Zap className="w-4 h-4" />
-                  </div>
-                  <span className="text-[11px] font-mono font-bold text-[#7C5CFF] uppercase tracking-wider">Predictive Testing</span>
-                </div>
-                <h3 className="text-xl font-bold text-white tracking-tight leading-tight">Automated AI Test Generation</h3>
-                <p className="text-[13.5px] text-[#A1A1A1] leading-relaxed">
-                  Our core semantic LLM parses your staging routes, code architecture, packages, and mock schemas. It automatically figures out authentication boundaries, generates 30+ edge cases, and writes readable browser E2E test files inside your repository folder.
-                </p>
-              </div>
-
-              {/* Minimal UI graphic representation */}
-              <div className="mt-6 p-3 rounded-lg bg-[#0C0C0F] border border-white/[0.04] font-mono text-[11px] text-zinc-400 select-none">
-                <p className="text-purple-400">// AI generated case for: /api/checkout</p>
-                <div className="flex items-center gap-1.5 mt-1">
-                  <span className="text-[#10B981]">✔</span>
-                  <span>test('order state with negative volume should throw validation error 400')</span>
-                </div>
-                <div className="flex items-center gap-1.5 mt-1">
-                  <span className="text-[#10B981]">✔</span>
-                  <span>test('concurrent stripe session token generation under checkout overload')</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Feature 2: CI/CD integration (4cols) */}
-            <div className="md:col-span-4 relative rounded-2xl bg-white/[0.02] border border-white/[0.06] p-6 hover:border-white/[0.1] transition-all duration-300 group flex flex-col justify-between min-h-[280px]">
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#4F9CF9]/10 border border-[#4F9CF9]/25 text-[#4F9CF9]">
-                    <Layers className="w-4 h-4" />
-                  </div>
-                  <span className="text-[11px] font-mono font-bold text-[#4F9CF9] uppercase tracking-wider">Workflow Connect</span>
-                </div>
-                <h3 className="text-xl font-bold text-white tracking-tight leading-tight">Native CI/CD Integration</h3>
-                <p className="text-[13.5px] text-[#A1A1A1] leading-relaxed">
-                  Plug BotlyHub directly into your release cycle. Integrates natively, securely, and seamlessly with GitHub Actions, CircleCI, Jenkins, Vercel Deployments, Netlify, and GitLab Pipelines using standard OAuth.
-                </p>
-              </div>
-
-              {/* Horizontal line representation of branches */}
-              <div className="mt-6 flex items-center gap-3 text-zinc-500 font-mono text-[10.5px]">
-                <span className="text-[#EDEDED]">Commit</span>
-                <span>---&gt;</span>
-                <span className="text-[#7C5CFF]">Botly QA</span>
-                <span>---&gt;</span>
-                <span className="text-[#10B981]">Vercel Deploy</span>
-              </div>
-            </div>
-
-            {/* Feature 3: Real-Time Bug Detection (4cols) */}
-            <div className="md:col-span-4 relative rounded-2xl bg-white/[0.02] border border-white/[0.06] p-6 hover:border-white/[0.1] transition-all duration-300 group flex flex-col justify-between min-h-[280px]">
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-orange-500/10 border border-orange-500/25 text-orange-400">
-                    <Activity className="w-4 h-4" />
-                  </div>
-                  <span className="text-[11px] font-mono font-bold text-orange-400 uppercase tracking-wider">Live telemetry</span>
-                </div>
-                <h3 className="text-xl font-bold text-white tracking-tight leading-tight">Real-Time Bug Detection</h3>
-                <p className="text-[13.5px] text-[#A1A1A1] leading-relaxed">
-                  Catch accessibility flaws, server-side unhandled promise rejections, network latency overhead spikes, visual layout shifts, and visual overlaps before your customers report them.
-                </p>
-              </div>
-
-              <div className="mt-6 flex items-center gap-2.5 px-3 py-1.5 rounded bg-amber-500/10 border border-amber-500/20 text-orange-300 font-mono text-[11px]">
-                <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-                <span>Layout break detected at screen 375px</span>
-              </div>
-            </div>
-
-            {/* Feature 4: GitHub Integration (4cols) */}
-            <div className="md:col-span-4 relative rounded-2xl bg-white/[0.02] border border-white/[0.06] p-6 hover:border-white/[0.1] transition-all duration-300 group flex flex-col justify-between min-h-[280px]">
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#7C5CFF]/10 border border-[#7C5CFF]/25 text-[#7C5CFF]">
-                    <Github className="w-4 h-4" />
-                  </div>
-                  <span className="text-[11px] font-mono font-bold text-[#7C5CFF] uppercase tracking-wider">GitHub App</span>
-                </div>
-                <h3 className="text-xl font-bold text-white tracking-tight leading-tight">Inline Code Comments</h3>
-                <p className="text-[13.5px] text-[#A1A1A1] leading-relaxed">
-                  BotlyHub acts like a senior reviewer. When a dynamic scenario fails during check trials, it comments directly inline, on the precise line of code with rich terminal logs, code context, and suggestion fixes.
-                </p>
-              </div>
-
-              <div className="mt-6 text-[10px] text-zinc-500 font-mono flex items-center gap-1.5">
-                <MessageSquare className="w-3.5 h-3.5" />
-                <span>botlyhub-bot commented on useAuth.ts</span>
-              </div>
-            </div>
-
-            {/* Feature 5: Deployment Validation (4cols) */}
-            <div className="md:col-span-4 relative rounded-2xl bg-white/[0.02] border border-white/[0.06] p-6 hover:border-white/[0.1] transition-all duration-300 group flex flex-col justify-between min-h-[280px]">
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-[#10B981]">
-                    <ShieldCheck className="w-4 h-4" />
-                  </div>
-                  <span className="text-[11px] font-mono font-bold text-emerald-400 uppercase tracking-wider">Gatekeep policy</span>
-                </div>
-                <h3 className="text-xl font-bold text-white tracking-tight leading-tight">Deployment Gates</h3>
-                <p className="text-[13.5px] text-[#A1A1A1] leading-relaxed">
-                  Do not let failed staging tests block your live traffic. Configure custom BotlyHub deployment block policies that intercept preview URLs directly. If test validation falls below 100%, deployment is safely halted.
-                </p>
-              </div>
-
-              <div className="mt-6 text-[11px] text-[#10B981] font-mono flex items-center gap-1.5 font-bold">
-                <Check className="w-3.5 h-3.5" />
-                <span>Staging Deployment Purged</span>
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-      </section>
-
-      {/* 4. BOT & MINI-APP ECOSYSTEM MARKETPLACE DEVELOPER PREVIEW */}
-      <section className="py-20 md:py-28 relative border-t border-white/[0.03] z-10 bg-[#08080A]">
-        <div className="absolute top-0 right-1/2 translate-x-1/2 w-[550px] h-[550px] rounded-full bg-[#4F9CF9]/5 blur-[125px] pointer-events-none" />
-        <div className="max-w-6xl mx-auto px-6">
-          
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
-            <div className="max-w-2xl text-left">
-              <span className="text-[11px] font-mono font-bold tracking-widest text-[#7C5CFF] uppercase bg-[#7C5CFF]/10 border border-[#7C5CFF]/20 px-3 py-1 rounded-full">Global Directory</span>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-white mt-4 tracking-tight leading-tight">Explore the BotlyHub Telegram Ecosystem</h2>
-              <p className="text-[#A1A1A1] mt-3.5 text-sm md:text-base">
-                Discover, configure, and connect verified Telegram bots, automated channel tools, and decentralized Web3 Mini-Apps built by our developer community.
-              </p>
-            </div>
-            <div className="flex shrink-0">
-              <button 
-                onClick={() => navigate('/search')}
-                className="group flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-black text-xs font-semibold hover:bg-zinc-200 active:scale-95 transition-all shadow-[0_4px_12px_rgba(255,255,255,0.1)]"
-              >
-                <span>Browse All {categories.length - 1}+ Categories</span>
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-              </button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-            {categories
-              .filter(cat => cat.id !== 'all')
-              .slice(0, 10)
-              .map((cat, idx) => {
-                const IconComponent = cat.icon;
-                const localizedLabel = t(cat.label) || cat.id.toUpperCase();
-                return (
-                  <div
-                    key={cat.id}
-                    onClick={() => navigate(`/search?category=${cat.id}`)}
-                    className="group relative rounded-xl bg-white/[0.02] border border-white/[0.05] hover:border-white/[0.13] p-5 cursor-pointer hover:bg-white/[0.03] hover:shadow-[0_8px_30px_rgba(0,0,0,0.4)] transition-all duration-300 flex flex-col items-center text-center justify-between min-h-[140px] select-none active:scale-[0.98]"
-                  >
-                    <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#7C5CFF]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/[0.03] border border-white/[0.08] group-hover:bg-[#7C5CFF]/10 group-hover:border-[#7C5CFF]/25 text-zinc-400 group-hover:text-white transition-all duration-300 p-3 shrink-0">
-                      {IconComponent ? (
-                        <IconComponent size={24} className="group-hover:scale-110 transition-transform" />
-                      ) : (
-                        <Bot className="w-5 h-5" />
-                      )}
-                    </div>
-                    <div className="mt-4">
-                      <h4 className="text-[13px] font-bold text-slate-100 group-hover:text-white truncate">
-                        {localizedLabel}
-                      </h4>
-                      <p className="text-[10px] text-zinc-500 mt-1 uppercase font-mono tracking-wider">
-                        {cat.id} Directory
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
-          </div>
-
-          <div className="mt-10 rounded-2xl bg-gradient-to-r from-[#7C5CFF]/10 via-transparent to-[#4F9CF9]/10 border border-white/[0.05] p-6 lg:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="text-left space-y-2">
-              <span className="text-[9.5px] font-mono font-black text-[#5BC0BE] bg-[#5BC0BE]/15 border border-[#5BC0BE]/25 px-2 py-0.5 rounded uppercase tracking-wider">Submit your app</span>
-              <h3 className="text-lg font-bold text-white">Are you a Telegram developer or community creator?</h3>
-              <p className="text-zinc-400 text-xs max-w-xl leading-relaxed">
-                List your Telegram bot, mini-app, group, or channel to gain organic distribution, build reputation rankings, and integrate instant micro-payments.
-              </p>
-            </div>
-            <button 
-              onClick={() => navigate('/u/login')}
-              className="w-full md:w-auto px-5 py-3 rounded-xl bg-white/[0.03] border border-white/[0.08] text-[#EDEDED] text-xs hover:bg-white/[0.06] font-semibold transition-all shrink-0 flex items-center justify-center gap-2"
-            >
-              <span>Add Your Bot Now</span>
-              <ExternalLink className="w-3 h-3" />
-            </button>
-          </div>
-
-        </div>
-      </section>
-
-      {/* 5. Product Demo Section (Interactive Dashboard Mock) */}
-      <section id="sandbox" className="py-20 md:py-28 relative border-t border-white/[0.03] z-10 bg-[#070708]">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[#7C5CFF]/3 blur-[140px] pointer-events-none" />
-        
-        <div className="max-w-6xl mx-auto px-6">
-          
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <span className="text-[11px] font-mono font-bold tracking-widest text-[#7C5CFF] uppercase bg-[#7C5CFF]/10 border border-[#7C5CFF]/20 px-3 py-1 rounded-full">Interactive Dev Demo</span>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-white mt-4 tracking-tight">Try BotlyHub Pipeline Simulation</h2>
-            <p className="text-[#A1A1A1] mt-3.5 text-sm md:text-base">Experience how BotlyHub executes tests on the fly. Select a repository node, switch branches, and trigger the AI QA pipeline instantly.</p>
-          </div>
-
-          <div className="rounded-2xl bg-gradient-to-b from-white/[0.05] to-transparent border border-white/[0.07] p-1.5 shadow-[0_30px_60px_rgba(0,0,0,0.6)]">
-            <div className="rounded-xl bg-[#09090B] overflow-hidden grid grid-cols-1 lg:grid-cols-12 text-left min-h-[550px]">
-              
-              {/* Dashboard Left Sidebar Control View (3 columns) */}
-              <div className="lg:col-span-3 bg-[#0D0D10] p-5 border-b lg:border-b-0 lg:border-r border-white/[0.06] flex flex-col justify-between">
-                
-                <div className="space-y-6">
-                  {/* Repo select */}
-                  <div>
-                    <label className="text-[10px] font-mono font-bold text-zinc-400 block tracking-wider uppercase mb-2">Connected Repository</label>
-                    <div className="space-y-1.5">
-                      {Object.keys(repos).map((repoName) => (
-                        <button
-                          key={repoName}
-                          onClick={() => {
-                            setSelectedRepo(repoName);
-                            setSelectedBranch('main');
-                          }}
-                          className={`w-full flex items-center justify-between text-[12.5px] px-3 py-2 rounded-lg transition-all text-left ${selectedRepo === repoName ? 'bg-white/[0.05] text-[#7C5CFF] border border-white/[0.08] font-bold' : 'text-zinc-400 hover:bg-white/[0.02] hover:text-white border border-transparent'}`}
-                        >
-                          <span className="truncate">{repoName}</span>
-                          <span className="text-[10px] bg-white/[0.05] px-1.5 py-0.5 rounded text-zinc-500 font-mono">active</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Branch / Code Change Select */}
-                  <div>
-                    <label className="text-[10px] font-mono font-bold text-zinc-400 block tracking-wider uppercase mb-2">Select Target Branch</label>
-                    <div className="relative">
-                      <select 
-                        value={selectedBranch}
-                        onChange={(e) => setSelectedBranch(e.target.value)}
-                        disabled={isTestRunning}
-                        className="w-full bg-[#121216] border border-white/[0.08] text-white text-[12.5px] rounded-lg px-3 py-2 outline-none cursor-pointer focus:border-[#7C5CFF] transition-colors appearance-none font-mono font-semibold"
-                      >
-                        {repos[selectedRepo as keyof typeof repos].branches.map((br) => (
-                          <option key={br} value={br}>{br}</option>
-                        ))}
-                      </select>
-                      <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-zinc-500 pointer-events-none" />
-                    </div>
-                  </div>
-
-                  {/* Commit info details */}
-                  <div className="p-3.5 rounded-lg bg-white/[0.02] border border-white/[0.04] space-y-12">
-                    <div>
-                      <span className="text-[10px] font-mono text-zinc-500 block">COMMIT HASH</span>
-                      <span className="text-[12px] font-mono font-bold text-zinc-300">{repos[selectedRepo as keyof typeof repos].commits[selectedBranch as 'main']?.hash || 'none'}</span>
-                    </div>
-                    <div>
-                      <span className="text-[10px] font-mono text-zinc-500 block">COMMIT MESSAGE</span>
-                      <span className="text-[12.5px] text-zinc-300 line-clamp-2 leading-snug">"{repos[selectedRepo as keyof typeof repos].commits[selectedBranch as 'main']?.msg || ''}"</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Automation Trigger Buttons */}
-                <div className="mt-8 pt-4 border-t border-white/[0.04] space-y-2">
-                  <button
-                    onClick={handleTriggerQAFeedback}
-                    disabled={isTestRunning}
-                    className="w-full flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-semibold text-white bg-gradient-to-r from-[#7C5CFF] to-[#6A47FF] hover:opacity-90 active:scale-[0.98] transition-all cursor-pointer font-sans disabled:opacity-40 shadow-[0_4px_15px_rgba(124,92,255,0.25)]"
-                  >
-                    {isTestRunning ? (
-                      <>
-                        <RefreshCw className="w-4 h-4 animate-spin" />
-                        <span>Evaluating...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Play className="w-4 h-4 fill-white" />
-                        <span>Trigger AI QA Suite</span>
-                      </>
-                    )}
-                  </button>
-                  <button
-                    onClick={resetDemoState}
-                    disabled={isTestRunning || testResultState === 'idle'}
-                    className="w-full py-2 text-center rounded-lg border border-white/[0.06] text-zinc-400 hover:text-white hover:bg-white/[0.02] transition-all text-xs"
-                  >
-                    Clear Canvas
-                  </button>
-                </div>
-
-              </div>
-
-              {/* Central dashboard pipeline feedback panel (9 columns) */}
-              <div className="lg:col-span-9 bg-[#09090C] flex flex-col justify-between overflow-hidden">
-                
-                {/* Status Header Area */}
-                <div className="px-6 py-4 bg-[#0F0F12] border-b border-white/[0.06] flex items-center justify-between">
-                  <div>
-                    <span className="text-[10px] font-mono text-zinc-500 block">PIPELINE RUN FEEDBACK</span>
-                    <h3 className="text-sm font-bold text-white font-mono flex items-center gap-2">
-                      <span>job_feed_run_#381</span>
-                      {testResultState === 'running' && <span className="text-[#7C5CFF] text-[11px] font-normal flex items-center gap-1"><RefreshCw className="w-3 h-3 animate-spin" /> executing checks...</span>}
-                      {testResultState === 'success' && <span className="text-[#10B981] text-[11px] font-normal flex items-center gap-1 bg-[#10B981]/15 px-2 py-0.5 rounded border border-[#10B981]/30">✔ passed cleanly</span>}
-                      {testResultState === 'warning' && <span className="text-[#F59E0B] text-[11px] font-normal flex items-center gap-1 bg-[#F59E0B]/15 px-2 py-0.5 rounded border border-[#F59E0B]/30">⚠ completed with alert</span>}
-                      {testResultState === 'failed' && <span className="text-[#EF4444] text-[11px] font-normal flex items-center gap-1 bg-[#EF4444]/15 px-2 py-0.5 rounded border border-[#EF4444]/30">⚙ validation gate block</span>}
-                    </h3>
-                  </div>
-
-                  {/* Horizontal step pipelines */}
-                  <div className="flex items-center gap-2">
-                    <div className={`p-1 rounded-full ${currentTestStep >= 0 && testResultState !== 'idle' ? 'text-[#7C5CFF]' : 'text-zinc-600'}`}>
-                      <Code className="w-4.5 h-4.5" />
-                    </div>
-                    <div className="w-4 h-[1px] bg-white/[0.06]" />
-                    <div className={`p-1 rounded-full ${currentTestStep >= 1 ? 'text-[#7C5CFF]' : 'text-zinc-600'}`}>
-                      <Cpu className="w-4.5 h-4.5" />
-                    </div>
-                    <div className="w-4 h-[1px] bg-white/[0.06]" />
-                    <div className={`p-1 rounded-full ${currentTestStep >= 2 ? 'text-[#7C5CFF]' : 'text-zinc-600'}`}>
-                      <Terminal className="w-4.5 h-4.5" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Navigation Tabs inner */}
-                <div className="flex border-b border-white/[0.05] bg-[#0A0A0E] text-[12px] font-mono">
-                  <button onClick={() => setActiveTab('logger')} className={`px-5 py-2.5 transition-all scroll-mb-[1px] border-b-2 font-bold ${activeTab === 'logger' ? 'border-[#7C5CFF] text-white bg-[#09090C]' : 'border-transparent text-zinc-500 hover:text-white'}`}>Live Output Logs</button>
-                  <button onClick={() => setActiveTab('scenarios')} className={`px-5 py-2.5 transition-all scroll-mb-[1px] border-b-2 font-bold ${activeTab === 'scenarios' ? 'border-[#7C5CFF] text-white bg-[#09090C]' : 'border-transparent text-zinc-500 hover:text-white'}`}>AI Test Scenarios</button>
-                  <button onClick={() => setActiveTab('visual')} className={`px-5 py-2.5 transition-all scroll-mb-[1px] border-b-2 font-bold ${activeTab === 'visual' ? 'border-[#7C5CFF] text-white bg-[#09090C]' : 'border-transparent text-zinc-500 hover:text-white'}`}>Visual Regression Diff</button>
-                  <button onClick={() => setActiveTab('recommendation')} className={`px-5 py-2.5 transition-all scroll-mb-[1px] border-b-2 font-bold ${activeTab === 'recommendation' ? 'border-[#7C5CFF] text-white bg-[#09090C]' : 'border-transparent text-zinc-500 hover:text-white'}`}>AI Recommendation FIX</button>
-                </div>
-
-                {/* Dashboard Tab Content Canvas */}
-                <div className="flex-1 p-6 font-mono text-[12.5px] overflow-y-auto min-h-[300px] max-h-[380px] bg-[#09090C]">
-                  
-                  {/* TAB 1: Live Output Logger */}
-                  {activeTab === 'logger' && (
-                    <div className="space-y-2">
-                      {testOutput.length === 0 ? (
-                        <div className="text-zinc-500 text-center py-20 font-sans">
-                          <Terminal className="w-8 h-8 mx-auto mb-3 text-zinc-600 animate-pulse" />
-                          <p>The console is currently awaiting execution telemetry.</p>
-                          <p className="text-[12px] text-zinc-600 mt-1">Press "Trigger AI QA Suite" on the left to start checking code.</p>
-                        </div>
-                      ) : (
-                        testOutput.map((log, index) => {
-                          let textClass = 'text-zinc-300';
-                          if (log.includes('✅') || log.includes('✓') || log.includes('✔')) textClass = 'text-emerald-400 font-bold';
-                          if (log.includes('⚠') || log.includes('warning')) textClass = 'text-[#F59E0B] font-bold';
-                          if (log.includes('❌') || log.includes('🚨') || log.includes('danger') || log.includes('failed')) textClass = 'text-red-400 font-bold';
-                          if (log.includes('🤖') || log.includes('[botlyhub-ai]')) textClass = 'text-[#7C5CFF] font-semibold';
-                          if (log.includes('⚡')) textClass = 'text-[#4F9CF9] font-semibold';
-                          return (
-                            <motion.div
-                              key={index}
-                              initial={{ opacity: 0, x: -5 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ duration: 0.15 }}
-                              className={`leading-relaxed border-l-2 border-white/[0.04] pl-3 py-0.5 ${textClass}`}
-                            >
-                              {log}
-                            </motion.div>
-                          );
-                        })
-                      )}
-                    </div>
-                  )}
-
-                  {/* TAB 2: AI Generated Test Scenarios */}
-                  {activeTab === 'scenarios' && (
-                    <div className="space-y-4 font-sans">
-                      <div className="p-4 rounded-lg bg-white/[0.02] border border-white/[0.05] space-y-3">
-                        <div className="flex items-center gap-2">
-                          <Cpu className="w-4.5 h-4.5 text-[#7C5CFF]" />
-                          <h4 className="text-[13.5px] font-bold text-white font-mono">Synthesised Integration Routes ({selectedRepo})</h4>
-                        </div>
-                        <p className="text-zinc-400 text-[12.5px]">These browser user simulators are generated on the fly during branch analysis:</p>
-                        
-                        <div className="divide-y divide-white/[0.04] text-[12.5px]">
-                          <div className="py-2.5 flex items-center justify-between">
-                            <span className="font-mono text-zinc-300">01_auth_flow_recovery.spec_runner</span>
-                            <span className="text-[#10B981] font-bold">Passed (0.42s)</span>
-                          </div>
-                          <div className="py-2.5 flex items-center justify-between">
-                            <span className="font-mono text-zinc-300">02_rest_api_schema_boundary_checks</span>
-                            <span className={`font-bold ${selectedBranch === 'hotfix/api-headers' ? 'text-[#F59E0B]' : 'text-[#10B981]'}`}>
-                              {selectedBranch === 'hotfix/api-headers' ? 'Completed [Warning]' : 'Passed (0.58s)'}
-                            </span>
-                          </div>
-                          <div className="py-2.5 flex items-center justify-between">
-                            <span className="font-mono text-zinc-300">03_supabase_session_eviction_compliance</span>
-                            <span className={`font-bold ${selectedBranch === 'bugfix/auth-leak' ? 'text-red-400' : 'text-[#10B981]'}`}>
-                              {selectedBranch === 'bugfix/auth-leak' ? 'Failed [Gate Block]' : 'Passed (0.35s)'}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* TAB 3: Visual Regression Screen Diff Layout */}
-                  {activeTab === 'visual' && (
-                    <div className="space-y-4 font-sans h-full flex flex-col justify-center items-center">
-                      {selectedBranch === 'hotfix/api-headers' ? (
-                        <div className="w-full space-y-4 text-center">
-                          <div className="flex items-center justify-center gap-2 text-[#F59E0B] font-mono text-[13px] bg-[#F59E0B]/10 p-2.5 rounded-lg border border-[#F59E0B]/20 mb-4">
-                            <AlertTriangle className="w-4 h-4 shrink-0 animate-bounce" />
-                            <span>Warning: Layout Element Overlap on 320px breakpoints (Login Modal)</span>
-                          </div>
-                          <div className="grid grid-cols-2 gap-4 max-w-xl mx-auto">
-                            <div className="space-y-1.5 p-3 rounded-lg bg-white/[0.02] border border-white/[0.05]">
-                              <span className="text-[10px] text-zinc-500 font-mono block uppercase">Expected Layout</span>
-                              <div className="h-32 rounded bg-zinc-800 flex flex-col items-center justify-center gap-1.5 p-3">
-                                <div className="w-16 h-4 rounded bg-zinc-700" />
-                                <div className="w-20 h-8 rounded bg-[#7C5CFF]/30 border border-[#7C5CFF]/25" />
-                              </div>
-                            </div>
-                            <div className="space-y-1.5 p-3 rounded-lg bg-white/[0.02] border border-[#EF4444]/20">
-                              <span className="text-[10px] text-[#EF4444] font-mono block uppercase">Actual Staging Shift</span>
-                              <div className="h-32 rounded bg-zinc-800 flex flex-col items-center justify-center gap-1.5 relative overflow-hidden text-red-400">
-                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-[15deg] font-mono font-bold text-[10px] text-red-500 bg-red-950/85 border border-red-500/20 px-2 py-0.5 whitespace-nowrap z-10">OVERLAPPING BUTTONS</div>
-                                <div className="w-16 h-4 rounded bg-zinc-700 select-none blur-[0.5px]" />
-                                <div className="w-20 h-8 rounded bg-red-500/20 border border-red-500/30 select-none translate-y-[-8px] blur-[0.5px]" />
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="text-zinc-500 text-center py-20">
-                          <Layers className="w-8 h-8 mx-auto mb-3 text-zinc-650" />
-                          <p className="text-[13px]">No visual regressions detected across modern viewports.</p>
-                          <p className="text-[11px] text-zinc-600 mt-1">Staging screenshot snapshot diffs match production master 100%.</p>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* TAB 4: AI Code Recommendation and Fixes */}
-                  {activeTab === 'recommendation' && (
-                    <div className="space-y-4">
-                      {selectedBranch === 'bugfix/auth-leak' ? (
-                        <div className="space-y-3 font-sans">
-                          <div className="p-3.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-[12.5px] font-mono flex items-center gap-2">
-                            <XCircle className="w-4.5 h-4.5 shrink-0" />
-                            <span>Insecure state propagation: cached JWT tokens bypass local eviction on logout.</span>
-                          </div>
-                          
-                          <div className="space-y-1.5">
-                            <span className="text-[10px] font-mono text-zinc-500 block">AI HIGHLIGHTED FIX (useSession.ts)</span>
-                            <div className="rounded-lg bg-[#0C0C0F] border border-white/[0.05] p-4 text-[11px] font-mono overflow-x-auto text-zinc-400">
-                              <p className="text-zinc-500">// Old code:</p>
-                              <p className="text-red-400 line-through">- function logOut() &#123; navigate("/login"); &#125;</p>
-                              <p className="text-zinc-500 mt-2">// Recommended patch:</p>
-                              <p className="text-emerald-400 font-bold">+ function logOut() &#123;</p>
-                              <p className="text-emerald-400 font-bold">+   localStorage.removeItem("auth_token_jwt");</p>
-                              <p className="text-emerald-400 font-bold">+   sessionStorage.clear();</p>
-                              <p className="text-emerald-400 font-bold">+   navigate("/login");</p>
-                              <p className="text-emerald-400 font-bold">+ &#125;</p>
-                            </div>
-                          </div>
-
-                          <button 
-                            onClick={() => {
-                              alert("AI Patch applied dynamically! Triggering test automation check flow again.");
-                              setSelectedBranch('main');
-                              handleTriggerQAFeedback();
-                            }}
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500 text-[#09090C] font-semibold text-xs rounded-lg hover:bg-emerald-400 transition-colors font-sans"
-                          >
-                            <Zap className="w-3.5 h-3.5 fill-current" />
-                            <span>Auto Patch Repository</span>
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="text-zinc-500 text-center py-20 font-sans">
-                          <CheckCircle2 className="w-8 h-8 mx-auto mb-3 text-emerald-500/80" />
-                          <p className="text-[13px] text-zinc-300 font-bold">Codebase exhibits pristine pattern health.</p>
-                          <p className="text-[11px] text-[#A1A1A1] mt-1">No pending memory leaks, authentication bugs, or stale headers.</p>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                </div>
-
-                {/* Simulated telemetry info bar (Bottom UI) */}
-                <div className="px-6 py-3.5 bg-[#0D0D10] border-t border-white/[0.06] text-zinc-500 text-[11.5px] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
-                  <div className="flex items-center gap-4">
-                    <span>Repository Node: <span className="font-mono text-zinc-300 font-medium">{selectedRepo}</span></span>
-                    <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-white/20" />
-                    <span>Active Target Commit: <span className="font-mono text-zinc-300 font-medium">{repos[selectedRepo as keyof typeof repos].commits[selectedBranch as 'main']?.hash || ''}</span></span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]"></span>
-                    <span>Verified under SHA-256 staging parameters</span>
-                  </div>
-                </div>
-
-              </div>
-              
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* 5. Integrations Section (Logos Style Grid) */}
-      <section id="integrations" className="py-20 md:py-24 relative border-t border-white/[0.03] z-10 bg-[#0A0A0B]">
-        <div className="max-w-6xl mx-auto px-6">
-          
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            
-            <div className="lg:col-span-5 text-left space-y-4">
-              <span className="text-[11px] font-mono font-bold tracking-widest text-[#7C5CFF] uppercase bg-[#7C5CFF]/10 border border-[#7C5CFF]/20 px-3 py-1 rounded-full">Seamless Bridges</span>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight leading-tight">Integrates with your existing tech ecosystem</h2>
-              <p className="text-[#A1A1A1] text-sm md:text-[14.5px] leading-relaxed">
-                No complex scripting or server hosting required. Connect BotlyHub directly into your GitHub App ecosystem, Slack workspace alert loops, and Vercel preview gateways in less than five minutes.
-              </p>
-              
-              <div className="pt-2 flex items-center gap-1.5 text-zinc-500 font-mono text-[12px]">
-                <Lock className="w-3.5 h-3.5" />
-                <span>Encrypted using SSH, AES-256 protocols</span>
-              </div>
-            </div>
-
-            <div className="lg:col-span-7">
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                
-                {/* Integration Card 1 */}
-                <div className="rounded-xl bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.04] p-5 flex flex-col items-center justify-center text-center transition-all group cursor-pointer">
-                  <Github className="w-8 h-8 text-zinc-400 group-hover:text-white group-hover:scale-105 transition-all mb-3.5" />
-                  <span className="text-[13px] font-bold text-white block">GitHub</span>
-                  <span className="text-[10px] text-zinc-500 font-mono mt-0.5">Push / PR Events</span>
-                </div>
-
-                {/* Integration Card 2 */}
-                <div className="rounded-xl bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.04] p-5 flex flex-col items-center justify-center text-center transition-all group cursor-pointer">
-                  <Gitlab className="w-8 h-8 text-zinc-400 group-hover:text-amber-500 group-hover:scale-105 transition-all mb-3.5" />
-                  <span className="text-[13px] font-bold text-white block">GitLab</span>
-                  <span className="text-[10px] text-zinc-500 font-mono mt-0.5">Commit Hooks</span>
-                </div>
-
-                {/* Integration Card 3 */}
-                <div className="rounded-xl bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.04] p-5 flex flex-col items-center justify-center text-center transition-all group cursor-pointer">
-                  <div className="w-8 h-8 bg-zinc-800 rounded-lg flex items-center justify-center mb-3.5">
-                    <span className="text-[13px] font-mono font-bold text-white">▲</span>
-                  </div>
-                  <span className="text-[13px] font-bold text-white block">Vercel</span>
-                  <span className="text-[10px] text-zinc-500 font-mono mt-0.5">Preview Dep Gates</span>
-                </div>
-
-                {/* Integration Card 4 */}
-                <div className="rounded-xl bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.04] p-5 flex flex-col items-center justify-center text-center transition-all group cursor-pointer">
-                  <div className="w-8 h-8 bg-[#4F9CF9]/10 rounded-lg flex items-center justify-center text-[#4F9CF9] mb-3.5">
-                    <Layers className="w-5 h-5 text-zinc-400 group-hover:text-[#4F9CF9] group-hover:scale-105 transition-all" />
-                  </div>
-                  <span className="text-[13px] font-bold text-white block">CI Platforms</span>
-                  <span className="text-[10px] text-zinc-500 font-mono mt-0.5">Webhook Trigger</span>
-                </div>
-
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-      </section>
-
-      {/* 6. Pricing Section */}
-      <section id="pricing" className="py-20 md:py-28 relative border-t border-white/[0.03] z-10 bg-[#070708]">
-        <div className="absolute top-0 right-1/4 w-[350px] h-[350px] rounded-full bg-[#4F9CF9]/3 blur-[120px] pointer-events-none" />
-        
-        <div className="max-w-5xl mx-auto px-6">
-          
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <span className="text-[11px] font-mono font-bold tracking-widest text-[#7C5CFF]/90 uppercase bg-[#7C5CFF]/10 border border-[#7C5CFF]/20 px-3 py-1 rounded-full">Transparent Pricing</span>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-white mt-4 tracking-tight leading-tight">Simple billing styled for scaling teams</h2>
-            <p className="text-[#A1A1A1] mt-3.5 text-sm md:text-base">Start for free, then scale boundaries dynamically as your release throughput multiplies.</p>
-
-            {/* Interval switch */}
-            <div className="flex items-center justify-center gap-3 mt-8">
-              <span className={`text-[13px] font-semibold transition-colors ${pricingInterval === 'monthly' ? 'text-white' : 'text-zinc-500'}`}>Monthly Billing</span>
-              <button 
-                onClick={() => setPricingInterval(pricingInterval === 'monthly' ? 'yearly' : 'monthly')}
-                className="w-12 h-6.5 rounded-full bg-white/[0.06] border border-white/[0.08] p-1 flex items-center transition-all cursor-pointer select-none"
-              >
-                <div className={`w-4.5 h-4.5 rounded-full bg-white transition-all transform ${pricingInterval === 'yearly' ? 'translate-x-5.5' : 'translate-x-0'}`} />
-              </button>
-              <div className="flex items-center gap-1.5">
-                <span className={`text-[13px] font-semibold transition-colors ${pricingInterval === 'yearly' ? 'text-white' : 'text-zinc-500'}`}>Annual Billing</span>
-                <span className="px-1.5 py-0.5 text-[10px] bg-emerald-500/15 text-emerald-400 rounded-md border border-emerald-500/20 font-bold leading-none uppercase">Save 20%</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-stretch">
-            
-            {/* TIER 1: Free */}
-            <div className="relative rounded-2xl bg-white/[0.02] border border-white/[0.05] p-6.5 hover:border-white/[0.1] transition-all flex flex-col justify-between">
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-[17px] font-bold text-white block">Developer Free</h3>
-                  <span className="text-zinc-500 text-[12px] block mt-1 leading-snug">Hobby, sandbox trials, and basic staging pipelines.</span>
-                </div>
-
-                <div className="flex items-baseline gap-1">
-                  <span className="text-[28px] font-mono font-bold text-white">$0</span>
-                  <span className="text-zinc-500 text-[12px] uppercase tracking-wider font-mono">/ lifetime</span>
-                </div>
-
-                <div className="w-full h-[1px] bg-white/[0.04]" />
-
-                <ul className="space-y-2.5 text-[13px] text-zinc-400 font-medium">
-                  <li className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-zinc-650" />
-                    <span>Up to 2 connected repositories</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-zinc-650" />
-                    <span>10 automated AI QA test runs / mo</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-zinc-650" />
-                    <span>Basic inline GitHub review reports</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-zinc-650" />
-                    <span>Main branch tracking</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="mt-8">
-                <a href="#sandbox" className="w-full block text-center py-2.5 text-xs font-semibold rounded-lg bg-white/[0.04] text-white border border-white/[0.08] hover:bg-white/[0.08] transition-all">
-                  Get Started for Free
-                </a>
-              </div>
-            </div>
-
-            {/* TIER 2: Pro (Accent focused) */}
-            <div className="relative rounded-2xl bg-white/[0.03] border-[#7C5CFF]/40 border-2 p-6.5 hover:shadow-[0_12px_40px_rgba(124,92,255,0.15)] transition-all flex flex-col justify-between">
-              <div className="absolute top-[-11px] left-1/2 -translate-x-1/2 px-3 py-0.5 bg-[#7C5CFF] text-white text-[10px] rounded-full font-mono font-bold uppercase tracking-wider shadow">Most Popular</div>
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-[17px] font-bold text-white block">Botly Pro</h3>
-                  <span className="text-zinc-400 text-[12px] block mt-1 leading-snug">Continuous delivery checks for active squads.</span>
-                </div>
-
-                <div className="flex items-baseline gap-1">
-                  <span className="text-[28px] font-mono font-bold text-white">
-                    {pricingInterval === 'monthly' ? '$49' : '$39'}
-                  </span>
-                  <span className="text-zinc-500 text-[12px] uppercase tracking-wider font-mono">/ month</span>
-                </div>
-
-                <div className="w-full h-[1px] bg-white/[0.04]" />
-
-                <ul className="space-y-2.5 text-[13px] text-zinc-300 font-medium">
-                  <li className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-[#7C5CFF]" />
-                    <span>Unlimited connected repositories</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-[#7C5CFF]" />
-                    <span>250 automated AI QA runs / mo</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-[#7C5CFF]" />
-                    <span>All staging / preview branch runs</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-[#7C5CFF]" />
-                    <span>Visual layout regression snapshot diffs</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-[#7C5CFF]" />
-                    <span>Priority email & Slack support</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="mt-8">
-                <a href="#sandbox" className="w-full block text-center py-2.5 text-xs font-semibold rounded-lg bg-[#7C5CFF] text-white hover:bg-[#6A47FF] hover:shadow-[0_0_15px_rgba(124,92,255,0.3)] transition-all">
-                  Trigger 14-Day Free Trial
-                </a>
-              </div>
-            </div>
-
-            {/* TIER 3: Enterprise */}
-            <div className="relative rounded-2xl bg-white/[0.02] border border-white/[0.05] p-6.5 hover:border-white/[0.1] transition-all flex flex-col justify-between">
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-[17px] font-bold text-white block">Enterprise Custom</h3>
-                  <span className="text-zinc-500 text-[12px] block mt-1 leading-snug">Deep compliance, high volume security gates.</span>
-                </div>
-
-                <div className="flex items-baseline gap-1">
-                  <span className="text-[28px] font-mono font-bold text-white">Custom</span>
-                  <span className="text-zinc-500 text-[12px] uppercase tracking-wider font-mono">/ volume</span>
-                </div>
-
-                <div className="w-full h-[1px] bg-white/[0.04]" />
-
-                <ul className="space-y-2.5 text-[13px] text-zinc-400 font-medium">
-                  <li className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-zinc-650" />
-                    <span>Unlimited AI E2E scenarios</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-zinc-650" />
-                    <span>Self-hosted chromium runner compatibility</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-zinc-650" />
-                    <span>SSO, SAML & fine-grained team controls</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-zinc-650" />
-                    <span>Dedicated engineer pairing audits</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-zinc-650" />
-                    <span>99.9% uptime SLA compliance contract</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="mt-8">
-                <a href="mailto:kenanekinci0@gmail.com?subject=BotlyHub Enterprise Quote Request" className="w-full block text-center py-2.5 text-xs font-semibold rounded-lg bg-white/[0.04] text-white border border-white/[0.08] hover:bg-white/[0.08] transition-all">
-                  Contact Custom Sales
-                </a>
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-      </section>
-
-      {/* FAQ Accordion Section */}
-      <section className="py-20 md:py-24 relative border-t border-white/[0.03] z-10 bg-[#0A0A0B]">
-        <div className="max-w-4xl mx-auto px-6">
-          
-          <div className="text-center mb-16">
-            <span className="text-[11px] font-mono font-bold tracking-widest text-[#4F9CF9] uppercase bg-[#4F9CF9]/10 border border-[#4F9CF9]/20 px-3 py-1 rounded-full">Dev Questions</span>
-            <h2 className="text-3xl font-extrabold text-white mt-4">Frequently Asked Questions</h2>
-          </div>
-
-          <div className="space-y-3">
-            {[
-              {
-                q: "How does BotlyHub write QA scenarios dynamically?",
-                a: "BotlyHub connects directly to your code changes. When you push, our platform parses the syntactic hierarchy of API endpoints, routing patterns, and schema files. Our proprietary LLM analyzes database queries and client request triggers to synthesize actual playwright-compatible chromium E2E scenarios on the spot."
-              },
-              {
-                q: "Do I need to maintain test file scripts in my repository?",
-                a: "No script maintenance is strictly required. While you can download our AI-generated Spec files manually and commit them as baseline integrations, BotlyHub naturally reads your repository changes, saves scripts in temporary virtual cache volumes, and validates endpoints on every deployment pipeline run."
-              },
-              {
-                q: "Is my repository source code safely managed?",
-                a: "Absolutely. BotlyHub adheres to the highest level of security hygiene. We never persist your codebase files permanently on servers. Files are read temporarily in isolated sandbox cache sandboxes, audited, and discarded immediately after E2E runs complete. All secret tokens are stored using AES-256 encryption."
-              },
-              {
-                q: "How does the deployment gate policy feature operate?",
-                a: "If you configure an integration target (like Vercel production branch deployments), BotlyHub intercepts staging build hooks. If any dynamic test pipeline audit returns critical or fatal errors, BotlyHub notifies git, blocks staging propagation gates securely, and halts premature traffic routing to production."
-              }
-            ].map((item, index) => {
-              const isOpen = !!faqOpen[index];
-              return (
-                <div key={index} className="rounded-xl bg-white/[0.02] border border-white/[0.05] transition-all overflow-hidden text-left">
-                  <button 
-                    onClick={() => setFaqOpen({ ...faqOpen, [index]: !isOpen })}
-                    className="w-full px-5 py-4 flex items-center justify-between text-[14px] font-bold text-white text-left hover:bg-white/[0.02] transition-colors"
-                  >
-                    <span>{item.q}</span>
-                    <ChevronDown className={`w-4 h-4 text-zinc-500 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
-                  </button>
-                  <AnimatePresence initial={false}>
-                    {isOpen && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <div className="px-5 pb-5 pt-1 text-[13.5px] text-[#A1A1A1] leading-relaxed border-t border-white/[0.03]">
-                          {item.a}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              );
-            })}
-          </div>
-
-        </div>
-      </section>
-
-      {/* CTA Bottom Banner Section */}
-      <section className="py-20 md:py-28 relative border-t border-white/[0.03] z-10 bg-gradient-to-b from-[#0A0A0B] to-[#0D0D10] text-center overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] rounded-full bg-[#7C5CFF]/5 blur-[125px] pointer-events-none" />
-        
-        <div className="max-w-3xl mx-auto px-6 space-y-8 relative z-10">
-          <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white mb-2 leading-tight font-sans">
-            Ready to secure your deployments?
-          </h2>
-          <p className="text-[#A1A1A1] text-sm md:text-base max-w-xl mx-auto leading-relaxed">
-            Plug BotlyHub AI QA directly into your staging pipeline flow today. 100% automated, no credit card required.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a href="#sandbox" className="w-full sm:w-auto px-6 py-3 rounded-xl bg-white text-black text-sm font-semibold hover:bg-zinc-200 active:scale-95 transition-all text-center">
-              Sign Up for Free
-            </a>
-            <button 
-              onClick={handleCopyCLI}
-              className="w-full sm:w-auto px-4.5 py-3 rounded-xl bg-white/[0.03] border border-white/[0.08] text-zinc-300 hover:text-white hover:bg-white/[0.06] text-sm font-mono flex items-center justify-center gap-2 transition-all"
-            >
-              <span>{cliCopied ? 'Copied CLI Command!' : 'npm i @botlyhub/cli'}</span>
-              {cliCopied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* MINIMAL FOOTER */}
-      <footer className="py-12 border-t border-white/[0.05] bg-[#09090A] z-10 relative">
-        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+        {/* TOP BAR BAR */}
+        <header className="h-16 border-b border-white/[0.06] bg-[#0E1321]/60 backdrop-blur-md sticky top-0 px-8 flex items-center justify-between z-30">
           
           <div className="flex items-center gap-3">
-            <div className="w-6 h-6 rounded bg-[#7C5CFF]/20 flex items-center justify-center border border-[#7C5CFF]/30">
-              <Bot className="w-3.5 h-3.5 text-[#7C5CFF]" />
-            </div>
-            <span className="text-[14px] font-bold text-white tracking-tight">
-              Botly<span className="text-[#7C5CFF]">Hub</span>
-            </span>
-            <span className="text-zinc-650 font-mono text-[11px]">© 2026 BotlyHub. All rights reserved.</span>
+            <span className="text-slate-400 text-xs font-semibold uppercase font-mono">Route</span>
+            <ChevronRight size={12} className="text-slate-600" />
+            <h1 className="text-sm font-extrabold capitalize text-white flex items-center gap-2">
+              <span>{currentTab === 'directory' ? 'Telegram Ecosystem Directory' : currentTab}</span>
+              <span className="w-2 h-2 rounded-full bg-[#2ED573] animate-pulse" />
+            </h1>
           </div>
 
-          <div className="flex items-center gap-6 text-[13px] text-zinc-500 font-medium">
-            <a href="#docs" className="hover:text-white transition-colors">Documentation</a>
-            <a href="https://github.com" target="_blank" rel="noreferrer" className="hover:text-white transition-colors flex items-center gap-1">
-              <Github className="w-3.5 h-3.5" /> Github
-            </a>
-            <a href="mailto:kenanekinci0@gmail.com" className="hover:text-white transition-colors">Contact Support</a>
-            <div className="flex items-center gap-1.5 font-mono text-[10.5px] bg-[#10B981]/10 text-emerald-400 border border-[#10B981]/15 px-2 py-0.5 rounded">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse"></span>
-              All systems online
+          <div className="flex items-center gap-4">
+            {/* Status Indicator */}
+            <div className="hidden md:flex items-center gap-2 bg-white/[0.02] border border-white/[0.05] px-3 py-1.5 rounded-lg text-[11px] font-mono text-slate-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#2ED573]" />
+              <span>TON Core: Connected</span>
             </div>
+
+            {/* Main Action CTAs */}
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="flex items-center gap-2 px-3.5 py-1.5 bg-[#6C5CE7] text-white rounded-lg text-xs font-bold hover:bg-[#5b4ed4] active:scale-95 transition-all shadow-md"
+            >
+              <Plus size={14} />
+              <span>Create New Bot</span>
+            </button>
+
+            {/* Back to MiniApp link */}
+            <button 
+              onClick={() => navigate('/search')}
+              className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors bg-white/[0.03] border border-white/[0.06] px-3 py-1.5 rounded-lg"
+            >
+              <ExternalLink size={12} />
+              <span>App Market</span>
+            </button>
           </div>
+
+        </header>
+
+        {/* WORKSPACE VIEW CONTROLLERS */}
+        <div className="flex-1 p-8">
+          
+          <AnimatePresence mode="wait">
+            
+            {/* 1. DASHBOARD VIEW STATE */}
+            {currentTab === 'dashboard' && (
+              <motion.div
+                key="dashboard"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2 }}
+                className="space-y-8"
+              >
+                {/* METRICS ROW */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  
+                  <div className="bg-[#0E1321] border border-white/[0.06] p-5 rounded-2xl flex items-center justify-between relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-[#6C5CE7]/5 rounded-full blur-xl group-hover:bg-[#6C5CE7]/10 transition-colors pointer-events-none" />
+                    <div>
+                      <span className="text-[11px] font-mono text-slate-400 font-bold uppercase tracking-wider block">Total Cloud Bots</span>
+                      <span className="text-3xl font-extrabold text-white mt-1 block tracking-tight">{cloudBots.length}</span>
+                      <span className="text-[10px] text-[#2ED573] font-semibold mt-1 inline-flex items-center gap-1">
+                        <span>● Global state stable</span>
+                      </span>
+                    </div>
+                    <div className="w-11 h-11 rounded-lg bg-[#6C5CE7]/15 border border-[#6C5CE7]/20 flex items-center justify-center text-[#6C5CE7]">
+                      <Bot size={20} />
+                    </div>
+                  </div>
+
+                  <div className="bg-[#0E1321] border border-white/[0.06] p-5 rounded-2xl flex items-center justify-between relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-[#2ED573]/5 rounded-full blur-xl group-hover:bg-[#2ED573]/10 transition-colors pointer-events-none" />
+                    <div>
+                      <span className="text-[11px] font-mono text-slate-400 font-bold uppercase tracking-wider block">Active Runtime</span>
+                      <span className="text-3xl font-extrabold text-white mt-1 block tracking-tight">{activeBotsCount}</span>
+                      <span className="text-[10px] text-slate-400 font-semibold mt-1 inline-block">
+                        {cloudBots.length - activeBotsCount} in hibernation
+                      </span>
+                    </div>
+                    <div className="w-11 h-11 rounded-lg bg-[#2ED573]/15 border border-[#2ED573]/20 flex items-center justify-center text-[#2ED573]">
+                      <Activity size={20} />
+                    </div>
+                  </div>
+
+                  <div className="bg-[#0E1321] border border-white/[0.06] p-5 rounded-2xl flex items-center justify-between relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-[#4F9CF9]/5 rounded-full blur-xl group-hover:bg-[#4F9CF9]/10 transition-colors pointer-events-none" />
+                    <div>
+                      <span className="text-[11px] font-mono text-slate-400 font-bold uppercase tracking-wider block">Total Executions</span>
+                      <span className="text-3xl font-extrabold text-white mt-1 block tracking-tight font-mono">{totalExecutions}</span>
+                      <span className="text-[10px] text-[#4F9CF9] font-mono font-semibold mt-1 inline-block">
+                        +22 within past hour
+                      </span>
+                    </div>
+                    <div className="w-11 h-11 rounded-lg bg-[#4F9CF9]/15 border border-[#4F9CF9]/20 flex items-center justify-center text-[#4F9CF9]">
+                      <Sliders size={20} />
+                    </div>
+                  </div>
+
+                  <div className="bg-[#0E1321] border border-white/[0.06] p-5 rounded-2xl flex items-center justify-between relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-[#2ED573]/5 rounded-full blur-xl group-hover:bg-[#2ED573]/10 transition-colors pointer-events-none" />
+                    <div>
+                      <span className="text-[11px] font-mono text-slate-400 font-bold uppercase tracking-wider block">AI Inference Success</span>
+                      <span className="text-3xl font-extrabold text-white mt-1 block tracking-tight font-mono">98.1%</span>
+                      <span className="text-[10px] text-[#2ED573] font-semibold mt-1 inline-block">
+                        Avg latency <span className="font-mono">84ms</span>
+                      </span>
+                    </div>
+                    <div className="w-11 h-11 rounded-lg bg-[#2ED573]/15 border border-[#2ED573]/20 flex items-center justify-center text-[#2ED573]">
+                      <CheckCircle2 size={20} />
+                    </div>
+                  </div>
+
+                </div>
+
+                {/* BOT GRID CONTAINER */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-base font-extrabold text-white tracking-tight">Ecosystem AI Core Bots</h3>
+                      <p className="text-xs text-slate-400 mt-1">Primary active automated logic controllers on BotlyHub SaaS pipeline</p>
+                    </div>
+                    <span className="text-[10.5px] font-mono font-bold text-[#6C5CE7] bg-[#6C5CE7]/10 border border-[#6C5CE7]/20 px-3 py-1 rounded-full uppercase">
+                      Select Bot Card To Edit Instructions
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
+                    {cloudBots.map((b) => (
+                      <div
+                        key={b.id}
+                        className={`bg-[#0E1321] border ${
+                          selectedBotId === b.id ? 'border-[#6C5CE7] ring-1 ring-[#6C5CE7]' : 'border-white/[0.06]'
+                        } cursor-pointer p-5 rounded-2xl relative flex flex-col justify-between group hover:bg-[#12192c] transition-all`}
+                        onClick={() => setSelectedBotId(b.id)}
+                      >
+                        <div>
+                          {/* Banner Top elements */}
+                          <div className="flex items-center justify-between mb-4">
+                            <span className="text-[10px] bg-white/[0.03] border border-white/[0.08] px-2.5 py-1 rounded-full uppercase tracking-wider font-mono text-slate-400 font-bold">
+                              {b.type}
+                            </span>
+                            
+                            <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                              <span className={`w-1.5 h-1.5 rounded-full ${
+                                b.status === 'Active' ? 'bg-[#2ED573]' : b.status === 'Idle' ? 'bg-[#F59E0B]' : 'bg-[#FF4757]'
+                              }`} />
+                              <span className="text-[10px] text-slate-400 font-bold font-mono">{b.status}</span>
+                            </div>
+                          </div>
+
+                          <h4 className="font-extrabold text-[14.5px] text-white tracking-tight leading-tight group-hover:text-[#6C5CE7] transition-colors">
+                            {b.name}
+                          </h4>
+                          <p className="text-[11.5px] text-slate-400 mt-2 line-clamp-2 h-8 min-h-[32px] leading-relaxed">
+                            {b.systemPrompt}
+                          </p>
+
+                          {/* Trigger tags */}
+                          <div className="flex items-center gap-2 mt-4" onClick={(e) => e.stopPropagation()}>
+                            <span className="text-[9.5px] font-mono bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded border border-blue-500/20">
+                              Trigger: {b.trigger}
+                            </span>
+                          </div>
+
+                          {/* Sparkline analytics summaries */}
+                          <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-white/[0.04] text-[10.5px]">
+                            <div>
+                              <span className="text-slate-500 block">Total Runs</span>
+                              <span className="font-extrabold text-white font-mono mt-0.5 block">{b.runCount}</span>
+                            </div>
+                            <div>
+                              <span className="text-slate-500 block">Success Rate</span>
+                              <span className="font-extrabold text-[#2ED573] font-mono mt-0.5 block">{b.successRate}%</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Control buttons footer */}
+                        <div className="grid grid-cols-2 gap-2 mt-5" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            onClick={() => runBotNow(b.id)}
+                            disabled={runningBotId !== null}
+                            className="bg-[#6C5CE7]/10 hover:bg-[#6C5CE7]/25 text-[#6C5CE7] border border-[#6C5CE7]/35 py-1.5 rounded-lg text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all disabled:opacity-40"
+                          >
+                            {runningBotId === b.id ? (
+                              <RefreshCw size={11} className="animate-spin" />
+                            ) : (
+                              <Play size={11} fill="currentColor" />
+                            )}
+                            <span>Run now</span>
+                          </button>
+
+                          <button
+                            onClick={() => handleToggleBot(b.id)}
+                            className="bg-white/[0.02] hover:bg-white/[0.05] text-slate-200 border border-white/[0.06] py-1.5 rounded-lg text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-all"
+                          >
+                            <Sliders size={11} />
+                            <span>{b.status === 'Active' ? 'Disable' : 'Enable'}</span>
+                          </button>
+                        </div>
+
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* BOTTOM HALF: ACTION AND FEED PANEL GRID */}
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-6 pt-2">
+                  
+                  {/* LIVE TELEMETRY LOGS ROW (8 Columns) */}
+                  <div className="md:col-span-8 bg-[#0E1321] border border-white/[0.06] p-6 rounded-2xl flex flex-col justify-between">
+                    <div className="flex items-center justify-between mb-4 border-b border-white/[0.04] pb-3">
+                      <div className="flex items-center gap-2.5">
+                        <Terminal size={16} className="text-[#6C5CE7]" />
+                        <span className="font-extrabold text-sm text-white tracking-tight">Active Core Telemetry Logs Stream</span>
+                      </div>
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#2ED573] animate-ping" />
+                    </div>
+
+                    <div className="bg-[#08080A] rounded-xl p-4 font-mono text-[11.5px] leading-relaxed overflow-y-auto h-64 border border-white/[0.04]">
+                      {terminalFeedLogs.length === 0 ? (
+                        <div className="text-slate-500 italic h-full flex items-center justify-center">
+                          Waiting for bot execution trigger outputs...
+                        </div>
+                      ) : (
+                        <div className="space-y-1.5">
+                          {terminalFeedLogs.map((log, idx) => (
+                            <div key={idx} className="flex flex-col md:flex-row md:items-start gap-1 md:gap-3 text-slate-300">
+                              <span className="text-slate-500 shrink-0 font-medium">[{log.time}]</span>
+                              <span className="text-[#6C5CE7] font-bold shrink-0">{log.botName}:</span>
+                              <span className={log.status === 'success' ? 'text-[#2ED573]' : log.status === 'error' ? 'text-[#FF4757]' : 'text-slate-200'}>
+                                {log.text}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between mt-4 text-[10.5px] text-slate-400">
+                      <span>Telemetry sampling rate: realtime (5-second intervals via state)</span>
+                      <button 
+                        onClick={() => setTerminalFeedLogs([])}
+                        className="text-[#6C5CE7] cursor-pointer hover:underline font-bold"
+                      >
+                        Clear console buffer
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* QUICK ACTION CONTROLLERS (4 Columns) */}
+                  <div className="md:col-span-4 bg-[#0E1321] border border-white/[0.06] p-6 rounded-2xl flex flex-col justify-between">
+                    <div>
+                      <h3 className="font-extrabold text-sm text-slate-200 tracking-tight">Ecosystem Quick Controls</h3>
+                      <p className="text-xs text-slate-500 mt-1 mb-4 leading-relaxed">Fast pipeline orchestration procedures with unified TON authorization</p>
+                      
+                      <div className="space-y-3">
+                        <button
+                          onClick={() => setIsCreateModalOpen(true)}
+                          className="w-full flex items-center justify-between p-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] border border-white/[0.05] transition-all text-left"
+                        >
+                          <div>
+                            <span className="text-slate-200 font-bold text-xs block">Spin Up New Bot Agent</span>
+                            <span className="text-[10px] text-slate-500">Custom System execution bounds</span>
+                          </div>
+                          <Plus size={16} className="text-slate-400" />
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            const template: CloudBot = {
+                              id: `template_${Date.now()}`,
+                              name: 'Anti-Spam Shield Proxy',
+                              type: 'QA',
+                              status: 'Active',
+                              lastRun: 'Never',
+                              successRate: 100,
+                              runCount: 0,
+                              systemPrompt: 'Autonomous parser to analyze textual chat chains in Telegram spaces and exclude dangerous token web links instantly.',
+                              testInput: 'Deploy Anti-Spam shield templates',
+                              memory: [],
+                              apiKey: 'sk_live_ton_template',
+                              trigger: 'Webhook'
+                            };
+                            setCloudBots(prev => [template, ...prev]);
+                            showToast('Successfully imported preset: "Anti-Spam Shield Proxy"!', 'success');
+                          }}
+                          className="w-full flex items-center justify-between p-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] border border-white/[0.05] transition-all text-left"
+                        >
+                          <div>
+                            <span className="text-slate-200 font-bold text-xs block">Import Presets</span>
+                            <span className="text-[10px] text-slate-500">Load system templates</span>
+                          </div>
+                          <Layers size={16} className="text-slate-400" />
+                        </button>
+
+                        <button
+                          onClick={() => showToast('Refreshed TON Wallet endpoint configurations.', 'info')}
+                          className="w-full flex items-center justify-between p-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] border border-white/[0.05] transition-all text-left"
+                        >
+                          <div>
+                            <span className="text-slate-200 font-bold text-xs block">Connect Webhook Router</span>
+                            <span className="text-[10px] text-slate-500">Fast external API sync channels</span>
+                          </div>
+                          <Zap size={15} className="text-slate-400" />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="mt-6 pt-4 border-t border-white/[0.04] flex items-center justify-between text-[11px] text-slate-400 font-mono">
+                      <span>Server status: HEALTHY</span>
+                      <span className="text-[#2ED573]">API v3.4</span>
+                    </div>
+                  </div>
+
+                </div>
+
+                {/* BOT DETAIL SLIDE-OVER CONTROL PANEL */}
+                <AnimatePresence>
+                  {selectedBotId && selectedBot && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="fixed inset-0 bg-[#070708]/80 backdrop-blur-sm z-50 flex justify-end"
+                      onClick={() => setSelectedBotId(null)}
+                    >
+                      <motion.div
+                        initial={{ x: '100%' }}
+                        animate={{ x: 0 }}
+                        exit={{ x: '100%' }}
+                        transition={{ type: 'spring', damping: 26, stiffness: 220 }}
+                        className="w-full max-w-xl bg-[#0E1321] border-l border-white/[0.1] h-full shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-y-auto flex flex-col justify-between"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {/* HEADER PART */}
+                        <div>
+                          <div className="p-6 border-b border-white/[0.06] flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <Bot size={22} className="text-[#6C5CE7]" />
+                              <div>
+                                <h3 className="text-base font-extrabold tracking-tight text-white mb-0.5">{selectedBot.name}</h3>
+                                <span className="text-[10.5px] font-mono text-slate-500 block uppercase font-bold">{selectedBot.id}</span>
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => setSelectedBotId(null)}
+                              className="w-8 h-8 rounded-lg bg-white/[0.03] border border-white/[0.08] flex items-center justify-center text-slate-400 hover:text-white transition-all hover:bg-white/[0.06]"
+                            >
+                              X
+                            </button>
+                          </div>
+
+                          {/* DETAILS INTERIOR TABS CONTROLLER */}
+                          <div className="flex border-b border-white/[0.04] px-4">
+                            {['overview', 'prompt', 'memory', 'logs'].map((t) => (
+                              <button
+                                key={t}
+                                onClick={() => setBotDetailActiveTab(t as any)}
+                                className={`px-4 py-3 text-xs capitalize font-bold transition-all border-b-2 ${
+                                  botDetailActiveTab === t 
+                                    ? 'border-[#6C5CE7] text-white' 
+                                    : 'border-transparent text-slate-400 hover:text-slate-200'
+                                }`}
+                              >
+                                {t}
+                              </button>
+                            ))}
+                          </div>
+
+                          {/* BODY TABS DETECTOR */}
+                          <div className="p-6 space-y-6">
+                            
+                            {/* OVERVIEW DATA PANEL */}
+                            {botDetailActiveTab === 'overview' && (
+                              <div className="space-y-4">
+                                
+                                <div className="grid grid-cols-2 gap-4">
+                                  <div className="bg-white/[0.02] border border-white/[0.04] p-3 rounded-xl font-mono text-xs">
+                                    <span className="text-slate-500 block text-[10px]">API Key Endpoint Auth</span>
+                                    <span className="text-slate-300 font-bold block mt-1 truncate">{selectedBot.apiKey}</span>
+                                  </div>
+                                  <div className="bg-white/[0.02] border border-white/[0.04] p-3 rounded-xl">
+                                    <span className="text-slate-500 block text-[10px]">Trigger Key Method</span>
+                                    <select
+                                      value={selectedBot.trigger}
+                                      onChange={(e) => {
+                                        const val = e.target.value as any;
+                                        setCloudBots(prev => prev.map(b => b.id === selectedBot.id ? { ...b, trigger: val } : b));
+                                        showToast('Pipeline trigger updated', 'success');
+                                      }}
+                                      className="bg-transparent text-white font-semibold text-xs mt-1 w-full border-0 focus:outline-none focus:ring-0 cursor-pointer p-0"
+                                    >
+                                      {['Manual', 'Webhook', 'Schedule'].map((tr) => (
+                                        <option key={tr} value={tr} className="bg-[#0E1321] text-white">{tr}</option>
+                                      ))}
+                                    </select>
+                                  </div>
+                                </div>
+
+                                <div className="bg-white/[0.02] border border-white/[0.04] p-4 rounded-xl space-y-3">
+                                  <h4 className="text-xs font-bold text-slate-300">Agent Performance Stats</h4>
+                                  <div className="grid grid-cols-3 gap-3 font-mono text-xs text-center">
+                                    <div className="p-2 border border-white/[0.04] rounded-lg">
+                                      <span className="text-slate-500 block text-[9.5px]">Runs Count</span>
+                                      <span className="text-white font-extrabold mt-1 block">{selectedBot.runCount}</span>
+                                    </div>
+                                    <div className="p-2 border border-white/[0.04] rounded-lg">
+                                      <span className="text-slate-500 block text-[9.5px]">Success Rate</span>
+                                      <span className="text-[#2ED573] font-extrabold mt-1 block">{selectedBot.successRate}%</span>
+                                    </div>
+                                    <div className="p-2 border border-white/[0.04] rounded-lg">
+                                      <span className="text-slate-500 block text-[9.5px]">Type Category</span>
+                                      <span className="text-blue-400 font-extrabold mt-1 block">{selectedBot.type}</span>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                  <label className="text-[11.5px] font-bold text-slate-400">Integration system Instructions Description</label>
+                                  <p className="text-xs bg-[#08080A] p-3 rounded-xl border border-white/[0.04] leading-relaxed text-slate-300">
+                                    {selectedBot.systemPrompt}
+                                  </p>
+                                </div>
+
+                              </div>
+                            )}
+
+                            {/* PROMPT EDITOR PANEL */}
+                            {botDetailActiveTab === 'prompt' && (
+                              <div className="space-y-4">
+                                <div className="space-y-2">
+                                  <label className="text-[11.5px] font-bold text-slate-400 flex items-center justify-between">
+                                    <span>System Prompt (Instructions)</span>
+                                    <span className="text-[10px] text-slate-500 font-mono">Changes apply to next API run</span>
+                                  </label>
+                                  <textarea
+                                    value={selectedBot.systemPrompt}
+                                    onChange={(e) => {
+                                      const val = e.target.value;
+                                      setCloudBots(prev => prev.map(b => b.id === selectedBot.id ? { ...b, systemPrompt: val } : b));
+                                    }}
+                                    className="w-full bg-[#08080A] rounded-xl border border-white/[0.06] text-slate-200 text-xs p-4 focus:outline-none focus:border-[#6C5CE7] transition-all min-h-[140px] leading-relaxed"
+                                    placeholder="Enter system prompt for AI instructions..."
+                                    rows={5}
+                                  />
+                                </div>
+
+                                <div className="space-y-2">
+                                  <label className="text-[11.5px] font-bold text-slate-400">Test Mock Input Data</label>
+                                  <input
+                                    type="text"
+                                    value={selectedBot.testInput}
+                                    onChange={(e) => {
+                                      const val = e.target.value;
+                                      setCloudBots(prev => prev.map(b => b.id === selectedBot.id ? { ...b, testInput: val } : b));
+                                    }}
+                                    className="w-full bg-[#08080A] rounded-xl border border-white/[0.06] text-slate-200 text-xs px-4 py-3 focus:outline-none focus:border-[#6C5CE7] transition-all"
+                                  />
+                                </div>
+
+                                <button
+                                  onClick={() => runBotNow(selectedBot.id)}
+                                  disabled={runningBotId !== null}
+                                  className="w-full py-3 rounded-xl bg-[#6C5CE7] text-white text-xs font-bold hover:bg-[#5b4ed4] transition-all flex items-center justify-center gap-2"
+                                >
+                                  {runningBotId === selectedBot.id ? (
+                                    <RefreshCw size={13} className="animate-spin" />
+                                  ) : (
+                                    <Play size={13} fill="currentColor" />
+                                  )}
+                                  <span>Save instruction & Run bot inference</span>
+                                </button>
+                              </div>
+                            )}
+
+                            {/* MEMORY DATABASE PANEL */}
+                            {botDetailActiveTab === 'memory' && (
+                              <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-xs font-bold text-slate-300">Knowledge Base Memory Vectors</span>
+                                  <button
+                                    onClick={() => {
+                                      const updatedMemory = [...selectedBot.memory, { key: 'added_resource_key', value: 'New database URL vector value limit' }];
+                                      setCloudBots(prev => prev.map(b => b.id === selectedBot.id ? { ...b, memory: updatedMemory } : b));
+                                      showToast('Memory key added', 'success');
+                                    }}
+                                    className="text-[10.5px] font-bold text-[#6C5CE7] hover:underline"
+                                  >
+                                    + Add New Key
+                                  </button>
+                                </div>
+
+                                {selectedBot.memory.length === 0 ? (
+                                  <p className="text-xs text-slate-500 italic py-4 text-center border border-dashed border-white/[0.05] rounded-xl">
+                                    No custom memory keys loaded in system database.
+                                  </p>
+                                ) : (
+                                  <div className="space-y-2.5">
+                                    {selectedBot.memory.map((mem, idx) => (
+                                      <div key={idx} className="flex items-center justify-between gap-3 bg-white/[0.02] border border-white/[0.04] p-3 rounded-xl text-xs">
+                                        <div className="flex flex-col min-w-0 flex-1">
+                                          <input
+                                            type="text"
+                                            value={mem.key}
+                                            onChange={(e) => {
+                                              const newKey = e.target.value;
+                                              const copy = [...selectedBot.memory];
+                                              copy[idx].key = newKey;
+                                              setCloudBots(prev => prev.map(b => b.id === selectedBot.id ? { ...b, memory: copy } : b));
+                                            }}
+                                            className="bg-transparent text-[#6C5CE7] font-bold border-0 p-0 focus:outline-none focus:ring-0 text-xs"
+                                          />
+                                          <input
+                                            type="text"
+                                            value={mem.value}
+                                            onChange={(e) => {
+                                              const newVal = e.target.value;
+                                              const copy = [...selectedBot.memory];
+                                              copy[idx].value = newVal;
+                                              setCloudBots(prev => prev.map(b => b.id === selectedBot.id ? { ...b, memory: copy } : b));
+                                            }}
+                                            className="bg-transparent text-slate-300 border-0 p-0 focus:outline-none focus:ring-0 text-xs mt-1"
+                                          />
+                                        </div>
+                                        <button
+                                          onClick={() => {
+                                            const copy = selectedBot.memory.filter((_, i) => i !== idx);
+                                            setCloudBots(prev => prev.map(b => b.id === selectedBot.id ? { ...b, memory: copy } : b));
+                                            showToast('Memory key purged', 'info');
+                                          }}
+                                          className="text-slate-500 hover:text-[#FF4757] transition-all p-1"
+                                        >
+                                          <Trash2 size={14} />
+                                        </button>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
+                            {/* EXECUTIONS TRACE LOGGER */}
+                            {botDetailActiveTab === 'logs' && (
+                              <div className="space-y-3">
+                                <span className="text-xs font-bold text-slate-300 block">Console output limits (terminal mode)</span>
+                                <div className="bg-[#08080A] rounded-xl p-4 font-mono text-[10.5px] border border-white/[0.04] h-[280px] overflow-y-auto space-y-2">
+                                  <p className="text-slate-500">[2026-05-22 22:18:45 UTC] Initiating background telemetry agent monitor...</p>
+                                  <p className="text-[#2ED573]">[2026-05-22 22:18:46 UTC] Successfully synced prompt instructions to cloud database.</p>
+                                  <p className="text-slate-300">[2026-05-22 22:18:47 UTC] Model inference token stream loaded, returned 125 generated parameters.</p>
+                                  <p className="text-[#F59E0B]">[2026-05-22 22:18:48 UTC] SSL Session keep-alive check... active OK</p>
+                                  <p className="text-slate-500">[2026-05-22 22:18:49 UTC] Diagnostic trace finished successfully with zero leaks detected.</p>
+                                </div>
+                              </div>
+                            )}
+
+                          </div>
+                        </div>
+
+                        {/* SLIDE FOOTER OPTIONS */}
+                        <div className="p-6 border-t border-white/[0.06] bg-[#0A0E18] flex items-center justify-between text-xs text-slate-500 font-mono">
+                          <span>Developer node sandbox</span>
+                          <span className="text-[#2ED573]">API Online</span>
+                        </div>
+
+                      </motion.div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+              </motion.div>
+            )}
+
+            {/* 2. BOTS & APPLICATIONS DECENTRALIZED DIRECTORY STATE */}
+            {currentTab === 'directory' && (
+              <motion.div
+                key="directory"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2 }}
+                className="space-y-6"
+              >
+                {/* DIRECTORY BRIEF INTRO */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/[0.05] pb-5">
+                  <div>
+                    <h2 className="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
+                      <Globe className="text-[#6C5CE7]" size={20} />
+                      <span>Telegram Mini-Apps & Bot Ecosystem Directory</span>
+                    </h2>
+                    <p className="text-xs text-slate-400 mt-1">
+                      Browse verified Telegram automation systems, utility toolsets, decentralized finance gateways, and AI agents
+                    </p>
+                  </div>
+
+                  {/* SEARCH DECK BAR */}
+                  <div className="relative w-full md:w-80">
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" size={14} />
+                    <input
+                      type="text"
+                      value={directorySearchQuery}
+                      onChange={(e) => setDirectorySearchQuery(e.target.value)}
+                      placeholder="Search general directory bots..."
+                      className="w-full bg-[#0E1321] border border-white/[0.07] rounded-xl pl-10 pr-4 py-2 text-xs text-slate-200 focus:outline-none focus:border-[#6C5CE7]"
+                    />
+                    {directorySearchQuery && (
+                      <button 
+                        onClick={() => setDirectorySearchQuery('')}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white"
+                      >
+                        X
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* CATEGORIES GRID ROWS BUTTONS */}
+                <div className="space-y-2">
+                  <span className="text-[10px] font-mono font-bold tracking-widest text-slate-500 uppercase px-1">Filter Directory by ecosystem category</span>
+                  
+                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2.5">
+                    {resolvedCategoryList.map((cat) => (
+                      <button
+                        key={cat.id}
+                        onClick={() => setSelectedDirectoryCategory(cat.id)}
+                        className={`p-3.5 rounded-xl text-left border text-xs transition-all flex flex-col justify-between select-none ${
+                          selectedDirectoryCategory === cat.id
+                            ? 'bg-gradient-to-br from-[#6C5CE7]/15 to-transparent border-[#6C5CE7] text-white shadow-md' 
+                            : 'bg-[#0E1321] border-white/[0.05] hover:border-white/[0.12] text-slate-300'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between w-full">
+                          <span className="font-extrabold text-[12.5px] truncate max-w-[120px]">{cat.displayName}</span>
+                          <span className={`w-1.5 h-1.5 rounded-full ${selectedDirectoryCategory === cat.id ? 'bg-[#6C5CE7]' : 'bg-transparent'}`} />
+                        </div>
+                        <span className="text-[10px] text-slate-500 mt-1.5 line-clamp-1">{cat.displayDesc}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* RESULTS OUTPUT CONTAINER COLUMNGRID */}
+                <div className="space-y-4 pt-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-mono font-bold text-slate-400">
+                      Query matches: {filteredDirectoryBots.length} active bot applications found
+                    </span>
+                    <button
+                      onClick={() => navigate('/search')}
+                      className="text-xs text-[#6C5CE7] hover:underline flex items-center gap-1.5 font-bold"
+                    >
+                      <span>Interactive Advanced Search Panel</span>
+                      <ArrowRight size={11} />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    {filteredDirectoryBots.map((bot) => (
+                      <div 
+                        key={bot.id}
+                        className="bg-[#0E1321]/80 border border-white/[0.06] rounded-2xl p-5 hover:bg-[#12192c] transition-all flex flex-col justify-between group"
+                      >
+                        <div>
+                          {/* Banner top details logo and price */}
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                              <img
+                                src={bot.icon}
+                                alt={bot.name}
+                                className="w-12 h-12 rounded-xl object-cover bg-slate-800 border border-white/[0.04]"
+                                onError={(e) => {
+                                  (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`;
+                                }}
+                              />
+                              <div>
+                                <h4 className="font-extrabold text-sm text-white group-hover:text-[#6C5CE7] transition-all truncate max-w-[160px]">
+                                  {bot.name}
+                                </h4>
+                                <span className="text-[10px] text-slate-500 font-mono">Dev: {bot.developer}</span>
+                              </div>
+                            </div>
+
+                            {/* PRICE TAG IN TON SCALE */}
+                            <div className="text-right">
+                              {bot.price > 0 ? (
+                                <div className="flex items-center gap-1.5 bg-[#6C5CE7]/15 border border-[#6C5CE7]/25 px-2.5 py-1 rounded-full text-[#6C5CE7] font-bold text-[10px] font-mono">
+                                  <Coins size={11} />
+                                  <span>{bot.price} TON</span>
+                                </div>
+                              ) : (
+                                <span className="text-[9.5px] font-mono font-bold bg-[#2ED573]/10 text-[#2ED573] border border-[#2ED573]/20 px-2 py-0.5 rounded uppercase">
+                                  Free Use
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Description text */}
+                          <p className="text-xs text-slate-400 leading-relaxed min-h-[50px] line-clamp-3 mb-4">
+                            {bot.description}
+                          </p>
+
+                          {/* Languages row */}
+                          <div className="flex flex-wrap gap-1.5 mb-4">
+                            {bot.languages.map((l: string, i: number) => (
+                              <span key={i} className="text-[9px] bg-white/[0.03] text-slate-400 px-2 py-0.5 rounded font-mono">
+                                {l}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Card bottom CTA launching anchors */}
+                        <div className="flex items-center justify-between pt-4 border-t border-white/[0.04] mt-4 text-[11px]">
+                          <div className="flex items-center gap-1.5 bg-yellow-500/10 border border-yellow-500/20 px-2 py-0.5 rounded text-yellow-500 font-bold">
+                            <Star size={11} className="fill-yellow-500 text-yellow-500" />
+                            <span>{bot.rating}</span>
+                          </div>
+                          
+                          <a
+                            href={bot.bot_link}
+                            target="_blank"
+                            referrerPolicy="no-referrer"
+                            className="bg-white text-black px-4 py-1.5 rounded-lg text-xs font-semibold hover:bg-zinc-200 active:scale-95 transition-all flex items-center gap-1.5"
+                          >
+                            <span>Open Telegram</span>
+                            <ExternalLink size={10} />
+                          </a>
+                        </div>
+
+                      </div>
+                    ))}
+                  </div>
+
+                  {filteredDirectoryBots.length === 0 && (
+                    <div className="text-center py-12 border border-dashed border-white/[0.05] rounded-2xl">
+                      <Bot size={35} className="text-slate-600 mx-auto mb-3" />
+                      <p className="text-sm font-bold text-slate-300">No directory matching found</p>
+                      <p className="text-xs text-slate-500 mt-1">Adjust search parameters or select a clean primary category</p>
+                      <button
+                        onClick={() => { setSelectedDirectoryCategory('all'); setDirectorySearchQuery(''); }}
+                        className="bg-[#6C5CE7]/15 text-[#6C5CE7] hover:bg-[#6C5CE7]/25 px-4 py-1.5 rounded-lg text-xs font-medium mt-4"
+                      >
+                        Reset All Filters
+                      </button>
+                    </div>
+                  )}
+
+                </div>
+              </motion.div>
+            )}
+
+            {/* 3. WORKFLOW BUILDER PAGE */}
+            {currentTab === 'workflows' && (
+              <motion.div
+                key="workflows"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2 }}
+                className="space-y-6"
+              >
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/[0.05] pb-5">
+                  <div>
+                    <h2 className="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
+                      <Workflow className="text-[#6C5CE7]" size={20} />
+                      <span>Visual Automation Automation Pipeline Nodes</span>
+                    </h2>
+                    <p className="text-xs text-slate-400 mt-1">
+                      Configure structured action nodes, data webhooks, and AI agent processing pipelines sequentially.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={runWorkflowSimulation}
+                      disabled={activeWorkflowRunning}
+                      className="px-4 py-2 rounded-xl bg-[#2ED573] text-[#0B0F17] hover:bg-[#26b15e] transition-all font-bold text-xs flex items-center gap-2 disabled:opacity-40"
+                    >
+                      <Play size={13} fill="currentColor" />
+                      <span>Execute Sequencer Pipeline</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* GRAPH NODES INTERACTION ENVIRONMENT */}
+                <div className="bg-[#08080A] rounded-2xl border border-white/[0.06] p-8 min-h-[400px] relative flex flex-col md:flex-row items-center justify-center gap-8 overflow-hidden">
+                  
+                  {/* Decorative mesh vector background elements */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#6C5CE7]/3 rounded-full blur-[120px] pointer-events-none" />
+
+                  {workflowNodes.map((node, index) => (
+                    <React.Fragment key={node.id}>
+                      
+                      {/* CONNECTING VECTOR VECTOR DRAWING LINES */}
+                      {index > 0 && (
+                        <div className="hidden md:flex items-center justify-center shrink-0">
+                          <div className={`h-0.5 w-12 border-t-2 border-dashed ${
+                            activeWorkflowRunning ? 'border-[#2ED573]' : 'border-white/[0.08]'
+                          } relative`}>
+                            <ChevronRight size={14} className={`absolute -right-2 top-1/2 -translate-y-1/2 ${
+                              activeWorkflowRunning ? 'text-[#2ED573] animate-pulse' : 'text-slate-600'
+                            }`} />
+                          </div>
+                        </div>
+                      )}
+
+                      {/* WORK FLOW NODE CARD */}
+                      <div className="w-64 bg-[#0E1321] border border-white/[0.07] rounded-2xl p-5 relative group hover:border-[#6C5CE7] transition-all shadow-xl">
+                        
+                        <div className="flex items-center justify-between mb-3">
+                          <span className={`text-[9.5px] font-mono px-2 py-0.5 rounded font-black uppercase text-xs ${
+                            node.status === 'running' ? 'bg-[#F59E0B]/10 text-[#F59E0B]' :
+                            node.status === 'success' ? 'bg-[#2ED573]/10 text-[#2ED573]' :
+                            'bg-white/[0.04] text-slate-400'
+                          }`}>
+                            {node.type}
+                          </span>
+
+                          <button
+                            onClick={() => deleteWorkflowNode(node.id)}
+                            className="p-1 opacity-0 group-hover:opacity-100 text-slate-500 hover:text-[#FF4757] transition-all"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+
+                        <h4 className="font-extrabold text-white text-xs tracking-tight">{node.name}</h4>
+                        <span className="text-[10px] font-mono text-slate-500 block mt-1">{node.subtype}</span>
+
+                        <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/[0.04] text-[10px]">
+                          <span className="text-slate-500 font-mono">Index Node #{index + 1}</span>
+                          <span className={`flex items-center gap-1 ${
+                            node.status === 'success' ? 'text-[#2ED573]' :
+                            node.status === 'running' ? 'text-[#F59E0B]' :
+                            'text-slate-400'
+                          }`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${
+                              node.status === 'success' ? 'bg-[#2ED573]' :
+                              node.status === 'running' ? 'bg-[#F59E0B] animate-ping' :
+                              'bg-slate-700'
+                            }`} />
+                            <span className="capitalize">{node.status}</span>
+                          </span>
+                        </div>
+
+                      </div>
+
+                    </React.Fragment>
+                  ))}
+
+                  {/* EMPTY PLACEHOLDER STYLING CONSOLE */}
+                  {workflowNodes.length === 0 && (
+                    <div className="text-center py-8">
+                      <Workflow size={40} className="text-slate-700 mx-auto mb-4" />
+                      <p className="text-sm font-bold text-slate-400">Your visual workflow pipeline is empty</p>
+                      <p className="text-xs text-slate-500 mt-1">Add Trigger and Action nodes above to define automate chains</p>
+                    </div>
+                  )}
+
+                </div>
+
+                {/* BOTTOM CHASSIS TO RECONSTRUCT NODES */}
+                <div className="bg-[#0E1321] border border-white/[0.06] p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4">
+                  <div className="space-y-0.5 max-w-xl text-left">
+                    <h4 className="font-bold text-slate-200 text-xs">Dynamic Node Constructor Builder</h4>
+                    <p className="text-slate-500 text-[11px] leading-relaxed">
+                      Inject procedural processing blocks directly into your active runtime pipeline graph. Connect webhooks to Gemini APIs instantly.
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => addWorkflowNode('Trigger')}
+                      className="px-3.5 py-2 rounded-xl bg-white/[0.03] border border-white/[0.06] text-xs font-semibold text-white hover:bg-white/[0.06] flex items-center gap-1.5"
+                    >
+                      <Plus size={14} className="text-[#6C5CE7]" />
+                      <span>+ Add Webhook Trigger</span>
+                    </button>
+                    <button
+                      onClick={() => addWorkflowNode('AI Processing')}
+                      className="px-3.5 py-2 rounded-xl bg-white/[0.03] border border-white/[0.06] text-xs font-semibold text-white hover:bg-white/[0.06] flex items-center gap-1.5"
+                    >
+                      <Plus size={14} className="text-[#6C5CE7]" />
+                      <span>+ Add AI Processor</span>
+                    </button>
+                    <button
+                      onClick={() => addWorkflowNode('Action')}
+                      className="px-3.5 py-2 rounded-xl bg-white/[0.03] border border-white/[0.06] text-xs font-semibold text-white hover:bg-white/[0.06] flex items-center gap-1.5"
+                    >
+                      <Plus size={14} className="text-[#6C5CE7]" />
+                      <span>+ Add Action Node</span>
+                    </button>
+                  </div>
+                </div>
+
+              </motion.div>
+            )}
+
+            {/* 4. PROMPT PLAYGROUND VIEW STATE */}
+            {currentTab === 'playground' && (
+              <motion.div
+                key="playground"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2 }}
+                className="grid grid-cols-1 md:grid-cols-12 gap-6"
+              >
+                
+                {/* SETTINGS PANEL (4 columns) */}
+                <div className="md:col-span-4 bg-[#0E1321] border border-white/[0.06] p-6 rounded-2xl space-y-6">
+                  <div>
+                    <h2 className="text-sm font-extrabold text-white tracking-tight">Agent Selection Config</h2>
+                    <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">Adjust inference keys and constraints to audit model outcomes</p>
+                  </div>
+
+                  <div className="space-y-4 text-left">
+                    <div className="space-y-2">
+                      <label className="text-[11.5px] font-bold text-slate-400">Select Sandbox Target Bot</label>
+                      <select
+                        value={playgroundSelectedBotId}
+                        onChange={(e) => setPlaygroundSelectedBotId(e.target.value)}
+                        className="w-full bg-[#08080A] rounded-xl border border-white/[0.06] p-3 text-xs text-slate-200 focus:outline-none focus:border-[#6C5CE7]"
+                      >
+                        {cloudBots.map((b) => (
+                          <option key={b.id} value={b.id}>{b.name} ({b.type})</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-[11px]">
+                        <label className="font-bold text-slate-400">Creativity Temperature</label>
+                        <span className="text-[#6C5CE7] font-mono font-bold">{playgroundTemp}</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="1.2"
+                        step="0.1"
+                        value={playgroundTemp}
+                        onChange={(e) => setPlaygroundTemp(parseFloat(e.target.value))}
+                        className="w-full accent-[#6C5CE7] h-1.5 bg-white/[0.06] rounded-lg appearance-none cursor-pointer"
+                      />
+                    </div>
+
+                    <div className="bg-white/[0.02] border border-white/[0.04] p-3 rounded-xl font-mono text-[10px] text-slate-500 space-y-1">
+                      <span className="text-[#6C5CE7] font-bold block">Inference Parameters:</span>
+                      <div>Model: Llama3-70B-Chat</div>
+                      <div>Timeout Limit: 12000ms</div>
+                      <div>System API: Active</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* PLAYGROUND EDITOR MAIN FIELD (8 columns) */}
+                <div className="md:col-span-8 bg-[#0E1321] border border-white/[0.06] p-6 rounded-2xl flex flex-col justify-between space-y-4">
+                  
+                  <div className="space-y-4 flex-1">
+                    <div className="flex items-center justify-between border-b border-white/[0.04] pb-3">
+                      <div className="flex items-center gap-2">
+                        <Code className="text-[#6C5CE7]" size={16} />
+                        <span className="font-extrabold text-[#EDEDED] text-sm tracking-tight">Editable System Instructions</span>
+                      </div>
+                      <span className="text-[10px] font-mono text-[#2ED573] bg-[#2ED573]/10 px-2 py-0.5 rounded font-bold uppercase">OpenAI Playground Style</span>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="space-y-2 text-left animate-fadeIn">
+                        <textarea
+                          value={playgroundInstruction}
+                          onChange={(e) => setPlaygroundInstruction(e.target.value)}
+                          className="w-full bg-[#08080A] rounded-xl border border-white/[0.06] text-slate-300 font-mono text-xs p-4 focus:outline-none focus:border-[#6C5CE7] leading-relaxed min-h-[140px]"
+                          placeholder="Your system instructions define the voice and behavior of the agent..."
+                        />
+                      </div>
+
+                      <div className="space-y-2 text-left">
+                        <label className="text-[11.5px] font-bold text-slate-400">Simulated User Input Prompt</label>
+                        <input
+                          type="text"
+                          value={playgroundPromptInput}
+                          onChange={(e) => setPlaygroundPromptInput(e.target.value)}
+                          className="w-full bg-[#08080A] rounded-xl border border-white/[0.06] text-slate-200 text-xs px-4 py-3 focus:outline-none focus:border-[#6C5CE7]"
+                          placeholder="Type input questions to test model reactions..."
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* STREAM OUTPUT OUTPUT TERMINAL */}
+                  <div className="bg-[#08080A] rounded-xl border border-white/[0.04] p-4 font-mono text-xs leading-relaxed min-h-[140px]">
+                    <span className="text-slate-500 block mb-2 border-b border-white/[0.03] pb-1 font-bold">// Model stream telemetry outputs:</span>
+                    {playgroundOutputText ? (
+                      <pre className="text-slate-200 whitespace-pre-wrap font-sans text-xs">{playgroundOutputText}</pre>
+                    ) : (
+                      <span className="text-slate-600 italic">No output. Press "Submit Pipeline query" below to simulate stream tokens.</span>
+                    )}
+                  </div>
+
+                  <button
+                    onClick={handleRunPlayground}
+                    disabled={isPlaygroundInference}
+                    className="w-full bg-[#6C5CE7] hover:bg-[#5b4ed4] text-white py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all disabled:opacity-40"
+                  >
+                    {isPlaygroundInference ? (
+                      <RefreshCw size={14} className="animate-spin" />
+                    ) : (
+                      <Sparkles size={14} fill="currentColor" />
+                    )}
+                    <span>Submit Playground Query & Trace Outputs</span>
+                  </button>
+
+                </div>
+
+              </motion.div>
+            )}
+
+            {/* 5. PERFORMANCE ANALYTICS VIEW STATE */}
+            {currentTab === 'analytics' && (
+              <motion.div
+                key="analytics"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2 }}
+                className="space-y-6"
+              >
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                  <div className="bg-[#0E1321] border border-white/[0.06] p-5 rounded-2xl">
+                    <span className="text-slate-400 text-xs font-mono block">Active Platform Uptime</span>
+                    <span className="text-3xl font-extrabold text-[#2ED573] mt-2 block font-mono">{analyticsStats.uptime}</span>
+                    <p className="text-[10px] text-slate-500 mt-2">Aggregated across all server relay zones</p>
+                  </div>
+                  <div className="bg-[#0E1321] border border-white/[0.06] p-5 rounded-2xl">
+                    <span className="text-slate-400 text-xs font-mono block">Average Inference Latency</span>
+                    <span className="text-3xl font-extrabold text-[#4F9CF9] mt-2 block font-mono">{analyticsStats.latency}</span>
+                    <p className="text-[10px] text-slate-500 mt-2">Measured at browser WebSocket ingress</p>
+                  </div>
+                  <div className="bg-[#0E1321] border border-white/[0.06] p-5 rounded-2xl">
+                    <span className="text-slate-400 text-xs font-mono block">Platform Shard Storage Allocation</span>
+                    <span className="text-3xl font-extrabold text-white mt-2 block font-mono">{analyticsStats.databaseUsage}</span>
+                    <p className="text-[10px] text-slate-500 mt-2">Vector listings capacity utilization</p>
+                  </div>
+                </div>
+
+                {/* GRAPH VISUAL CHART BLOCK */}
+                <div className="bg-[#0E1321] border border-white/[0.06] p-6 rounded-2xl">
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <h3 className="font-extrabold text-sm text-white tracking-tight">API Request Metrics History</h3>
+                      <p className="text-xs text-slate-500 mt-1">Inference transactions and latencies logged over the past week</p>
+                    </div>
+                    <span className="text-[10.5px] font-mono text-[#6C5CE7] bg-[#6C5CE7]/15 px-3 py-1 rounded-full uppercase border border-[#6C5CE7]/25 font-bold">
+                      Ecosystem live tracking
+                    </span>
+                  </div>
+
+                  {/* SVG COMPREHENSIVE BAR CHART FOR SYSTEM */}
+                  <div className="h-64 flex items-end justify-between gap-4 pt-4 border-b border-white/[0.05] relative px-4 text-center">
+                    {/* Background target grid lines */}
+                    <div className="absolute top-1/4 left-0 right-0 border-t border-white/[0.02]" />
+                    <div className="absolute top-2/4 left-0 right-0 border-t border-white/[0.02]" />
+                    <div className="absolute top-3/4 left-0 right-0 border-t border-white/[0.02]" />
+
+                    {analyticsStats.usageHistory.map((day, idx) => {
+                      const maxRequests = 550;
+                      const heightPercent = `${(day.requests / maxRequests) * 100}%`;
+                      return (
+                        <div key={idx} className="flex-1 flex flex-col items-center gap-2 h-full justify-end z-10 group relative">
+                          <div className="opacity-0 group-hover:opacity-100 absolute -top-12 bg-[#0E1321] border border-white/[0.1] px-2.5 py-1.5 rounded text-[10px] font-mono text-[#6C5CE7] transition-all whitespace-nowrap shadow-lg">
+                            <span className="font-extrabold text-white">{day.requests} Req</span> / {day.latency}ms latency
+                          </div>
+
+                          <div 
+                            className="bg-gradient-to-t from-[#6C5CE7] to-[#4F9CF9] w-full rounded-t-lg transition-all group-hover:from-[#6C5CE7] group-hover:to-[#2ED573]" 
+                            style={{ height: heightPercent }}
+                          />
+                          <div className="text-[10px] font-mono text-slate-500 block shrink-0 mt-3">{day.date}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                </div>
+
+              </motion.div>
+            )}
+
+            {/* 6. SYSTEM TELEMETRY LOGS VIEW STATE */}
+            {currentTab === 'telemetry' && (
+              <motion.div
+                key="telemetry"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2 }}
+                className="space-y-4"
+              >
+                
+                <div className="bg-[#0E1321] border border-white/[0.06] p-6 rounded-2xl space-y-4">
+                  
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/[0.04] pb-4">
+                    <div className="space-y-0.5">
+                      <h3 className="font-extrabold text-sm text-slate-200 tracking-tight">Ecosystem Diagnostic Console Logs</h3>
+                      <p className="text-slate-500 text-xs">Filter real-time and operational status queries registered in BotlyHub telemetry</p>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        setTerminalFeedLogs([]);
+                        showToast('Telemetry diagnostics storage reset', 'success');
+                      }}
+                      className="text-xs font-bold text-[#FF4757] hover:underline cursor-pointer"
+                    >
+                      Reset Telemetry Dump
+                    </button>
+                  </div>
+
+                  <div className="bg-[#08080A] rounded-2xl border border-white/[0.05] p-5 font-mono text-[11px] leading-relaxed h-[420px] overflow-y-auto space-y-1.5">
+                    <div className="text-slate-500 font-bold mb-3">// Telemetry dump initialisation sequence: UTC+0 active</div>
+                    <div className="text-[#2ED573]">● SUCCESS (200) API keys decrypted. Pipeline state matched with secure gateway servers.</div>
+                    
+                    {terminalFeedLogs.map((log, idx) => (
+                      <div key={idx} className="flex flex-col md:flex-row md:items-start gap-1 md:gap-3 text-slate-300">
+                        <span className="text-slate-500">[{log.time}]</span>
+                        <span className="text-[#6C5CE7] font-bold">{log.botName}:</span>
+                        <span className={log.status === 'success' ? 'text-[#2ED573]' : log.status === 'error' ? 'text-[#FF4757]' : 'text-slate-200'}>
+                          {log.text}
+                        </span>
+                      </div>
+                    ))}
+                    
+                    <div className="text-slate-500 pt-2">... Listening continuously for next execution transaction ...</div>
+                  </div>
+
+                </div>
+
+              </motion.div>
+            )}
+
+          </AnimatePresence>
 
         </div>
-      </footer>
+
+      </main>
+
+      {/* CREATE BOT MODAL SCREEN */}
+      <AnimatePresence>
+        {isCreateModalOpen && (
+          <div className="fixed inset-0 bg-[#070708]/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-lg bg-[#0E1321] border border-white/[0.1] rounded-2xl overflow-hidden shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-6 border-b border-white/[0.06] flex items-center justify-between">
+                <span className="font-extrabold text-[#EDEDED] text-sm tracking-tight flex items-center gap-2">
+                  <Bot size={17} className="text-[#6C5CE7]" />
+                  <span>Spin Up New Cloud Bot Agent</span>
+                </span>
+                <button
+                  onClick={() => setIsCreateModalOpen(false)}
+                  className="text-slate-400 hover:text-white"
+                >
+                  X
+                </button>
+              </div>
+
+              <form onSubmit={handleCreateBot} className="p-6 space-y-4">
+                <div className="space-y-2">
+                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Bot Agent Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={newBotName}
+                    onChange={(e) => setNewBotName(e.target.value)}
+                    placeholder="e.g., TranslatorBot Master"
+                    className="w-full bg-[#08080A] rounded-xl border border-white/[0.07] px-4 py-3 text-xs text-white focus:outline-none focus:border-[#6C5CE7]"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Operational Category</label>
+                  <select
+                    value={newBotType}
+                    onChange={(e) => setNewBotType(e.target.value as any)}
+                    className="w-full bg-[#08080A] rounded-xl border border-white/[0.07] p-3 text-xs text-slate-300 focus:outline-none focus:border-[#6C5CE7]"
+                  >
+                    {['Support', 'Automation', 'QA', 'Assistant'].map((t) => (
+                      <option key={t} value={t}>{t} Bot Agent</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Initial System Prompt (AI Instructions)</label>
+                  <textarea
+                    value={newBotPrompt}
+                    onChange={(e) => setNewBotPrompt(e.target.value)}
+                    placeholder="Write custom prompt commands to define AI memory..."
+                    rows={4}
+                    className="w-full bg-[#08080A] rounded-xl border border-white/[0.07] p-4 text-xs text-white focus:outline-none focus:border-[#6C5CE7] leading-relaxed font-mono"
+                  />
+                </div>
+
+                <div className="flex justify-end gap-3 pt-4 border-t border-white/[0.04]">
+                  <button
+                    type="button"
+                    onClick={() => setIsCreateModalOpen(false)}
+                    className="px-4 py-2 border border-white/[0.07] hover:bg-white/[0.03] text-slate-300 rounded-xl text-xs font-semibold"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2.5 bg-[#6C5CE7] hover:bg-[#5b4ed4] text-white rounded-xl text-xs font-bold transition-all shadow-md"
+                  >
+                    Provision Agent
+                  </button>
+                </div>
+              </form>
+
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* TOAST NOTIFIERS LAYER */}
+      <div className="fixed bottom-6 right-6 space-y-2.5 z-50 pointer-events-none">
+        {toasts.map((t) => (
+          <motion.div
+            key={t.id}
+            initial={{ opacity: 0, y: 15, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className={`w-80 p-3.5 rounded-xl border shadow-[0_4px_16px_rgba(0,0,0,0.5)] pointer-events-auto flex items-center justify-between ${
+              t.type === 'error' ? 'bg-[#FF4757]/10 border-[#FF4757]/20 text-[#FF4757]' : 
+              t.type === 'info' ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' :
+              'bg-[#2ED573]/10 border-[#2ED573]/20 text-[#2ED573]'
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <span className={`w-1.5 h-1.5 rounded-full ${
+                t.type === 'error' ? 'bg-[#FF4757]' : t.type === 'info' ? 'bg-blue-400' : 'bg-[#2ED573]'
+              }`} />
+              <span className="text-[11.5px] font-semibold text-[#EDEDED]">{t.message}</span>
+            </div>
+            <button 
+              onClick={() => setToasts(prev => prev.filter(item => item.id !== t.id))}
+              className="text-slate-500 hover:text-white text-xs pl-2"
+            >
+              X
+            </button>
+          </motion.div>
+        ))}
+      </div>
 
     </div>
   );
