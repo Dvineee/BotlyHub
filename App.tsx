@@ -165,10 +165,10 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
     return () => tg.BackButton.offClick(handleBack);
   }, [location.pathname, navigate, isAdminPath]);
 
-  const hideBottomNav = isPanelPath || location.pathname.includes('/bot/') || location.pathname.includes('/payment/') || location.pathname.includes('/bot-panel/') || location.pathname.startsWith('/qa') || location.pathname.startsWith('/blog');
+  const hideBottomNav = isPanelPath || location.pathname === '/' || location.pathname.includes('/bot/') || location.pathname.includes('/payment/') || location.pathname.includes('/bot-panel/') || location.pathname.startsWith('/qa') || location.pathname.startsWith('/blog');
 
   return (
-    <div className={`${isPanelPath ? 'dark bg-slate-950' : 'bg-slate-50 dark:bg-slate-950'} flex flex-col min-h-screen transition-colors duration-300`}>
+    <div className={`${isPanelPath || location.pathname === '/' ? 'dark bg-[#0A0A0A]' : 'bg-slate-50 dark:bg-slate-950'} flex flex-col min-h-screen transition-colors duration-300`}>
       {isMaintenance && !isAdminPath ? (
         <Maintenance />
       ) : isRestricted && !isAdminPath ? (
@@ -178,7 +178,7 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
           {children}
           {!isPanelPath && !isMaintenance && !isRestricted && (
             <>
-              <Footer />
+              {location.pathname !== '/' && <Footer />}
               {!hideBottomNav && <BottomNav />}
             </>
           )}

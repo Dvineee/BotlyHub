@@ -1,2762 +1,1269 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  motion, 
+  AnimatePresence 
+} from 'motion/react';
+import { 
+  Terminal, 
+  GitBranch, 
+  Cpu, 
+  Workflow, 
+  Bot, 
+  CheckCircle2, 
+  XCircle, 
+  AlertTriangle, 
+  GitPullRequest, 
+  Zap, 
+  Layers, 
+  Play, 
+  Code, 
+  ArrowRight, 
+  ExternalLink, 
+  ShieldCheck, 
+  Activity,
+  Maximize2,
+  RefreshCw,
+  Copy,
+  Check,
+  Search,
+  ChevronDown,
+  Lock,
+  MessageSquare
+} from 'lucide-react';
 
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Search, ChevronLeft, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, Send, Link, CheckCircle2, ChevronDown, Sun, Moon, Wallet, Menu, Plus, LogOut, Compass, Coins, BarChart3, Binoculars, Share2, Briefcase, MousePointer2, ExternalLink, ArrowUpRight, ArrowLeft, MessageSquare, SlidersHorizontal, Sliders, Settings } from 'lucide-react';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
-import { motion, AnimatePresence } from 'motion/react';
-import { Bot, Announcement, Notification, BlogPost } from '../types';
-import { categories, appsSubCategories } from '../data';
-import { useTranslation } from '../TranslationContext';
-import { DatabaseService } from '../services/DatabaseService';
-import PriceService from '../services/PriceService';
-import { useTelegram } from '../hooks/useTelegram';
-import { useDraggableScroll } from '../hooks/useDraggableScroll';
-import { useFilter } from '../FilterContext';
-import { FilterMenu } from '../components/FilterMenu';
-import { useTheme } from '../ThemeContext';
-import Logo from '../components/Logo';
-import { SEO } from '../components/SEO';
-import LoginModal from '../components/LoginModal';
-
-const iconMap: Record<string, any> = {
-  Sparkles, Megaphone, Zap, Gift, Star, Info, BotIcon, Heart, Bell, Shield
-};
-
-const getLiveBotIcon = (bot: Bot) => {
-    if (bot.bot_link) {
-        const username = bot.bot_link.replace('@', '').replace('https://t.me/', '').split('/').pop()?.trim();
-        if (username) return `https://t.me/i/userpic/320/${username}.jpg`;
-    }
-    return bot.icon || `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=random&color=fff`;
-};
-
-
-
-const StarSVG = React.memo(({ className, size = 24 }: { className?: string, size?: number }) => (
-  <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
-    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+const Github = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+    <path d="M9 18c-4.51 2-5-2-7-2" />
   </svg>
-));
-
-const StarVisual = React.memo(() => (
-  <div className="absolute right-[-15px] sm:right-[-6px] top-1/2 -translate-y-1/2 w-[160px] h-[160px] sm:w-[180px] sm:h-[180px] flex items-center justify-center pointer-events-none select-none overflow-visible">
-    <div className="absolute inset-0 rounded-full blur-2xl opacity-60 pointer-events-none animate-pulse" style={{ background: 'radial-gradient(circle, rgba(245,158,11,0.25) 0%, transparent 70%)' }} />
-    
-    <div className="absolute -translate-x-12 -translate-y-2 scale-75 -rotate-12 text-amber-300 dark:text-amber-500/40 opacity-70 group-hover:scale-80 transition-transform duration-500">
-      <StarSVG size={45} />
-    </div>
-
-    <div className="absolute translate-x-14 translate-y-4 scale-60 rotate-[22deg] text-amber-300 dark:text-amber-500/30 opacity-60">
-      <StarSVG size={40} />
-    </div>
-
-    <div className="absolute z-10 scale-100 rotate-6 text-[#ffaf02] drop-shadow-[0_8px_20px_rgba(245,158,11,0.4)] group-hover:scale-105 group-hover:rotate-[12deg] transition-all duration-500">
-      <StarSVG size={85} />
-    </div>
-
-    <div className="absolute -translate-x-12 translate-y-12 text-amber-400/90 scale-75 animate-bounce duration-[3000ms]">
-      <StarSVG size={14} />
-    </div>
-    <div className="absolute translate-x-10 -translate-y-12 text-amber-400 opacity-95">
-      <StarSVG size={16} />
-    </div>
-
-    <div className="absolute z-20 translate-x-[24px] translate-y-[20px] bg-[#ff3b30] text-white text-[11px] font-black px-2.5 py-0.5 rounded-full shadow-lg shadow-red-500/40 rotate-[8deg] tracking-tight">
-      -30%
-    </div>
-  </div>
-));
-
-const TonCoin = React.memo(({ className, size = 48 }: { className?: string, size?: number }) => (
-  <div className={`relative flex items-center justify-center rounded-full bg-gradient-to-br from-[#2f80ed] to-[#0088cc] shadow-xl text-white border border-white/20 select-none ${className}`} style={{ width: size, height: size }}>
-    <svg width={size * 0.55} height={size * 0.55} viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="11" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M50 85 L15 35 L85 35 Z" fill="none" />
-      <path d="M50 35 L50 85" />
-    </svg>
-  </div>
-));
-
-const TonVisual = React.memo(() => (
-  <div className="absolute right-[-15px] sm:right-[-6px] top-1/2 -translate-y-1/2 w-[160px] h-[160px] sm:w-[180px] sm:h-[180px] flex items-center justify-center pointer-events-none select-none overflow-visible">
-    <div className="absolute inset-0 rounded-full blur-2xl opacity-60 pointer-events-none animate-pulse" style={{ background: 'radial-gradient(circle, rgba(56,189,248,0.25) 0%, transparent 70%)' }} />
-    
-    <div className="absolute z-10 translate-x-5 translate-y-14 rotate-[-30deg] scale-90 shadow-xl opacity-90 group-hover:translate-y-12 transition-all duration-500">
-      <TonCoin size={50} />
-    </div>
-
-    <div className="absolute z-20 -translate-x-4 -translate-y-4 rotate-[15deg] scale-115 drop-shadow-[0_8px_20px_rgba(47,128,237,0.4)] group-hover:scale-120 group-hover:rotate-[20deg] transition-all duration-500">
-      <TonCoin size={58} />
-    </div>
-
-    <div className="absolute z-0 translate-x-12 -translate-y-8 rotate-[35deg] scale-75 opacity-60 group-hover:-translate-y-10 transition-all duration-500">
-      <TonCoin size={42} />
-    </div>
-
-    <div className="absolute -translate-x-14 translate-y-6 text-sky-400 scale-75">
-      <StarSVG size={18} />
-    </div>
-    <div className="absolute translate-x-12 translate-y-8 text-amber-300 scale-90">
-      <StarSVG size={16} />
-    </div>
-    <div className="absolute translate-x-4 -translate-y-14 text-amber-400 scale-75 animate-bounce">
-      <StarSVG size={12} />
-    </div>
-  </div>
-));
-
-const CloverVisual = React.memo(() => (
-  <div className="absolute right-[-15px] sm:right-[-6px] top-1/2 -translate-y-1/2 w-[160px] h-[160px] sm:w-[180px] sm:h-[180px] flex items-center justify-center pointer-events-none select-none overflow-visible">
-    <div className="absolute inset-0 rounded-full blur-2xl opacity-60 pointer-events-none animate-pulse" style={{ background: 'radial-gradient(circle, rgba(52,199,89,0.25) 0%, transparent 70%)' }} />
-    
-    <div className="absolute z-10 w-[95px] h-[95px] sm:w-[105px] sm:h-[105px] rounded-full bg-gradient-to-tr from-[#34c759] to-[#2eb850] flex items-center justify-center shadow-2xl border-4 border-white dark:border-slate-800 drop-shadow-[0_12px_24px_rgba(52,199,89,0.35)] group-hover:scale-105 group-hover:rotate-[8deg] transition-all duration-500">
-      <svg width="52" height="52" viewBox="0 0 24 24" fill="currentColor" className="text-white">
-        <path d="M12 9c.5-1.5 2-2.5 3.5-2.5s2.5 1 2.5 2.5c0 1.5-1 3-2.5 3.5C14 13 12.5 12 12 9zm0 6c-.5 1.5-2 2.5-3.5 2.5S6 16.5 6 15c0-1.5 1-3 2.5-3.5 1.5-.5 3 .5 3.5 3.5zm0-6c-.5-1.5-2-2.5-3.5-2.5S6 7.5 6 9c0 1.5 1 3 2.5 3.5 1.5.5 3-.5 3.5-3.5zm0 6c.5 1.5 2 2.5 3.5 2.5s2.5-1 2.5-2.5c0-1.5-1-3-2.5-3.5-1.5-.5-3 .5-3.5 3.5z" />
-        <path d="M12 12c.5 1.5 1 3.5.5 5.5-.5 2-1.5 3.5-2.5 4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-      </svg>
-    </div>
-
-    <div className="absolute -translate-x-14 -translate-y-8 text-[#34c759] opacity-80">
-      <StarSVG size={18} />
-    </div>
-    <div className="absolute translate-x-14 translate-y-8 text-emerald-400 opacity-80">
-      <StarSVG size={16} />
-    </div>
-    <div className="absolute translate-x-14 -translate-y-10 text-emerald-300 opacity-60">
-      <StarSVG size={12} />
-    </div>
-    <div className="absolute -translate-x-10 translate-y-12 text-[#248a3d] opacity-80 animate-bounce">
-      <StarSVG size={14} />
-    </div>
-  </div>
-));
-
-export const visualPromos: Announcement[] = [];
-
-const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) => void }> = React.memo(({ ann, onShowPopup }) => {
-  const navigate = useNavigate();
-  const { haptic } = useTelegram();
-  const { t } = useTranslation();
-
-  const handleAction = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    haptic('light');
-    
-    try {
-        await DatabaseService.incrementPromotionClick(ann.id);
-    } catch (err) {
-        console.warn("Click tracking error:", err);
-    }
-
-    if (ann.action_type === 'popup') onShowPopup(ann);
-    else {
-        let link = ann.button_link;
-        if (!link) return;
-        if (link.startsWith('@')) window.location.href = `https://t.me/${link.substring(1)}`;
-        else if (link.startsWith('http')) window.location.href = link;
-        else if (link.startsWith('/')) navigate(link);
-        else window.location.href = `https://t.me/${link.replace('@','')}`;
-    }
-  };
-
-  const isStars = ann.id === 'promo-stars' || ann.icon_name === 'stars' || ann.title.toLowerCase().includes('stars');
-  const isTon = ann.id === 'promo-ton' || ann.icon_name === 'ton' || ann.title.toLowerCase().includes('ton');
-  const isClover = ann.id === 'promo-clover' || ann.icon_name === 'clover' || ann.title.toLowerCase().includes('clover') || ann.title.toLowerCase().includes('gift') || ann.description.toLowerCase().includes('gift') || ann.description.toLowerCase().includes('lucky buy');
-
-  let cardBgClass = "bg-[#f4f7f5] dark:bg-[#1a231d] border-[#e5ece8]/50 dark:border-white/5";
-  let btnClass = "bg-[#34c759] hover:bg-[#2eb850] text-white shadow-emerald-500/10";
-
-  if (isStars) {
-    cardBgClass = "bg-[#fbf7ee] dark:bg-[#201d16] border-[#f3eccf]/50 dark:border-white/5";
-    btnClass = "bg-[#ff9f0a] hover:bg-[#e08a00] text-white shadow-orange-500/10";
-  } else if (isTon) {
-    cardBgClass = "bg-[#f1f6fb] dark:bg-[#151c24] border-[#e3ebf4]/50 dark:border-white/5";
-    btnClass = "bg-[#2f80ed] hover:bg-[#1b6cd5] text-white shadow-blue-500/10";
-  }
-
-  return (
-    <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        onClick={handleAction}
-        className={`w-full h-[185px] sm:h-[195px] shrink-0 rounded-[24px] border border-solid p-6 pb-5 sm:p-7 sm:pb-6 relative overflow-hidden flex flex-col justify-between cursor-pointer select-none transition-all duration-305 hover:shadow-lg dark:hover:shadow-black/20 group backdrop-blur-md ${cardBgClass}`}
-    >
-        <div className="z-10 max-w-[58%] sm:max-w-[52%] flex flex-col items-start h-full justify-between">
-            <div className="flex flex-col gap-1.5">
-                <h3 className="text-[#0f172a] dark:text-white font-[900] text-[15px] sm:text-[17px] tracking-tight leading-snug font-sans group-hover:text-black dark:group-hover:text-slate-100 transition-colors">
-                    {ann.title}
-                </h3>
-                <p className="text-[#64748b] dark:text-slate-400 text-[11px] sm:text-[12px] leading-snug sm:leading-[1.4] font-medium line-clamp-3">
-                    {ann.description}
-                </p>
-            </div>
-
-            <button 
-                onClick={handleAction}
-                className={`flex items-center gap-1.5 px-[15px] py-[7px] sm:px-[18px] sm:py-[8px] rounded-full text-xs sm:text-[13px] font-[900] tracking-wide transition-all active:scale-95 shadow-md ${btnClass}`}
-            >
-                <ArrowUpRight size={14} strokeWidth={3} className="shrink-0 scale-105" />
-                <span>{ann.button_text}</span>
-            </button>
-        </div>
-
-        <div className="absolute right-0 top-0 bottom-0 w-[42%] overflow-visible">
-            {isStars && <StarVisual />}
-            {isTon && <TonVisual />}
-            {isClover && <CloverVisual />}
-            
-            {!isStars && !isTon && !isClover && ann.bg_image_url && (
-                <div className="absolute right-[16px] top-1/2 -translate-y-1/2 w-[110px] h-[110px] rounded-[22px] overflow-hidden border border-black/5 dark:border-white/10 shadow-lg shrink-0 pointer-events-none">
-                    <img 
-                        src={ann.bg_image_url} 
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
-                        referrerPolicy="no-referrer"
-                        alt="" 
-                        loading="lazy"
-                    />
-                </div>
-            )}
-        </div>
-    </motion.div>
-  );
-});
-
-const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = React.memo(({ bots }) => {
-    const navigate = useNavigate();
-    const { t } = useTranslation();
-    const scroll = useDraggableScroll();
-    const [activeType, setActiveType] = useState<'latest' | 'official' | 'featured'>('latest');
-    const [scrollState, setScrollState] = useState({ left: false, right: true });
-
-    const checkScroll = useCallback(() => {
-        const el = scroll.ref.current;
-        if (el) {
-            const canScrollLeft = el.scrollLeft > 5;
-            const canScrollRight = el.scrollLeft < (el.scrollWidth - el.clientWidth - 5);
-            setScrollState({ left: canScrollLeft, right: canScrollRight });
-        }
-    }, [scroll.ref]);
-
-    useEffect(() => {
-        const el = scroll.ref.current;
-        if (el) {
-            el.addEventListener('scroll', checkScroll);
-            checkScroll(); // Initial check
-            window.addEventListener('resize', checkScroll);
-            return () => {
-                el.removeEventListener('scroll', checkScroll);
-                window.removeEventListener('resize', checkScroll);
-            };
-        }
-    }, [checkScroll, scroll.ref, activeType]);
-
-    const featuredBots = useMemo(() => {
-        // En son eklenenler: If type is latest, show those flagged OR just the latest bots
-        if (activeType === 'latest') {
-            const flagged = bots.filter(b => b.promoted_type === 'latest');
-            if (flagged.length > 0) return flagged;
-            // Fallback: Show last 10 added bots
-            return [...bots].sort((a, b) => Number(b.id) - Number(a.id)).slice(0, 10);
-        }
-        // Orjinal: Show official bots
-        if (activeType === 'official') {
-            const flagged = bots.filter(b => b.promoted_type === 'official');
-            if (flagged.length > 0) return flagged;
-            return bots.filter(b => b.is_official).sort((a, b) => Number(a.id) - Number(b.id));
-        }
-        // Market Özel: Show featured bots
-        return bots.filter(b => b.promoted_type === 'featured');
-    }, [bots, activeType]);
-
-    const types = [
-        { id: 'latest', label: t('home_latest_added') },
-        { id: 'official', label: t('home_official') },
-        { id: 'featured', label: t('home_market_special') }
-    ];
-
-    const cycleType = () => {
-        const currentIndex = types.findIndex(t => t.id === activeType);
-        const nextIndex = (currentIndex + 1) % types.length;
-        setActiveType(types[nextIndex].id as any);
-    };
-
-    if (bots.length === 0) return null;
-
-    return (
-        <div className="home-search-bar latest-slider-container mb-6 md:mb-10 flex flex-col md:flex-row items-center !gap-[0.3rem] bg-[#ffffff] dark:bg-[#1e293b] px-4 md:px-[10px] !pt-[0.3rem] !pb-0 -mx-4 md:mx-0 rounded-none md:rounded-xl border-y md:border border-black/5 dark:border-white/5 relative overflow-hidden group !shadow-none">
-            {/* Header Info */}
-            <div className="flex flex-col shrink-0 min-w-full md:min-w-[180px] md:border-r border-black/5 dark:border-white/5 md:pr-6 h-full justify-center">
-                <div 
-                    className="flex items-center gap-1.5 mb-0.5 cursor-pointer md:cursor-default"
-                    onClick={() => { if (window.innerWidth < 768) cycleType(); }}
-                >
-                    <h2 className="text-[17px] font-black text-slate-900 dark:text-white lowercase tracking-tight leading-none">
-                        {types.find(t => t.id === activeType)?.label}
-                    </h2>
-                    <div className="text-slate-400">
-                        <Info size={16} />
-                    </div>
-                </div>
-                <div className="hidden md:flex flex-col">
-                    {types.map(t => t.id !== activeType && (
-                        <button 
-                            key={t.id}
-                            onClick={() => setActiveType(t.id as any)}
-                            className="text-[14px] font-medium text-blue-500 lowercase hover:underline text-left transition-all"
-                        >
-                            {t.label}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            {/* Slider Content */}
-            <div className="relative flex-1 w-full overflow-hidden">
-                {/* Left Blur & Button */}
-                <AnimatePresence>
-                    {scrollState.left && (
-                        <motion.div 
-                            initial={{ opacity: 0 }} 
-                            animate={{ opacity: 1 }} 
-                            exit={{ opacity: 0 }}
-                            className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[#ffffff] dark:from-[#1e293b] via-[#ffffff]/80 dark:via-[#1e293b]/80 to-transparent z-40 pointer-events-none flex items-center pl-2"
-                        >
-                            <button 
-                                onClick={(e) => { e.stopPropagation(); scroll.ref.current?.scrollBy({ left: -300, behavior: 'smooth' }); }}
-                                className="hidden md:flex w-8 h-8 bg-white dark:bg-slate-800 border border-black/5 dark:border-white/10 rounded-full items-center justify-center text-slate-400 hover:text-brand transition-all shadow-lg pointer-events-auto active:scale-95"
-                            >
-                                <ChevronLeft size={16} />
-                            </button>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-
-                {/* Right Blur & Button */}
-                <AnimatePresence>
-                    {scrollState.right && (
-                        <motion.div 
-                            initial={{ opacity: 0 }} 
-                            animate={{ opacity: 1 }} 
-                            exit={{ opacity: 0 }}
-                            className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#ffffff] dark:from-[#1e293b] via-[#ffffff]/80 dark:via-[#1e293b]/80 to-transparent z-40 pointer-events-none flex items-center justify-end pr-2"
-                        >
-                            <button 
-                                onClick={(e) => { e.stopPropagation(); scroll.ref.current?.scrollBy({ left: 300, behavior: 'smooth' }); }}
-                                className="hidden md:flex w-8 h-8 bg-white dark:bg-slate-800 border border-black/5 dark:border-white/10 rounded-full items-center justify-center text-slate-400 hover:text-brand transition-all shadow-lg pointer-events-auto active:scale-95"
-                            >
-                                <ChevronRight size={16} />
-                            </button>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-
-                <div 
-                    ref={scroll.ref}
-                    onMouseDown={scroll.onMouseDown}
-                    onMouseUp={scroll.onMouseUp}
-                    onMouseMove={scroll.onMouseMove}
-                    onMouseLeave={scroll.onMouseLeave}
-                    onContextMenu={scroll.onContextMenu}
-                    className={`flex items-start gap-10 overflow-x-auto no-scrollbar py-2 transform-gpu will-change-transform ${scroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
-                >
-                    {featuredBots.map((bot) => (
-                        <motion.div
-                            key={bot.id}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            onClick={() => navigate(`/bot/${bot.slug}`)}
-                            className="flex flex-col items-center gap-2 shrink-0 cursor-pointer group/item w-20"
-                        >
-                                <div className="relative">
-                                    <div className="absolute inset-0 bg-blue-500/10 blur-xl rounded-full opacity-0 group-hover/item:opacity-100 transition-opacity"></div>
-                                    <div className="w-[58px] h-[58px] rounded-full p-[2px] bg-gradient-to-tr from-black/5 to-black/10 dark:from-white/5 dark:to-white/10 group-hover/item:from-blue-500/50 group-hover/item:to-brand/50 transition-all">
-                                        <img 
-                                            src={getLiveBotIcon(bot)} 
-                                            className="w-full h-full rounded-full border border-black/5 dark:border-white/10 shadow-lg object-cover bg-white dark:bg-slate-800"
-                                            onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
-                                            referrerPolicy="no-referrer"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="flex flex-col items-center text-center">
-                                    <span className="text-[12px] font-bold text-slate-800 dark:text-slate-200 tracking-tight leading-tight whitespace-nowrap overflow-hidden text-ellipsis w-full group-hover/item:text-blue-500 transition-colors">
-                                        {bot.name.length > 9 ? bot.name.substring(0, 9) + '...' : bot.name}
-                                    </span>
-                                </div>
-                            </motion.div>
-                        ))}
-                </div>
-            </div>
-        </div>
-    );
-});
-
-const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonRate }) => {
-  const navigate = useNavigate();
-  const prices = useMemo(() => PriceService.convert(bot.price, tonRate), [bot.price, tonRate]);
-  
-  return (
-    <div onClick={() => navigate(`/bot/${bot.slug}`)} className="flex items-center p-3 sm:p-6 bot-card cursor-pointer group bg-white dark:bg-transparent hover:bg-slate-100 dark:hover:bg-slate-900/60 rounded-xl transition-all border border-black/5 dark:border-transparent hover:border-slate-200 dark:hover:border-slate-800/50 active:bg-slate-200 dark:active:bg-slate-900 transform-gpu">
-        <div className="relative shrink-0">
-            <img 
-                src={getLiveBotIcon(bot)} 
-                alt={bot.name} 
-                loading="lazy"
-                className="w-[3.8rem] h-[3.8rem] sm:w-[4.4rem] sm:h-[4.4rem] rounded-xl sm:rounded-xl object-cover bg-slate-200 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 group-hover:scale-105 transition-transform" 
-                onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
-            />
-            {/* Removed Zap icon badge for paid bots */}
-        </div>
-        <div className="flex-1 ml-5 min-w-0 mr-3">
-            <h3 className="font-extrabold text-lg text-slate-900 dark:text-slate-100 truncate tracking-tight uppercase leading-none mb-1.5 flex items-center gap-1.5">
-                {bot.name}
-                {bot.is_official && (
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="w-[14px] h-[14px] text-[#139fec] shrink-0">
-                        <path fillRule="evenodd" clipRule="evenodd" d="M7.408 1.2375C7.57933 1.11017 7.78667 1.0415 8 1.0415C8.21333 1.0415 8.42067 1.11017 8.592 1.2375L9.81067 2.14417C9.83467 2.16217 9.86133 2.1755 9.88933 2.18484C9.91733 2.19417 9.94733 2.19884 9.97733 2.19817L11.496 2.18084C11.7093 2.17817 11.918 2.24484 12.09 2.37017C12.2627 2.4955 12.39 2.6735 12.454 2.87684L12.9073 4.32617C12.916 4.35484 12.93 4.3815 12.9473 4.4055C12.9647 4.4295 12.986 4.45084 13.0107 4.46817L14.2493 5.34684C14.4233 5.47017 14.5527 5.64617 14.6187 5.8495C14.6847 6.05217 14.6833 6.27084 14.6153 6.4735L14.13 7.91284C14.1207 7.94084 14.1153 7.97084 14.1153 8.00017C14.1153 8.0295 14.12 8.0595 14.13 8.0875L14.6153 9.52684C14.6833 9.72884 14.6847 9.9475 14.6187 10.1508C14.5527 10.3535 14.4233 10.5302 14.2493 10.6535L13.0107 11.5322C12.9867 11.5495 12.9653 11.5702 12.9473 11.5948C12.93 11.6188 12.9167 11.6455 12.9073 11.6742L12.454 13.1235C12.3907 13.3268 12.2627 13.5048 12.09 13.6302C11.9173 13.7555 11.7093 13.8222 11.496 13.8195L9.97733 13.8022C9.94733 13.8015 9.918 13.8062 9.88933 13.8155C9.86133 13.8248 9.83467 13.8382 9.81067 13.8562L8.592 14.7628C8.42067 14.8902 8.21333 14.9588 8 14.9588C7.78667 14.9588 7.57933 14.8902 7.408 14.7628L6.18933 13.8562C6.16533 13.8382 6.13867 13.8248 6.11067 13.8155C6.08267 13.8062 6.05267 13.8015 6.02267 13.8022L4.504 13.8195C4.29067 13.8222 4.082 13.7555 3.91 13.6302C3.73733 13.5048 3.61 13.3268 3.546 13.1235L3.09267 11.6742C3.084 11.6455 3.07 11.6188 3.05267 11.5948C3.03533 11.5708 3.014 11.5495 2.98933 11.5322L1.75067 10.6535C1.57667 10.5302 1.44733 10.3542 1.38133 10.1508C1.31533 9.94817 1.31667 9.7295 1.38467 9.52684L1.87 8.00017C1.88067 8.0595 1.88533 8.03017 1.88533 8.00017C1.88533 7.97017 1.88067 7.94084 1.87067 7.91284L1.38533 6.4735C1.31733 6.2715 1.316 6.05284 1.382 5.8495C1.448 5.64684 1.57733 5.47084 1.75133 5.3475L2.99 4.46884C3.014 4.45084 3.03533 4.43017 3.05333 4.40617C3.07067 4.38217 3.084 4.3555 3.09333 4.32684L3.54667 2.8775C3.61 2.67417 3.738 2.49617 3.91067 2.37084C4.08333 2.2455 4.29133 2.17884 4.50467 2.1815L6.02333 2.19884C6.05333 2.1995 6.08266 2.19484 6.11133 2.1855C6.13933 2.17617 6.166 2.16284 6.19 2.14484L7.408 1.2375Z" fill="currentColor"></path>
-                        <path fillRule="evenodd" clipRule="evenodd" d="M7.33334 10.6668C7.16267 10.6668 6.992 10.6015 6.862 10.4715L4.862 8.4715C4.60134 8.21083 4.60134 7.7895 4.862 7.52883C5.12267 7.26817 5.544 7.26817 5.80467 7.52883L7.33334 9.0575L10.1953 6.1955C10.456 5.93483 10.8773 5.93483 11.138 6.1955C11.3987 6.45617 11.3987 6.8775 11.138 7.13817L7.80467 10.4715C7.67467 10.6015 7.504 10.6668 7.33334 10.6668Z" fill="white"></path>
-                    </svg>
-                )}
-            </h3>
-            <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider truncate mb-2">{bot.description}</p>
-            <div className="flex items-center gap-3">
-                {bot.price > 0 && (
-                    <div className="flex items-center gap-2 px-2 py-1 bg-blue-500/10 rounded-md border border-blue-500/20">
-                        <span className="text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-tighter flex items-center gap-1">
-                            {Number(prices.ton).toFixed(1)}
-                            <svg fill="none" height="12" width="12" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" className="translate-y-[0.5px]">
-                                <title>Payment TON icon</title>
-                                <g clipPath="url(#a_ton_home)" fill="currentColor">
-                                    <path d="M7.5 11.015V5.963H5.268a.31.31 0 0 0-.272.463l1.772 3.17.734 1.419ZM9.232 9.596l1.771-3.17a.31.31 0 0 0-.272-.463H8.498v5.053l.734-1.42Z"></path>
-                                    <path clipRule="evenodd" d="M16 8.5a8 8 0 1 1-16 0 8 8 0 0 1 16 0ZM5.268 4.965h5.464c1.004 0 1.64 1.085 1.136 1.96l-3.372 5.844a.572.572 0 0 1-.992 0L4.132 6.925c-.505-.876.132-1.96 1.136-1.96Z" fillRule="evenodd"></path>
-                                </g>
-                                <defs>
-                                    <clipPath id="a_ton_home">
-                                        <path d="M0 0h16v16H0z" fill="#fff" transform="translate(0 .5)"></path>
-                                    </clipPath>
-                                </defs>
-                            </svg>
-                        </span>
-                    </div>
-                )}
-                <div className="flex items-center gap-1 px-2 py-1 bg-yellow-500/10 rounded-md border border-yellow-500/20">
-                    <Star size={10} className="text-yellow-500 fill-yellow-500" />
-                    <span className="text-[9px] font-black text-yellow-600 dark:text-yellow-400 uppercase tracking-tighter">{bot.rating || '0.0'}</span>
-                </div>
-
-            </div>
-        </div>
-    </div>
-  );
-});
-
-const CategoryBotCard: React.FC<{ bot: Bot, rank: number }> = React.memo(({ bot, rank }) => {
-  const navigate = useNavigate();
-  return (
-    <div 
-      onClick={() => navigate(`/bot/${bot.slug}`)} 
-      className="flex items-center cursor-pointer group hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-all rounded-[16px] p-2 -m-2 select-none active:scale-[0.98] transform-gpu"
-    >
-        <div className="relative shrink-0 select-none">
-            <img 
-                src={getLiveBotIcon(bot)} 
-                alt={bot.name} 
-                loading="lazy"
-                className="w-12 h-12 sm:w-[54px] sm:h-[54px] rounded-[11px] sm:rounded-[13px] object-cover bg-slate-100 dark:bg-slate-900 border border-black/[0.04] dark:border-white/[0.06] group-hover:scale-105 transition-transform" 
-                onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
-            />
-            <div className="absolute -right-1.5 -bottom-1.5 w-[18px] h-[18px] sm:w-[20px] sm:h-[20px] rounded-full bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 flex items-center justify-center font-[900] text-[10px] sm:text-[11px] shadow-[0_2px_5px_rgba(0,0,0,0.12)] border border-slate-100 dark:border-slate-700/50">
-                {rank}
-            </div>
-        </div>
-        <div className="flex-1 ml-4 sm:ml-4.5 min-w-0 pr-1 select-none">
-            <h3 className="font-extrabold text-[14px] sm:text-[15.5px] text-slate-900 dark:text-slate-50 font-sans tracking-tight leading-tight mb-1 flex items-center gap-1">
-                <span className="truncate">{bot.name}</span>
-                {bot.is_official && (
-                    <svg width="15" height="15" viewBox="0 0 16 16" fill="none" className="w-[14px] h-[14px] text-[#24a1de] dark:text-[#38bdf8] shrink-0">
-                        <path fillRule="evenodd" clipRule="evenodd" d="M7.408 1.2375C7.57933 1.11017 7.78667 1.0415 8 1.0415C8.21333 1.0415 8.42067 1.11017 8.592 1.2375L9.81067 2.14417C9.83467 2.16217 9.86133 2.1755 9.88933 2.18484C9.91733 2.19417 9.94733 2.19884 9.97733 2.19817L11.496 2.18084C11.7093 2.17817 11.918 2.24484 12.09 2.37017C12.2627 2.4955 12.39 2.6735 12.454 2.87684L12.9073 4.32617C12.916 4.35484 12.93 4.3815 12.9473 4.4055C12.9647 4.4295 12.986 4.45084 13.0107 4.46817L14.2493 5.34684C14.4233 5.47017 14.5527 5.64617 14.6187 5.8495C14.6847 6.05217 14.6833 6.27084 14.6153 6.4735L14.13 7.91284C14.1207 7.94084 14.1153 7.97084 14.1153 8.00017C14.1153 8.0295 14.12 8.0595 14.13 8.0875L14.6153 9.52684C14.6833 9.72884 14.6847 9.9475 14.6187 10.1508C14.5527 10.3535 14.4233 10.5302 14.2493 10.6535L13.0107 11.5322C12.9867 11.5495 12.9653 11.5702 12.9473 11.5948C12.93 11.6188 12.9167 11.6455 12.9073 11.6742L12.454 13.1235C12.3907 13.3268 12.2627 13.5048 12.09 13.6302C11.9173 13.7555 11.7093 13.8222 11.496 13.8195L9.97733 13.8022C9.94733 13.8015 9.918 13.8062 9.88933 13.8155C9.86133 13.8248 9.83467 13.8382 9.81067 13.8562L8.592 14.7628C8.42067 14.8902 8.21333 14.9588 8 14.9588C7.78667 14.9588 7.57933 14.8902 7.408 14.7628L6.18933 13.8562C6.16533 13.8382 6.13867 13.8248 6.11067 13.8155C6.08267 13.8062 6.05267 13.8015 6.02267 13.8022L4.504 13.8195C4.29067 13.8222 4.082 13.7555 3.91 13.6302C3.73733 13.5048 3.61 13.3268 3.546 13.1235L3.09267 11.6742C3.084 11.6455 3.07 11.6188 3.05267 11.5948C3.03533 11.5708 3.014 11.5495 2.98933 11.5322L1.75067 10.6535C1.57667 10.5302 1.44733 10.3542 1.38133 10.1508C1.31533 9.94817 1.31667 9.7295 1.38467 9.52684L1.87 8.00017C1.88067 8.0595 1.88533 8.03017 1.88533 8.00017C1.88533 7.97017 1.88067 7.94084 1.87067 7.91284L1.38533 6.4735C1.31733 6.2715 1.316 6.05284 1.382 5.8495C1.448 5.64684 1.57733 5.47084 1.75133 5.3475L2.99 4.46884C3.014 4.45084 3.03533 4.43017 3.05333 4.40617C3.07067 4.38217 3.084 4.3555 3.09333 4.32684L3.54667 2.8775C3.61 2.67417 3.738 2.49617 3.91067 2.37084C4.08333 2.2455 4.29133 2.17884 4.50467 2.1815L6.02333 2.19884C6.05333 2.1995 6.08266 2.19484 6.11133 2.1855C6.13933 2.17617 6.166 2.16284 6.19 2.14484L7.408 1.2375Z" fill="currentColor"></path>
-                        <path fillRule="evenodd" clipRule="evenodd" d="M7.33334 10.6668C7.16267 10.6668 6.992 10.6015 6.862 10.4715L4.862 8.4715C4.60134 8.21083 4.60134 7.7895 4.862 7.52883C5.12267 7.26817 5.544 7.26817 5.80467 7.52883L7.33334 9.0575L10.1953 6.1955C10.456 5.93483 10.8773 5.93483 11.138 6.1955C11.3987 6.45617 11.3987 6.8775 11.138 7.13817L7.80467 10.4715C7.67467 10.6015 7.504 10.6668 7.33334 10.6668Z" fill="white"></path>
-                    </svg>
-                )}
-            </h3>
-            <p className="text-[12px] sm:text-[13px] text-slate-500 dark:text-slate-400 font-medium leading-[1.35] line-clamp-2">
-                {bot.description}
-            </p>
-        </div>
-    </div>
-  );
-});
-
-const getMobileColumns = (bots: Bot[]) => {
-  const list = bots.slice(0, 12);
-  const cols = [];
-  
-  if (list.length <= 3) {
-    for (let i = 0; i < list.length; i++) {
-      cols.push([{ bot: list[i], rank: i + 1 }]);
-    }
-  } else if (list.length <= 6) {
-    const row1 = list.slice(0, 3);
-    const row2 = list.slice(3, 6);
-    
-    for (let i = 0; i < Math.max(row1.length, row2.length); i++) {
-      const colItems = [];
-      if (row1[i]) colItems.push({ bot: row1[i], rank: i + 1 });
-      if (row2[i]) colItems.push({ bot: row2[i], rank: i + 4 });
-      cols.push(colItems);
-    }
-  } else if (list.length <= 9) {
-    const row1 = list.slice(0, 3);
-    const row2 = list.slice(3, 6);
-    const row3 = list.slice(6, 9);
-    
-    for (let i = 0; i < 3; i++) {
-      const colItems = [];
-      if (row1[i]) colItems.push({ bot: row1[i], rank: i + 1 });
-      if (row2[i]) colItems.push({ bot: row2[i], rank: i + 4 });
-      if (row3[i]) colItems.push({ bot: row3[i], rank: i + 7 });
-      cols.push(colItems);
-    }
-  } else {
-    // 10 to 12 bots -> distribute dynamically into 3 rows of up to 4 items each
-    const colsCount = Math.ceil(list.length / 3); // 4 for length=12
-    const row1 = list.slice(0, colsCount);
-    const row2 = list.slice(colsCount, colsCount * 2);
-    const row3 = list.slice(colsCount * 2);
-    
-    for (let i = 0; i < colsCount; i++) {
-      const colItems = [];
-      if (row1[i]) colItems.push({ bot: row1[i], rank: i + 1 });
-      if (row2[i]) colItems.push({ bot: row2[i], rank: i + 1 + colsCount });
-      if (row3[i]) colItems.push({ bot: row3[i], rank: i + 1 + colsCount * 2 });
-      cols.push(colItems);
-    }
-  }
-  return cols;
-};
-
-const AddProjectBanner: React.FC<{ className?: string }> = ({ className = "" }) => {
-    const navigate = useNavigate();
-    const { t } = useTranslation();
-    
-    return (
-        <div 
-            className={`h-[128px] rounded-xl bg-white dark:bg-slate-900/60 border border-black/5 dark:border-white/10 flex items-center p-2 sm:p-3 gap-4 shrink-0 snap-center overflow-hidden cursor-pointer group backdrop-blur-xl transition-all hover:border-blue-500/30 ${className}`}
-            onClick={() => navigate('/settings')}
-        >
-            {/* Left Side: Illustration Placeholder */}
-            <div className="w-[100px] h-[100px] rounded-xl overflow-hidden relative shrink-0 bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-                <img 
-                    src="https://i.hizliresim.com/eoisiuq.png" 
-                    alt="Add Project" 
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    referrerPolicy="no-referrer"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
-            </div>
-            
-            {/* Right Side: Content */}
-            <div className="flex-1 min-w-0 pr-1 py-1 flex flex-col justify-between h-[100px]">
-                <div>
-                    <h3 className="text-slate-900 dark:text-white font-bold text-[17px] tracking-tight truncate leading-tight mb-1 group-hover:text-blue-500 transition-colors">
-                        {t('home_add_auto_title')}
-                    </h3>
-                    <p className="text-slate-400 dark:text-slate-500 text-[12px] leading-[1.4] line-clamp-2 font-medium opacity-90">
-                        {t('home_add_auto_desc')}
-                    </p>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                    <div 
-                        className="flex items-center gap-1.5 px-2 py-0.5 rounded-lg shrink-0"
-                        style={{ background: 'linear-gradient(135deg, #3B82F6, #2563EB)' }}
-                    >
-                        <span className="text-[9px] font-black text-white uppercase tracking-widest leading-none">
-                            {t('home_join_now')}
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-const NavMenu = ({ 
-    isScrolled, 
-    user, 
-    unreadCount, 
-    theme, 
-    toggleTheme, 
-    haptic, 
-    isMenuOpen, 
-    setIsMenuOpen, 
-    setIsLoginModalOpen, 
-    setWebAuthUser, 
-    isLoginModalOpen,
-    menuRef: parentMenuRef,
-    openMenu,
-    setOpenMenu,
-    navState,
-    setNavState,
-    mobileModal,
-    setMobileModal
-}: { 
-    isScrolled: boolean, 
-    user: any, 
-    unreadCount: number, 
-    theme: string, 
-    toggleTheme: () => void, 
-    haptic: any, 
-    isMenuOpen: boolean, 
-    setIsMenuOpen: (v: boolean) => void,
-    setIsLoginModalOpen: (v: boolean) => void,
-    setWebAuthUser: (v: any) => void,
-    isLoginModalOpen: boolean,
-    menuRef: React.RefObject<HTMLDivElement>,
-    openMenu: 'kesfet' | 'investors' | null,
-    setOpenMenu: (v: 'kesfet' | 'investors' | null) => void,
-    navState: 'main' | 'bots' | 'apps',
-    setNavState: (v: 'main' | 'bots' | 'apps') => void,
-    mobileModal: 'kesfet' | 'investors' | null,
-    setMobileModal: (v: 'kesfet' | 'investors' | null) => void
-}) => {
-    const { t } = useTranslation();
-    const navigate = useNavigate();
-    const internalMenuRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (internalMenuRef.current && !internalMenuRef.current.contains(event.target as Node)) {
-                setOpenMenu(null);
-                setNavState('main');
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
-
-    const botsCategories = categories.filter(c => c.id !== 'apps' && c.id !== 'all');
-    const appsCategories = appsSubCategories;
-
-    const handleCategoryClick = (catId: string, mode: 'bots' | 'apps') => {
-        haptic('light');
-        navigate(`/search?mode=${mode}&category=${catId}`);
-        setOpenMenu(null);
-        setMobileModal(null);
-        setNavState('main');
-    };
-
-    interface MenuItem {
-        id: string;
-        label: string;
-        desc: string;
-        icon: any;
-        action?: () => void;
-        path?: string;
-    }
-
-    const discoverItems: MenuItem[] = [
-        { id: 'bots', label: 'Botlar', desc: 'Telegram Bot Marketi', icon: BotIcon, action: () => setNavState('bots') },
-        { id: 'apps', label: 'Uygulamalar', desc: 'Web3 & TMA Uygulamaları', icon: LayoutGrid, action: () => setNavState('apps') },
-        { id: 'channels', label: 'Kanallar', desc: 'Popüler Telegram Kanalları', icon: Megaphone, path: '/channels' },
-        { id: 'ads', label: 'Reklam', desc: 'Projenizi Öne Çıkarın', icon: Share2, path: '/settings' },
-    ];
-
-    const investorItems: MenuItem[] = [
-        { id: 'exchanges', label: 'Borsalar ve Takas', desc: 'CEX & DEX Platformları', icon: BarChart3 },
-        { id: 'earn', label: 'Kazanç Uygulamaları', desc: 'Pasif Gelir Fırsatları', icon: Coins },
-        { id: 'tools', label: 'Yatırım Araçları', desc: 'Analiz ve Takip Araçları', icon: Briefcase },
-        { id: 'new', label: 'Yeni Keşifler', desc: 'Gelecek Vaadeden Projeler', icon: Compass },
-    ];
-
-    const simpleLinks = [
-        { label: 'Hızlı Link 1', path: '#' },
-        { label: 'Hızlı Link 2', path: '#' },
-        { label: 'Hızlı Link 3', path: '#' },
-    ];
-
-    const renderMegaMenuContent = () => {
-        if (openMenu === 'kesfet') {
-            return (
-                <div className="max-w-5xl mx-auto px-6 grid grid-cols-12 gap-8">
-                    <div className="col-span-8">
-                        <AnimatePresence mode="wait">
-                            {navState === 'main' ? (
-                                <motion.div 
-                                    key="main"
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: -20 }}
-                                    className="grid grid-cols-2 gap-4"
-                                >
-                                    {discoverItems.map(item => (
-                                        <button 
-                                            key={item.id}
-                                            onClick={() => {
-                                                if (item.action) item.action();
-                                                else if (item.path) { navigate(item.path); setOpenMenu(null); }
-                                            }}
-                                            className="flex items-center gap-4 p-4 hover:bg-black/[0.02] dark:hover:bg-white/5 rounded-2xl transition-all group border border-transparent hover:border-black/5 dark:hover:border-white/10 text-left w-full"
-                                        >
-                                            <div className="menu-icon-container shrink-0 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
-                                                <item.icon size={20} />
-                                            </div>
-                                            <div className="flex flex-col">
-                                                <span className="text-[14px] font-semibold menu-item-text">{item.label}</span>
-                                                <span className="text-[12px] text-slate-500 dark:text-slate-400 font-normal">{item.desc}</span>
-                                            </div>
-                                        </button>
-                                    ))}
-                                </motion.div>
-                            ) : navState === 'bots' ? (
-                                <motion.div 
-                                    key="bots"
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: 20 }}
-                                    className="flex flex-col gap-6"
-                                >
-                                    <div className="flex items-center gap-4 mb-2">
-                                        <button 
-                                            onClick={() => setNavState('main')}
-                                            className="p-2 hover:bg-white/10 rounded-full text-slate-500 transition-colors"
-                                        >
-                                            <ArrowLeft size={20} />
-                                        </button>
-                                        <h3 className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-tight">Bot Kategorileri</h3>
-                                    </div>
-                                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                                        {botsCategories.map(cat => (
-                                            <button 
-                                                key={cat.id}
-                                                onClick={() => handleCategoryClick(cat.id, 'bots')}
-                                                className="flex items-center gap-3 p-3 hover:bg-black/[0.02] dark:hover:bg-white/5 rounded-xl transition-all group text-left border border-transparent hover:border-black/5 dark:hover:border-white/10 w-full"
-                                            >
-                                                <div className="menu-icon-container !w-8 !h-8 px-0 shrink-0 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
-                                                    <cat.icon size={16} />
-                                                </div>
-                                                <span className="text-[11px] font-bold uppercase tracking-tight menu-item-text">{t(cat.label)}</span>
-                                            </button>
-                                        ))}
-                                    </div>
-                                </motion.div>
-                            ) : (
-                                <motion.div 
-                                    key="apps"
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: 20 }}
-                                    className="flex flex-col gap-6"
-                                >
-                                    <div className="flex items-center gap-4 mb-2">
-                                        <button 
-                                            onClick={() => setNavState('main')}
-                                            className="p-2 hover:bg-white/10 rounded-full text-slate-500 transition-colors"
-                                        >
-                                            <ArrowLeft size={20} />
-                                        </button>
-                                        <h3 className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-tight">Uygulama Kategorileri</h3>
-                                    </div>
-                                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                                        {appsCategories.map(cat => (
-                                            <button 
-                                                key={cat.id}
-                                                onClick={() => handleCategoryClick(cat.id, 'apps')}
-                                                className="flex items-center gap-3 p-3 hover:bg-black/[0.02] dark:hover:bg-white/5 rounded-xl transition-all group text-left border border-transparent hover:border-black/5 dark:hover:border-white/10 w-full"
-                                            >
-                                                <div className="menu-icon-container !w-8 !h-8 px-0 shrink-0 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
-                                                    <cat.icon size={16} />
-                                                </div>
-                                                <span className="text-[11px] font-bold uppercase tracking-tight menu-item-text">{t(cat.label)}</span>
-                                            </button>
-                                        ))}
-                                    </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
-                    <div className="col-span-4 border-l border-black/5 dark:border-white/5 pl-8 flex flex-col justify-center gap-3">
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-600 mb-2">Hızlı Bağlantılar</span>
-                        {simpleLinks.map((link, i) => (
-                            <a 
-                                key={i}
-                                href={link.path}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-blue-500 transition-all font-bold text-xs uppercase group"
-                            >
-                                {link.label}
-                                <ExternalLink size={14} className="opacity-0 group-hover:opacity-100 transition-all" />
-                            </a>
-                        ))}
-                    </div>
-                </div>
-            );
-        }
-
-        if (openMenu === 'investors') {
-            return (
-                <div className="max-w-5xl mx-auto px-6 grid grid-cols-12 gap-8">
-                    <div className="col-span-8">
-                        <div className="grid grid-cols-2 gap-4">
-                            {investorItems.map(item => (
-                                <button 
-                                    key={item.id}
-                                    className="flex items-center gap-4 p-4 hover:bg-black/[0.02] dark:hover:bg-white/5 rounded-2xl transition-all group border border-transparent hover:border-black/5 dark:hover:border-white/10 text-left w-full"
-                                >
-                                    <div className="menu-icon-container shrink-0 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
-                                        <item.icon size={20} />
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-[14px] font-semibold menu-item-text">{item.label}</span>
-                                        <span className="text-[12px] text-slate-500 dark:text-slate-400 font-normal">{item.desc}</span>
-                                    </div>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                    <div className="col-span-4 border-l border-black/5 dark:border-white/5 pl-8 flex flex-col justify-center gap-3">
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-600 mb-2">Yatırım Linkleri</span>
-                        {simpleLinks.map((link, i) => (
-                            <a 
-                                key={i}
-                                href={link.path}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-emerald-500 transition-all font-bold text-xs uppercase group"
-                            >
-                                {link.label}
-                                <ExternalLink size={14} className="opacity-0 group-hover:opacity-100 transition-all" />
-                            </a>
-                        ))}
-                    </div>
-                </div>
-            );
-        }
-    };
-
-    return (
-        <>
-        <div className="sticky top-0 z-[1] bg-white dark:bg-slate-900 border-b border-[#f7f7f7] dark:border-white/5 w-full py-2.5 md:pb-2 transition-colors" ref={internalMenuRef}>
-            <div className="max-w-7xl mx-auto px-5 sm:px-8 flex items-center justify-between">
-                {/* Left Section (Logo) */}
-                <div className="hidden md:flex items-center w-48 shrink-0">
-                    {isScrolled ? (
-                        <Logo onClick={() => navigate('/')} className="cursor-pointer" />
-                    ) : null}
-                </div>
-
-                {/* Center Section (Navigation) */}
-                <div className="flex items-center justify-center gap-8 md:gap-14 flex-1">
-                    {/* Discover (Keşfet) */}
-                    <div 
-                        className="relative md:static"
-                        onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('kesfet'); }}
-                    >
-                        <button 
-                            onClick={() => {
-                                if (window.innerWidth < 768) {
-                                    haptic('light');
-                                    setMobileModal('kesfet');
-                                } else {
-                                    setOpenMenu(openMenu === 'kesfet' ? null : 'kesfet');
-                                }
-                            }}
-                            className={`nav-menu-item grow-0 ${openMenu === 'kesfet' ? 'text-slate-900 dark:text-white bg-blue-500/5' : 'text-slate-600 dark:text-slate-400 hover:bg-blue-500/5'}`}
-                        >
-                            Keşfet <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'kesfet' ? 'rotate-180' : ''}`} />
-                        </button>
-                    </div>
-
-                    {/* Investors (Yatırımcılar) */}
-                    <div 
-                        className="relative md:static"
-                        onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('investors'); }}
-                    >
-                        <button 
-                            onClick={() => {
-                                if (window.innerWidth < 768) {
-                                    haptic('light');
-                                    setMobileModal('investors');
-                                } else {
-                                    setOpenMenu(openMenu === 'investors' ? null : 'investors');
-                                }
-                            }}
-                            className={`nav-menu-item grow-0 ${openMenu === 'investors' ? 'text-slate-900 dark:text-white bg-emerald-500/5' : 'text-slate-600 dark:text-slate-400 hover:bg-emerald-500/5'}`}
-                        >
-                            Yatırımcılar <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'investors' ? 'rotate-180' : ''}`} />
-                        </button>
-                    </div>
-
-                    {/* Blog Link */}
-                    <button 
-                        onClick={() => { haptic('light'); navigate('/blog'); }}
-                        className="nav-menu-item text-slate-600 dark:text-slate-400 hover:bg-blue-500/5"
-                    >
-                        {t('blog_title')}
-                    </button>
-                </div>
-
-                {/* Profile Section */}
-                <div className="flex items-center justify-end md:w-48 shrink-0">
-                    <AnimatePresence mode="wait">
-                        {isScrolled && (
-                            <motion.div 
-                                key="scrolled-actions"
-                                initial={{ opacity: 0, x: 10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: 10 }}
-                                transition={{ duration: 0.2 }}
-                                className="hidden md:flex items-center gap-2 md:gap-3"
-                            >
-                                {user && (
-                                    <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 border border-black/5 dark:border-white/5 rounded-xl text-slate-900 dark:text-white active:scale-95 transition-all outline-none shrink-0">
-                                        <Wallet size={18} />
-                                    </button>
-                                )}
-
-                                <div className="relative font-sans" ref={parentMenuRef}>
-                                    <button 
-                                      onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
-                                      className={`h-10 px-3 flex items-center gap-2 border border-black/5 dark:border-white/5 text-slate-900 dark:text-white rounded-xl active:scale-95 transition-all relative ${isMenuOpen ? 'bg-slate-100 dark:bg-white/10' : 'bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10'}`}
-                                    >
-                                         <div className="flex md:hidden items-center gap-1.5">
-                                             {user ? (
-                                                 <span className="text-[11px] font-black uppercase tracking-wide">
-                                                     {(user.username || user.first_name || user.name || '').slice(0, 5)}{(user.username || user.first_name || user.name || '').length > 5 ? '..' : ''}
-                                                 </span>
-                                             ) : (
-                                                 <Menu size={18} className="text-slate-700 dark:text-slate-300" />
-                                             )}
-                                             <ChevronDown size={12} className={`text-slate-400 dark:text-slate-500 transition-transform duration-200 ${isMenuOpen ? 'rotate-180' : ''}`} />
-                                         </div>
-                                         <div className="hidden md:flex items-center gap-1.5">
-                                             {user ? (
-                                                 <>
-                                                     <span className="text-[11px] font-black uppercase tracking-wide">
-                                                         {user.username || user.first_name || user.name || ''}
-                                                     </span>
-                                                     <ChevronDown size={12} className={`text-slate-400 dark:text-slate-500 transition-transform duration-200 ${isMenuOpen ? 'rotate-180' : ''}`} />
-                                                 </>
-                                             ) : (
-                                                 <Settings size={18} className="text-slate-700 dark:text-slate-300" />
-                                             )}
-                                         </div>
-                                        {user && unreadCount > 0 && (
-                                            <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[8px] font-black text-white flex items-center justify-center px-1">
-                                                {unreadCount > 9 ? '9+' : unreadCount}
-                                            </div>
-                                        )}
-                                    </button>
-                                    {isMenuOpen && (
-                                        <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-white/5 rounded-2xl shadow-2xl p-2 z-[100] animate-in fade-in zoom-in-95 duration-200">
-                                            {user ? (
-                                                <>
-                                                    <div className="p-4 border-b border-slate-100 dark:border-white/5 mb-2">
-                                                        <div className="flex items-center gap-3">
-                                                            {(user.photo_url || user.avatar) ? (
-                                                                <img 
-                                                                    src={user.photo_url || user.avatar} 
-                                                                    alt={user.first_name || user.name}
-                                                                    className="w-10 h-10 rounded-full object-cover"
-                                                                />
-                                                            ) : (
-                                                                <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-black">
-                                                                    {user.first_name ? user.first_name[0] : (user.name ? user.name[0] : 'U')}
-                                                                </div>
-                                                            )}
-                                                            <div className="flex flex-col min-w-0">
-                                                                <span className="text-[13px] font-bold text-slate-900 dark:text-white truncate">
-                                                                    {user.first_name ? `${user.first_name} ${user.last_name || ''}` : user.name}
-                                                                </span>
-                                                                <span className="text-[10px] text-slate-500 truncate">@{user.username || user.id}</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <button onClick={() => { haptic('light'); navigate('/'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                                        <Store size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                                        <span className="text-xs font-bold uppercase tracking-tight">{t('market')}</span>
-                                                    </button>
-
-                                                    <button onClick={() => { haptic('light'); navigate('/profile'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                                        <User size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                                        <span className="text-xs font-bold uppercase tracking-tight">{t('profile')}</span>
-                                                    </button>
-
-                                                    <button onClick={() => { haptic('light'); navigate('/my-bots'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                                        <BotIcon size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                                        <span className="text-xs font-bold uppercase tracking-tight">{t('my_bots')}</span>
-                                                    </button>
-
-                                                    <button onClick={() => { haptic('light'); navigate('/channels'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                                        <Megaphone size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                                        <span className="text-xs font-bold uppercase tracking-tight">{t('my_channels')}</span>
-                                                    </button>
-
-                                                    <button onClick={() => { haptic('light'); navigate('/notifications'); setIsMenuOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                                        <div className="flex items-center gap-3">
-                                                            <Bell size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                                            <span className="text-xs font-bold uppercase tracking-tight">{t('notifications')}</span>
-                                                        </div>
-                                                        {unreadCount > 0 && <div className="w-2 h-2 bg-red-500 rounded-full" />}
-                                                    </button>
-
-                                                    <button onClick={() => { haptic('light'); navigate('/qa'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                                        <MessageSquare size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                                        <span className="text-xs font-bold uppercase tracking-tight">Soru Cevap & Q&A</span>
-                                                    </button>
-
-                                                    <div className="h-px bg-slate-100 dark:border-white/5 my-2" />
-
-                                                    {/* Gece Modu & Add Your inside dropdown */}
-                                                    <button onClick={() => { haptic('light'); toggleTheme(); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                                        {theme === 'dark' ? (
-                                                            <>
-                                                                <Sun size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                                                <span className="text-xs font-bold uppercase tracking-tight">{t('light_mode') || 'Gündüz Modu'}</span>
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <Moon size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                                                <span className="text-xs font-bold uppercase tracking-tight">{t('dark_mode') || 'Gece Modu'}</span>
-                                                            </>
-                                                        )}
-                                                    </button>
-
-                                                    <button onClick={() => { haptic('light'); navigate('/settings'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                                        <Plus size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                                        <span className="text-xs font-bold uppercase tracking-tight">{t('add_your')}</span>
-                                                    </button>
-
-                                                    <div className="h-px bg-slate-100 dark:border-white/5 my-2" />
-                                                    
-                                                    <button 
-                                                        onClick={() => { 
-                                                            const confirmed = window.confirm("Çıkış yapmak istediğinize emin misiniz?");
-                                                            if (confirmed) {
-                                                                haptic('medium'); 
-                                                                setWebAuthUser(null);
-                                                                setIsMenuOpen(false); 
-                                                            }
-                                                        }} 
-                                                        className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 text-red-500 transition-all font-bold text-xs uppercase"
-                                                    >
-                                                        <LogOut size={18} /> 
-                                                        <span className="text-xs font-bold uppercase tracking-tight">{t('home_logout')}</span>
-                                                    </button>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <button onClick={() => { haptic('light'); setIsLoginModalOpen(true); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 transition-all group font-bold">
-                                                        <User size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300" />
-                                                        <span className="text-xs font-bold uppercase tracking-tight">{t('login')}</span>
-                                                    </button>
-
-                                                    <button onClick={() => { haptic('light'); toggleTheme(); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                                        {theme === 'dark' ? (
-                                                            <>
-                                                                <Sun size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                                                <span className="text-xs font-bold uppercase tracking-tight">{t('light_mode') || 'Gündüz Modu'}</span>
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <Moon size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                                                <span className="text-xs font-bold uppercase tracking-tight">{t('dark_mode') || 'Gece Modu'}</span>
-                                                            </>
-                                                        )}
-                                                    </button>
-
-                                                    <button onClick={() => { haptic('light'); navigate('/settings'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                                        <Plus size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                                        <span className="text-xs font-bold uppercase tracking-tight">{t('add_your')}</span>
-                                                    </button>
-                                                </>
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
-
-                                {!user && (
-                                    <button 
-                                        onClick={() => { haptic('light'); setIsLoginModalOpen(true); }}
-                                        className="nav-menu-item !px-5 bg-blue-500 hover:bg-blue-600 text-white text-[13px] font-bold rounded-[10px] transition-all active:scale-95 flex items-center justify-center whitespace-nowrap shadow-lg shadow-blue-500/25 border-none"
-                                    >
-                                        {t('home_login')}
-                                    </button>
-                                )}
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </div>
-            </div>
-
-            {/* Desktop Mega Menu Dropdown */}
-            <AnimatePresence>
-                {openMenu && (
-                    <motion.div 
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.2 }}
-                        className="hidden md:block absolute left-0 right-0 top-full bg-white dark:bg-slate-900/95 backdrop-blur-xl border-b border-black/5 dark:border-white/10 shadow-2xl z-[100] mega-menu-container"
-                        onMouseLeave={() => { setOpenMenu(null); setNavState('main'); }}
-                    >
-                        {renderMegaMenuContent()}
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </div>
-
-        {/* Mobile Modal for Categories */}
-        <AnimatePresence>
-            {mobileModal && (
-                <div className="fixed inset-0 z-[200] flex items-end justify-center p-0 md:hidden">
-                    <motion.div 
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={() => { setMobileModal(null); setNavState('main'); }}
-                        className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"
-                    />
-                    <motion.div 
-                        initial={{ y: "100%" }}
-                        animate={{ y: 0 }}
-                        exit={{ y: "100%" }}
-                        transition={{ type: "spring", damping: 30, stiffness: 300 }}
-                        className="relative w-full bg-white dark:bg-slate-900 rounded-t-[32px] overflow-hidden pt-4 pb-12 border-t border-black/10 dark:border-white/10"
-                    >
-                        {/* Drag Handle */}
-                        <div className="w-12 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full mx-auto mb-8" />
-                        
-                        <div className="flex justify-between items-center mb-6 px-8">
-                            <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-widest uppercase italic">
-                                {mobileModal === 'kesfet' ? 'KEŞFET' : 'YATIRIMCILAR'}
-                            </h3>
-                            <button onClick={() => { setMobileModal(null); setNavState('main'); }} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-500 active:scale-90 transition-all">
-                                <X size={20} />
-                            </button>
-                        </div>
-                        
-                        <div className="max-h-[70vh] overflow-y-auto px-6 pb-4">
-                            <AnimatePresence mode="wait">
-                                {navState === 'main' ? (
-                                    <motion.div 
-                                        key="mobile-main"
-                                        initial={{ opacity: 0, x: -20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: -20 }}
-                                        className="grid grid-cols-1 gap-3"
-                                    >
-                                        {(mobileModal === 'kesfet' ? discoverItems : investorItems).map((item) => (
-                                            <button
-                                                key={item.id}
-                                                onClick={() => {
-                                                    if (item.action) item.action();
-                                                    else if (item.path) { navigate(item.path); setMobileModal(null); }
-                                                }}
-                                                className="w-full flex items-center gap-4 p-4 hover:bg-slate-50 dark:hover:bg-white/5 active:bg-slate-100 dark:active:bg-white/10 transition-all rounded-2xl border border-black/5 dark:border-white/5 group mobile-menu-item"
-                                            >
-                                                <div className={`mobile-menu-icon-container flex items-center justify-center rounded-xl shrink-0 ${mobileModal === 'kesfet' ? 'text-blue-500' : 'text-emerald-500'}`}>
-                                                    <item.icon size={22} className="menu-item-icon" />
-                                                </div>
-                                                <div className="flex flex-col items-start min-w-0">
-                                                    <span className="text-[13px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider truncate w-full">
-                                                        {item.label}
-                                                    </span>
-                                                </div>
-                                                {item.action && <ChevronRight size={16} className="ml-auto text-slate-300 dark:text-slate-700" />}
-                                            </button>
-                                        ))}
-                                    </motion.div>
-                                ) : navState === 'bots' ? (
-                                    <motion.div 
-                                        key="mobile-bots"
-                                        initial={{ opacity: 0, x: 20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: 20 }}
-                                        className="flex flex-col gap-4"
-                                    >
-                                        <button 
-                                            onClick={() => setNavState('main')}
-                                            className="flex items-center gap-2 text-blue-500 font-black uppercase tracking-widest text-[11px] mb-2"
-                                        >
-                                            <ArrowLeft size={16} /> Geri
-                                        </button>
-                                        <div className="grid grid-cols-2 gap-3">
-                                            {botsCategories.map(cat => (
-                                                <button 
-                                                    key={cat.id}
-                                                    onClick={() => handleCategoryClick(cat.id, 'bots')}
-                                                    className="flex flex-col items-start gap-3 p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5 mobile-menu-item"
-                                                >
-                                                    <div className="mobile-menu-icon-container flex items-center justify-center text-blue-500">
-                                                        <cat.icon size={20} />
-                                                    </div>
-                                                    <span className="text-[10px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300">{t(cat.label)}</span>
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </motion.div>
-                                ) : (
-                                    <motion.div 
-                                        key="mobile-apps"
-                                        initial={{ opacity: 0, x: 20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: 20 }}
-                                        className="flex flex-col gap-4"
-                                    >
-                                        <button 
-                                            onClick={() => setNavState('main')}
-                                            className="flex items-center gap-2 text-blue-500 font-black uppercase tracking-widest text-[11px] mb-2"
-                                        >
-                                            <ArrowLeft size={16} /> Geri
-                                        </button>
-                                        <div className="grid grid-cols-2 gap-3">
-                                            {appsCategories.map(cat => (
-                                                <button 
-                                                    key={cat.id}
-                                                    onClick={() => handleCategoryClick(cat.id, 'apps')}
-                                                    className="flex flex-col items-start gap-3 p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5 mobile-menu-item"
-                                                >
-                                                    <div className="mobile-menu-icon-container flex items-center justify-center text-emerald-500">
-                                                        <cat.icon size={20} />
-                                                    </div>
-                                                    <span className="text-[10px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300">{t(cat.label)}</span>
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                            
-                            {navState === 'main' && (
-                                <div className="mt-8 pt-6 border-t border-black/5 dark:border-white/5">
-                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-600 block mb-4">Hızlı Bağlantılar</span>
-                                    <div className="grid grid-cols-1 gap-2">
-                                        {simpleLinks.map((link, i) => (
-                                            <a 
-                                                key={i}
-                                                href={link.path}
-                                                className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-slate-300 font-bold text-xs uppercase"
-                                            >
-                                                {link.label}
-                                                <ExternalLink size={14} />
-                                            </a>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </motion.div>
-                </div>
-            )}
-        </AnimatePresence>
-        </>
-    );
-};
-
-const Home = () => {
-  const navigate = useNavigate();
-  const { t } = useTranslation();
-  const { user, haptic, isTelegram, setWebAuthUser } = useTelegram();
-  const { toggleTheme, theme } = useTheme();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [openMenu, setOpenMenu] = useState<'kesfet' | 'investors' | null>(null);
-  const [navState, setNavState] = useState<'main' | 'bots' | 'apps'>('main');
-  const [mobileModal, setMobileModal] = useState<'kesfet' | 'investors' | null>(null);
-  const [bots, setBots] = useState<Bot[]>([]);
-  const [announcements, setAnnouncements] = useState<Announcement[]>(visualPromos);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-  const [tonRate, setTonRate] = useState(250);
-  const [selectedAnn, setSelectedAnn] = useState<Announcement | null>(null);
+);
+
+const Gitlab = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="m22 13.29-1.93-5.94a1.35 1.35 0 0 0-.58-.69 1.41 1.41 0 0 0-.91-.12 1.39 1.39 0 0 0-.69.46 1.35 1.35 0 0 0-.25.8l-.29 3a7.33 7.33 0 0 1-1.07 3 .75.75 0 0 1-.84.29 11.2 11.2 0 0 0-7.08 0 .75.75 0 0 1-.84-.29 7.36 7.36 0 0 1-1.07-3l-.29-3a1.34 1.34 0 0 0-.25-.8 1.37 1.37 0 0 0-.69-.46 1.41 1.41 0 0 0-.91.12 1.36 1.36 0 0 0-.58.69L2 13.29a1.72 1.72 0 0 0 .58 1.8l7.65 5.52a1.71 1.71 0 0 0 2 0l7.65-5.52a1.72 1.72 0 0 0 .62-1.8z" />
+  </svg>
+);
+
+// Color Palette Definition for Code Reference:
+// Background: #0A0A0A
+// Cards: rgba(255,255,255,0.04)
+// Borders: rgba(255,255,255,0.08)
+// Accent: #7C5CFF (Botly Purple) or #4F9CF9 (Dev Blue)
+// Success: #10B981, Warning: #F59E0B, Failed: #EF4444
+
+export default function Home() {
+  // Navigation active anchors
+  const [activeSection, setActiveSection] = useState('hero');
+
+  // Interactive QA Sandbox States
+  const [selectedRepo, setSelectedRepo] = useState('vercel-nextjs-api');
+  const [selectedBranch, setSelectedBranch] = useState('main');
+  const [isTestRunning, setIsTestRunning] = useState(false);
+  const [currentTestStep, setCurrentTestStep] = useState(0);
+  const [testOutput, setTestOutput] = useState<string[]>([]);
+  const [testResultState, setTestResultState] = useState<'idle' | 'running' | 'success' | 'warning' | 'failed'>('idle');
+  const [activeTab, setActiveTab] = useState<'logger' | 'scenarios' | 'visual' | 'recommendation'>('logger');
+  const [isCopied, setIsCopied] = useState(false);
+  const [cliCopied, setCliCopied] = useState(false);
+
+  // Pricing Interval State
+  const [pricingInterval, setPricingInterval] = useState<'monthly' | 'yearly'>('monthly');
+
+  // FAQ toggles
+  const [faqOpen, setFaqOpen] = useState<Record<number, boolean>>({
+    0: true,
+  });
+
+  // Keep track of scroll positions for scroll-spy or nav borders
   const [isScrolled, setIsScrolled] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-  const { activeFilter } = useFilter();
-  const [selectedAppsCategory, setSelectedAppsCategory] = useState('all');
-  const [selectedBotsCategory, setSelectedBotsCategory] = useState('all');
-  const [homeBlogs, setHomeBlogs] = useState<BlogPost[]>([]);
 
   useEffect(() => {
     const handleScroll = () => {
-        setIsScrolled(window.scrollY > 200);
+      setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-  
-  const annScroll = useDraggableScroll();
-  const catScroll = useDraggableScroll();
-  const botsCatScroll = useDraggableScroll();
 
-  const botsCategories = categories.filter(c => c.id !== 'apps' && c.id !== 'all');
-
-  const filteredBots = useMemo(() => {
-    let result = [...bots];
-    
-    if (activeFilter === 'paid') result = result.filter(b => b.price > 0);
-    else if (activeFilter === 'free') result = result.filter(b => b.price === 0);
-    else if (activeFilter === 'popular') result = result.sort((a, b) => (b.views || 0) - (a.views || 0));
-    else if (activeFilter === 'bhub') result = result.filter(b => b.is_official);
-    
-    return result;
-  }, [bots, activeFilter]);
-
-  const loadData = useCallback(async () => {
-    // İlk yüklemede sadece botları, duyuruları ve son blogları çek, fiyatı arka planda güncelle
-    const [botData, annData, blogData] = await Promise.all([
-        DatabaseService.getBots(),
-        DatabaseService.getAnnouncements(),
-        DatabaseService.getBlogs(3)
-    ]);
-    
-    setBots(botData);
-    const activeAnns = annData.filter(a => a.is_active);
-    const combinedAnns = [
-        ...visualPromos,
-        ...activeAnns.filter(dbAnn => !visualPromos.some(vp => vp.title.toLowerCase() === dbAnn.title.toLowerCase() || vp.id === dbAnn.id))
-    ];
-    setAnnouncements(combinedAnns);
-    setHomeBlogs(blogData);
-    setIsLoading(false);
-
-    // Fiyat ve bildirimleri arka planda çek
-    PriceService.getTonPrice().then(pData => setTonRate(pData.tonTry));
-    
-    if (user?.id) {
-        DatabaseService.getNotifications(user.id.toString()).then(notes => {
-            const unread = notes.filter(n => !n.isRead).length;
-            setUnreadCount(unread);
-        });
+  // Repository database mock structure
+  const repos = {
+    'vercel-nextjs-api': {
+      branches: ['main', 'developer-route', 'hotfix/api-headers'],
+      commits: {
+        'main': { hash: 'f87a13c', msg: 'Merge branch "dev/supabase-sync"', time: '2m ago' },
+        'developer-route': { hash: 'c2e5b71', msg: 'feat: add metrics analytics capture', time: '1h ago' },
+        'hotfix/api-headers': { hash: 'a1b7e09', msg: 'fix: bypass caching policy on staging', time: '4h ago' }
+      }
+    },
+    'supabase-dashboard': {
+      branches: ['main', 'feature/realtime-feed', 'bugfix/auth-leak'],
+      commits: {
+        'main': { hash: 'e571c84', msg: 'doc: update API route guides', time: '10m ago' },
+        'feature/realtime-feed': { hash: 'b9bd7e1', msg: 'feat: add websockets trigger for active row updates', time: '2h ago' },
+        'bugfix/auth-leak': { hash: 'd9e075c', msg: 'security: revoke token on session expiration hook', time: '1d ago' }
+      }
+    },
+    'linear-clone-app': {
+      branches: ['main', 'feature/kanban-drag', 'refactor/optimistic-ui'],
+      commits: {
+        'main': { hash: '9b0c2e4', msg: 'chore: bump dev dependencies', time: '30m ago' },
+        'feature/kanban-drag': { hash: '5c81de3', msg: 'feat: drag and drop with keyboard support', time: '5h ago' },
+        'refactor/optimistic-ui': { hash: '1a2b3c4', msg: 'refactor: use query cache for instant board updates', time: '2d ago' }
+      }
     }
-  }, [user?.id]);
-
-  useEffect(() => {
-    loadData();
-    const handleClickOutside = (event: MouseEvent) => {
-        if (menuRef.current && !menuRef.current.contains(event.target as Node)) setIsMenuOpen(false);
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [loadData]);
-
-  const categorizedBots = useMemo(() => {
-    const result: Record<string, { featured: { bot: Bot, label: string }[], slider: Bot[], total: number }> = {};
-    const baseBots = [...filteredBots].sort((a, b) => (b.views || 0) - (a.views || 0));
-
-    // Apps section
-    const allApps = baseBots.filter(b => Array.isArray(b.category) ? b.category.includes('apps') : b.category === 'apps');
-    
-    // Market, Özel, Seçilen mapping for Apps
-    const marketApps = allApps.filter(b => b.promoted_type !== 'featured' && !b.is_official);
-    const ozelApps = allApps.filter(b => b.promoted_type === 'featured');
-    const secilenApps = allApps.filter(b => b.is_official || b.promoted_type === 'official');
-    
-    const appsFeaturedList: { bot: Bot, label: string }[] = [];
-    marketApps.slice(0, 2).forEach(bot => appsFeaturedList.push({ bot, label: 'Market' }));
-    ozelApps.slice(0, 2).forEach(bot => appsFeaturedList.push({ bot, label: 'Özel' }));
-    secilenApps.slice(0, 2).forEach(bot => appsFeaturedList.push({ bot, label: 'Seçilen' }));
-    
-    if (appsFeaturedList.length < 3) {
-        allApps.slice(0, 3).forEach((bot, i) => {
-            if (!appsFeaturedList.some(x => x.bot.id === bot.id)) {
-                const labels = ['Market', 'Özel', 'Seçilen'];
-                appsFeaturedList.push({ bot, label: labels[i % 3] });
-            }
-        });
-    }
-
-    // Slider/List (Popular apps in selected category)
-    let appsForList = allApps;
-    if (selectedAppsCategory !== 'all') {
-        appsForList = allApps.filter(b => 
-            Array.isArray(b.category) 
-                ? b.category.includes(selectedAppsCategory) 
-                : b.category === selectedAppsCategory
-        );
-    }
-    const appsSlider = appsForList.slice(0, 12); // Limit to 12 as requested
-
-    if (allApps.length > 0) {
-        result['apps'] = {
-            featured: appsFeaturedList,
-            slider: appsSlider,
-            total: allApps.length
-        };
-    }
-
-    // Bots section (everything else)
-    const allBots = baseBots.filter(b => Array.isArray(b.category) ? !b.category.includes('apps') : b.category !== 'apps');
-    
-    // Market, Özel, Seçilen mapping for Bots
-    const marketBots = allBots.filter(b => b.promoted_type !== 'featured' && !b.is_official);
-    const ozelBots = allBots.filter(b => b.promoted_type === 'featured');
-    const secilenBots = allBots.filter(b => b.is_official || b.promoted_type === 'official');
-    
-    const botsFeaturedList: { bot: Bot, label: string }[] = [];
-    marketBots.slice(0, 2).forEach(bot => botsFeaturedList.push({ bot, label: 'Market' }));
-    ozelBots.slice(0, 2).forEach(bot => botsFeaturedList.push({ bot, label: 'Özel' }));
-    secilenBots.slice(0, 2).forEach(bot => botsFeaturedList.push({ bot, label: 'Seçilen' }));
-    
-    if (botsFeaturedList.length < 3) {
-        allBots.slice(0, 3).forEach((bot, i) => {
-            if (!botsFeaturedList.some(x => x.bot.id === bot.id)) {
-                const labels = ['Market', 'Özel', 'Seçilen'];
-                botsFeaturedList.push({ bot, label: labels[i % 3] });
-            }
-        });
-    }
-
-    // Slider/List (Popular bots in selected category)
-    let botsForList = allBots;
-    if (selectedBotsCategory !== 'all') {
-        botsForList = allBots.filter(b => 
-            Array.isArray(b.category) 
-                ? b.category.includes(selectedBotsCategory) 
-                : b.category === selectedBotsCategory
-        );
-    }
-    const botsSlider = botsForList.slice(0, 12); // Limit to 12 as requested
-
-    if (allBots.length > 0) {
-        result['bots'] = {
-            featured: botsFeaturedList,
-            slider: botsSlider,
-            total: allBots.length
-        };
-    }
-    
-    return result;
-  }, [filteredBots, selectedAppsCategory, selectedBotsCategory]);
-
-  interface MenuItem {
-      id: string;
-      label: string;
-      desc: string;
-      icon: any;
-      action?: () => void;
-      path?: string;
-  }
-
-  const discoverItems: MenuItem[] = [
-      { id: 'bots', label: 'Botlar', desc: 'Telegram Bot Marketi', icon: BotIcon, action: () => setNavState('bots') },
-      { id: 'apps', label: 'Uygulamalar', desc: 'Web3 & TMA Uygulamaları', icon: LayoutGrid, action: () => setNavState('apps') },
-      { id: 'channels', label: 'Kanallar', desc: 'Popüler Telegram Kanalları', icon: Megaphone, path: '/channels' },
-      { id: 'ads', label: 'Reklam', desc: 'Projenizi Öne Çıkarın', icon: Share2, path: '/settings' },
-  ];
-
-  const investorItems: MenuItem[] = [
-      { id: 'exchanges', label: 'Borsalar ve Takas', desc: 'CEX & DEX Platformları', icon: BarChart3 },
-      { id: 'earn', label: 'Kazanç Uygulamaları', desc: 'Pasif Gelir Fırsatları', icon: Coins },
-      { id: 'tools', label: 'Yatırım Araçları', desc: 'Analiz ve Takip Araçları', icon: Briefcase },
-      { id: 'new', label: 'Yeni Keşifler', desc: 'Gelecek Vaadeden Projeler', icon: Compass },
-  ];
-
-  const simpleLinks = [
-      { label: 'Hızlı Link 1', path: '#' },
-      { label: 'Hızlı Link 2', path: '#' },
-      { label: 'Hızlı Link 3', path: '#' },
-  ];
-
-  const appsCategories = appsSubCategories;
-
-  const handleCategoryClick = (catId: string, mode: 'bots' | 'apps') => {
-      haptic('light');
-      navigate(`/search?mode=${mode}&category=${catId}`);
-      setOpenMenu(null);
-      setMobileModal(null);
-      setNavState('main');
   };
 
-  const renderMegaMenuContent = () => {
-      if (openMenu === 'kesfet') {
-          return (
-              <div className="max-w-5xl mx-auto px-6 grid grid-cols-12 gap-8">
-                  <div className="col-span-8">
-                      <AnimatePresence mode="wait">
-                          {navState === 'main' ? (
-                              <motion.div 
-                                  key="main"
-                                  initial={{ opacity: 0, x: -20 }}
-                                  animate={{ opacity: 1, x: 0 }}
-                                  exit={{ opacity: 0, x: -20 }}
-                                  className="grid grid-cols-2 gap-4"
-                              >
-                                  {discoverItems.map(item => (
-                                      <button 
-                                          key={item.id}
-                                          onClick={() => {
-                                              if (item.action) item.action();
-                                              else if (item.path) { navigate(item.path); setOpenMenu(null); }
-                                          }}
-                                          className="flex items-center gap-4 p-4 hover:bg-black/[0.02] dark:hover:bg-white/5 rounded-2xl transition-all group border border-transparent hover:border-black/5 dark:hover:border-white/10 text-left w-full"
-                                      >
-                                          <div className="menu-icon-container shrink-0 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
-                                              <item.icon size={20} />
-                                          </div>
-                                          <div className="flex flex-col">
-                                              <span className="text-[14px] font-semibold menu-item-text">{item.label}</span>
-                                              <span className="text-[12px] text-slate-500 dark:text-slate-400 font-normal">{item.desc}</span>
-                                          </div>
-                                      </button>
-                                  ))}
-                              </motion.div>
-                          ) : navState === 'bots' ? (
-                              <motion.div 
-                                  key="bots"
-                                  initial={{ opacity: 0, x: 20 }}
-                                  animate={{ opacity: 1, x: 0 }}
-                                  exit={{ opacity: 0, x: 20 }}
-                                  className="flex flex-col gap-6"
-                              >
-                                  <div className="flex items-center gap-4 mb-2">
-                                      <button 
-                                          onClick={() => setNavState('main')}
-                                          className="p-2 hover:bg-white/10 rounded-full text-slate-500 transition-colors"
-                                      >
-                                          <ArrowLeft size={20} />
-                                      </button>
-                                      <h3 className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-tight">Bot Kategorileri</h3>
-                                  </div>
-                                  <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                                      {botsCategories.map(cat => (
-                                          <button 
-                                              key={cat.id}
-                                              onClick={() => handleCategoryClick(cat.id, 'bots')}
-                                              className="flex items-center gap-3 p-3 hover:bg-black/[0.02] dark:hover:bg-white/5 rounded-xl transition-all group text-left border border-transparent hover:border-black/5 dark:hover:border-white/10 w-full"
-                                          >
-                                              <div className="menu-icon-container !w-8 !h-8 px-0 shrink-0 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
-                                                  <cat.icon size={16} />
-                                              </div>
-                                              <span className="text-[11px] font-bold uppercase tracking-tight menu-item-text">{t(cat.label)}</span>
-                                          </button>
-                                      ))}
-                                  </div>
-                              </motion.div>
-                          ) : (
-                              <motion.div 
-                                  key="apps"
-                                  initial={{ opacity: 0, x: 20 }}
-                                  animate={{ opacity: 1, x: 0 }}
-                                  exit={{ opacity: 0, x: 20 }}
-                                  className="flex flex-col gap-6"
-                              >
-                                  <div className="flex items-center gap-4 mb-2">
-                                      <button 
-                                          onClick={() => setNavState('main')}
-                                          className="p-2 hover:bg-white/10 rounded-full text-slate-500 transition-colors"
-                                      >
-                                          <ArrowLeft size={20} />
-                                      </button>
-                                      <h3 className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-tight">Uygulama Kategorileri</h3>
-                                  </div>
-                                  <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                                      {appsCategories.map(cat => (
-                                          <button 
-                                              key={cat.id}
-                                              onClick={() => handleCategoryClick(cat.id, 'apps')}
-                                              className="flex items-center gap-3 p-3 hover:bg-black/[0.02] dark:hover:bg-white/5 rounded-xl transition-all group text-left border border-transparent hover:border-black/5 dark:hover:border-white/10 w-full"
-                                          >
-                                              <div className="menu-icon-container !w-8 !h-8 px-0 shrink-0 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
-                                                  <cat.icon size={16} />
-                                              </div>
-                                              <span className="text-[11px] font-bold uppercase tracking-tight menu-item-text">{t(cat.label)}</span>
-                                          </button>
-                                      ))}
-                                  </div>
-                              </motion.div>
-                          )}
-                      </AnimatePresence>
-                  </div>
-                  <div className="col-span-4 border-l border-black/5 dark:border-white/5 pl-8 flex flex-col justify-center gap-3">
-                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-600 mb-2">Hızlı Bağlantılar</span>
-                      {simpleLinks.map((link, i) => (
-                          <a 
-                              key={i}
-                              href={link.path}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-blue-500 transition-all font-bold text-xs uppercase group"
-                          >
-                              {link.label}
-                              <ExternalLink size={14} className="opacity-0 group-hover:opacity-100 transition-all" />
-                          </a>
-                      ))}
-                  </div>
-              </div>
-          );
+  // Run a interactive simulation of BotlyHub's pipeline
+  const handleTriggerQAFeedback = () => {
+    if (isTestRunning) return;
+    
+    setIsTestRunning(true);
+    setTestResultState('running');
+    setCurrentTestStep(0);
+    setActiveTab('logger');
+    
+    const logs: string[] = [];
+    const pushLog = (msg: string, delay: number) => {
+      return new Promise<void>((resolve) => {
+        setTimeout(() => {
+          logs.push(msg);
+          setTestOutput([...logs]);
+          resolve();
+        }, delay);
+      });
+    };
+
+    const runLogs = async () => {
+      setTestOutput([]);
+      await pushLog(`⚡ [botlyhub-pipeline] initialising pipeline client for ${selectedRepo}/${selectedBranch}`, 250);
+      await pushLog(`🚀 [botlyhub-pipeline] matched commit ${repos[selectedRepo as keyof typeof repos].commits[selectedBranch as 'main'].hash} (${repos[selectedRepo as keyof typeof repos].commits[selectedBranch as 'main'].msg})`, 450);
+      await pushLog(`📦 [botlyhub-pipeline] scanning environment secrets... valid`, 400);
+      await pushLog(`🔍 [botlyhub-ai] step 1/3: performing syntactic and pattern audit`, 500);
+      
+      // Syntax phase specific warnings
+      if (selectedBranch === 'hotfix/api-headers') {
+        await pushLog(`⚠️  [botlyhub-ai] warning: insecure staging wildcard headers detected in api/headers.ts [line 47]`, 600);
+      } else if (selectedBranch === 'bugfix/auth-leak') {
+        await pushLog(`🚨  [botlyhub-ai] danger: high risk session leak detected in useSession.ts [line 114]. Auth token cache not evicted upon logOut() invocation`, 650);
+      } else {
+        await pushLog(`✅  [botlyhub-ai] no core syntactic issues or static security leaks detected`, 500);
       }
 
-      if (openMenu === 'investors') {
-          return (
-              <div className="max-w-5xl mx-auto px-6 grid grid-cols-12 gap-8">
-                  <div className="col-span-8">
-                      <div className="grid grid-cols-2 gap-4">
-                          {investorItems.map(item => (
-                              <button 
-                                  key={item.id}
-                                  className="flex items-center gap-4 p-4 hover:bg-black/[0.02] dark:hover:bg-white/5 rounded-2xl transition-all group border border-transparent hover:border-black/5 dark:hover:border-white/10 text-left w-full"
-                              >
-                                  <div className="menu-icon-container shrink-0 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
-                                      <item.icon size={20} />
-                                  </div>
-                                  <div className="flex flex-col">
-                                      <span className="text-[14px] font-semibold menu-item-text">{item.label}</span>
-                                      <span className="text-[12px] text-slate-500 dark:text-slate-400 font-normal">{item.desc}</span>
-                                  </div>
-                              </button>
-                          ))}
-                      </div>
-                  </div>
-                  <div className="col-span-4 border-l border-black/5 dark:border-white/5 pl-8 flex flex-col justify-center gap-3">
-                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-600 mb-2">Yatırım Linkleri</span>
-                      {simpleLinks.map((link, i) => (
-                          <a 
-                              key={i}
-                              href={link.path}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-emerald-500 transition-all font-bold text-xs uppercase group"
-                          >
-                              {link.label}
-                              <ExternalLink size={14} className="opacity-0 group-hover:opacity-100 transition-all" />
-                          </a>
-                      ))}
-                  </div>
-              </div>
-          );
+      setCurrentTestStep(1);
+      await pushLog(`🧠 [botlyhub-ai] step 2/3: dynamically generating 14 automated integration scenarios`, 600);
+      await pushLog(`🧪 [botlyhub-ai] scenario gen: 4 authentication flows, 6 state transitions, 4 data mutating requests`, 400);
+      
+      setCurrentTestStep(2);
+      await pushLog(`🌐 [botlyhub-crawler] step 3/3: spawning headless chromium cluster (E2E simulation)`, 600);
+      await pushLog(`🤖 [botlyhub-crawler] running test: 'simulating standard login with delayed network latency'`, 450);
+      
+      if (selectedBranch === 'bugfix/auth-leak') {
+        await pushLog(`❌  [botlyhub-crawler] test 'session cache purge on logout' failed: local storage token retained after exit signal dispatch`, 700);
+        await pushLog(`📊  [botlyhub-pipeline] run failed: 13 passed, 0 warnings, 1 failed.`, 300);
+        setTestResultState('failed');
+      } else if (selectedBranch === 'hotfix/api-headers') {
+        await pushLog(`⚠️  [botlyhub-crawler] test 'visual layout integrity under responsive boundaries' warning: button element overlap on 320px screen width`, 700);
+        await pushLog(`📊  [botlyhub-pipeline] run completed with warning: 13 passed, 1 warning, 0 failed.`, 300);
+        setTestResultState('warning');
+        setActiveTab('visual');
+      } else if (selectedBranch === 'feature/realtime-feed') {
+        await pushLog(`ℹ️  [botlyhub-crawler] telemetry: websocket connection speed 180ms within threshold`, 500);
+        await pushLog(`✅  [botlyhub-pipeline] run passed flawlessly: 14 passed, 0 warnings, 0 failed.`, 300);
+        setTestResultState('success');
+        setActiveTab('recommendation');
+      } else {
+        await pushLog(`✅  [botlyhub-pipeline] run passed flawlessly: 14 passed, 0 warnings, 0 failed.`, 600);
+        setTestResultState('success');
       }
+      
+      setIsTestRunning(false);
+    };
+
+    runLogs();
+  };
+
+  // Reset demo block
+  const resetDemoState = () => {
+    setIsTestRunning(false);
+    setTestOutput([]);
+    setTestResultState('idle');
+    setCurrentTestStep(0);
+  };
+
+  useEffect(() => {
+    resetDemoState();
+  }, [selectedRepo, selectedBranch]);
+
+  // Copy CLI command utils
+  const handleCopyCLI = () => {
+    navigator.clipboard.writeText('npm i -g @botlyhub/cli && botlyhub init');
+    setCliCopied(true);
+    setTimeout(() => setCliCopied(false), 2000);
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-200 animate-in transition-colors duration-300 home-page">
-      <SEO 
-          title={t('home_seo_title')} 
-          description={t('home_seo_desc')}
-      />
-      {/* Top Background Wrapper (Sticky Header on Desktop and Mobile) */}
-      <div 
-        className="sticky top-0 z-[120] bg-white dark:bg-slate-950 border-b border-black/[0.03] dark:border-white/5 transition-all shadow-sm"
-        onMouseLeave={() => { setOpenMenu(null); setNavState('main'); }}
-      >
-        {/* Top Section */}
-        <div className="w-full py-4 relative z-[120]">
-          <div className="max-w-7xl mx-auto px-5 sm:px-8">
-              <div className="flex flex-wrap md:flex-nowrap items-center justify-between px-1 gap-y-4 md:gap-x-6">
-                <div className="flex items-center order-1 md:w-36 lg:w-48 shrink-0">
-                    <Logo onClick={() => navigate('/')} className="cursor-pointer" />
-                </div>
+    <div className="bg-[#0A0A0A] text-[#EDEDED] font-sans overflow-x-hidden min-h-screen">
+      
+      {/* GLOW BACKGROUND ORBITS */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[600px] pointer-events-none overflow-hidden z-0">
+        <div className="absolute top-[-10%] left-[10%] w-[350px] h-[350px] rounded-full bg-[#7C5CFF]/10 blur-[130px]" />
+        <div className="absolute top-[25%] right-[15%] w-[450px] h-[450px] rounded-full bg-[#4F9CF9]/10 blur-[150px]" />
+        <div className="absolute top-[5%] left-1/2 -translate-x-1/2 w-[800px] h-[1px] bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+      </div>
 
-                  <div className="w-full md:flex-1 md:max-w-4xl order-3 md:order-2 flex items-center gap-4 lg:gap-8 font-sans justify-center">
-                      {/* Search Bar Container */}
-                      <div className="flex-1 md:max-w-[280px] lg:max-w-[320px] relative z-[130]">
-                          <div className="relative flex items-center bg-[#eeefef] dark:bg-slate-800 rounded-xl group transition-all h-[42px] px-3">
-                              <div 
-                                onClick={() => navigate('/search')} 
-                                className="flex items-center flex-1 min-w-0 cursor-pointer active:scale-[0.98] transition-transform"
-                              >
-                                  <Search size={16} className="text-[#8e8e93] dark:text-slate-400 group-hover:text-blue-500 transition-colors shrink-0 mr-2" />
-                                  <div className="w-full text-[13px] text-[#2c2c2e] dark:text-slate-350 font-bold truncate min-w-0 tracking-wide">
-                                      Herşeyi ara
-                                  </div>
-                              </div>
-                              
-                              {/* Vertical Divider */}
-                              <div className="w-px h-5 bg-black/[0.08] dark:bg-white/[0.08] mx-1 shrink-0" />
-                              
-                              {/* Filter Menu */}
-                              <div className="shrink-0 relative z-[140]">
-                                  <FilterMenu />
-                              </div>
-                          </div>
-                      </div>
-
-                      {/* Header Navigation Links (Keşfet, Yatırımcılar, Blog) */}
-                      <div className="hidden md:flex items-center gap-5 lg:gap-8 shrink-0">
-                          {/* Keşfet */}
-                          <button 
-                              onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('kesfet'); }}
-                              onClick={() => { haptic('light'); setOpenMenu(openMenu === 'kesfet' ? null : 'kesfet'); }}
-                              className={`nav-menu-item text-slate-800 dark:text-white hover:opacity-80 flex items-center gap-1 transition-all font-semibold text-[14px] select-none tracking-tight py-2 border-b-2 ${openMenu === 'kesfet' ? 'border-blue-500' : 'border-transparent'}`}
-                          >
-                              <span>Keşfet</span>
-                              <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'kesfet' ? 'rotate-180' : ''}`} />
-                          </button>
-
-                          {/* Yatırımcılar */}
-                          <button 
-                              onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('investors'); }}
-                              onClick={() => { haptic('light'); setOpenMenu(openMenu === 'investors' ? null : 'investors'); }}
-                              className={`nav-menu-item text-slate-800 dark:text-white hover:opacity-80 flex items-center gap-1 transition-all font-semibold text-[14px] select-none tracking-tight py-2 border-b-2 ${openMenu === 'investors' ? 'border-emerald-500' : 'border-transparent'}`}
-                          >
-                              <span>Yatırımcılar</span>
-                              <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'investors' ? 'rotate-180' : ''}`} />
-                          </button>
-
-                          {/* Blog */}
-                          <button 
-                              onClick={() => { haptic('light'); navigate('/blog'); }}
-                              className="nav-menu-item text-slate-800 dark:text-white hover:opacity-80 flex items-center gap-1 transition-all font-semibold text-[14px] select-none tracking-tight py-2 border-b-2 border-transparent"
-                          >
-                              <span>Blog</span>
-                          </button>
-                      </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 md:gap-3 order-2 md:order-3 md:w-48 justify-end ml-auto shrink-0 font-sans">
-                      {user && (
-                          <button onClick={() => { haptic('medium'); navigate('/earnings'); }} className="hidden sm:flex w-10 h-10 items-center justify-center text-slate-900 dark:text-white bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 rounded-xl active:scale-95 transition-all outline-none">
-                              <Wallet size={18} />
-                          </button>
-                      )}
-
-                      {!user && (
-                          <button 
-                              onClick={() => { haptic('light'); setIsLoginModalOpen(true); }}
-                              className="px-5 h-10 bg-blue-500 hover:bg-blue-600 text-white text-[13px] font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center whitespace-nowrap shadow-lg shadow-blue-500/25"
-                          >
-                              {t('login')}
-                          </button>
-                      )}
-
-                      <div className="relative" ref={menuRef}>
-                          <button 
-                            onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }} 
-                            className="h-10 px-3 flex items-center justify-center gap-1.5 text-slate-900 dark:text-white bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 border border-black/5 dark:border-white/5 rounded-xl active:scale-95 transition-all relative outline-none select-none"
-                          >
-                                <div className="flex md:hidden items-center gap-1.5">
-                                    {user ? (
-                                        <span className="text-[11px] font-black uppercase tracking-wide">
-                                            {(user.username || user.first_name || user.name || '').slice(0, 5)}{(user.username || user.first_name || user.name || '').length > 5 ? '..' : ''}
-                                        </span>
-                                    ) : (
-                                        <Menu size={18} className="text-slate-700 dark:text-slate-300" />
-                                    )}
-                                    <ChevronDown size={12} className={`text-slate-400 dark:text-slate-500 transition-transform duration-200 ${isMenuOpen ? 'rotate-180' : ''}`} />
-                                </div>
-                                <div className="hidden md:flex items-center gap-1.5">
-                                    {user ? (
-                                        <>
-                                            <span className="text-[11px] font-black uppercase tracking-wide">
-                                                {user.username || user.first_name || user.name || ''}
-                                            </span>
-                                            <ChevronDown size={12} className={`text-slate-400 dark:text-slate-500 transition-transform duration-200 ${isMenuOpen ? 'rotate-180' : ''}`} />
-                                        </>
-                                    ) : (
-                                        <Settings size={18} className="text-slate-700 dark:text-slate-300" />
-                                    )}
-                                </div>
-                              {user && unreadCount > 0 && (
-                                  <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[8px] font-black text-white flex items-center justify-center px-1 badge-pop">
-                                      {unreadCount > 9 ? '9+' : unreadCount}
-                                  </div>
-                              )}
-                          </button>
-                          {isMenuOpen && (
-                              <div className="absolute right-0 top-full mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-white/5 rounded-2xl shadow-2xl p-2 z-[100] animate-in fade-in zoom-in-95 duration-200">
-                                  {user ? (
-                                      <>
-                                          <div className="p-4 border-b border-slate-100 dark:border-white/5 mb-2">
-                                              <div className="flex items-center gap-3">
-                                                  {(user.photo_url || user.avatar) ? (
-                                                      <img 
-                                                          src={user.photo_url || user.avatar} 
-                                                          alt={user.first_name || user.name}
-                                                          className="w-10 h-10 rounded-full object-cover"
-                                                      />
-                                                  ) : (
-                                                      <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-black">
-                                                          {user.first_name ? user.first_name[0] : (user.name ? user.name[0] : 'U')}
-                                                      </div>
-                                                  )}
-                                                  <div className="flex flex-col min-w-0">
-                                                      <span className="text-[13px] font-bold text-slate-900 dark:text-white truncate">
-                                                          {user.first_name ? `${user.first_name} ${user.last_name || ''}` : user.name}
-                                                      </span>
-                                                      <span className="text-[10px] text-slate-500 truncate">@{user.username || user.id}</span>
-                                                  </div>
-                                              </div>
-                                          </div>
-
-                                          <button onClick={() => { haptic('light'); navigate('/'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                              <Store size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                              <span className="text-xs font-bold uppercase tracking-tight">{t('market')}</span>
-                                          </button>
-
-                                          <button 
-                                              onClick={() => { haptic('light'); setMobileModal('kesfet'); setIsMenuOpen(false); }} 
-                                              className="flex md:hidden w-full flex-center items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group"
-                                          >
-                                              <Compass size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                              <span className="text-xs font-bold uppercase tracking-tight">Keşfet</span>
-                                          </button>
-
-                                          <button 
-                                              onClick={() => { haptic('light'); setMobileModal('investors'); setIsMenuOpen(false); }} 
-                                              className="flex md:hidden w-full flex-center items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group"
-                                          >
-                                              <Briefcase size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                              <span className="text-xs font-bold uppercase tracking-tight">Yatırımcılar</span>
-                                          </button>
-
-                                          <button onClick={() => { haptic('light'); navigate('/profile'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                              <User size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                              <span className="text-xs font-bold uppercase tracking-tight">{t('profile')}</span>
-                                          </button>
-
-                                          <button onClick={() => { haptic('light'); navigate('/my-bots'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                              <BotIcon size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                              <span className="text-xs font-bold uppercase tracking-tight">{t('my_bots')}</span>
-                                          </button>
-
-                                          <button onClick={() => { haptic('light'); navigate('/channels'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                              <Megaphone size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                              <span className="text-xs font-bold uppercase tracking-tight">{t('my_channels')}</span>
-                                          </button>
-
-                                          <button onClick={() => { haptic('light'); navigate('/notifications'); setIsMenuOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                              <div className="flex items-center gap-3">
-                                                  <Bell size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                                  <span className="text-xs font-bold uppercase tracking-tight">{t('notifications')}</span>
-                                              </div>
-                                              {unreadCount > 0 && <div className="w-2 h-2 bg-red-500 rounded-full" />}
-                                          </button>
-
-                                          <button onClick={() => { haptic('light'); navigate('/qa'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                              <MessageSquare size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                              <span className="text-xs font-bold uppercase tracking-tight">{t('qa_forum') || 'Soru Cevap Forumu'}</span>
-                                          </button>
-
-                                          <div className="h-px bg-slate-100 dark:border-white/5 my-2" />
-
-                                          {/* Night Mode & Add Your inside dropdown */}
-                                          <button onClick={() => { haptic('light'); toggleTheme(); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                              {theme === 'dark' ? (
-                                                  <>
-                                                      <Sun size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                                      <span className="text-xs font-bold uppercase tracking-tight">{t('light_mode') || 'Gündüz Modu'}</span>
-                                                  </>
-                                              ) : (
-                                                  <>
-                                                      <Moon size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                                      <span className="text-xs font-bold uppercase tracking-tight">{t('dark_mode') || 'Gece Modu'}</span>
-                                                  </>
-                                              )}
-                                          </button>
-
-                                          <button onClick={() => { haptic('light'); navigate('/settings'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                              <Plus size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                              <span className="text-xs font-bold uppercase tracking-tight">{t('add_your')}</span>
-                                          </button>
-
-                                          <div className="h-px bg-slate-100 dark:border-white/5 my-2" />
-                                          
-                                          <button 
-                                              onClick={() => { 
-                                                  const confirmed = window.confirm("Çıkış yapmak istediğinize emin misiniz?");
-                                                  if (confirmed) {
-                                                      haptic('medium'); 
-                                                      setWebAuthUser(null);
-                                                      setIsMenuOpen(false); 
-                                                  }
-                                              }} 
-                                              className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 text-red-500 transition-all font-bold text-xs uppercase"
-                                          >
-                                              <LogOut size={18} /> 
-                                              <span className="text-xs font-bold uppercase tracking-tight">{t('home_logout')}</span>
-                                          </button>
-                                      </>
-                                  ) : (
-                                      <>
-                                          <button onClick={() => { haptic('light'); setIsLoginModalOpen(true); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 transition-all group font-bold">
-                                              <User size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300" />
-                                              <span className="text-xs font-bold uppercase tracking-tight">{t('login')}</span>
-                                          </button>
-
-                                          <button onClick={() => { haptic('light'); navigate('/'); setIsMenuOpen(false); }} className="flex md:hidden w-full flex-center items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                              <Store size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                              <span className="text-xs font-bold uppercase tracking-tight">{t('market')}</span>
-                                          </button>
-
-                                          <button 
-                                              onClick={() => { haptic('light'); setMobileModal('kesfet'); setIsMenuOpen(false); }} 
-                                              className="flex md:hidden w-full flex-center items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group"
-                                          >
-                                              <Compass size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                              <span className="text-xs font-bold uppercase tracking-tight">Keşfet</span>
-                                          </button>
-
-                                          <button 
-                                              onClick={() => { haptic('light'); setMobileModal('investors'); setIsMenuOpen(false); }} 
-                                              className="flex md:hidden w-full flex-center items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group"
-                                          >
-                                              <Briefcase size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                              <span className="text-xs font-bold uppercase tracking-tight">Yatırımcılar</span>
-                                          </button>
-
-                                          <button onClick={() => { haptic('light'); toggleTheme(); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                              {theme === 'dark' ? (
-                                                  <>
-                                                      <Sun size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                                      <span className="text-xs font-bold uppercase tracking-tight">{t('light_mode') || 'Gündüz Modu'}</span>
-                                                  </>
-                                              ) : (
-                                                  <>
-                                                      <Moon size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                                      <span className="text-xs font-bold uppercase tracking-tight">{t('dark_mode') || 'Gece Modu'}</span>
-                                                  </>
-                                              )}
-                                          </button>
-
-                                          <button onClick={() => { haptic('light'); navigate('/settings'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group">
-                                              <Plus size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                                              <span className="text-xs font-bold uppercase tracking-tight">{t('add_your')}</span>
-                                          </button>
-                                      </>
-                                  )}
-                              </div>
-                          )}
-                      </div>
-                  </div>
-                  <LoginModal 
-                      isOpen={isLoginModalOpen} 
-                      onClose={() => setIsLoginModalOpen(false)} 
-                      onAuth={(user) => setWebAuthUser(user)} 
-                  />
-                </div>
-              </div>
-          </div>
+      {/* HEADER NAVIGATION */}
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-[#0A0A0A]/85 backdrop-blur-md border-b border-white/[0.06] py-3' : 'bg-transparent py-5'}`}>
+        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           
-          {/* Desktop Mega Menu Dropdown */}
-          <AnimatePresence>
-              {openMenu && (
-                  <motion.div 
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.2 }}
-                      className="hidden md:block absolute left-0 right-0 top-full bg-white dark:bg-slate-900/95 backdrop-blur-xl border-b border-black/5 dark:border-white/10 shadow-2xl z-[100] mega-menu-container"
-                      onMouseLeave={() => { setOpenMenu(null); setNavState('main'); }}
-                  >
-                      {renderMegaMenuContent()}
-                  </motion.div>
-              )}
-          </AnimatePresence>
-      </div>
-        {isLoading ? (
-            <div className="flex flex-col items-center justify-center py-24 gap-4"><Loader2 className="animate-spin text-blue-500" size={32} /></div>
-        ) : (
-            <>
-              {announcements.length > 0 && (
-                  <div className="pb-8 pt-4 max-w-7xl mx-auto w-full px-5 sm:px-8 overflow-hidden select-none animate-in fade-in duration-500">
-                      <AnnouncementsCarousel 
-                          announcements={announcements} 
-                          scroll={annScroll} 
-                          onShowPopup={(a) => setSelectedAnn(a)} 
-                      />
-                  </div>
-              )}
-            </>
-          )}
-
-
-
-      {/* Bottom Section */}
-      <div className="bg-white dark:bg-slate-950 w-full pt-10 pb-32 shadow-[0_-1px_0_0_rgba(0,0,0,0.015)]">
-          <div className="max-w-7xl mx-auto px-5 sm:px-8">
-              {!isLoading && (
-                  <>
-                    <div className="mb-10 sm:mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700 text-center">
-                        <h1 className="mobile-hero-title font-bold tracking-[-0.035em] md:leading-none leading-tight text-slate-900 dark:text-white">
-                            {t('home_hero_title').includes(':') ? (
-                                <>
-                                    {t('home_hero_title').split(':')[0]}: <span className="text-blue-500">{t('home_hero_title').split(':')[1]?.trim()}</span>
-                                </>
-                            ) : t('home_hero_title')}
-                        </h1>
-                        <p className="mt-6 text-slate-500 dark:text-slate-400 text-sm md:hero-desc font-medium max-w-2xl mx-auto uppercase tracking-widest italic">
-                            {t('home_hero_desc')}
-                        </p>
-                    </div>
-
-                    <AnimatePresence mode="wait">
-                <motion.div 
-                    key={activeFilter}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.3 }}
-                >
-                    {/* Apps Section */}
-                    {categorizedBots['apps'] && (() => {
-                        const data = categorizedBots['apps'];
-                        
-                        const featuredBots = data.featured;
-                        const sliderBots = data.slider;
-
-                        const botChunks = [];
-                        for (let i = 0; i < sliderBots.length; i += 3) {
-                            botChunks.push(sliderBots.slice(i, i + 3));
-                        }
-
-                        return (
-                            <div className="mt-10 mb-10 space-y-6">
-                                <div className="flex flex-col gap-6 overflow-hidden">
-                                    <div 
-                                        className="flex flex-col gap-1 cursor-pointer group shrink-0"
-                                        onClick={() => navigate(`/search?mode=apps&category=all`)}
-                                    >
-                                        <div className="flex items-center gap-2">
-                                            <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight uppercase italic text-blue-500">
-                                                APPS
-                                            </h2>
-                                            <span className="text-sm font-bold text-slate-400 dark:text-slate-600 ml-1">
-                                                {data.total}
-                                            </span>
-                                            <ChevronRight size={16} className="text-slate-300 dark:text-slate-700 group-hover:translate-x-1 transition-transform" />
-                                        </div>
-                                        <p className="hidden sm:block text-[0.86rem] text-slate-400 dark:text-slate-600 font-normal leading-relaxed">
-                                            {t('home_apps_desc')}
-                                        </p>
-                                    </div>
-
-                                    {/* Top 3 Featured Cards for this section */}
-                                    <div className="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth pb-3 mb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
-                                        {featuredBots.map(({ bot }) => (
-                                            <div 
-                                                key={bot.id} 
-                                                onClick={() => navigate(`/bot/${bot.slug}`)}
-                                                className={`flex items-center justify-between p-4 rounded-xl border border-black/[0.05] dark:border-white/[0.08] hover:border-blue-500/20 transition-all cursor-pointer group hover:scale-[1.01] bg-[#00000008] dark:bg-white/[0.03] min-w-[280px] sm:min-w-[320px] shrink-0 relative ${featuredBots.length <= 3 ? 'md:flex-1 md:min-w-0' : 'md:w-[calc(33.333%-11px)]'}`}
-                                            >
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-12 h-12 featured-bot-card-img flex items-center justify-center p-[1px] overflow-hidden shrink-0">
-                                                        <img 
-                                                            src={getLiveBotIcon(bot)} 
-                                                            className="w-full h-full object-cover bg-white featured-bot-card-img" 
-                                                            alt=""
-                                                            onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
-                                                        />
-                                                    </div>
-                                                    <div className="flex flex-col min-w-0">
-                                                        <div className="flex items-center gap-1">
-                                                            <span className="text-lg font-black text-slate-900 dark:text-white tracking-tight truncate leading-tight">{bot.name}</span>
-                                                            <CheckCircle2 size={14} className="text-blue-500 fill-blue-500/10 shrink-0" />
-                                                        </div>
-                                                        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold line-clamp-1 uppercase tracking-tight">{bot.description}</span>
-                                                    </div>
-                                                </div>
-                                                <div className="text-2xl font-black text-slate-900 dark:text-white mr-1 shrink-0 italic">
-                                                    {bot.rating || '0.0'}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    <div 
-                                        ref={catScroll.ref}
-                                        onMouseDown={catScroll.onMouseDown}
-                                        onMouseUp={catScroll.onMouseUp}
-                                        onMouseMove={catScroll.onMouseMove}
-                                        onMouseLeave={catScroll.onMouseLeave}
-                                        onContextMenu={catScroll.onContextMenu}
-                                        className="category-filter-container no-scrollbar relative z-0"
-                                    >
-                                        <button 
-                                            className={`category-filter-item ${selectedAppsCategory === 'all' ? 'active' : ''}`}
-                                            onClick={() => { haptic('light'); setSelectedAppsCategory('all'); }}
-                                        >
-                                            {t('home_all')}
-                                        </button>
-                                        {appsSubCategories.map((subCat) => (
-                                            <button 
-                                                key={subCat.id} 
-                                                className={`category-filter-item ${selectedAppsCategory === subCat.id ? 'active' : ''}`}
-                                                onClick={() => { haptic('light'); setSelectedAppsCategory(subCat.id); }}
-                                            >
-                                                {t(subCat.label)}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                                
-                                {(() => {
-                                    const displayedBots = sliderBots.slice(0, 12);
-                                    return (
-                                        <>
-                                            {/* Desktop Grid Layout (sm and up) */}
-                                            <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-7 px-1 py-2">
-                                                {displayedBots.map((bot, idx) => (
-                                                    <CategoryBotCard key={bot.id} bot={bot} rank={idx + 1} />
-                                                ))}
-                                            </div>
-
-                                            {/* Mobile Horizontal Carousel Layout (xs) */}
-                                            <div className="sm:hidden relative -mx-4 px-4 overflow-hidden">
-                                                <div className="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory pb-4">
-                                                    {getMobileColumns(sliderBots).map((col, colIdx) => (
-                                                        <div key={colIdx} className="flex flex-col gap-5 min-w-[85vw] snap-center first:pl-2">
-                                                            {col.map(({ bot, rank }) => (
-                                                                <CategoryBotCard key={bot.id} bot={bot} rank={rank} />
-                                                            ))}
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </>
-                                    );
-                                })()}
-                            </div>
-                        );
-                    })()}
-
-                    {/* Mobile Banner between sections */}
-                    <div className="px-4 mb-10 sm:hidden">
-                        <AddProjectBanner />
-                    </div>
-
-                    {/* Bots Section */}
-                    {categorizedBots['bots'] && (() => {
-                        const data = categorizedBots['bots'];
-                        
-                        const featuredBots = data.featured;
-                        const sliderBots = data.slider;
-
-                        const botChunks = [];
-                        for (let i = 0; i < sliderBots.length; i += 3) {
-                            botChunks.push(sliderBots.slice(i, i + 3));
-                        }
-
-                        return (
-                            <div className="mt-20 mb-10 space-y-6">
-                                <div className="flex flex-col gap-6 overflow-hidden">
-                                    <div 
-                                        className="flex flex-col gap-1 cursor-pointer group shrink-0"
-                                        onClick={() => navigate(`/search?mode=bots&category=all`)}
-                                    >
-                                        <div className="flex items-center gap-2">
-                                            <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight uppercase italic">
-                                                BOTS
-                                            </h2>
-                                            <span className="text-sm font-bold text-slate-400 dark:text-slate-600 ml-1">
-                                                {data.total}
-                                            </span>
-                                            <ChevronRight size={16} className="text-slate-300 dark:text-slate-700 group-hover:translate-x-1 transition-transform" />
-                                        </div>
-                                        <p className="hidden sm:block text-[0.86rem] text-slate-400 dark:text-slate-600 font-normal leading-relaxed">
-                                            {t('home_bots_desc')}
-                                        </p>
-                                    </div>
-
-                                    {/* Top 3 Featured Cards for this section */}
-                                    <div className="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth pb-3 mb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
-                                        {featuredBots.map(({ bot }) => (
-                                            <div 
-                                                key={bot.id} 
-                                                onClick={() => navigate(`/bot/${bot.slug}`)}
-                                                className={`flex items-center justify-between p-4 rounded-xl border border-black/[0.05] dark:border-white/[0.08] hover:border-blue-500/20 transition-all cursor-pointer group hover:scale-[1.01] bg-[#00000008] dark:bg-white/[0.03] min-w-[280px] sm:min-w-[320px] shrink-0 relative ${featuredBots.length <= 3 ? 'md:flex-1 md:min-w-0' : 'md:w-[calc(33.333%-11px)]'}`}
-                                            >
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-12 h-12 featured-bot-card-img flex items-center justify-center p-[1px] overflow-hidden shrink-0">
-                                                        <img 
-                                                            src={getLiveBotIcon(bot)} 
-                                                            className="w-full h-full object-cover bg-white featured-bot-card-img" 
-                                                            alt=""
-                                                            onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
-                                                        />
-                                                    </div>
-                                                    <div className="flex flex-col min-w-0">
-                                                        <div className="flex items-center gap-1">
-                                                            <span className="text-lg font-black text-slate-900 dark:text-white tracking-tight truncate leading-tight">{bot.name}</span>
-                                                            <CheckCircle2 size={14} className="text-blue-500 fill-blue-500/10 shrink-0" />
-                                                        </div>
-                                                        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold line-clamp-1 uppercase tracking-tight">{bot.description}</span>
-                                                    </div>
-                                                </div>
-                                                <div className="text-2xl font-black text-slate-900 dark:text-white mr-1 shrink-0 italic">
-                                                    {bot.rating || '0.0'}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    <div 
-                                        ref={botsCatScroll.ref}
-                                        onMouseDown={botsCatScroll.onMouseDown}
-                                        onMouseUp={botsCatScroll.onMouseUp}
-                                        onMouseMove={botsCatScroll.onMouseMove}
-                                        onMouseLeave={botsCatScroll.onMouseLeave}
-                                        onContextMenu={botsCatScroll.onContextMenu}
-                                        className="category-filter-container no-scrollbar relative z-0"
-                                    >
-                                        <button 
-                                            className={`category-filter-item ${selectedBotsCategory === 'all' ? 'active' : ''}`}
-                                            onClick={() => { haptic('light'); setSelectedBotsCategory('all'); }}
-                                        >
-                                            {t('home_all')}
-                                        </button>
-                                        {botsCategories.map((cat) => (
-                                            <button 
-                                                key={cat.id} 
-                                                className={`category-filter-item ${selectedBotsCategory === cat.id ? 'active' : ''}`}
-                                                onClick={() => { haptic('light'); setSelectedBotsCategory(cat.id); }}
-                                            >
-                                                {t(cat.label)}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                                
-                                {(() => {
-                                    const displayedBots = sliderBots.slice(0, 12);
-                                    return (
-                                        <>
-                                            {/* Desktop Grid Layout (sm and up) */}
-                                            <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-7 px-1 py-2">
-                                                {displayedBots.map((bot, idx) => (
-                                                    <CategoryBotCard key={bot.id} bot={bot} rank={idx + 1} />
-                                                ))}
-                                            </div>
-
-                                            {/* Mobile Horizontal Carousel Layout (xs) */}
-                                            <div className="sm:hidden relative -mx-4 px-4 overflow-hidden">
-                                                <div className="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory pb-4">
-                                                    {getMobileColumns(sliderBots).map((col, colIdx) => (
-                                                        <div key={colIdx} className="flex flex-col gap-5 min-w-[85vw] snap-center first:pl-2">
-                                                            {col.map(({ bot, rank }) => (
-                                                                <CategoryBotCard key={bot.id} bot={bot} rank={rank} />
-                                                            ))}
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </>
-                                    );
-                                })()}
-                            </div>
-                        );
-                    })()}
-
-                    {Object.keys(categorizedBots).length === 0 && (
-                        <div className="py-24 text-center text-slate-400 dark:text-slate-700 font-bold uppercase text-xs tracking-widest animate-in fade-in zoom-in duration-500">
-                             {t('home_no_items')}
-                        </div>
-                    )}
-                </motion.div>
-            </AnimatePresence>
-
-            {homeBlogs.length > 0 && (
-                <div className="mt-24 mb-16 pt-16 border-t border-black/[0.03] dark:border-white/[0.03]">
-                    <div className="flex items-center justify-between mb-8">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-[2px] bg-blue-500"></div>
-                            <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight uppercase italic">
-                                {t('blog_title')}
-                            </h2>
-                        </div>
-                        <button 
-                            onClick={() => { haptic('light'); navigate('/blog'); }}
-                            className="text-[11px] font-bold text-slate-400 hover:text-blue-500 uppercase tracking-widest transition-colors flex items-center gap-1.5"
-                        >
-                            {t('blog_all_articles')}
-                            <ChevronRight size={14} />
-                        </button>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-                        {homeBlogs.map((post) => (
-                            <div 
-                                key={post.id}
-                                onClick={() => { haptic('light'); navigate(`/blog/${post.slug || post.id}`); }}
-                                className="group cursor-pointer flex flex-col bg-slate-50 dark:bg-slate-900/10 border border-black/5 dark:border-white/5 rounded-3xl overflow-hidden hover:border-blue-500/20 hover:scale-[1.01] transition-all duration-300"
-                            >
-                                <div className="aspect-video relative overflow-hidden bg-slate-100 dark:bg-white/5">
-                                    {post.image ? (
-                                        <img 
-                                            src={post.image} 
-                                            alt={post.title} 
-                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
-                                            referrerPolicy="no-referrer"
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-600/10 to-indigo-600/10 text-blue-500">
-                                            <Sparkles size={24} />
-                                        </div>
-                                    )}
-                                    <div className="absolute top-4 left-4">
-                                        <span className="bg-white/90 dark:bg-slate-950/90 backdrop-blur-md text-slate-900 dark:text-white text-[8px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border border-black/5 dark:border-white/5">
-                                            {post.category}
-                                        </span>
-                                    </div>
-                                </div>
-                                <div className="p-5 flex-1 flex flex-col justify-between">
-                                    <div>
-                                        <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-tight line-clamp-2 mb-2 group-hover:text-blue-500 transition-colors duration-300">
-                                            {post.title}
-                                        </h3>
-                                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed italic line-clamp-2 mb-4">
-                                            {post.excerpt || post.content.replace(/<[^>]*>/g, '').slice(0, 100) + '...'}
-                                        </p>
-                                    </div>
-
-                                    <div className="flex items-center justify-between pt-3 border-t border-black/[0.03] dark:border-white/[0.03]">
-                                        <div className="flex items-center gap-2 max-w-[70%]">
-                                            <div className="w-6 h-6 rounded-full overflow-hidden bg-slate-100 dark:bg-white/5 border border-black/5 dark:border-white/10 shrink-0">
-                                                <img 
-                                                    src={post.authorAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(post.author)}&background=334155&color=fff&bold=true`} 
-                                                    alt="" 
-                                                    className="w-full h-full object-cover"
-                                                />
-                                            </div>
-                                            <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 truncate">
-                                                {post.author}
-                                            </span>
-                                        </div>
-                                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tight shrink-0">
-                                            {post.readTime || '5 dk'}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            <div className="mt-20 mb-20 px-4 max-w-4xl mx-auto border-t border-black/[0.03] dark:border-white/[0.03] pt-20">
-                <div className="prose prose-slate dark:prose-invert max-w-none">
-                    <h2 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight italic mb-6">
-                        {t('home_about_title').includes(':') ? (
-                            <>
-                                {t('home_about_title').split(':')[0]}: <span className="text-blue-500">{t('home_about_title').split(':')[1]?.trim()}</span>
-                            </>
-                        ) : t('home_about_title')}
-                    </h2>
-                    <div className="text-[13px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed italic space-y-4">
-                        <p>{t('home_about_p1')}</p>
-                        <p>{t('home_about_p2')}</p>
-                        <p>{t('home_about_p3')}</p>
-                        <p>{t('home_about_p4')}</p>
-                    </div>
-                </div>
-            </div>
-
-            <div className="mt-20 mb-20 px-4 max-w-4xl mx-auto">
-                <div className="flex items-center gap-3 mb-8">
-                    <div className="w-10 h-[2px] bg-blue-500"></div>
-                    <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight uppercase italic">
-                        {t('home_faq_title')}
-                    </h2>
-                </div>
-                
-                <div className="space-y-4">
-                    {[
-                        {
-                            q: t('home_faq_1_q'),
-                            a: t('home_faq_1_a')
-                        },
-                        {
-                            q: t('home_faq_2_q'),
-                            a: t('home_faq_2_a')
-                        },
-                        {
-                            q: t('home_faq_3_q'),
-                            a: t('home_faq_3_a')
-                        },
-                        {
-                            q: t('home_faq_4_q'),
-                            a: t('home_faq_4_a')
-                        }
-                    ].map((item, idx) => (
-                        <details key={idx} className="group bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-xl transition-all overflow-hidden shadow-sm">
-                            <summary className="flex items-center justify-between p-5 cursor-pointer list-none">
-                                <span className="text-[13px] font-bold text-slate-900 dark:text-white uppercase tracking-tight italic">{item.q}</span>
-                                <ChevronDown size={18} className="text-slate-400 group-open:rotate-180 transition-transform duration-300" />
-                            </summary>
-                            <div className="p-5 pt-0 text-[12px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed italic border-t border-black/[0.03] dark:border-white/[0.03] bg-[#00000004] dark:bg-black/20">
-                                {item.a}
-                            </div>
-                        </details>
-                    ))}
-                </div>
-                
-                {/* FAQ Schema */}
-                <script type="application/ld+json">
-                    {JSON.stringify({
-                        "@context": "https://schema.org",
-                        "@type": "FAQPage",
-                        "mainEntity": [
-                            {
-                                "@type": "Question",
-                                "name": "BotlyHub nedir?",
-                                "acceptedAnswer": {
-                                    "@type": "AcceptedAnswer",
-                                    "text": "BotlyHub, Telegram ekosistemindeki en iyi botları, kanalları ve uygulamaları keşfetmenizi sağlayan merkezi bir platformdur."
-                                }
-                            },
-                            {
-                                "@type": "Question",
-                                "name": "Kendi botumu nasıl ekleyebilirim?",
-                                "acceptedAnswer": {
-                                    "@type": "AcceptedAnswer",
-                                    "text": "Sağ üstteki 'Bot Ekle' butonuna basarak veya admin paneli üzerinden projenizi sisteme kaydedebilirsiniz."
-                                }
-                            },
-                            {
-                                "@type": "Question",
-                                "name": "Premium üyelik avantajları nelerdir?",
-                                "acceptedAnswer": {
-                                    "@type": "AcceptedAnswer",
-                                    "text": "Düşük komisyonlar, öne çıkan listeleme ve detaylı analizler sunar."
-                                }
-                            }
-                        ]
-                    })}
-                </script>
-            </div>
-
-            <div className="mt-16">
-                <div className="pb-32" />
-            </div>
-          </>
-        )}
-        </div>
-      </div>
-
-      <AnimatePresence>
-        {selectedAnn && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-xl" onClick={() => setSelectedAnn(null)}>
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-white dark:bg-slate-900 border border-black/10 dark:border-white/10 w-[min(calc(100vw-32px),384px)] rounded-xl overflow-hidden relative" 
-              onClick={e => e.stopPropagation()}
-            >
-                <div className="relative h-44 overflow-hidden">
-                    {selectedAnn.bg_image_url ? (
-                        <>
-                            <img src={selectedAnn.bg_image_url} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-slate-900 via-transparent to-transparent"></div>
-                        </>
-                    ) : (
-                        <div className={`absolute inset-0 bg-gradient-to-br ${
-                            selectedAnn.color_scheme === 'purple' ? 'from-purple-600 to-indigo-700' :
-                            selectedAnn.color_scheme === 'emerald' ? 'from-emerald-600 to-teal-700' :
-                            selectedAnn.color_scheme === 'blue' ? 'from-blue-600 to-cyan-700' :
-                            'from-orange-500 to-red-600'
-                        } opacity-90`}>
-                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white/20 to-transparent"></div>
-                        </div>
-                    )}
-                    
-                    <button 
-                        onClick={() => setSelectedAnn(null)} 
-                        className="absolute top-6 right-6 flex items-center justify-center p-2 text-white/80 hover:text-white transition-all active:scale-90 drop-shadow-lg"
-                    >
-                        <X size={20} />
-                    </button>
-
-                    <div className="absolute bottom-6 left-8 flex items-center gap-2">
-                        {selectedAnn.badge_text && (
-                            selectedAnn.badge_text.toLowerCase() === 'sponsorlu' ? (
-                                <div className="sponsored-badge flex items-center px-3 py-1 rounded-full shadow-lg">
-                                    <span className="text-[10px] font-black text-white uppercase tracking-widest">{selectedAnn.badge_text}</span>
-                                </div>
-                            ) : (
-                                <div className="px-3 py-1 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl">
-                                    <span className="text-[10px] font-black text-white uppercase tracking-widest">{selectedAnn.badge_text}</span>
-                                </div>
-                            )
-                        )}
-                        {selectedAnn.tag && (
-                            <div className="px-3 py-1 bg-brand border border-white/20 rounded-xl">
-                                <span className="text-[10px] font-black text-white uppercase tracking-widest">{selectedAnn.tag}</span>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                <div className="p-8 pt-2">
-                    <div className="flex items-center gap-4 mb-4">
-                        {selectedAnn.icon_name !== 'None' && (
-                            <div className="w-12 h-12 bg-slate-100 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-xl flex items-center justify-center shrink-0">
-                                {React.createElement(iconMap[selectedAnn.icon_name] || Sparkles, { size: 22, className: 'text-brand dark:text-brand-light' })}
-                            </div>
-                        )}
-                        <h3 className="text-xl lg:text-2xl font-black text-slate-900 dark:text-white tracking-tight italic uppercase leading-none truncate pr-2">
-                            {selectedAnn.title}
-                        </h3>
-                    </div>
-
-                    <div className="bg-slate-50 dark:bg-black/20 rounded-xl p-6 mb-8 border border-black/5 dark:border-white/5">
-                        <p className="text-slate-600 dark:text-slate-400 text-[12px] leading-relaxed font-bold uppercase italic opacity-80 whitespace-pre-wrap">
-                            {selectedAnn.content_detail || selectedAnn.description}
-                        </p>
-                    </div>
-                    
-                    <div className="space-y-3">
-                        <button 
-                            onClick={() => { 
-                                haptic('heavy'); 
-                                const link = selectedAnn.button_link;
-                                if (link.startsWith('@')) window.location.href = `https://t.me/${link.substring(1)}`;
-                                else if (link.startsWith('http')) window.location.href = link;
-                                else navigate(link);
-                                setSelectedAnn(null); 
-                            }} 
-                            className="w-full h-14 bg-brand dark:bg-brand-light text-white text-[12px] font-black rounded-xl uppercase tracking-[0.2em] active:scale-[0.98] transition-all flex items-center justify-center gap-3 group shadow-lg shadow-brand/20"
-                        >
-                            {selectedAnn.button_text || t('home_explore_now')} 
-                            <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                        </button>
-                        
-                        <button 
-                            onClick={() => setSelectedAnn(null)} 
-                            className="w-full py-4 text-slate-400 dark:text-slate-500 font-black text-[9px] uppercase tracking-[0.2em] hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
-                        >
-                            {t('home_maybe_later')}
-                        </button>
-                    </div>
-                </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* Mobile Modal for Categories */}
-      <AnimatePresence>
-          {mobileModal && (
-              <div className="fixed inset-0 z-[200] flex items-end justify-center p-0 md:hidden">
-                  <motion.div 
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      onClick={() => { setMobileModal(null); setNavState('main'); }}
-                      className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"
-                  />
-                  <motion.div 
-                      initial={{ y: "100%" }}
-                      animate={{ y: 0 }}
-                      exit={{ y: "100%" }}
-                      transition={{ type: "spring", damping: 30, stiffness: 300 }}
-                      className="relative w-full bg-white dark:bg-slate-900 rounded-t-[32px] overflow-hidden pt-4 pb-12 border-t border-black/10 dark:border-white/10"
-                  >
-                      {/* Drag Handle */}
-                      <div className="w-12 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full mx-auto mb-8" />
-                      
-                      <div className="flex justify-between items-center mb-6 px-8">
-                          <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-widest uppercase italic bg-transparent border-none outline-none">
-                              {mobileModal === 'kesfet' ? 'KEŞFET' : 'YATIRIMCILAR'}
-                          </h3>
-                          <button onClick={() => { setMobileModal(null); setNavState('main'); }} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-500 active:scale-90 transition-all">
-                              <X size={20} />
-                          </button>
-                      </div>
-                      
-                      <div className="max-h-[70vh] overflow-y-auto px-6 pb-4">
-                          <AnimatePresence mode="wait">
-                              {navState === 'main' ? (
-                                  <motion.div 
-                                      key="mobile-main"
-                                      initial={{ opacity: 0, x: -20 }}
-                                      animate={{ opacity: 1, x: 0 }}
-                                      exit={{ opacity: 0, x: -20 }}
-                                      className="grid grid-cols-1 gap-3"
-                                  >
-                                      {(mobileModal === 'kesfet' ? discoverItems : investorItems).map((item) => (
-                                          <button
-                                              key={item.id}
-                                              onClick={() => {
-                                                  if (item.action) item.action();
-                                                  else if (item.path) { navigate(item.path); setMobileModal(null); }
-                                              }}
-                                              className="w-full flex items-center gap-4 p-4 hover:bg-slate-50 dark:hover:bg-white/5 active:bg-slate-100 dark:active:bg-white/10 transition-all rounded-2xl border border-black/5 dark:border-white/5 group mobile-menu-item"
-                                          >
-                                              <div className={`mobile-menu-icon-container flex items-center justify-center rounded-xl shrink-0 ${mobileModal === 'kesfet' ? 'text-blue-500' : 'text-emerald-500'}`}>
-                                                  <item.icon size={22} className="menu-item-icon" />
-                                              </div>
-                                              <div className="flex flex-col items-start min-w-0">
-                                                  <span className="text-[13px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider truncate w-full">
-                                                      {item.label}
-                                                  </span>
-                                              </div>
-                                              {item.action && <ChevronRight size={16} className="ml-auto text-slate-300 dark:text-slate-700" />}
-                                          </button>
-                                      ))}
-                                  </motion.div>
-                              ) : navState === 'bots' ? (
-                                  <motion.div 
-                                      key="mobile-bots"
-                                      initial={{ opacity: 0, x: 20 }}
-                                      animate={{ opacity: 1, x: 0 }}
-                                      exit={{ opacity: 0, x: 20 }}
-                                      className="flex flex-col gap-4"
-                                  >
-                                      <button 
-                                          onClick={() => setNavState('main')}
-                                          className="flex items-center gap-2 text-blue-500 font-black uppercase tracking-widest text-[11px] mb-2"
-                                      >
-                                          <ArrowLeft size={16} /> Geri
-                                      </button>
-                                      <div className="grid grid-cols-2 gap-3">
-                                          {botsCategories.map(cat => (
-                                              <button 
-                                                  key={cat.id}
-                                                  onClick={() => handleCategoryClick(cat.id, 'bots')}
-                                                  className="flex flex-col items-start gap-3 p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5 mobile-menu-item"
-                                              >
-                                                  <div className="mobile-menu-icon-container flex items-center justify-center text-blue-500">
-                                                      <cat.icon size={20} />
-                                                  </div>
-                                                  <span className="text-[10px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300">{t(cat.label)}</span>
-                                              </button>
-                                          ))}
-                                      </div>
-                                  </motion.div>
-                              ) : (
-                                  <motion.div 
-                                      key="mobile-apps"
-                                      initial={{ opacity: 0, x: 20 }}
-                                      animate={{ opacity: 1, x: 0 }}
-                                      exit={{ opacity: 0, x: 20 }}
-                                      className="flex flex-col gap-4"
-                                  >
-                                      <button 
-                                          onClick={() => setNavState('main')}
-                                          className="flex items-center gap-2 text-blue-500 font-black uppercase tracking-widest text-[11px] mb-2"
-                                      >
-                                          <ArrowLeft size={16} /> Geri
-                                      </button>
-                                      <div className="grid grid-cols-2 gap-3">
-                                          {appsCategories.map(cat => (
-                                              <button 
-                                                  key={cat.id}
-                                                  onClick={() => handleCategoryClick(cat.id, 'apps')}
-                                                  className="flex flex-col items-start gap-3 p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5 mobile-menu-item"
-                                              >
-                                                  <div className="mobile-menu-icon-container flex items-center justify-center text-emerald-500">
-                                                      <cat.icon size={20} />
-                                                  </div>
-                                                  <span className="text-[10px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300">{t(cat.label)}</span>
-                                              </button>
-                                          ))}
-                                      </div>
-                                  </motion.div>
-                              )}
-                          </AnimatePresence>
-                          
-                          {navState === 'main' && (
-                              <div className="mt-8 pt-6 border-t border-black/5 dark:border-white/5">
-                                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-600 block mb-4">Hızlı Bağlantılar</span>
-                                  <div className="grid grid-cols-1 gap-2">
-                                      {simpleLinks.map((link, i) => (
-                                          <a 
-                                              key={i}
-                                              href={link.path}
-                                              className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-slate-300 font-bold text-xs uppercase"
-                                          >
-                                              {link.label}
-                                              <ExternalLink size={14} />
-                                          </a>
-                                      ))}
-                                  </div>
-                              </div>
-                          )}
-                      </div>
-                  </motion.div>
+          {/* Logo with Dev aesthetics */}
+          <a href="#" className="flex items-center gap-2.5 group">
+            <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-[#7C5CFF] to-[#4F9CF9] p-[1.5px] shadow-[0_0_15px_rgba(124,92,255,0.3)] group-hover:shadow-[0_0_20px_rgba(124,92,255,0.5)] transition-all duration-300">
+              <div className="flex items-center justify-center w-full h-full rounded-[6px] bg-[#0A0A0A]">
+                <Bot className="w-4.5 h-4.5 text-[#EDEDED] group-hover:text-white transition-colors" />
               </div>
-          )}
-      </AnimatePresence>
+            </div>
+            <span className="text-[17px] font-bold tracking-tight text-white group-hover:text-slate-100 font-sans">
+              Botly<span className="text-[#7C5CFF]">Hub</span>
+            </span>
+            <div className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] bg-[#7C5CFF]/15 border border-[#7C5CFF]/30 text-[#7C5CFF] rounded font-mono font-medium">v3.0</div>
+          </a>
+
+          {/* Nav links similar to Vercel/Linear style dropdowns / indicators */}
+          <nav className="hidden md:flex items-center gap-8 text-[13.5px] text-[#A1A1A1] font-medium">
+            <a href="#how-it-works" className="hover:text-white transition-colors">How it Works</a>
+            <a href="#features" className="hover:text-white transition-colors">Features</a>
+            <a href="#sandbox" className="hover:text-white transition-colors relative flex items-center gap-1.5">
+              Interactive QA Live <span className="w-1.5 h-1.5 rounded-full bg-[#7C5CFF] animate-pulse"></span>
+            </a>
+            <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
+            <a href="#integrations" className="hover:text-white transition-colors">Integrations</a>
+          </nav>
+
+          {/* Action CTAs */}
+          <div className="flex items-center gap-4">
+            <a href="#sandbox" className="hidden lg:flex items-center gap-1.5 text-[13px] font-mono text-zinc-400 hover:text-white px-3 py-1.5 rounded-md bg-white/[0.02] border border-white/[0.05] hover:border-white/[0.1] transition-all">
+              <Terminal className="w-3.5 h-3.5" />
+              <span>npx run botlyhub</span>
+            </a>
+            <a href="#sandbox" className="px-4 py-1.5 rounded-lg bg-white text-black text-[13px] font-semibold hover:bg-[#EDEDED] active:scale-95 transition-all shadow-[0_4px_12px_rgba(255,255,255,0.15)]">
+              Get Started
+            </a>
+          </div>
+
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <section id="hero" className="relative pt-32 pb-24 md:pt-40 md:pb-36 overflow-hidden z-10">
+        <div className="max-w-5xl mx-auto px-6 text-center flex flex-col items-center">
+          
+          {/* Announcement pill with soft background and tiny gradient indicator */}
+          <motion.div 
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="inline-flex items-center gap-2.5 px-3.5 py-1 rounded-full bg-white/[0.03] border border-white/[0.06] text-[12px] font-medium text-zinc-300 hover:border-white/[0.12] transition-colors cursor-pointer mb-8"
+          >
+            <span className="flex h-2 w-2 relative">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#7C5CFF] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#7C5CFF]"></span>
+            </span>
+            <span className="text-zinc-400">Automated QA Sandbox running live.</span>
+            <span className="text-white hover:text-[#7C5CFF] flex items-center gap-0.5 font-semibold">Try simulation <ArrowRight className="w-3 h-3" /></span>
+          </motion.div>
+
+          {/* Big headline */}
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.1 }}
+            className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white mb-6 leading-[1.1] font-sans"
+          >
+            Automated AI QA <br />
+            <span className="bg-gradient-to-r from-white via-white to-zinc-500 bg-clip-text text-transparent">for every deploy</span>
+          </motion.h1>
+
+          {/* Subtext */}
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+            className="text-[15px] sm:text-[17px] md:text-[19px] text-[#A1A1A1] max-w-2xl leading-relaxed mb-10 font-medium"
+          >
+            BotlyHub runs intelligent tests, detects bugs, and validates your product before it reaches production. Fully integrated with your deployment timeline.
+          </motion.p>
+
+          {/* Hero CTAs */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.3 }}
+            className="flex flex-col sm:flex-row items-center gap-4 mb-16"
+          >
+            <a href="#sandbox" className="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#7C5CFF] text-white hover:bg-[#6A47FF] hover:shadow-[0_0_20px_rgba(124,92,255,0.4)] active:scale-[0.98] transition-all duration-200 text-sm font-semibold text-center">
+              Get Started for Free
+            </a>
+            <a href="#docs" className="w-full sm:w-auto px-6 py-3 rounded-xl bg-white/[0.03] border border-white/[0.08] text-[#EDEDED] text-sm hover:bg-white/[0.06] font-semibold text-center transition-all">
+              View Docs
+            </a>
+          </motion.div>
+
+          {/* PRODUCT PREVIEW PANEL (Terminal / Dashboard style) */}
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="w-full max-w-4xl rounded-2xl bg-gradient-to-b from-white/[0.06] to-white/[0.02] border border-white/[0.08] p-1 shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-10"
+          >
+            <div className="rounded-[12px] bg-[#0C0C0E] overflow-hidden">
+              
+              {/* Fake Window Header */}
+              <div className="flex items-center justify-between px-4 py-3 bg-[#111114] border-b border-white/[0.05] select-none">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-red-500/30 border border-red-500/10" />
+                  <div className="w-3 h-3 rounded-full bg-yellow-500/25 border border-yellow-500/10" />
+                  <div className="w-3 h-3 rounded-full bg-green-500/20 border border-green-500/10" />
+                  <span className="text-[11px] text-[#71717A] ml-2 font-mono">botlyhub.yml</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="px-2 py-0.5 rounded bg-white/[0.03] text-[#7C5CFF] font-mono text-[10px] border border-white/[0.05] flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse"></span> Staging Validated
+                  </div>
+                </div>
+              </div>
+
+              {/* Inside Window (Dynamic CI pipeline mock) */}
+              <div className="grid grid-cols-1 md:grid-cols-12 md:divide-x md:divide-white/[0.05] text-left">
+                
+                {/* Left col: File tree & parameters */}
+                <div className="md:col-span-4 p-4 space-y-4">
+                  <div>
+                    <span className="text-[10px] font-mono font-bold text-[#A1A1A1] block tracking-widest uppercase mb-2">Automated QA Triggers</span>
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between text-[12.5px] px-2.5 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.04] text-zinc-300">
+                        <span className="flex items-center gap-2"><GitBranch className="w-3.5 h-3.5 text-zinc-500" /> on.push</span>
+                        <span className="text-zinc-500 font-mono text-[11px]">[main, dev]</span>
+                      </div>
+                      <div className="flex items-center justify-between text-[12.5px] px-2.5 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.04] text-zinc-300">
+                        <span className="flex items-center gap-2"><GitPullRequest className="w-3.5 h-3.5 text-zinc-500" /> on.pull_request</span>
+                        <span className="text-zinc-500 font-mono text-[11px]">[opened, sync]</span>
+                      </div>
+                      <div className="flex items-center justify-between text-[12.5px] px-2.5 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.04] text-zinc-300 text-zinc-500 line-through">
+                        <span className="flex items-center gap-2"><Layers className="w-3.5 h-3.5 opacity-60" /> on.manual_deploy</span>
+                        <span className="text-zinc-500 font-mono text-[11px]">[admin]</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <span className="text-[10px] font-mono font-bold text-[#A1A1A1] block tracking-widest uppercase mb-2">AI QA Core Suite</span>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-[12px] text-zinc-400">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981] shrink-0" />
+                        <span>Static code parsing with LLM</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-[12px] text-zinc-400">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981] shrink-0" />
+                        <span>Dynamic scenario synthesising</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-[12px] text-zinc-400">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981] shrink-0" />
+                        <span>E2E Chromium bot testing (live logs)</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-[12px] text-zinc-400">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981] shrink-0" />
+                        <span>Visual regression check screenshot diffs</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right col: Running terminal script */}
+                <div className="md:col-span-8 p-4 bg-[#09090A]/95 flex flex-col justify-between font-mono text-[12px] min-h-[220px]">
+                  <div className="space-y-1.5 max-h-[190px] overflow-y-auto no-scrollbar scroll-smooth">
+                    <p className="text-[#A1A1A1]">$ npx run botlyhub-e2e --repo=demo-site</p>
+                    <p className="text-zinc-500">Initializing workspace...</p>
+                    <p className="text-emerald-400">✔ GitHub token authenticated</p>
+                    <p className="text-zinc-300">✔ Read configuration botlyhub.yml</p>
+                    <p className="text-purple-400">🤖 AI matching codebase dependencies: React 18, Supabase db Client</p>
+                    <p className="text-[#f1f6fb]">🤖 AI generated 14 functional E2E tests targetting '/api/*' routes</p>
+                    <p className="text-zinc-400">--- Running tests ---</p>
+                    <p className="text-[#10B981]">✔ GET /api/health (24ms) - Status 200</p>
+                    <p className="text-[#10B981]">✔ POST /api/payment/create-order (112ms) - Expected invoice output verified</p>
+                    <p className="text-[#F59E0B]">⚠ Visual layout width limit exceeded on viewport width 360px (Login Modal)</p>
+                    <p className="text-[#EDEDED]">Execution finished in 4.27s.</p>
+                  </div>
+
+                  <div className="mt-4 pt-3 border-t border-white/[0.04] flex items-center justify-between text-zinc-500 text-[11px]">
+                    <span>CLI tool: @botlyhub/cli v3.0</span>
+                    <span className="text-[#10B981] font-bold">13/14 tests passed</span>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+          </motion.div>
+
+        </div>
+      </section>
+
+      {/* 2. How it works */}
+      <section id="how-it-works" className="py-20 md:py-28 relative border-t border-white/[0.03] z-10 bg-[#070708]">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(124,92,255,0.02),transparent)] pointer-events-none" />
+        
+        <div className="max-w-6xl mx-auto px-6">
+          
+          <div className="text-center max-w-2xl mx-auto mb-16 md:mb-20">
+            <span className="text-[11px] font-mono font-bold tracking-widest text-[#7C5CFF]/90 uppercase bg-[#7C5CFF]/10 border border-[#7C5CFF]/20 px-3 py-1 rounded-full">Automated Pipeline</span>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white mt-4 tracking-tight leading-tight">3 simple steps to total production safety</h2>
+            <p className="text-[#A1A1A1] mt-3.5 text-sm md:text-base">We automate the critical path between code push and live deployment checks instantly.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+            
+            {/* CARD 1 */}
+            <div className="relative rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.12] p-6 hover:shadow-[0_8px_30px_rgba(0,0,0,0.4)] transition-all duration-300 group">
+              <div className="absolute top-[-1px] left-6 right-6 h-[1px] bg-gradient-to-r from-transparent via-[#7C5CFF]/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/[0.03] border border-white/[0.08] text-white group-hover:bg-[#7C5CFF]/15 group-hover:border-[#7C5CFF]/30 transition-all mb-6">
+                <Github className="w-5 h-5 text-zinc-300 group-hover:text-[#7C5CFF] transition-colors" />
+              </div>
+              <span className="text-zinc-500 font-mono text-[13px] block mb-2">01 / REPOSITORY SYNC</span>
+              <h3 className="text-[18px] font-bold text-white mb-2 leading-tight group-hover:text-[#7C5CFF] transition-colors">Connect your repository</h3>
+              <p className="text-[13.5px] text-[#A1A1A1] leading-relaxed">
+                Connect your Github or GitLab organization with our native GitHub App. BotlyHub maps the file structures, routing mechanisms, and API models automatically within seconds.
+              </p>
+            </div>
+
+            {/* CARD 2 */}
+            <div className="relative rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.12] p-6 hover:shadow-[0_8px_30px_rgba(0,0,0,0.4)] transition-all duration-300 group">
+              <div className="absolute top-[-1px] left-6 right-6 h-[1px] bg-gradient-to-r from-transparent via-[#4F9CF9]/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/[0.03] border border-white/[0.08] text-white group-hover:bg-[#4F9CF9]/15 group-hover:border-[#4F9CF9]/30 transition-all mb-6">
+                <Cpu className="w-5 h-5 text-zinc-300 group-hover:text-[#4F9CF9] transition-colors" />
+              </div>
+              <span className="text-zinc-500 font-mono text-[13px] block mb-2">02 / AI SCENARIO SYNTHESIS</span>
+              <h3 className="text-[18px] font-bold text-white mb-2 leading-tight group-hover:text-[#4F9CF9] transition-colors">AI generates test scenarios</h3>
+              <p className="text-[13.5px] text-[#A1A1A1] leading-relaxed">
+                Our model reads your PR diff, automatically targets database triggers & forms, and designs end-to-end integration workflows with multi-user simulation scenarios dynamically. No manual scripting ever.
+              </p>
+            </div>
+
+            {/* CARD 3 */}
+            <div className="relative rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.12] p-6 hover:shadow-[0_8px_30px_rgba(0,0,0,0.4)] transition-all duration-300 group">
+              <div className="absolute top-[-1px] left-6 right-6 h-[1px] bg-gradient-to-r from-transparent via-[#7C5CFF]/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/[0.03] border border-white/[0.08] text-white group-hover:bg-[#7C5CFF]/15 group-hover:border-[#7C5CFF]/30 transition-all mb-6">
+                <Workflow className="w-5 h-5 text-zinc-300 group-hover:text-[#7C5CFF] transition-colors" />
+              </div>
+              <span className="text-zinc-500 font-mono text-[13px] block mb-2">03 / CONTINUOUS STAGING CHECKS</span>
+              <h3 className="text-[18px] font-bold text-white mb-2 leading-tight group-hover:text-[#7C5CFF] transition-colors">Runs QA and reports</h3>
+              <p className="text-[13.5px] text-[#A1A1A1] leading-relaxed">
+                Every code commit triggering a push, pull request, or stage deploy immediately kicks off BotlyHub simulation cycles. Failures block the deployment gate, and issues are commented directly inline on GitHub.
+              </p>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* 3. Features Section (Grid Layout) */}
+      <section id="features" className="py-20 md:py-28 relative border-t border-white/[0.03] z-10 bg-[#0A0A0B]">
+        <div className="max-w-6xl mx-auto px-6">
+          
+          <div className="text-center max-w-2xl mx-auto mb-16 md:mb-20">
+            <span className="text-[11px] font-mono font-bold tracking-widest text-[#4F9CF9]/90 uppercase bg-[#4F9CF9]/10 border border-[#4F9CF9]/20 px-3 py-1 rounded-full">Feature Capabilities</span>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white mt-4 tracking-tight leading-tight">Advanced QA Engine For Dev Teams</h2>
+            <p className="text-[#A1A1A1] mt-3.5 text-sm md:text-base">Comprehensive validation layers engineered and polished for modern, zero-downtime platforms.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+            
+            {/* Feature 1: AI Test Generation (Double Wide - 8cols) */}
+            <div className="md:col-span-8 relative rounded-2xl bg-white/[0.02] border border-white/[0.06] p-6 hover:border-white/[0.1] transition-all duration-300 group flex flex-col justify-between overflow-hidden min-h-[280px]">
+              <div className="absolute top-0 right-[-10%] w-[250px] h-[250px] bg-[#7C5CFF]/5 rounded-full blur-[80px] pointer-events-none" />
+              <div className="space-y-3 max-w-md">
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#7C5CFF]/10 border border-[#7C5CFF]/25 text-[#7C5CFF]">
+                    <Zap className="w-4 h-4" />
+                  </div>
+                  <span className="text-[11px] font-mono font-bold text-[#7C5CFF] uppercase tracking-wider">Predictive Testing</span>
+                </div>
+                <h3 className="text-xl font-bold text-white tracking-tight leading-tight">Automated AI Test Generation</h3>
+                <p className="text-[13.5px] text-[#A1A1A1] leading-relaxed">
+                  Our core semantic LLM parses your staging routes, code architecture, packages, and mock schemas. It automatically figures out authentication boundaries, generates 30+ edge cases, and writes readable browser E2E test files inside your repository folder.
+                </p>
+              </div>
+
+              {/* Minimal UI graphic representation */}
+              <div className="mt-6 p-3 rounded-lg bg-[#0C0C0F] border border-white/[0.04] font-mono text-[11px] text-zinc-400 select-none">
+                <p className="text-purple-400">// AI generated case for: /api/checkout</p>
+                <div className="flex items-center gap-1.5 mt-1">
+                  <span className="text-[#10B981]">✔</span>
+                  <span>test('order state with negative volume should throw validation error 400')</span>
+                </div>
+                <div className="flex items-center gap-1.5 mt-1">
+                  <span className="text-[#10B981]">✔</span>
+                  <span>test('concurrent stripe session token generation under checkout overload')</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Feature 2: CI/CD integration (4cols) */}
+            <div className="md:col-span-4 relative rounded-2xl bg-white/[0.02] border border-white/[0.06] p-6 hover:border-white/[0.1] transition-all duration-300 group flex flex-col justify-between min-h-[280px]">
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#4F9CF9]/10 border border-[#4F9CF9]/25 text-[#4F9CF9]">
+                    <Layers className="w-4 h-4" />
+                  </div>
+                  <span className="text-[11px] font-mono font-bold text-[#4F9CF9] uppercase tracking-wider">Workflow Connect</span>
+                </div>
+                <h3 className="text-xl font-bold text-white tracking-tight leading-tight">Native CI/CD Integration</h3>
+                <p className="text-[13.5px] text-[#A1A1A1] leading-relaxed">
+                  Plug BotlyHub directly into your release cycle. Integrates natively, securely, and seamlessly with GitHub Actions, CircleCI, Jenkins, Vercel Deployments, Netlify, and GitLab Pipelines using standard OAuth.
+                </p>
+              </div>
+
+              {/* Horizontal line representation of branches */}
+              <div className="mt-6 flex items-center gap-3 text-zinc-500 font-mono text-[10.5px]">
+                <span className="text-[#EDEDED]">Commit</span>
+                <span>---&gt;</span>
+                <span className="text-[#7C5CFF]">Botly QA</span>
+                <span>---&gt;</span>
+                <span className="text-[#10B981]">Vercel Deploy</span>
+              </div>
+            </div>
+
+            {/* Feature 3: Real-Time Bug Detection (4cols) */}
+            <div className="md:col-span-4 relative rounded-2xl bg-white/[0.02] border border-white/[0.06] p-6 hover:border-white/[0.1] transition-all duration-300 group flex flex-col justify-between min-h-[280px]">
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-orange-500/10 border border-orange-500/25 text-orange-400">
+                    <Activity className="w-4 h-4" />
+                  </div>
+                  <span className="text-[11px] font-mono font-bold text-orange-400 uppercase tracking-wider">Live telemetry</span>
+                </div>
+                <h3 className="text-xl font-bold text-white tracking-tight leading-tight">Real-Time Bug Detection</h3>
+                <p className="text-[13.5px] text-[#A1A1A1] leading-relaxed">
+                  Catch accessibility flaws, server-side unhandled promise rejections, network latency overhead spikes, visual layout shifts, and visual overlaps before your customers report them.
+                </p>
+              </div>
+
+              <div className="mt-6 flex items-center gap-2.5 px-3 py-1.5 rounded bg-amber-500/10 border border-amber-500/20 text-orange-300 font-mono text-[11px]">
+                <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                <span>Layout break detected at screen 375px</span>
+              </div>
+            </div>
+
+            {/* Feature 4: GitHub Integration (4cols) */}
+            <div className="md:col-span-4 relative rounded-2xl bg-white/[0.02] border border-white/[0.06] p-6 hover:border-white/[0.1] transition-all duration-300 group flex flex-col justify-between min-h-[280px]">
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#7C5CFF]/10 border border-[#7C5CFF]/25 text-[#7C5CFF]">
+                    <Github className="w-4 h-4" />
+                  </div>
+                  <span className="text-[11px] font-mono font-bold text-[#7C5CFF] uppercase tracking-wider">GitHub App</span>
+                </div>
+                <h3 className="text-xl font-bold text-white tracking-tight leading-tight">Inline Code Comments</h3>
+                <p className="text-[13.5px] text-[#A1A1A1] leading-relaxed">
+                  BotlyHub acts like a senior reviewer. When a dynamic scenario fails during check trials, it comments directly inline, on the precise line of code with rich terminal logs, code context, and suggestion fixes.
+                </p>
+              </div>
+
+              <div className="mt-6 text-[10px] text-zinc-500 font-mono flex items-center gap-1.5">
+                <MessageSquare className="w-3.5 h-3.5" />
+                <span>botlyhub-bot commented on useAuth.ts</span>
+              </div>
+            </div>
+
+            {/* Feature 5: Deployment Validation (4cols) */}
+            <div className="md:col-span-4 relative rounded-2xl bg-white/[0.02] border border-white/[0.06] p-6 hover:border-white/[0.1] transition-all duration-300 group flex flex-col justify-between min-h-[280px]">
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-[#10B981]">
+                    <ShieldCheck className="w-4 h-4" />
+                  </div>
+                  <span className="text-[11px] font-mono font-bold text-emerald-400 uppercase tracking-wider">Gatekeep policy</span>
+                </div>
+                <h3 className="text-xl font-bold text-white tracking-tight leading-tight">Deployment Gates</h3>
+                <p className="text-[13.5px] text-[#A1A1A1] leading-relaxed">
+                  Do not let failed staging tests block your live traffic. Configure custom BotlyHub deployment block policies that intercept preview URLs directly. If test validation falls below 100%, deployment is safely halted.
+                </p>
+              </div>
+
+              <div className="mt-6 text-[11px] text-[#10B981] font-mono flex items-center gap-1.5 font-bold">
+                <Check className="w-3.5 h-3.5" />
+                <span>Staging Deployment Purged</span>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* 4. Product Demo Section (Interactive Dashboard Mock) */}
+      <section id="sandbox" className="py-20 md:py-28 relative border-t border-white/[0.03] z-10 bg-[#070708]">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[#7C5CFF]/3 blur-[140px] pointer-events-none" />
+        
+        <div className="max-w-6xl mx-auto px-6">
+          
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <span className="text-[11px] font-mono font-bold tracking-widest text-[#7C5CFF] uppercase bg-[#7C5CFF]/10 border border-[#7C5CFF]/20 px-3 py-1 rounded-full">Interactive Dev Demo</span>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white mt-4 tracking-tight">Try BotlyHub Pipeline Simulation</h2>
+            <p className="text-[#A1A1A1] mt-3.5 text-sm md:text-base">Experience how BotlyHub executes tests on the fly. Select a repository node, switch branches, and trigger the AI QA pipeline instantly.</p>
+          </div>
+
+          <div className="rounded-2xl bg-gradient-to-b from-white/[0.05] to-transparent border border-white/[0.07] p-1.5 shadow-[0_30px_60px_rgba(0,0,0,0.6)]">
+            <div className="rounded-xl bg-[#09090B] overflow-hidden grid grid-cols-1 lg:grid-cols-12 text-left min-h-[550px]">
+              
+              {/* Dashboard Left Sidebar Control View (3 columns) */}
+              <div className="lg:col-span-3 bg-[#0D0D10] p-5 border-b lg:border-b-0 lg:border-r border-white/[0.06] flex flex-col justify-between">
+                
+                <div className="space-y-6">
+                  {/* Repo select */}
+                  <div>
+                    <label className="text-[10px] font-mono font-bold text-zinc-400 block tracking-wider uppercase mb-2">Connected Repository</label>
+                    <div className="space-y-1.5">
+                      {Object.keys(repos).map((repoName) => (
+                        <button
+                          key={repoName}
+                          onClick={() => {
+                            setSelectedRepo(repoName);
+                            setSelectedBranch('main');
+                          }}
+                          className={`w-full flex items-center justify-between text-[12.5px] px-3 py-2 rounded-lg transition-all text-left ${selectedRepo === repoName ? 'bg-white/[0.05] text-[#7C5CFF] border border-white/[0.08] font-bold' : 'text-zinc-400 hover:bg-white/[0.02] hover:text-white border border-transparent'}`}
+                        >
+                          <span className="truncate">{repoName}</span>
+                          <span className="text-[10px] bg-white/[0.05] px-1.5 py-0.5 rounded text-zinc-500 font-mono">active</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Branch / Code Change Select */}
+                  <div>
+                    <label className="text-[10px] font-mono font-bold text-zinc-400 block tracking-wider uppercase mb-2">Select Target Branch</label>
+                    <div className="relative">
+                      <select 
+                        value={selectedBranch}
+                        onChange={(e) => setSelectedBranch(e.target.value)}
+                        disabled={isTestRunning}
+                        className="w-full bg-[#121216] border border-white/[0.08] text-white text-[12.5px] rounded-lg px-3 py-2 outline-none cursor-pointer focus:border-[#7C5CFF] transition-colors appearance-none font-mono font-semibold"
+                      >
+                        {repos[selectedRepo as keyof typeof repos].branches.map((br) => (
+                          <option key={br} value={br}>{br}</option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-zinc-500 pointer-events-none" />
+                    </div>
+                  </div>
+
+                  {/* Commit info details */}
+                  <div className="p-3.5 rounded-lg bg-white/[0.02] border border-white/[0.04] space-y-12">
+                    <div>
+                      <span className="text-[10px] font-mono text-zinc-500 block">COMMIT HASH</span>
+                      <span className="text-[12px] font-mono font-bold text-zinc-300">{repos[selectedRepo as keyof typeof repos].commits[selectedBranch as 'main']?.hash || 'none'}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-mono text-zinc-500 block">COMMIT MESSAGE</span>
+                      <span className="text-[12.5px] text-zinc-300 line-clamp-2 leading-snug">"{repos[selectedRepo as keyof typeof repos].commits[selectedBranch as 'main']?.msg || ''}"</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Automation Trigger Buttons */}
+                <div className="mt-8 pt-4 border-t border-white/[0.04] space-y-2">
+                  <button
+                    onClick={handleTriggerQAFeedback}
+                    disabled={isTestRunning}
+                    className="w-full flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-semibold text-white bg-gradient-to-r from-[#7C5CFF] to-[#6A47FF] hover:opacity-90 active:scale-[0.98] transition-all cursor-pointer font-sans disabled:opacity-40 shadow-[0_4px_15px_rgba(124,92,255,0.25)]"
+                  >
+                    {isTestRunning ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        <span>Evaluating...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Play className="w-4 h-4 fill-white" />
+                        <span>Trigger AI QA Suite</span>
+                      </>
+                    )}
+                  </button>
+                  <button
+                    onClick={resetDemoState}
+                    disabled={isTestRunning || testResultState === 'idle'}
+                    className="w-full py-2 text-center rounded-lg border border-white/[0.06] text-zinc-400 hover:text-white hover:bg-white/[0.02] transition-all text-xs"
+                  >
+                    Clear Canvas
+                  </button>
+                </div>
+
+              </div>
+
+              {/* Central dashboard pipeline feedback panel (9 columns) */}
+              <div className="lg:col-span-9 bg-[#09090C] flex flex-col justify-between overflow-hidden">
+                
+                {/* Status Header Area */}
+                <div className="px-6 py-4 bg-[#0F0F12] border-b border-white/[0.06] flex items-center justify-between">
+                  <div>
+                    <span className="text-[10px] font-mono text-zinc-500 block">PIPELINE RUN FEEDBACK</span>
+                    <h3 className="text-sm font-bold text-white font-mono flex items-center gap-2">
+                      <span>job_feed_run_#381</span>
+                      {testResultState === 'running' && <span className="text-[#7C5CFF] text-[11px] font-normal flex items-center gap-1"><RefreshCw className="w-3 h-3 animate-spin" /> executing checks...</span>}
+                      {testResultState === 'success' && <span className="text-[#10B981] text-[11px] font-normal flex items-center gap-1 bg-[#10B981]/15 px-2 py-0.5 rounded border border-[#10B981]/30">✔ passed cleanly</span>}
+                      {testResultState === 'warning' && <span className="text-[#F59E0B] text-[11px] font-normal flex items-center gap-1 bg-[#F59E0B]/15 px-2 py-0.5 rounded border border-[#F59E0B]/30">⚠ completed with alert</span>}
+                      {testResultState === 'failed' && <span className="text-[#EF4444] text-[11px] font-normal flex items-center gap-1 bg-[#EF4444]/15 px-2 py-0.5 rounded border border-[#EF4444]/30">⚙ validation gate block</span>}
+                    </h3>
+                  </div>
+
+                  {/* Horizontal step pipelines */}
+                  <div className="flex items-center gap-2">
+                    <div className={`p-1 rounded-full ${currentTestStep >= 0 && testResultState !== 'idle' ? 'text-[#7C5CFF]' : 'text-zinc-600'}`}>
+                      <Code className="w-4.5 h-4.5" />
+                    </div>
+                    <div className="w-4 h-[1px] bg-white/[0.06]" />
+                    <div className={`p-1 rounded-full ${currentTestStep >= 1 ? 'text-[#7C5CFF]' : 'text-zinc-600'}`}>
+                      <Cpu className="w-4.5 h-4.5" />
+                    </div>
+                    <div className="w-4 h-[1px] bg-white/[0.06]" />
+                    <div className={`p-1 rounded-full ${currentTestStep >= 2 ? 'text-[#7C5CFF]' : 'text-zinc-600'}`}>
+                      <Terminal className="w-4.5 h-4.5" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Navigation Tabs inner */}
+                <div className="flex border-b border-white/[0.05] bg-[#0A0A0E] text-[12px] font-mono">
+                  <button onClick={() => setActiveTab('logger')} className={`px-5 py-2.5 transition-all scroll-mb-[1px] border-b-2 font-bold ${activeTab === 'logger' ? 'border-[#7C5CFF] text-white bg-[#09090C]' : 'border-transparent text-zinc-500 hover:text-white'}`}>Live Output Logs</button>
+                  <button onClick={() => setActiveTab('scenarios')} className={`px-5 py-2.5 transition-all scroll-mb-[1px] border-b-2 font-bold ${activeTab === 'scenarios' ? 'border-[#7C5CFF] text-white bg-[#09090C]' : 'border-transparent text-zinc-500 hover:text-white'}`}>AI Test Scenarios</button>
+                  <button onClick={() => setActiveTab('visual')} className={`px-5 py-2.5 transition-all scroll-mb-[1px] border-b-2 font-bold ${activeTab === 'visual' ? 'border-[#7C5CFF] text-white bg-[#09090C]' : 'border-transparent text-zinc-500 hover:text-white'}`}>Visual Regression Diff</button>
+                  <button onClick={() => setActiveTab('recommendation')} className={`px-5 py-2.5 transition-all scroll-mb-[1px] border-b-2 font-bold ${activeTab === 'recommendation' ? 'border-[#7C5CFF] text-white bg-[#09090C]' : 'border-transparent text-zinc-500 hover:text-white'}`}>AI Recommendation FIX</button>
+                </div>
+
+                {/* Dashboard Tab Content Canvas */}
+                <div className="flex-1 p-6 font-mono text-[12.5px] overflow-y-auto min-h-[300px] max-h-[380px] bg-[#09090C]">
+                  
+                  {/* TAB 1: Live Output Logger */}
+                  {activeTab === 'logger' && (
+                    <div className="space-y-2">
+                      {testOutput.length === 0 ? (
+                        <div className="text-zinc-500 text-center py-20 font-sans">
+                          <Terminal className="w-8 h-8 mx-auto mb-3 text-zinc-600 animate-pulse" />
+                          <p>The console is currently awaiting execution telemetry.</p>
+                          <p className="text-[12px] text-zinc-600 mt-1">Press "Trigger AI QA Suite" on the left to start checking code.</p>
+                        </div>
+                      ) : (
+                        testOutput.map((log, index) => {
+                          let textClass = 'text-zinc-300';
+                          if (log.includes('✅') || log.includes('✓') || log.includes('✔')) textClass = 'text-emerald-400 font-bold';
+                          if (log.includes('⚠') || log.includes('warning')) textClass = 'text-[#F59E0B] font-bold';
+                          if (log.includes('❌') || log.includes('🚨') || log.includes('danger') || log.includes('failed')) textClass = 'text-red-400 font-bold';
+                          if (log.includes('🤖') || log.includes('[botlyhub-ai]')) textClass = 'text-[#7C5CFF] font-semibold';
+                          if (log.includes('⚡')) textClass = 'text-[#4F9CF9] font-semibold';
+                          return (
+                            <motion.div
+                              key={index}
+                              initial={{ opacity: 0, x: -5 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ duration: 0.15 }}
+                              className={`leading-relaxed border-l-2 border-white/[0.04] pl-3 py-0.5 ${textClass}`}
+                            >
+                              {log}
+                            </motion.div>
+                          );
+                        })
+                      )}
+                    </div>
+                  )}
+
+                  {/* TAB 2: AI Generated Test Scenarios */}
+                  {activeTab === 'scenarios' && (
+                    <div className="space-y-4 font-sans">
+                      <div className="p-4 rounded-lg bg-white/[0.02] border border-white/[0.05] space-y-3">
+                        <div className="flex items-center gap-2">
+                          <Cpu className="w-4.5 h-4.5 text-[#7C5CFF]" />
+                          <h4 className="text-[13.5px] font-bold text-white font-mono">Synthesised Integration Routes ({selectedRepo})</h4>
+                        </div>
+                        <p className="text-zinc-400 text-[12.5px]">These browser user simulators are generated on the fly during branch analysis:</p>
+                        
+                        <div className="divide-y divide-white/[0.04] text-[12.5px]">
+                          <div className="py-2.5 flex items-center justify-between">
+                            <span className="font-mono text-zinc-300">01_auth_flow_recovery.spec_runner</span>
+                            <span className="text-[#10B981] font-bold">Passed (0.42s)</span>
+                          </div>
+                          <div className="py-2.5 flex items-center justify-between">
+                            <span className="font-mono text-zinc-300">02_rest_api_schema_boundary_checks</span>
+                            <span className={`font-bold ${selectedBranch === 'hotfix/api-headers' ? 'text-[#F59E0B]' : 'text-[#10B981]'}`}>
+                              {selectedBranch === 'hotfix/api-headers' ? 'Completed [Warning]' : 'Passed (0.58s)'}
+                            </span>
+                          </div>
+                          <div className="py-2.5 flex items-center justify-between">
+                            <span className="font-mono text-zinc-300">03_supabase_session_eviction_compliance</span>
+                            <span className={`font-bold ${selectedBranch === 'bugfix/auth-leak' ? 'text-red-400' : 'text-[#10B981]'}`}>
+                              {selectedBranch === 'bugfix/auth-leak' ? 'Failed [Gate Block]' : 'Passed (0.35s)'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* TAB 3: Visual Regression Screen Diff Layout */}
+                  {activeTab === 'visual' && (
+                    <div className="space-y-4 font-sans h-full flex flex-col justify-center items-center">
+                      {selectedBranch === 'hotfix/api-headers' ? (
+                        <div className="w-full space-y-4 text-center">
+                          <div className="flex items-center justify-center gap-2 text-[#F59E0B] font-mono text-[13px] bg-[#F59E0B]/10 p-2.5 rounded-lg border border-[#F59E0B]/20 mb-4">
+                            <AlertTriangle className="w-4 h-4 shrink-0 animate-bounce" />
+                            <span>Warning: Layout Element Overlap on 320px breakpoints (Login Modal)</span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-4 max-w-xl mx-auto">
+                            <div className="space-y-1.5 p-3 rounded-lg bg-white/[0.02] border border-white/[0.05]">
+                              <span className="text-[10px] text-zinc-500 font-mono block uppercase">Expected Layout</span>
+                              <div className="h-32 rounded bg-zinc-800 flex flex-col items-center justify-center gap-1.5 p-3">
+                                <div className="w-16 h-4 rounded bg-zinc-700" />
+                                <div className="w-20 h-8 rounded bg-[#7C5CFF]/30 border border-[#7C5CFF]/25" />
+                              </div>
+                            </div>
+                            <div className="space-y-1.5 p-3 rounded-lg bg-white/[0.02] border border-[#EF4444]/20">
+                              <span className="text-[10px] text-[#EF4444] font-mono block uppercase">Actual Staging Shift</span>
+                              <div className="h-32 rounded bg-zinc-800 flex flex-col items-center justify-center gap-1.5 relative overflow-hidden text-red-400">
+                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-[15deg] font-mono font-bold text-[10px] text-red-500 bg-red-950/85 border border-red-500/20 px-2 py-0.5 whitespace-nowrap z-10">OVERLAPPING BUTTONS</div>
+                                <div className="w-16 h-4 rounded bg-zinc-700 select-none blur-[0.5px]" />
+                                <div className="w-20 h-8 rounded bg-red-500/20 border border-red-500/30 select-none translate-y-[-8px] blur-[0.5px]" />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-zinc-500 text-center py-20">
+                          <Layers className="w-8 h-8 mx-auto mb-3 text-zinc-650" />
+                          <p className="text-[13px]">No visual regressions detected across modern viewports.</p>
+                          <p className="text-[11px] text-zinc-600 mt-1">Staging screenshot snapshot diffs match production master 100%.</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* TAB 4: AI Code Recommendation and Fixes */}
+                  {activeTab === 'recommendation' && (
+                    <div className="space-y-4">
+                      {selectedBranch === 'bugfix/auth-leak' ? (
+                        <div className="space-y-3 font-sans">
+                          <div className="p-3.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-[12.5px] font-mono flex items-center gap-2">
+                            <XCircle className="w-4.5 h-4.5 shrink-0" />
+                            <span>Insecure state propagation: cached JWT tokens bypass local eviction on logout.</span>
+                          </div>
+                          
+                          <div className="space-y-1.5">
+                            <span className="text-[10px] font-mono text-zinc-500 block">AI HIGHLIGHTED FIX (useSession.ts)</span>
+                            <div className="rounded-lg bg-[#0C0C0F] border border-white/[0.05] p-4 text-[11px] font-mono overflow-x-auto text-zinc-400">
+                              <p className="text-zinc-500">// Old code:</p>
+                              <p className="text-red-400 line-through">- function logOut() &#123; navigate("/login"); &#125;</p>
+                              <p className="text-zinc-500 mt-2">// Recommended patch:</p>
+                              <p className="text-emerald-400 font-bold">+ function logOut() &#123;</p>
+                              <p className="text-emerald-400 font-bold">+   localStorage.removeItem("auth_token_jwt");</p>
+                              <p className="text-emerald-400 font-bold">+   sessionStorage.clear();</p>
+                              <p className="text-emerald-400 font-bold">+   navigate("/login");</p>
+                              <p className="text-emerald-400 font-bold">+ &#125;</p>
+                            </div>
+                          </div>
+
+                          <button 
+                            onClick={() => {
+                              alert("AI Patch applied dynamically! Triggering test automation check flow again.");
+                              setSelectedBranch('main');
+                              handleTriggerQAFeedback();
+                            }}
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500 text-[#09090C] font-semibold text-xs rounded-lg hover:bg-emerald-400 transition-colors font-sans"
+                          >
+                            <Zap className="w-3.5 h-3.5 fill-current" />
+                            <span>Auto Patch Repository</span>
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="text-zinc-500 text-center py-20 font-sans">
+                          <CheckCircle2 className="w-8 h-8 mx-auto mb-3 text-emerald-500/80" />
+                          <p className="text-[13px] text-zinc-300 font-bold">Codebase exhibits pristine pattern health.</p>
+                          <p className="text-[11px] text-[#A1A1A1] mt-1">No pending memory leaks, authentication bugs, or stale headers.</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                </div>
+
+                {/* Simulated telemetry info bar (Bottom UI) */}
+                <div className="px-6 py-3.5 bg-[#0D0D10] border-t border-white/[0.06] text-zinc-500 text-[11.5px] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
+                  <div className="flex items-center gap-4">
+                    <span>Repository Node: <span className="font-mono text-zinc-300 font-medium">{selectedRepo}</span></span>
+                    <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-white/20" />
+                    <span>Active Target Commit: <span className="font-mono text-zinc-300 font-medium">{repos[selectedRepo as keyof typeof repos].commits[selectedBranch as 'main']?.hash || ''}</span></span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]"></span>
+                    <span>Verified under SHA-256 staging parameters</span>
+                  </div>
+                </div>
+
+              </div>
+              
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* 5. Integrations Section (Logos Style Grid) */}
+      <section id="integrations" className="py-20 md:py-24 relative border-t border-white/[0.03] z-10 bg-[#0A0A0B]">
+        <div className="max-w-6xl mx-auto px-6">
+          
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            
+            <div className="lg:col-span-5 text-left space-y-4">
+              <span className="text-[11px] font-mono font-bold tracking-widest text-[#7C5CFF] uppercase bg-[#7C5CFF]/10 border border-[#7C5CFF]/20 px-3 py-1 rounded-full">Seamless Bridges</span>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight leading-tight">Integrates with your existing tech ecosystem</h2>
+              <p className="text-[#A1A1A1] text-sm md:text-[14.5px] leading-relaxed">
+                No complex scripting or server hosting required. Connect BotlyHub directly into your GitHub App ecosystem, Slack workspace alert loops, and Vercel preview gateways in less than five minutes.
+              </p>
+              
+              <div className="pt-2 flex items-center gap-1.5 text-zinc-500 font-mono text-[12px]">
+                <Lock className="w-3.5 h-3.5" />
+                <span>Encrypted using SSH, AES-256 protocols</span>
+              </div>
+            </div>
+
+            <div className="lg:col-span-7">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                
+                {/* Integration Card 1 */}
+                <div className="rounded-xl bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.04] p-5 flex flex-col items-center justify-center text-center transition-all group cursor-pointer">
+                  <Github className="w-8 h-8 text-zinc-400 group-hover:text-white group-hover:scale-105 transition-all mb-3.5" />
+                  <span className="text-[13px] font-bold text-white block">GitHub</span>
+                  <span className="text-[10px] text-zinc-500 font-mono mt-0.5">Push / PR Events</span>
+                </div>
+
+                {/* Integration Card 2 */}
+                <div className="rounded-xl bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.04] p-5 flex flex-col items-center justify-center text-center transition-all group cursor-pointer">
+                  <Gitlab className="w-8 h-8 text-zinc-400 group-hover:text-amber-500 group-hover:scale-105 transition-all mb-3.5" />
+                  <span className="text-[13px] font-bold text-white block">GitLab</span>
+                  <span className="text-[10px] text-zinc-500 font-mono mt-0.5">Commit Hooks</span>
+                </div>
+
+                {/* Integration Card 3 */}
+                <div className="rounded-xl bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.04] p-5 flex flex-col items-center justify-center text-center transition-all group cursor-pointer">
+                  <div className="w-8 h-8 bg-zinc-800 rounded-lg flex items-center justify-center mb-3.5">
+                    <span className="text-[13px] font-mono font-bold text-white">▲</span>
+                  </div>
+                  <span className="text-[13px] font-bold text-white block">Vercel</span>
+                  <span className="text-[10px] text-zinc-500 font-mono mt-0.5">Preview Dep Gates</span>
+                </div>
+
+                {/* Integration Card 4 */}
+                <div className="rounded-xl bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.04] p-5 flex flex-col items-center justify-center text-center transition-all group cursor-pointer">
+                  <div className="w-8 h-8 bg-[#4F9CF9]/10 rounded-lg flex items-center justify-center text-[#4F9CF9] mb-3.5">
+                    <Layers className="w-5 h-5 text-zinc-400 group-hover:text-[#4F9CF9] group-hover:scale-105 transition-all" />
+                  </div>
+                  <span className="text-[13px] font-bold text-white block">CI Platforms</span>
+                  <span className="text-[10px] text-zinc-500 font-mono mt-0.5">Webhook Trigger</span>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* 6. Pricing Section */}
+      <section id="pricing" className="py-20 md:py-28 relative border-t border-white/[0.03] z-10 bg-[#070708]">
+        <div className="absolute top-0 right-1/4 w-[350px] h-[350px] rounded-full bg-[#4F9CF9]/3 blur-[120px] pointer-events-none" />
+        
+        <div className="max-w-5xl mx-auto px-6">
+          
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <span className="text-[11px] font-mono font-bold tracking-widest text-[#7C5CFF]/90 uppercase bg-[#7C5CFF]/10 border border-[#7C5CFF]/20 px-3 py-1 rounded-full">Transparent Pricing</span>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white mt-4 tracking-tight leading-tight">Simple billing styled for scaling teams</h2>
+            <p className="text-[#A1A1A1] mt-3.5 text-sm md:text-base">Start for free, then scale boundaries dynamically as your release throughput multiplies.</p>
+
+            {/* Interval switch */}
+            <div className="flex items-center justify-center gap-3 mt-8">
+              <span className={`text-[13px] font-semibold transition-colors ${pricingInterval === 'monthly' ? 'text-white' : 'text-zinc-500'}`}>Monthly Billing</span>
+              <button 
+                onClick={() => setPricingInterval(pricingInterval === 'monthly' ? 'yearly' : 'monthly')}
+                className="w-12 h-6.5 rounded-full bg-white/[0.06] border border-white/[0.08] p-1 flex items-center transition-all cursor-pointer select-none"
+              >
+                <div className={`w-4.5 h-4.5 rounded-full bg-white transition-all transform ${pricingInterval === 'yearly' ? 'translate-x-5.5' : 'translate-x-0'}`} />
+              </button>
+              <div className="flex items-center gap-1.5">
+                <span className={`text-[13px] font-semibold transition-colors ${pricingInterval === 'yearly' ? 'text-white' : 'text-zinc-500'}`}>Annual Billing</span>
+                <span className="px-1.5 py-0.5 text-[10px] bg-emerald-500/15 text-emerald-400 rounded-md border border-emerald-500/20 font-bold leading-none uppercase">Save 20%</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-stretch">
+            
+            {/* TIER 1: Free */}
+            <div className="relative rounded-2xl bg-white/[0.02] border border-white/[0.05] p-6.5 hover:border-white/[0.1] transition-all flex flex-col justify-between">
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-[17px] font-bold text-white block">Developer Free</h3>
+                  <span className="text-zinc-500 text-[12px] block mt-1 leading-snug">Hobby, sandbox trials, and basic staging pipelines.</span>
+                </div>
+
+                <div className="flex items-baseline gap-1">
+                  <span className="text-[28px] font-mono font-bold text-white">$0</span>
+                  <span className="text-zinc-500 text-[12px] uppercase tracking-wider font-mono">/ lifetime</span>
+                </div>
+
+                <div className="w-full h-[1px] bg-white/[0.04]" />
+
+                <ul className="space-y-2.5 text-[13px] text-zinc-400 font-medium">
+                  <li className="flex items-center gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-zinc-650" />
+                    <span>Up to 2 connected repositories</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-zinc-650" />
+                    <span>10 automated AI QA test runs / mo</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-zinc-650" />
+                    <span>Basic inline GitHub review reports</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-zinc-650" />
+                    <span>Main branch tracking</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="mt-8">
+                <a href="#sandbox" className="w-full block text-center py-2.5 text-xs font-semibold rounded-lg bg-white/[0.04] text-white border border-white/[0.08] hover:bg-white/[0.08] transition-all">
+                  Get Started for Free
+                </a>
+              </div>
+            </div>
+
+            {/* TIER 2: Pro (Accent focused) */}
+            <div className="relative rounded-2xl bg-white/[0.03] border-[#7C5CFF]/40 border-2 p-6.5 hover:shadow-[0_12px_40px_rgba(124,92,255,0.15)] transition-all flex flex-col justify-between">
+              <div className="absolute top-[-11px] left-1/2 -translate-x-1/2 px-3 py-0.5 bg-[#7C5CFF] text-white text-[10px] rounded-full font-mono font-bold uppercase tracking-wider shadow">Most Popular</div>
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-[17px] font-bold text-white block">Botly Pro</h3>
+                  <span className="text-zinc-400 text-[12px] block mt-1 leading-snug">Continuous delivery checks for active squads.</span>
+                </div>
+
+                <div className="flex items-baseline gap-1">
+                  <span className="text-[28px] font-mono font-bold text-white">
+                    {pricingInterval === 'monthly' ? '$49' : '$39'}
+                  </span>
+                  <span className="text-zinc-500 text-[12px] uppercase tracking-wider font-mono">/ month</span>
+                </div>
+
+                <div className="w-full h-[1px] bg-white/[0.04]" />
+
+                <ul className="space-y-2.5 text-[13px] text-zinc-300 font-medium">
+                  <li className="flex items-center gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-[#7C5CFF]" />
+                    <span>Unlimited connected repositories</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-[#7C5CFF]" />
+                    <span>250 automated AI QA runs / mo</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-[#7C5CFF]" />
+                    <span>All staging / preview branch runs</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-[#7C5CFF]" />
+                    <span>Visual layout regression snapshot diffs</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-[#7C5CFF]" />
+                    <span>Priority email & Slack support</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="mt-8">
+                <a href="#sandbox" className="w-full block text-center py-2.5 text-xs font-semibold rounded-lg bg-[#7C5CFF] text-white hover:bg-[#6A47FF] hover:shadow-[0_0_15px_rgba(124,92,255,0.3)] transition-all">
+                  Trigger 14-Day Free Trial
+                </a>
+              </div>
+            </div>
+
+            {/* TIER 3: Enterprise */}
+            <div className="relative rounded-2xl bg-white/[0.02] border border-white/[0.05] p-6.5 hover:border-white/[0.1] transition-all flex flex-col justify-between">
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-[17px] font-bold text-white block">Enterprise Custom</h3>
+                  <span className="text-zinc-500 text-[12px] block mt-1 leading-snug">Deep compliance, high volume security gates.</span>
+                </div>
+
+                <div className="flex items-baseline gap-1">
+                  <span className="text-[28px] font-mono font-bold text-white">Custom</span>
+                  <span className="text-zinc-500 text-[12px] uppercase tracking-wider font-mono">/ volume</span>
+                </div>
+
+                <div className="w-full h-[1px] bg-white/[0.04]" />
+
+                <ul className="space-y-2.5 text-[13px] text-zinc-400 font-medium">
+                  <li className="flex items-center gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-zinc-650" />
+                    <span>Unlimited AI E2E scenarios</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-zinc-650" />
+                    <span>Self-hosted chromium runner compatibility</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-zinc-650" />
+                    <span>SSO, SAML & fine-grained team controls</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-zinc-650" />
+                    <span>Dedicated engineer pairing audits</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-zinc-650" />
+                    <span>99.9% uptime SLA compliance contract</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="mt-8">
+                <a href="mailto:kenanekinci0@gmail.com?subject=BotlyHub Enterprise Quote Request" className="w-full block text-center py-2.5 text-xs font-semibold rounded-lg bg-white/[0.04] text-white border border-white/[0.08] hover:bg-white/[0.08] transition-all">
+                  Contact Custom Sales
+                </a>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* FAQ Accordion Section */}
+      <section className="py-20 md:py-24 relative border-t border-white/[0.03] z-10 bg-[#0A0A0B]">
+        <div className="max-w-4xl mx-auto px-6">
+          
+          <div className="text-center mb-16">
+            <span className="text-[11px] font-mono font-bold tracking-widest text-[#4F9CF9] uppercase bg-[#4F9CF9]/10 border border-[#4F9CF9]/20 px-3 py-1 rounded-full">Dev Questions</span>
+            <h2 className="text-3xl font-extrabold text-white mt-4">Frequently Asked Questions</h2>
+          </div>
+
+          <div className="space-y-3">
+            {[
+              {
+                q: "How does BotlyHub write QA scenarios dynamically?",
+                a: "BotlyHub connects directly to your code changes. When you push, our platform parses the syntactic hierarchy of API endpoints, routing patterns, and schema files. Our proprietary LLM analyzes database queries and client request triggers to synthesize actual playwright-compatible chromium E2E scenarios on the spot."
+              },
+              {
+                q: "Do I need to maintain test file scripts in my repository?",
+                a: "No script maintenance is strictly required. While you can download our AI-generated Spec files manually and commit them as baseline integrations, BotlyHub naturally reads your repository changes, saves scripts in temporary virtual cache volumes, and validates endpoints on every deployment pipeline run."
+              },
+              {
+                q: "Is my repository source code safely managed?",
+                a: "Absolutely. BotlyHub adheres to the highest level of security hygiene. We never persist your codebase files permanently on servers. Files are read temporarily in isolated sandbox cache sandboxes, audited, and discarded immediately after E2E runs complete. All secret tokens are stored using AES-256 encryption."
+              },
+              {
+                q: "How does the deployment gate policy feature operate?",
+                a: "If you configure an integration target (like Vercel production branch deployments), BotlyHub intercepts staging build hooks. If any dynamic test pipeline audit returns critical or fatal errors, BotlyHub notifies git, blocks staging propagation gates securely, and halts premature traffic routing to production."
+              }
+            ].map((item, index) => {
+              const isOpen = !!faqOpen[index];
+              return (
+                <div key={index} className="rounded-xl bg-white/[0.02] border border-white/[0.05] transition-all overflow-hidden text-left">
+                  <button 
+                    onClick={() => setFaqOpen({ ...faqOpen, [index]: !isOpen })}
+                    className="w-full px-5 py-4 flex items-center justify-between text-[14px] font-bold text-white text-left hover:bg-white/[0.02] transition-colors"
+                  >
+                    <span>{item.q}</span>
+                    <ChevronDown className={`w-4 h-4 text-zinc-500 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <div className="px-5 pb-5 pt-1 text-[13.5px] text-[#A1A1A1] leading-relaxed border-t border-white/[0.03]">
+                          {item.a}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              );
+            })}
+          </div>
+
+        </div>
+      </section>
+
+      {/* CTA Bottom Banner Section */}
+      <section className="py-20 md:py-28 relative border-t border-white/[0.03] z-10 bg-gradient-to-b from-[#0A0A0B] to-[#0D0D10] text-center overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] rounded-full bg-[#7C5CFF]/5 blur-[125px] pointer-events-none" />
+        
+        <div className="max-w-3xl mx-auto px-6 space-y-8 relative z-10">
+          <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white mb-2 leading-tight font-sans">
+            Ready to secure your deployments?
+          </h2>
+          <p className="text-[#A1A1A1] text-sm md:text-base max-w-xl mx-auto leading-relaxed">
+            Plug BotlyHub AI QA directly into your staging pipeline flow today. 100% automated, no credit card required.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a href="#sandbox" className="w-full sm:w-auto px-6 py-3 rounded-xl bg-white text-black text-sm font-semibold hover:bg-zinc-200 active:scale-95 transition-all text-center">
+              Sign Up for Free
+            </a>
+            <button 
+              onClick={handleCopyCLI}
+              className="w-full sm:w-auto px-4.5 py-3 rounded-xl bg-white/[0.03] border border-white/[0.08] text-zinc-300 hover:text-white hover:bg-white/[0.06] text-sm font-mono flex items-center justify-center gap-2 transition-all"
+            >
+              <span>{cliCopied ? 'Copied CLI Command!' : 'npm i @botlyhub/cli'}</span>
+              {cliCopied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* MINIMAL FOOTER */}
+      <footer className="py-12 border-t border-white/[0.05] bg-[#09090A] z-10 relative">
+        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+          
+          <div className="flex items-center gap-3">
+            <div className="w-6 h-6 rounded bg-[#7C5CFF]/20 flex items-center justify-center border border-[#7C5CFF]/30">
+              <Bot className="w-3.5 h-3.5 text-[#7C5CFF]" />
+            </div>
+            <span className="text-[14px] font-bold text-white tracking-tight">
+              Botly<span className="text-[#7C5CFF]">Hub</span>
+            </span>
+            <span className="text-zinc-650 font-mono text-[11px]">© 2026 BotlyHub. All rights reserved.</span>
+          </div>
+
+          <div className="flex items-center gap-6 text-[13px] text-zinc-500 font-medium">
+            <a href="#docs" className="hover:text-white transition-colors">Documentation</a>
+            <a href="https://github.com" target="_blank" rel="noreferrer" className="hover:text-white transition-colors flex items-center gap-1">
+              <Github className="w-3.5 h-3.5" /> Github
+            </a>
+            <a href="mailto:kenanekinci0@gmail.com" className="hover:text-white transition-colors">Contact Support</a>
+            <div className="flex items-center gap-1.5 font-mono text-[10.5px] bg-[#10B981]/10 text-emerald-400 border border-[#10B981]/15 px-2 py-0.5 rounded">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse"></span>
+              All systems online
+            </div>
+          </div>
+
+        </div>
+      </footer>
+
     </div>
   );
-};
-
-const AnnouncementsCarousel: React.FC<{ 
-    announcements: Announcement[], 
-    scroll: any, 
-    onShowPopup: (ann: Announcement) => void 
-}> = React.memo(({ announcements, scroll, onShowPopup }) => {
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const { t } = useTranslation();
-
-    const handleScroll = useCallback(() => {
-        if (scroll.ref.current) {
-            const width = scroll.ref.current.offsetWidth;
-            const index = Math.round(scroll.ref.current.scrollLeft / width);
-            if (index !== currentIndex) {
-                setCurrentIndex(index);
-            }
-        }
-    }, [currentIndex, scroll.ref]);
-
-    useEffect(() => {
-        const el = scroll.ref.current;
-        if (el) {
-            el.addEventListener('scroll', handleScroll, { passive: true });
-            return () => el.removeEventListener('scroll', handleScroll);
-        }
-    }, [handleScroll, scroll.ref]);
-
-    useEffect(() => {
-        if (announcements.length <= 1) return;
-
-        const interval = setInterval(() => {
-            if (window.innerWidth < 768 && scroll.ref.current && !scroll.isDragging) {
-                const nextIndex = (currentIndex + 1) % announcements.length;
-                const width = scroll.ref.current.offsetWidth;
-                scroll.ref.current.scrollTo({
-                    left: nextIndex * width,
-                    behavior: 'smooth'
-                });
-            }
-        }, 5000);
-
-        return () => clearInterval(interval);
-    }, [currentIndex, announcements.length, scroll.isDragging, scroll.ref]);
-
-    return (
-        <div className="w-full flex flex-col gap-4">
-            <div className="flex items-center gap-2 px-1">
-                <h2 className="text-[19px] sm:text-[21px] font-[900] text-slate-900 dark:text-white tracking-widest uppercase italic font-sans leading-none">
-                    {t('home_promotions_title') || 'İlginizi Çekebilir'}
-                </h2>
-                <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-slate-800 px-1.5 py-0.5 rounded-md uppercase tracking-widest bg-slate-50 dark:bg-white/5 font-sans leading-none h-5 flex items-center">
-                    Ad promo
-                </span>
-            </div>
-
-            <div className="relative">
-                <div 
-                    ref={scroll.ref}
-                    onMouseDown={scroll.onMouseDown}
-                    onMouseUp={scroll.onMouseUp}
-                    onMouseMove={scroll.onMouseMove}
-                    onMouseLeave={scroll.onMouseLeave}
-                    onContextMenu={scroll.onContextMenu}
-                    className={`flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 overflow-x-auto md:overflow-x-visible no-scrollbar pb-3 scroll-smooth snap-x snap-mandatory ${scroll.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
-                >
-                    {announcements.map((ann) => (
-                        <div 
-                            key={ann.id} 
-                            className="w-[84vw] sm:w-[50vw] md:w-full shrink-0 snap-center"
-                        >
-                            <PromoCard ann={ann} onShowPopup={onShowPopup} />
-                        </div>
-                    ))}
-                </div>
-
-                {announcements.length > 1 && (
-                    <div className="md:hidden flex justify-center items-center gap-1.5 mt-3 pointer-events-none">
-                        {announcements.map((_, i) => (
-                            <div 
-                                key={i} 
-                                className={`h-1.5 rounded-full transition-all duration-300 ${i === currentIndex ? 'w-4 bg-slate-800 dark:bg-white' : 'w-1.5 bg-slate-300 dark:bg-slate-700'}`} 
-                            />
-                        ))}
-                    </div>
-                )}
-            </div>
-        </div>
-    );
-});
-
-export default Home;
+}

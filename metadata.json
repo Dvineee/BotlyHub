@@ -1,6 +1,6 @@
 {
   "name": "BotlyHub V3",
-  "description": "A comprehensive Telegram bot marketplace, Q&A community board, and subscription management dashboard.",
+  "description": "Automated AI QA for developers. BotlyHub runs intelligent tests, detects bugs, and validates your product before it reaches production with every PR, commit, and deployment.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
