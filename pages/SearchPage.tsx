@@ -286,8 +286,8 @@ const NavMenu = ({
 
     return (
         <>
-        <div className="sticky top-0 z-[100] bg-white dark:bg-slate-900 border-b border-[#f7f7f7] dark:border-white/5 w-full py-2.5 md:pb-2 transition-colors" ref={internalMenuRef}>
-            <div className="max-w-7xl mx-auto px-5 sm:px-8 flex items-center justify-between">
+        <div className="sticky top-0 z-[100] bg-white dark:bg-slate-900 border-b border-[#f7f7f7] dark:border-white/5 w-full py-2 md:pb-2 transition-colors" ref={internalMenuRef}>
+            <div className="max-w-7xl mx-auto px-6 sm:px-8 flex items-center justify-between">
                 {/* Left Section (Logo) */}
                 <div className="hidden md:flex items-center w-48 shrink-0">
                     <Logo onClick={() => navigate('/')} className="cursor-pointer" />
@@ -598,9 +598,9 @@ const SearchPage = () => {
         setSearchMode={setSearchMode}
         setActiveCategory={setActiveCategory}
       />
-      <div className="max-w-7xl mx-auto px-5 sm:px-8 pt-10 pb-32">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 pt-12 pb-16">
         {/* Results */}
-        <div className="flex items-center gap-3 mb-10">
+        <div className="flex items-center gap-3 mb-8">
           <div className="flex-1 relative">
             <div className="relative flex items-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl p-1 transition-all group custom-search-outline">
               <div className="ml-2 w-8 h-8 flex items-center justify-center text-slate-400 group-focus-within:text-blue-500 shrink-0">
@@ -628,7 +628,7 @@ const SearchPage = () => {
       </div>
 
       {/* Categories Horizontal Scroll */}
-      <div className="mb-10">
+      <div className="mb-8">
         <div 
             ref={catScroll.ref}
             onMouseDown={catScroll.onMouseDown}

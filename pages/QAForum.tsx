@@ -633,8 +633,8 @@ export default function QAForum() {
       />
 
       {/* Header Sticky Navigation Panel */}
-      <header ref={internalMenuRef} className="sticky top-0 z-40 bg-white dark:bg-slate-900 border-b border-[#f7f7f7] dark:border-white/5 w-full py-2.5 transition-colors">
-        <div className="max-w-7xl mx-auto px-5 sm:px-8 flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-0">
+      <header ref={internalMenuRef} className="sticky top-0 z-40 bg-white dark:bg-slate-900 border-b border-[#f7f7f7] dark:border-white/5 w-full py-2 transition-colors">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-0">
           
           {/* Section 1: Center Navigation links (Takes top row on mobile via flex/order, center on desktop) */}
           <div className="flex items-center justify-center gap-4 md:gap-14 order-1 md:order-2 w-full md:w-auto pb-1.5 md:pb-0 border-b md:border-b-0 border-slate-100 dark:border-white/5 md:border-transparent">
