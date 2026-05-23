@@ -7,23 +7,18 @@ import { useTelegram } from '../hooks/useTelegram';
 
 const FilterIcon = ({ size = 18, className = "" }: { size?: number, className?: string }) => (
   <svg 
+    xmlns="http://www.w3.org/2000/svg" 
     width={size} 
     height={size} 
-    viewBox="0 0 24 24" 
     fill="none" 
-    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24" 
     className={className}
+    style={{ height: size, width: size, display: 'block', flex: '0 0 auto' }}
   >
-    <g stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-      <line x1="4" y1="6" x2="20" y2="6"/>
-      <circle cx="13" cy="6" r="1.5" fill="currentColor"/>
-      
-      <line x1="4" y1="12" x2="20" y2="12"/>
-      <circle cx="8" cy="12" r="1.5" fill="currentColor"/>
-      
-      <line x1="4" y1="18" x2="20" y2="18"/>
-      <circle cx="16" cy="18" r="1.5" fill="currentColor"/>
-    </g>
+    <path 
+      fill="currentColor" 
+      d="M16.929 13.28a3.643 3.643 0 1 1-3.546 4.484 1 1 0 0 1-.168.017l-7.432.006a.858.858 0 0 1 0-1.714l7.432-.006a1 1 0 0 1 .168.017 3.645 3.645 0 0 1 3.546-2.803m0 1.716a1.929 1.929 0 1 0 0 3.857 1.929 1.929 0 0 0 0-3.857M7.643 4a3.645 3.645 0 0 1 3.545 2.802 1 1 0 0 1 .17-.016h8.356a.858.858 0 0 1 0 1.714h-8.357a1 1 0 0 1-.168-.017A3.643 3.643 0 1 1 7.643 4m0 1.714a1.928 1.928 0 1 0 0 3.857 1.928 1.928 0 0 0 0-3.857"
+    />
   </svg>
 );
 

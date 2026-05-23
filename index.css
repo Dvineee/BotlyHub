@@ -1528,5 +1528,20 @@ header, nav, .sticky-nav {
   }
 }
 
+.category-filter-item:hover, .category-filter-item.active {
+    box-shadow: 4px 4px #000000;
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border-color: #000000 !important;
+}
+.category-filter-item {
+    padding: 8px 15px;
+    border: 1px solid #323232;
+    border-radius: 18px;
+    transition: box-shadow var(--tDuration, 0.2s), transform var(--tDuration, 0.2s), background var(--tDuration, 0.2s);
+    text-align: center;
+    overflow: hidden;
+}
+
 
 
