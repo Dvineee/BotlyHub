@@ -1541,6 +1541,8 @@ header, nav, .sticky-nav {
     transition: box-shadow var(--tDuration, 0.2s), transform var(--tDuration, 0.2s), background var(--tDuration, 0.2s);
     text-align: center;
     overflow: hidden;
+    background-color: #ffffff00 !important;
+    color: var(--text-secondary) !important;
 }
 
 
