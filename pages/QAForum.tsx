@@ -636,56 +636,44 @@ export default function QAForum() {
       <header ref={internalMenuRef} className="sticky top-0 z-40 bg-white dark:bg-slate-900 border-b border-[#f7f7f7] dark:border-white/5 w-full py-2.5 transition-colors">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-0">
           
-          {/* Section 1: Center Navigation links (Takes top row on mobile via flex/order, center on desktop) */}
-          <div className="flex items-center justify-center gap-4 md:gap-14 order-1 md:order-2 w-full md:w-auto pb-1.5 md:pb-0 border-b md:border-b-0 border-slate-100 dark:border-white/5 md:border-transparent">
-            {/* Discover (Keşfet) */}
-            <div 
-              className="relative md:static"
-              onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('kesfet'); }}
-            >
-              <button 
-                onClick={() => {
-                  if (window.innerWidth < 768) {
-                    haptic('light');
-                    setMobileModal('kesfet');
-                  } else {
-                    setOpenMenu(openMenu === 'kesfet' ? null : 'kesfet');
-                  }
-                }}
-                className={`nav-menu-item grow-0 ${openMenu === 'kesfet' ? 'text-slate-900 dark:text-white bg-blue-500/5' : 'text-slate-600 dark:text-slate-400 hover:bg-blue-500/5'}`}
-              >
-                Keşfet <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'kesfet' ? 'rotate-180' : ''}`} />
-              </button>
-            </div>
+           {/* Section 1: Center Navigation links (Takes top row on mobile via flex/order, center on desktop) */}
+           <div className="flex items-center justify-center gap-4 md:gap-14 order-1 md:order-2 w-full md:w-auto pb-1.5 md:pb-0 border-b md:border-b-0 border-slate-100 dark:border-white/5 md:border-transparent">
+             {/* Discover / Keşfet */}
+             <button 
+                 onClick={() => { haptic('light'); navigate('/'); }}
+                 className="nav-menu-item text-slate-600 dark:text-slate-400 hover:bg-blue-500/5 grow-0 whitespace-nowrap"
+             >
+                 {t('nav_explore')}
+             </button>
 
-            {/* Investors (Yatırımcılar) */}
-            <div 
-              className="relative md:static"
-              onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('investors'); }}
-            >
-              <button 
-                onClick={() => {
-                  if (window.innerWidth < 768) {
-                    haptic('light');
-                    setMobileModal('investors');
-                  } else {
-                    setOpenMenu(openMenu === 'investors' ? null : 'investors');
-                  }
-                }}
-                className={`nav-menu-item grow-0 ${openMenu === 'investors' ? 'text-slate-900 dark:text-white bg-emerald-500/5' : 'text-slate-600 dark:text-slate-400 hover:bg-emerald-500/5'}`}
-              >
-                Yatırımcılar <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'investors' ? 'rotate-180' : ''}`} />
-              </button>
-            </div>
+             {/* Categories / Kategoriler */}
+             <div 
+               className="relative md:static"
+               onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('kesfet'); }}
+             >
+               <button 
+                 onClick={() => {
+                   if (window.innerWidth < 768) {
+                     haptic('light');
+                     setMobileModal('kesfet');
+                   } else {
+                     setOpenMenu(openMenu === 'kesfet' ? null : 'kesfet');
+                   }
+                 }}
+                 className={`nav-menu-item grow-0 ${openMenu === 'kesfet' ? 'text-slate-900 dark:text-white bg-blue-500/5' : 'text-slate-600 dark:text-slate-400 hover:bg-blue-500/5'}`}
+               >
+                 Kategoriler <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'kesfet' ? 'rotate-180' : ''}`} />
+               </button>
+             </div>
 
-            {/* Blog Link */}
-            <button 
-              onClick={() => { haptic('light'); navigate('/blog'); }}
-              className="nav-menu-item text-slate-600 dark:text-slate-400 hover:bg-blue-500/5"
-            >
-              {t('blog_title')}
-            </button>
-          </div>
+             {/* My Bots / Botlarım */}
+             <button 
+               onClick={() => { haptic('light'); navigate('/my-bots'); }}
+               className="nav-menu-item text-slate-600 dark:text-slate-400 hover:bg-blue-500/5"
+             >
+               {t('my_bots')}
+             </button>
+           </div>
 
           {/* Section 2 & 3 Mobile-Row Container */}
           <div className="flex md:contents items-center justify-between order-2 md:order-none w-full md:w-auto">

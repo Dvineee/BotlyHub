@@ -183,7 +183,15 @@ const NavMenu = ({
                 {/* Center Section (Navigation & Search) */}
                 <div className="hidden md:flex items-center justify-center gap-8 md:gap-10 flex-1">
                     <div className="flex items-center gap-6">
-                        {/* Discover (Keşfet) */}
+                        {/* Discover / Keşfet */}
+                        <button 
+                            onClick={() => { haptic('light'); navigate('/'); }}
+                            className="nav-menu-item text-slate-600 dark:text-slate-400 hover:bg-blue-500/5 grow-0 whitespace-nowrap"
+                        >
+                            {t('nav_explore')}
+                        </button>
+
+                        {/* Categories / Kategoriler */}
                         <div 
                             className="relative md:static"
                             onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('kesfet'); }}
@@ -199,36 +207,16 @@ const NavMenu = ({
                                 }}
                                 className={`nav-menu-item grow-0 ${openMenu === 'kesfet' ? 'text-slate-900 dark:text-white bg-blue-500/5' : 'text-slate-600 dark:text-slate-400 hover:bg-blue-500/5'}`}
                             >
-                                Keşfet <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'kesfet' ? 'rotate-180' : ''}`} />
+                                Kategoriler <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'kesfet' ? 'rotate-180' : ''}`} />
                             </button>
                         </div>
 
-                        {/* Investors (Yatırımcılar) */}
-                        <div 
-                            className="relative md:static"
-                            onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('investors'); }}
-                        >
-                            <button 
-                                onClick={() => {
-                                    if (window.innerWidth < 768) {
-                                        haptic('light');
-                                        setMobileModal('investors');
-                                    } else {
-                                        setOpenMenu(openMenu === 'investors' ? null : 'investors');
-                                    }
-                                }}
-                                className={`nav-menu-item grow-0 ${openMenu === 'investors' ? 'text-slate-900 dark:text-white bg-emerald-500/5' : 'text-slate-600 dark:text-slate-400 hover:bg-emerald-500/5'}`}
-                            >
-                                Yatırımcılar <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'investors' ? 'rotate-180' : ''}`} />
-                            </button>
-                        </div>
-
-                        {/* Blog Link */}
+                        {/* My Bots / Botlarım */}
                         <button 
-                            onClick={() => { haptic('light'); navigate('/blog'); }}
+                            onClick={() => { haptic('light'); navigate('/my-bots'); }}
                             className="nav-menu-item text-slate-600 dark:text-slate-400 hover:bg-blue-500/5 whitespace-nowrap"
                         >
-                            {t('blog_title')}
+                            {t('my_bots')}
                         </button>
                     </div>
 

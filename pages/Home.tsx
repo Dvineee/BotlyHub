@@ -437,71 +437,56 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonR
   return (
     <div 
       onClick={() => navigate(`/bot/${bot.slug}`)} 
-      className="flex flex-col p-6 bg-white dark:bg-[#0F1623] border border-black/[0.06] dark:border-white/[0.06] rounded-[14px] transition-all duration-200 ease-out hover:-translate-y-[2px] hover:border-black/[0.12] dark:hover:border-white/[0.12] hover:shadow-md hover:shadow-black/[0.01] dark:hover:shadow-black/[0.08] active:scale-[0.98] transform-gpu cursor-pointer select-none group w-full relative"
+      className="flex flex-col p-5 bg-white dark:bg-[#0F1623] border border-black/[0.06] dark:border-white/[0.06] rounded-[16px] transition-all duration-[180ms] ease-out hover:-translate-y-[2px] hover:border-black/[0.12] dark:hover:border-white/[0.12] shadow-none hover:shadow-none active:scale-[0.98] transform-gpu cursor-pointer select-none group w-full relative min-h-[175px]"
     >
-        {/* Üst Alan: Avatar, Bot Adı ve Kategori Badge aynı hizada */}
-        <div className="flex items-center gap-3 w-full mb-3 min-w-0">
-            <img 
-                src={getLiveBotIcon(bot)} 
-                alt={bot.name} 
-                loading="lazy"
-                className="w-11 h-11 rounded-xl object-cover bg-slate-100 dark:bg-slate-800 border border-black/[0.04] dark:border-white/[0.06] shrink-0" 
-                onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
-            />
-            <div className="flex-1 min-w-0 flex flex-col gap-0.5">
-                <div className="flex items-center gap-1.5 min-w-0">
-                    <h3 className="font-bold text-[15px] sm:text-[16px] text-slate-900 dark:text-slate-50 truncate tracking-tight leading-tight">
-                        {bot.name}
-                    </h3>
-                    {bot.is_official && (
-                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="text-[#139fec] shrink-0">
-                            <path fillRule="evenodd" clipRule="evenodd" d="M7.408 1.2375C7.57933 1.11017 7.78667 1.0415 8 1.0415C8.21333 1.0415 8.42067 1.11017 8.592 1.23749L9.81067 2.14417C9.83467 2.16217 9.86133 2.1755 9.88933 2.18484C9.91733 2.19417 9.94733 2.19884 9.97733 2.19817L11.496 2.18084C11.7093 2.17817 11.918 2.24484 12.09 2.37017C12.2627 2.4955 12.39 2.6735 12.454 2.87684L12.9073 4.32617C12.916 4.35484 12.93 4.3815 12.9473 4.4055C12.9647 4.4295 12.986 4.45084 13.0107 4.46817L14.2493 5.34684C14.4233 5.47017 14.5527 5.64617 14.6187 5.8495C14.6847 6.05217 14.6833 6.27084 14.6153 6.4735L14.13 7.91284C14.1207 7.94084 14.1153 7.97084 14.1153 8.00017C14.1153 8.0295 14.12 8.0595 14.13 8.0875L14.6153 9.52684C14.6833 9.72884 14.6847 9.9475 14.6187 10.1508C14.5527 10.3535 14.4233 10.5302 14.2493 10.6535L13.0107 11.5322C12.9867 11.5495 12.9653 11.5702 12.9473 11.5948C12.93 11.6188 12.9167 11.6455 12.9073 11.6742L12.454 13.1235C12.3907 13.3268 12.2627 13.5048 12.09 13.6302C11.9173 13.7555 11.7093 13.8222 11.496 13.8195L9.97733 13.8022C9.94733 13.8015 9.918 13.8062 9.88933 13.8155C9.86133 13.8248 9.83467 13.8382 9.81067 13.8562L8.592 14.7628C8.42067 14.8902 8.21333 14.9588 8 14.9588C7.78667 14.9588 7.57933 14.8902 7.408 14.7628L6.18933 13.8562C6.16533 13.8382 6.13867 13.8248 6.11067 13.8155C6.08267 13.8062 6.05267 13.8015 6.02267 13.8022L4.504 13.8195C4.29067 13.8222 4.082 13.7555 3.91 13.6302C3.73733 13.5048 3.61 13.3268 3.546 13.1235L3.09267 11.6742C3.084 11.6455 3.07 11.6188 3.05267 11.5948C3.03533 11.5708 3.014 11.5495 2.98933 11.5322L1.75067 10.6535C1.57667 10.5302 1.44733 10.3542 1.38133 10.1508C1.31533 9.94817 1.31667 9.7295 1.38467 9.52684L1.87 8.00017C1.88067 8.0595 1.88533 8.03017 1.88533 8.00017C1.88533 7.97017 1.88067 7.94084 1.87067 7.91284L1.38533 6.4735C1.31733 6.2715 1.316 6.05284 1.382 5.8495C1.448 5.64684 1.57733 5.47084 1.75133 5.3475L1.75133 5.3475L2.99 4.46884C3.014 4.45084 3.03533 4.43017 3.05333 4.40617C3.07067 4.38217 3.084 4.3555 3.09333 4.32684L3.54667 2.8775C3.61 2.67417 3.738 2.49617 3.91067 2.37084C4.08333 2.2455 4.29133 2.17884 4.50467 2.1815L6.02333 2.19884C6.05333 2.1995 6.08266 2.19484 6.11133 2.1855C6.13933 2.17617 6.166 2.16284 6.19 2.14484L7.408 1.2375Z" fill="currentColor"></path>
-                            <path fillRule="evenodd" clipRule="evenodd" d="M7.33334 10.6668C7.16267 10.6668 6.992 10.6015 6.862 10.4715L4.862 8.4715C4.60134 8.21083 4.60134 7.7895 4.862 7.52883C5.12267 7.26817 5.544 7.26817 5.80467 7.52883L7.33334 9.0575L10.1953 6.1955C10.456 5.93483 10.8773 5.93483 11.138 6.1955C11.3987 6.45617 11.3987 6.8775 11.138 7.13817L7.80467 10.4715C7.67467 10.6015 7.504 10.6668 7.33334 10.6668Z" fill="white"></path>
-                        </svg>
-                    )}
+        {/* Top: bot identity (avatar + name) + category badge inline */}
+        <div className="flex items-start justify-between gap-3 w-full mb-3.5 min-w-0">
+            <div className="flex items-center gap-3 min-w-0">
+                <img 
+                    src={getLiveBotIcon(bot)} 
+                    alt={bot.name} 
+                    loading="lazy"
+                    className="w-10 h-10 rounded-xl object-cover bg-slate-50 dark:bg-slate-800 border border-black/[0.04] dark:border-white/[0.06] shrink-0" 
+                    onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
+                />
+                <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                        <h3 className="font-bold text-[15px] text-slate-900 dark:text-slate-50 truncate tracking-tight leading-none group-hover:text-blue-500 transition-colors">
+                            {bot.name}
+                        </h3>
+                        {bot.is_official && (
+                            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" className="text-[#139fec] shrink-0">
+                                <path fillRule="evenodd" clipRule="evenodd" d="M7.408 1.2375C7.57933 1.11017 7.78667 1.0415 8 1.0415C8.21333 1.0415 8.42067 1.11017 8.592 1.23749L9.81067 2.14417C9.83467 2.16217 9.86133 2.1755 9.88933 2.18484C9.91733 2.19417 9.94733 2.19884 9.97733 2.19817L11.496 2.18084C11.7093 2.17817 11.918 2.24484 12.09 2.37017C12.2627 2.4955 12.39 2.6735 12.454 2.87684L12.9073 4.32617C12.916 4.35484 12.93 4.3815 12.9473 4.4055C12.9647 4.4295 12.986 4.45084 13.0107 4.46817L14.2493 5.34684C14.4233 5.47017 14.5527 5.64617 14.6187 5.8495C14.6847 6.05217 14.6833 6.27084 14.6153 6.4735L14.13 7.91284C14.1207 7.94084 14.1153 7.97084 14.1153 8.00017C14.1153 8.0295 14.12 8.0595 14.13 8.0875L14.6153 9.52684C14.6833 9.72884 14.6847 9.9475 14.6187 10.1508C14.5527 10.3535 14.4233 10.5302 14.2493 10.6535L13.0107 11.5322C12.9867 11.5495 12.9653 11.5702 12.9473 11.5948C12.93 11.6188 12.9167 11.6455 12.9073 11.6742L12.454 13.1235C12.3907 13.3268 12.2627 13.5048 12.09 13.6302C11.9173 13.7555 11.7093 13.8222 11.496 13.8195L9.97733 13.8022C9.94733 13.8015 9.918 13.8062 9.88933 13.8155C9.86133 13.8248 9.83467 13.8382 9.81067 13.8562L8.592 14.7628C8.42067 14.8902 8.21333 14.9588 8 14.9588C7.78667 14.9588 7.57933 14.8902 7.408 14.7628L6.18933 13.8562C6.16533 13.8382 6.13867 13.8248 6.11067 13.8155C6.08267 13.8062 6.05267 13.8015 6.02267 13.8022L4.504 13.8195C4.29067 13.8222 4.082 13.7555 3.91 13.6302C3.73733 13.5048 3.61 13.3268 3.546 13.1235L3.09267 11.6742C3.084 11.6455 3.07 11.6188 3.05267 11.5948C3.03533 11.5708 3.014 11.5495 2.98933 11.5322L1.75067 10.6535C1.57667 10.5302 1.44733 10.3542 1.38133 10.1508C1.31533 9.94817 1.31667 9.7295 1.38467 9.52684L1.87 8.00017C1.88067 8.0595 1.88533 8.03017 1.88533 8.00017C1.88533 7.97017 1.88067 7.94084 1.87067 7.91284L1.38533 6.4735C1.31733 6.2715 1.316 6.05284 1.382 5.8495C1.448 5.64684 1.57733 5.47084 1.75133 5.3475L1.75133 5.3475L2.99 4.46884C3.014 4.45084 3.03533 4.43017 3.05333 4.40617C3.07067 4.38217 3.084 4.3555 3.09333 4.32684L3.54667 2.8775C3.61 2.67417 3.738 2.49617 3.91067 2.37084C4.08333 2.2455 4.29133 2.17884 4.50467 2.1815L6.02333 2.19884C6.05333 2.1995 6.08266 2.19484 6.11133 2.1855C6.13933 2.17617 6.166 2.16284 6.19 2.14484L7.408 1.2375Z" fill="currentColor"></path>
+                            </svg>
+                        )}
+                    </div>
                 </div>
-                {catLabel && (
-                    <span className="text-[10px] sm:text-[11px] font-semibold text-[#0000008a] dark:text-slate-400 uppercase tracking-wider block">
-                        {catLabel}
-                    </span>
-                )}
             </div>
+            {catLabel && (
+                <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-white/[0.04] px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0 transition-opacity">
+                    {catLabel}
+                </span>
+            )}
         </div>
 
-        {/* Orta Alan: Açıklama, max 2 satır, opacity biraz düşük, leading-relaxed */}
-        <p className="text-[13px] sm:text-[14px] text-slate-600/85 dark:text-slate-400/85 font-normal leading-relaxed line-clamp-2 min-h-[40px] mb-4">
-            {bot.description.startsWith('bot_') ? t(bot.description) : bot.description}
-        </p>
+        {/* Middle: 1 line "personality text" -> Handles Telegram automation in seconds */}
+        <div className="mb-4 flex-1 min-h-[22px]">
+            <p className="text-[13px] sm:text-[13.5px] text-slate-500/90 dark:text-slate-400/90 font-normal leading-normal line-clamp-1 truncate">
+                {bot.description.startsWith('bot_') ? t(bot.description) : bot.description}
+            </p>
+        </div>
 
-        {/* Alt Alan: Tek sıra: kullanıcı sayısı, rating, run/use button şeklinde */}
-        <div className="mt-auto pt-3 border-t border-black/[0.03] dark:border-white/[0.03] flex items-center justify-between gap-3 text-[12px] font-bold text-slate-500 dark:text-slate-400">
-            <div className="flex items-center gap-3">
-                {/* Kullanıcı sayısı */}
-                {formattedUserCount ? (
-                    <div className="flex items-center gap-1">
-                        <span className="text-slate-700 dark:text-slate-300 font-extrabold">{formattedUserCount}</span>
-                        <span className="text-slate-400 dark:text-slate-500 font-normal">{t('users') || 'kullanıcı'}</span>
-                    </div>
-                ) : (
-                    <div className="flex items-center gap-1">
-                        <span className="text-slate-700 dark:text-slate-300 font-extrabold">{bot.views || '1.1k'}</span>
-                        <span className="text-slate-400 dark:text-slate-500 font-normal">{t('views') || 'görüntülenme'}</span>
-                    </div>
-                )}
-
-                {/* Vertical Separator */}
-                <div className="w-px h-3 bg-black/[0.08] dark:bg-white/[0.08]" />
-
-                {/* Rating */}
-                <div className="flex items-center gap-1">
-                    <Star size={12} className="text-amber-400 fill-amber-400" />
-                    <span className="text-slate-700 dark:text-slate-300 font-extrabold">{bot.rating || '4.8'}</span>
-                </div>
+        {/* Bottom: usage signal (not stats noise) & primary CTA */}
+        <div className="mt-auto pt-3 border-t border-black/[0.03] dark:border-white/[0.03] flex items-center justify-between gap-3">
+            {/* Usage signal */}
+            <div className="flex items-center gap-1.5 text-[12px] text-slate-400 dark:text-slate-500 font-bold">
+                <span className="text-slate-700 dark:text-slate-400">{formattedUserCount || bot.views || '1.1k'}</span>
+                <span>{t('users') || 'users'}</span>
             </div>
 
-            {/* Run/Use Button */}
+            {/* CTA Button */}
             <button 
-                className="px-3.5 py-1.5 bg-blue-500/10 hover:bg-blue-500 text-blue-600 hover:text-white dark:bg-blue-500/15 dark:text-blue-400 dark:hover:bg-blue-500 dark:hover:text-white rounded-lg transition-all text-[11px] sm:text-[12px] font-extrabold leading-none active:scale-95 flex items-center gap-1 border border-blue-500/20"
+                className="px-4 py-1.5 bg-blue-500/10 hover:bg-blue-500 text-blue-600 hover:text-white dark:bg-blue-500/15 dark:text-blue-400 dark:hover:bg-blue-500 dark:hover:text-white rounded-lg transition-all text-[12px] font-extrabold leading-none active:scale-95 border border-blue-500/20"
                 onClick={(e) => {
                     e.stopPropagation();
                     haptic('light');
@@ -512,7 +497,7 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonR
                     }
                 }}
             >
-                {t('run') || 'Başlat'}
+                {t('run') || 'Run'}
             </button>
         </div>
     </div>
@@ -903,7 +888,15 @@ const NavMenu = ({
 
                 {/* Center Section (Navigation) */}
                 <div className="flex items-center justify-center gap-8 md:gap-14 flex-1">
-                    {/* Discover (Keşfet) */}
+                    {/* Discover / Keşfet */}
+                    <button 
+                        onClick={() => { haptic('light'); navigate('/'); }}
+                        className="nav-menu-item grow-0 text-slate-600 dark:text-slate-400 hover:bg-blue-500/5"
+                    >
+                        {t('nav_explore')}
+                    </button>
+
+                    {/* Categories / Kategoriler */}
                     <div 
                         className="relative md:static"
                         onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('kesfet'); }}
@@ -919,36 +912,16 @@ const NavMenu = ({
                             }}
                             className={`nav-menu-item grow-0 ${openMenu === 'kesfet' ? 'text-slate-900 dark:text-white bg-blue-500/5' : 'text-slate-600 dark:text-slate-400 hover:bg-blue-500/5'}`}
                         >
-                            Keşfet <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'kesfet' ? 'rotate-180' : ''}`} />
+                            Kategoriler <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'kesfet' ? 'rotate-180' : ''}`} />
                         </button>
                     </div>
 
-                    {/* Investors (Yatırımcılar) */}
-                    <div 
-                        className="relative md:static"
-                        onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('investors'); }}
-                    >
-                        <button 
-                            onClick={() => {
-                                if (window.innerWidth < 768) {
-                                    haptic('light');
-                                    setMobileModal('investors');
-                                } else {
-                                    setOpenMenu(openMenu === 'investors' ? null : 'investors');
-                                }
-                            }}
-                            className={`nav-menu-item grow-0 ${openMenu === 'investors' ? 'text-slate-900 dark:text-white bg-emerald-500/5' : 'text-slate-600 dark:text-slate-400 hover:bg-emerald-500/5'}`}
-                        >
-                            Yatırımcılar <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'investors' ? 'rotate-180' : ''}`} />
-                        </button>
-                    </div>
-
-                    {/* Blog Link */}
+                    {/* My Bots / Botlarım */}
                     <button 
-                        onClick={() => { haptic('light'); navigate('/blog'); }}
+                        onClick={() => { haptic('light'); navigate('/my-bots'); }}
                         className="nav-menu-item text-slate-600 dark:text-slate-400 hover:bg-blue-500/5"
                     >
-                        {t('blog_title')}
+                        {t('my_bots')}
                     </button>
                 </div>
 
@@ -1696,34 +1669,32 @@ const Home = () => {
                           </div>
                       </div>
 
-                      {/* Header Navigation Links (Keşfet, Yatırımcılar, Blog) */}
+                      {/* Header Navigation Links (Discover, Categories, My Bots) */}
                       <div className="hidden md:flex items-center gap-5 lg:gap-8 shrink-0">
-                          {/* Keşfet */}
+                          {/* Discover / Keşfet */}
+                          <button 
+                              onClick={() => { haptic('light'); navigate('/'); }}
+                              className="nav-menu-item text-slate-800 dark:text-white hover:opacity-80 flex items-center gap-1 transition-all font-semibold text-[14px] select-none tracking-tight py-2 border-b-2 border-transparent"
+                          >
+                              <span>{t('nav_explore')}</span>
+                          </button>
+
+                          {/* Categories / Kategoriler */}
                           <button 
                               onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('kesfet'); }}
                               onClick={() => { haptic('light'); setOpenMenu(openMenu === 'kesfet' ? null : 'kesfet'); }}
                               className={`nav-menu-item text-slate-800 dark:text-white hover:opacity-80 flex items-center gap-1 transition-all font-semibold text-[14px] select-none tracking-tight py-2 border-b-2 ${openMenu === 'kesfet' ? 'border-blue-500' : 'border-transparent'}`}
                           >
-                              <span>Keşfet</span>
+                              <span>Kategoriler</span>
                               <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'kesfet' ? 'rotate-180' : ''}`} />
                           </button>
 
-                          {/* Yatırımcılar */}
+                          {/* My Bots / Botlarım */}
                           <button 
-                              onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('investors'); }}
-                              onClick={() => { haptic('light'); setOpenMenu(openMenu === 'investors' ? null : 'investors'); }}
-                              className={`nav-menu-item text-slate-800 dark:text-white hover:opacity-80 flex items-center gap-1 transition-all font-semibold text-[14px] select-none tracking-tight py-2 border-b-2 ${openMenu === 'investors' ? 'border-emerald-500' : 'border-transparent'}`}
-                          >
-                              <span>Yatırımcılar</span>
-                              <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'investors' ? 'rotate-180' : ''}`} />
-                          </button>
-
-                          {/* Blog */}
-                          <button 
-                              onClick={() => { haptic('light'); navigate('/blog'); }}
+                              onClick={() => { haptic('light'); navigate('/my-bots'); }}
                               className="nav-menu-item text-slate-800 dark:text-white hover:opacity-80 flex items-center gap-1 transition-all font-semibold text-[14px] select-none tracking-tight py-2 border-b-2 border-transparent"
                           >
-                              <span>Blog</span>
+                              <span>{t('my_bots')}</span>
                           </button>
                       </div>
                   </div>
