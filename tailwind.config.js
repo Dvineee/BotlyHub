@@ -9,7 +9,7 @@ export default {
     extend: {
       colors: {
         brand: {
-          DEFAULT: '#2F88FF',
+          DEFAULT: '#3b82f6',
           light: '#60a5fa',
         },
         slate: {
