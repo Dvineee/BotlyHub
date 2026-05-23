@@ -1149,25 +1149,7 @@ span, div, input {
         margin-bottom: 0rem !important;
     }
 
-    .home-page .text-2xl.font-black.text-slate-900.dark\:text-white.mr-1.shrink-0.italic {
-        position: relative;
-        right: -20px;
-        padding: 7px 8px 3px 12px;
-        border-radius: 18px 14px 0 32px;
-        top: -19px;
-        background-color: #fff;
-        -webkit-text-stroke: 1px rgb(0 0 0 / 40%);
-        color: #0000; 
-        font-weight: 400;
-        text-shadow: rgb(255 255 255 / 60%) 3px 3px 6px;
-    }
 
-    .dark .home-page .text-2xl.font-black.text-slate-900.dark\:text-white.mr-1.shrink-0.italic {
-        background-color: #0f172a;
-        -webkit-text-stroke: 1px rgb(255 255 255 / 40%);
-        text-shadow: rgb(0 0 0 / 60%) 3px 3px 6px;
-        border-radius: 32px 0 14px 18px;
-    }
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -1338,31 +1320,7 @@ span, div, input {
     outline: solid 1px #ffffff0d;
 }
 
-.home-page .text-2xl.font-black.text-slate-900.dark\:text-white.mr-1.shrink-0.italic {
-    position: relative;
-    right: -20px;
-    padding: 7px 8px 3px 12px;
-    border-radius: 18px 0px 0px 32px;
-    top: -19px;
-    background-color: #ffffff;
-    -webkit-text-stroke: 1px rgb(0 0 0 / 40%);
-    color: #00000000;
-    font-weight: 400;
-    text-shadow: rgb(255 255 255 / 60%) 3px 3px 6px;
-}
 
-.home-page.dark .text-2xl.font-black.text-slate-900.dark\:text-white.mr-1.shrink-0.italic,
-.dark .home-page .text-2xl.font-black.text-slate-900.dark\:text-white.mr-1.shrink-0.italic {
-    position: relative;
-    right: -20px;
-    padding: 7px 8px 3px 12px;
-    border-radius: 18px 0px 0px 32px;
-    top: -19px;
-    background-color: #12172c;
-    -webkit-text-stroke: 1px rgb(255 255 255 / 40%);
-    color: #000000;
-    text-shadow: rgb(0 0 0) 3px 3px 6px;
-}
 
 .blog-page-scope .rounded-full {
     border-radius: 0px !important;

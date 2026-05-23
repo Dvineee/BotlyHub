@@ -165,6 +165,24 @@ export const visualPromos: Announcement[] = [
   }
 ];
 
+export const isDemoAnnouncement = (ann: Announcement): boolean => {
+  const titleLower = ann.title?.toLowerCase() || '';
+  const descLower = ann.description?.toLowerCase() || '';
+  return (
+    titleLower.includes('demo') ||
+    titleLower.includes('test') ||
+    titleLower.includes('deneme') ||
+    titleLower.includes('kısa ve net') ||
+    titleLower.includes('kisa ve net') ||
+    titleLower.includes('bir başka duyuru') ||
+    titleLower.includes('bir baska duyuru') ||
+    descLower.includes('duyuru açıklaması') ||
+    descLower.includes('duyuru aciklamasi') ||
+    descLower.includes('kısa bir açıklama') ||
+    descLower.includes('kisa bir aciklama')
+  );
+};
+
 const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) => void }> = React.memo(({ ann, onShowPopup }) => {
   const navigate = useNavigate();
   const { haptic } = useTelegram();
@@ -1330,7 +1348,7 @@ const Home = () => {
     ]);
     
     setBots(botData);
-    const activeAnns = annData.filter(a => a.is_active);
+    const activeAnns = annData.filter(a => a.is_active && !isDemoAnnouncement(a));
     const combinedAnns = [
         ...visualPromos,
         ...activeAnns.filter(dbAnn => !visualPromos.some(vp => vp.title.toLowerCase() === dbAnn.title.toLowerCase() || vp.id === dbAnn.id))
@@ -2032,9 +2050,6 @@ const Home = () => {
                                                         <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold line-clamp-1 uppercase tracking-tight">{bot.description}</span>
                                                     </div>
                                                 </div>
-                                                <div className="text-2xl font-black text-slate-900 dark:text-white mr-1 shrink-0 italic">
-                                                    {bot.rating || '0.0'}
-                                                </div>
                                             </div>
                                         ))}
                                     </div>
@@ -2162,9 +2177,6 @@ const Home = () => {
                                                         </div>
                                                         <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold line-clamp-1 uppercase tracking-tight">{bot.description}</span>
                                                     </div>
-                                                </div>
-                                                <div className="text-2xl font-black text-slate-900 dark:text-white mr-1 shrink-0 italic">
-                                                    {bot.rating || '0.0'}
                                                 </div>
                                             </div>
                                         ))}
