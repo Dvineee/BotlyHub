@@ -1539,4 +1539,72 @@ header, nav, .sticky-nav {
   color: var(--text-primary) !important;
 }
 
+/* Unified Spacing & Premium Grids Layout System */
+
+/* 1. Unified Headers and Navbar height */
+.navbar-unified {
+  height: 64px !important;
+  display: flex !important;
+  align-items: center !important;
+  background-color: var(--bg-main) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+@media (min-width: 768px) {
+  .navbar-unified {
+    height: 76px !important; /* Perfect desktop header depth */
+  }
+}
+
+/* 2. Unified Container paddings */
+.container-padding-unified {
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+}
+@media (min-width: 640px) {
+  .container-padding-unified {
+    padding-left: 32px !important;
+    padding-right: 32px !important;
+  }
+}
+
+/* 3. Unified Page and Section margins */
+.section-gap-unified {
+  margin-top: 48px !important;
+  margin-bottom: 48px !important;
+}
+@media (min-width: 768px) {
+  .section-gap-unified {
+    margin-top: 64px !important;
+    margin-bottom: 64px !important;
+  }
+}
+
+/* 4. Unified Card Inner Padding */
+.card-padding-unified {
+  padding: 16px !important;
+  border-radius: 16px !important;
+}
+@media (min-width: 640px) {
+  .card-padding-unified {
+    padding: 24px !important; /* Elegant breathing room on larger viewports */
+  }
+}
+
+/* 5. Unified Header-Subtext gap structure */
+.header-cluster-unified {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important; /* Consistent title and desc gap */
+  margin-bottom: 24px !important; /* Exact boundary gap between header and card list */
+}
+
+@media (min-width: 768px) {
+  .header-cluster-unified {
+    gap: 12px !important;
+    margin-bottom: 32px !important;
+  }
+}
+
+
 

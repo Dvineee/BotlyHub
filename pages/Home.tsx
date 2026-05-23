@@ -470,7 +470,7 @@ const CategoryBotCard: React.FC<{ bot: Bot, rank: number }> = React.memo(({ bot,
   return (
     <div 
       onClick={() => navigate(`/bot/${bot.slug}`)} 
-      className="flex items-center cursor-pointer group hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-all rounded-[16px] p-2 -m-2 select-none active:scale-[0.98] transform-gpu"
+      className="flex items-center cursor-pointer group hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-all rounded-2xl p-3 select-none active:scale-[0.98] transform-gpu"
     >
         <div className="relative shrink-0 select-none">
             <img 
@@ -1607,11 +1607,11 @@ const Home = () => {
       />
       {/* Top Background Wrapper (Sticky Header on Desktop and Mobile) */}
       <div 
-        className="sticky top-0 z-[120] bg-white dark:bg-slate-950 border-b border-black/[0.03] dark:border-white/5 transition-all shadow-sm"
+        className="sticky top-0 z-[120] min-h-[64px] md:h-[72px] py-2 md:py-0 flex items-center bg-white dark:bg-slate-950 border-b border-black/[0.03] dark:border-white/5 transition-all shadow-sm"
         onMouseLeave={() => { setOpenMenu(null); setNavState('main'); }}
       >
         {/* Top Section */}
-        <div className="w-full py-4 relative z-[120]">
+        <div className="w-full relative z-[120]">
           <div className="max-w-7xl mx-auto px-5 sm:px-8">
               <div className="flex flex-wrap md:flex-nowrap items-center justify-between px-1 gap-y-4 md:gap-x-6">
                 <div className="flex items-center order-1 md:w-36 lg:w-48 shrink-0">
@@ -1971,10 +1971,10 @@ const Home = () => {
                         }
 
                         return (
-                            <div className="mt-10 mb-10 space-y-6">
+                            <div className="my-12 md:my-16 space-y-6 md:space-y-8">
                                 <div className="flex flex-col gap-6 overflow-hidden">
                                     <div 
-                                        className="flex flex-col gap-1 cursor-pointer group shrink-0"
+                                        className="flex flex-col gap-2 cursor-pointer group shrink-0"
                                         onClick={() => navigate(`/search?mode=apps&category=all`)}
                                     >
                                         <div className="flex items-center gap-2">
@@ -2073,10 +2073,6 @@ const Home = () => {
                                         </>
                                     );
                                 })()}
-
-                                <div className="mt-8">
-                                    <FeaturedBotsSlider bots={bots.filter(b => Array.isArray(b.category) ? b.category.includes('apps') : b.category === 'apps')} />
-                                </div>
                             </div>
                         );
                     })()}
@@ -2099,10 +2095,10 @@ const Home = () => {
                         }
 
                         return (
-                            <div className="mt-20 mb-10 space-y-6">
+                            <div className="my-12 md:my-16 space-y-6 md:space-y-8">
                                 <div className="flex flex-col gap-6 overflow-hidden">
                                     <div 
-                                        className="flex flex-col gap-1 cursor-pointer group shrink-0"
+                                        className="flex flex-col gap-2 cursor-pointer group shrink-0"
                                         onClick={() => navigate(`/search?mode=bots&category=all`)}
                                     >
                                         <div className="flex items-center gap-2">
@@ -2201,10 +2197,6 @@ const Home = () => {
                                         </>
                                     );
                                 })()}
-
-                                <div className="mt-8">
-                                    <FeaturedBotsSlider bots={bots.filter(b => Array.isArray(b.category) ? !b.category.includes('apps') : b.category !== 'apps')} />
-                                </div>
                             </div>
                         );
                     })()}
@@ -2218,7 +2210,7 @@ const Home = () => {
             </AnimatePresence>
 
             {homeBlogs.length > 0 && (
-                <div className="mt-24 mb-16 pt-16 border-t border-black/[0.03] dark:border-white/[0.03]">
+                <div className="my-12 md:my-16 pt-12 md:pt-16 border-t border-black/[0.03] dark:border-white/[0.03]">
                     <div className="flex items-center justify-between mb-8">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-[2px] bg-blue-500"></div>

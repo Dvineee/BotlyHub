@@ -163,7 +163,7 @@ const NavMenu = ({
 
     return (
         <>
-        <div className="sticky top-0 z-[100] bg-white dark:bg-slate-900 border-b border-[#f7f7f7] dark:border-white/5 w-full py-2.5 md:pb-2 transition-colors" ref={internalMenuRef}>
+        <div className="sticky top-0 z-[100] min-h-[64px] md:h-[72px] py-2 md:py-0 flex items-center bg-white dark:bg-slate-900 border-b border-[#f7f7f7] dark:border-white/5 w-full transition-colors" ref={internalMenuRef}>
             <div className="max-w-7xl mx-auto px-5 sm:px-8 flex items-center justify-between gap-3 md:gap-4">
                 {/* Left Section (Logo) */}
                 <div className="flex items-center w-auto shrink-0">
