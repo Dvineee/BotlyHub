@@ -1398,7 +1398,7 @@ button.bg-brand, button.bg-blue-500, button.bg-blue-600, a.bg-brand, a.bg-blue-5
 
 /* Clean overrides for .light and .dark specifically for card backgrounds */
 .light .bg-slate-50, .light .bg-slate-100, .light .bg-slate-200, .light .bg-white, .light .bg-slate-100\/50, .light .bg-white\/80 {
-  background-color: #e2e5eb !important;
+  background-color: #e2e5eb;
   color: #000 !important;
   border: solid 1px #a9a9a92b;
 }
