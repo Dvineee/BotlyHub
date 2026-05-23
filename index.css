@@ -4,8 +4,8 @@
 @import url('https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap');
 
 :root {
-  --font-main: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-headers: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-main: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  --font-headers: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
 }
 
 body {
@@ -36,7 +36,7 @@ body {
     --text-secondary: rgba(255, 255, 255, 0.54); /* #ffffff8a */
     --border-main: rgba(255, 255, 255, 0.06);
     --input-bg: #121C2E;
-    --btn-primary: #7C5CFF;
+    --btn-primary: #4F7CFF;
 
     --text-main: var(--text-primary);
     --card-bg: var(--bg-secondary);
@@ -50,7 +50,7 @@ body {
     --text-secondary: rgba(11, 15, 23, 0.6);
     --border-main: rgba(0, 0, 0, 0.06);
     --input-bg: #F1F5F9;
-    --btn-primary: #7C5CFF;
+    --btn-primary: #4F7CFF;
 
     --text-main: var(--text-primary);
     --card-bg: var(--bg-secondary);
@@ -1398,8 +1398,13 @@ button.bg-brand, button.bg-blue-500, button.bg-blue-600, a.bg-brand, a.bg-blue-5
 
 /* Clean overrides for .light and .dark specifically for card backgrounds */
 .light .bg-slate-50, .light .bg-slate-100, .light .bg-slate-200, .light .bg-white, .light .bg-slate-100\/50, .light .bg-white\/80 {
-  background-color: #e2e5eb !important; /* #e2e5eb as intermediate container bg */
-  color: #000000 !important;
+  background-color: #e2e5eb !important;
+  color: #000 !important;
+  border: solid 1px #a9a9a92b;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
 }
 
 .light .bg-white\/5, .light .bg-black\/5, .light .bg-slate-500\/5, .light .bg-slate-900\/5 {
@@ -1522,153 +1527,6 @@ header, nav, .sticky-nav {
     margin-bottom: 32px !important;
   }
 }
-
-/* -------------------------------------------------------------
-   🧬 BOTLYHUB SIGNATURE VISUAL KIT v2 (Linear-level Lock)
-   ------------------------------------------------------------- */
-
-/* 1. Global Reset & Quiet Colors on Dark Mode */
-.dark, .dark-mode {
-  --bg-main: #0B0F17 !important;
-  --bg-secondary: #0F1623 !important;
-  --bg-elevated: #121C2E !important;
-  --border-main: rgba(255, 255, 255, 0.06) !important;
-}
-
-.dark body, .dark .home-page, .dark .search-page, .dark .bot-detail-page {
-  background-color: #0B0F17 !important;
-}
-
-/* 2. Unified Signature Accent Color: #7C5CFF */
-.text-accent {
-  color: #7C5CFF !important;
-}
-.bg-accent {
-  background-color: #7C5CFF !important;
-}
-.border-accent {
-  border-color: #7C5CFF !important;
-}
-
-/* Overriding default tailwind color classes to align to single color #7C5CFF in dark mode */
-.dark .text-blue-500, 
-.dark .text-blue-600, 
-.dark .text-brand {
-  color: #7C5CFF !important;
-}
-
-.dark .bg-blue-500, 
-.dark .bg-blue-600,
-.dark .bg-brand {
-  background-color: #7C5CFF !important;
-}
-
-.dark .border-blue-500, 
-.dark .border-blue-600 {
-  border-color: #7C5CFF !important;
-}
-
-/* 3. Strict Typography Line Heights & Scaling */
-.signature-h1 {
-  font-family: var(--font-main) !important;
-  font-size: 48px !important;
-  font-weight: 700 !important;
-  letter-spacing: -0.04em !important;
-  line-height: 1.1 !important;
-}
-
-.signature-h2 {
-  font-family: var(--font-main) !important;
-  font-size: 36px !important;
-  font-weight: 650 !important;
-  letter-spacing: -0.03em !important;
-  line-height: 1.1 !important;
-}
-
-.signature-h3 {
-  font-family: var(--font-main) !important;
-  font-size: 24px !important;
-  font-weight: 600 !important;
-  letter-spacing: -0.02em !important;
-  line-height: 1.4 !important;
-}
-
-/* 4. Signature Cards with ZERO GLOW and weighting hover */
-.signature-card {
-  background-color: var(--bg-secondary) !important;
-  border: 1px solid var(--border-main) !important;
-  border-radius: 16px !important;
-  padding: 20px !important;
-  box-shadow: none !important;
-  transition: transform 180ms ease-out, border-color 180ms ease-out, box-shadow 180ms ease-out !important;
-}
-
-.signature-card:hover {
-  transform: translateY(-2px) !important;
-  border-color: rgba(255, 255, 255, 0.21) !important; /* +15% opacity on raw white borders */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important; /* Simple soft low blur shadow */
-}
-
-/* 5. Precise Button System (Height: 40/44px, Radius: 10-12px) */
-.btn-signature-primary {
-  height: 42px !important;
-  border-radius: 11px !important;
-  background-color: #7C5CFF !important;
-  color: #ffffff !important;
-  font-weight: 600 !important;
-  font-size: 14px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding-left: 20px !important;
-  padding-right: 20px !important;
-  border: none !important;
-  transition: all 150ms ease-out !important;
-  cursor: pointer !important;
-}
-
-.btn-signature-primary:hover {
-  background-color: #6a49f5 !important; /* Darken 8% */
-}
-
-.btn-signature-secondary {
-  height: 42px !important;
-  border-radius: 11px !important;
-  background-color: transparent !important;
-  color: var(--text-primary) !important;
-  border: 1px solid var(--border-main) !important;
-  font-weight: 600 !important;
-  font-size: 14px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding-left: 20px !important;
-  padding-right: 20px !important;
-  transition: all 150ms ease-out !important;
-  cursor: pointer !important;
-}
-
-.btn-signature-secondary:hover {
-  background-color: var(--bg-elevated) !important; /* Subtle surface fill */
-}
-
-/* 6. Motion Easing / Feedback scale */
-.signature-interaction {
-  transition: transform 120ms ease-out !important;
-}
-.signature-interaction:active {
-  transform: scale(0.98) !important;
-}
-
-/* 7. Grid Lock Structure */
-.signature-container {
-  max-width: 1120px !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  padding-left: 20px !important;
-  padding-right: 20px !important;
-}
-
 
 
 
