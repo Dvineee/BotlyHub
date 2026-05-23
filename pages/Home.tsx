@@ -487,7 +487,7 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number, featuredRank?: number }> = 
             {/* CTA Button */}
             <button 
                 className={featuredRank 
-                    ? "px-4 py-1.5 bg-orange-500/10 hover:bg-orange-500 text-orange-600 hover:text-white dark:bg-orange-500/15 dark:text-orange-400 dark:hover:bg-orange-500 dark:hover:text-white rounded-lg transition-all text-[12px] font-extrabold leading-none active:scale-95 border border-orange-500/20"
+                    ? "px-4 py-1.5 bg-orange-500/10 hover:bg-orange-500 text-orange-600 hover:text-white dark:bg-orange-500/15 dark:text-orange-400 dark:hover:bg-orange-500 dark:hover:text-white rounded-lg transition-all text-[12px] font-extrabold leading-none active:scale-95 border border-orange-500/20 flex items-center justify-center gap-1"
                     : "px-4 py-1.5 bg-blue-500/10 hover:bg-blue-500 text-blue-600 hover:text-white dark:bg-blue-500/15 dark:text-blue-400 dark:hover:bg-blue-500 dark:hover:text-white rounded-lg transition-all text-[12px] font-extrabold leading-none active:scale-95 border border-blue-500/20"}
                 onClick={(e) => {
                     e.stopPropagation();
@@ -499,7 +499,14 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number, featuredRank?: number }> = 
                     }
                 }}
             >
-                {featuredRank ? `öne çıkan #${featuredRank}` : (t('run') || 'Run')}
+                {featuredRank ? (
+                    <>
+                        <svg aria-hidden="true" className="w-[14px] h-[14px] fill-current" viewBox="0 0 24 24">
+                            <use href="#solar.fire"></use>
+                        </svg>
+                        <span>öne çıkan #{featuredRank}</span>
+                    </>
+                ) : (t('run') || 'Run')}
             </button>
         </div>
     </div>
@@ -2103,18 +2110,10 @@ const Home = () => {
                                     </div>
 
                                     {/* Top 3 Featured Cards for this section */}
-                                    <div className="flex flex-col gap-2">
-                                        <div className="flex items-center gap-1.5 text-orange-500 font-extrabold text-[12px] uppercase tracking-wider">
-                                            <svg aria-hidden="true" className="w-[18px] h-[18px] fill-current" viewBox="0 0 24 24">
-                                                <use href="#solar.fire"></use>
-                                            </svg>
-                                            <span>ÖNE ÇIKAN</span>
-                                        </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-4 animate-in fade-in slide-in-from-bottom-2 duration-700">
-                                            {featuredBots.map((bot, index) => (
-                                                <BotCard key={bot.id} bot={bot} tonRate={tonRate} featuredRank={index + 1} />
-                                            ))}
-                                        </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-4 animate-in fade-in slide-in-from-bottom-2 duration-700">
+                                        {featuredBots.map((bot, index) => (
+                                            <BotCard key={bot.id} bot={bot} tonRate={tonRate} featuredRank={index + 1} />
+                                        ))}
                                     </div>
 
                                     <div 
@@ -2213,18 +2212,10 @@ const Home = () => {
                                     </div>
 
                                     {/* Top 3 Featured Cards for this section */}
-                                    <div className="flex flex-col gap-2">
-                                        <div className="flex items-center gap-1.5 text-orange-500 font-extrabold text-[12px] uppercase tracking-wider">
-                                            <svg aria-hidden="true" className="w-[18px] h-[18px] fill-current" viewBox="0 0 24 24">
-                                                <use href="#solar.fire"></use>
-                                            </svg>
-                                            <span>ÖNE ÇIKAN</span>
-                                        </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-4 animate-in fade-in slide-in-from-bottom-2 duration-700">
-                                            {featuredBots.map((bot, index) => (
-                                                <BotCard key={bot.id} bot={bot} tonRate={tonRate} featuredRank={index + 1} />
-                                            ))}
-                                        </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-4 animate-in fade-in slide-in-from-bottom-2 duration-700">
+                                        {featuredBots.map((bot, index) => (
+                                            <BotCard key={bot.id} bot={bot} tonRate={tonRate} featuredRank={index + 1} />
+                                        ))}
                                     </div>
 
                                     <div 
