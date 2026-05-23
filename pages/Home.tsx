@@ -1377,8 +1377,10 @@ const Home = () => {
     // Apps section
     const allApps = baseBots.filter(b => Array.isArray(b.category) ? b.category.includes('apps') : b.category === 'apps');
     
-    // Top 3 (Overall most popular apps)
-    const appsFeatured = allApps.slice(0, 3);
+    // Top 3 (First 3 bots will be the dashboards selected featured bot or app, with fallbacks)
+    const dashboardAppsFeatured = allApps.filter(b => b.promoted_type === 'featured');
+    const remainingApps = allApps.filter(b => b.promoted_type !== 'featured');
+    const appsFeatured = [...dashboardAppsFeatured, ...remainingApps].slice(0, 3);
     
     // Slider/List (Popular apps in selected category)
     let appsForList = allApps;
@@ -1402,8 +1404,10 @@ const Home = () => {
     // Bots section (everything else)
     const allBots = baseBots.filter(b => Array.isArray(b.category) ? !b.category.includes('apps') : b.category !== 'apps');
     
-    // Top 3 (Overall most popular bots)
-    const botsFeatured = allBots.slice(0, 3);
+    // Top 3 (First 3 bots will be the dashboards selected featured bot or app, with fallbacks)
+    const dashboardBotsFeatured = allBots.filter(b => b.promoted_type === 'featured');
+    const remainingBots = allBots.filter(b => b.promoted_type !== 'featured');
+    const botsFeatured = [...dashboardBotsFeatured, ...remainingBots].slice(0, 3);
     
     // Slider/List (Popular bots in selected category)
     let botsForList = allBots;
@@ -1632,6 +1636,14 @@ const Home = () => {
           title={t('home_seo_title')} 
           description={t('home_seo_desc')}
       />
+      <svg xmlns="http://www.w3.org/2000/svg" className="hidden" style={{ display: 'none' }}>
+        <symbol id="solar.fire" viewBox="0 0 24 24">
+          <g fill="currentColor">
+            <path d="M12 2C11.3 3.6 10.1 5.4 9.1 7.2C8.1 9 7.4 11.1 7.4 13C7.4 17.1 10.4 20.1 14.5 20.1C18.6 20.1 21.6 17.1 21.6 13C21.6 11.2 20.9 9.3 19.9 7.7C19 6.2 17.7 4.7 16.5 3.5C16.9 4.9 17 6.4 16.5 7.7C16 9.1 14.9 10.2 13.5 10.7C13.5 8.2 12 5.5 12 2Z"/>
+            <path d="M11.6 9C11.6 9 10.2 10.2 9.4 11.7C8.6 13.2 8.1 15 8.1 16.5C8.1 19.5 10.5 22 13.6 22C16.7 22 19.1 19.5 19.1 16.5C19.1 15 18.6 13.2 17.8 11.7C17 10.2 15.6 9 15.6 9C15.6 11 14.5 12.5 13.1 13C11.8 13.5 11.6 10.5 11.6 9Z" opacity="0.6"/>
+          </g>
+        </symbol>
+      </svg>
       {/* Top Background Wrapper (Sticky Header on Desktop and Mobile) */}
       <div 
         className="sticky top-0 z-[120] min-h-[64px] md:h-[72px] py-2 md:py-0 flex items-center bg-white dark:bg-slate-950 border-b border-black/[0.03] dark:border-white/5 transition-all shadow-sm"
@@ -2089,10 +2101,18 @@ const Home = () => {
                                     </div>
 
                                     {/* Top 3 Featured Cards for this section */}
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-4 animate-in fade-in slide-in-from-bottom-2 duration-700">
-                                        {featuredBots.map((bot) => (
-                                            <BotCard key={bot.id} bot={bot} tonRate={tonRate} />
-                                        ))}
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex items-center gap-1.5 text-orange-500 font-extrabold text-[12px] uppercase tracking-wider">
+                                            <svg aria-hidden="true" className="w-[18px] h-[18px] fill-current" viewBox="0 0 24 24">
+                                                <use href="#solar.fire"></use>
+                                            </svg>
+                                            <span>ÖNE ÇIKAN</span>
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-4 animate-in fade-in slide-in-from-bottom-2 duration-700">
+                                            {featuredBots.map((bot) => (
+                                                <BotCard key={bot.id} bot={bot} tonRate={tonRate} />
+                                            ))}
+                                        </div>
                                     </div>
 
                                     <div 
@@ -2191,10 +2211,18 @@ const Home = () => {
                                     </div>
 
                                     {/* Top 3 Featured Cards for this section */}
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-4 animate-in fade-in slide-in-from-bottom-2 duration-700">
-                                        {featuredBots.map((bot) => (
-                                            <BotCard key={bot.id} bot={bot} tonRate={tonRate} />
-                                        ))}
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex items-center gap-1.5 text-orange-500 font-extrabold text-[12px] uppercase tracking-wider">
+                                            <svg aria-hidden="true" className="w-[18px] h-[18px] fill-current" viewBox="0 0 24 24">
+                                                <use href="#solar.fire"></use>
+                                            </svg>
+                                            <span>ÖNE ÇIKAN</span>
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-4 animate-in fade-in slide-in-from-bottom-2 duration-700">
+                                            {featuredBots.map((bot) => (
+                                                <BotCard key={bot.id} bot={bot} tonRate={tonRate} />
+                                            ))}
+                                        </div>
                                     </div>
 
                                     <div 
