@@ -437,7 +437,7 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonR
   return (
     <div 
       onClick={() => navigate(`/bot/${bot.slug}`)} 
-      className="flex flex-col p-6 bg-white dark:bg-slate-900 border border-black/[0.06] dark:border-white/[0.08] rounded-2xl transition-all duration-200 ease-out hover:-translate-y-[2px] hover:border-black/[0.12] dark:hover:border-white/[0.12] hover:shadow-md hover:shadow-black/[0.01] dark:hover:shadow-black/[0.08] active:scale-[0.98] transform-gpu cursor-pointer select-none group w-full relative"
+      className="flex flex-col p-6 bg-white dark:bg-[#0F1623] border border-black/[0.06] dark:border-white/[0.06] rounded-[14px] transition-all duration-200 ease-out hover:-translate-y-[2px] hover:border-black/[0.12] dark:hover:border-white/[0.12] hover:shadow-md hover:shadow-black/[0.01] dark:hover:shadow-black/[0.08] active:scale-[0.98] transform-gpu cursor-pointer select-none group w-full relative"
     >
         {/* Üst Alan: Avatar, Bot Adı ve Kategori Badge aynı hizada */}
         <div className="flex items-center gap-3 w-full mb-3 min-w-0">
@@ -1991,32 +1991,88 @@ const Home = () => {
           <div className="max-w-6xl mx-auto px-6 sm:px-8">
               {!isLoading && (
                   <>
-                    <div className="mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700 text-center relative z-10">
-                        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-[-0.03em] md:leading-[1.15] leading-[1.2] text-slate-900 dark:text-white max-w-3xl mx-auto">
-                            {t('home_hero_title').includes(':') ? (
-                                <>
-                                    {t('home_hero_title').split(':')[0]}: <span className="text-blue-500">{t('home_hero_title').split(':')[1]?.trim()}</span>
-                                </>
-                            ) : t('home_hero_title')}
-                        </h1>
-                        <p className="mt-8 text-[15px] sm:text-[16px] text-slate-500/80 dark:text-slate-400/80 leading-[1.6] font-normal max-w-[65ch] mx-auto tracking-normal">
-                            {t('home_hero_desc')}
-                        </p>
-                        
-                        {/* CTA Buttons - Premium, equal height, correct padding and style */}
-                        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-                            <button 
-                                onClick={() => { haptic('medium'); navigate('/search'); }}
-                                className="px-8 h-12 bg-blue-500 hover:bg-blue-600 text-white text-[14px] font-bold rounded-xl transition-all shadow-md shadow-blue-500/10 active:scale-95 flex items-center justify-center whitespace-nowrap"
-                            >
-                                {t('explore_now') || 'Hemen Keşfet'}
-                            </button>
-                            <button 
-                                onClick={() => { haptic('light'); navigate('/settings'); }}
-                                className="px-8 h-12 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-800 dark:text-slate-200 text-[14px] font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center whitespace-nowrap border border-black/5 dark:border-white/5"
-                            >
-                                {t('add_your') || 'Botunu Ekle'}
-                            </button>
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700 relative z-10 text-center lg:text-left">
+                        <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left">
+                            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-[-0.04em] md:leading-[1.1] leading-[1.2] text-slate-900 dark:text-white max-w-2xl">
+                                {t('home_hero_title').includes(':') ? (
+                                    <>
+                                        {t('home_hero_title').split(':')[0]}: <span className="text-blue-500 dark:text-blue-400">{t('home_hero_title').split(':')[1]?.trim()}</span>
+                                    </>
+                                ) : t('home_hero_title')}
+                            </h1>
+                            <p className="mt-6 text-[15px] sm:text-[16px] text-slate-500/80 dark:text-slate-400/80 leading-[1.6] font-normal max-w-[55ch]">
+                                {t('home_hero_desc')}
+                            </p>
+                            
+                            {/* CTA Buttons - Premium, equal height, correct padding and style */}
+                            <div className="mt-8 flex flex-wrap items-center justify-center lg:justify-start gap-4">
+                                <button 
+                                    onClick={() => { haptic('medium'); navigate('/search'); }}
+                                    className="px-8 h-12 bg-blue-500 hover:bg-blue-600 text-white text-[14px] font-bold rounded-xl transition-all shadow-md shadow-blue-500/10 active:scale-95 flex items-center justify-center whitespace-nowrap"
+                                >
+                                    {t('explore_now') || 'Hemen Keşfet'}
+                                </button>
+                                <button 
+                                    onClick={() => { haptic('light'); navigate('/settings'); }}
+                                    className="px-8 h-12 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-800 dark:text-slate-200 text-[14px] font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center whitespace-nowrap border border-black/5 dark:border-white/5"
+                                >
+                                    {t('add_your') || 'Botunu Ekle'}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Right Column: Premium mock-up preview UI */}
+                        <div className="lg:col-span-5 hidden lg:block relative w-full">
+                            <div className="relative p-6 rounded-[14px] border border-black/[0.06] dark:border-white/[0.06] bg-slate-50 dark:bg-[#0F1623] text-slate-900 dark:text-white overflow-hidden shadow-2xl">
+                                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/30 to-transparent" />
+                                
+                                <div className="flex items-center justify-between mb-4 pb-3 border-b border-black/[0.04] dark:border-white/[0.04]">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                                        <span className="text-[10px] font-bold tracking-wider text-slate-500 dark:text-slate-400 uppercase">BOTLYHUB SYSTEM ACTIVE</span>
+                                    </div>
+                                    <span className="text-[10px] font-mono text-slate-400">v2.4.9</span>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div className="p-3.5 rounded-xl bg-white dark:bg-[#121C2E] border border-black/[0.04] dark:border-white/[0.05] flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-500 flex items-center justify-center font-bold text-xs shrink-0">
+                                                AI
+                                            </div>
+                                            <div className="min-w-0">
+                                                <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">Assistant Pro Bot</h4>
+                                                <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">Natural language tool integration</p>
+                                            </div>
+                                        </div>
+                                        <span className="text-[9px] font-bold bg-blue-500/15 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full shrink-0">ACTIVE</span>
+                                    </div>
+
+                                    <div className="p-3.5 rounded-xl bg-white dark:bg-[#121C2E] border border-black/[0.04] dark:border-white/[0.05] flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-500 flex items-center justify-center font-bold text-xs shrink-0">
+                                                TN
+                                            </div>
+                                            <div className="min-w-0">
+                                                <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">TON Wallet Hub</h4>
+                                                <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">Secure automated play flow</p>
+                                            </div>
+                                        </div>
+                                        <span className="text-[9px] font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full shrink-0">1.2M USERS</span>
+                                    </div>
+
+                                    <div className="pt-2 flex justify-between items-center text-[10px] font-mono text-slate-400">
+                                        <span>Discover bots built for real use</span>
+                                        <span className="text-blue-500 dark:text-blue-400 font-bold">Explore list →</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Floating subtle overlay badge */}
+                            <div className="absolute -bottom-3 -right-2 p-3 rounded-lg bg-white dark:bg-[#121C2E] border border-black/[0.06] dark:border-white/[0.08] text-slate-800 dark:text-white flex items-center gap-2 shadow-xl">
+                                <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                                <span className="text-[10px] font-bold tracking-wider text-slate-600 dark:text-slate-300">Option A Active</span>
+                            </div>
                         </div>
                     </div>
 

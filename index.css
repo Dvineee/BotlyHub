@@ -29,26 +29,28 @@ body {
 
 @layer base {
   :root {
-    --bg-main: #0b0f19;
-    --bg-secondary: #161e2e;
+    --bg-main: #0B0F17;
+    --bg-secondary: #0F1623;
+    --bg-elevated: #121C2E;
     --text-primary: #ffffff;
     --text-secondary: rgba(255, 255, 255, 0.54); /* #ffffff8a */
-    --border-main: rgba(255, 255, 255, 0.08);
-    --input-bg: #1e293b;
-    --btn-primary: #3b82f6;
+    --border-main: rgba(255, 255, 255, 0.06);
+    --input-bg: #121C2E;
+    --btn-primary: #4F7CFF;
 
     --text-main: var(--text-primary);
     --card-bg: var(--bg-secondary);
   }
 
   .light {
-    --bg-main: #ffffff;
-    --bg-secondary: #e2e5eb;
-    --text-primary: #000000;
-    --text-secondary: rgba(0, 0, 0, 0.54); /* #0000008a */
-    --border-main: rgba(0, 0, 0, 0.08);
-    --input-bg: #e2e5eb;
-    --btn-primary: #3b82f6;
+    --bg-main: #F8FAFC;
+    --bg-secondary: #FFFFFF;
+    --bg-elevated: #F1F5F9;
+    --text-primary: #0B0F17;
+    --text-secondary: rgba(11, 15, 23, 0.6);
+    --border-main: rgba(0, 0, 0, 0.06);
+    --input-bg: #F1F5F9;
+    --btn-primary: #4F7CFF;
 
     --text-main: var(--text-primary);
     --card-bg: var(--bg-secondary);
@@ -104,8 +106,8 @@ body {
     font-weight: 500;
   }
 
-  .font-bold {
-    font-weight: 700 !important;
+  .font-bold, .font-extrabold {
+    font-weight: 600 !important;
   }
 
   .font-black {
@@ -286,7 +288,7 @@ span.text-\[10px\].font-black.text-slate-500.dark\:text-slate-400.uppercase.trac
 /* Bot card sub-element styling layout overrides removed to let React tailwind classes govern correctly */
 
 .font-bold {
-    font-weight: 700 !important;
+    font-weight: 600 !important;
 }
 
 .group:hover .group-hover\:border-blue-500 {
@@ -507,7 +509,7 @@ span.text-\[10px\].font-bold.text-slate-500.dark\:text-slate-400.uppercase.track
 /* Removed secondary vertical padding overrides */
 
 .font-extrabold {
-    font-weight: 800;
+    font-weight: 600 !important;
 }
 .text-lg {
     font-size: 1rem;
@@ -517,14 +519,9 @@ p.text-\[10px\].text-slate-400.dark\:text-slate-500.font-medium.uppercase.tracki
     font-size: 12px;
 }
 .truncate {
-    text-transform: none !important;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    align-items: center;
-    font-size: 16px;
-    font-weight: 700;
-    letter-spacing: -1%;
 }
 
 .dark\:bg-slate-900\/60:is(.dark *) {
