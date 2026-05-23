@@ -163,8 +163,8 @@ const NavMenu = ({
 
     return (
         <>
-        <div className="sticky top-0 z-[100] bg-white dark:bg-slate-900 border-b border-[#f7f7f7] dark:border-white/5 w-full py-2 md:pb-2 transition-colors" ref={internalMenuRef}>
-            <div className="max-w-7xl mx-auto px-6 sm:px-8 flex items-center justify-between gap-3 md:gap-4">
+        <div className="sticky top-0 z-[100] bg-white dark:bg-slate-900 border-b border-[#f7f7f7] dark:border-white/5 w-full py-2.5 md:pb-2 transition-colors" ref={internalMenuRef}>
+            <div className="max-w-7xl mx-auto px-5 sm:px-8 flex items-center justify-between gap-3 md:gap-4">
                 {/* Left Section (Logo) */}
                 <div className="flex items-center w-auto shrink-0">
                     <Logo onClick={() => navigate('/')} className="cursor-pointer" />
@@ -181,7 +181,7 @@ const NavMenu = ({
                 </div>
 
                 {/* Center Section (Navigation & Search) */}
-                <div className="hidden md:flex items-center justify-center gap-8 md:gap-8 flex-1">
+                <div className="hidden md:flex items-center justify-center gap-8 md:gap-10 flex-1">
                     <div className="flex items-center gap-6">
                         {/* Discover (Keşfet) */}
                         <div 
@@ -635,11 +635,11 @@ const BotDetail = () => {
         isLoginModalOpen={isLoginModalOpen}
         menuRef={menuRef}
       />
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 md:px-8">
-        <div className="lg:grid lg:grid-cols-[1fr_320px] lg:gap-16 overflow-visible pt-12">
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 md:px-10">
+        <div className="lg:grid lg:grid-cols-[1fr_320px] lg:gap-16 overflow-visible pt-10">
           <div className="lg:col-start-1 min-w-0">
             {/* Hero & Stats Section */}
-            <div className="pt-8 px-6 lg:px-0 flex flex-col md:flex-row md:items-center gap-6 mb-8">
+            <div className="pt-10 px-6 lg:px-0 flex flex-col md:flex-row md:items-center gap-6 mb-10">
               <div className="flex items-start justify-between gap-6 flex-1">
             <div className="flex items-start gap-6 min-w-0">
           <div className="flex flex-col gap-4 shrink-0 w-24">
@@ -957,15 +957,15 @@ const BotDetail = () => {
 
       {/* Rating Section */}
       {isOwned && (
-          <div className="px-6 mb-8">
+          <div className="px-6 mb-10">
               <motion.div 
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="relative p-6 bg-white/5 dark:bg-slate-900/40 backdrop-blur-xl rounded-xl border border-black/5 dark:border-white/5 overflow-hidden group"
+                className="relative p-5 bg-white/5 dark:bg-slate-900/40 backdrop-blur-xl rounded-xl border border-black/5 dark:border-white/5 overflow-hidden group"
               >
                   <div className="relative z-10">
-                      <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center justify-between mb-5">
                           <div className="flex flex-col gap-0.5">
                               <h3 className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Deneyimi Puanla</h3>
                           </div>
@@ -973,7 +973,7 @@ const BotDetail = () => {
                               <motion.div 
                                 initial={{ scale: 0.9, opacity: 0 }}
                                 animate={{ scale: 1, opacity: 1 }}
-                                className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded-xl"
+                                className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded-xl"
                               >
                                   <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></div>
                                   <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Puanınız: {userRating}</span>
@@ -995,7 +995,7 @@ const BotDetail = () => {
                                       disabled={isRating}
                                       whileHover={{ scale: 1.1 }}
                                       whileTap={{ scale: 0.9 }}
-                                      className="relative p-2 transition-all z-50"
+                                      className="relative p-1.5 transition-all z-50"
                                   >
                                       <Star 
                                           size={28} 
@@ -1021,11 +1021,11 @@ const BotDetail = () => {
       )}
 
       {/* Description */}
-      <div className="px-6 mb-8">
+      <div className="px-6 mb-10">
           <div className="flex items-center justify-between mb-4 px-2">
             <h3 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">{t('detail_about_label')}</h3>
           </div>
-          <div className="p-3 bg-white dark:bg-slate-900/60 rounded-xl border border-black/5 dark:border-white/5 text-sm text-slate-600 dark:text-slate-400 leading-[1.6] whitespace-pre-wrap">
+          <div className="p-[11px] bg-white dark:bg-slate-900/60 rounded-xl border border-black/5 dark:border-white/5 text-sm text-slate-600 dark:text-slate-400 leading-[1.6] whitespace-pre-wrap">
               {bot.description}
           </div>
       </div>
@@ -1033,7 +1033,7 @@ const BotDetail = () => {
           </div>
 
           {/* Right Column (PC only) - Action bar moved here for large screens */}
-          <aside className="hidden lg:flex flex-col gap-4 sticky top-8 h-fit pr-6 lg:pr-0 mt-8">
+          <aside className="hidden lg:flex flex-col gap-4 sticky top-10 h-fit pr-6 lg:pr-0 mt-10">
               {/* Action Buttons for Sidebar */}
               <div className="flex flex-col gap-4">
                   <button 

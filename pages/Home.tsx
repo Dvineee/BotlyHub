@@ -129,7 +129,41 @@ const CloverVisual = React.memo(() => (
   </div>
 ));
 
-export const visualPromos: Announcement[] = [];
+export const visualPromos: Announcement[] = [
+  {
+    id: "promo-stars",
+    title: "Save 30% on Stars",
+    description: "Buy Stars 30% cheaper than inside Telegram",
+    button_text: "Get Stars",
+    button_link: "https://t.me/stars",
+    icon_name: "stars",
+    color_scheme: "yellow",
+    is_active: true,
+    action_type: "link"
+  },
+  {
+    id: "promo-ton",
+    title: "Add TON to your balance",
+    description: "Buy TON via the P2P Market in Wallet",
+    button_text: "Open",
+    button_link: "https://t.me/wallet",
+    icon_name: "ton",
+    color_scheme: "blue",
+    is_active: true,
+    action_type: "link"
+  },
+  {
+    id: "promo-clover",
+    title: "Pay only 1% of Gift's price",
+    description: "Buy offchain gifts & stickers via Lucky Buy or get Gems",
+    button_text: "Lucky Buy",
+    button_link: "https://t.me/luckybuy",
+    icon_name: "clover",
+    color_scheme: "green",
+    is_active: true,
+    action_type: "link"
+  }
+];
 
 const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) => void }> = React.memo(({ ann, onShowPopup }) => {
   const navigate = useNavigate();
@@ -177,10 +211,10 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         onClick={handleAction}
-        className={`w-full h-[185px] sm:h-[195px] shrink-0 rounded-[24px] border border-solid p-6 pb-6 sm:p-6 sm:pb-6 relative overflow-hidden flex flex-col justify-between cursor-pointer select-none transition-all duration-305 hover:shadow-lg dark:hover:shadow-black/20 group backdrop-blur-md ${cardBgClass}`}
+        className={`w-full h-[185px] sm:h-[195px] shrink-0 rounded-[24px] border border-solid p-6 pb-5 sm:p-7 sm:pb-6 relative overflow-hidden flex flex-col justify-between cursor-pointer select-none transition-all duration-305 hover:shadow-lg dark:hover:shadow-black/20 group backdrop-blur-md ${cardBgClass}`}
     >
         <div className="z-10 max-w-[58%] sm:max-w-[52%] flex flex-col items-start h-full justify-between">
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1.5">
                 <h3 className="text-[#0f172a] dark:text-white font-[900] text-[15px] sm:text-[17px] tracking-tight leading-snug font-sans group-hover:text-black dark:group-hover:text-slate-100 transition-colors">
                     {ann.title}
                 </h3>
@@ -191,7 +225,7 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
 
             <button 
                 onClick={handleAction}
-                className={`flex items-center gap-2 px-4 py-2 sm:px-4 sm:py-2 rounded-full text-xs sm:text-[13px] font-[900] tracking-wide transition-all active:scale-95 shadow-md ${btnClass}`}
+                className={`flex items-center gap-1.5 px-[15px] py-[7px] sm:px-[18px] sm:py-[8px] rounded-full text-xs sm:text-[13px] font-[900] tracking-wide transition-all active:scale-95 shadow-md ${btnClass}`}
             >
                 <ArrowUpRight size={14} strokeWidth={3} className="shrink-0 scale-105" />
                 <span>{ann.button_text}</span>
@@ -281,11 +315,11 @@ const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = React.memo(({ bots }) => {
     if (bots.length === 0) return null;
 
     return (
-        <div className="home-search-bar latest-slider-container mb-6 md:mb-8 flex flex-col md:flex-row items-center gap-2 bg-[#ffffff] dark:bg-[#1e293b] px-4 md:px-4 pt-2 pb-2 -mx-4 md:mx-0 rounded-none md:rounded-xl border-y md:border border-black/5 dark:border-white/5 relative overflow-hidden group !shadow-none">
+        <div className="home-search-bar latest-slider-container mb-6 md:mb-10 flex flex-col md:flex-row items-center !gap-[0.3rem] bg-[#ffffff] dark:bg-[#1e293b] px-4 md:px-[10px] !pt-[0.3rem] !pb-0 -mx-4 md:mx-0 rounded-none md:rounded-xl border-y md:border border-black/5 dark:border-white/5 relative overflow-hidden group !shadow-none">
             {/* Header Info */}
             <div className="flex flex-col shrink-0 min-w-full md:min-w-[180px] md:border-r border-black/5 dark:border-white/5 md:pr-6 h-full justify-center">
                 <div 
-                    className="flex items-center gap-2 mb-2 cursor-pointer md:cursor-default"
+                    className="flex items-center gap-1.5 mb-0.5 cursor-pointer md:cursor-default"
                     onClick={() => { if (window.innerWidth < 768) cycleType(); }}
                 >
                     <h2 className="text-[17px] font-black text-slate-900 dark:text-white lowercase tracking-tight leading-none">
@@ -405,8 +439,8 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonR
             />
             {/* Removed Zap icon badge for paid bots */}
         </div>
-        <div className="flex-1 ml-4 min-w-0 mr-3">
-            <h3 className="font-extrabold text-lg text-slate-900 dark:text-slate-100 truncate tracking-tight uppercase leading-none mb-2 flex items-center gap-2">
+        <div className="flex-1 ml-5 min-w-0 mr-3">
+            <h3 className="font-extrabold text-lg text-slate-900 dark:text-slate-100 truncate tracking-tight uppercase leading-none mb-1.5 flex items-center gap-1.5">
                 {bot.name}
                 {bot.is_official && (
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="w-[14px] h-[14px] text-[#139fec] shrink-0">
@@ -436,7 +470,7 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonR
                         </span>
                     </div>
                 )}
-                <div className="flex items-center gap-2 px-2 py-1 bg-yellow-500/10 rounded-md border border-yellow-500/20">
+                <div className="flex items-center gap-1 px-2 py-1 bg-yellow-500/10 rounded-md border border-yellow-500/20">
                     <Star size={10} className="text-yellow-500 fill-yellow-500" />
                     <span className="text-[9px] font-black text-yellow-600 dark:text-yellow-400 uppercase tracking-tighter">{bot.rating || '0.0'}</span>
                 </div>
@@ -466,8 +500,8 @@ const CategoryBotCard: React.FC<{ bot: Bot, rank: number }> = React.memo(({ bot,
                 {rank}
             </div>
         </div>
-        <div className="flex-1 ml-4 sm:ml-4 min-w-0 pr-1 select-none">
-            <h3 className="font-extrabold text-[14px] sm:text-[15.5px] text-slate-900 dark:text-slate-50 font-sans tracking-tight leading-tight mb-2 flex items-center gap-2">
+        <div className="flex-1 ml-4 sm:ml-4.5 min-w-0 pr-1 select-none">
+            <h3 className="font-extrabold text-[14px] sm:text-[15.5px] text-slate-900 dark:text-slate-50 font-sans tracking-tight leading-tight mb-1 flex items-center gap-1">
                 <span className="truncate">{bot.name}</span>
                 {bot.is_official && (
                     <svg width="15" height="15" viewBox="0 0 16 16" fill="none" className="w-[14px] h-[14px] text-[#24a1de] dark:text-[#38bdf8] shrink-0">
@@ -1326,31 +1360,15 @@ const Home = () => {
   }, [loadData]);
 
   const categorizedBots = useMemo(() => {
-    const result: Record<string, { featured: { bot: Bot, label: string }[], slider: Bot[], total: number }> = {};
+    const result: Record<string, { featured: Bot[], slider: Bot[], total: number }> = {};
     const baseBots = [...filteredBots].sort((a, b) => (b.views || 0) - (a.views || 0));
 
     // Apps section
     const allApps = baseBots.filter(b => Array.isArray(b.category) ? b.category.includes('apps') : b.category === 'apps');
     
-    // Market, Özel, Seçilen mapping for Apps
-    const marketApps = allApps.filter(b => b.promoted_type !== 'featured' && !b.is_official);
-    const ozelApps = allApps.filter(b => b.promoted_type === 'featured');
-    const secilenApps = allApps.filter(b => b.is_official || b.promoted_type === 'official');
+    // Top 3 (Overall most popular apps)
+    const appsFeatured = allApps.slice(0, 3);
     
-    const appsFeaturedList: { bot: Bot, label: string }[] = [];
-    marketApps.slice(0, 2).forEach(bot => appsFeaturedList.push({ bot, label: 'Market' }));
-    ozelApps.slice(0, 2).forEach(bot => appsFeaturedList.push({ bot, label: 'Özel' }));
-    secilenApps.slice(0, 2).forEach(bot => appsFeaturedList.push({ bot, label: 'Seçilen' }));
-    
-    if (appsFeaturedList.length < 3) {
-        allApps.slice(0, 3).forEach((bot, i) => {
-            if (!appsFeaturedList.some(x => x.bot.id === bot.id)) {
-                const labels = ['Market', 'Özel', 'Seçilen'];
-                appsFeaturedList.push({ bot, label: labels[i % 3] });
-            }
-        });
-    }
-
     // Slider/List (Popular apps in selected category)
     let appsForList = allApps;
     if (selectedAppsCategory !== 'all') {
@@ -1364,7 +1382,7 @@ const Home = () => {
 
     if (allApps.length > 0) {
         result['apps'] = {
-            featured: appsFeaturedList,
+            featured: appsFeatured,
             slider: appsSlider,
             total: allApps.length
         };
@@ -1373,25 +1391,9 @@ const Home = () => {
     // Bots section (everything else)
     const allBots = baseBots.filter(b => Array.isArray(b.category) ? !b.category.includes('apps') : b.category !== 'apps');
     
-    // Market, Özel, Seçilen mapping for Bots
-    const marketBots = allBots.filter(b => b.promoted_type !== 'featured' && !b.is_official);
-    const ozelBots = allBots.filter(b => b.promoted_type === 'featured');
-    const secilenBots = allBots.filter(b => b.is_official || b.promoted_type === 'official');
+    // Top 3 (Overall most popular bots)
+    const botsFeatured = allBots.slice(0, 3);
     
-    const botsFeaturedList: { bot: Bot, label: string }[] = [];
-    marketBots.slice(0, 2).forEach(bot => botsFeaturedList.push({ bot, label: 'Market' }));
-    ozelBots.slice(0, 2).forEach(bot => botsFeaturedList.push({ bot, label: 'Özel' }));
-    secilenBots.slice(0, 2).forEach(bot => botsFeaturedList.push({ bot, label: 'Seçilen' }));
-    
-    if (botsFeaturedList.length < 3) {
-        allBots.slice(0, 3).forEach((bot, i) => {
-            if (!botsFeaturedList.some(x => x.bot.id === bot.id)) {
-                const labels = ['Market', 'Özel', 'Seçilen'];
-                botsFeaturedList.push({ bot, label: labels[i % 3] });
-            }
-        });
-    }
-
     // Slider/List (Popular bots in selected category)
     let botsForList = allBots;
     if (selectedBotsCategory !== 'all') {
@@ -1405,7 +1407,7 @@ const Home = () => {
 
     if (allBots.length > 0) {
         result['bots'] = {
-            featured: botsFeaturedList,
+            featured: botsFeatured,
             slider: botsSlider,
             total: allBots.length
         };
@@ -1933,7 +1935,7 @@ const Home = () => {
         ) : (
             <>
               {announcements.length > 0 && (
-                  <div className="pb-8 pt-4 max-w-7xl mx-auto w-full px-6 sm:px-8 overflow-hidden select-none animate-in fade-in duration-500">
+                  <div className="pb-8 pt-4 max-w-7xl mx-auto w-full px-5 sm:px-8 overflow-hidden select-none animate-in fade-in duration-500">
                       <AnnouncementsCarousel 
                           announcements={announcements} 
                           scroll={annScroll} 
@@ -1947,11 +1949,11 @@ const Home = () => {
 
 
       {/* Bottom Section */}
-      <div className="bg-white dark:bg-slate-950 w-full pt-12 pb-16 shadow-[0_-1px_0_0_rgba(0,0,0,0.015)]">
-          <div className="max-w-7xl mx-auto px-6 sm:px-8">
+      <div className="bg-white dark:bg-slate-950 w-full pt-10 pb-32 shadow-[0_-1px_0_0_rgba(0,0,0,0.015)]">
+          <div className="max-w-7xl mx-auto px-5 sm:px-8">
               {!isLoading && (
                   <>
-                    <div className="mb-8 sm:mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700 text-center">
+                    <div className="mb-10 sm:mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700 text-center">
                         <h1 className="mobile-hero-title font-bold tracking-[-0.035em] md:leading-none leading-tight text-slate-900 dark:text-white">
                             {t('home_hero_title').includes(':') ? (
                                 <>
@@ -2006,12 +2008,12 @@ const Home = () => {
                                     </div>
 
                                     {/* Top 3 Featured Cards for this section */}
-                                    <div className="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth pb-3 mb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
-                                        {featuredBots.map(({ bot }) => (
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2 animate-in fade-in slide-in-from-bottom-2 duration-700">
+                                        {featuredBots.map((bot) => (
                                             <div 
                                                 key={bot.id} 
                                                 onClick={() => navigate(`/bot/${bot.slug}`)}
-                                                className={`flex items-center justify-between p-4 rounded-xl border border-black/[0.05] dark:border-white/[0.08] hover:border-blue-500/20 transition-all cursor-pointer group hover:scale-[1.01] bg-[#00000008] dark:bg-white/[0.03] min-w-[280px] sm:min-w-[320px] shrink-0 relative ${featuredBots.length <= 3 ? 'md:flex-1 md:min-w-0' : 'md:w-[calc(33.333%-11px)]'}`}
+                                                className="flex items-center justify-between p-4 rounded-xl border border-black/[0.05] dark:border-white/[0.08] hover:border-blue-500/20 transition-all cursor-pointer group hover:scale-[1.01] bg-[#00000008] dark:bg-white/[0.03]"
                                             >
                                                 <div className="flex items-center gap-4">
                                                     <div className="w-12 h-12 featured-bot-card-img flex items-center justify-center p-[1px] overflow-hidden shrink-0">
@@ -2137,12 +2139,12 @@ const Home = () => {
                                     </div>
 
                                     {/* Top 3 Featured Cards for this section */}
-                                    <div className="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth pb-3 mb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
-                                        {featuredBots.map(({ bot }) => (
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2 animate-in fade-in slide-in-from-bottom-2 duration-700">
+                                        {featuredBots.map((bot) => (
                                             <div 
                                                 key={bot.id} 
                                                 onClick={() => navigate(`/bot/${bot.slug}`)}
-                                                className={`flex items-center justify-between p-4 rounded-xl border border-black/[0.05] dark:border-white/[0.08] hover:border-blue-500/20 transition-all cursor-pointer group hover:scale-[1.01] bg-[#00000008] dark:bg-white/[0.03] min-w-[280px] sm:min-w-[320px] shrink-0 relative ${featuredBots.length <= 3 ? 'md:flex-1 md:min-w-0' : 'md:w-[calc(33.333%-11px)]'}`}
+                                                className="flex items-center justify-between p-4 rounded-xl border border-black/[0.05] dark:border-white/[0.08] hover:border-blue-500/20 transition-all cursor-pointer group hover:scale-[1.01] bg-[#00000008] dark:bg-white/[0.03]"
                                             >
                                                 <div className="flex items-center gap-4">
                                                     <div className="w-12 h-12 featured-bot-card-img flex items-center justify-center p-[1px] overflow-hidden shrink-0">
@@ -2281,7 +2283,7 @@ const Home = () => {
                                         </span>
                                     </div>
                                 </div>
-                                <div className="p-4 flex-1 flex flex-col justify-between">
+                                <div className="p-5 flex-1 flex flex-col justify-between">
                                     <div>
                                         <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-tight line-clamp-2 mb-2 group-hover:text-blue-500 transition-colors duration-300">
                                             {post.title}
@@ -2361,11 +2363,11 @@ const Home = () => {
                         }
                     ].map((item, idx) => (
                         <details key={idx} className="group bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 rounded-xl transition-all overflow-hidden shadow-sm">
-                            <summary className="flex items-center justify-between p-4 cursor-pointer list-none">
+                            <summary className="flex items-center justify-between p-5 cursor-pointer list-none">
                                 <span className="text-[13px] font-bold text-slate-900 dark:text-white uppercase tracking-tight italic">{item.q}</span>
                                 <ChevronDown size={18} className="text-slate-400 group-open:rotate-180 transition-transform duration-300" />
                             </summary>
-                            <div className="p-4 pt-0 text-[12px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed italic border-t border-black/[0.03] dark:border-white/[0.03] bg-[#00000004] dark:bg-black/20">
+                            <div className="p-5 pt-0 text-[12px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed italic border-t border-black/[0.03] dark:border-white/[0.03] bg-[#00000004] dark:bg-black/20">
                                 {item.a}
                             </div>
                         </details>
