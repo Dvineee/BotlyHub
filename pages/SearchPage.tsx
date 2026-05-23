@@ -47,87 +47,110 @@ const getLangLabel = (lang: string) => {
 const BotCard: React.FC<{ bot: Bot, tonRate: number }> = ({ bot, tonRate }) => {
   const navigate = useNavigate();
   const prices = PriceService.convert(bot.price, tonRate);
-  
+  const { t } = useTranslation();
+
+  const firstCatId = bot.category?.[0];
+  const catLabelObj = categories.find(c => c.id === firstCatId);
+  const catLabel = catLabelObj ? t(catLabelObj.label) : firstCatId;
+
+  const formattedUserCount = React.useMemo(() => {
+    if (!bot.user_count) return null;
+    if (bot.user_count >= 1000000) {
+      return (bot.user_count / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+    }
+    if (bot.user_count >= 1000) {
+      return (bot.user_count / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+    }
+    return bot.user_count.toString();
+  }, [bot.user_count]);
+
+  const haptic = (vibe: 'light' | 'medium') => {
+    try {
+      if (vibe === 'light') window.navigator.vibrate?.(10);
+      else window.navigator.vibrate?.(20);
+    } catch {}
+  };
+
   return (
-    <div onClick={() => navigate(`/bot/${bot.slug}`)} className="flex items-center p-3 sm:p-6 bot-card cursor-pointer group bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-900/80 rounded-xl transition-all border border-black/5 dark:border-white/5 active:scale-[0.98] ">
-        <div className="relative shrink-0">
+    <div 
+      onClick={() => navigate(`/bot/${bot.slug}`)} 
+      className="flex flex-col p-5 bg-white dark:bg-slate-900 border border-black/[0.05] dark:border-white/[0.05] rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:border-black/[0.12] dark:hover:border-white/[0.12] hover:shadow-lg hover:shadow-black/[0.02] dark:hover:shadow-black/[0.2] transform-gpu cursor-pointer select-none group w-full relative"
+    >
+        {/* Üst Alan: Avatar, Bot Adı ve Kategori Badge aynı hizada */}
+        <div className="flex items-center gap-3 w-full mb-3 min-w-0">
             <img 
                 src={getLiveBotIcon(bot)} 
                 alt={bot.name} 
-                className="w-14 h-14 sm:w-20 sm:h-20 rounded-xl sm:rounded-xl object-cover bg-slate-200 dark:bg-slate-900  border border-black/5 dark:border-white/5 group-hover:scale-105 transition-transform" 
+                loading="lazy"
+                className="w-11 h-11 rounded-xl object-cover bg-slate-100 dark:bg-slate-800 border border-black/[0.04] dark:border-white/[0.06] shrink-0" 
                 onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
             />
-            {bot.price > 0 && (
-                <div className="absolute -top-1.5 -right-1.5 w-7 h-7 bg-brand dark:bg-brand-light rounded-xl flex items-center justify-center  border-2 border-slate-50 dark:border-slate-950">
-                    <Zap size={12} fill="currentColor" className="text-white" />
+            <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+                <div className="flex items-center gap-1.5 min-w-0">
+                    <h3 className="font-bold text-[15px] sm:text-[16px] text-slate-900 dark:text-slate-50 truncate tracking-tight leading-tight">
+                        {bot.name}
+                    </h3>
+                    {bot.is_official && (
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="text-[#139fec] shrink-0">
+                            <path fillRule="evenodd" clipRule="evenodd" d="M7.408 1.2375C7.57933 1.11017 7.78667 1.0415 8 1.0415C8.21333 1.0415 8.42067 1.11017 8.592 1.23749L9.81067 2.14417C9.83467 2.16217 9.86133 2.1755 9.88933 2.18484C9.91733 2.19417 9.94733 2.19884 9.97733 2.19817L11.496 2.18084C11.7093 2.17817 11.918 2.24484 12.09 2.37017C12.2627 2.4955 12.39 2.6735 12.454 2.87684L12.9073 4.32617C12.916 4.35484 12.93 4.3815 12.9473 4.4055C12.9647 4.4295 12.986 4.45084 13.0107 4.46817L14.2493 5.34684C14.4233 5.47017 14.5527 5.64617 14.6187 5.8495C14.6847 6.05217 14.6833 6.27084 14.6153 6.4735L14.13 7.91284C14.1207 7.94084 14.1153 7.97084 14.1153 8.00017C14.1153 8.0295 14.12 8.0595 14.13 8.0875L14.6153 9.52684C14.6833 9.72884 14.6847 9.9475 14.6187 10.1508C14.5527 10.3535 14.4233 10.5302 14.2493 10.6535L13.0107 11.5322C12.9867 11.5495 12.9653 11.5702 12.9473 11.5948C12.93 11.6188 12.9167 11.6455 12.9073 11.6742L12.454 13.1235C12.3907 13.3268 12.2627 13.5048 12.09 13.6302C11.9173 13.7555 11.7093 13.8222 11.496 13.8195L9.97733 13.8022C9.94733 13.8015 9.918 13.8062 9.88933 13.8155C9.86133 13.8248 9.83467 13.8382 9.81067 13.8562L8.592 14.7628C8.42067 14.8902 8.21333 14.9588 8 14.9588C7.78667 14.9588 7.57933 14.8902 7.408 14.7628L6.18933 13.8562C6.16533 13.8382 6.13867 13.8248 6.11067 13.8155C6.08267 13.8062 6.05267 13.8015 6.02267 13.8022L4.504 13.8195C4.29067 13.8222 4.082 13.7555 3.91 13.6302C3.73733 13.5048 3.61 13.3268 3.546 13.1235L3.09267 11.6742C3.084 11.6455 3.07 11.6188 3.05267 11.5948C3.03533 11.5708 3.014 11.5495 2.98933 11.5322L1.75067 10.6535C1.57667 10.5302 1.44733 10.3542 1.38133 10.1508C1.31533 9.94817 1.31667 9.7295 1.38467 9.52684L1.87 8.00017C1.88067 8.0595 1.88533 8.03017 1.88533 8.00017C1.88533 7.97017 1.88067 7.94084 1.87067 7.91284L1.38533 6.4735C1.31733 6.2715 1.316 6.05284 1.382 5.8495C1.448 5.64684 1.57733 5.47084 1.75133 5.3475L1.75133 5.3475L2.99 4.46884C3.014 4.45084 3.03533 4.43017 3.05333 4.40617C3.07067 4.38217 3.084 4.3555 3.09333 4.32684L3.54667 2.8775C3.61 2.67417 3.738 2.49617 3.91067 2.37084C4.08333 2.2455 4.29133 2.17884 4.50467 2.1815L6.02333 2.19884C6.05333 2.1995 6.08266 2.19484 6.11133 2.1855C6.13933 2.17617 6.166 2.16284 6.19 2.14484L7.408 1.2375Z" fill="currentColor"></path>
+                            <path fillRule="evenodd" clipRule="evenodd" d="M7.33334 10.6668C7.16267 10.6668 6.992 10.6015 6.862 10.4715L4.862 8.4715C4.60134 8.21083 4.60134 7.7895 4.862 7.52883C5.12267 7.26817 5.544 7.26817 5.80467 7.52883L7.33334 9.0575L10.1953 6.1955C10.456 5.93483 10.8773 5.93483 11.138 6.1955C11.3987 6.45617 11.3987 6.8775 11.138 7.13817L7.80467 10.4715C7.67467 10.6015 7.504 10.6668 7.33334 10.6668Z" fill="white"></path>
+                        </svg>
+                    )}
                 </div>
-            )}
-        </div>
-        <div className="flex-1 ml-5 min-w-0">
-            <h3 className="font-bold text-lg text-slate-900 dark:text-white truncate tracking-tight mb-1 flex items-center gap-1.5">
-                {bot.name}
-                {bot.is_official && (
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="w-[14px] h-[14px] text-[#139fec] shrink-0">
-                        <path fillRule="evenodd" clipRule="evenodd" d="M7.408 1.2375C7.57933 1.11017 7.78667 1.0415 8 1.0415C8.21333 1.0415 8.42067 1.11017 8.592 1.2375L9.81067 2.14417C9.83467 2.16217 9.86133 2.1755 9.88933 2.18484C9.91733 2.19417 9.94733 2.19884 9.97733 2.19817L11.496 2.18084C11.7093 2.17817 11.918 2.24484 12.09 2.37017C12.2627 2.4955 12.39 2.6735 12.454 2.87684L12.9073 4.32617C12.916 4.35484 12.93 4.3815 12.9473 4.4055C12.9647 4.4295 12.986 4.45084 13.0107 4.46817L14.2493 5.34684C14.4233 5.47017 14.5527 5.64617 14.6187 5.8495C14.6847 6.05217 14.6833 6.27084 14.6153 6.4735L14.13 7.91284C14.1207 7.94084 14.1153 7.97084 14.1153 8.00017C14.1153 8.0295 14.12 8.0595 14.13 8.0875L14.6153 9.52684C14.6833 9.72884 14.6847 9.9475 14.6187 10.1508C14.5527 10.3535 14.4233 10.5302 14.2493 10.6535L13.0107 11.5322C12.9867 11.5495 12.9653 11.5702 12.9473 11.5948C12.93 11.6188 12.9167 11.6455 12.9073 11.6742L12.454 13.1235C12.3907 13.3268 12.2627 13.5048 12.09 13.6302C11.9173 13.7555 11.7093 13.8222 11.496 13.8195L9.97733 13.8022C9.94733 13.8015 9.918 13.8062 9.88933 13.8155C9.86133 13.8248 9.83467 13.8382 9.81067 13.8562L8.592 14.7628C8.42067 14.8902 8.21333 14.9588 8 14.9588C7.78667 14.9588 7.57933 14.8902 7.408 14.7628L6.18933 13.8562C6.16533 13.8382 6.13867 13.8248 6.11067 13.8155C6.08267 13.8062 6.05267 13.8015 6.02267 13.8022L4.504 13.8195C4.29067 13.8222 4.082 13.7555 3.91 13.6302C3.73733 13.5048 3.61 13.3268 3.546 13.1235L3.09267 11.6742C3.084 11.6455 3.07 11.6188 3.05267 11.5948C3.03533 11.5708 3.014 11.5495 2.98933 11.5322L1.75067 10.6535C1.57667 10.5302 1.44733 10.3542 1.38133 10.1508C1.31533 9.94817 1.31667 9.7295 1.38467 9.52684L1.87 8.00017C1.88067 8.0595 1.88533 8.03017 1.88533 8.00017C1.88533 7.97017 1.88067 7.94084 1.87067 7.91284L1.38533 6.4735C1.31733 6.2715 1.316 6.05284 1.382 5.8495C1.448 5.64684 1.57733 5.47084 1.75133 5.3475L2.99 4.46884C3.014 4.45084 3.03533 4.43017 3.05333 4.40617C3.07067 4.38217 3.084 4.3555 3.09333 4.32684L3.54667 2.8775C3.61 2.67417 3.738 2.49617 3.91067 2.37084C4.08333 2.2455 4.29133 2.17884 4.50467 2.1815L6.02333 2.19884C6.05333 2.1995 6.08266 2.19484 6.11133 2.1855C6.13933 2.17617 6.166 2.16284 6.19 2.14484L7.408 1.2375Z" fill="currentColor"></path>
-                        <path fillRule="evenodd" clipRule="evenodd" d="M7.33334 10.6668C7.16267 10.6668 6.992 10.6015 6.862 10.4715L4.862 8.4715C4.60134 8.21083 4.60134 7.7895 4.862 7.52883C5.12267 7.26817 5.544 7.26817 5.80467 7.52883L7.33334 9.0575L10.1953 6.1955C10.456 5.93483 10.8773 5.93483 11.138 6.1955C11.3987 6.45617 11.3987 6.8775 11.138 7.13817L7.80467 10.4715C7.67467 10.6015 7.504 10.6668 7.33334 10.6668Z" fill="white"></path>
-                    </svg>
-                )}
-            </h3>
-            <p className="text-[11px] text-slate-500 font-medium truncate mb-2">{bot.description}</p>
-            <div className="flex items-center gap-3">
-                {bot.price > 0 && (
-                    <div className="flex items-center gap-2 bg-brand/10 dark:bg-brand-light/10 px-3 py-1 rounded-xl">
-                        <Zap size={10} className="text-brand dark:text-brand-light" />
-                        <span className="text-[10px] font-bold text-brand dark:text-brand-light uppercase tracking-wider flex items-center gap-1">
-                            {Number(prices.ton).toFixed(1)}
-                            <svg fill="none" height="12" width="12" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" className="translate-y-[0.5px]">
-                                <title>Payment TON icon</title>
-                                <g clipPath="url(#a_ton_search)" fill="currentColor">
-                                    <path d="M7.5 11.015V5.963H5.268a.31.31 0 0 0-.272.463l1.772 3.17.734 1.419ZM9.232 9.596l1.771-3.17a.31.31 0 0 0-.272-.463H8.498v5.053l.734-1.42Z"></path>
-                                    <path clipRule="evenodd" d="M16 8.5a8 8 0 1 1-16 0 8 8 0 0 1 16 0ZM5.268 4.965h5.464c1.004 0 1.64 1.085 1.136 1.96l-3.372 5.844a.572.572 0 0 1-.992 0L4.132 6.925c-.505-.876.132-1.96 1.136-1.96Z" fillRule="evenodd"></path>
-                                </g>
-                                <defs>
-                                    <clipPath id="a_ton_search">
-                                        <path d="M0 0h16v16H0z" fill="#fff" transform="translate(0 .5)"></path>
-                                    </clipPath>
-                                </defs>
-                            </svg>
-                        </span>
-                    </div>
-                )}
-                <div className="flex items-center gap-1.5 bg-yellow-500/10 px-3 py-1 rounded-xl border border-yellow-500/20">
-                    <Star size={10} className="text-yellow-500 fill-yellow-500" />
-                    <span className="text-[10px] font-bold text-yellow-600 dark:text-yellow-400 uppercase tracking-wider">{bot.rating || '0.0'}</span>
-                </div>
-                {bot.languages && bot.languages.length > 0 && (
-                    <div className="flex items-center gap-1.5">
-                        {bot.languages.map((lang, idx) => (
-                            <span 
-                                key={idx} 
-                                className={`
-                                    text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-tighter opacity-80
-                                    ${idx === 3 ? 'hidden md:inline-block' : ''}
-                                    ${idx >= 4 ? 'hidden lg:inline-block' : ''}
-                                `}
-                            >
-                                <span className="md:hidden">{getLangLabel(lang)}</span>
-                                <span className="hidden md:inline">{lang}</span>
-                            </span>
-                        ))}
-                        {/* Plus SVG indicators for mobile/tablet truncation */}
-                        {bot.languages.length > 3 && (
-                            <span className="inline-flex md:hidden text-slate-400 dark:text-slate-500 opacity-80 items-center">
-                                <svg width="6" height="6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                            </span>
-                        )}
-                        {bot.languages.length > 4 && (
-                            <span className="hidden md:inline-flex lg:hidden text-slate-400 dark:text-slate-500 opacity-80 items-center">
-                                <svg width="6" height="6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                            </span>
-                        )}
-                    </div>
+                {catLabel && (
+                    <span className="text-[10px] sm:text-[11px] font-semibold text-[#0000008a] dark:text-slate-400 uppercase tracking-wider block">
+                        {catLabel}
+                    </span>
                 )}
             </div>
+        </div>
+
+        {/* Orta Alan: Açıklama, max 2 satır, opacity biraz düşük, leading-relaxed */}
+        <p className="text-[13px] sm:text-[14px] text-slate-600/85 dark:text-slate-400/85 font-normal leading-relaxed line-clamp-2 min-h-[40px] mb-4">
+            {bot.description.startsWith('bot_') ? t(bot.description) : bot.description}
+        </p>
+
+        {/* Alt Alan: Tek sıra: kullanıcı sayısı, rating, run/use button şeklinde */}
+        <div className="mt-auto pt-3 border-t border-black/[0.03] dark:border-white/[0.03] flex items-center justify-between gap-3 text-[12px] font-bold text-slate-500 dark:text-slate-400">
+            <div className="flex items-center gap-3">
+                {/* Kullanıcı sayısı */}
+                {formattedUserCount ? (
+                    <div className="flex items-center gap-1">
+                        <span className="text-slate-700 dark:text-slate-300 font-extrabold">{formattedUserCount}</span>
+                        <span className="text-slate-400 dark:text-slate-500 font-normal">{t('users') || 'kullanıcı'}</span>
+                    </div>
+                ) : (
+                    <div className="flex items-center gap-1">
+                        <span className="text-slate-700 dark:text-slate-300 font-extrabold">{bot.views || '1.1k'}</span>
+                        <span className="text-slate-400 dark:text-slate-500 font-normal">{t('views') || 'görüntülenme'}</span>
+                    </div>
+                )}
+
+                {/* Vertical Separator */}
+                <div className="w-px h-3 bg-black/[0.08] dark:bg-white/[0.08]" />
+
+                {/* Rating */}
+                <div className="flex items-center gap-1">
+                    <Star size={12} className="text-amber-400 fill-amber-400" />
+                    <span className="text-slate-700 dark:text-slate-300 font-extrabold">{bot.rating || '4.8'}</span>
+                </div>
+            </div>
+
+            {/* Run/Use Button */}
+            <button 
+                className="px-3.5 py-1.5 bg-blue-500/10 hover:bg-blue-500 text-blue-600 hover:text-white dark:bg-blue-500/15 dark:text-blue-400 dark:hover:bg-blue-500 dark:hover:text-white rounded-lg transition-all text-[11px] sm:text-[12px] font-extrabold leading-none active:scale-95 flex items-center gap-1 border border-blue-500/20"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    haptic('light');
+                    if (bot.bot_link) {
+                        window.open(bot.bot_link, '_blank', 'noopener,noreferrer');
+                    } else {
+                        navigate(`/bot/${bot.slug}`);
+                    }
+                }}
+            >
+                {t('run') || 'Başlat'}
+            </button>
         </div>
     </div>
   );
