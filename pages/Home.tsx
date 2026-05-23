@@ -39,7 +39,7 @@ const StarSVG = React.memo(({ className, size = 24 }: { className?: string, size
 
 const StarVisual = React.memo(() => (
   <div className="absolute right-[-15px] sm:right-[-6px] top-1/2 -translate-y-1/2 w-[160px] h-[160px] sm:w-[180px] sm:h-[180px] flex items-center justify-center pointer-events-none select-none overflow-visible">
-    <div className="absolute inset-0 rounded-full blur-2xl opacity-60 pointer-events-none animate-pulse" style={{ background: 'radial-gradient(circle, rgba(245,158,11,0.25) 0%, transparent 70%)' }} />
+    <div className="absolute inset-0 rounded-full blur-3xl opacity-20 pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(245,158,11,0.1) 0%, transparent 70%)' }} />
     
     <div className="absolute -translate-x-12 -translate-y-2 scale-75 -rotate-12 text-amber-300 dark:text-amber-500/40 opacity-70 group-hover:scale-80 transition-transform duration-500">
       <StarSVG size={45} />
@@ -49,7 +49,7 @@ const StarVisual = React.memo(() => (
       <StarSVG size={40} />
     </div>
 
-    <div className="absolute z-10 scale-100 rotate-6 text-[#ffaf02] drop-shadow-[0_8px_20px_rgba(245,158,11,0.4)] group-hover:scale-105 group-hover:rotate-[12deg] transition-all duration-500">
+    <div className="absolute z-10 scale-100 rotate-6 text-[#ffaf02] drop-shadow-[0_4px_10px_rgba(245,158,11,0.2)] group-hover:scale-105 group-hover:rotate-[12deg] transition-all duration-500">
       <StarSVG size={85} />
     </div>
 
@@ -60,14 +60,14 @@ const StarVisual = React.memo(() => (
       <StarSVG size={16} />
     </div>
 
-    <div className="absolute z-20 translate-x-[24px] translate-y-[20px] bg-[#ff3b30] text-white text-[11px] font-black px-2.5 py-0.5 rounded-full shadow-lg shadow-red-500/40 rotate-[8deg] tracking-tight">
+    <div className="absolute z-20 translate-x-[24px] translate-y-[20px] bg-[#ff3b30] text-white text-[11px] font-black px-2.5 py-0.5 rounded-full shadow-lg shadow-red-500/10 rotate-[8deg] tracking-tight">
       -30%
     </div>
   </div>
 ));
 
 const TonCoin = React.memo(({ className, size = 48 }: { className?: string, size?: number }) => (
-  <div className={`relative flex items-center justify-center rounded-full bg-gradient-to-br from-[#2f80ed] to-[#0088cc] shadow-xl text-white border border-white/20 select-none ${className}`} style={{ width: size, height: size }}>
+  <div className={`relative flex items-center justify-center rounded-full bg-gradient-to-br from-[#2f80ed] to-[#0088cc] shadow-xl text-white border border-white/10 select-none ${className}`} style={{ width: size, height: size }}>
     <svg width={size * 0.55} height={size * 0.55} viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="11" strokeLinecap="round" strokeLinejoin="round">
       <path d="M50 85 L15 35 L85 35 Z" fill="none" />
       <path d="M50 35 L50 85" />
@@ -77,13 +77,13 @@ const TonCoin = React.memo(({ className, size = 48 }: { className?: string, size
 
 const TonVisual = React.memo(() => (
   <div className="absolute right-[-15px] sm:right-[-6px] top-1/2 -translate-y-1/2 w-[160px] h-[160px] sm:w-[180px] sm:h-[180px] flex items-center justify-center pointer-events-none select-none overflow-visible">
-    <div className="absolute inset-0 rounded-full blur-2xl opacity-60 pointer-events-none animate-pulse" style={{ background: 'radial-gradient(circle, rgba(56,189,248,0.25) 0%, transparent 70%)' }} />
+    <div className="absolute inset-0 rounded-full blur-3xl opacity-20 pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(56,189,248,0.1) 0%, transparent 70%)' }} />
     
     <div className="absolute z-10 translate-x-5 translate-y-14 rotate-[-30deg] scale-90 shadow-xl opacity-90 group-hover:translate-y-12 transition-all duration-500">
       <TonCoin size={50} />
     </div>
 
-    <div className="absolute z-20 -translate-x-4 -translate-y-4 rotate-[15deg] scale-115 drop-shadow-[0_8px_20px_rgba(47,128,237,0.4)] group-hover:scale-120 group-hover:rotate-[20deg] transition-all duration-500">
+    <div className="absolute z-20 -translate-x-4 -translate-y-4 rotate-[15deg] scale-115 drop-shadow-[0_4px_10px_rgba(47,128,237,0.2)] group-hover:scale-120 group-hover:rotate-[20deg] transition-all duration-500">
       <TonCoin size={58} />
     </div>
 
@@ -105,9 +105,9 @@ const TonVisual = React.memo(() => (
 
 const CloverVisual = React.memo(() => (
   <div className="absolute right-[-15px] sm:right-[-6px] top-1/2 -translate-y-1/2 w-[160px] h-[160px] sm:w-[180px] sm:h-[180px] flex items-center justify-center pointer-events-none select-none overflow-visible">
-    <div className="absolute inset-0 rounded-full blur-2xl opacity-60 pointer-events-none animate-pulse" style={{ background: 'radial-gradient(circle, rgba(52,199,89,0.25) 0%, transparent 70%)' }} />
+    <div className="absolute inset-0 rounded-full blur-3xl opacity-20 pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(52,199,89,0.1) 0%, transparent 70%)' }} />
     
-    <div className="absolute z-10 w-[95px] h-[95px] sm:w-[105px] sm:h-[105px] rounded-full bg-gradient-to-tr from-[#34c759] to-[#2eb850] flex items-center justify-center shadow-2xl border-4 border-white dark:border-slate-800 drop-shadow-[0_12px_24px_rgba(52,199,89,0.35)] group-hover:scale-105 group-hover:rotate-[8deg] transition-all duration-500">
+    <div className="absolute z-10 w-[95px] h-[95px] sm:w-[105px] sm:h-[105px] rounded-full bg-gradient-to-tr from-[#34c759] to-[#2eb850] flex items-center justify-center shadow-xl border-4 border-white dark:border-slate-800 drop-shadow-[0_4px_12px_rgba(52,199,89,0.15)] group-hover:scale-105 group-hover:rotate-[8deg] transition-all duration-500">
       <svg width="52" height="52" viewBox="0 0 24 24" fill="currentColor" className="text-white">
         <path d="M12 9c.5-1.5 2-2.5 3.5-2.5s2.5 1 2.5 2.5c0 1.5-1 3-2.5 3.5C14 13 12.5 12 12 9zm0 6c-.5 1.5-2 2.5-3.5 2.5S6 16.5 6 15c0-1.5 1-3 2.5-3.5 1.5-.5 3 .5 3.5 3.5zm0-6c-.5-1.5-2-2.5-3.5-2.5S6 7.5 6 9c0 1.5 1 3 2.5 3.5 1.5.5 3-.5 3.5-3.5zm0 6c.5 1.5 2 2.5 3.5 2.5s2.5-1 2.5-2.5c0-1.5-1-3-2.5-3.5-1.5-.5-3 .5-3.5 3.5z" />
         <path d="M12 12c.5 1.5 1 3.5.5 5.5-.5 2-1.5 3.5-2.5 4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -437,7 +437,7 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = React.memo(({ bot, tonR
   return (
     <div 
       onClick={() => navigate(`/bot/${bot.slug}`)} 
-      className="flex flex-col p-5 bg-white dark:bg-slate-900 border border-black/[0.05] dark:border-white/[0.05] rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:border-black/[0.12] dark:hover:border-white/[0.12] hover:shadow-lg hover:shadow-black/[0.02] dark:hover:shadow-black/[0.2] transform-gpu cursor-pointer select-none group w-full relative"
+      className="flex flex-col p-6 bg-white dark:bg-slate-900 border border-black/[0.06] dark:border-white/[0.08] rounded-2xl transition-all duration-200 ease-out hover:-translate-y-[2px] hover:border-black/[0.12] dark:hover:border-white/[0.12] hover:shadow-md hover:shadow-black/[0.01] dark:hover:shadow-black/[0.08] active:scale-[0.98] transform-gpu cursor-pointer select-none group w-full relative"
     >
         {/* Üst Alan: Avatar, Bot Adı ve Kategori Badge aynı hizada */}
         <div className="flex items-center gap-3 w-full mb-3 min-w-0">
@@ -1987,27 +1987,27 @@ const Home = () => {
 
 
       {/* Bottom Section */}
-      <div className="bg-white dark:bg-slate-950 w-full pt-10 pb-32 shadow-[0_-1px_0_0_rgba(0,0,0,0.015)]">
-          <div className="max-w-7xl mx-auto px-5 sm:px-8">
+      <div className="bg-white dark:bg-slate-950 w-full py-24 shadow-[0_-1px_0_0_rgba(0,0,0,0.015)]">
+          <div className="max-w-6xl mx-auto px-6 sm:px-8">
               {!isLoading && (
                   <>
-                    <div className="mb-14 sm:mb-20 animate-in fade-in slide-in-from-bottom-4 duration-700 text-center relative z-10">
-                        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[72px] font-extrabold tracking-[-0.04em] md:leading-[1.1] leading-[1.2] text-slate-900 dark:text-white max-w-4xl mx-auto">
+                    <div className="mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700 text-center relative z-10">
+                        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-[-0.03em] md:leading-[1.15] leading-[1.2] text-slate-900 dark:text-white max-w-3xl mx-auto">
                             {t('home_hero_title').includes(':') ? (
                                 <>
                                     {t('home_hero_title').split(':')[0]}: <span className="text-blue-500">{t('home_hero_title').split(':')[1]?.trim()}</span>
                                 </>
                             ) : t('home_hero_title')}
                         </h1>
-                        <p className="mt-6 text-[15px] sm:text-[17px] md:text-[18px] text-slate-500/80 dark:text-slate-400/80 leading-relaxed font-normal max-w-xl mx-auto tracking-normal">
+                        <p className="mt-8 text-[15px] sm:text-[16px] text-slate-500/80 dark:text-slate-400/80 leading-[1.6] font-normal max-w-[65ch] mx-auto tracking-normal">
                             {t('home_hero_desc')}
                         </p>
                         
                         {/* CTA Buttons - Premium, equal height, correct padding and style */}
-                        <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+                        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
                             <button 
                                 onClick={() => { haptic('medium'); navigate('/search'); }}
-                                className="px-8 h-12 bg-blue-500 hover:bg-blue-600 text-white text-[14px] font-bold rounded-xl transition-all shadow-md shadow-blue-500/20 active:scale-95 flex items-center justify-center whitespace-nowrap"
+                                className="px-8 h-12 bg-blue-500 hover:bg-blue-600 text-white text-[14px] font-bold rounded-xl transition-all shadow-md shadow-blue-500/10 active:scale-95 flex items-center justify-center whitespace-nowrap"
                             >
                                 {t('explore_now') || 'Hemen Keşfet'}
                             </button>

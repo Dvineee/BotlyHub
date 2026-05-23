@@ -74,7 +74,7 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = ({ bot, tonRate }) => {
   return (
     <div 
       onClick={() => navigate(`/bot/${bot.slug}`)} 
-      className="flex flex-col p-5 bg-white dark:bg-slate-900 border border-black/[0.05] dark:border-white/[0.05] rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:border-black/[0.12] dark:hover:border-white/[0.12] hover:shadow-lg hover:shadow-black/[0.02] dark:hover:shadow-black/[0.2] transform-gpu cursor-pointer select-none group w-full relative"
+      className="flex flex-col p-6 bg-white dark:bg-slate-900 border border-black/[0.06] dark:border-white/[0.08] rounded-2xl transition-all duration-200 ease-out hover:-translate-y-[2px] hover:border-black/[0.12] dark:hover:border-white/[0.12] hover:shadow-md hover:shadow-black/[0.01] dark:hover:shadow-black/[0.08] active:scale-[0.98] transform-gpu cursor-pointer select-none group w-full relative"
     >
         {/* Üst Alan: Avatar, Bot Adı ve Kategori Badge aynı hizada */}
         <div className="flex items-center gap-3 w-full mb-3 min-w-0">

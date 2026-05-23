@@ -97,7 +97,7 @@ body {
   }
 
   span, div, input {
-    font-weight: 600;
+    font-weight: inherit;
   }
 
   button, a {
@@ -283,33 +283,7 @@ span.text-\[10px\].font-black.text-slate-500.dark\:text-slate-400.uppercase.trac
     border-color: rgba(255, 255, 255, 0.1);
 }
 
-.bot-card .py-4, .sticky.py-4 {
-    box-shadow: none !important;
-    padding-top: 0.6rem;
-    padding-bottom: 0.6rem;
-}
-
-.bot-card .mb-10 {
-  margin-bottom: 1rem;
-}
-
-.bot-card {
-    padding: 6px !important;
-}
-
-.bot-card .py-1 {
-    padding-top: 0.1rem !important;
-    padding-bottom: 0.1rem !important;
-}
-
-.bot-card .text-\[9px\] {
-    font-size: 12px !important;
-    font-weight: 400 !important;
-}
-
-.bot-card svg.lucide-star {
-    stroke-width: 1.5px !important;
-}
+/* Bot card sub-element styling layout overrides removed to let React tailwind classes govern correctly */
 
 .font-bold {
     font-weight: 700 !important;
@@ -353,26 +327,14 @@ svg.lucide.lucide-chevron-right:focus {
     }
 }
 
-.bg-slate-900 {
-    color: #ffffff;
-    --tw-bg-opacity: 1;
-    background-color: var(--btn-primary) !important;
-}
-
-.bg-slate-100 {
-    --tw-bg-opacity: 1;
-    background-color: rgb(241 245 249 / 0%);
-}
+/* Removed destructive bg-slate-900 and bg-slate-100 overrides to let standard colors function properly */
 
 .text-white {
     --tw-text-opacity: 1;
     color: rgb(255 255 255 / var(--tw-text-opacity, 1));
 }
 
-.py-3 {
-    padding-top: 0rem;
-    padding-bottom: 0rem;
-}
+/* Removed custom py-3 override to let standard tailwind classes specify padding */
 
 .hover\:bg-slate-100:hover {
     background-color: #00000008 !important;
@@ -457,38 +419,7 @@ html:not(.dark) .text-slate-400 {
     background-color: rgb(255 255 255);
 }
 
-.mb-3 {
-    padding: 0.75em !important;
-    box-shadow: none !important;
-    margin-bottom: 0.5rem;
-}
-
-.space-y-6>:not([hidden])~:not([hidden]) {
-    gap: 2em;
-    --tw-space-y-reverse: 0;
-    margin-top: calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));
-    margin-bottom: calc(1.5rem * var(--tw-space-y-reverse));
-}
-
-.bot-card .p-5 {
-    /* background: none; */
-    padding: 0.5rem;
-}
-
-.border-b-8 {
-    height: 55px;
-    border-bottom-width: 0;
-}
-
-img, video {
-    border-width: 0;
-    max-width: 100%;
-    height: auto;
-}
-
-.bot-card .p-6 {
-    padding: 0.5rem;
-}
+/* Margin and padding custom overrides removed for layout flexibility */
 
 .px-8 {
     margin-bottom: 21px;
@@ -534,15 +465,7 @@ button.w-10.h-10.flex.items-center.justify-center.rounded-2xl.border.transition-
     padding: 1px 8px;
 }
 
-.bot-card .px-3, .bot-card .px-4 {
-    padding: 6px;
-    padding-left: .5rem;
-    padding-right: .5rem;
-}
-
-.bot-card .gap-2 {
-    gap: 0.2rem;
-}
+/* Bot-card micro paddings removed */
 
 button.category-btn {
     box-shadow: none;
@@ -581,13 +504,10 @@ span.text-\[10px\].font-bold.text-slate-500.dark\:text-slate-400.uppercase.track
     margin-left: -51px;
     width: 9rem;
 }
-.py-3 {
-    padding-top: 0.3rem;
-    padding-bottom: 0.3rem;
-}
+/* Removed secondary vertical padding overrides */
 
 .font-extrabold {
-    font-weight: 500;
+    font-weight: 800;
 }
 .text-lg {
     font-size: 1rem;
@@ -1119,7 +1039,7 @@ img[src$=".png"] {
 }
 
 span, div, input {
-    font-weight: 600;
+    font-weight: inherit;
 }
 
 @media (min-width: 640px) {
