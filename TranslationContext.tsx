@@ -4,6 +4,10 @@ import './types';
 
 const translations = {
   tr: {
+    "light_mode": "Gündüz Modu",
+    "dark_mode": "Gece Modu",
+    "qa_forum": "Soru Cevap Forumu",
+    "explore_now": "Hemen Keşfet",
     "market": "Mağaza",
     "profile": "Profil",
     "profile_bots": "Botlar",
@@ -325,7 +329,7 @@ const translations = {
     "share_copied": "Link kopyalandı!",
     "featured": "Öne Çıkanlar",
     "search_results": "Arama Sonuçları",
-    "add_your": "Add Your",
+    "add_your": "Botunu Ekle",
     "blog_title": "Blog",
     "blog_subtitle": "En Yeni Botlar ve Kripto Dünyasından Haberler",
     "blog_search_placeholder": "Blogda ara...",
@@ -419,6 +423,10 @@ const translations = {
     "blog_team_label": "BOTLYHUB EKİBİ"
   },
   en: {
+    "light_mode": "Light Mode",
+    "dark_mode": "Dark Mode",
+    "qa_forum": "Q&A Forum",
+    "explore_now": "Explore Now",
     "market": "Market",
     "profile": "Profile",
     "profile_bots": "Bots",
@@ -1402,7 +1410,12 @@ export const TranslationProvider = ({ children }: PropsWithChildren<{}>) => {
 
   const t = (key: string) => {
     // @ts-ignore
-    return translations[language][key] || translations['en'][key] || key;
+    const found = translations[language]?.[key] || translations['en']?.[key];
+    if (found !== undefined) return found;
+    if (key && key.includes('_')) {
+      return "";
+    }
+    return key;
   };
 
   return (

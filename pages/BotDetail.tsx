@@ -7,12 +7,12 @@ import {
   Sparkles, Star, Download, Info, CheckCircle2, Globe, Cpu,
   Play, UserPlus, MessageSquare, BarChart3, MousePointer2,
   Search, LayoutGrid, Store, User as UserIcon, Megaphone, Bell, Link as LinkIcon, Flag,
-  Sun, Moon, Wallet, Menu, ExternalLink, Coins, Briefcase, Compass, LogOut, Plus
+  Sun, Moon, Wallet, Menu, ExternalLink, Coins, Briefcase, Compass, LogOut, Plus, ArrowLeft
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate, useParams, Link as RouterLink } from 'react-router-dom';
 import { Bot, Channel, User, Notification } from '../types';
-import { categories } from '../data';
+import { categories, appsSubCategories } from '../data';
 import { useTelegram } from '../hooks/useTelegram';
 import { DatabaseService } from '../services/DatabaseService';
 import PriceService from '../services/PriceService';
@@ -62,7 +62,7 @@ const NavMenu = ({
     const navigate = useNavigate();
     const [openMenu, setOpenMenu] = useState<'kesfet' | 'investors' | null>(null);
     const [mobileModal, setMobileModal] = useState<'kesfet' | 'investors' | null>(null);
-    const [searchQuery, setSearchQuery] = useState('');
+    const [navState, setNavState] = useState<'main' | 'bots' | 'apps'>('main');
     const internalMenuRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -75,24 +75,41 @@ const NavMenu = ({
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (searchQuery.trim()) {
-            haptic('light');
-            navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
-            setOpenMenu(null);
-            setMobileModal(null);
-        }
+    const currentUser = {
+        id: user?.id?.toString() || 'user-active-session',
+        name: user?.username ? `@${user.username}` : `@${(user?.first_name || user?.name || 'Kenan').toLowerCase().replace(/\s+/g, '')}`,
+        avatar: user?.photo_url || user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.first_name || user?.name || 'Kenan')}&background=0f172a&color=fff`,
+        bio: ''
     };
 
-    const discoverItems: { id: string; label: string; desc: string; icon: any; action?: () => void; path?: string; }[] = [
-        { id: 'bots', label: 'Botlar', desc: 'Telegram Bot Marketi', icon: BotIcon, action: () => { navigate('/search?mode=bots&category=all'); setOpenMenu(null); setMobileModal(null); } },
-        { id: 'apps', label: 'Uygulamalar', desc: 'Web3 & TMA Uygulamaları', icon: LayoutGrid, action: () => { navigate('/search?mode=apps&category=all'); setOpenMenu(null); setMobileModal(null); } },
+    const botsCategories = categories.filter(c => c.id !== 'apps' && c.id !== 'all');
+    const appsCategories = appsSubCategories;
+
+    const handleCategoryClick = (catId: string, mode: 'bots' | 'apps') => {
+        haptic('light');
+        navigate(`/search?mode=${mode}&category=${catId}`);
+        setOpenMenu(null);
+        setMobileModal(null);
+        setNavState('main');
+    };
+
+    interface MenuItem {
+        id: string;
+        label: string;
+        desc: string;
+        icon: any;
+        action?: () => void;
+        path?: string;
+    }
+
+    const discoverItems: MenuItem[] = [
+        { id: 'bots', label: 'Botlar', desc: 'Telegram Bot Marketi', icon: BotIcon, action: () => setNavState('bots') },
+        { id: 'apps', label: 'Uygulamalar', desc: 'Web3 & TMA Uygulamaları', icon: LayoutGrid, action: () => setNavState('apps') },
         { id: 'channels', label: 'Kanallar', desc: 'Popüler Telegram Kanalları', icon: Megaphone, path: '/channels' },
         { id: 'ads', label: 'Reklam', desc: 'Projenizi Öne Çıkarın', icon: Share2, path: '/settings' },
     ];
 
-    const investorItems: { id: string; label: string; desc: string; icon: any; action?: () => void; path?: string; }[] = [
+    const investorItems: MenuItem[] = [
         { id: 'exchanges', label: 'Borsalar ve Takas', desc: 'CEX & DEX Platformları', icon: BarChart3 },
         { id: 'earn', label: 'Kazanç Uygulamaları', desc: 'Pasif Gelir Fırsatları', icon: Coins },
         { id: 'tools', label: 'Yatırım Araçları', desc: 'Analiz ve Takip Araçları', icon: Briefcase },
@@ -110,26 +127,115 @@ const NavMenu = ({
             return (
                 <div className="max-w-5xl mx-auto px-6 grid grid-cols-12 gap-8">
                     <div className="col-span-8">
-                        <div className="grid grid-cols-2 gap-4">
-                            {discoverItems.map(item => (
-                                <button 
-                                    key={item.id}
-                                    onClick={() => {
-                                        if (item.action) item.action();
-                                        else if (item.path) { navigate(item.path); setOpenMenu(null); }
-                                    }}
-                                    className="flex items-center gap-4 p-4 hover:bg-black/[0.02] dark:hover:bg-white/5 rounded-2xl transition-all group border border-transparent hover:border-black/5 dark:hover:border-white/10 text-left w-full"
+                        <AnimatePresence mode="wait">
+                            {navState === 'main' ? (
+                                <motion.div 
+                                    key="main"
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -20 }}
+                                    className="grid grid-cols-2 gap-4"
                                 >
-                                    <div className="menu-icon-container shrink-0">
-                                        <item.icon size={20} className="menu-item-icon" />
+                                    {discoverItems.map(item => (
+                                        <button 
+                                            key={item.id}
+                                            onClick={() => {
+                                                if (item.action) item.action();
+                                                else if (item.path) { navigate(item.path); setOpenMenu(null); }
+                                            }}
+                                            className="flex items-center gap-4 p-4 hover:bg-black/[0.02] dark:hover:bg-white/5 rounded-2xl transition-all group border border-transparent hover:border-black/5 dark:hover:border-white/10 text-left w-full"
+                                        >
+                                            <div className="menu-icon-container shrink-0 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
+                                                <item.icon size={20} />
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <span className="text-[14px] font-semibold menu-item-text">{item.label}</span>
+                                                <span className="text-[12px] text-slate-500 dark:text-slate-400 font-normal">{item.desc}</span>
+                                            </div>
+                                        </button>
+                                    ))}
+                                </motion.div>
+                            ) : navState === 'bots' ? (
+                                <motion.div 
+                                    key="bots"
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: 20 }}
+                                    className="flex flex-col gap-6"
+                                >
+                                    <div className="flex items-center gap-4 mb-2">
+                                        <button 
+                                            onClick={() => setNavState('main')}
+                                            className="p-2 hover:bg-white/10 rounded-full text-slate-500 transition-colors"
+                                        >
+                                            <ArrowLeft size={20} />
+                                        </button>
+                                        <h3 className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-tight">Bot Kategorileri</h3>
                                     </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-[14px] font-semibold menu-item-text">{item.label}</span>
-                                        <span className="text-[12px] text-slate-500 dark:text-slate-400 font-normal">{item.desc}</span>
+                                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                                        {botsCategories.map(cat => (
+                                            <button 
+                                                key={cat.id}
+                                                onClick={() => handleCategoryClick(cat.id, 'bots')}
+                                                className="flex items-center gap-3 p-3 hover:bg-black/[0.02] dark:hover:bg-white/5 rounded-xl transition-all group text-left border border-transparent hover:border-black/5 dark:hover:border-white/10 w-full"
+                                            >
+                                                <div className="menu-icon-container !w-8 !h-8 px-0 shrink-0 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
+                                                    <cat.icon size={16} />
+                                                </div>
+                                                <span className="text-[11px] font-bold uppercase tracking-tight menu-item-text">{t(cat.label)}</span>
+                                            </button>
+                                        ))}
                                     </div>
-                                </button>
-                            ))}
-                        </div>
+                                </motion.div>
+                            ) : (
+                                <motion.div 
+                                    key="apps"
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: 20 }}
+                                    className="flex flex-col gap-6"
+                                >
+                                    <div className="flex items-center gap-4 mb-2">
+                                        <button 
+                                            onClick={() => setNavState('main')}
+                                            className="p-2 hover:bg-white/10 rounded-full text-slate-500 transition-colors"
+                                        >
+                                            <ArrowLeft size={20} />
+                                        </button>
+                                        <h3 className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-tight">Uygulama Kategorileri</h3>
+                                    </div>
+                                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                                        {appsCategories.map(cat => (
+                                            <button 
+                                                key={cat.id}
+                                                onClick={() => handleCategoryClick(cat.id, 'apps')}
+                                                className="flex items-center gap-3 p-3 hover:bg-black/[0.02] dark:hover:bg-white/5 rounded-xl transition-all group text-left border border-transparent hover:border-black/5 dark:hover:border-white/10 w-full"
+                                            >
+                                                <div className="menu-icon-container !w-8 !h-8 px-0 shrink-0 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
+                                                    <cat.icon size={16} />
+                                                </div>
+                                                <span className="text-[11px] font-bold uppercase tracking-tight menu-item-text">{t(cat.label)}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+                    <div className="col-span-4 border-l border-black/5 dark:border-white/5 pl-8 flex flex-col justify-center gap-3">
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-600 mb-2">Hızlı Bağlantılar</span>
+                        {simpleLinks.map((link, i) => (
+                            <a 
+                                key={i}
+                                href={link.path}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-blue-500 transition-all font-bold text-xs uppercase group"
+                            >
+                                {link.label}
+                                <ExternalLink size={14} className="opacity-0 group-hover:opacity-100 transition-all" />
+                            </a>
+                        ))}
                     </div>
                 </div>
             );
@@ -143,10 +249,13 @@ const NavMenu = ({
                             {investorItems.map(item => (
                                 <button 
                                     key={item.id}
+                                    onClick={() => {
+                                        if (item.path) { navigate(item.path); setOpenMenu(null); }
+                                    }}
                                     className="flex items-center gap-4 p-4 hover:bg-black/[0.02] dark:hover:bg-white/5 rounded-2xl transition-all group border border-transparent hover:border-black/5 dark:hover:border-white/10 text-left w-full"
                                 >
-                                    <div className="menu-icon-container shrink-0">
-                                        <item.icon size={20} className="menu-item-icon" />
+                                    <div className="menu-icon-container shrink-0 flex items-center justify-center text-slate-400 group-hover:text-emerald-500 transition-colors">
+                                        <item.icon size={20} />
                                     </div>
                                     <div className="flex flex-col">
                                         <span className="text-[14px] font-semibold menu-item-text">{item.label}</span>
@@ -156,6 +265,21 @@ const NavMenu = ({
                             ))}
                         </div>
                     </div>
+                    <div className="col-span-4 border-l border-black/5 dark:border-white/5 pl-8 flex flex-col justify-center gap-3">
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-600 mb-2">Yatırım Linkleri</span>
+                        {simpleLinks.map((link, i) => (
+                            <a 
+                                key={i}
+                                href={link.path}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-emerald-500 transition-all font-bold text-xs uppercase group"
+                            >
+                                {link.label}
+                                <ExternalLink size={14} className="opacity-0 group-hover:opacity-100 transition-all" />
+                            </a>
+                        ))}
+                    </div>
                 </div>
             );
         }
@@ -163,113 +287,198 @@ const NavMenu = ({
 
     return (
         <>
-        <div className="sticky top-0 z-[100] min-h-[64px] md:h-[72px] py-2 md:py-0 flex items-center bg-white dark:bg-slate-900 border-b border-[#f7f7f7] dark:border-white/5 w-full transition-colors" ref={internalMenuRef}>
-            <div className="max-w-7xl mx-auto px-5 sm:px-8 flex items-center justify-between gap-3 md:gap-4">
-                {/* Left Section (Logo) */}
-                <div className="flex items-center w-auto shrink-0">
-                    <Logo onClick={() => navigate('/')} className="cursor-pointer" />
-                </div>
-
-                {/* Mobile Search Button */}
-                <div className="flex md:hidden flex-1 justify-center">
+        <header ref={internalMenuRef} className="sticky top-0 z-40 bg-white dark:bg-slate-900 border-b border-[#f7f7f7] dark:border-white/5 w-full py-2.5 transition-colors">
+            <div className="max-w-7xl mx-auto px-5 sm:px-8 flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-0">
+                
+                {/* Section 1: Center Navigation links */}
+                <div className="flex items-center justify-center gap-4 md:gap-14 order-1 md:order-2 w-full md:w-auto pb-1.5 md:pb-0 border-b md:border-b-0 border-slate-100 dark:border-white/5 md:border-transparent">
+                    {/* Discover / Keşfet */}
                     <button 
-                        onClick={() => { haptic('light'); navigate('/search'); }}
-                        className="w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-slate-800/50 border border-black/5 dark:border-white/10 rounded-xl text-slate-500 active:scale-95 transition-all"
+                        onClick={() => { haptic('light'); navigate('/'); }}
+                        className="nav-menu-item text-slate-600 dark:text-slate-400 hover:bg-blue-500/5 grow-0 whitespace-nowrap"
+                        id="nav-explore-btn"
                     >
-                        <Search size={20} />
+                        {t('nav_explore')}
                     </button>
-                </div>
 
-                {/* Center Section (Navigation & Search) */}
-                <div className="hidden md:flex items-center justify-center gap-8 md:gap-10 flex-1">
-                    <div className="flex items-center gap-6">
-                        {/* Discover / Keşfet */}
+                    {/* Categories / Kategoriler */}
+                    <div 
+                        className="relative md:static"
+                        onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('kesfet'); }}
+                    >
                         <button 
-                            onClick={() => { haptic('light'); navigate('/'); }}
-                            className="nav-menu-item text-slate-600 dark:text-slate-400 hover:bg-blue-500/5 grow-0 whitespace-nowrap"
+                            onClick={() => {
+                                if (window.innerWidth < 768) {
+                                    haptic('light');
+                                    setMobileModal('kesfet');
+                                } else {
+                                    setOpenMenu(openMenu === 'kesfet' ? null : 'kesfet');
+                                }
+                            }}
+                            className={`nav-menu-item grow-0 ${openMenu === 'kesfet' ? 'text-slate-900 dark:text-white bg-blue-500/5' : 'text-slate-600 dark:text-slate-400 hover:bg-blue-500/5'}`}
+                            id="nav-categories-btn"
                         >
-                            {t('nav_explore')}
-                        </button>
-
-                        {/* Categories / Kategoriler */}
-                        <div 
-                            className="relative md:static"
-                            onMouseEnter={() => { if (window.innerWidth >= 768) setOpenMenu('kesfet'); }}
-                        >
-                            <button 
-                                onClick={() => {
-                                    if (window.innerWidth < 768) {
-                                        haptic('light');
-                                        setMobileModal('kesfet');
-                                    } else {
-                                        setOpenMenu(openMenu === 'kesfet' ? null : 'kesfet');
-                                    }
-                                }}
-                                className={`nav-menu-item grow-0 ${openMenu === 'kesfet' ? 'text-slate-900 dark:text-white bg-blue-500/5' : 'text-slate-600 dark:text-slate-400 hover:bg-blue-500/5'}`}
-                            >
-                                Kategoriler <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'kesfet' ? 'rotate-180' : ''}`} />
-                            </button>
-                        </div>
-
-                        {/* My Bots / Botlarım */}
-                        <button 
-                            onClick={() => { haptic('light'); navigate('/my-bots'); }}
-                            className="nav-menu-item text-slate-600 dark:text-slate-400 hover:bg-blue-500/5 whitespace-nowrap"
-                        >
-                            {t('my_bots')}
+                            Kategoriler <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${openMenu === 'kesfet' ? 'rotate-180' : ''}`} />
                         </button>
                     </div>
 
-                    {/* Search Bar */}
-                    <form onSubmit={handleSearch} className="flex-1 max-w-sm">
-                        <div className="relative flex items-center bg-slate-50 dark:bg-slate-800/50 border border-black/5 dark:border-white/10 rounded-xl p-1 group">
-                            <Search size={16} className="ml-2 text-slate-400 group-focus-within:text-blue-500" />
-                            <input 
-                                type="text"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder={t('search_placeholder')}
-                                className="w-full bg-transparent border-none focus:ring-0 text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 text-slate-700 dark:text-slate-200"
-                            />
-                        </div>
-                    </form>
+                    {/* My Bots / Botlarım */}
+                    <button 
+                        onClick={() => { haptic('light'); navigate('/my-bots'); }}
+                        className="nav-menu-item text-slate-600 dark:text-slate-400 hover:bg-blue-500/5"
+                        id="nav-my-bots-btn"
+                    >
+                        {t('my_bots')}
+                    </button>
                 </div>
 
-                {/* Profile Section */}
-                <div className="flex items-center justify-end w-auto shrink-0 gap-2 md:gap-3">
-                    <button 
-                        onClick={() => { haptic('light'); toggleTheme(); }} 
-                        className="hidden md:flex nav-menu-item min-w-[33px] px-2 items-center justify-center bg-transparent hover:bg-slate-100/50 dark:hover:bg-white/5 border border-black/5 dark:border-white/5 rounded-[10px] text-slate-900 dark:text-white active:scale-95 transition-all outline-none"
-                    >
-                        {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
-                    </button>
-
-                    {user ? null : (
+                {/* Section 2 & 3 Mobile-Row Container */}
+                <div className="flex md:contents items-center justify-between order-2 md:order-none w-full md:w-auto">
+                    {/* Section 2: Geri / return button */}
+                    <div className="flex items-center justify-start md:order-1 md:w-48 shrink-0">
                         <button 
-                            onClick={() => { haptic('light'); setIsLoginModalOpen(true); }}
-                            className="nav-menu-item bg-blue-600 hover:bg-blue-700 text-white border-none text-[10px] font-black uppercase tracking-widest px-4 md:px-6 shadow-lg shadow-blue-500/20 active:scale-95 transition-all whitespace-nowrap"
+                            onClick={() => {
+                                haptic('light');
+                                navigate(-1);
+                            }}
+                            className="group flex items-center gap-2 text-[11px] font-black uppercase tracking-wider text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                            id="header-back-btn"
                         >
-                            {t('home_login')}
+                            <span className="p-1 rounded-lg bg-slate-100 dark:bg-slate-800 group-hover:bg-slate-200 dark:group-hover:bg-slate-700 transition-colors">
+                                <ChevronLeft size={14} />
+                            </span>
+                            <span>Geri</span>
                         </button>
-                    )}
+                    </div>
+
+                    {/* Section 3: Right Side: Theme toggle + Profile */}
+                    <div className="flex items-center justify-end md:order-3 md:w-48 gap-3 shrink-0">
+                        <button 
+                            onClick={() => { haptic('light'); toggleTheme(); }} 
+                            className="w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 border border-black/5 dark:border-white/5 rounded-xl text-slate-900 dark:text-white active:scale-95 transition-all outline-none shrink-0"
+                            id="header-theme-toggle"
+                        >
+                            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                        </button>
+
+                        {!user || !user.id || user.id === 'guest_user' ? (
+                            <button 
+                                onClick={() => { haptic('light'); setIsLoginModalOpen(true); }}
+                                className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white border-none text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-blue-500/20 active:scale-95 transition-all whitespace-nowrap"
+                                id="header-login-btn"
+                            >
+                                {t('home_login')}
+                            </button>
+                        ) : (
+                            <div className="relative" ref={parentMenuRef}>
+                                <button 
+                                    onClick={() => { haptic('light'); setIsMenuOpen(!isMenuOpen); }}
+                                    className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 bg-slate-50 dark:bg-slate-900 border border-slate-200/40 dark:border-slate-800/20 rounded-xl transition-all active:scale-95 duration-150 shadow-xs"
+                                    id="header-profile-menu-btn"
+                                >
+                                    <img 
+                                        src={currentUser.avatar} 
+                                        className="w-5 h-5 rounded-full object-cover"
+                                        alt=""
+                                        referrerPolicy="no-referrer"
+                                    />
+                                    <span className="max-w-[70px] sm:max-w-[100px] truncate">{currentUser.name}</span>
+                                    <ChevronDown size={12} className={`text-slate-400 dark:text-slate-500 transition-transform duration-200 ${isMenuOpen ? 'rotate-180' : ''}`} />
+                                </button>
+
+                                {isMenuOpen && (
+                                    <div className="absolute right-0 top-full mt-2 w-60 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-2xl shadow-2xl p-2 z-[100] animate-in fade-in zoom-in-95 duration-200">
+                                        <div className="p-4 border-b border-slate-100 dark:border-white/5 mb-2">
+                                            <div className="flex items-center gap-3">
+                                                <img 
+                                                    src={currentUser.avatar} 
+                                                    alt={currentUser.name}
+                                                    className="w-10 h-10 rounded-full object-cover"
+                                                    referrerPolicy="no-referrer"
+                                                />
+                                                <div className="flex flex-col min-w-0">
+                                                    <span className="text-[13px] font-bold text-slate-900 dark:text-white truncate">
+                                                        {currentUser.name}
+                                                    </span>
+                                                    <span className="text-[10px] text-slate-500 truncate">@{user?.username || currentUser.id}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <button onClick={() => { haptic('light'); navigate('/'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group text-left">
+                                            <Store size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                            <span className="text-xs font-bold uppercase tracking-tight">{t('market')}</span>
+                                        </button>
+
+                                        <button onClick={() => { haptic('light'); navigate('/profile'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group text-left">
+                                            <UserIcon size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                            <span className="text-xs font-bold uppercase tracking-tight">{t('profile')}</span>
+                                        </button>
+
+                                        <button onClick={() => { haptic('light'); navigate('/my-bots'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group text-left">
+                                            <BotIcon size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                            <span className="text-xs font-bold uppercase tracking-tight">{t('my_bots')}</span>
+                                        </button>
+
+                                        <button onClick={() => { haptic('light'); navigate('/channels'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group text-left">
+                                            <Megaphone size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                            <span className="text-xs font-bold uppercase tracking-tight">{t('my_channels')}</span>
+                                        </button>
+
+                                        <button onClick={() => { haptic('light'); navigate('/notifications'); setIsMenuOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group text-left">
+                                            <div className="flex items-center gap-3">
+                                                <Bell size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                                <span className="text-xs font-bold uppercase tracking-tight">{t('notifications')}</span>
+                                            </div>
+                                            {unreadCount > 0 && <div className="w-2 h-2 bg-red-500 rounded-full" />}
+                                        </button>
+
+                                        <button onClick={() => { haptic('light'); navigate('/qa'); setIsMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group text-left">
+                                            <MessageSquare size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
+                                            <span className="text-xs font-bold uppercase tracking-tight">{t('qa_forum') || 'Soru Cevap Forumu'}</span>
+                                        </button>
+
+                                        <div className="h-px bg-slate-100 dark:border-white/5 my-2" />
+                                        
+                                        <button 
+                                            onClick={() => { 
+                                                const confirmed = window.confirm("Çıkış yapmak istediğinize emin misiniz?");
+                                                if (confirmed) {
+                                                    haptic('medium'); 
+                                                    setWebAuthUser(null);
+                                                    setIsMenuOpen(false); 
+                                                    navigate('/');
+                                                }
+                                            }} 
+                                            className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 text-red-500 transition-all font-bold text-xs uppercase text-left"
+                                        >
+                                            <LogOut size={18} /> 
+                                            <span className="text-xs font-bold uppercase tracking-tight">{t('home_logout')}</span>
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
-            {/* Desktop Mega Menu Overlay */}
+            {/* Desktop Mega Menu Dropdown */}
             <AnimatePresence>
                 {openMenu && (
                     <motion.div 
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="absolute top-full left-0 w-full bg-white dark:bg-slate-900 border-b border-black/5 dark:border-white/5 shadow-2xl py-8 hidden md:block"
-                        onMouseLeave={() => setOpenMenu(null)}
+                        transition={{ duration: 0.2 }}
+                        className="hidden md:block absolute left-0 right-0 top-full bg-white dark:bg-slate-900/95 backdrop-blur-xl border-b border-black/5 dark:border-white/10 shadow-2xl z-[100] mega-menu-container"
+                        onMouseLeave={() => { setOpenMenu(null); setNavState('main'); }}
                     >
                         {renderMegaMenuContent()}
                     </motion.div>
                 )}
             </AnimatePresence>
-        </div>
+        </header>
 
         {/* Mobile Mega Menus */}
         <AnimatePresence>
@@ -293,7 +502,7 @@ const NavMenu = ({
                             <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase italic">
                                 {mobileModal === 'kesfet' ? 'Keşfet' : 'Yatırımcılar'}
                             </h3>
-                            <button onClick={() => setMobileModal(null)} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-500">
+                            <button onClick={() => setMobileModal(null)} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400">
                                 <X size={20} />
                             </button>
                         </div>
@@ -716,8 +925,8 @@ const BotDetail = () => {
                   )}
               </h1>
               <div className="flex flex-wrap gap-2 mb-3">
-                  <span className="bg-brand/10 border border-brand/20 text-brand dark:text-brand-light text-[10px] font-bold px-3 py-1 rounded-xl uppercase flex items-center gap-1">
-                      <ShieldCheck size={12} /> {t('verified')}
+                  <span className="bg-brand/10 border border-brand/20 text-brand dark:text-brand-light text-[10px] font-bold px-3 py-1 rounded-xl flex items-center gap-1">
+                      @{bot.bot_link ? bot.bot_link.replace('@', '').replace('https://t.me/', '').split('/').pop()?.trim() : bot.name.replace(/\s+/g, '')}
                   </span>
               </div>
           </div>

@@ -619,7 +619,7 @@ export default function QAForum() {
   };
 
   return (
-    <div className="bg-[#f8fafc] dark:bg-slate-950 min-h-screen text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300 pb-20">
+    <div className="bg-slate-50 dark:bg-slate-950 min-h-screen text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300 pb-20">
       <style>{`
         @media (max-width: 767px) {
           .gap-8 {
@@ -692,7 +692,7 @@ export default function QAForum() {
                 }}
                 className="group flex items-center gap-2 text-[11px] font-black uppercase tracking-wider text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
               >
-                <span className="p-1 rounded-lg bg-slate-100 dark:bg-slate-800 group-hover:bg-slate-200 dark:group-hover:bg-slate-705 transition-colors">
+                <span className="p-1 rounded-lg bg-slate-100 dark:bg-slate-800 group-hover:bg-slate-200 dark:group-hover:bg-slate-700 transition-colors">
                   <ChevronLeft size={14} />
                 </span>
                 <span>{isDetailView ? 'Geri Dön' : 'Geri'}</span>
@@ -928,7 +928,7 @@ export default function QAForum() {
                               className={`hidden sm:flex flex-col items-center p-2 rounded-xl border transition-all shrink-0 w-11 h-14 justify-center ${
                                 hasUpvoted 
                                   ? 'bg-indigo-50 dark:bg-indigo-950/40 border-indigo-200/80 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400' 
-                                  : 'bg-white dark:bg-slate-900 border-slate-200/60 dark:border-slate-800 hover:border-slate-350 dark:hover:border-slate-750 text-slate-400 hover:text-slate-600'
+                                  : 'bg-white dark:bg-slate-900 border-slate-200/60 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-400 hover:text-slate-600'
                               }`}
                             >
                               <Triangle size={12} className={`mb-1 fill-current stroke-current transition-transform duration-300 ${hasUpvoted ? 'scale-110' : ''}`} />
@@ -959,7 +959,7 @@ export default function QAForum() {
                                       {formatDisplayAuthor(topic.author_name)}
                                     </span>
                                   </div>
-                                  <span className="text-[10px] text-slate-350 dark:text-slate-650">•</span>
+                                  <span className="text-[10px] text-slate-300 dark:text-slate-600">•</span>
                                   <span className="text-xs text-slate-400">
                                     {formatTimeRelative(topic.created_at)}
                                   </span>
@@ -974,7 +974,7 @@ export default function QAForum() {
                                   )}
                                   <button 
                                     onClick={(e) => { e.stopPropagation(); haptic('light'); }}
-                                    className="text-slate-350 hover:text-indigo-500 transition-colors p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-900"
+                                    className="text-slate-300 hover:text-indigo-500 transition-colors p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-900"
                                   >
                                     <Bookmark size={14} />
                                   </button>
@@ -1005,7 +1005,7 @@ export default function QAForum() {
                                       />
                                     ))}
                                     {topic.comments_count > 3 && (
-                                      <div className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-850 ring-2 ring-white dark:ring-slate-950 text-[7px] font-bold text-slate-500">
+                                      <div className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 ring-2 ring-white dark:ring-slate-950 text-[7px] font-bold text-slate-500">
                                         +{topic.comments_count - 3}
                                       </div>
                                     )}
@@ -1080,7 +1080,7 @@ export default function QAForum() {
                             alt=""
                           />
                           <div>
-                            <h3 className="text-sm font-black text-slate-850 dark:text-white leading-tight group-hover/author-detail:text-indigo-500 transition-colors">
+                            <h3 className="text-sm font-black text-slate-800 dark:text-white leading-tight group-hover/author-detail:text-indigo-500 transition-colors">
                               {formatDisplayAuthor(activeTopic.author_name)}
                             </h3>
                           </div>
@@ -1098,7 +1098,7 @@ export default function QAForum() {
                       {/* Centered Interaction metrics row matched to image 3 layout */}
                       <div className="flex items-center gap-3 mb-6">
                         <button 
-                          onClick={() => handleUpvote(activeTopic.id)}
+                           onClick={() => handleUpvote(activeTopic.id)}
                           className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all ${
                             activeTopic.upvoted_users?.includes(currentUser.id)
                               ? 'bg-indigo-50 dark:bg-indigo-950/40 border-indigo-200/80 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 shadow-inner'
@@ -1109,7 +1109,7 @@ export default function QAForum() {
                           <span>{activeTopic.upvotes_count || 0}</span>
                         </button>
                         
-                        <span className="text-slate-300 dark:text-slate-750 font-mono">/</span>
+                        <span className="text-slate-300 dark:text-slate-700 font-mono">/</span>
 
                         <span className="text-slate-400 text-xs font-semibold flex items-center gap-1">
                           <MessageSquare size={13} /> {activeTopic.comments_count || 0} Cevap yazıldı
@@ -1127,7 +1127,7 @@ export default function QAForum() {
                           {activeTopic.tags.map(tag => (
                             <span 
                               key={tag.id}
-                              className="bg-slate-100 dark:bg-slate-850 text-slate-500 dark:text-slate-400 font-bold px-3 py-1 rounded-lg text-xs hover:text-indigo-500 transition-colors"
+                              className="bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-bold px-3 py-1 rounded-lg text-xs hover:text-indigo-500 transition-colors"
                             >
                               # {tag.name}
                             </span>
@@ -1182,7 +1182,7 @@ export default function QAForum() {
                           placeholder="Düşüncelerinizi paylaşın..." 
                           className="w-full text-sm text-slate-800 dark:text-slate-200 bg-transparent py-2 resize-none outline-none min-h-[90px] placeholder:italic placeholder:text-slate-400"
                         />
-                        <span className="absolute bottom-2 right-2 text-[10px] text-slate-350 dark:text-slate-650 font-bold font-mono">
+                        <span className="absolute bottom-2 right-2 text-[10px] text-slate-300 dark:text-slate-600 font-bold font-mono">
                           M↓
                         </span>
                       </div>
@@ -1232,7 +1232,7 @@ export default function QAForum() {
                                             haptic('light');
                                             navigate(`/user/${comment.author_id}`);
                                           }}
-                                          className="text-xs font-black text-slate-850 dark:text-white cursor-pointer hover:text-indigo-500 transition-colors"
+                                          className="text-xs font-black text-slate-800 dark:text-white cursor-pointer hover:text-indigo-500 transition-colors"
                                         >
                                           {formatDisplayAuthor(comment.author_name)}
                                         </span>
@@ -1240,7 +1240,7 @@ export default function QAForum() {
                                           {formatTimeRelative(comment.created_at)}
                                         </span>
                                       </div>
-                                      <p className="text-sm text-slate-600 dark:text-slate-350 leading-relaxed max-w-full overflow-hidden whitespace-pre-wrap">
+                                      <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-full overflow-hidden whitespace-pre-wrap">
                                         {comment.content}
                                       </p>
                                       
@@ -1263,7 +1263,7 @@ export default function QAForum() {
 
                                   {/* Inline Reply Form under root comment */}
                                   {activeReplyCommentId === comment.id && (
-                                    <div className="mt-3 ml-11 bg-slate-50/60 dark:bg-slate-900/40 p-3 rounded-2xl border border-slate-250/20 dark:border-slate-800/30 flex flex-col gap-2 shadow-xs">
+                                    <div className="mt-3 ml-11 bg-slate-50/60 dark:bg-slate-900/40 p-3 rounded-2xl border border-slate-200/20 dark:border-slate-800/30 flex flex-col gap-2 shadow-xs">
                                       <div className="flex items-center justify-between">
                                         <span className="text-[10px] font-black text-indigo-500 dark:text-indigo-450 uppercase tracking-widest font-mono">
                                           {formatDisplayAuthor(comment.author_name)} kullanıcısına yanıt veriyorsunuz
@@ -1321,7 +1321,7 @@ export default function QAForum() {
                                                   haptic('light');
                                                   navigate(`/user/${reply.author_id}`);
                                                 }}
-                                                className="text-[11px] font-black text-slate-850 dark:text-slate-200 cursor-pointer hover:text-indigo-500 transition-colors"
+                                                className="text-[11px] font-black text-slate-800 dark:text-slate-200 cursor-pointer hover:text-indigo-500 transition-colors"
                                               >
                                                 {formatDisplayAuthor(reply.author_name)}
                                               </span>
@@ -1329,7 +1329,7 @@ export default function QAForum() {
                                                 {formatTimeRelative(reply.created_at)}
                                               </span>
                                             </div>
-                                            <p className="text-xs text-slate-600 dark:text-slate-350 leading-relaxed max-w-full overflow-hidden whitespace-pre-wrap">
+                                            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed max-w-full overflow-hidden whitespace-pre-wrap">
                                               {reply.content}
                                             </p>
                                             
@@ -1391,7 +1391,7 @@ export default function QAForum() {
                       }
                       fetchTopics(selectedFilter, tag.name);
                     }}
-                    className="px-3 py-1.5 bg-slate-50 dark:bg-slate-850 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 border border-slate-200/30 dark:border-slate-800 rounded-xl text-xs font-bold transition-all"
+                    className="px-3 py-1.5 bg-slate-50 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 border border-slate-200/30 dark:border-slate-800 rounded-xl text-xs font-bold transition-all"
                   >
                     #{tag.name}
                   </button>
@@ -1478,7 +1478,7 @@ export default function QAForum() {
                   value={newContent}
                   onChange={(e) => setNewContent(e.target.value)}
                   placeholder="Açıklama: Type '/' for commands..." 
-                  className="w-full text-sm bg-transparent text-slate-600 dark:text-slate-350 outline-none border-none py-2 px-0 resize-none min-h-[140px] placeholder:text-slate-400/80"
+                  className="w-full text-sm bg-transparent text-slate-600 dark:text-slate-300 outline-none border-none py-2 px-0 resize-none min-h-[140px] placeholder:text-slate-400/80"
                 />
               </div>
 
@@ -1489,7 +1489,7 @@ export default function QAForum() {
                   {selectedTags.map(tag => (
                     <span 
                       key={tag.id}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-50 dark:bg-slate-850 text-slate-600 dark:text-slate-300 rounded-lg text-xs font-bold ring-1 ring-slate-200/50 dark:ring-slate-800"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-lg text-xs font-bold ring-1 ring-slate-200/50 dark:ring-slate-800"
                     >
                       <span>#{tag.name}</span>
                       <button 
@@ -1543,7 +1543,7 @@ export default function QAForum() {
               <div className="flex items-center justify-end gap-3 border-t border-slate-100 dark:border-slate-800/60 pt-4">
                 <button 
                   onClick={() => { haptic('light'); setShowCreateModal(false); }}
-                  className="text-xs font-bold text-slate-450 hover:text-slate-650 dark:text-slate-500 transition-colors shrink-0 px-3 py-2"
+                  className="text-xs font-bold text-slate-400 hover:text-slate-600 dark:text-slate-500 transition-colors shrink-0 px-3 py-2"
                 >
                   İptal etmek
                 </button>
@@ -1612,11 +1612,11 @@ export default function QAForum() {
                             <item.icon size={22} className="menu-item-icon" />
                           </div>
                           <div className="flex flex-col items-start min-w-0">
-                            <span className="text-[13px] font-black text-slate-850 dark:text-slate-200 uppercase tracking-wider truncate w-full text-left">
+                            <span className="text-[13px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider truncate w-full text-left">
                               {item.label}
                             </span>
                           </div>
-                          {item.action && <ChevronRight size={16} className="ml-auto text-slate-300 dark:text-slate-705" />}
+                          {item.action && <ChevronRight size={16} className="ml-auto text-slate-300 dark:text-slate-700" />}
                         </button>
                       ))}
                     </motion.div>
@@ -1689,7 +1689,7 @@ export default function QAForum() {
                         <a 
                           key={i}
                           href={link.path}
-                          className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-slate-305 font-bold text-xs uppercase"
+                          className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-slate-300 font-bold text-xs uppercase"
                         >
                           {link.label}
                           <ExternalLink size={14} />

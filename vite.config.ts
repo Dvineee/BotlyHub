@@ -23,6 +23,32 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       outDir: 'dist',
+      sourcemap: false,
+      chunkSizeWarningLimit: 1200,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (id.includes('ethers') || id.includes('@ethersproject')) {
+                return 'vendor-ethers';
+              }
+              if (id.includes('lucide-react')) {
+                return 'vendor-lucide';
+              }
+              if (id.includes('recharts') || id.includes('d3')) {
+                return 'vendor-charts';
+              }
+              if (id.includes('@supabase') || id.includes('supabase')) {
+                return 'vendor-supabase';
+              }
+              if (id.includes('@tonconnect') || id.includes('ton-core') || id.includes('ton')) {
+                return 'vendor-ton';
+              }
+              return 'vendor-common';
+            }
+          }
+        }
+      }
     },
     server: {
       host: true,

@@ -119,7 +119,7 @@ const BlogPage: React.FC = () => {
   const regularPosts = featuredPost ? filteredPosts.filter(p => p.id !== featuredPost.id) : filteredPosts;
 
   return (
-    <div className="bg-[#fcfcfc] dark:bg-slate-950 min-h-screen text-slate-900 dark:text-slate-100 font-sans blog-page-scope">
+    <div className="bg-slate-50 dark:bg-slate-950 min-h-screen text-slate-900 dark:text-slate-100 font-sans blog-page-scope transition-colors duration-300">
       <SEO 
           title={`${t('blog_title')} - ${t('blog_subtitle')}`} 
           description={t('blog_community_desc')} 
@@ -383,7 +383,7 @@ const BlogPage: React.FC = () => {
       <div className="max-w-[1400px] mx-auto flex">
         
         {/* Left Sidebar - Hashnode Style */}
-        <aside className={`hidden lg:flex flex-col ${isSidebarCollapsed ? 'w-20 overflow-visible' : 'w-64'} h-screen sticky top-0 z-[100] border-r border-slate-100 dark:border-white/5 py-8 transition-all duration-300 bg-[#fcfcfc] dark:bg-slate-950`}>
+        <aside className={`hidden lg:flex flex-col ${isSidebarCollapsed ? 'w-20 overflow-visible' : 'w-64'} h-screen sticky top-0 z-[100] border-r border-slate-100 dark:border-white/5 py-8 transition-all duration-300 bg-slate-50 dark:bg-slate-950`}>
           <div className="px-6 flex items-center justify-between mb-10 shrink-0">
             {!isSidebarCollapsed && <Logo />}
             <button 

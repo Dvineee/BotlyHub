@@ -298,7 +298,7 @@ const BlogPostDetail: React.FC = () => {
 
   if (!post) {
     return (
-      <div className="bg-[#fcfcfc] dark:bg-slate-950 min-h-screen flex flex-col items-center justify-center space-y-6 p-8 text-center">
+      <div className="bg-slate-50 dark:bg-slate-950 min-h-screen flex flex-col items-center justify-center space-y-6 p-8 text-center transition-colors duration-300">
         <BotIcon size={64} className="text-slate-800" />
         <h2 className="text-2xl font-black uppercase italic tracking-tighter">{t('blog_not_found')}</h2>
         <p className="text-slate-500 max-w-xs text-sm font-medium">{t('blog_not_found_desc')}</p>
@@ -308,7 +308,7 @@ const BlogPostDetail: React.FC = () => {
   }
 
   return (
-    <div className="bg-[#fcfcfc] dark:bg-slate-950 min-h-screen text-slate-900 dark:text-slate-100 font-sans blog-page-scope">
+    <div className="bg-slate-50 dark:bg-slate-950 min-h-screen text-slate-900 dark:text-slate-100 font-sans blog-page-scope transition-colors duration-300">
       <SEO 
         title={`${post.title}`} 
         description={post.title} 
@@ -505,7 +505,7 @@ const BlogPostDetail: React.FC = () => {
       <div className="max-w-[1400px] mx-auto flex">
         
         {/* Left Sidebar - Consistent with BlogPage */}
-        <aside className={`hidden lg:flex flex-col ${isSidebarCollapsed ? 'w-20 overflow-visible' : 'w-64'} h-screen sticky top-0 z-[100] border-r border-slate-100 dark:border-white/5 py-8 transition-all duration-300 bg-[#fcfcfc] dark:bg-slate-950`}>
+        <aside className={`hidden lg:flex flex-col ${isSidebarCollapsed ? 'w-20 overflow-visible' : 'w-64'} h-screen sticky top-0 z-[100] border-r border-slate-100 dark:border-white/5 py-8 transition-all duration-300 bg-slate-50 dark:bg-slate-950`}>
           <div className="px-6 flex items-center justify-between mb-10 shrink-0">
             {!isSidebarCollapsed && <Logo onClick={() => navigate('/blog')} className="cursor-pointer" />}
             <button 

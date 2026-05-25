@@ -497,7 +497,7 @@ export default function UserProfile() {
                                 </div>
                                 <div className="flex items-center justify-between text-xs">
                                     <span className="text-slate-400 font-medium uppercase tracking-wide">Hesap Türü</span>
-                                    <span className={`font-extrabold uppercase px-2 py-0.5 rounded-lg text-[9px] ${profile.is_premium ? 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-450'}`}>
+                                    <span className={`font-extrabold uppercase px-2 py-0.5 rounded-lg text-[9px] ${profile.is_premium ? 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'}`}>
                                         {profile.is_premium ? 'Premium Kaşif' : 'Standart Kaşif'}
                                     </span>
                                 </div>
@@ -523,13 +523,13 @@ export default function UserProfile() {
                     <div className="md:col-span-8 space-y-6">
                         
                         {/* Profile Tabs precisely aligned (matches design language of screenshot) */}
-                        <div className="flex items-center gap-2 pb-2.5 border-b border-slate-200/50 dark:border-slate-850 mb-6 flex-wrap">
+                        <div className="flex items-center gap-2 pb-2.5 border-b border-slate-200/50 dark:border-slate-800 mb-6 flex-wrap">
                             <button 
                                 onClick={() => { haptic('light'); setActiveTab('library'); }}
                                 className={`py-1.5 px-4 text-xs font-bold tracking-tight rounded-full transition-all flex items-center gap-1.5 ${
                                     activeTab === 'library' 
                                         ? 'bg-slate-200/70 dark:bg-slate-800 text-slate-950 dark:text-white font-black' 
-                                        : 'text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-350'
+                                        : 'text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-300'
                                 }`}
                             >
                                 <span>{t('profile_bots') || 'Botlar'}</span>
@@ -545,7 +545,7 @@ export default function UserProfile() {
                                 className={`py-1.5 px-4 text-xs font-bold tracking-tight rounded-full transition-all flex items-center gap-1.5 ${
                                     activeTab === 'channels' 
                                         ? 'bg-slate-200/70 dark:bg-slate-800 text-slate-950 dark:text-white font-black' 
-                                        : 'text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-350'
+                                        : 'text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-300'
                                 }`}
                             >
                                 <span>{t('my_channels') || 'Kanallar'}</span>
@@ -561,7 +561,7 @@ export default function UserProfile() {
                                 className={`py-1.5 px-4 text-xs font-bold tracking-tight rounded-full transition-all flex items-center gap-1.5 ${
                                     activeTab === 'qa' 
                                         ? 'bg-slate-200/70 dark:bg-slate-800 text-slate-950 dark:text-white font-black' 
-                                        : 'text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-350'
+                                        : 'text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-300'
                                 }`}
                             >
                                 <span>Soru-Cevap</span>
@@ -577,7 +577,7 @@ export default function UserProfile() {
                                 className={`py-1.5 px-4 text-xs font-bold tracking-tight rounded-full transition-all flex items-center gap-1.5 ${
                                     activeTab === 'comments' 
                                         ? 'bg-slate-200/70 dark:bg-slate-800 text-slate-950 dark:text-white font-black' 
-                                        : 'text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-350'
+                                        : 'text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-300'
                                 }`}
                             >
                                 <span>{t('profile_comments') || 'Yorumlar'}</span>
@@ -594,7 +594,7 @@ export default function UserProfile() {
                                 className={`py-1.5 px-4 text-xs font-bold tracking-tight rounded-full md:hidden flex items-center gap-1.5 ${
                                     activeTab === 'about' 
                                         ? 'bg-slate-200/70 dark:bg-slate-800 text-slate-950 dark:text-white font-black' 
-                                        : 'text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-350'
+                                        : 'text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-300'
                                 }`}
                             >
                                 <span>{t('profile_about') || 'Hakkında'}</span>
@@ -675,7 +675,7 @@ export default function UserProfile() {
                                                 </div>
                                             ) : (
                                                 <div className="bg-white dark:bg-slate-900/60 border border-slate-200/50 dark:border-slate-800/50 p-12 rounded-3xl text-center">
-                                                    <BotIcon size={32} className="mx-auto text-slate-300 dark:text-slate-650 mb-3 animate-bounce" />
+                                                    <BotIcon size={32} className="mx-auto text-slate-300 dark:text-slate-600 mb-3 animate-bounce" />
                                                     <h4 className="text-sm font-bold text-slate-800 dark:text-white tracking-tight mb-2">
                                                         KÜTÜPHANENİZ BOMBOŞ
                                                     </h4>
@@ -705,7 +705,7 @@ export default function UserProfile() {
                                                             className="flex items-center justify-between p-4 bg-white dark:bg-slate-900/60 border border-slate-200/50 dark:border-slate-800/40 rounded-3xl hover:border-indigo-500/20 hover:bg-slate-50 dark:hover:bg-slate-900/40 hover:shadow-sm transition-all"
                                                         >
                                                             <div className="flex items-center gap-3">
-                                                                <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-850 flex items-center justify-center text-slate-600 dark:text-slate-300 font-bold text-xs border border-slate-200/40 dark:border-slate-800/65 overflow-hidden">
+                                                                <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 font-bold text-xs border border-slate-200/40 dark:border-slate-800/65 overflow-hidden">
                                                                     {(channel.icon || channel.photo_url || channel.avatar) ? (
                                                                         <img src={channel.icon || channel.photo_url || channel.avatar} className="w-full h-full object-cover" alt="" referrerPolicy="no-referrer" />
                                                                     ) : (
@@ -732,7 +732,7 @@ export default function UserProfile() {
                                                 </div>
                                             ) : (
                                                 <div className="bg-white dark:bg-slate-900/60 border border-slate-200/50 dark:border-slate-800/50 p-12 rounded-3xl text-center">
-                                                    <Send size={32} className="mx-auto text-slate-300 dark:text-slate-650 mb-3" />
+                                                    <Send size={32} className="mx-auto text-slate-300 dark:text-slate-600 mb-3" />
                                                     <h4 className="text-sm font-bold text-slate-800 dark:text-white tracking-tight mb-2">
                                                         KANAL BULUNMADI
                                                     </h4>
@@ -774,7 +774,7 @@ export default function UserProfile() {
                                                                     {topic.tags && topic.tags.map((tag: any) => (
                                                                         <span 
                                                                             key={tag.id}
-                                                                            className="px-2.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-350 rounded-lg font-bold border border-slate-250/20"
+                                                                            className="px-2.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-lg font-bold border border-slate-200/20"
                                                                         >
                                                                             #{tag.name}
                                                                         </span>
@@ -794,7 +794,7 @@ export default function UserProfile() {
                                                 </div>
                                             ) : (
                                                 <div className="bg-white dark:bg-slate-900/60 border border-slate-200/50 dark:border-slate-800/50 p-12 rounded-3xl text-center">
-                                                    <MessageSquare size={32} className="mx-auto text-slate-300 dark:text-slate-650 mb-3" />
+                                                    <MessageSquare size={32} className="mx-auto text-slate-300 dark:text-slate-600 mb-3" />
                                                     <h4 className="text-sm font-bold text-slate-800 dark:text-white tracking-tight mb-2">
                                                         HENÜZ SORU SORULMADI
                                                     </h4>
@@ -851,7 +851,7 @@ export default function UserProfile() {
                                                             const relatedBlog = commentBlogTitlesMap[comment.blog_id];
                                                             return (
                                                                 <div key={comment.id} className="flex gap-3">
-                                                                    <div className="w-8 h-8 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-850 border border-slate-200/60 dark:border-slate-800 shrink-0 mt-0.5 shadow-sm">
+                                                                    <div className="w-8 h-8 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-200/60 dark:border-slate-800 shrink-0 mt-0.5 shadow-sm">
                                                                         <img 
                                                                             src={profile.avatar} 
                                                                             className="w-full h-full object-cover" 
@@ -859,7 +859,7 @@ export default function UserProfile() {
                                                                             referrerPolicy="no-referrer"
                                                                         />
                                                                     </div>
-
+ 
                                                                     <div className="flex-1 min-w-0">
                                                                         <div className="bg-slate-100/60 dark:bg-slate-800/60 border border-slate-200/10 dark:border-slate-700/10 px-4 py-3 rounded-2xl rounded-tl-[4px] inline-block max-w-full shadow-inner">
                                                                             <p className="text-sm text-slate-800 dark:text-slate-200 font-medium">
@@ -882,7 +882,7 @@ export default function UserProfile() {
                                                                                     <span>·</span>
                                                                                     <Link 
                                                                                         to={`/blog/${relatedBlog.slug}`}
-                                                                                        className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase text-slate-450 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors max-w-[200px] truncate"
+                                                                                        className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors max-w-[200px] truncate"
                                                                                     >
                                                                                         <ExternalLink size={9} />
                                                                                         <span className="truncate">{relatedBlog.title}</span>
@@ -908,7 +908,7 @@ export default function UserProfile() {
                                                     <div className="space-y-6">
                                                         {userQaComments.map(comment => (
                                                             <div key={comment.id} className="flex gap-3">
-                                                                    <div className="w-8 h-8 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-850 border border-slate-200/60 dark:border-slate-800 shrink-0 mt-0.5 shadow-sm">
+                                                                    <div className="w-8 h-8 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-200/60 dark:border-slate-800 shrink-0 mt-0.5 shadow-sm">
                                                                         <img 
                                                                             src={profile.avatar} 
                                                                             className="w-full h-full object-cover" 
@@ -939,7 +939,7 @@ export default function UserProfile() {
                                                                                     <span>·</span>
                                                                                     <div 
                                                                                         onClick={() => navigate('/qa', { state: { autoOpenTopicId: comment.topic_id } })}
-                                                                                        className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase text-slate-450 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors max-w-[200px] truncate cursor-pointer"
+                                                                                        className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors max-w-[200px] truncate cursor-pointer"
                                                                                     >
                                                                                         <ExternalLink size={9} />
                                                                                         <span className="truncate">{comment.topic_title || "Konuyu Görüntüle"}</span>
@@ -1070,7 +1070,7 @@ export default function UserProfile() {
                                 <button 
                                     type="button"
                                     onClick={() => { haptic('light'); setIsEditMode(false); }}
-                                    className="flex-1 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-slate-600 dark:hover:text-slate-350 border border-slate-200/40 dark:border-slate-800 rounded-xl block text-center transition-all bg-slate-50 dark:bg-slate-850"
+                                    className="flex-1 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 border border-slate-200/40 dark:border-slate-800 rounded-xl block text-center transition-all bg-slate-50 dark:bg-slate-800"
                                 >
                                     İPTAL
                                 </button>

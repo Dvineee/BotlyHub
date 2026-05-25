@@ -437,7 +437,7 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number, featuredRank?: number }> = 
   return (
     <div 
       onClick={() => navigate(`/bot/${bot.slug}`)} 
-      className="flex flex-col p-5 bg-white dark:bg-[#0F1623] border border-black/[0.06] dark:border-white/[0.06] rounded-[16px] transition-all duration-[180ms] ease-out hover:-translate-y-[2px] hover:border-black/[0.12] dark:hover:border-white/[0.12] shadow-none hover:shadow-none active:scale-[0.98] transform-gpu cursor-pointer select-none group w-full relative min-h-[175px]"
+      className="flex flex-col p-5 bg-white dark:bg-[#0F1623] border border-black/[0.06] dark:border-white/[0.06] rounded-[16px] transition-all duration-[180ms] ease-out hover:border-black/[0.12] dark:hover:border-white/[0.12] shadow-none hover:shadow-none active:scale-[0.98] transform-gpu cursor-pointer select-none group w-full relative min-h-[175px]"
     >
         {/* Top: bot identity (avatar + name) + category badge inline */}
         <div className="flex items-start justify-between gap-3 w-full mb-3.5 min-w-0">
@@ -518,7 +518,7 @@ const CategoryBotCard: React.FC<{ bot: Bot, rank: number }> = React.memo(({ bot,
   return (
     <div 
       onClick={() => navigate(`/bot/${bot.slug}`)} 
-      className="flex items-center cursor-pointer group hover:bg-slate-100/50 dark:hover:bg-slate-900/40 hover:-translate-y-0.5 border border-transparent hover:border-black/[0.03] dark:hover:border-white/[0.03] transition-all duration-300 rounded-2xl p-3 select-none active:scale-[0.98] transform-gpu"
+      className="flex items-center cursor-pointer group hover:bg-slate-100/50 dark:hover:bg-slate-900/40 border border-transparent hover:border-black/[0.03] dark:hover:border-white/[0.03] transition-all duration-300 rounded-2xl p-3 select-none active:scale-[0.98] transform-gpu"
     >
         <div className="relative shrink-0 select-none">
             <img 
@@ -584,51 +584,6 @@ const getMobileColumns = (bots: Bot[]) => {
   return cols;
 };
 
-const AddProjectBanner: React.FC<{ className?: string }> = ({ className = "" }) => {
-    const navigate = useNavigate();
-    const { t } = useTranslation();
-    
-    return (
-        <div 
-            className={`h-[128px] rounded-xl bg-white dark:bg-slate-900/60 border border-black/5 dark:border-white/10 flex items-center p-2 sm:p-3 gap-4 shrink-0 snap-center overflow-hidden cursor-pointer group backdrop-blur-xl transition-all hover:border-blue-500/30 ${className}`}
-            onClick={() => navigate('/settings')}
-        >
-            {/* Left Side: Illustration Placeholder */}
-            <div className="w-[100px] h-[100px] rounded-xl overflow-hidden relative shrink-0 bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-                <img 
-                    src="https://i.hizliresim.com/eoisiuq.png" 
-                    alt="Add Project" 
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    referrerPolicy="no-referrer"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
-            </div>
-            
-            {/* Right Side: Content */}
-            <div className="flex-1 min-w-0 pr-1 py-1 flex flex-col justify-between h-[100px]">
-                <div>
-                    <h3 className="text-slate-900 dark:text-white font-bold text-[17px] tracking-tight truncate leading-tight mb-1 group-hover:text-blue-500 transition-colors">
-                        {t('home_add_auto_title')}
-                    </h3>
-                    <p className="text-slate-400 dark:text-slate-500 text-[12px] leading-[1.4] line-clamp-2 font-medium opacity-90">
-                        {t('home_add_auto_desc')}
-                    </p>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                    <div 
-                        className="flex items-center gap-1.5 px-2 py-0.5 rounded-lg shrink-0"
-                        style={{ background: 'linear-gradient(135deg, #3B82F6, #2563EB)' }}
-                    >
-                        <span className="text-[9px] font-black text-white uppercase tracking-widest leading-none">
-                            {t('home_join_now')}
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
 
 const NavMenu = ({ 
     isScrolled, 
@@ -1675,7 +1630,7 @@ const Home = () => {
                                 className="flex items-center flex-1 min-w-0 cursor-pointer active:scale-[0.98] transition-transform"
                               >
                                   <Search size={16} className="text-[#8e8e93] dark:text-slate-400 group-hover:text-blue-500 transition-colors shrink-0 mr-2" />
-                                  <div className="w-full text-[13px] text-[#2c2c2e] dark:text-slate-350 font-bold truncate min-w-0 tracking-wide">
+                                  <div className="w-full text-[13px] text-[#2c2c2e] dark:text-slate-300 font-bold truncate min-w-0 tracking-wide">
                                       Herşeyi ara
                                   </div>
                               </div>
@@ -2110,9 +2065,11 @@ const Home = () => {
                                     </div>
 
                                     {/* Top 3 Featured Cards for this section */}
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-4 animate-in fade-in slide-in-from-bottom-2 duration-700">
+                                    <div className="flex md:grid md:grid-cols-3 gap-5 mb-4 overflow-x-auto no-scrollbar pb-3 md:pb-0 snap-x snap-mandatory animate-in fade-in slide-in-from-bottom-2 duration-700">
                                         {featuredBots.map((bot, index) => (
-                                            <BotCard key={bot.id} bot={bot} tonRate={tonRate} featuredRank={index + 1} />
+                                            <div key={bot.id} className="min-w-[280px] w-[85%] sm:min-w-[320px] md:w-full snap-center shrink-0">
+                                                <BotCard bot={bot} tonRate={tonRate} featuredRank={index + 1} />
+                                            </div>
                                         ))}
                                     </div>
 
@@ -2173,10 +2130,6 @@ const Home = () => {
                         );
                     })()}
 
-                    {/* Mobile Banner between sections */}
-                    <div className="px-4 mb-10 sm:hidden">
-                        <AddProjectBanner />
-                    </div>
 
                     {/* Bots Section */}
                     {categorizedBots['bots'] && (() => {
@@ -2212,9 +2165,11 @@ const Home = () => {
                                     </div>
 
                                     {/* Top 3 Featured Cards for this section */}
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-4 animate-in fade-in slide-in-from-bottom-2 duration-700">
+                                    <div className="flex md:grid md:grid-cols-3 gap-5 mb-4 overflow-x-auto no-scrollbar pb-3 md:pb-0 snap-x snap-mandatory animate-in fade-in slide-in-from-bottom-2 duration-700">
                                         {featuredBots.map((bot, index) => (
-                                            <BotCard key={bot.id} bot={bot} tonRate={tonRate} featuredRank={index + 1} />
+                                            <div key={bot.id} className="min-w-[280px] w-[85%] sm:min-w-[320px] md:w-full snap-center shrink-0">
+                                                <BotCard bot={bot} tonRate={tonRate} featuredRank={index + 1} />
+                                            </div>
                                         ))}
                                     </div>
 
@@ -2755,15 +2710,6 @@ const AnnouncementsCarousel: React.FC<{
 
     return (
         <div className="w-full flex flex-col gap-4">
-            <div className="flex items-center gap-2 px-1">
-                <h2 className="text-[19px] sm:text-[21px] font-[900] text-slate-900 dark:text-white tracking-widest uppercase italic font-sans leading-none">
-                    {t('home_promotions_title') || 'İlginizi Çekebilir'}
-                </h2>
-                <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-slate-800 px-1.5 py-0.5 rounded-md uppercase tracking-widest bg-slate-50 dark:bg-white/5 font-sans leading-none h-5 flex items-center">
-                    Ad promo
-                </span>
-            </div>
-
             <div className="relative">
                 <div 
                     ref={scroll.ref}
