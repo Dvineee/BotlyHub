@@ -1223,10 +1223,15 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+  if (process.env.VERCEL || process.env.VERCEL_ENV) {
+    console.log("[SERVER] Running in Vercel Serverless environment. Skipping app.listen.");
     startBackgroundPaymentChecker();
-  });
+  } else {
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+      startBackgroundPaymentChecker();
+    });
+  }
 
   return app;
 }
