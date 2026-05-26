@@ -556,7 +556,6 @@ p.text-\[10px\].text-slate-400.dark\:text-slate-500.font-medium.uppercase.tracki
     font-size: 12px;
 }
 .truncate {
-    overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
@@ -1418,9 +1417,7 @@ h1, h2, h3, h4, h5, h6, .title, .text-slate-900, .dark\:.text-white {
   color: var(--text-secondary) !important;
 }
 
-.dark .text-white, .dark .text-slate-100, .dark .text-gray-100 {
-  color: var(--text-primary) !important;
-}
+
 
 /* Force primary button styling dynamically */
 .bg-brand, .bg-blue-500, .bg-blue-600, .bg-\[\#3b82f6\], .bg-brand-light {
@@ -1484,7 +1481,7 @@ button.bg-brand:hover, button.bg-blue-500:hover, button.bg-blue-600:hover, a.bg-
   backdrop-filter: blur(16px) !important;
   -webkit-backdrop-filter: blur(16px) !important;
   border: 1px solid rgba(255, 255, 255, 0.058) !important;
-  color: var(--text-primary) !important;
+  color: var(--text-secondary) !important;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 20px rgba(0, 0, 0, 0.15) !important;
 }
 
@@ -1695,6 +1692,7 @@ header, nav, .sticky-nav {
     backdrop-filter: blur(16px) !important;
     -webkit-backdrop-filter: blur(16px) !important;
     border: 1px solid rgba(255, 255, 255, 0.058) !important;
+    color: var(--text-secondary) !important;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 20px rgba(0, 0, 0, 0.15) !important;
 }
 
@@ -1821,6 +1819,22 @@ img.rounded-\[13px\],
     --tw-shadow: 0 0 #0000;
     --tw-shadow-colored: 0 0 #0000;
     box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.rounded-\[24px\] {
+    border-radius: 12px !important;
+}
+
+@media (min-width: 640px) {
+    .sm\:w-\[54px\] {
+        width: 62px !important;
+    }
+}
+
+@media (min-width: 640px) {
+    .sm\:h-\[54px\] {
+        height: 62px !important;
+    }
 }
 
 
