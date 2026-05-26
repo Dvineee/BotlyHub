@@ -1,6 +1,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { Bot, User, Channel, Announcement, Notification, UserBot, ActivityLog, Promotion, Referral, ReferralSettings, BlogPost, BlogComment } from '../types';
+import { API_BASE_URL } from '../constants';
 
 const SUPABASE_URL = (typeof process !== 'undefined' && process.env?.SUPABASE_URL) || 
                     (import.meta.env?.VITE_SUPABASE_URL) || 
@@ -435,6 +436,30 @@ export class DatabaseService {
   static async updateChannelAdStatus(channelId: string, status: boolean) {
       const { error } = await supabase.from('channels').update({ revenue_enabled: status }).eq('id', channelId);
       if (error) throw error;
+  }
+
+  static async getGroupUsers(channelId: string): Promise<any[]> {
+    try {
+      const fetchUrl = `${API_BASE_URL}/api/group-users/${encodeURIComponent(channelId)}`;
+      const res = await fetch(fetchUrl);
+      if (!res.ok) {
+        throw new Error(`API error: ${res.statusText}`);
+      }
+      const data = await res.json();
+      return data || [];
+    } catch (e) {
+      console.error("[DatabaseService] Error fetching group users via proxy API, falling back to direct client query:", e);
+      const { data, error } = await supabase
+        .from('group_users')
+        .select('*')
+        .eq('channel_id', channelId.toString());
+      
+      if (error) {
+        console.error("[DatabaseService] Anonymous query fallback error:", error);
+        return [];
+      }
+      return data || [];
+    }
   }
 
   // --- BOTS ---

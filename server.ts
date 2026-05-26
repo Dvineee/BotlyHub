@@ -157,6 +157,45 @@ async function startServer() {
     res.json({ status: "ok", time: new Date().toISOString() });
   });
 
+  app.get("/api/group-users/:channelId", async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    try {
+      const { channelId } = req.params;
+      if (!channelId) {
+        return res.status(400).json({ error: "channelId is required" });
+      }
+
+      let targetTelegramId = channelId.toString();
+
+      // If channelId is a UUID, look up the corresponding telegram_id
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(channelId);
+      if (isUuid) {
+        const { data: channelData } = await supabaseAdmin
+          .from('channels')
+          .select('telegram_id')
+          .eq('id', channelId)
+          .maybeSingle();
+        if (channelData?.telegram_id) {
+          targetTelegramId = channelData.telegram_id.toString();
+        }
+      }
+
+      const { data, error } = await supabaseAdmin
+        .from('group_users')
+        .select('*')
+        .eq('channel_id', targetTelegramId);
+
+      if (error) {
+        console.error("[SERVER] Error fetching group users via admin:", error);
+        return res.status(500).json({ error: error.message });
+      }
+      return res.json(data || []);
+    } catch (err: any) {
+      console.error("[SERVER] Error in group-users endpoint:", err);
+      return res.status(500).json({ error: err.message });
+    }
+  });
+
   // --- DISCUSSION FORUM FILE PERSISTENCE ---
   const DISCUSSIONS_FILE = path.join(process.cwd(), "discussions.json");
 
@@ -166,15 +205,15 @@ async function startServer() {
         const initialSeed = [
           {
             id: "discussion-1",
-            title: "Combot bugün neden bu kadar geçiş işlemleri yapıyor?",
-            content: "Özellikle bugün kombo bayağı kanalda geçmeye çalışıyor. Başlattım ama yine de yanıtlar geç veren kanalda bu sorun yaşayan başka kimse var mı? Sadece bende olup olmadığını merak ediyorum.",
+            title: "BotlyHub bugün neden bu kadar hızlı işlem yapıyor?",
+            content: "Özellikle bugün BotlyHub bayağı kanalda mükemmel hızda çalışıyor. Başlattım ve anında yanıtlar veren kanalda bu harika hızı yaşayan başka kimse var mı? Sadece bende olup olmadığını merak ediyorum.",
             author_id: "user-seyyid",
             author_name: "Seyyid Ahmed Şah",
             author_avatar: "https://ui-avatars.com/api/?name=Seyyid+Ahmed+Sah&background=020617&color=fff",
             author_bio: "Merhaba, ben Ahmer. Yazılım Mühendisliği öğrencisi ve tam yığın geliştiriciyim.",
             created_at: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
             tags: [
-              { type: "bot", id: "combot", name: "Combot" },
+              { type: "bot", id: "botlyhub", name: "BotlyHub" },
               { type: "general", id: "giriş", name: "giriş" }
             ],
             upvotes_count: 25,
@@ -188,7 +227,7 @@ async function startServer() {
                 author_name: "Amrit Raj",
                 author_avatar: "https://ui-avatars.com/api/?name=Amrit+Raj&background=6d28d9&color=fff",
                 author_bio: "Kod, düşünmenin görünür kalıntısından başka bir şey değildir.",
-                content: "Ben de aynı şekilde yaşıyorum, Combot sunucularında yoğunluk var sanırım. Bazı kanallarda gecikmeler yaşanıyor.",
+                content: "Ben de aynı şekilde yaşıyorum, BotlyHub sunucularında harika bir optimizasyon var sanırım. Tüm kanallarda anlık hızlı yanıtlar alınıyor.",
                 created_at: new Date(Date.now() - 15 * 60 * 60 * 1000).toISOString(),
                 likes_count: 12
               }
@@ -205,7 +244,7 @@ async function startServer() {
             created_at: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
             tags: [
               { type: "general", id: "programlama", name: "programlama" },
-              { type: "bot", id: "combot", name: "Combot" }
+              { type: "bot", id: "botlyhub", name: "BotlyHub" }
             ],
             upvotes_count: 14,
             upvoted_users: ["user-demo1"],

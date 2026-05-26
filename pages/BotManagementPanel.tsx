@@ -12,7 +12,7 @@ import {
 import LoginModal from '../components/LoginModal';
 import { useTelegram } from '../hooks/useTelegram';
 import { DatabaseService } from '../services/DatabaseService';
-import { UserBot } from '../types';
+import { UserBot, Channel } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 
 const SidebarItem = ({ icon: Icon, label, path, active, badge, color, external }: any) => (
@@ -71,26 +71,45 @@ const GroupCard = ({ name, username, members, active, onClick }: any) => (
 );
 
 const BotManagementPanel = () => {
-  const { botId, groupId } = useParams();
+  const { botId, groupId: routeGroupId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Extract groupId from location.pathname if it contains /groups/
+  const groupMatch = location.pathname.match(/\/groups\/([^/]+)/);
+  const groupId = routeGroupId || (groupMatch ? groupMatch[1] : undefined);
+
   const { user, haptic, notification, setWebAuthUser } = useTelegram();
   const [bot, setBot] = useState<UserBot | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [channels, setChannels] = useState<Channel[]>([]);
+  const [activeChannel, setActiveChannel] = useState<Channel | null>(null);
 
   useEffect(() => {
-    const fetchBot = async () => {
+    const fetchBotAndChannels = async () => {
       setIsLoading(true);
       if (botId && user?.id) {
         const bots = await DatabaseService.getUserBots(user.id.toString());
         const found = bots.find(b => b.id === botId);
         if (found) setBot(found);
+
+        const userChannels = await DatabaseService.getChannels(user.id.toString());
+        setChannels(userChannels ?? []);
       }
       setIsLoading(false);
     };
-    fetchBot();
+    fetchBotAndChannels();
   }, [botId, user]);
+
+  useEffect(() => {
+    if (groupId && channels.length > 0) {
+      const found = channels.find(c => String(c.telegram_id) === String(groupId));
+      setActiveChannel(found || null);
+    } else {
+      setActiveChannel(null);
+    }
+  }, [groupId, channels]);
 
   if (isLoading) {
     return (
@@ -121,7 +140,7 @@ const BotManagementPanel = () => {
 
   const groupNavItems = [
     { label: 'Ayarlar', icon: Settings, path: `groups/${groupId}/settings` },
-    { label: 'Combot AI', icon: Lightbulb, path: `groups/${groupId}/ai` },
+    { label: 'BotlyHub AI', icon: Lightbulb, path: `groups/${groupId}/ai` },
     { label: 'Pro', icon: Star, path: `groups/${groupId}/pro`, highlight: true },
     { label: 'Moderasyon', icon: Shield, path: `groups/${groupId}/moderation` },
     { label: 'Analiz', icon: Columns, path: `groups/${groupId}/analysis` },
@@ -132,7 +151,7 @@ const BotManagementPanel = () => {
   ];
 
   const externalNavItems = [
-    { label: 'Combot Anti-Spam', icon: ShieldAlert, path: 'antispam', external: true },
+    { label: 'BotlyHub Anti-Spam', icon: ShieldAlert, path: 'antispam', external: true },
     { label: 'Telegram Top Groups', icon: Globe, path: 'top-groups', external: true },
     { label: 'Stickers Catalogue', icon: Sticker, path: 'stickers', external: true },
   ];
@@ -163,7 +182,7 @@ const BotManagementPanel = () => {
                  </div>
                </div>
             </div>
-            <span className="font-bold text-white text-lg tracking-tight">Combot</span>
+            <span className="font-bold text-white text-lg tracking-tight">BotlyHub</span>
           </Link>
 
           <div className="space-y-4">
@@ -180,17 +199,25 @@ const BotManagementPanel = () => {
               ))}
             </div>
 
-            {/* Current Active Item (Kaju Test) */}
+            {/* Current Active Item (Active Channel or Group) */}
             {groupId ? (
               <div className="space-y-1">
                 <div className="px-3 py-2 flex items-center justify-between group cursor-pointer hover:bg-white/2 transition-all rounded-lg mb-2">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full border border-white/10 overflow-hidden shrink-0">
-                       <img src="https://botlyhub.com/kaju-logo.png" alt="Kaju" className="w-full h-full object-cover" />
+                    <div className="w-10 h-10 rounded-full border border-white/10 overflow-hidden bg-slate-800 shrink-0 flex items-center justify-center font-black text-white italic text-sm">
+                       {activeChannel?.icon ? (
+                         <img src={activeChannel.icon} alt={activeChannel.name} className="w-full h-full object-cover" />
+                       ) : (
+                         (activeChannel?.name?.[0] || 'G').toUpperCase()
+                       )}
                     </div>
                     <div>
-                      <h4 className="text-[14px] font-bold text-white leading-tight uppercase tracking-tight">KAJU TEST</h4>
-                      <span className="text-[12px] text-slate-500 lowercase leading-tight">@botlyhub</span>
+                      <h4 className="text-[14px] font-bold text-white leading-tight uppercase tracking-tight truncate max-w-[100px]">
+                        {activeChannel?.name || 'Grup Detay'}
+                      </h4>
+                      <span className="text-[12px] text-slate-500 leading-tight block truncate max-w-[100px]">
+                        {activeChannel?.telegram_id || groupId}
+                      </span>
                     </div>
                   </div>
                   <ChevronRight size={14} className="text-slate-600" />
@@ -325,17 +352,17 @@ const BotManagementPanel = () => {
         <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
           <Routes>
             <Route index element={<NavigateToGroups botId={botId} />} />
-            <Route path="groups" element={<GroupsView />} />
+            <Route path="groups" element={<GroupsView channels={channels} isLoading={isLoading} />} />
             <Route path="scheduler" element={<EmptyModule title="Zamanlayıcı" />} />
             <Route path="commands" element={<EmptyModule title="Komutlar" />} />
             <Route path="api" element={<EmptyModule title="API Yönetimi" />} />
             <Route path="bot-settings" element={<BotSettingsView bot={bot} />} />
             <Route path="billing" element={<BillingView />} />
             
-            <Route path="groups/:groupId/settings" element={<GroupSettingsView />} />
+            <Route path="groups/:groupId/settings" element={<GroupSettingsView channel={activeChannel} />} />
             <Route path="groups/:groupId/moderation" element={<ModerationView />} />
             <Route path="groups/:groupId/analysis" element={<AnalysisView />} />
-            <Route path="groups/:groupId/users" element={<UsersView />} />
+            <Route path="groups/:groupId/users" element={<UsersView channel={activeChannel} />} />
             <Route path="*" element={<EmptyModule />} />
           </Routes>
         </div>
@@ -351,9 +378,9 @@ const BotManagementPanel = () => {
               <span className="text-slate-800">|</span>
               <a href="#" className="text-[9px] font-black text-slate-500 hover:text-white uppercase tracking-widest transition-colors">hizmet şartları</a>
               <span className="text-slate-800">|</span>
-              <a href="#" className="text-[9px] font-black text-slate-500 hover:text-white uppercase tracking-widest transition-colors">@combotchat</a>
+              <a href="#" className="text-[9px] font-black text-slate-500 hover:text-white uppercase tracking-widest transition-colors">@botlyhubchat</a>
               <span className="text-slate-800">|</span>
-              <a href="#" className="text-[9px] font-black text-slate-500 hover:text-white uppercase tracking-widest transition-colors">@combotnews</a>
+              <a href="#" className="text-[9px] font-black text-slate-500 hover:text-white uppercase tracking-widest transition-colors">@botlyhubnews</a>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -373,9 +400,10 @@ const NavigateToGroups = ({ botId }: any) => {
   return null;
 };
 
-const GroupSettingsView = () => {
+const GroupSettingsView = ({ channel }: { channel: any }) => {
     const [activeTab, setActiveTab] = useState('basic'); // basic or team
-    const groupId = '-1003360909133'; // Prototype ID from image
+    const { groupId } = useParams();
+    const displayGroupId = channel ? channel.telegram_id : (groupId || '-1003360909133');
 
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-5xl">
@@ -407,7 +435,7 @@ const GroupSettingsView = () => {
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-3">ID</label>
                         <div className="flex items-center gap-2">
                             <div className="h-12 flex-1 bg-[#14181f] border border-white/5 rounded-xl px-4 flex items-center font-mono text-sm text-white">
-                                {groupId}
+                                {displayGroupId}
                             </div>
                             <button className="h-12 w-12 bg-white/5 hover:bg-white/10 text-white rounded-xl flex items-center justify-center transition-all">
                                 <CreditCard size={18} />
@@ -433,7 +461,7 @@ const GroupSettingsView = () => {
                             </div>
                             <div>
                                 <h4 className="text-sm font-bold text-white group-hover:text-blue-500 transition-colors">Günlük analiz raporu al</h4>
-                                <p className="text-[11px] text-slate-500 leading-relaxed font-medium">Combot grubunuz hakkında günlük bir rapor gönderir</p>
+                                <p className="text-[11px] text-slate-500 leading-relaxed font-medium">BotlyHub grubunuz hakkında günlük bir rapor gönderir</p>
                             </div>
                         </label>
                     </div>
@@ -464,8 +492,8 @@ const GroupSettingsView = () => {
                                 <input type="checkbox" defaultChecked className="w-6 h-6 accent-blue-600 rounded-lg" />
                             </div>
                             <div>
-                                <h4 className="text-sm font-black text-white italic uppercase tracking-tighter mb-1">Combot Anti-Spam (CAS) kullan</h4>
-                                <p className="text-xs text-slate-400 leading-relaxed font-medium">Combot Anti-Spam, Telegram'daki spam gönderenleri tespit etmek için tasarlanmış otomatik bir sistemdir. Grubunuzu korur!</p>
+                                <h4 className="text-sm font-black text-white italic uppercase tracking-tighter mb-1">BotlyHub Anti-Spam (BAS) kullan</h4>
+                                <p className="text-xs text-slate-400 leading-relaxed font-medium">BotlyHub Anti-Spam, Telegram'daki spam gönderenleri tespit etmek için tasarlanmış otomatik bir sistemdir. Grubunuzu korur!</p>
                             </div>
                         </label>
                     </div>
@@ -500,7 +528,7 @@ const GroupSettingsView = () => {
                                 <span className="text-[10px] font-black bg-blue-600/20 text-blue-400 px-2 py-0.5 rounded italic uppercase tracking-widest border border-blue-500/20">Pro</span>
                             </div>
                             <p className="text-xs text-slate-500 font-medium leading-relaxed max-w-lg mb-0 italic">
-                                Combot yerine kendi botunuzu kullanın. Adını, kullanıcı adını, açıklamasını ve profil resmini ihtiyaçlarınıza göre özelleştirin.
+                                BotlyHub yerine kendi botunuzu kullanın. Adını, kullanıcı adını, açıklamasını ve profil resmini ihtiyaçlarınıza göre özelleştirin.
                             </p>
                         </div>
                         <div className="absolute top-1/2 -right-10 -translate-y-1/2 opacity-5 pointer-events-none">
@@ -514,7 +542,7 @@ const GroupSettingsView = () => {
                         <div>
                             <h2 className="text-xl font-black text-white italic uppercase tracking-tighter mb-1">Yöneticiler</h2>
                             <p className="text-xs text-slate-500 font-medium flex items-center gap-1 italic">
-                                <Info size={12} /> Combot'u yönetebilen yöneticiler
+                                <Info size={12} /> BotlyHub'ı yönetebilen yöneticiler
                             </p>
                         </div>
                         <div className="flex items-center gap-2">
@@ -531,7 +559,7 @@ const GroupSettingsView = () => {
 
                     <div className="space-y-3">
                         {[
-                            { id: '210944655', name: 'Combot', user: '@combot', isBot: true },
+                            { id: '210944655', name: 'BotlyHub', user: '@botlyhub', isBot: true },
                             { id: '842614237', name: 'KAJU', user: '@kajju66', isBot: false },
                         ].map((admin, i) => (
                             <div key={i} className="bg-[#14181f] border border-white/5 rounded-[24px] p-4 flex items-center gap-4 group hover:border-blue-500/30 transition-all cursor-pointer">
@@ -782,7 +810,7 @@ const BillingView = () => {
     );
 };
 
-const GroupsView = () => {
+const GroupsView = ({ channels, isLoading }: { channels: Channel[], isLoading: boolean }) => {
   const { botId } = useParams();
   const navigate = useNavigate();
   const { haptic } = useTelegram();
@@ -800,36 +828,35 @@ const GroupsView = () => {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <GroupCard 
-          name="Kaju Test" 
-          username="kajugroup" 
-          members="1.2k" 
-          active={true} 
-          onClick={() => { haptic('light'); navigate(`/bot-panel/${botId}/groups/kaju-test/settings`); }} 
-        />
-        <GroupCard 
-          name="Kaju Community" 
-          username="kajucomm" 
-          members="4.8k" 
-          active={true} 
-          onClick={() => { haptic('light'); navigate(`/bot-panel/${botId}/groups/kaju-comm/settings`); }} 
-        />
-        <GroupCard 
-          name="BotlyHub Haberler" 
-          username="botlyhubnews" 
-          members="8.5k" 
-          active={true} 
-          onClick={() => { haptic('light'); navigate(`/bot-panel/${botId}/groups/botlyhub-news/settings`); }} 
-        />
-        <GroupCard 
-          name="Yeni deneme" 
-          username="veriverkin" 
-          members="7" 
-          active={false} 
-          onClick={() => { haptic('light'); navigate(`/bot-panel/${botId}/groups/test-group/settings`); }} 
-        />
-      </div>
+      {isLoading ? (
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="animate-spin text-blue-500" size={32} />
+        </div>
+      ) : channels && channels.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {channels.map((channel) => (
+            <GroupCard 
+              key={channel.id}
+              name={channel.name} 
+              username={channel.telegram_id} 
+              members={typeof channel.memberCount === 'number' ? channel.memberCount.toLocaleString() : '0'} 
+              active={channel.revenueEnabled !== undefined ? channel.revenueEnabled : true} 
+              onClick={() => { haptic('light'); navigate(`/bot-panel/${botId}/groups/${channel.telegram_id}/settings`); }} 
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="bg-[#14181f]/40 border border-dashed border-white/5 p-12 rounded-[32px] text-center mb-8">
+          <Users size={48} className="text-slate-700 mx-auto mb-4" />
+          <h3 className="text-base font-bold text-white mb-2">Henüz Grup veya Kanal Bulunmuyor</h3>
+          <p className="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed mb-6">
+            Bu bota bağlı herhangi bir grup veya kanal bulunamadı. Lütfen yeni bir grup veya kanal ekleyerek başlayın.
+          </p>
+          <button className="h-10 px-6 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition-all shadow-md">
+            Yeni Grup / Kanal Ekle
+          </button>
+        </div>
+      )}
 
       <div className="bg-orange-500/5 border border-orange-500/20 rounded-3xl p-6">
         <div className="flex items-start gap-4">
@@ -1000,70 +1027,133 @@ const AnalysisView = () => (
   </div>
 );
 
-const UsersView = () => (
-  <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-    <div className="bg-[#14181f] border border-white/5 rounded-[40px] overflow-hidden">
-      <div className="p-8 border-b border-white/5 flex items-center justify-between">
-        <h3 className="text-lg font-black text-white italic uppercase tracking-tighter">Üye Yönetimi</h3>
-        <div className="flex items-center gap-3">
-           <div className="relative">
-              <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
-              <input type="text" placeholder="Üye ara..." className="bg-[#0f1218] border border-white/5 rounded-xl pl-10 pr-4 h-10 text-xs text-white outline-none focus:border-blue-500/30 w-64" />
+const UsersView = ({ channel }: { channel: any }) => {
+  const { groupId } = useParams();
+  const [groupUsers, setGroupUsers] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const targetGroupId = channel?.telegram_id || groupId || '';
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      if (!targetGroupId) return;
+      setIsLoading(true);
+      try {
+        const data = await DatabaseService.getGroupUsers(targetGroupId);
+        setGroupUsers(data || []);
+      } catch (err) {
+        console.error("Error fetching group users:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchUsers();
+  }, [targetGroupId]);
+
+  // Filter users by search term
+  const displayedUsers = groupUsers.filter(u => 
+    (u.name && u.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (u.username && u.username.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (u.user_id && String(u.user_id).includes(searchTerm))
+  );
+
+  return (
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="bg-[#14181f] border border-white/5 rounded-[40px] overflow-hidden">
+        <div className="p-8 border-b border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h3 className="text-lg font-black text-white italic uppercase tracking-tighter">
+              Üye Yönetimi
+            </h3>
+            <p className="text-xs text-slate-500 font-medium mt-1">
+              {channel ? `${channel.name} grubuna ait kullanıcı listesi` : 'Grup kullanıcı listesi'} ({targetGroupId})
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+             <div className="relative">
+                <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
+                <input 
+                  type="text" 
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Üye ara..." 
+                  className="bg-[#0f1218] border border-white/5 rounded-xl pl-10 pr-4 h-10 text-xs text-white outline-none focus:border-blue-500/30 w-64" 
+                />
+             </div>
+             <button className="h-10 px-4 bg-white/5 hover:bg-white/10 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2">
+               <Filter size={14} />
+               Filtrele
+             </button>
+          </div>
+        </div>
+
+        {isLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="animate-spin text-blue-500" size={32} />
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="bg-white/2 border-b border-white/5">
+                   <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">ID</th>
+                   <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Kullanıcı</th>
+                   <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Karma (XP)</th>
+                   <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Katılım Tarihi</th>
+                   <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest text-right">İşlem</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {displayedUsers.map((gUser, i) => (
+                  <tr key={gUser.user_id || i} className="hover:bg-white/2 transition-colors">
+                    <td className="px-8 py-5 text-[10px] font-medium text-slate-500 tracking-widest">
+                      {gUser.user_id}
+                    </td>
+                    <td className="px-8 py-5">
+                       <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center font-black text-white italic text-xs uppercase">
+                            {gUser.name?.[0] || 'U'}
+                          </div>
+                          <div>
+                            <h4 className="text-xs font-bold text-white">{gUser.name}</h4>
+                            <span className="text-[10px] text-blue-500 font-bold lowercase tracking-wider">
+                              @{gUser.username || 'user'}
+                            </span>
+                          </div>
+                       </div>
+                    </td>
+                    <td className="px-8 py-5 text-xs font-black text-amber-500 italic">
+                      {gUser.xp !== undefined ? gUser.xp : 0} XP
+                    </td>
+                    <td className="px-8 py-5 text-[10px] font-medium text-slate-500 uppercase tracking-widest">
+                      {gUser.joined_at ? new Date(gUser.joined_at).toLocaleString('tr-TR') : 'Bilinmiyor'}
+                    </td>
+                    <td className="px-8 py-5 text-right">
+                      <button className="text-slate-600 hover:text-white transition-colors"><MoreVertical size={16} /></button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        <div className="p-8 bg-white/2 border-t border-white/5 flex items-center justify-between">
+           <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest italic">
+             Veritabanından Çekilen Aktif Üyeler ({displayedUsers.length} kişi listeleniyor)
+           </span>
+           <div className="flex items-center gap-2">
+              <button className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white disabled:opacity-20"><ChevronRight size={16} className="rotate-180" /></button>
+              <button className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white font-black italic">1</button>
+              <button className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white font-black italic">2</button>
+              <button className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white disabled:opacity-20"><ChevronRight size={16} /></button>
            </div>
-           <button className="h-10 px-4 bg-white/5 hover:bg-white/10 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2">
-             <Filter size={14} />
-             Filtrele
-           </button>
         </div>
       </div>
-      <div className="overflow-x-auto">
-        <table className="w-full text-left">
-          <thead>
-            <tr className="bg-white/2 border-b border-white/5">
-               <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">ID</th>
-               <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Kullanıcı</th>
-               <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Karma (XP)</th>
-               <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Mesaj</th>
-               <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Son Görülme</th>
-               <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest text-right">İşlem</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-white/5">
-            {[1,2,3,4,5].map(i => (
-              <tr key={i} className="hover:bg-white/2 transition-colors">
-                <td className="px-8 py-5 text-[10px] font-medium text-slate-500 tracking-widest">842614237</td>
-                <td className="px-8 py-5">
-                   <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center font-black text-white italic text-xs">K</div>
-                      <div>
-                        <h4 className="text-xs font-bold text-white">Kenan Ekinci</h4>
-                        <span className="text-[10px] text-blue-500 font-bold lowercase tracking-wider">@kajju66</span>
-                      </div>
-                   </div>
-                </td>
-                <td className="px-8 py-5 text-xs font-black text-amber-500 italic">420 XP</td>
-                <td className="px-8 py-5 text-xs font-bold text-white">1,245</td>
-                <td className="px-8 py-5 text-[10px] font-medium text-slate-500 uppercase tracking-widest">16.05.2026 23:09</td>
-                <td className="px-8 py-5 text-right">
-                  <button className="text-slate-600 hover:text-white transition-colors"><MoreVertical size={16} /></button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="p-8 bg-white/2 border-t border-white/5 flex items-center justify-between">
-         <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest italic">1 - 5 / 154 kullanıcı gösteriliyor</span>
-         <div className="flex items-center gap-2">
-            <button className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white disabled:opacity-20"><ChevronRight size={16} className="rotate-180" /></button>
-            <button className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white font-black italic">1</button>
-            <button className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white font-black italic">2</button>
-            <button className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white disabled:opacity-20"><ChevronRight size={16} /></button>
-         </div>
-      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const EmptyModule = ({ title }: { title?: string }) => (
   <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in">
