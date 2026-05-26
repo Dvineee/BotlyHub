@@ -30,30 +30,29 @@ body {
 
 @layer base {
   :root {
-    --color-primary: #7C5CFF;
-    --color-secondary: #2DD4FF;
-    --color-success: #2EE59D;
-    --color-warning: #FFB020;
-    --color-danger: #FF4D6D;
+    --color-primary: #6366F1;
+    --color-secondary: #A855F7;
+    --color-success: #10B981;
+    --color-warning: #F59E0B;
+    --color-danger: #EF4444;
 
-    --bg-main: #05060A;
-    --bg-elevated: #0A0D14;
-    --bg-card: #0E121B;
+    --bg-main: #0F172A;
+    --bg-elevated: #151E2E;
+    --bg-card: #1E2937;
     --bg-secondary: var(--bg-card);
 
-    --border-default: rgba(255,255,255,0.06);
-    --border-hover: rgba(124,92,255,0.25);
+    --border-default: rgba(255, 255, 255, 0.06);
+    --border-hover: rgba(99, 102, 241, 0.25);
 
-    --text-primary: #E6EAF2;
-    --text-secondary: #9AA4B2;
-    --text-muted: #6B7280;
+    --text-primary: #E0E7FF;
+    --text-secondary: #CBD5E1;
+    --text-muted: #64748B;
 
     --border-main: var(--border-default);
     --border-hover-override: var(--border-hover);
     --border-color: var(--border-default);
     --input-bg: var(--bg-elevated);
     --btn-primary: var(--color-primary);
-    --border-color: var(--border-default);
     --btn-bg: var(--text-primary);
     --btn-text: var(--bg-main);
     --accent: var(--color-secondary);
@@ -64,30 +63,29 @@ body {
   }
 
   .dark {
-    --color-primary: #7C5CFF;
-    --color-secondary: #2DD4FF;
-    --color-success: #2EE59D;
-    --color-warning: #FFB020;
-    --color-danger: #FF4D6D;
+    --color-primary: #6366F1;
+    --color-secondary: #A855F7;
+    --color-success: #10B981;
+    --color-warning: #F59E0B;
+    --color-danger: #EF4444;
 
-    --bg-main: #05060A;
-    --bg-elevated: #0A0D14;
-    --bg-card: #0E121B;
+    --bg-main: #0F172A;
+    --bg-elevated: #151E2E;
+    --bg-card: #1E2937;
     --bg-secondary: var(--bg-card);
 
-    --border-default: rgba(255,255,255,0.06);
-    --border-hover: rgba(124,92,255,0.25);
+    --border-default: rgba(255, 255, 255, 0.06);
+    --border-hover: rgba(99, 102, 241, 0.25);
 
-    --text-primary: #E6EAF2;
-    --text-secondary: #9AA4B2;
-    --text-muted: #6B7280;
+    --text-primary: #E0E7FF;
+    --text-secondary: #CBD5E1;
+    --text-muted: #64748B;
 
     --border-main: var(--border-default);
     --border-hover-override: var(--border-hover);
     --border-color: var(--border-default);
     --input-bg: var(--bg-elevated);
     --btn-primary: var(--color-primary);
-    --border-color: var(--border-default);
     --btn-bg: var(--text-primary);
     --btn-text: var(--bg-main);
     --accent: var(--color-secondary);
