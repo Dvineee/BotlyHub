@@ -580,14 +580,14 @@ const BlogPage: React.FC = () => {
           </div>
 
           <header className="mb-12">
-            <div className="flex items-center gap-2 text-blue-500 font-black uppercase text-[10px] tracking-[0.2em] mb-4">
+            <div className="flex items-center gap-2 text-blue-500 font-extrabold uppercase text-[10px] tracking-[0.2em] mb-4">
               <span className="w-8 h-[2px] bg-blue-500"></span>
-              BOTLYHUB BLOG
+              BOTLYHUB BLOG | KNOWLEDGE HUB
             </div>
-            <h1 className="text-3xl md:text-5xl font-black tracking-tighter text-slate-900 dark:text-white mb-4 italic">
+            <h1 className="text-4xl md:text-6xl text-slate-900 dark:text-white mb-4 italic hero-title">
               {t('blog_hero_title')}
             </h1>
-            <p className="text-lg text-slate-500 dark:text-slate-400 font-medium max-w-2xl">
+            <p className="text-lg text-slate-500 dark:text-slate-400 font-medium max-w-2xl opacity-80">
               {t('blog_subtitle')}
             </p>
           </header>
@@ -627,9 +627,9 @@ const BlogPage: React.FC = () => {
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     onClick={() => { haptic('light'); navigate('/blog/' + (featuredPost.slug || featuredPost.id)); }}
-                    className="group cursor-pointer blog-featured-card custom-cursor-on-hover bg-white dark:bg-slate-900/40 p-6 rounded-[44px] border border-slate-100 dark:border-white/5 hover:border-blue-500/30 transition-all shadow-xl shadow-slate-200/20 dark:shadow-none"
+                    className="group cursor-pointer blog-featured-card custom-cursor-on-hover fancy-glass-card hover:border-blue-500/30 transition-all"
                   >
-                    <div className="aspect-[16/9] md:aspect-[2.4/1] rounded-[32px] overflow-hidden mb-8 bg-slate-100 dark:bg-slate-900 shadow-2xl relative">
+                    <div className="aspect-[16/9] md:aspect-[2.4/1] rounded-2xl overflow-hidden mb-6 bg-slate-100 dark:bg-slate-900/40 relative">
                       {featuredPost.image ? (
                         <img 
                           src={featuredPost.image} 
@@ -680,10 +680,10 @@ const BlogPage: React.FC = () => {
                           <span className="text-[10px] font-bold uppercase">{featuredPost.readTime || `5 ${t('blog_read_time')}`}</span>
                         </div>
                       </div>
-                      <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tighter leading-tight group-hover:text-blue-600 transition-colors italic">
+                      <h2 className="text-3xl md:text-4xl text-slate-900 dark:text-white tracking-tighter leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors card-title italic">
                         {featuredPost.title}
                       </h2>
-                      <p className="text-base md:text-xl text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2 italic font-medium">
+                      <p className="text-base md:text-lg text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2 italic font-medium card-desc">
                         {featuredPost.excerpt}
                       </p>
                       <div className="flex flex-wrap gap-2 py-4">
@@ -691,7 +691,7 @@ const BlogPage: React.FC = () => {
                            <span key={i} className="px-2 py-1 bg-slate-100 dark:bg-white/5 rounded-lg text-[9px] font-black text-slate-500 uppercase tracking-widest border border-slate-100 dark:border-white/10 group-hover:border-blue-500/30 transition-all">#{tag}</span>
                         ))}
                       </div>
-                      <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-white/5">
+                      <div className="flex items-center justify-between pt-4 border-t border-slate-100/50 dark:border-slate-800/10">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center text-white shrink-0 shadow-lg shadow-blue-500/20">
                             <Logo isIcon className="scale-50 fill-white" />
@@ -709,7 +709,7 @@ const BlogPage: React.FC = () => {
                   </motion.div>
                 )}
 
-                <div className={`grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-16 ${activeCategory === 'all' ? 'py-20 border-t' : ''} border-slate-100 dark:border-white/5`}>
+                <div className={`grid grid-cols-1 md:grid-cols-2 gap-8 ${activeCategory === 'all' ? 'py-16 border-t' : ''} border-slate-100/50 dark:border-white/5`}>
                   {regularPosts.map((post, idx) => (
                     <motion.div 
                       key={post.id}
@@ -717,14 +717,14 @@ const BlogPage: React.FC = () => {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.1 }}
                       onClick={() => { haptic('light'); navigate('/blog/' + (post.slug || post.id)); }}
-                      className="group cursor-pointer flex flex-col h-full"
+                      className="group cursor-pointer flex flex-col h-full fancy-glass-card hover:border-blue-500/30 transition-all"
                     >
-                      <div className="aspect-[16/10] rounded-[32px] overflow-hidden mb-8 bg-slate-100 dark:bg-slate-900 shadow-lg relative">
+                      <div className="aspect-[16/10] rounded-2xl overflow-hidden mb-6 bg-slate-100 dark:bg-slate-900/40 relative">
                         {post.image ? (
                           <img 
                             src={post.image} 
                             alt={post.title}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
                             referrerPolicy="no-referrer"
                             loading="lazy"
                           />
@@ -733,8 +733,8 @@ const BlogPage: React.FC = () => {
                               <BookOpen size={32} className="text-slate-800" />
                            </div>
                         )}
-                        <div className="absolute top-6 left-6">
-                           <span className="bg-slate-950/80 backdrop-blur-md px-4 py-2 rounded-xl text-[8px] font-black text-white uppercase tracking-widest border border-white/10">{post.category}</span>
+                        <div className="absolute top-4 left-4">
+                           <span className="bg-slate-950/80 backdrop-blur-md px-3 py-1.5 rounded-xl text-[8px] font-black text-white uppercase tracking-widest border border-white/10">{post.category}</span>
                         </div>
                       </div>
                       <div className="space-y-4 flex-1 flex flex-col">
@@ -745,18 +745,18 @@ const BlogPage: React.FC = () => {
                           <span className="flex items-center gap-1.5"><Heart size={12} className="text-red-500" /> {post.likes_count || 0}</span>
                           <span className="flex items-center gap-1.5"><Clock size={12} className="text-blue-500" /> {post.readTime || '5 dk'}</span>
                         </div>
-                        <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tighter group-hover:text-blue-600 transition-colors line-clamp-2 italic leading-tight">
+                        <h3 className="text-xl md:text-2xl text-slate-900 dark:text-white tracking-tighter group-hover:text-blue-600 transition-colors line-clamp-2 italic leading-tight card-title">
                           {post.title}
                         </h3>
-                        <p className="text-sm text-slate-500 dark:text-slate-500 line-clamp-3 leading-relaxed flex-1 font-medium italic">
+                        <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-3 leading-relaxed flex-1 font-medium italic card-desc">
                           {post.excerpt}
                         </p>
-                        <div className="flex flex-wrap gap-2 pt-2 pb-4">
+                        <div className="flex flex-wrap gap-2 pt-2">
                           {post.hashtags?.slice(0, 3).map((tag, i) => (
                             <span key={i} className="text-[9px] font-black text-blue-500/50 uppercase tracking-widest group-hover:text-blue-500 transition-colors">#{tag}</span>
                           ))}
                         </div>
-                        <div className="flex items-center justify-between pt-6 group-hover:translate-y-[-4px] transition-transform">
+                        <div className="flex items-center justify-between pt-4 mt-4 border-t border-slate-100/50 dark:border-slate-800/10">
                           <div className="flex items-center gap-2">
                              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white p-1.5 shadow-sm">
                                 <Logo isIcon className="fill-white" />
@@ -846,12 +846,12 @@ const BlogPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-slate-900/40 rounded-[32px] p-8 border border-slate-100 dark:border-white/5 relative group shadow-sm">
+          <div className="fancy-glass-card relative group shadow-sm">
             <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center mb-6 overflow-hidden p-2.5">
               <Logo isIcon className="fill-blue-600 dark:fill-blue-400" />
             </div>
-            <h3 className="text-xl font-black italic tracking-tighter mb-3 uppercase text-slate-900 dark:text-white">{t('blog_join_community')}</h3>
-            <p className="text-slate-500 dark:text-slate-400 text-[11px] font-medium mb-6 leading-relaxed italic">{t('blog_community_desc')}</p>
+            <h3 className="text-xl font-semibold mb-3 uppercase text-slate-900 dark:text-white card-title">{t('blog_join_community')}</h3>
+            <p className="text-slate-500 dark:text-slate-400 text-sm mb-6 leading-relaxed card-desc">{t('blog_community_desc')}</p>
             <button 
               onClick={() => { haptic('medium'); window.open('https://t.me/BotlyHub', '_blank'); }}
               className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-black uppercase text-[10px] tracking-widest rounded-2xl transition-all shadow-lg shadow-blue-500/20 active:scale-95 flex items-center justify-center gap-3 group/btn"

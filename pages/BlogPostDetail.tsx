@@ -748,7 +748,7 @@ const BlogPostDetail: React.FC = () => {
                 {t('blog_comments')} <span className="text-slate-300 dark:text-slate-800">/</span> {comments.length}
               </h3>
               
-              <div className="bg-white dark:bg-slate-900/40 p-6 rounded-[32px] border border-slate-100 dark:border-white/5 mb-12">
+              <div className="fancy-glass-card mb-12">
                 <form onSubmit={handleCommentSubmit} className="space-y-4">
                   <div className="flex items-start gap-4">
                     <div className="w-10 h-10 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 shrink-0 overflow-hidden">
@@ -816,13 +816,13 @@ const BlogPostDetail: React.FC = () => {
             </section>
 
             {/* Author Card */}
-            <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-white/5 rounded-3xl p-6 flex flex-col md:flex-row items-center gap-6 mb-12">
+            <div className="fancy-glass-card flex flex-col md:flex-row items-center gap-6 mb-12">
               <div className="w-20 h-20 rounded-full bg-blue-600 flex items-center justify-center text-white shrink-0 p-4">
                 <Logo isIcon className="fill-white" />
               </div>
               <div className="flex-1 text-center md:text-left">
-                <h4 className="text-xl font-black text-slate-900 dark:text-white mb-2">{post.author}</h4>
-                <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-4">
+                <h4 className="text-xl font-semibold text-slate-900 dark:text-white mb-2 card-title">{post.author}</h4>
+                <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-4 card-desc">
                   {t('blog_author_desc')}
                 </p>
                 <div className="flex items-center justify-center md:justify-start gap-4">

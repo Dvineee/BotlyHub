@@ -843,29 +843,29 @@ export default function QAForum() {
                   {/* Image 1 Pattern: "K Tartışma Başlat..." Input Box */}
                   <div 
                     onClick={() => { haptic('medium'); setShowCreateModal(true); }}
-                    className="border-b border-slate-200/80 dark:border-slate-800/80 pb-4 px-1 flex items-center justify-between cursor-pointer hover:border-[#4f46e5] dark:hover:border-[#4f46e5] transition-colors duration-300 group"
+                    className="cursor-pointer fancy-glass-card flex items-center justify-between transition-all duration-300 group hover:border-indigo-500/30"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-indigo-50 dark:bg-slate-800 border border-slate-200/40 dark:border-slate-700 flex items-center justify-center font-bold text-indigo-600 dark:text-indigo-400">
-                        {currentUser.name.charAt(0)}
+                      <div className="w-9 h-9 rounded-full bg-indigo-550/10 dark:bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center font-bold text-indigo-650 dark:text-indigo-400">
+                        {currentUser.name.charAt(0).toUpperCase()}
                       </div>
-                      <span className="text-sm text-slate-400 dark:text-slate-500 font-medium group-hover:text-[#4f46e5] transition-colors">
+                      <span className="text-sm text-slate-500 dark:text-slate-400 font-medium group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                         Tartışma başlat...
                       </span>
                     </div>
-                    <div className="text-slate-400 group-hover:text-[#4f46e5] transition-colors">
+                    <div className="text-slate-450 dark:text-slate-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                       <MessageSquare size={18} strokeWidth={2} />
                     </div>
                   </div>
 
                   {/* Sorting Filter Sorters - Matches exact aesthetics from image 1 */}
-                  <div className="flex items-center gap-1.5 pb-2 border-b border-slate-200/30 dark:border-slate-800/30 overflow-x-auto select-none no-scrollbar">
+                  <div className="flex items-center gap-1.5 pb-2 border-b border-slate-200/20 dark:border-slate-800/20 overflow-x-auto select-none no-scrollbar">
                     <button
                       onClick={() => handleFilterChange('all')}
-                      className={`flex items-center gap-1 py-2 px-4 rounded-xl text-xs font-bold transition-all shrink-0 ${
+                      className={`flex items-center gap-1.5 py-2 px-4 rounded-xl text-xs font-semibold tracking-tight transition-all shrink-0 ${
                         selectedFilter === 'all'
-                          ? 'bg-slate-200/70 dark:bg-slate-800 text-slate-950 dark:text-white font-black'
-                          : 'text-slate-400 dark:text-slate-500 hover:text-slate-700'
+                          ? 'bg-indigo-600/10 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 shadow-xs'
+                          : 'text-slate-500 dark:text-slate-400 border border-transparent hover:bg-slate-100 dark:hover:bg-slate-900/60 hover:text-slate-800 dark:hover:text-slate-200'
                       }`}
                     >
                       <Trophy size={13} className="text-amber-500" />
@@ -873,10 +873,10 @@ export default function QAForum() {
                     </button>
                     <button
                       onClick={() => handleFilterChange('son')}
-                      className={`flex items-center gap-1.5 py-2 px-4 rounded-xl text-xs font-bold transition-all shrink-0 ${
+                      className={`flex items-center gap-1.5 py-2 px-4 rounded-xl text-xs font-semibold tracking-tight transition-all shrink-0 ${
                         selectedFilter === 'son'
-                          ? 'bg-slate-200/70 dark:bg-slate-800 text-slate-950 dark:text-white font-black'
-                          : 'text-slate-400 dark:text-slate-500 hover:text-slate-700'
+                          ? 'bg-indigo-600/10 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 shadow-xs'
+                          : 'text-slate-500 dark:text-slate-400 border border-transparent hover:bg-slate-100 dark:hover:bg-slate-900/60 hover:text-slate-800 dark:hover:text-slate-200'
                       }`}
                     >
                       <Clock size={13} />
@@ -884,10 +884,10 @@ export default function QAForum() {
                     </button>
                     <button
                       onClick={() => handleFilterChange('week')}
-                      className={`flex items-center gap-1.5 py-2 px-4 rounded-xl text-xs font-bold transition-all shrink-0 ${
+                      className={`flex items-center gap-1.5 py-2 px-4 rounded-xl text-xs font-semibold tracking-tight transition-all shrink-0 ${
                         selectedFilter === 'week'
-                          ? 'bg-slate-200/70 dark:bg-slate-800 text-slate-950 dark:text-white font-black'
-                          : 'text-slate-400 dark:text-slate-500 hover:text-slate-700'
+                          ? 'bg-indigo-600/10 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 shadow-xs'
+                          : 'text-slate-500 dark:text-slate-400 border border-transparent hover:bg-slate-100 dark:hover:bg-slate-900/60 hover:text-slate-800 dark:hover:text-slate-200'
                       }`}
                     >
                       <Calendar size={13} />
@@ -895,10 +895,10 @@ export default function QAForum() {
                     </button>
                     <button
                       onClick={() => handleFilterChange('month')}
-                      className={`flex items-center gap-1.5 py-2 px-4 rounded-xl text-xs font-bold transition-all shrink-0 ${
+                      className={`flex items-center gap-1.5 py-2 px-4 rounded-xl text-xs font-semibold tracking-tight transition-all shrink-0 ${
                         selectedFilter === 'month'
-                          ? 'bg-slate-200/70 dark:bg-slate-800 text-slate-950 dark:text-white font-black'
-                          : 'text-slate-400 dark:text-slate-500 hover:text-slate-700'
+                          ? 'bg-indigo-600/10 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 shadow-xs'
+                          : 'text-slate-500 dark:text-slate-400 border border-transparent hover:bg-slate-100 dark:hover:bg-slate-900/60 hover:text-slate-800 dark:hover:text-slate-200'
                       }`}
                     >
                       <Calendar size={13} />
@@ -913,14 +913,14 @@ export default function QAForum() {
                       <p className="text-xs text-slate-400 italic">Yükleniyor...</p>
                     </div>
                   ) : topics.length > 0 ? (
-                    <div className="divide-y divide-slate-100 dark:divide-slate-900/40">
+                    <div className="space-y-4">
                       {topics.map(topic => {
                         const hasUpvoted = topic.upvoted_users?.includes(currentUser.id);
                         return (
                           <article 
                             key={topic.id}
                             onClick={() => handleViewDetails(topic)}
-                            className="py-5 flex items-start gap-4 cursor-pointer group hover:bg-slate-500/[0.015] rounded-xl px-2 transition-all relative"
+                            className="cursor-pointer group fancy-glass-card transition-all relative flex items-start gap-4"
                           >
                             {/* Upvote Pill Indicator on Left Side */}
                             <div 
@@ -928,7 +928,7 @@ export default function QAForum() {
                               className={`hidden sm:flex flex-col items-center p-2 rounded-xl border transition-all shrink-0 w-11 h-14 justify-center ${
                                 hasUpvoted 
                                   ? 'bg-indigo-50 dark:bg-indigo-950/40 border-indigo-200/80 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400' 
-                                  : 'bg-white dark:bg-slate-900 border-slate-200/60 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-400 hover:text-slate-600'
+                                  : 'bg-slate-50 hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-850 border-slate-200/60 dark:border-slate-800/80 hover:border-slate-300 dark:hover:border-slate-700 text-slate-400 hover:text-slate-600'
                               }`}
                             >
                               <Triangle size={12} className={`mb-1 fill-current stroke-current transition-transform duration-300 ${hasUpvoted ? 'scale-110' : ''}`} />
@@ -955,7 +955,7 @@ export default function QAForum() {
                                       alt=""
                                       referrerPolicy="no-referrer"
                                     />
-                                    <span className="text-xs font-bold text-slate-600 dark:text-slate-400 group-hover/author:text-indigo-500 transition-colors">
+                                    <span className="text-xs font-bold text-slate-500 dark:text-slate-400 group-hover/author:text-indigo-500 transition-colors">
                                       {formatDisplayAuthor(topic.author_name)}
                                     </span>
                                   </div>
@@ -982,17 +982,17 @@ export default function QAForum() {
                               </div>
 
                               {/* Post Title */}
-                              <h2 className="text-base font-black text-slate-950 dark:text-white leading-snug tracking-tight mb-1.5 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                              <h2 className="text-base font-semibold text-slate-950 dark:text-white leading-snug tracking-tight mb-1.5 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors card-title">
                                 {topic.title}
                               </h2>
 
                               {/* Text Excerpt Body */}
-                              <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed font-normal p-[0.3rem] m-[4px]">
+                              <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed font-normal card-desc">
                                 {topic.content}
                               </p>
 
                               {/* Footer engagement tags row */}
-                              <div className="flex items-center justify-between flex-wrap gap-2 text-xs">
+                              <div className="flex items-center justify-between flex-wrap gap-2 text-xs mt-3 pt-3 border-t border-slate-100/50 dark:border-slate-800/10">
                                 {/* Comments/Engagement Avatar overlapping list */}
                                 <div className="flex items-center gap-2">
                                   <div className="flex -space-x-1.5 overflow-hidden">
@@ -1010,7 +1010,7 @@ export default function QAForum() {
                                       </div>
                                     )}
                                   </div>
-                                  <span className="text-xs text-slate-400 font-medium">
+                                  <span className="text-xs text-slate-400 font-medium opacity-75">
                                     {topic.comments_count > 0 
                                       ? `${formatDisplayAuthor(topic.comments?.[0]?.author_name || 'Birisi')} ve ${topic.comments_count} kişi daha yorum yaptı.`
                                       : 'Henüz cevap yazılmamış.'
@@ -1064,7 +1064,7 @@ export default function QAForum() {
                 >
                   {/* Main discussion card detailed */}
                   {activeTopic && (
-                    <div className="p-1 sm:p-2">
+                    <div className="fancy-glass-card mb-6">
                       {/* Detailed Card Top author information matching top part of Image 3 */}
                       <div className="flex items-start justify-between gap-4 border-b border-slate-200/40 dark:border-slate-800/20 pb-4.5 mb-5 select-none">
                         <div 
@@ -1172,8 +1172,7 @@ export default function QAForum() {
 
                     {/* Submit Comment Field Matched exactly to Image 3 */}
                     <div 
-                      style={{ border: 'solid 1px #a7a2f263' }}
-                      className="bg-white dark:bg-slate-900 rounded-xl p-4 flex flex-col gap-3"
+                      className="bg-white/5 dark:bg-slate-900/40 border border-slate-200/50 dark:border-slate-800/60 rounded-2xl p-4 flex flex-col gap-3"
                     >
                       <div className="relative">
                         <textarea 
@@ -1213,7 +1212,7 @@ export default function QAForum() {
                                 .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
                               
                               return (
-                                <div key={comment.id} className="py-4 border-b border-slate-200/40 dark:border-slate-800/20 last:border-none transition-all">
+                                <div key={comment.id} className="p-4 mb-4 rounded-2xl bg-white/5 dark:bg-slate-900/40 border border-slate-200/40 dark:border-slate-800/40 hover:border-slate-300 dark:hover:border-slate-700/60 transition-all">
                                   {/* Main Root Comment */}
                                   <div className="flex items-start gap-3">
                                     <img 
@@ -1371,7 +1370,7 @@ export default function QAForum() {
           {/* Right Column: Sidebar featuring Popüler Etiketler & En Çok Tartışılanlar */}
           <div className="lg:col-span-4 space-y-6 hidden lg:block select-none sticky top-24 h-fit">
             {/* 🏷️ Popüler Etiketler Widget */}
-            <div className="bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800/40 rounded-3xl p-5 shadow-xs">
+            <div className="fancy-glass-card">
               <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100 dark:border-slate-800/30">
                 <Sparkles size={16} className="text-indigo-500 fill-indigo-500/10" />
                 <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white font-mono">
@@ -1400,7 +1399,7 @@ export default function QAForum() {
             </div>
 
             {/* 💬 En Çok Tartışılanlar (Most Discussed) Widget */}
-            <div className="bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800/40 rounded-3xl p-5 shadow-xs">
+            <div className="fancy-glass-card">
               <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100 dark:border-slate-800/30">
                 <MessageSquare size={16} className="text-indigo-500" />
                 <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white font-mono">

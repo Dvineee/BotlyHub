@@ -1745,36 +1745,31 @@ header, nav, .sticky-nav {
 /* Premium SaaS Visual Upgrade (Linear & Stripe level refinement) */
 
 /* 1. Fine-tuned Typography hierarchy */
-h1 {
-  font-weight: 800 !important;
-  letter-spacing: -0.03em !important;
-}
-
-h2, h3 {
+h1, .hero-title {
   font-weight: 700 !important;
+  letter-spacing: -0.04em !important;
+  line-height: 1.15 !important;
+}
+
+h2, h3, .card-title {
+  font-weight: 600 !important;
   letter-spacing: -0.02em !important;
+  line-height: 1.3 !important;
 }
 
-/* Medium text & metadata refinement */
-.text-xs, .text-\[10px\], .text-\[11px\], .text-\[12px\], .text-slate-500, .text-slate-400 {
-  letter-spacing: -0.005em !important;
-  line-height: 1.45 !important;
+/* Card Description/Açıklama text opacity limit */
+.card-desc, .bot-card p, .fancy-glass-card p {
+  opacity: 0.72 !important;
+  line-height: 1.5 !important;
 }
 
-/* 2. Premium Grid & Card Spacing Consistency (8px / 16px Scale) */
+/* 2. Unified Spacing System & Card Spacing (20px Padding & 16px Radius) */
 .fancy-glass-card, .stats-card-bg, .official-links-box, .popular-content-card, .similar-post-card, .bot-card {
-  padding: 1.25rem !important; /* Elegant 20px padding */
-  border-radius: 14px !important; /* Perfect Linear card radius */
+  padding: 20px !important; /* Premium 20px padding */
+  border-radius: 16px !important; /* Refined 16px rounded border */
 }
 
-@media (min-width: 640px) {
-  .fancy-glass-card, .stats-card-bg, .official-links-box, .popular-content-card, .similar-post-card, .bot-card {
-    padding: 1.5rem !important; /* Elegant 24px padding for desktop */
-    border-radius: 16px !important;
-  }
-}
-
-/* 3. Image / Avatar Polish (14-16px and overlay glow) */
+/* 3. Avatar & Image Polish (Consistent 16px radius with border details) */
 img.rounded-xl,
 img.rounded-3xl,
 img.rounded-2xl,
@@ -1783,7 +1778,7 @@ img.rounded-\[13px\],
 .bot-card img,
 .similar-post-card img,
 .popular-content-card img {
-  border-radius: 14px !important;
+  border-radius: 16px !important;
   border: 1px solid rgba(15, 23, 42, 0.04) !important;
 }
 
@@ -1795,22 +1790,59 @@ img.rounded-\[13px\],
 .dark .bot-card img,
 .dark .similar-post-card img,
 .dark .popular-content-card img {
-  border-radius: 14px !important;
+  border-radius: 16px !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
 }
 
-/* 4. Color & Surface Refinement overrides */
-.light {
-  --border-color: rgba(15, 23, 42, 0.05);
-}
-.dark {
-  --border-color: rgba(255, 255, 255, 0.06);
+/* 4. Soft Surface Gradients & Quality Borders */
+.light .fancy-glass-card, .light .stats-card-bg, .light .official-links-box, .light .popular-content-card, .light .similar-post-card, .light .bot-card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.95) 100%) !important;
+  border: 1px solid rgba(15, 23, 42, 0.05) !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.015), 0 4px 16px rgba(15, 23, 42, 0.02) !important;
 }
 
+.light .fancy-glass-card:hover, .light .stats-card-bg:hover, .light .popular-content-card:hover, .light .similar-post-card:hover, .light .bot-card:hover {
+  border-color: rgba(15, 23, 42, 0.12) !important;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06), 0 2px 4px rgba(15, 23, 42, 0.01) !important;
+}
+
+.dark .fancy-glass-card, .dark .stats-card-bg, .dark .official-links-box, .dark .popular-content-card, .dark .similar-post-card, .dark .bot-card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.015) 100%), var(--bg-secondary) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+.dark .fancy-glass-card:hover, .dark .stats-card-bg:hover, .dark .popular-content-card:hover, .dark .similar-post-card:hover, .dark .bot-card:hover {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* 5. Clean Transitions & Hover Lift システム */
+.fancy-glass-card, .stats-card-bg, .official-links-box, .popular-content-card, .similar-post-card, .bot-card, button, a {
+  transition: background 180ms ease, border-color 180ms ease, transform 180ms ease, opacity 180ms ease, box-shadow 180ms ease !important;
+}
+
+.fancy-glass-card:hover, .stats-card-bg:hover, .popular-content-card:hover, .similar-post-card:hover, .bot-card:hover {
+  transform: translateY(-2px) !important;
+}
+
+/* 6. Soluk Meta Datası (Kategori/Tag/Count Satırı) */
+.bot-card .text-xs,
+.fancy-glass-card .text-xs,
+.similar-post-card .text-xs,
+.bot-card .text-slate-500,
+.bot-card .text-slate-400,
+.fancy-glass-card .text-slate-400,
+.fancy-glass-card .text-slate-500 {
+  opacity: 0.55 !important;
+  font-size: 12px !important;
+  letter-spacing: -0.005em !important;
+}
+
+/* 7. Additional Styles requested */
 .dark\:bg-\[\#0F1623\]:is(.dark *) {
     mask-image: linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 60%, transparent 100%);
-    /* --tw-bg-opacity: 1; */
     background-color: rgb(26 27 29) !important;
 }
 
@@ -1819,6 +1851,11 @@ img.rounded-\[13px\],
     --tw-shadow: 0 0 #0000;
     --tw-shadow-colored: 0 0 #0000;
     box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.light .hover\:shadow-none:hover {
+    filter: brightness(0.98) !important;
+    --tw-shadow: 0 0 #0000 !important;
 }
 
 .rounded-\[24px\] {
