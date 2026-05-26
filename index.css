@@ -4,8 +4,8 @@
 @import url('https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap');
 
 :root {
-  --font-main: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-  --font-headers: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  --font-main: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  --font-headers: "Plus Jakarta Sans", "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
 }
 
 body {
@@ -14,6 +14,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   font-weight: 400;
+  letter-spacing: -0.01em;
 }
 
 *,
@@ -124,13 +125,14 @@ body {
   h1, h2, h3, h4, h5, h6, .title {
     font-family: var(--font-headers);
     font-weight: 600;
-    letter-spacing: -0.03em;
-    line-height: 1.2;
+    letter-spacing: -0.025em;
+    line-height: 1.25;
   }
 
   p {
-    line-height: 1.5;
+    line-height: 1.6;
     font-weight: 400;
+    letter-spacing: -0.011em;
   }
 
   span, div, input {
@@ -1448,19 +1450,24 @@ button.bg-brand:hover, button.bg-blue-500:hover, button.bg-blue-600:hover, a.bg-
   border-color: var(--border-color) !important;
 }
 
+/* Force transitions and premium feel on all cards */
+.fancy-glass-card, .stats-card-bg, .official-links-box, .popular-content-card, .similar-post-card, .bot-card {
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
 /* Clean overrides for .light and .dark specifically for card backgrounds */
 .light .bg-slate-50, .light .bg-slate-100, .light .bg-slate-200, .light .bg-white, .light .bg-slate-100\/50, .light .bg-white\/80,
 .light .fancy-glass-card, .light .stats-card-bg, .light .official-links-box, .light .popular-content-card, .light .similar-post-card, .light .bot-card {
-  background-color: var(--bg-secondary) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.75) 100%) !important;
   color: var(--text-primary) !important;
-  border: 1px solid var(--border-color) !important;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.02) !important;
+  border: 1px solid rgba(15, 23, 42, 0.05) !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.015), 0 4px 16px rgba(15, 23, 42, 0.02) !important;
 }
 
 .light .fancy-glass-card:hover, .light .stats-card-bg:hover, .light .popular-content-card:hover, .light .similar-post-card:hover, .light .bot-card:hover {
   transform: translateY(-2px) !important;
-  border-color: var(--border-hover) !important;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.06) !important;
+  border-color: rgba(15, 23, 42, 0.12) !important;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06), 0 2px 4px rgba(15, 23, 42, 0.01) !important;
 }
 
 .mb-4 {
@@ -1468,23 +1475,23 @@ button.bg-brand:hover, button.bg-blue-500:hover, button.bg-blue-600:hover, a.bg-
 }
 
 .light .bg-white\/5, .light .bg-black\/5, .light .bg-slate-500\/5, .light .bg-slate-900\/5 {
-  background-color: rgba(0, 0, 0, 0.05) !important;
+  background-color: rgba(0, 0, 0, 0.04) !important;
 }
 
 .dark .bg-slate-50, .dark .bg-slate-100, .dark .bg-slate-200, .dark .bg-white, .dark .bg-slate-900\/40, .dark .bg-slate-850,
 .dark .fancy-glass-card, .dark .stats-card-bg, .dark .official-links-box, .dark .popular-content-card, .dark .similar-post-card, .dark .bot-card {
-  background-color: var(--bg-secondary) !important; /* Premium dark glass */
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
-  border: 1px solid var(--border-color) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.018) 0%, rgba(255, 255, 255, 0) 100%), var(--bg-secondary) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.058) !important;
   color: var(--text-primary) !important;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.4) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 20px rgba(0, 0, 0, 0.15) !important;
 }
 
 .dark .fancy-glass-card:hover, .dark .stats-card-bg:hover, .dark .popular-content-card:hover, .dark .similar-post-card:hover, .dark .bot-card:hover {
   transform: translateY(-2px) !important;
-  border-color: var(--border-hover) !important;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3) !important;
 }
 
 /* Input Fields, textareas and dropdown selects */
@@ -1498,19 +1505,6 @@ input.search-input, .comment-textarea, select, input[type="text"], input[type="p
 .lg\:pr-0 {
   background-color: var(--bg-secondary) !important;
   border: 1px solid var(--border-color) !important;
-}
-
-/* Category Filter items styles */
-.category-filter-item {
-  background-color: var(--bg-secondary) !important;
-  color: var(--text-secondary) !important;
-  border: 1px solid var(--border-color) !important;
-}
-
-.category-filter-item:hover, .category-filter-item.active {
-  background-color: var(--btn-primary) !important;
-  color: #ffffff !important;
-  border-color: var(--btn-primary) !important;
 }
 
 /* Forms & Cards borders */
@@ -1696,19 +1690,12 @@ header, nav, .sticky-nav {
     background-color: #1e293b;
 }
 
-.category-filter-item:hover, .category-filter-item.active {
-    background-color: #1e293bd4 !important;
-    color: #f8fafc !important;
-    border-color: #33415587 !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
-}
-
 .dark .bg-slate-50, .dark .bg-slate-100, .dark .bg-slate-200, .dark .bg-white, .dark .bg-slate-900\/40, .dark .bg-slate-850, .dark .fancy-glass-card, .dark .stats-card-bg, .dark .official-links-box, .dark .popular-content-card, .dark .similar-post-card, .dark .bot-card {
-    background-color: var(--bg-secondary) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    border: 1px solid var(--border-color) !important;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4) !important;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.018) 0%, rgba(255, 255, 255, 0) 100%), var(--bg-secondary) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.058) !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 20px rgba(0, 0, 0, 0.15) !important;
 }
 
 .max-w-6xl {
@@ -1756,6 +1743,86 @@ header, nav, .sticky-nav {
     border: 1px solid var(--border-color) !important;
     --tw-bg-opacity: 1;
 }
+
+/* Premium SaaS Visual Upgrade (Linear & Stripe level refinement) */
+
+/* 1. Fine-tuned Typography hierarchy */
+h1 {
+  font-weight: 800 !important;
+  letter-spacing: -0.03em !important;
+}
+
+h2, h3 {
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+}
+
+/* Medium text & metadata refinement */
+.text-xs, .text-\[10px\], .text-\[11px\], .text-\[12px\], .text-slate-500, .text-slate-400 {
+  letter-spacing: -0.005em !important;
+  line-height: 1.45 !important;
+}
+
+/* 2. Premium Grid & Card Spacing Consistency (8px / 16px Scale) */
+.fancy-glass-card, .stats-card-bg, .official-links-box, .popular-content-card, .similar-post-card, .bot-card {
+  padding: 1.25rem !important; /* Elegant 20px padding */
+  border-radius: 14px !important; /* Perfect Linear card radius */
+}
+
+@media (min-width: 640px) {
+  .fancy-glass-card, .stats-card-bg, .official-links-box, .popular-content-card, .similar-post-card, .bot-card {
+    padding: 1.5rem !important; /* Elegant 24px padding for desktop */
+    border-radius: 16px !important;
+  }
+}
+
+/* 3. Image / Avatar Polish (14-16px and overlay glow) */
+img.rounded-xl,
+img.rounded-3xl,
+img.rounded-2xl,
+img.rounded-\[11px\],
+img.rounded-\[13px\],
+.bot-card img,
+.similar-post-card img,
+.popular-content-card img {
+  border-radius: 14px !important;
+  border: 1px solid rgba(15, 23, 42, 0.04) !important;
+}
+
+.dark img.rounded-xl,
+.dark img.rounded-3xl,
+.dark img.rounded-2xl,
+.dark img.rounded-\[11px\],
+.dark img.rounded-\[13px\],
+.dark .bot-card img,
+.dark .similar-post-card img,
+.dark .popular-content-card img {
+  border-radius: 14px !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+}
+
+/* 4. Color & Surface Refinement overrides */
+.light {
+  --border-color: rgba(15, 23, 42, 0.05);
+}
+.dark {
+  --border-color: rgba(255, 255, 255, 0.06);
+}
+
+.dark\:bg-\[\#0F1623\]:is(.dark *) {
+    mask-image: linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 60%, transparent 100%);
+    /* --tw-bg-opacity: 1; */
+    background-color: rgb(26 27 29) !important;
+}
+
+.hover\:shadow-none:hover {
+    filter: brightness(1.25);
+    --tw-shadow: 0 0 #0000;
+    --tw-shadow-colored: 0 0 #0000;
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
 
 
 

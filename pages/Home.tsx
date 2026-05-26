@@ -1349,11 +1349,32 @@ const Home = () => {
     // Slider/List (Popular apps in selected category)
     let appsForList = allApps;
     if (selectedAppsCategory !== 'all') {
-        appsForList = allApps.filter(b => 
-            Array.isArray(b.category) 
-                ? b.category.includes(selectedAppsCategory) 
-                : b.category === selectedAppsCategory
-        );
+        const appsCategoryMap: Record<string, (b: Bot) => boolean> = {
+            'trending': (b) => (b.views || 0) > 50,
+            'editors_choice': (b) => b.promoted_type === 'featured',
+            'new': (b) => !!b.isNew,
+            'games_sub': (b) => Array.isArray(b.category) ? b.category.includes('games') : b.category === 'games',
+            'ai_sub': (b) => Array.isArray(b.category) ? b.category.includes('ai_services') : b.category === 'ai_services',
+            'trade': (b) => Array.isArray(b.category) ? b.category.includes('finance') : b.category === 'finance',
+            'social': (b) => Array.isArray(b.category) ? b.category.includes('communication') : b.category === 'communication',
+            'security_privacy': (b) => Array.isArray(b.category) ? b.category.includes('security') : b.category === 'security',
+            'dev': (b) => Array.isArray(b.category) ? b.category.includes('utilities') : b.category === 'utilities',
+            'art': (b) => Array.isArray(b.category) ? b.category.includes('content') : b.category === 'content',
+            'earn': (b) => Array.isArray(b.category) ? b.category.includes('crypto') : b.category === 'crypto',
+            'web3_general': (b) => Array.isArray(b.category) ? b.category.includes('crypto') || b.category.includes('finance') : b.category === 'crypto',
+            'tma_bots': (b) => true,
+            'ton_sites': (b) => true,
+            'saas': (b) => Array.isArray(b.category) ? b.category.includes('productivity') : b.category === 'productivity'
+        };
+        if (appsCategoryMap[selectedAppsCategory]) {
+            appsForList = allApps.filter(appsCategoryMap[selectedAppsCategory]);
+        } else {
+            appsForList = allApps.filter(b => 
+                Array.isArray(b.category) 
+                    ? b.category.includes(selectedAppsCategory) 
+                    : b.category === selectedAppsCategory
+            );
+        }
     }
     const appsSlider = appsForList.slice(0, 9); // Limit to 9 as requested
 
