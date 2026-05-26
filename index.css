@@ -1,6 +1,6 @@
 
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&family=Raleway:wght@400;500;600&display=swap');
 @import url('https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap');
 
 :root {
@@ -1355,7 +1355,8 @@ span, div, input {
 }
 
 span.text-xs.text-slate-400.font-medium {
-    font-size: 0.821rem !important;
+    font-family: 'Raleway', sans-serif;
+    font-size: .821rem !important;
     font-weight: 400;
     color: #62666d !important;
 }
@@ -1835,9 +1836,9 @@ img.rounded-\[13px\],
 .bot-card .text-slate-400,
 .fancy-glass-card .text-slate-400,
 .fancy-glass-card .text-slate-500 {
-  opacity: 0.55 !important;
+  opacity: .95 !important;
   font-size: 12px !important;
-  letter-spacing: -0.005em !important;
+  letter-spacing: -.005em !important;
 }
 
 /* 7. Additional Styles requested */
