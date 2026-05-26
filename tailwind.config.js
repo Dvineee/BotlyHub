@@ -18,13 +18,18 @@ export default {
   theme: {
     extend: {
       colors: {
+        primary: 'var(--color-primary)',
+        secondary: 'var(--color-secondary)',
+        success: 'var(--color-success)',
+        warning: 'var(--color-warning)',
+        danger: 'var(--color-danger)',
         brand: {
-          DEFAULT: '#3b82f6',
-          light: '#60a5fa',
+          DEFAULT: 'var(--color-primary)',
+          light: 'var(--color-secondary)',
         },
         slate: {
           850: '#1e293b',
-          950: '#020617', // Explicitly defined to match your app
+          950: '#020617',
         }
       },
       fontFamily: {

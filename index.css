@@ -30,63 +30,101 @@ body {
 
 @layer base {
   :root {
-    --bg-main: #0A0A0B;
-    --bg-secondary: #111214;
-    --bg-elevated: #16181D;
-    --text-primary: #F5F7FA;
-    --text-secondary: #9CA3AF;
+    --color-primary: #7C5CFF;
+    --color-secondary: #2DD4FF;
+    --color-success: #2EE59D;
+    --color-warning: #FFB020;
+    --color-danger: #FF4D6D;
+
+    --bg-main: #05060A;
+    --bg-elevated: #0A0D14;
+    --bg-card: #0E121B;
+    --bg-secondary: var(--bg-card);
+
+    --border-default: rgba(255,255,255,0.06);
+    --border-hover: rgba(124,92,255,0.25);
+
+    --text-primary: #E6EAF2;
+    --text-secondary: #9AA4B2;
     --text-muted: #6B7280;
-    --border-main: rgba(255, 255, 255, 0.08);
-    --border-hover: rgba(255, 255, 255, 0.14);
-    --input-bg: #16181D;
-    --btn-primary: #60A5FA;
-    --border-color: rgba(255, 255, 255, 0.08);
-    --btn-bg: #F5F7FA;
-    --btn-text: #0A0A0B;
-    --accent: #5EEAD4;
-    --accent-2: #60A5FA;
+
+    --border-main: var(--border-default);
+    --border-hover-override: var(--border-hover);
+    --border-color: var(--border-default);
+    --input-bg: var(--bg-elevated);
+    --btn-primary: var(--color-primary);
+    --border-color: var(--border-default);
+    --btn-bg: var(--text-primary);
+    --btn-text: var(--bg-main);
+    --accent: var(--color-secondary);
+    --accent-2: var(--color-primary);
 
     --text-main: var(--text-primary);
-    --card-bg: var(--bg-secondary);
+    --card-bg: var(--bg-card);
   }
 
   .dark {
-    --bg-main: #0A0A0B;
-    --bg-secondary: #111214;
-    --bg-elevated: #16181D;
-    --text-primary: #F5F7FA;
-    --text-secondary: #9CA3AF;
+    --color-primary: #7C5CFF;
+    --color-secondary: #2DD4FF;
+    --color-success: #2EE59D;
+    --color-warning: #FFB020;
+    --color-danger: #FF4D6D;
+
+    --bg-main: #05060A;
+    --bg-elevated: #0A0D14;
+    --bg-card: #0E121B;
+    --bg-secondary: var(--bg-card);
+
+    --border-default: rgba(255,255,255,0.06);
+    --border-hover: rgba(124,92,255,0.25);
+
+    --text-primary: #E6EAF2;
+    --text-secondary: #9AA4B2;
     --text-muted: #6B7280;
-    --border-main: rgba(255, 255, 255, 0.08);
-    --border-hover: rgba(255, 255, 255, 0.14);
-    --input-bg: #16181D;
-    --btn-primary: #60A5FA;
-    --border-color: rgba(255, 255, 255, 0.08);
-    --btn-bg: #F5F7FA;
-    --btn-text: #0A0A0B;
-    --accent: #5EEAD4;
-    --accent-2: #60A5FA;
+
+    --border-main: var(--border-default);
+    --border-hover-override: var(--border-hover);
+    --border-color: var(--border-default);
+    --input-bg: var(--bg-elevated);
+    --btn-primary: var(--color-primary);
+    --border-color: var(--border-default);
+    --btn-bg: var(--text-primary);
+    --btn-text: var(--bg-main);
+    --accent: var(--color-secondary);
+    --accent-2: var(--color-primary);
 
     --text-main: var(--text-primary);
-    --card-bg: var(--bg-secondary);
+    --card-bg: var(--bg-card);
   }
 
   .light {
+    --color-primary: #7C5CFF;
+    --color-secondary: #2DD4FF;
+    --color-success: #2EE59D;
+    --color-warning: #FFB020;
+    --color-danger: #FF4D6D;
+
     --bg-main: #F7F8FA;
-    --bg-secondary: #FFFFFF;
     --bg-elevated: #F1F5F9;
+    --bg-card: #FFFFFF;
+    --bg-secondary: #FFFFFF;
+
+    --border-default: rgba(15, 23, 42, 0.06);
+    --border-hover: rgba(124, 92, 255, 0.15);
+
     --text-primary: #0F172A;
     --text-secondary: #64748B;
     --text-muted: #94A3B8;
-    --border-main: rgba(15, 23, 42, 0.08);
-    --border-hover: rgba(15, 23, 42, 0.14);
+
+    --border-main: var(--border-default);
+    --border-color: var(--border-default);
     --input-bg: #F1F5F9;
-    --btn-primary: #3B82F6;
-    --border-color: rgba(15, 23, 42, 0.08);
+    --btn-primary: var(--color-primary);
+    --border-color: var(--border-default);
     --btn-bg: #0F172A;
     --btn-text: #FFFFFF;
-    --accent: #5EEAD4;
-    --accent-2: #3B82F6;
+    --accent: var(--color-secondary);
+    --accent-2: var(--color-primary);
 
     --text-main: var(--text-primary);
     --card-bg: var(--bg-secondary);
@@ -1480,14 +1518,14 @@ button.bg-brand:hover, button.bg-blue-500:hover, button.bg-blue-600:hover, a.bg-
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.018) 0%, rgba(255, 255, 255, 0) 100%), var(--bg-secondary) !important;
   backdrop-filter: blur(16px) !important;
   -webkit-backdrop-filter: blur(16px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.058) !important;
+  border: 1px solid var(--border-default) !important;
   color: var(--text-secondary) !important;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 20px rgba(0, 0, 0, 0.15) !important;
 }
 
 .dark .fancy-glass-card:hover, .dark .stats-card-bg:hover, .dark .popular-content-card:hover, .dark .similar-post-card:hover, .dark .bot-card:hover {
   transform: translateY(-2px) !important;
-  border-color: rgba(255, 255, 255, 0.14) !important;
+  border-color: var(--border-hover) !important;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3) !important;
 }
 
@@ -1809,12 +1847,12 @@ img.rounded-\[13px\],
 
 .dark .fancy-glass-card, .dark .stats-card-bg, .dark .official-links-box, .dark .popular-content-card, .dark .similar-post-card, .dark .bot-card {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.015) 100%), var(--bg-secondary) !important;
-  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid var(--border-default) !important;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 20px rgba(0, 0, 0, 0.15) !important;
 }
 
 .dark .fancy-glass-card:hover, .dark .stats-card-bg:hover, .dark .popular-content-card:hover, .dark .similar-post-card:hover, .dark .bot-card:hover {
-  border-color: rgba(255, 255, 255, 0.12) !important;
+  border-color: var(--border-hover) !important;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3) !important;
 }
 
