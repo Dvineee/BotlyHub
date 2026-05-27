@@ -1116,7 +1116,7 @@ const NavMenu = ({
                         animate={{ y: 0 }}
                         exit={{ y: "100%" }}
                         transition={{ type: "spring", damping: 30, stiffness: 300 }}
-                        className="relative w-full bg-white dark:bg-slate-900 rounded-t-[32px] overflow-hidden pt-4 pb-12 border-t border-black/10 dark:border-white/10"
+                        className="relative w-full bg-white dark:bg-slate-900 rounded-t-[32px] overflow-y-auto max-h-[85vh] pt-4 pb-12 border-t border-black/10 dark:border-white/10"
                     >
                         {/* Drag Handle */}
                         <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mb-8" />
@@ -2541,29 +2541,26 @@ const Home = () => {
       {/* Mobile Modal for Categories */}
       <AnimatePresence>
           {mobileModal && (
-              <div className="fixed inset-0 z-[200] flex items-end justify-center p-0 md:hidden">
+              <div className="fixed inset-0 z-[200] overflow-hidden md:hidden">
                   <motion.div 
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                       onClick={() => { setMobileModal(null); setNavState('main'); }}
-                      className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"
+                      className="absolute inset-0 bg-slate-950/80 backdrop-blur-md"
                   />
                   <motion.div 
-                      initial={{ y: "100%" }}
+                      initial={{ y: "-100%" }}
                       animate={{ y: 0 }}
-                      exit={{ y: "100%" }}
-                      transition={{ type: "spring", damping: 30, stiffness: 300 }}
-                      className="relative w-full bg-white dark:bg-slate-900 rounded-t-[32px] overflow-hidden pt-4 pb-12 border-t border-black/10 dark:border-white/10"
+                      exit={{ y: "-100%" }}
+                      transition={{ type: "spring", damping: 28, stiffness: 280 }}
+                      className="absolute top-0 left-0 w-full bg-white dark:bg-[#0c0e14] rounded-b-[32px] overflow-y-auto max-h-[85vh] pt-6 pb-10 border-b border-black/10 dark:border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.3)]"
                   >
-                      {/* Drag Handle */}
-                      <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mb-8" />
-                      
-                      <div className="flex justify-between items-center mb-6 px-8">
-                          <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-widest uppercase italic bg-transparent border-none outline-none">
+                      <div className="flex justify-between items-center mb-6 px-6">
+                          <h3 className="text-lg font-black text-slate-900 dark:text-white tracking-widest uppercase italic bg-transparent border-none outline-none">
                               {mobileModal === 'kesfet' ? 'KEŞFET' : 'YATIRIMCILAR'}
                           </h3>
-                          <button onClick={() => { setMobileModal(null); setNavState('main'); }} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-500 active:scale-90 transition-all">
+                          <button onClick={() => { setMobileModal(null); setNavState('main'); }} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-500 active:scale-95 transition-all">
                               <X size={20} />
                           </button>
                       </div>
@@ -2587,7 +2584,7 @@ const Home = () => {
                                               }}
                                               className="w-full flex items-center gap-4 p-4 hover:bg-slate-50 dark:hover:bg-white/5 active:bg-slate-100 dark:active:bg-white/10 transition-all rounded-2xl border border-black/5 dark:border-white/5 group mobile-menu-item"
                                           >
-                                              <div className={`mobile-menu-icon-container flex items-center justify-center rounded-xl shrink-0 ${mobileModal === 'kesfet' ? 'text-blue-500' : 'text-emerald-500'}`}>
+                                              <div className={`mobile-menu-icon-container flex items-center justify-center rounded-xl shrink-0 ${mobileModal === 'kesfet' ? 'text-blue-500 bg-blue-500/10 dark:bg-blue-500/20' : 'text-emerald-500 bg-emerald-500/10 dark:bg-emerald-500/20'}`}>
                                                   <item.icon size={22} className="menu-item-icon" />
                                               </div>
                                               <div className="flex flex-col items-start min-w-0">
@@ -2620,7 +2617,7 @@ const Home = () => {
                                                   onClick={() => handleCategoryClick(cat.id, 'bots')}
                                                   className="flex flex-col items-start gap-3 p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5 mobile-menu-item"
                                               >
-                                                  <div className="mobile-menu-icon-container flex items-center justify-center text-blue-500">
+                                                  <div className="mobile-menu-icon-container flex items-center justify-center text-blue-500 bg-blue-500/10 dark:bg-blue-500/20">
                                                       <cat.icon size={20} />
                                                   </div>
                                                   <span className="text-[10px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300">{t(cat.label)}</span>
@@ -2649,7 +2646,7 @@ const Home = () => {
                                                   onClick={() => handleCategoryClick(cat.id, 'apps')}
                                                   className="flex flex-col items-start gap-3 p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5 mobile-menu-item"
                                               >
-                                                  <div className="mobile-menu-icon-container flex items-center justify-center text-emerald-500">
+                                                  <div className="mobile-menu-icon-container flex items-center justify-center text-emerald-500 bg-emerald-500/10 dark:bg-emerald-500/20">
                                                       <cat.icon size={20} />
                                                   </div>
                                                   <span className="text-[10px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300">{t(cat.label)}</span>

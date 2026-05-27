@@ -1453,16 +1453,7 @@ button.bg-brand:hover, button.bg-blue-500:hover, button.bg-blue-600:hover, a.bg-
   background-color: rgba(0, 0, 0, 0.04) !important;
 }
 
-.dark .bg-slate-50, .dark .bg-slate-100, .dark .bg-slate-200, .dark .bg-white, .dark .bg-slate-900\/40, .dark .bg-slate-850, .dark .fancy-glass-card, .dark .stats-card-bg, .dark .official-links-box, .dark .popular-content-card, .dark .similar-post-card, .dark .bot-card {
-    backdrop-filter: blur(16px) !important;
-    color: var(--text-secondary) !important;
-    box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 2px, rgba(0, 0, 0, 0.15) 0px 4px 20px !important;
-    background: linear-gradient(180deg, #ffffff05, #fff0), var(--bg-secondary) !important;
-    border-width: 1px !important;
-    border-style: solid !important;
-    border-color: rgba(255, 255, 255, 0.06) !important;
-    border-image: initial !important;
-}
+
 
 .dark .fancy-glass-card:hover, .dark .stats-card-bg:hover, .dark .popular-content-card:hover, .dark .similar-post-card:hover, .dark .bot-card:hover {
   border-color: rgba(255, 255, 255, 0.14) !important;
@@ -1816,6 +1807,272 @@ img.rounded-\[13px\],
 .group:hover .group-hover\:text-blue-500 {
     color: inherit !important;
 }
+
+/* Modallar ve Açılır Menüler için Tema ve Mobil İyileştirmeleri */
+
+/* 1. Light Mode Modal/Dropdown Tutarlılığı */
+html:not(.dark) .fixed .bg-white:not(.bottom-nav-container),
+html:not(.dark) .absolute[class*="bg-white"]:not(.bottom-nav-container),
+html:not(.dark) .mega-menu-container,
+html:not(.dark) [role="dialog"],
+html:not(.dark) .modal-content,
+html:not(.dark) [class*="dropdown-menu"] {
+    background: linear-gradient(180deg, #ffffff, #fcfcfc) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    color: #0f172a !important;
+    box-shadow: 0 10px 40px -10px rgba(15, 23, 42, 0.12), 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+    border: 1px solid rgba(15, 23, 42, 0.08) !important;
+}
+
+/* 2. Dark Mode Modal/Dropdown Tutarlılığı */
+.dark .fixed .bg-white:not(.bottom-nav-container),
+.dark .fixed [class*="bg-[#14181f]"]:not(.bottom-nav-container),
+.dark .fixed [class*="bg-slate-900"]:not(.bottom-nav-container),
+.dark .fixed [class*="bg-[#0c0e14]"]:not(.bottom-nav-container),
+.dark .absolute[class*="bg-white"]:not(.bottom-nav-container),
+.dark .absolute[class*="bg-slate-900"]:not(.bottom-nav-container),
+.dark .absolute[class*="bg-slate-950"]:not(.bottom-nav-container),
+.dark .absolute[class*="bg-[#0c0e14]"]:not(.bottom-nav-container),
+.dark .mega-menu-container,
+.dark [role="dialog"],
+.dark .modal-content,
+.dark [class*="dropdown-menu"] {
+    background: linear-gradient(180deg, #0c0e14, #06080c) !important;
+    backdrop-filter: blur(24px) !important;
+    -webkit-backdrop-filter: blur(24px) !important;
+    color: var(--text-primary) !important;
+    box-shadow: 0 15px 50px -15px rgba(0, 0, 0, 0.6), 0 1px 3px rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* 3. Menü Öğesi Geliştirmeleri */
+.dark .absolute[class*="dropdown-menu"] button,
+.dark [class*="dropdown-menu"] a,
+.dark .mega-menu-container button,
+.dark .mega-menu-container a {
+    color: var(--text-secondary) !important;
+    transition: all 0.2s ease !important;
+}
+.dark .absolute[class*="dropdown-menu"] button:hover,
+.dark [class*="dropdown-menu"] a:hover,
+.dark .mega-menu-container button:hover,
+.dark .mega-menu-container a:hover {
+    color: var(--text-primary) !important;
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+html:not(.dark) .absolute[class*="dropdown-menu"] button,
+html:not(.dark) [class*="dropdown-menu"] a,
+html:not(.dark) .mega-menu-container button,
+html:not(.dark) .mega-menu-container a {
+    color: #475569 !important;
+    transition: all 0.2s ease !important;
+}
+html:not(.dark) .absolute[class*="dropdown-menu"] button:hover,
+html:not(.dark) [class*="dropdown-menu"] a:hover,
+html:not(.dark) .mega-menu-container button:hover,
+html:not(.dark) .mega-menu-container a:hover {
+    color: #0f172a !important;
+    background-color: rgba(15, 23, 42, 0.04) !important;
+}
+
+/* 4. Arka plan blur ve görsel odak derinliği */
+.fixed.inset-0.bg-slate-950\/80,
+.fixed.inset-0.bg-slate-950\/40,
+.fixed.inset-0.bg-black\/80,
+.fixed.inset-0.bg-black\/95 {
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+}
+
+/* 5. Mobil cihazlar için Alt Menü (Bottom Sheet) ve Modal İyileştirmeleri */
+@media (max-width: 639px) {
+    /* Her iki modal yönü (Alt ve Üst Sheet) edge-to-edge (kenardan kenara) tam genişlikte durmasını sağlama */
+    .rounded-t-\[32px\], .rounded-b-\[32px\] {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        border-left: none !important;
+        border-right: none !important;
+        left: 0 !important;
+        right: 0 !important;
+    }
+
+    .rounded-t-\[32px\] {
+        border-radius: 32px 32px 0 0 !important;
+        border-bottom: none !important;
+        bottom: 0 !important;
+    }
+
+    .rounded-b-\[32px\] {
+        border-radius: 0 0 32px 32px !important;
+        border-top: none !important;
+        top: 0 !important;
+    }
+
+    .dark .rounded-t-\[32px\], .dark .rounded-b-\[32px\] {
+        background: linear-gradient(180deg, #0c0e14 0%, #06080c 100%) !important;
+    }
+
+    .dark .rounded-t-\[32px\] {
+        border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    .dark .rounded-b-\[32px\] {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    html:not(.dark) .rounded-t-\[32px\], html:not(.dark) .rounded-b-\[32px\] {
+        background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%) !important;
+    }
+
+    html:not(.dark) .rounded-t-\[32px\] {
+        border-top: 1px solid rgba(15, 23, 42, 0.08) !important;
+    }
+
+    html:not(.dark) .rounded-b-\[32px\] {
+        border-bottom: 1px solid rgba(15, 23, 42, 0.08) !important;
+    }
+
+    /* Alt Sabit Menü (BottomNav) Koruma Kuralları */
+    .bottom-nav-container {
+        background: rgba(255, 255, 255, 0.95) !important;
+        background-color: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: blur(24px) !important;
+        -webkit-backdrop-filter: blur(24px) !important;
+        border: none !important;
+        border-top: 1px solid rgba(226, 232, 240, 0.8) !important;
+        box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.03) !important;
+        padding-bottom: env(safe-area-inset-bottom) !important;
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 100 !important;
+        border-radius: 0 !important;
+    }
+
+    .dark .bottom-nav-container {
+        background: rgba(12, 14, 20, 0.98) !important;
+        background-color: rgba(12, 14, 20, 0.98) !important;
+        backdrop-filter: blur(24px) !important;
+        -webkit-backdrop-filter: blur(24px) !important;
+        border: none !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
+        box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.4) !important;
+        padding-bottom: env(safe-area-inset-bottom) !important;
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 100 !important;
+        border-radius: 0 !important;
+    }
+
+    /* Mobil Menü Ögeleri (Discover / Keşfet & Yatırımcılar vb.) CSS Geliştirmeleri */
+    .mobile-menu-item {
+        background-color: rgba(15, 23, 42, 0.03) !important;
+        border: 1px solid rgba(15, 23, 42, 0.06) !important;
+        border-radius: 16px !important;
+        padding: 14px 16px !important;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 16px !important;
+        text-align: left !important;
+    }
+
+    .mobile-menu-itemText, .mobile-menu-item span {
+        color: #1e293b !important; /* slate-800 equivalent */
+        font-weight: 800 !important;
+    }
+
+    .mobile-menu-item:hover, .mobile-menu-item:active {
+        background-color: rgba(15, 23, 42, 0.06) !important;
+        transform: translateY(-0.5px);
+    }
+
+    /* Dark Mode için Mobil Menü Ögeleri */
+    .dark .mobile-menu-item {
+        background-color: rgba(255, 255, 255, 0.04) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    .dark .mobile-menu-item:hover, .dark .mobile-menu-item:active {
+        background-color: rgba(255, 255, 255, 0.08) !important;
+    }
+
+    .dark .mobile-menu-itemText, .dark .mobile-menu-item span {
+        color: #f1f5f9 !important; /* slate-100 equivalent */
+    }
+
+    .mobile-menu-icon-container {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 38px !important;
+        height: 38px !important;
+        border-radius: 12px !important;
+        background-color: rgba(59, 130, 246, 0.08) !important; /* blue-500 tint */
+    }
+
+    .dark .mobile-menu-icon-container {
+        background-color: rgba(59, 130, 246, 0.16) !important;
+    }
+
+    /* Yeşil ikon kapları (Yatırımcılar) */
+    .mobile-menu-icon-container.text-emerald-500 {
+        background-color: rgba(16, 185, 129, 0.08) !important;
+    }
+
+    .dark .mobile-menu-icon-container.text-emerald-500 {
+        background-color: rgba(16, 185, 129, 0.16) !important;
+    }
+
+    textarea, .comment-textarea {
+        max-height: 180px !important;
+    }
+}
+
+/* 6. Form alanı giriş öğesi estetikleri */
+.dark .fixed input,
+.dark .fixed textarea,
+.dark .fixed select,
+.dark .absolute input,
+.dark .absolute textarea,
+.dark .absolute select {
+    background-color: rgba(0, 0, 0, 0.2) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.dark .fixed input:focus,
+.dark .fixed textarea:focus,
+.dark .fixed select:focus {
+    border-color: var(--btn-primary) !important;
+    box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.15) !important;
+}
+
+html:not(.dark) .fixed input,
+html:not(.dark) .fixed textarea,
+html:not(.dark) .fixed select,
+html:not(.dark) .absolute input,
+html:not(.dark) .absolute textarea,
+html:not(.dark) .absolute select {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border: 1px solid rgba(15, 23, 42, 0.15) !important;
+}
+
+html:not(.dark) .fixed input:focus,
+html:not(.dark) .fixed textarea:focus,
+html:not(.dark) .fixed select:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15) !important;
+}
+
 
 
 

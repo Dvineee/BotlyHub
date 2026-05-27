@@ -26,21 +26,26 @@ const BottomNav: React.FC = () => {
     };
 
     return (
-        <div className="md:hidden fixed bottom-6 left-6 right-6 z-[100] pb-[env(safe-area-inset-bottom)]">
-            <div className="bg-white/90 dark:bg-[#0f121a]/95 backdrop-blur-3xl border border-black/5 dark:border-white/10 rounded-[28px] p-1.5 flex items-center justify-between shadow-2xl shadow-blue-500/5 select-none">
+        <div className="bottom-nav-container md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-white/95 dark:bg-[#0c0e14]/98 backdrop-blur-3xl border-t border-slate-200/50 dark:border-white/10 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_rgba(0,0,0,0.03)] dark:shadow-[0_-8px_30px_rgba(0,0,0,0.4)] select-none">
+            <div className="flex items-center justify-around h-16 max-w-md mx-auto px-1">
                 {navItems.map((item) => {
                     const active = isActive(item.path);
                     return (
                         <button
                             key={item.id}
                             onClick={() => { haptic('light'); navigate(item.path); }}
-                            className={`relative flex flex-col items-center justify-center w-12 h-12 rounded-[20px] transition-all duration-200 ${active ? 'text-blue-500 bg-blue-500/8 dark:bg-blue-500/12' : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'}`}
+                            className="relative flex flex-col items-center justify-center flex-1 h-full py-0.5 outline-none transition-transform active:scale-95"
                         >
-                            <item.icon size={20} strokeWidth={active ? 2.5 : 2} />
+                            <div className={`flex items-center justify-center p-1 rounded-xl transition-all duration-200 ${active ? 'text-blue-500' : 'text-slate-400 dark:text-slate-500'}`}>
+                                <item.icon size={20} className="transition-all" strokeWidth={active ? 2.25 : 1.8} />
+                            </div>
+                            <span className={`text-[8.5px] font-black tracking-wider uppercase transition-colors duration-150 block truncate max-w-full px-1 ${active ? 'text-blue-500' : 'text-slate-400 dark:text-slate-500'}`}>
+                                {item.label}
+                            </span>
                             {active && (
                                 <motion.div
                                     layoutId="bottomNavBadge"
-                                    className="absolute -bottom-0.5 w-1 h-1 bg-blue-500 rounded-full"
+                                    className="absolute top-0 w-8 h-0.5 bg-blue-500 rounded-full"
                                 />
                             )}
                         </button>

@@ -597,26 +597,26 @@ const NavMenu = ({
         {/* Mobile Mega Menus */}
         <AnimatePresence>
             {mobileModal && (
-                <div className="fixed inset-0 z-[200] md:hidden">
+                <div className="fixed inset-0 z-[200] overflow-hidden md:hidden">
                     <motion.div 
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={() => setMobileModal(null)}
-                        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                        className="absolute inset-0 bg-slate-950/80 backdrop-blur-md"
                     />
                     <motion.div 
-                        initial={{ y: '100%' }}
+                        initial={{ y: '-100%' }}
                         animate={{ y: 0 }}
-                        exit={{ y: '100%' }}
-                        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                        className="absolute bottom-0 left-0 w-full bg-white dark:bg-slate-900 rounded-t-[32px] p-6 max-h-[85vh] overflow-y-auto"
+                        exit={{ y: '-100%' }}
+                        transition={{ type: 'spring', damping: 28, stiffness: 280 }}
+                        className="absolute top-0 left-0 w-full bg-white dark:bg-[#0c0e14] rounded-b-[32px] pt-6 pb-12 px-6 max-h-[85vh] overflow-y-auto border-b border-black/10 dark:border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.3)]"
                     >
                         <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase italic">
-                                {mobileModal === 'kesfet' ? 'Keşfet' : 'Yatırımcılar'}
+                            <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase italic">
+                                {mobileModal === 'kesfet' ? 'KEŞFET' : 'YATIRIMCILAR'}
                             </h3>
-                            <button onClick={() => setMobileModal(null)} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400">
+                            <button onClick={() => setMobileModal(null)} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-500 active:scale-95 transition-all">
                                 <X size={20} />
                             </button>
                         </div>
@@ -629,14 +629,14 @@ const NavMenu = ({
                                         if (item.action) item.action();
                                         else if (item.path) { navigate(item.path); setMobileModal(null); }
                                     }}
-                                    className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-white/5 rounded-2xl text-left"
+                                    className="w-full flex items-center gap-4 p-4 hover:bg-slate-50 dark:hover:bg-white/5 active:bg-slate-100 dark:active:bg-white/10 transition-all rounded-2xl border border-black/5 dark:border-white/5 group mobile-menu-item text-left"
                                 >
-                                    <div className="w-12 h-12 bg-white dark:bg-slate-800 rounded-xl flex items-center justify-center shadow-sm text-blue-500">
-                                        <item.icon size={24} />
+                                    <div className={`mobile-menu-icon-container flex items-center justify-center rounded-xl shrink-0 ${mobileModal === 'kesfet' ? 'text-blue-500 bg-blue-500/10 dark:bg-blue-500/20' : 'text-emerald-500 bg-emerald-500/10 dark:bg-emerald-500/20'}`}>
+                                        <item.icon size={22} className="menu-item-icon" />
                                     </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-base font-bold text-slate-900 dark:text-white">{item.label}</span>
-                                        <span className="text-xs text-slate-500 dark:text-slate-400">{item.desc}</span>
+                                    <div className="flex flex-col min-w-0">
+                                        <span className="text-[13px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider truncate w-full">{item.label}</span>
+                                        <span className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{item.desc}</span>
                                     </div>
                                 </button>
                             ))}

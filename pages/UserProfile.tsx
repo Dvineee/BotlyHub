@@ -1011,7 +1011,7 @@ export default function UserProfile() {
                             initial={{ opacity: 0, y: 50, scale: 0.95 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 50, scale: 0.95 }}
-                            className="bg-white dark:bg-slate-900 w-full max-w-md rounded-t-[32px] sm:rounded-3xl overflow-hidden border border-slate-200/50 dark:border-slate-800/50 shadow-2xl"
+                            className="bg-white dark:bg-slate-900 w-full max-w-md rounded-t-[32px] sm:rounded-3xl overflow-y-auto max-h-[90vh] sm:max-h-[85vh] border border-slate-200/50 dark:border-slate-800/50 shadow-2xl"
                         >
                             {/* Header */}
                             <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
