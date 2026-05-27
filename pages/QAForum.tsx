@@ -1577,7 +1577,7 @@ export default function QAForum() {
               className="relative w-full bg-white dark:bg-slate-900 rounded-t-[32px] overflow-hidden pt-4 pb-12 border-t border-black/10 dark:border-white/10"
             >
               {/* Drag Handle */}
-              <div className="w-12 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full mx-auto mb-8" />
+              <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mb-8" />
               
               <div className="flex justify-between items-center mb-6 px-8">
                 <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-widest uppercase italic font-sans">

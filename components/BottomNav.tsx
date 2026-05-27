@@ -26,29 +26,27 @@ const BottomNav: React.FC = () => {
     };
 
     return (
-        <div className="md:hidden fixed bottom-4 left-4 right-4 z-[100]">
-            <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl border border-black/5 dark:border-white/10 rounded-[32px] p-2 flex items-center justify-between shadow-2xl shadow-blue-500/10">
+        <div className="md:hidden fixed bottom-6 left-6 right-6 z-[100] pb-[env(safe-area-inset-bottom)]">
+            <div className="bg-white/90 dark:bg-[#0f121a]/95 backdrop-blur-3xl border border-black/5 dark:border-white/10 rounded-[28px] p-1.5 flex items-center justify-between shadow-2xl shadow-blue-500/5 select-none">
                 {navItems.map((item) => {
                     const active = isActive(item.path);
                     return (
                         <button
                             key={item.id}
                             onClick={() => { haptic('light'); navigate(item.path); }}
-                            className={`relative flex flex-col items-center justify-center w-14 h-14 rounded-[22px] transition-all ${active ? 'text-blue-500 bg-blue-500/5' : 'text-slate-400'}`}
+                            className={`relative flex flex-col items-center justify-center w-12 h-12 rounded-[20px] transition-all duration-200 ${active ? 'text-blue-500 bg-blue-500/8 dark:bg-blue-500/12' : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'}`}
                         >
-                            <item.icon size={22} strokeWidth={active ? 2.5 : 2} />
+                            <item.icon size={20} strokeWidth={active ? 2.5 : 2} />
                             {active && (
                                 <motion.div
                                     layoutId="bottomNavBadge"
-                                    className="absolute -bottom-1 w-1 h-1 bg-blue-500 rounded-full"
+                                    className="absolute -bottom-0.5 w-1 h-1 bg-blue-500 rounded-full"
                                 />
                             )}
                         </button>
                     );
                 })}
             </div>
-            {/* Safe area padding */}
-            <div className="h-[env(safe-area-inset-bottom)]" />
         </div>
     );
 };

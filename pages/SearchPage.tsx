@@ -108,7 +108,7 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = ({ bot, tonRate }) => {
 
         {/* Middle: 1 line "personality text" -> Handles Telegram automation in seconds */}
         <div className="mb-4 flex-1 min-h-[22px]">
-            <p className="text-[13px] sm:text-[13.5px] text-slate-500/90 dark:text-slate-400/90 font-normal leading-normal line-clamp-1 truncate">
+            <p className="text-[13px] sm:text-[13.5px] text-slate-500 dark:text-slate-400 font-normal leading-normal line-clamp-1 truncate">
                 {bot.description.startsWith('bot_') ? t(bot.description) : bot.description}
             </p>
         </div>

@@ -471,7 +471,7 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number, featuredRank?: number }> = 
 
         {/* Middle: 1 line "personality text" -> Handles Telegram automation in seconds */}
         <div className="mb-4 flex-1 min-h-[22px]">
-            <p className="text-[13px] sm:text-[13.5px] text-slate-500/90 dark:text-slate-400/90 font-normal leading-normal line-clamp-1 truncate">
+            <p className="text-[13px] sm:text-[13.5px] text-slate-500 dark:text-slate-400 font-normal leading-normal line-clamp-1 truncate">
                 {bot.description.startsWith('bot_') ? t(bot.description) : bot.description}
             </p>
         </div>
@@ -1119,7 +1119,7 @@ const NavMenu = ({
                         className="relative w-full bg-white dark:bg-slate-900 rounded-t-[32px] overflow-hidden pt-4 pb-12 border-t border-black/10 dark:border-white/10"
                     >
                         {/* Drag Handle */}
-                        <div className="w-12 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full mx-auto mb-8" />
+                        <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mb-8" />
                         
                         <div className="flex justify-between items-center mb-6 px-8">
                             <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-widest uppercase italic">
@@ -2557,7 +2557,7 @@ const Home = () => {
                       className="relative w-full bg-white dark:bg-slate-900 rounded-t-[32px] overflow-hidden pt-4 pb-12 border-t border-black/10 dark:border-white/10"
                   >
                       {/* Drag Handle */}
-                      <div className="w-12 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full mx-auto mb-8" />
+                      <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mb-8" />
                       
                       <div className="flex justify-between items-center mb-6 px-8">
                           <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-widest uppercase italic bg-transparent border-none outline-none">
