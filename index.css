@@ -560,8 +560,10 @@ p.text-\[10px\].text-slate-400.dark\:text-slate-500.font-medium.uppercase.tracki
 }
 
 .dark\:bg-slate-900\/60:is(.dark *) {
-    background-color: #1e2337;
+    outline: 1px solid var(--border-color) !important;
+    background-color: #191919 !important;
 }
+
 .dark\:bg-slate-800\/60:is(.dark *) {
     background: none !important;
 }
@@ -1569,7 +1571,7 @@ header, nav, .sticky-nav {
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
     text-align: center;
     background-color: var(--bg-elevated) !important;
-    color: var(--text-secondary) !important;
+    color: #d4d4d4 !important;
 }
 
 .category-filter-item:hover, .category-filter-item.active {
@@ -1772,6 +1774,8 @@ img.rounded-\[13px\],
 
 /* 7. Additional Styles requested */
 .dark\:bg-\[\#0F1623\]:is(.dark *) {
+    border: 1px solid var(--border-color) !important;
+    -webkit-mask-image: linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 60%, transparent 100%);
     mask-image: linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 60%, transparent 100%);
     background-color: rgb(26 27 29) !important;
 }
@@ -2072,6 +2076,12 @@ html:not(.dark) .fixed select:focus {
     border-color: #3b82f6 !important;
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15) !important;
 }
+
+/* User Dark Mode Specific Settings Override */
+.dark\:text-slate-400:is(.dark *) {
+    color: #8c8c8c !important;
+}
+
 
 
 
