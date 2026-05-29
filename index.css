@@ -30,42 +30,42 @@ body {
 
 @layer base {
   :root {
-    --bg-main: #0A0F1C;
-    --bg-secondary: #111827;
-    --bg-elevated: #1e293b;
+    --bg-main: #0A0A0B;
+    --bg-secondary: #111214;
+    --bg-elevated: #16181D;
     --text-primary: #F5F7FA;
     --text-secondary: #9CA3AF;
     --text-muted: #6B7280;
     --border-main: rgba(255, 255, 255, 0.08);
     --border-hover: rgba(255, 255, 255, 0.14);
-    --input-bg: #111827;
-    --btn-primary: #5B21B6;
+    --input-bg: #16181D;
+    --btn-primary: #60A5FA;
     --border-color: rgba(255, 255, 255, 0.08);
     --btn-bg: #F5F7FA;
-    --btn-text: #0A0F1C;
-    --accent: #67E8F9;
-    --accent-2: #C026D3;
+    --btn-text: #0A0A0B;
+    --accent: #5EEAD4;
+    --accent-2: #60A5FA;
 
     --text-main: var(--text-primary);
     --card-bg: var(--bg-secondary);
   }
 
   .dark {
-    --bg-main: #0A0F1C;
-    --bg-secondary: #111827;
-    --bg-elevated: #1e293b;
+    --bg-main: #0A0A0B;
+    --bg-secondary: #111214;
+    --bg-elevated: #16181D;
     --text-primary: #F5F7FA;
     --text-secondary: #9CA3AF;
     --text-muted: #6B7280;
     --border-main: rgba(255, 255, 255, 0.08);
     --border-hover: rgba(255, 255, 255, 0.14);
-    --input-bg: #111827;
-    --btn-primary: #5B21B6;
+    --input-bg: #16181D;
+    --btn-primary: #60A5FA;
     --border-color: rgba(255, 255, 255, 0.08);
     --btn-bg: #F5F7FA;
-    --btn-text: #0A0F1C;
-    --accent: #67E8F9;
-    --accent-2: #C026D3;
+    --btn-text: #0A0A0B;
+    --accent: #5EEAD4;
+    --accent-2: #60A5FA;
 
     --text-main: var(--text-primary);
     --card-bg: var(--bg-secondary);
@@ -1426,6 +1426,7 @@ button.bg-brand:hover, button.bg-blue-500:hover, button.bg-blue-600:hover, a.bg-
 /* Force backgrounds of sections/cards and secondary elements */
 .fancy-glass-card, .stats-card-bg, .official-links-box, .popular-content-card, .similar-post-card, .bot-card {
   background-color: var(--bg-secondary) !important;
+  border: 1px solid rgba(255, 255, 255, .08) !important;
   border-color: var(--border-color) !important;
 }
 
@@ -1457,18 +1458,8 @@ button.bg-brand:hover, button.bg-blue-500:hover, button.bg-blue-600:hover, a.bg-
 
 
 
-.dark .fancy-glass-card, .dark .stats-card-bg, .dark .official-links-box, .dark .popular-content-card, .dark .similar-post-card, .dark .bot-card {
-  background-color: rgba(17, 24, 39, 0.75) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5) !important;
-}
-
 .dark .fancy-glass-card:hover, .dark .stats-card-bg:hover, .dark .popular-content-card:hover, .dark .similar-post-card:hover, .dark .bot-card:hover {
-  transform: translateY(-8px) scale(1.02) !important;
-  border-color: rgba(103, 232, 249, 0.45) !important;
-  box-shadow: 0 20px 40px -10px rgba(91, 33, 182, 0.3), 0 0 20px 2px rgba(192, 38, 211, 0.2), 0 0 15px 1px rgba(103, 232, 249, 0.15) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
 }
 
 /* Input Fields, textareas and dropdown selects */
@@ -1484,6 +1475,16 @@ input.search-input, .comment-textarea, select, input[type="text"], input[type="p
   border: 1px solid var(--border-color) !important;
 }
 
+.dark .lg\:pr-0 {
+    background-color: rgb(25 25 25) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.hover\:text-blue-500:hover {
+    --tw-text-opacity: 1;
+    color: rgb(212 217 224) !important;
+}
+
 
 
 header, nav, .sticky-nav {
@@ -1491,16 +1492,12 @@ header, nav, .sticky-nav {
   border-color: var(--border-color) !important;
 }
 
-.dark .bg-slate-950,
-.dark .dark\:bg-slate-950,
-.dark .bg-slate-900,
-.dark .dark\:bg-slate-900,
-.dark .bg-slate-50,
-.dark .dark\:bg-slate-50,
-.dark .bg-[#0a0a0b],
-.dark .bg-[#0c0e14],
-.dark .bg-[#0A0F1C] {
+.bg-slate-950, .dark\:.bg-slate-950, .bg-\[\#fcfcfc\], .bg-\[\#f8fafc\] {
   background-color: var(--bg-main) !important;
+}
+
+.dark .bg-slate-950, .dark .dark\:.bg-slate-950, .dark .bg-\[\#fcfcfc\], .dark .bg-\[\#f8fafc\] {
+  background: transparent !important;
 }
 
 /* Fix specific UI components */
@@ -1733,10 +1730,10 @@ h2, h3, .card-title {
   line-height: 1.5 !important;
 }
 
-/* 2. Unified Spacing System & Card Spacing (20px Padding & 18px Radius) */
+/* 2. Unified Spacing System & Card Spacing (20px Padding & 16px Radius) */
 .fancy-glass-card, .stats-card-bg, .official-links-box, .popular-content-card, .similar-post-card, .bot-card {
   padding: 20px !important; /* Premium 20px padding */
-  border-radius: 18px !important; /* Refined 18px rounded border */
+  border-radius: 16px !important; /* Refined 16px rounded border */
 }
 
 /* 3. Avatar & Image Polish (Consistent 16px radius with border details) */
@@ -1787,20 +1784,10 @@ img.rounded-\[13px\],
 
 /* 7. Additional Styles requested */
 .dark\:bg-\[\#0F1623\]:is(.dark *) {
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    border-radius: 18px !important;
+    border: 1px solid var(--border-color) !important;
     -webkit-mask-image: linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 60%, transparent 100%);
     mask-image: linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 60%, transparent 100%);
-    background-color: rgba(17, 24, 39, 0.75) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-}
-
-.dark\:bg-\[\#0F1623\]:hover:is(.dark *) {
-    transform: translateY(-4px) !important;
-    border-color: rgba(103, 232, 249, 0.45) !important;
-    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.6), 0 0 15px 1px rgba(103, 232, 249, 0.15) !important;
+    background-color: rgb(26 27 29) !important;
 }
 
 .hover\:shadow-none:hover {
@@ -1865,7 +1852,7 @@ html:not(.dark) [class*="dropdown-menu"] {
 .dark [role="dialog"],
 .dark .modal-content,
 .dark [class*="dropdown-menu"] {
-    background: rgba(17, 24, 39, 0.95) !important;
+    background: linear-gradient(180deg, #0c0e14, #06080c) !important;
     backdrop-filter: blur(24px) !important;
     -webkit-backdrop-filter: blur(24px) !important;
     color: var(--text-primary) !important;

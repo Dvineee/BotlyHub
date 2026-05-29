@@ -1955,12 +1955,8 @@ const Home = () => {
 
 
       {/* Bottom Section */}
-      <div className="bg-white dark:bg-[#0A0F1C] w-full py-24 shadow-[0_-1px_0_0_rgba(0,0,0,0.015)] relative overflow-hidden">
-          {/* Ambient background glows */}
-          <div className="hidden dark:block absolute top-[-10%] left-[-10%] w-[45%] h-[55%] rounded-full bg-indigo-900/15 blur-[100px] pointer-events-none" />
-          <div className="hidden dark:block absolute bottom-[-15%] right-[-10%] w-[45%] h-[55%] rounded-full bg-fuchsia-900/10 blur-[100px] pointer-events-none" />
-          
-          <div className="max-w-6xl mx-auto px-6 sm:px-8 relative z-10">
+      <div className="bg-white dark:bg-slate-950 w-full py-24 shadow-[0_-1px_0_0_rgba(0,0,0,0.015)]">
+          <div className="max-w-6xl mx-auto px-6 sm:px-8">
               {!isLoading && (
                   <>
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700 relative z-10 text-center lg:text-left">
@@ -1968,13 +1964,9 @@ const Home = () => {
                             <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-[-0.04em] md:leading-[1.1] leading-[1.2] text-slate-900 dark:text-white max-w-2xl">
                                 {t('home_hero_title').includes(':') ? (
                                     <>
-                                        {t('home_hero_title').split(':')[0]}: <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#67E8F9] via-[#8B5CF6] to-[#C026D3]">{t('home_hero_title').split(':')[1]?.trim()}</span>
+                                        {t('home_hero_title').split(':')[0]}: <span className="text-blue-500 dark:text-blue-400">{t('home_hero_title').split(':')[1]?.trim()}</span>
                                     </>
-                                ) : (
-                                    <>
-                                        BotlyHub <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#67E8F9] via-[#8B5CF6] to-[#C026D3]">AI Studio</span>
-                                    </>
-                                )}
+                                ) : t('home_hero_title')}
                             </h1>
                             <p className="mt-6 text-[15px] sm:text-[16px] text-slate-500/80 dark:text-slate-400/80 leading-[1.6] font-normal max-w-[55ch]">
                                 {t('home_hero_desc')}
@@ -1984,7 +1976,7 @@ const Home = () => {
                             <div className="mt-8 flex flex-wrap items-center justify-center lg:justify-start gap-4">
                                 <button 
                                     onClick={() => { haptic('medium'); navigate('/search'); }}
-                                    className="px-8 h-12 bg-gradient-to-r from-[#5B21B6] via-[#7C3AED] to-[#C026D3] hover:brightness-110 text-white text-[14px] font-bold rounded-xl transition-all shadow-lg shadow-purple-500/20 hover:shadow-purple-500/30 hover:scale-[1.02] active:scale-95 flex items-center justify-center whitespace-nowrap"
+                                    className="px-8 h-12 bg-blue-500 hover:bg-blue-600 text-white text-[14px] font-bold rounded-xl transition-all shadow-md shadow-blue-500/10 active:scale-95 flex items-center justify-center whitespace-nowrap"
                                 >
                                     {t('explore_now') || 'Hemen Keşfet'}
                                 </button>
