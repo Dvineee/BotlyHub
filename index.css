@@ -1457,9 +1457,18 @@ button.bg-brand:hover, button.bg-blue-500:hover, button.bg-blue-600:hover, a.bg-
 
 
 
+.dark .fancy-glass-card, .dark .stats-card-bg, .dark .official-links-box, .dark .popular-content-card, .dark .similar-post-card, .dark .bot-card {
+  background-color: rgba(17, 24, 39, 0.75) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5) !important;
+}
+
 .dark .fancy-glass-card:hover, .dark .stats-card-bg:hover, .dark .popular-content-card:hover, .dark .similar-post-card:hover, .dark .bot-card:hover {
-  border-color: rgba(255, 255, 255, 0.14) !important;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  transform: translateY(-8px) scale(1.02) !important;
+  border-color: rgba(103, 232, 249, 0.45) !important;
+  box-shadow: 0 20px 40px -10px rgba(91, 33, 182, 0.3), 0 0 20px 2px rgba(192, 38, 211, 0.2), 0 0 15px 1px rgba(103, 232, 249, 0.15) !important;
 }
 
 /* Input Fields, textareas and dropdown selects */
@@ -1482,12 +1491,16 @@ header, nav, .sticky-nav {
   border-color: var(--border-color) !important;
 }
 
-.bg-slate-950, .dark\:.bg-slate-950, .bg-\[\#fcfcfc\], .bg-\[\#f8fafc\] {
+.dark .bg-slate-950,
+.dark .dark\:bg-slate-950,
+.dark .bg-slate-900,
+.dark .dark\:bg-slate-900,
+.dark .bg-slate-50,
+.dark .dark\:bg-slate-50,
+.dark .bg-[#0a0a0b],
+.dark .bg-[#0c0e14],
+.dark .bg-[#0A0F1C] {
   background-color: var(--bg-main) !important;
-}
-
-.dark .bg-slate-950, .dark .dark\:.bg-slate-950, .dark .bg-\[\#fcfcfc\], .dark .bg-\[\#f8fafc\] {
-  background: transparent !important;
 }
 
 /* Fix specific UI components */
@@ -1720,10 +1733,10 @@ h2, h3, .card-title {
   line-height: 1.5 !important;
 }
 
-/* 2. Unified Spacing System & Card Spacing (20px Padding & 16px Radius) */
+/* 2. Unified Spacing System & Card Spacing (20px Padding & 18px Radius) */
 .fancy-glass-card, .stats-card-bg, .official-links-box, .popular-content-card, .similar-post-card, .bot-card {
   padding: 20px !important; /* Premium 20px padding */
-  border-radius: 16px !important; /* Refined 16px rounded border */
+  border-radius: 18px !important; /* Refined 18px rounded border */
 }
 
 /* 3. Avatar & Image Polish (Consistent 16px radius with border details) */
@@ -1852,7 +1865,7 @@ html:not(.dark) [class*="dropdown-menu"] {
 .dark [role="dialog"],
 .dark .modal-content,
 .dark [class*="dropdown-menu"] {
-    background: linear-gradient(180deg, #0c0e14, #06080c) !important;
+    background: rgba(17, 24, 39, 0.95) !important;
     backdrop-filter: blur(24px) !important;
     -webkit-backdrop-filter: blur(24px) !important;
     color: var(--text-primary) !important;
