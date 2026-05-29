@@ -1480,7 +1480,7 @@ input.search-input, .comment-textarea, select, input[type="text"], input[type="p
     border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.hover\:text-blue-500:hover {
+.dark .hover\:text-blue-500:hover {
     --tw-text-opacity: 1;
     color: rgb(212 217 224) !important;
 }
