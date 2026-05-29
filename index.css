@@ -30,42 +30,42 @@ body {
 
 @layer base {
   :root {
-    --bg-main: #0A0A0B;
-    --bg-secondary: #111214;
-    --bg-elevated: #16181D;
+    --bg-main: #0A0F1C;
+    --bg-secondary: #111827;
+    --bg-elevated: #1e293b;
     --text-primary: #F5F7FA;
     --text-secondary: #9CA3AF;
     --text-muted: #6B7280;
     --border-main: rgba(255, 255, 255, 0.08);
     --border-hover: rgba(255, 255, 255, 0.14);
-    --input-bg: #16181D;
-    --btn-primary: #60A5FA;
+    --input-bg: #111827;
+    --btn-primary: #5B21B6;
     --border-color: rgba(255, 255, 255, 0.08);
     --btn-bg: #F5F7FA;
-    --btn-text: #0A0A0B;
-    --accent: #5EEAD4;
-    --accent-2: #60A5FA;
+    --btn-text: #0A0F1C;
+    --accent: #67E8F9;
+    --accent-2: #C026D3;
 
     --text-main: var(--text-primary);
     --card-bg: var(--bg-secondary);
   }
 
   .dark {
-    --bg-main: #0A0A0B;
-    --bg-secondary: #111214;
-    --bg-elevated: #16181D;
+    --bg-main: #0A0F1C;
+    --bg-secondary: #111827;
+    --bg-elevated: #1e293b;
     --text-primary: #F5F7FA;
     --text-secondary: #9CA3AF;
     --text-muted: #6B7280;
     --border-main: rgba(255, 255, 255, 0.08);
     --border-hover: rgba(255, 255, 255, 0.14);
-    --input-bg: #16181D;
-    --btn-primary: #60A5FA;
+    --input-bg: #111827;
+    --btn-primary: #5B21B6;
     --border-color: rgba(255, 255, 255, 0.08);
     --btn-bg: #F5F7FA;
-    --btn-text: #0A0A0B;
-    --accent: #5EEAD4;
-    --accent-2: #60A5FA;
+    --btn-text: #0A0F1C;
+    --accent: #67E8F9;
+    --accent-2: #C026D3;
 
     --text-main: var(--text-primary);
     --card-bg: var(--bg-secondary);
@@ -1774,10 +1774,20 @@ img.rounded-\[13px\],
 
 /* 7. Additional Styles requested */
 .dark\:bg-\[\#0F1623\]:is(.dark *) {
-    border: 1px solid var(--border-color) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 18px !important;
     -webkit-mask-image: linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 60%, transparent 100%);
     mask-image: linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 60%, transparent 100%);
-    background-color: rgb(26 27 29) !important;
+    background-color: rgba(17, 24, 39, 0.75) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.dark\:bg-\[\#0F1623\]:hover:is(.dark *) {
+    transform: translateY(-4px) !important;
+    border-color: rgba(103, 232, 249, 0.45) !important;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.6), 0 0 15px 1px rgba(103, 232, 249, 0.15) !important;
 }
 
 .hover\:shadow-none:hover {
