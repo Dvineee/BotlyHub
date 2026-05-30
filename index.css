@@ -1445,7 +1445,6 @@ button.bg-brand:hover, button.bg-blue-500:hover, button.bg-blue-600:hover, a.bg-
 
 .light .fancy-glass-card:hover, .light .stats-card-bg:hover, .light .popular-content-card:hover, .light .similar-post-card:hover, .light .bot-card:hover {
   border-color: rgba(15, 23, 42, 0.12) !important;
-  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06), 0 2px 4px rgba(15, 23, 42, 0.01) !important;
 }
 
 .mb-4 {
@@ -1584,12 +1583,20 @@ header, nav, .sticky-nav {
     color: #d4d4d4 !important;
 }
 
+.light .category-filter-item {
+    color: #0f172a !important;
+}
+
 .category-filter-item:hover, .category-filter-item.active {
     transform: translateY(-1px) !important;
     background-color: var(--btn-bg) !important;
     color: var(--btn-text) !important;
     border-color: var(--btn-bg) !important;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
+}
+
+.light .category-filter-item:hover, .light .category-filter-item.active {
+    color: var(--btn-text) !important;
 }
 
 .category-filter-container {
