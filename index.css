@@ -1461,6 +1461,10 @@ button.bg-brand:hover, button.bg-blue-500:hover, button.bg-blue-600:hover, a.bg-
   border-color: rgba(255, 255, 255, 0.14) !important;
 }
 
+.dark .official-links-box {
+    background-color: #1e293b00 !important;
+}
+
 /* Input Fields, textareas and dropdown selects */
 input.search-input, .comment-textarea, select, input[type="text"], input[type="password"], input[type="email"], textarea {
   background-color: var(--bg-secondary) !important;
@@ -1482,6 +1486,42 @@ input.search-input, .comment-textarea, select, input[type="text"], input[type="p
 .dark .hover\:text-blue-500:hover {
     --tw-text-opacity: 1;
     color: rgb(212 217 224) !important;
+}
+
+article.cursor-pointer.group.fancy-glass-card.transition-all.relative.flex.items-start.gap-4 {
+    box-shadow: none !important;
+    background-color: #11121400 !important;
+}
+
+.dark\:bg-slate-900:is(.dark *),
+.dark .dark\:bg-slate-900,
+.dark .bg-slate-900,
+.dark [class*="dark:bg-slate-900"] {
+    --tw-bg-opacity: 1 !important;
+    background: #ffffff0d !important;
+    background-color: #ffffff0d !important;
+}
+
+.light .bg-slate-50, .light .bg-slate-100, .light .bg-slate-200, .light .bg-white, .light .bg-slate-100\/50, .light .bg-white\/80, .light .fancy-glass-card, .light .stats-card-bg, .light .official-links-box, .light .popular-content-card, .light .similar-post-card, .light .bot-card {
+    border: 1px solid rgba(15, 23, 42, .05) !important;
+}
+
+.dark .bg-slate-50, .dark .bg-slate-100, .dark .bg-slate-200, .dark .bg-white, 
+.dark .bg-slate-900, .dark .bg-slate-950, .dark .bg-slate-800,
+.dark .bg-slate-100\/50, .dark .bg-white\/80, .dark .bg-slate-900\/50, .dark .bg-slate-900\/40, .dark .bg-slate-900\/60,
+.dark .fancy-glass-card, .dark .stats-card-bg, .dark .official-links-box, 
+.dark .popular-content-card, .dark .similar-post-card, .dark .bot-card {
+    border: 1px solid rgba(255, 255, 255, .05) !important;
+}
+
+.dark\:text-slate-950:is(.dark *) {
+    background-color: #f5f7fa !important;
+    --tw-text-opacity: 1;
+    color: rgb(2 6 23 / var(--tw-text-opacity, 1));
+}
+
+.border-b-8 {
+    border-bottom-width: 0px;
 }
 
 
@@ -2094,84 +2134,10 @@ html:not(.dark) .fixed select:focus {
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15) !important;
 }
 
-/* User Dark Mode Specific Settings Override & High-Quality Cohesion */
+/* User Dark Mode Specific Settings Override */
 .dark\:text-slate-400:is(.dark *) {
-    color: rgba(255, 255, 255, 0.6) !important;
+    color: #8c8c8c !important;
 }
-
-/* 1. Prevent major page and section outer wrappers from getting forced card borders and gradients in Light Mode */
-.light .min-h-screen, 
-.light .search-page, 
-.light .home-page, 
-.light #root, 
-.light .bot-detail-page, 
-.light .blog-page-scope, 
-.light .qa-forum-page {
-    border: none !important;
-    box-shadow: none !important;
-    background: var(--bg-main) !important;
-}
-
-/* 2. Symmetrical fade-mask decoration for the home page promo preview card in Light Mode */
-html:not(.dark) .lg\:col-span-5 [class*="bg-slate-50"] {
-    -webkit-mask-image: linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 60%, transparent 100%) !important;
-    mask-image: linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 60%, transparent 100%) !important;
-}
-
-/* 3. Fully unified Premium Input, Textarea, and Select Focus states for BOTH modes */
-input.search-input:focus, 
-.comment-textarea:focus, 
-select:focus, 
-input[type="text"]:focus, 
-input[type="password"]:focus, 
-input[type="email"]:focus, 
-textarea:focus {
-    border-color: var(--btn-primary) !important;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.16) !important;
-    outline: none !important;
-}
-
-.dark input.search-input:focus, 
-.dark .comment-textarea:focus, 
-.dark select:focus, 
-.dark input[type="text"]:focus, 
-.dark input[type="password"]:focus, 
-.dark input[type="email"]:focus, 
-.dark textarea:focus {
-    border-color: var(--btn-primary) !important;
-    box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.16) !important;
-    outline: none !important;
-}
-
-/* 4. Fix contrast issues for .bot-category-tag on Dark Mode */
-.dark .bot-detail-page .bot-category-tag {
-    color: var(--text-secondary) !important;
-    background-color: rgba(255, 255, 255, 0.1) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-}
-
-/* 5. Clean, elegant, non-conflicting Sidebar (.lg:pr-0) across modes */
-.lg\:pr-0 {
-    background-color: var(--bg-secondary) !important;
-    border: 1px solid var(--border-color) !important;
-}
-
-.dark .lg\:pr-0 {
-    background-color: var(--bg-secondary) !important;
-    border: 1px solid rgba(255, 255, 255, 0.05) !important;
-}
-
-.light .lg\:pr-0 {
-    background-color: var(--bg-secondary) !important;
-    border: 1px solid rgba(15, 23, 42, 0.05) !important;
-}
-
-/* 6. Beautiful similar-post-card hover state for Light Mode to match Dark Mode */
-.light .similar-post-card:hover {
-    background-color: var(--bg-elevated) !important;
-    border-color: rgba(59, 130, 246, 0.25) !important;
-}
-
 
 
 
