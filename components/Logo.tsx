@@ -10,35 +10,53 @@ interface LogoProps {
 
 export const Logo: React.FC<LogoProps> = ({ className, style, onClick, isIcon }) => {
   const iconContent = (
-    <div className={`${isIcon ? 'w-full h-full' : 'w-8 h-8'} flex-shrink-0`}>
+    <div className={`${isIcon ? 'w-full h-full' : 'w-9 h-9 md:w-10 md:h-10'} flex-shrink-0 transition-transform duration-300 hover:scale-105`}>
       <svg 
         width="100%" 
         height="100%" 
-        viewBox="0 0 48 48" 
+        viewBox="0 0 60 60" 
         fill="none" 
         xmlns="http://www.w3.org/2000/svg"
       >
-        <g transform="rotate(204 24 25)">
+        <style>{`
+          .logo-plate-path {
+            fill: #000000;
+            transition: fill 0.3s ease;
+          }
+          .logo-stroke-path {
+            fill: #000000;
+            transition: fill 0.3s ease;
+          }
+          .dark .logo-plate-path {
+            fill: #ffffff;
+          }
+          .dark .logo-stroke-path {
+            fill: #ffffff;
+          }
+        `}</style>
+
+        <defs>
+          <mask id="linear-cuts">
+            {/* Her şeyi beyaza boya (görünür kıl) */}
+            <rect x="0" y="0" width="60" height="60" fill="#ffffff" />
+            {/* Soldan giren ve ortada biten 3 kalın kesici çizgi (siyah alanlar logoyu siler/keser) */}
+            <g stroke="#000000" strokeWidth="3.5" strokeLinecap="round">
+              <line x1="-5" y1="22" x2="30" y2="22" />
+              <line x1="-5" y1="28" x2="35" y2="28" />
+              <line x1="-5" y1="34" x2="30" y2="34" />
+            </g>
+          </mask>
+        </defs>
+
+        {/* LOGO GÖVDESİ: Tam ortalanmış ve kesik maskesi uygulanmış ana plaka */}
+        <g mask="url(#linear-cuts)" transform="translate(0, 4)">
           <path 
-            d="M23.4365 26.5357L17.5199 39.224C16.1195 42.2273 12.5496 43.5266 9.54633 42.1262V42.1262C6.54309 40.7257 5.24376 37.1558 6.6442 34.1526L18.373 9" 
-            fill="#30a9fe" 
-            stroke="#FFF" 
-            strokeWidth="4" 
-            strokeLinecap="round"
+            d="M33.638,9.147,50.362,20.853A3.844,3.844,0,0,1,52,24a3.844,3.844,0,0,1-1.638,3.147L33.638,38.853A6.338,6.338,0,0,1,30,40a6.338,6.338,0,0,1-3.638-1.147L9.638,27.147A3.844,3.844,0,0,1,8,24a3.844,3.844,0,0,1,1.638-3.147L26.362,9.147A6.338,6.338,0,0,1,30,8A6.338,6.338,0,0,1,33.638,9.147Z" 
+            className="logo-plate-path"
           />
           <path 
-            d="M41.3541 34.1527L29.5208 8.7761C28.1203 5.77286 24.5505 4.47352 21.5472 5.87396C18.544 7.27439 17.2447 10.8443 18.6451 13.8475L30.4784 39.2241C31.8788 42.2274 35.4487 43.5267 38.452 42.1263C41.4552 40.7258 42.7545 37.156 41.3541 34.1527Z" 
-            fill="#30a9fe" 
-            stroke="#FFF" 
-            strokeWidth="4"
-          />
-          <circle 
-            cx="25" 
-            cy="38" 
-            r="6" 
-            fill="#30a9fe" 
-            stroke="#FFF" 
-            strokeWidth="4"
+            d="M30,41.5a7.818,7.818,0,0,1-4.5-1.417L8.778,28.375a5.34,5.34,0,0,1,0-8.75L25.5,7.918a7.972,7.972,0,0,1,9,0h0L51.222,19.625a5.34,5.34,0,0,1,0,8.75L34.5,40.082A7.811,7.811,0,0,1,30,41.5Zm0-32a4.825,4.825,0,0,0-2.779.876L10.5,22.082a2.341,2.341,0,0,0,0,3.836L27.222,37.625a4.921,4.921,0,0,0,5.557,0L49.5,25.918a2.341,2.341,0,0,0,0-3.836L32.779,10.376A4.825,4.825,0,0,0,30,9.5Z" 
+            className="logo-stroke-path"
           />
         </g>
       </svg>
@@ -55,14 +73,14 @@ export const Logo: React.FC<LogoProps> = ({ className, style, onClick, isIcon })
 
   return (
     <div 
-      className={`flex items-center gap-2 ${className}`} 
+      className={`flex items-center gap-2.5 ${className}`} 
       style={style}
       onClick={onClick}
     >
       {iconContent}
-      <span className="flex items-center text-2xl font-black tracking-[-0.08em] uppercase italic leading-none">
-        <span className="text-slate-900 dark:text-white">BOTLY</span>
-        <span className="text-blue-500 ml-0.5 drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]">HUB</span>
+      <span className="flex items-center text-2xl md:text-3xl font-black tracking-[-0.08em] uppercase italic leading-none select-none">
+        <span className="text-slate-900 dark:text-white transition-colors duration-300">BOTLY</span>
+        <span className="text-blue-500 ml-0.5 drop-shadow-[0_0_15px_rgba(59,130,246,0.3)] select-none">HUB</span>
       </span>
     </div>
   );
