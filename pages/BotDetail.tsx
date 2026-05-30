@@ -553,6 +553,7 @@ const BotDetail = () => {
   const [isCopied, setIsCopied] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isCategoriesExpanded, setIsCategoriesExpanded] = useState(false);
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [isSidebarDropdownOpen, setIsSidebarDropdownOpen] = useState(false);
   const [userRating, setUserRating] = useState<number | null>(null);
   const [hoverRating, setHoverRating] = useState<number | null>(null);
@@ -1222,8 +1223,32 @@ const BotDetail = () => {
           <div className="flex items-center justify-between mb-4 px-2">
             <h3 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">{t('detail_about_label')}</h3>
           </div>
-          <div className="p-[11px] bg-white dark:bg-slate-900/60 rounded-xl border border-black/5 dark:border-white/5 text-sm text-slate-600 dark:text-slate-400 leading-[1.6] whitespace-pre-wrap">
-              {bot.description}
+          <div className="p-[11px] bg-white dark:bg-slate-900/60 rounded-xl border border-black/5 dark:border-white/5 text-sm text-slate-600 dark:text-slate-400 leading-[1.6]">
+              <div className="whitespace-pre-wrap">
+                  {bot.description.length > 250 && !isDescriptionExpanded 
+                      ? `${bot.description.slice(0, 250)}...` 
+                      : bot.description
+                  }
+              </div>
+              {bot.description.length > 250 && (
+                  <button
+                      onClick={() => {
+                          haptic('light');
+                          setIsDescriptionExpanded(!isDescriptionExpanded);
+                      }}
+                      className="mt-3 text-xs font-bold text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1 active:scale-95 transition-all select-none"
+                  >
+                      {isDescriptionExpanded ? (
+                          <>
+                              {t('show_less') || 'Daha az göster'}
+                          </>
+                      ) : (
+                          <>
+                              {t('show_more') || 'Daha fazla göster'}
+                          </>
+                      )}
+                  </button>
+              )}
           </div>
       </div>
 
