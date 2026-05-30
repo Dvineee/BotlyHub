@@ -2094,10 +2094,84 @@ html:not(.dark) .fixed select:focus {
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15) !important;
 }
 
-/* User Dark Mode Specific Settings Override */
+/* User Dark Mode Specific Settings Override & High-Quality Cohesion */
 .dark\:text-slate-400:is(.dark *) {
-    color: #8c8c8c !important;
+    color: rgba(255, 255, 255, 0.6) !important;
 }
+
+/* 1. Prevent major page and section outer wrappers from getting forced card borders and gradients in Light Mode */
+.light .min-h-screen, 
+.light .search-page, 
+.light .home-page, 
+.light #root, 
+.light .bot-detail-page, 
+.light .blog-page-scope, 
+.light .qa-forum-page {
+    border: none !important;
+    box-shadow: none !important;
+    background: var(--bg-main) !important;
+}
+
+/* 2. Symmetrical fade-mask decoration for the home page promo preview card in Light Mode */
+html:not(.dark) .lg\:col-span-5 [class*="bg-slate-50"] {
+    -webkit-mask-image: linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 60%, transparent 100%) !important;
+    mask-image: linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 60%, transparent 100%) !important;
+}
+
+/* 3. Fully unified Premium Input, Textarea, and Select Focus states for BOTH modes */
+input.search-input:focus, 
+.comment-textarea:focus, 
+select:focus, 
+input[type="text"]:focus, 
+input[type="password"]:focus, 
+input[type="email"]:focus, 
+textarea:focus {
+    border-color: var(--btn-primary) !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.16) !important;
+    outline: none !important;
+}
+
+.dark input.search-input:focus, 
+.dark .comment-textarea:focus, 
+.dark select:focus, 
+.dark input[type="text"]:focus, 
+.dark input[type="password"]:focus, 
+.dark input[type="email"]:focus, 
+.dark textarea:focus {
+    border-color: var(--btn-primary) !important;
+    box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.16) !important;
+    outline: none !important;
+}
+
+/* 4. Fix contrast issues for .bot-category-tag on Dark Mode */
+.dark .bot-detail-page .bot-category-tag {
+    color: var(--text-secondary) !important;
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* 5. Clean, elegant, non-conflicting Sidebar (.lg:pr-0) across modes */
+.lg\:pr-0 {
+    background-color: var(--bg-secondary) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+.dark .lg\:pr-0 {
+    background-color: var(--bg-secondary) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.light .lg\:pr-0 {
+    background-color: var(--bg-secondary) !important;
+    border: 1px solid rgba(15, 23, 42, 0.05) !important;
+}
+
+/* 6. Beautiful similar-post-card hover state for Light Mode to match Dark Mode */
+.light .similar-post-card:hover {
+    background-color: var(--bg-elevated) !important;
+    border-color: rgba(59, 130, 246, 0.25) !important;
+}
+
 
 
 
