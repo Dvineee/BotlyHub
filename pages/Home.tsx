@@ -197,7 +197,7 @@ const PromoCard: React.FC<{ ann: Announcement, onShowPopup: (ann: Announcement) 
         onClick={handleAction}
         className={`w-full h-[185px] sm:h-[195px] shrink-0 rounded-[24px] border border-solid p-6 pb-5 sm:p-7 sm:pb-6 relative overflow-hidden flex flex-col justify-between cursor-pointer select-none transition-all duration-305 hover:shadow-lg dark:hover:shadow-black/20 group backdrop-blur-md ${cardBgClass}`}
     >
-        <div className="z-10 max-w-[58%] sm:max-w-[52%] flex flex-col items-start h-full justify-between">
+        <div className="z-10 max-w-[58%] sm:max-w-[61%] flex flex-col items-start h-full justify-between">
             <div className="flex flex-col gap-1.5">
                 <h3 className="text-[#0f172a] dark:text-white font-[900] text-[15px] sm:text-[17px] tracking-tight leading-snug font-sans group-hover:text-black dark:group-hover:text-slate-100 transition-colors">
                     {ann.title}
