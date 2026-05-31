@@ -985,11 +985,11 @@ const BotDetail = () => {
               <div className="relative mb-6">
                   <button 
                       onClick={() => { haptic('light'); setIsDropdownOpen(!isDropdownOpen); }}
-                      className="w-full h-14 bg-white dark:bg-slate-900 rounded-xl border border-black/5 dark:border-white/10 flex items-center justify-between px-5 text-[11px] font-black uppercase tracking-[0.2em] transition-all active:scale-[0.98] stats-card-bg"
+                      className="w-full h-14 bg-white dark:bg-slate-900 rounded-xl border border-black/5 dark:border-white/10 flex items-center justify-between px-5 text-[11px] font-black tracking-[0.2em] transition-all active:scale-[0.98] stats-card-bg"
                   >
                       <div className="flex items-center gap-3">
                           <LinkIcon size={18} className="text-brand" />
-                          <span>{t('detail_official_links') || 'RESMİ LİNKLER'}</span>
+                          <span>{t('detail_official_links') || 'Resmi Linkler'}</span>
                       </div>
                       <ChevronDown size={18} className={`transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
@@ -1016,7 +1016,7 @@ const BotDetail = () => {
                                           >
                                               <div className="flex items-center gap-3">
                                                   <Send size={14} className="text-blue-500" />
-                                                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300">Telegram Grup</span>
+                                                  <span className="text-[10px] font-black tracking-widest text-slate-700 dark:text-slate-300">Telegram Grup</span>
                                               </div>
                                               <ChevronRight size={14} className="text-slate-300 dark:text-slate-700" />
                                           </button>
@@ -1028,7 +1028,7 @@ const BotDetail = () => {
                                           >
                                               <div className="flex items-center gap-3">
                                                   <Globe size={14} className="text-emerald-500" />
-                                                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300">Web Site</span>
+                                                  <span className="text-[10px] font-black tracking-widest text-slate-700 dark:text-slate-300">Web Site</span>
                                               </div>
                                               <ChevronRight size={14} className="text-slate-300 dark:text-slate-700" />
                                           </button>
@@ -1040,7 +1040,7 @@ const BotDetail = () => {
                                           >
                                               <div className="flex items-center gap-3">
                                                   <Cpu size={14} className="text-purple-500" />
-                                                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300">App / Bot</span>
+                                                  <span className="text-[10px] font-black tracking-widest text-slate-700 dark:text-slate-300">App / Bot</span>
                                               </div>
                                               <ChevronRight size={14} className="text-slate-300 dark:text-slate-700" />
                                           </button>
@@ -1052,7 +1052,7 @@ const BotDetail = () => {
                                           >
                                               <div className="flex items-center gap-3">
                                                   <Share2 size={14} className="text-orange-500" />
-                                                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300">Sosyal Medya</span>
+                                                  <span className="text-[10px] font-black tracking-widest text-slate-700 dark:text-slate-300">Sosyal Medya</span>
                                               </div>
                                               <ChevronRight size={14} className="text-slate-300 dark:text-slate-700" />
                                           </button>
@@ -1289,14 +1289,14 @@ const BotDetail = () => {
                         className="h-20 flex-1 bg-white dark:bg-slate-900 rounded-xl border border-black/5 dark:border-white/10 flex items-center justify-center gap-3 text-slate-500 dark:text-slate-400 active:scale-95 transition-all relative border-b-8 border-transparent"
                       >
                           <Share2 size={20} className={isCopied ? 'text-emerald-500' : ''} />
-                          <span className="text-[10px] font-black uppercase tracking-[0.2em]">{t('detail_share_btn')}</span>
+                          <span className="text-[10px] font-black tracking-[0.2em]">{t('detail_share_btn')}</span>
                           <AnimatePresence>
                               {isCopied && (
                                   <motion.span 
                                       initial={{ opacity: 0, y: -10 }}
                                       animate={{ opacity: 1, y: -35 }}
                                       exit={{ opacity: 0 }}
-                                      className="absolute left-1/2 -translate-x-1/2 text-[8px] font-black text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-md uppercase whitespace-nowrap"
+                                      className="absolute left-1/2 -translate-x-1/2 text-[8px] font-black text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-md whitespace-nowrap"
                                   >
                                       {t('share_copied')}
                                   </motion.span>
@@ -1316,7 +1316,7 @@ const BotDetail = () => {
                   {(bot.telegram_group || bot.website_url || bot.app_url || bot.social_url) && (
                       <div className="flex flex-col bg-white dark:bg-slate-900/40 rounded-xl border border-black/5 dark:border-white/5 p-4 pt-5 gap-[0.6em] official-links-box">
                           <div className="px-2 mb-1">
-                              <h4 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">{t('detail_official_links')}</h4>
+                              <h4 className="text-[10px] font-black text-slate-400 dark:text-slate-500 tracking-[0.2em]">{t('detail_official_links')}</h4>
                           </div>
                           {bot.telegram_group && (
                               <button 
@@ -1326,10 +1326,10 @@ const BotDetail = () => {
                                   }}
                                   className="w-full flex items-center gap-4 pl-2 pr-6 py-4.5 hover:bg-slate-50 dark:hover:bg-transparent rounded-2xl transition-all text-left group"
                               >
-                                  <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                      <Send size={16} className="text-blue-500" />
+                                  <div className="w-8 h-8 rounded-xl bg-slate-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                      <Send size={16} className="text-slate-500 dark:text-slate-400" />
                                   </div>
-                                  <span className="text-[10px] font-black uppercase tracking-widest italic text-slate-700 dark:text-slate-300">{t('detail_tg_group')}</span>
+                                  <span className="text-[10px] font-black tracking-widest italic text-slate-700 dark:text-slate-300">{t('detail_tg_group')}</span>
                               </button>
                           )}
                           {bot.website_url && (
@@ -1337,10 +1337,10 @@ const BotDetail = () => {
                                   onClick={() => window.open(bot.website_url, '_blank')}
                                   className="w-full flex items-center gap-4 pl-2 pr-6 py-4.5 hover:bg-slate-50 dark:hover:bg-transparent rounded-2xl transition-all text-left group"
                               >
-                                  <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                      <Globe size={16} className="text-emerald-500" />
+                                  <div className="w-8 h-8 rounded-xl bg-slate-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                      <Globe size={16} className="text-slate-500 dark:text-slate-400" />
                                   </div>
-                                  <span className="text-[10px] font-black uppercase tracking-widest italic text-slate-700 dark:text-slate-300">{t('detail_website')}</span>
+                                  <span className="text-[10px] font-black tracking-widest italic text-slate-700 dark:text-slate-300">{t('detail_website')}</span>
                               </button>
                           )}
                           {bot.app_url && (
@@ -1348,10 +1348,10 @@ const BotDetail = () => {
                                   onClick={() => window.open(bot.app_url, '_blank')}
                                   className="w-full flex items-center gap-4 pl-2 pr-6 py-4.5 hover:bg-slate-50 dark:hover:bg-transparent rounded-2xl transition-all text-left group"
                               >
-                                  <div className="w-8 h-8 rounded-xl bg-purple-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                      <PlusCircle size={16} className="text-purple-500" />
+                                  <div className="w-8 h-8 rounded-xl bg-slate-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                      <PlusCircle size={16} className="text-slate-500 dark:text-slate-400" />
                                   </div>
-                                  <span className="text-[10px] font-black uppercase tracking-widest italic text-slate-700 dark:text-slate-300">{t('detail_app_bot')}</span>
+                                  <span className="text-[10px] font-black tracking-widest italic text-slate-700 dark:text-slate-300">{t('detail_app_bot')}</span>
                               </button>
                           )}
                           {bot.social_url && (
@@ -1359,10 +1359,10 @@ const BotDetail = () => {
                                   onClick={() => window.open(bot.social_url, '_blank')}
                                   className="w-full flex items-center gap-4 pl-2 pr-6 py-4.5 hover:bg-slate-50 dark:hover:bg-transparent rounded-2xl transition-all text-left group"
                               >
-                                  <div className="w-8 h-8 rounded-xl bg-blue-400/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                      <Share2 size={16} className="text-blue-400" />
+                                  <div className="w-8 h-8 rounded-xl bg-slate-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                      <Share2 size={16} className="text-slate-500 dark:text-slate-400" />
                                   </div>
-                                  <span className="text-[10px] font-black uppercase tracking-widest italic text-slate-700 dark:text-slate-300">{t('detail_social')}</span>
+                                  <span className="text-[10px] font-black tracking-widest italic text-slate-700 dark:text-slate-300">{t('detail_social')}</span>
                               </button>
                           )}
                       </div>

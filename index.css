@@ -563,8 +563,7 @@ p.text-\[10px\].text-slate-400.dark\:text-slate-500.font-medium.uppercase.tracki
 }
 
 .dark\:bg-slate-900\/60:is(.dark *) {
-    outline: 1px solid var(--border-color) !important;
-    background-color: #191919 !important;
+    outline: none;
 }
 
 .dark\:bg-slate-800\/60:is(.dark *) {
@@ -2167,6 +2166,22 @@ html:not(.dark) .fixed select:focus {
 .dark\:text-slate-400:is(.dark *) {
     color: #8c8c8c !important;
 }
+
+/* Highly specific button styling for official link buttons inside detail page sidebar */
+.official-links-box button.group {
+    outline: 1px solid var(--border-color) !important;
+    padding: 4px !important;
+}
+
+/* Colorless and neutral icon styling in direct link sidebar group */
+.official-links-box button.group svg {
+    color: var(--text-secondary) !important;
+}
+
+.official-links-box button.group .rounded-xl {
+    background-color: rgba(148, 163, 184, 0.1) !important;
+}
+
 
 
 
