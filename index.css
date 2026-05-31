@@ -1443,9 +1443,7 @@ button.bg-brand:hover, button.bg-blue-500:hover, button.bg-blue-600:hover, a.bg-
 
 /* Clean overrides for .light and .dark specifically for card backgrounds */
 .light .bg-slate-50, .light .bg-slate-100, .light .bg-slate-200, .light .bg-white, .light .bg-slate-100\/50, .light .bg-white\/80, .light .fancy-glass-card, .light .stats-card-bg, .light .official-links-box, .light .popular-content-card, .light .similar-post-card, .light .bot-card {
-    background: linear-gradient(180deg, #fffffff2, #ffffffbf) !important;
     color: var(--text-primary) !important;
-    border: 1px solid rgba(15, 23, 42, .05) !important;
     box-shadow: 0 1px 2px #0f172a04, 0 4px 16px #0f172a05 !important;
 }
 
