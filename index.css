@@ -566,6 +566,10 @@ p.text-\[10px\].text-slate-400.dark\:text-slate-500.font-medium.uppercase.tracki
     outline: none;
 }
 
+.user-hover-card-inner {
+    border: 1px solid var(--item-border-color) !important;
+}
+
 .dark\:bg-slate-800\/60:is(.dark *) {
     background: none !important;
 }
@@ -1500,8 +1504,7 @@ article.cursor-pointer.group.fancy-glass-card.transition-all.relative.flex.items
 .dark .bg-slate-900,
 .dark [class*="dark:bg-slate-900"] {
     --tw-bg-opacity: 1 !important;
-    background: #ffffff0d !important;
-    background-color: #ffffff0d !important;
+    background: #202123 !important;
 }
 
 .bg-slate-50, .bg-slate-100, .bg-slate-200, .bg-white, 

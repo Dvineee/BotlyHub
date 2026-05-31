@@ -68,6 +68,17 @@ export default function QAForum() {
     return `@${trimmed.toLowerCase().replace(/\s+/g, '')}`;
   };
 
+  const formatTimeMinutes = (dateStr: string) => {
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    const hours = Math.floor(mins / 60);
+    const days = Math.floor(hours / 24);
+
+    if (mins < 60) return `${Math.max(1, mins)} dakika önce`;
+    if (hours < 24) return `${hours} saat önce`;
+    return `${days} gün önce`;
+  };
+
   // Active current user session details
   const currentUser = {
     id: user?.id?.toString() || 'user-active-session',
@@ -147,6 +158,23 @@ export default function QAForum() {
       .filter(t => t.comments_count > 0)
       .sort((a, b) => (b.comments_count || 0) - (a.comments_count || 0))
       .slice(0, 5);
+  }, [topics]);
+
+  // Topics commented on in the last 24 hours
+  const last24hCommentedTopics = React.useMemo(() => {
+    const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
+    return topics.filter(topic => {
+      if (!topic.comments || topic.comments.length === 0) return false;
+      return topic.comments.some(comment => {
+        return new Date(comment.created_at).getTime() > oneDayAgo;
+      });
+    }).sort((a, b) => {
+      const getLatestCommentTime = (t: QTopic) => {
+        const times = t.comments.map(c => new Date(c.created_at).getTime());
+        return Math.max(...times, 0);
+      };
+      return getLatestCommentTime(b) - getLatestCommentTime(a);
+    });
   }, [topics]);
 
   // Fetch discussions list
@@ -917,10 +945,70 @@ export default function QAForum() {
                     </div>
                   ) : topics.length > 0 ? (
                     <div className="space-y-4">
-                      {topics.map(topic => {
+                      {topics.map((topic, index) => {
                         const hasUpvoted = topic.upvoted_users?.includes(currentUser.id);
+                        const showSpecialBoxHere = index === 2 || (index === topics.length - 1 && topics.length < 3);
                         return (
-                          <article 
+                          <React.Fragment key={topic.id}>
+                            {showSpecialBoxHere && last24hCommentedTopics.length > 0 && (
+                              <div className="bg-white dark:bg-[#111214] border border-slate-100 dark:border-slate-800/80 rounded-2xl p-5 shadow-xs space-y-4 my-6">
+                                <div className="space-y-4">
+                                  {last24hCommentedTopics.map(h24Topic => {
+                                    const sortedComments = [...(h24Topic.comments || [])].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+                                    const latestComment = sortedComments[0];
+                                    const otherCommentersCount = h24Topic.comments_count - 1;
+                                    const rawName = (latestComment?.author_name || 'Birisi').replace(/^@/, '');
+                                    const cleanName = rawName.charAt(0).toUpperCase() + rawName.slice(1);
+                                    const authorText = otherCommentersCount > 0 ? `${cleanName} + ${otherCommentersCount}` : cleanName;
+                                    const uniqueAvatars = Array.from(new Set((h24Topic.comments || []).map(c => c.author_avatar))).slice(0, 3);
+
+                                    return (
+                                      <div 
+                                        key={h24Topic.id}
+                                        onClick={() => handleViewDetails(h24Topic)}
+                                        className="flex items-start gap-4 hover:bg-black/[0.02] dark:hover:bg-white/5 p-2 rounded-xl transition-all cursor-pointer group"
+                                      >
+                                        <div className="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-[#1e1f22] border border-slate-200/40 dark:border-slate-800/80 rounded-lg shrink-0 min-w-[55px] h-9 select-none">
+                                          <MessageSquare size={13} className="text-slate-500 dark:text-slate-400" />
+                                          <span className="text-xs font-black font-mono text-slate-700 dark:text-slate-350">
+                                            {h24Topic.comments_count || 0}
+                                          </span>
+                                        </div>
+
+                                        <div className="flex-1 min-w-0">
+                                          <h4 className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-indigo-500 dark:group-hover:text-indigo-400 transition-colors line-clamp-1 leading-snug">
+                                            {h24Topic.title}
+                                          </h4>
+                                          <div className="flex items-center gap-2 mt-1 flex-wrap select-none">
+                                            {uniqueAvatars.length > 0 && (
+                                              <div className="flex -space-x-1.5 overflow-hidden shrink-0">
+                                                {uniqueAvatars.map((avatar, i) => (
+                                                  <img 
+                                                    key={i}
+                                                    src={avatar} 
+                                                    className="inline-block h-4 w-4 rounded-full ring-2 ring-white dark:ring-[#111214] object-cover bg-slate-50"
+                                                    alt=""
+                                                  />
+                                                ))}
+                                              </div>
+                                            )}
+                                            <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                                              {authorText}
+                                            </span>
+                                            <span className="text-[11px] font-bold text-emerald-500 dark:text-[#10b981] flex items-center gap-1 shrink-0">
+                                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-[#10b981] inline-block"></span>
+                                              {latestComment ? formatTimeMinutes(latestComment.created_at) : ''}
+                                            </span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            )}
+
+                            <article 
                             key={topic.id}
                             onClick={() => handleViewDetails(topic)}
                             className="cursor-pointer group fancy-glass-card transition-all relative flex items-start gap-4"
@@ -1035,8 +1123,9 @@ export default function QAForum() {
                               </div>
                             </div>
                           </article>
-                        );
-                      })}
+                        </React.Fragment>
+                      );
+                    })}
                     </div>
                   ) : (
                     <div className="bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800/40 p-12 rounded-3xl text-center">

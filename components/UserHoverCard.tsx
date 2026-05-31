@@ -252,8 +252,9 @@ export const UserHoverCard: React.FC<UserHoverCardProps> = ({ userId, user, chil
             className="pointer-events-auto"
           >
               <div 
+                id="user-hover-card-main"
                 onClick={handleCardClick}
-                className="bg-white/95 dark:bg-slate-905/95 dark:bg-slate-950/98 backdrop-blur-md rounded-2xl border border-slate-200/90 dark:border-slate-800/90 shadow-[0_20px_50px_rgba(0,0,0,0.12)] text-left overflow-hidden transition-colors duration-300 cursor-pointer hover:border-blue-500/30 group"
+                className="user-hover-card-inner bg-white/95 dark:bg-slate-950 backdrop-blur-md rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-[0_20px_50px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.4)] text-left overflow-hidden transition-colors duration-300 cursor-pointer hover:border-blue-500/40 dark:hover:border-blue-500/40 group"
               >
                 {loading ? (
                   /* Loading Shimmer State */
@@ -278,37 +279,37 @@ export const UserHoverCard: React.FC<UserHoverCardProps> = ({ userId, user, chil
                         <img 
                           src={getUserAvatar(profile)} 
                           alt={getDisplayName(profile)}
-                          className="w-11 h-11 rounded-full object-cover border border-slate-200/50 dark:border-slate-800 ring-2 ring-slate-100/50 dark:ring-slate-900 group-hover:scale-102 transition-transform duration-300"
+                          className="w-11 h-11 rounded-full object-cover border border-slate-200/50 dark:border-slate-800 ring-2 ring-slate-100/50 dark:ring-slate-900/40 group-hover:scale-105 transition-transform duration-300"
                           referrerPolicy="no-referrer"
                         />
                         {profile?.status === 'Active' && (
-                          <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white dark:border-slate-950 rounded-full shadow-sm"></span>
+                          <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white dark:border-[#111214] rounded-full shadow-sm"></span>
                         )}
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 tracking-tight truncate">
+                          <h4 className="text-sm font-bold text-slate-800 dark:text-white tracking-tight truncate">
                             {getDisplayName(profile)}
                           </h4>
                           {profile?.role === 'Admin' && (
-                            <span className="text-[9px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-500 font-extrabold uppercase tracking-wide">
+                            <span className="text-[9px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-500 dark:bg-blue-400/15 dark:text-blue-400 font-extrabold uppercase tracking-wide">
                               Admin
                             </span>
                           )}
                           {(profile?.is_premium || profile?.badges?.includes('Premium')) && (
-                            <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-500 font-extrabold uppercase tracking-wide">
+                            <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-500 dark:bg-amber-400/15 dark:text-amber-400 font-extrabold uppercase tracking-wide">
                               PREMIUM
                             </span>
                           )}
                         </div>
-                        <p className="text-[11px] font-medium text-slate-400 dark:text-slate-500 tracking-tight">
+                        <p className="text-[11px] font-medium text-slate-400 dark:text-slate-400/85 tracking-tight">
                           {getDisplayUsername(profile)}
                         </p>
                       </div>
                     </div>
 
                     {/* About section - maximum 2 lines line-clamp */}
-                    <p className="text-[11.5px] leading-relaxed font-normal text-slate-500 dark:text-slate-400 mt-3 line-clamp-2 select-none">
+                    <p className="text-[11.5px] leading-relaxed font-normal text-slate-500 dark:text-slate-300 mt-3 line-clamp-2 select-none">
                       {profile?.isRestricted 
                         ? 'Hesap kısıtlaması aktif durumda. Lütfen kurallara uygun hareket ediniz.' 
                         : profile?.role === 'Admin'
@@ -319,15 +320,15 @@ export const UserHoverCard: React.FC<UserHoverCardProps> = ({ userId, user, chil
                     </p>
 
                     {profile?.email && (
-                      <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500 mt-2 line-clamp-1">
+                      <p className="text-[10px] font-medium text-slate-400 dark:text-slate-400/80 mt-2 line-clamp-1">
                         E-posta: {profile.email}
                       </p>
                     )}
 
                     {/* Compact metadata info */}
-                    <div className="flex items-center justify-between text-[10px] font-medium text-slate-400 dark:text-slate-500 mt-3.5 pt-2.5 border-t border-slate-100 dark:border-white/5">
+                    <div className="flex items-center justify-between text-[10px] font-medium text-slate-400 dark:text-slate-400/85 mt-3.5 pt-2.5 border-t border-slate-100 dark:border-slate-800/80">
                       <span className="flex items-center gap-1">
-                        <Calendar size={11} className="text-slate-400 dark:text-slate-600" />
+                        <Calendar size={11} className="text-slate-400 dark:text-slate-500" />
                         Üyelik: {formatDate(profile?.joinDate)}
                       </span>
                       <span className="text-blue-500 dark:text-blue-400 font-bold hover:underline flex items-center gap-0.5">
