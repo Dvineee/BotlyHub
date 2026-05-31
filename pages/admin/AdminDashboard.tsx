@@ -50,10 +50,14 @@ const NavItem = ({ to, icon: Icon, label, active, onClick }: any) => {
     <Link 
       to={to} 
       onClick={onClick}
-      className={`flex items-center gap-4 px-6 py-4 rounded-[24px] transition-all duration-300 ${active ? 'bg-brand text-white  ' : 'text-slate-500 hover:bg-white/5 hover:text-white'}`}
+      className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-sm font-medium ${
+        active 
+          ? 'bg-blue-600/10 text-blue-400 border border-blue-500/20 shadow-[0_2px_10px_rgba(37,99,235,0.05)]' 
+          : 'text-slate-400 hover:bg-slate-900/60 hover:text-white border border-transparent'
+      }`}
     >
-      <Icon size={18} />
-      <span className="font-black text-[10px] uppercase tracking-[0.2em]">{label}</span>
+      <Icon size={18} className={active ? 'text-blue-400' : 'text-slate-400 transition-colors'} />
+      <span>{label}</span>
     </Link>
   );
 };
@@ -68,82 +72,87 @@ const AdminDashboard = () => {
   }, [navigate]);
 
   return (
-    <div className="dark min-h-screen bg-[#020617] flex text-slate-200 overflow-hidden font-sans">
+    <div className="dark min-h-screen bg-[#090d16] flex text-slate-100 overflow-hidden font-sans">
       {isSidebarOpen && (
-          <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[65] lg:hidden animate-in fade-in" onClick={() => setSidebarOpen(false)}></div>
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[65] lg:hidden animate-in fade-in" onClick={() => setSidebarOpen(false)}></div>
       )}
 
-      <aside className={`fixed inset-y-0 left-0 z-[70] w-72 bg-[#020617] border-r border-white/5 transition-transform duration-500 lg:relative lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="h-full flex flex-col p-8">
-          <div className="flex items-center gap-4 mb-14">
-            <div className="shrink-0">
+      <aside className={`fixed inset-y-0 left-0 z-[70] w-64 bg-[#090d16] border-r border-slate-800/40 transition-transform duration-300 lg:relative lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="h-full flex flex-col p-6">
+          <div className="flex items-center gap-3 mb-10 px-2">
+            <div className="shrink-0 bg-blue-600/10 p-2.5 rounded-xl border border-blue-500/15">
                 <Logo 
-                    style={{ width: '2.5rem', height: 'auto', display: 'block' }} 
+                    style={{ width: '1.75rem', height: 'auto', display: 'block' }} 
                     className="" 
                 />
             </div>
             <div>
-                <h2 className="text-xl font-black text-white italic tracking-tighter uppercase leading-none">Botly<span className="text-brand">Hub</span></h2>
-                <span className="text-[8px] font-black text-slate-700 uppercase tracking-[0.4em] mt-1.5 block">Kurumsal Konsol</span>
+                <h2 className="text-base font-bold text-white tracking-tight leading-none">Botly<span className="text-blue-500">Hub</span></h2>
+                <span className="text-[10px] font-medium text-slate-500 tracking-wider mt-1.5 block">Yönetici Paneli</span>
             </div>
           </div>
           
-            <nav className="flex-1 space-y-2 overflow-y-auto no-scrollbar">
-            <NavItem to="/a/dashboard" icon={LayoutDashboard} label="Panel" active={location.pathname === '/a/dashboard'} onClick={() => setSidebarOpen(false)} />
-            <div className="pt-8 pb-3 px-6"><span className="text-[9px] font-black text-slate-600 uppercase tracking-widest italic">İzleme</span></div>
+          <nav className="flex-1 space-y-1 overflow-y-auto no-scrollbar px-1">
+            <NavItem to="/a/dashboard" icon={LayoutDashboard} label="Genel Bakış" active={location.pathname === '/a/dashboard'} onClick={() => setSidebarOpen(false)} />
+            
+            <div className="pt-6 pb-2 px-3">
+              <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">İzleme</span>
+            </div>
             <NavItem to="/a/dashboard/users" icon={Users} label="Kullanıcılar" active={location.pathname.startsWith('/a/dashboard/users')} onClick={() => setSidebarOpen(false)} />
-            <NavItem to="/a/dashboard/admin-logs" icon={ShieldCheck} label="Admin Logları" active={location.pathname.startsWith('/a/dashboard/admin-logs')} onClick={() => setSidebarOpen(false)} />
+            <NavItem to="/a/dashboard/admin-logs" icon={ShieldCheck} label="Yönetici Logları" active={location.pathname.startsWith('/a/dashboard/admin-logs')} onClick={() => setSidebarOpen(false)} />
             <NavItem to="/a/dashboard/user-logs" icon={History} label="Üye Hareketleri" active={location.pathname.startsWith('/a/dashboard/user-logs')} onClick={() => setSidebarOpen(false)} />
-            <NavItem to="/a/dashboard/sales" icon={Wallet} label="Finans" active={location.pathname.startsWith('/a/dashboard/sales')} onClick={() => setSidebarOpen(false)} />
+            <NavItem to="/a/dashboard/sales" icon={Wallet} label="Finansövel" active={location.pathname.startsWith('/a/dashboard/sales')} onClick={() => setSidebarOpen(false)} />
             <NavItem to="/a/dashboard/referrals" icon={UserPlus} label="Referanslar" active={location.pathname.startsWith('/a/dashboard/referrals')} onClick={() => setSidebarOpen(false)} />
             
-            <div className="pt-8 pb-3 px-6"><span className="text-[9px] font-black text-slate-600 uppercase tracking-widest italic">İçerik</span></div>
+            <div className="pt-6 pb-2 px-3">
+              <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">İçerik</span>
+            </div>
             <NavItem to="/a/dashboard/bots" icon={BotIcon} label="Market Botları" active={location.pathname.startsWith('/a/dashboard/bots')} onClick={() => setSidebarOpen(false)} />
             <NavItem to="/a/dashboard/promotions" icon={RadioIcon} label="Tanıtım Motoru" active={location.pathname.startsWith('/a/dashboard/promotions')} onClick={() => setSidebarOpen(false)} />
             <NavItem to="/a/dashboard/announcements" icon={Megaphone} label="Duyuru Merkezi" active={location.pathname.startsWith('/a/dashboard/announcements')} onClick={() => setSidebarOpen(false)} />
             <NavItem to="/a/dashboard/notifications" icon={Bell} label="Bildirim Gönder" active={location.pathname.startsWith('/a/dashboard/notifications')} onClick={() => setSidebarOpen(false)} />
             <NavItem to="/a/dashboard/blogs" icon={BookOpen} label="Blog Yönetimi" active={location.pathname.startsWith('/a/dashboard/blogs')} onClick={() => setSidebarOpen(false)} />
             
-            <div className="pt-8 pb-3 px-6"><span className="text-[9px] font-black text-slate-600 uppercase tracking-widest italic">Sistem</span></div>
+            <div className="pt-6 pb-2 px-3">
+              <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Sistem</span>
+            </div>
             <NavItem to="/a/dashboard/settings" icon={SettingsIcon} label="Sistem Ayarları" active={location.pathname.startsWith('/a/dashboard/settings')} onClick={() => setSidebarOpen(false)} />
           </nav>
 
-          <button onClick={() => { DatabaseService.logoutAdmin(); navigate('/a/admin'); }} className="mt-8 flex items-center gap-4 px-8 py-5 text-red-500 font-black text-[10px] uppercase tracking-widest hover:bg-red-500/10 rounded-[24px] transition-all group border border-transparent hover:border-red-500/20">
-            <LogOut size={18} /> Çıkış Yap
+          <button 
+            onClick={() => { DatabaseService.logoutAdmin(); navigate('/a/admin'); }} 
+            className="mt-6 flex items-center justify-center gap-3 w-full px-4 py-3 bg-red-500/10 text-red-400 font-medium text-sm rounded-xl hover:bg-red-500 hover:text-white transition-all border border-red-500/10 hover:border-transparent"
+          >
+            <LogOut size={16} /> <span>Oturumu Kapat</span>
           </button>
         </div>
       </aside>
 
-      <main className="flex-1 flex flex-col overflow-hidden relative">
-        <header className="h-24 border-b border-white/5 flex items-center justify-between px-6 lg:px-10 bg-[#020617]/80 backdrop-blur-2xl z-50">
-           <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-3 bg-slate-900 border border-white/5 rounded-xl text-slate-400 active:scale-95 transition-all">
-              <Menu size={20}/>
+      <main className="flex-1 flex flex-col overflow-hidden relative bg-[#060913]">
+        <header className="h-16 border-b border-slate-800/40 flex items-center justify-between px-6 lg:px-8 bg-[#090d16]/70 backdrop-blur-md z-50">
+           <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 bg-slate-900 border border-slate-800/60 rounded-xl text-slate-400 active:scale-95 transition-all">
+              <Menu size={18}/>
            </button>
            
-           <div className="flex items-center gap-4 lg:gap-8 ml-auto">
-              <div className="hidden sm:flex items-center gap-3 bg-white/5 px-4 py-2 rounded-xl border border-white/5">
-                 <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse "></div>
-                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">CANLI SİSTEM</span>
+           <div className="flex items-center gap-3 ml-auto">
+              <div className="hidden sm:flex items-center gap-2 bg-[#121c30] px-3 py-1 rounded-full border border-blue-500/15">
+                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                 <span className="text-[10px] font-semibold text-blue-300 uppercase tracking-wider">Canlı Operasyonel Durum</span>
               </div>
-              <motion.div 
-                  animate={{ 
-                    boxShadow: [
-                      "0 0 20px rgba(37, 99, 235, 0.2)",
-                      "0 0 40px rgba(37, 99, 235, 0.6)",
-                      "0 0 20px rgba(37, 99, 235, 0.2)"
-                    ],
-                    scale: [1, 1.05, 1]
-                  }}
-                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                  className="w-10 h-10 lg:w-12 lg:h-12 rounded-xl lg:rounded-2xl bg-gradient-to-br from-brand to-brand/80 flex items-center justify-center font-black text-white italic text-xl  "
-               >
-                 A
-               </motion.div>
+              <div className="flex items-center gap-2 px-1.5 py-1.5 bg-slate-900 border border-slate-800/60 rounded-xl">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center font-bold text-white text-sm shadow-[0_2px_10px_rgba(37,99,235,0.15)]">
+                  A
+                </div>
+                <div className="hidden md:block text-left px-2 leading-tight">
+                  <p className="text-xs font-semibold text-white">Yönetici</p>
+                  <p className="text-[9px] text-slate-500">Root Seviyesi</p>
+                </div>
+              </div>
            </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto p-4 lg:p-12 no-scrollbar">
-          <div className="max-w-7xl mx-auto space-y-12 pb-24">
+        <div className="flex-1 overflow-y-auto p-6 lg:p-8 no-scrollbar">
+          <div className="max-w-7xl mx-auto space-y-8 pb-16">
             <Routes>
               <Route path="/" element={<HomeView />} />
               <Route path="users" element={<UserManagement />} />
@@ -167,31 +176,33 @@ const AdminDashboard = () => {
 
 const StatCard = ({ icon: Icon, label, value, color }: any) => {
     const colors: any = {
-        blue: 'text-brand bg-brand/10 border-brand/20',
-        purple: 'text-brand bg-brand/10 border-brand/20',
-        emerald: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20',
-        orange: 'text-orange-500 bg-orange-500/10 border-orange-500/20'
+        blue: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
+        purple: 'text-purple-400 bg-purple-500/10 border-purple-500/20',
+        emerald: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+        orange: 'text-orange-400 bg-orange-500/10 border-orange-500/20'
     };
     return (
-        <div className="bg-slate-900/40 border border-white/5 p-6 lg:p-10 rounded-[32px] lg:rounded-[48px] hover:border-white/10 transition-all group overflow-hidden stats-card-bg">
-            <div className={`w-10 h-10 lg:w-14 lg:h-14 ${colors[color]} rounded-[18px] lg:rounded-[20px] border flex items-center justify-center mb-4 lg:mb-8  group-hover:scale-110 transition-all`}><Icon size={24} /></div>
-            <p className="text-[8px] lg:text-[10px] font-black text-slate-600 uppercase tracking-widest mb-1">{label}</p>
-            <h3 className="text-xl lg:text-3xl font-black text-white tracking-tighter italic leading-none">{typeof value === 'number' ? value.toLocaleString() : value}</h3>
+        <div className="bg-[#101626]/40 border border-slate-800/60 p-6 rounded-2xl hover:border-slate-700/80 hover:translate-y-[-2px] transition-all duration-300 group shadow-sm flex items-center justify-between">
+            <div className="space-y-1 leading-none">
+              <p className="text-xs font-semibold text-slate-400 tracking-tight">{label}</p>
+              <h3 className="text-2xl font-bold text-white tracking-tight pt-1">{typeof value === 'number' ? value.toLocaleString() : value}</h3>
+            </div>
+            <div className={`w-12 h-12 ${colors[color]} rounded-xl border flex items-center justify-center group-hover:scale-105 transition-transform duration-300`}><Icon size={20} /></div>
         </div>
     );
 };
 
 const AdminInput = ({ label, value, onChange, type = "text", placeholder = "", icon: Icon }: any) => (
-    <div className="space-y-2 text-white group">
-        <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 group-focus-within:text-blue-500 transition-colors italic">{label}</label>
+    <div className="space-y-1.5 text-white group w-full">
+        <label className="text-xs font-semibold text-slate-400 tracking-tight ml-1 group-focus-within:text-blue-400 transition-colors">{label}</label>
         <div className="relative">
-            {Icon && <Icon className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-700 group-focus-within:text-brand transition-colors" size={18} />}
+            {Icon && <Icon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors" size={16} />}
             <input 
                 type={type} 
                 value={value} 
                 onChange={e => onChange(e.target.value)} 
                 placeholder={placeholder}
-                className={`w-full h-14 lg:h-18 bg-slate-950 border border-white/5 rounded-[22px] lg:rounded-[28px] ${Icon ? 'pl-14' : 'px-8'} pr-8 text-[11px] font-black text-white outline-none focus:border-brand transition-all uppercase italic `} 
+                className={`w-full h-11 bg-slate-950/70 border border-slate-800/80 rounded-xl ${Icon ? 'pl-11' : 'px-4'} pr-4 text-sm font-normal text-white placeholder-slate-600 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all duration-150`} 
             />
         </div>
     </div>
@@ -205,37 +216,37 @@ const HomeView = () => {
         DatabaseService.getAdminStats().then(s => { setStats(s); setIsLoading(false); }); 
     }, []);
 
-    if (isLoading) return <div className="flex justify-center py-24"><Loader2 className="animate-spin text-brand" size={32} /></div>;
+    if (isLoading) return <div className="flex justify-center py-24"><Loader2 className="animate-spin text-blue-500" size={32} /></div>;
 
     return (
-        <div className="animate-in fade-in duration-700 space-y-12">
-            <div className="flex flex-col gap-2">
-                <h1 className="text-4xl lg:text-5xl font-black text-white uppercase italic tracking-tighter leading-none">Kurumsal <span className="text-brand">Genel Bakış</span></h1>
-                <p className="text-[10px] font-black text-slate-700 uppercase tracking-[0.5em] italic">Platform büyüme ve performans metrikleri</p>
+        <div className="animate-in fade-in duration-300 space-y-6">
+            <div className="flex flex-col gap-1">
+                <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight leading-none">Sistem Genel Bakış</h1>
+                <p className="text-sm font-normal text-slate-400 leading-normal">Büyüme ve operasyonel performans metrikleri</p>
             </div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard icon={Users} label="Toplam Üye" value={stats.userCount} color="blue" />
                 <StatCard icon={BotIcon} label="Aktif Botlar" value={stats.botCount} color="purple" />
                 <StatCard icon={BarChart3} label="Satış Adedi" value={stats.salesCount} color="orange" />
                 <StatCard icon={TrendingUp} label="Toplam Ciro" value={`₺${stats.totalRevenue.toLocaleString()}`} color="emerald" />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-                <div className="lg:col-span-2 bg-slate-900/40 border border-white/5 p-8 lg:p-12 rounded-[40px] lg:rounded-[56px]  relative overflow-hidden group">
-                    <h3 className="text-base lg:text-xl font-black italic uppercase tracking-tight mb-8">Büyüme Hızı (Haftalık)</h3>
-                    <div className="h-32 lg:h-48 flex items-end gap-2 lg:gap-3 px-2">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2 bg-[#101626]/40 border border-slate-800/60 p-6 rounded-2xl relative overflow-hidden group">
+                    <h3 className="text-sm font-semibold text-slate-300 tracking-tight mb-6">Haftalık Büyüme Oranı</h3>
+                    <div className="h-40 flex items-end gap-3 px-2">
                         {[40, 70, 45, 90, 65, 80, 100].map((h, i) => (
-                            <div key={i} className="flex-1 bg-gradient-to-t from-blue-600 to-indigo-400 rounded-t-xl transition-all duration-1000" style={{ height: `${h}%` }}></div>
+                            <div key={i} className="flex-1 bg-gradient-to-t from-blue-600/80 to-blue-500/30 rounded-t-lg transition-all duration-500 hover:opacity-100 opacity-90 cursor-pointer h-full" style={{ height: `${h}%` }}></div>
                         ))}
                     </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-blue-600/20 to-transparent border border-blue-500/10 p-8 lg:p-12 rounded-[40px] lg:rounded-[56px] flex flex-col justify-center relative overflow-hidden">
-                    <Sparkles className="absolute -top-6 -right-6 text-blue-500/20 w-32 h-32" />
-                    <p className="text-[10px] font-black text-blue-500 uppercase tracking-[0.5em] mb-4 italic">GÜNLÜK RAPOR</p>
-                    <p className="text-white text-xl lg:text-3xl font-black italic uppercase tracking-tighter leading-none mb-3">Sistemler <span className="text-emerald-500">Optimum</span></p>
-                    <p className="text-slate-500 text-[10px] lg:text-sm font-bold leading-relaxed uppercase opacity-70">Operasyonel verimlilik %99.8. Kayıt hızı artışı %14.</p>
+                <div className="bg-gradient-to-br from-blue-600/10 to-transparent border border-blue-500/15 p-6 rounded-2xl flex flex-col justify-center relative overflow-hidden">
+                    <Sparkles className="absolute -top-4 -right-4 text-blue-500/10 w-24 h-24" />
+                    <p className="text-[10px] font-bold text-blue-400 uppercase tracking-wider mb-2">Günlük Rapor</p>
+                    <p className="text-white text-lg font-bold leading-none mb-2">Sistem Stabil durumda</p>
+                    <p className="text-slate-400 text-xs font-normal leading-relaxed opacity-90">Operasyonel verimlilik %99.9 seviyesinde. Kayıt hızlarında %14 oranında istikrarlı büyüme gözlenmiştir.</p>
                 </div>
             </div>
         </div>
@@ -335,61 +346,61 @@ const BotManagement = () => {
     });
 
     return (
-        <div className="space-y-12 animate-in fade-in">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div className="space-y-6 animate-in fade-in duration-200">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h2 className="text-3xl lg:text-4xl font-black text-white italic uppercase tracking-tighter leading-none">Market <span className="text-brand">Envanteri</span></h2>
-                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em] mt-2 italic">Platform envanterini profesyonelce yönetin</p>
+                    <h2 className="text-xl lg:text-2xl font-bold text-white tracking-tight leading-none">Market Envanteri</h2>
+                    <p className="text-xs text-slate-400 mt-1 leading-normal">Platformda yer alan Telegram botlarını ve web uygulamalarını profesyonelce yönetin</p>
                 </div>
-                <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
-                    <div className="relative group">
-                        <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-brand transition-colors" size={18} />
+                <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                    <div className="relative group w-full sm:w-64">
+                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors" size={16} />
                         <input 
                             type="text" 
-                            placeholder="ÜRÜN ARA (İSİM, @, ID)..." 
+                            placeholder="Ürün arayın..." 
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full md:w-80 h-16 bg-slate-900 border border-white/5 rounded-[24px] pl-16 pr-8 text-[10px] font-black uppercase tracking-widest text-white outline-none focus:border-brand transition-all"
+                            className="w-full h-11 bg-slate-950/70 border border-slate-800/80 rounded-xl pl-10 pr-4 text-xs font-normal text-white placeholder-slate-600 outline-none focus:border-blue-500 transition-all"
                         />
                     </div>
                     <button 
                         onClick={openCreateModal}
-                        className="bg-brand hover:opacity-90 px-8 py-5 rounded-[24px] text-[10px] font-black uppercase tracking-[0.4em] transition-all active:scale-95 flex items-center justify-center gap-3"
+                        className="bg-blue-600 hover:bg-blue-500 hover:scale-[1.01] px-5 py-2.5 rounded-xl text-xs font-semibold text-white transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm"
                     >
-                        <Plus size={18} /> YENİ ÜRÜN TANIMLA
+                        <Plus size={16} /> Yeni Ürün Tanımla
                     </button>
                     <button 
                         onClick={load}
-                        className="p-5 bg-white/5 hover:bg-white/10 rounded-[24px] text-slate-400 transition-all active:scale-95 flex items-center justify-center"
+                        className="px-3 h-11 bg-slate-900/60 hover:bg-slate-850 border border-slate-800 rounded-xl text-slate-400 transition-all active:scale-95 flex items-center justify-center"
                         title="Yenile"
                     >
-                        <History size={18} />
+                        <History size={16} />
                     </button>
                 </div>
             </div>
 
-            <div className="flex gap-4 p-2 bg-slate-900 border border-white/5 rounded-[28px] w-full md:w-fit">
+            <div className="flex gap-1.5 p-1 bg-[#101626]/40 border border-slate-800/60 rounded-xl w-full md:w-fit">
                 <button 
                     onClick={() => setListFilter('apps')}
-                    className={`flex-1 md:px-12 py-4 rounded-[22px] text-[10px] font-black uppercase tracking-widest transition-all ${listFilter === 'apps' ? 'bg-brand text-white' : 'text-slate-500 hover:text-white'}`}
+                    className={`px-5 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all ${listFilter === 'apps' ? 'bg-blue-600/10 text-blue-400 border border-blue-500/20 shadow-sm' : 'text-slate-400 hover:text-white border border-transparent'}`}
                 >
-                    UYGULAMALAR
+                    Uygulamalar
                 </button>
                 <button 
                     onClick={() => setListFilter('bots')}
-                    className={`flex-1 md:px-12 py-4 rounded-[22px] text-[10px] font-black uppercase tracking-widest transition-all ${listFilter === 'bots' ? 'bg-brand text-white' : 'text-slate-500 hover:text-white'}`}
+                    className={`px-5 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all ${listFilter === 'bots' ? 'bg-blue-600/10 text-blue-400 border border-blue-500/20 shadow-sm' : 'text-slate-400 hover:text-white border border-transparent'}`}
                 >
-                    BOTLAR
+                    Botlar
                 </button>
             </div>
 
             {isLoading ? (
-                <div className="flex flex-col items-center justify-center py-32 gap-4">
-                    <Loader2 className="animate-spin text-brand" size={40} />
-                    <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">Veriler Senkronize Ediliyor...</span>
+                <div className="flex flex-col items-center justify-center py-24 gap-3">
+                    <Loader2 className="animate-spin text-blue-500" size={32} />
+                    <span className="text-xs text-slate-500 font-medium italic">Envanter verileri çekiliyor...</span>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredBotsList.map(b => (
                         <div 
                             key={b.id} 
@@ -404,88 +415,86 @@ const BotManagement = () => {
                                 });
                                 setIsModalOpen(true);
                             }}
-                            className="bg-slate-900/40 border border-white/5 rounded-[32px] lg:rounded-[56px] p-6 lg:p-10 flex flex-col gap-6 lg:gap-8 group hover:border-brand/40 transition-all relative overflow-hidden backdrop-blur-sm cursor-pointer"
+                            className="bg-[#101626]/40 border border-slate-800/60 rounded-2xl p-6 flex flex-col justify-between group hover:border-blue-500/30 hover:translate-y-[-2px] transition-all duration-300 relative overflow-hidden backdrop-blur-sm cursor-pointer shadow-sm"
                         >
-                            <div className="flex justify-between items-start relative z-10">
-                                <div className="relative">
-                                    <img 
-                                        src={getLiveBotIcon(b.bot_link)} 
-                                        className="w-14 h-14 lg:w-20 lg:h-20 rounded-[24px] lg:rounded-[32px] border border-white/10  object-cover bg-slate-950 group-hover:rotate-6 group-hover:scale-105 transition-all" 
-                                        onError={(e) => (e.target as any).src = `https://ui-avatars.com/api/?name=${b.name}`}
-                                    />
-                                    {b.price > 0 && <div className="absolute -top-2 -right-2 w-6 h-6 lg:w-7 lg:h-7 bg-brand rounded-xl flex items-center justify-center  border-4 border-[#020617]"><Zap size={10} fill="currentColor" /></div>}
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-start relative z-10">
+                                    <div className="relative">
+                                        <img 
+                                            src={getLiveBotIcon(b.bot_link)} 
+                                            className="w-14 h-14 rounded-xl border border-slate-800/80 object-cover bg-slate-950 transition-transform duration-300 group-hover:scale-105" 
+                                            onError={(e) => (e.target as any).src = `https://ui-avatars.com/api/?name=${b.name}`}
+                                            referrerPolicy="no-referrer"
+                                        />
+                                        {b.price > 0 && <div className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-blue-500 rounded-lg flex items-center justify-center border-2 border-slate-950 font-semibold text-white"><Zap size={10} fill="currentColor" /></div>}
+                                    </div>
+                                    <div className="flex gap-1.5" onClick={(e) => e.stopPropagation()}>
+                                        {b.is_official && (
+                                            <div className="px-2 py-1 bg-blue-500/10 border border-blue-500/20 rounded-lg flex items-center gap-1">
+                                                <ShieldCheck size={11} className="text-blue-400" />
+                                                <span className="text-[9px] font-bold text-blue-400 uppercase tracking-widest">Resmi</span>
+                                            </div>
+                                        )}
+                                        <button 
+                                            onClick={async (e) => {
+                                                e.stopPropagation();
+                                                const nextType = b.promoted_type === 'featured' ? 'none' : 'featured';
+                                                await DatabaseService.saveBot({ ...b, promoted_type: nextType });
+                                                load();
+                                            }}
+                                            className={`p-2 rounded-xl transition-all ${b.promoted_type === 'featured' ? 'bg-amber-500 text-white' : 'bg-[#181e30] text-slate-400 hover:text-amber-400 border border-slate-800/50'}`}
+                                            title="Öne Çıkar"
+                                        >
+                                            <Star size={13} fill={b.promoted_type === 'featured' ? "currentColor" : "none"} />
+                                        </button>
+                                        <button 
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                const cats = Array.isArray(b.category) ? b.category : (b.category ? (typeof b.category === 'string' && b.category.startsWith('[') ? JSON.parse(b.category) : [b.category]) : ['utilities']);
+                                                setEditingBot({
+                                                    ...b,
+                                                    product_type: cats.includes('apps') ? 'app' : 'bot',
+                                                    promoted_type: b.promoted_type || 'none',
+                                                    languages: b.languages || [],
+                                                    category: cats
+                                                });
+                                                setIsModalOpen(true);
+                                            }} 
+                                            className="p-2 bg-[#181e30] text-slate-400 hover:text-white rounded-xl border border-slate-800/50 hover:bg-blue-600 transition-all shadow-md"
+                                        >
+                                            <Edit3 size={13}/>
+                                        </button>
+                                        <button 
+                                            onClick={async (e) => { 
+                                                e.stopPropagation();
+                                                if(confirm(`'${b.name}' Silsin mi?`)) { 
+                                                    await DatabaseService.deleteBot(b.id); 
+                                                    await DatabaseService.logActivity('admin', 'bot_manage', 'bot_deleted', 'Bot Silindi', `${b.name} isimli bot sistemden silindi.`); 
+                                                    load(); 
+                                                } 
+                                            }} 
+                                            className="p-2 bg-[#181e30] border border-slate-800/50 text-red-400 hover:bg-red-500 hover:text-white rounded-xl transition-all"
+                                        >
+                                            <Trash2 size={13}/>
+                                        </button>
+                                    </div>
                                 </div>
-                                <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-                                    {b.is_official && (
-                                        <div className="px-3 py-1 bg-brand/10 border border-brand/20 rounded-lg flex items-center gap-1.5">
-                                            <ShieldCheck size={10} className="text-brand" />
-                                            <span className="text-[8px] font-black text-brand uppercase tracking-widest">OFFICIAL</span>
-                                        </div>
-                                    )}
-                                    <button 
-                                        onClick={async (e) => {
-                                            e.stopPropagation();
-                                            const nextType = b.promoted_type === 'featured' ? 'none' : 'featured';
-                                            await DatabaseService.saveBot({ ...b, promoted_type: nextType });
-                                            load();
-                                        }}
-                                        className={`p-2.5 lg:p-3 rounded-xl transition-all ${b.promoted_type === 'featured' ? 'bg-amber-500 text-white' : 'bg-white/5 text-slate-500 hover:bg-amber-500/20 hover:text-amber-500'}`}
-                                        title="Öne Çıkar"
-                                    >
-                                        <Star size={16} fill={b.promoted_type === 'featured' ? "currentColor" : "none"} />
-                                    </button>
-                                    <button 
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            const cats = Array.isArray(b.category) ? b.category : (b.category ? (typeof b.category === 'string' && b.category.startsWith('[') ? JSON.parse(b.category) : [b.category]) : ['utilities']);
-                                            setEditingBot({
-                                                ...b,
-                                                product_type: cats.includes('apps') ? 'app' : 'bot',
-                                                promoted_type: b.promoted_type || 'none',
-                                                languages: b.languages || [],
-                                                category: cats
-                                            });
-                                            setIsModalOpen(true);
-                                        }} 
-                                        className="p-2.5 lg:p-3 bg-white/5 rounded-xl hover:bg-brand text-slate-500 hover:text-white transition-all shadow-xl"
-                                    >
-                                        <Edit3 size={16}/>
-                                    </button>
-                                    <button 
-                                        onClick={async (e) => { 
-                                            e.stopPropagation();
-                                            if(confirm(`'${b.name}' Silsin mi?`)) { 
-                                                await DatabaseService.deleteBot(b.id); 
-                                                await DatabaseService.logActivity('admin', 'bot_manage', 'bot_deleted', 'Bot Silindi', `${b.name} isimli bot sistemden silindi.`); 
-                                                load(); 
-                                            } 
-                                        }} 
-                                        className="p-2.5 lg:p-3 bg-white/5 rounded-xl text-red-500 hover:bg-red-500 hover:text-white transition-all"
-                                    >
-                                        <Trash2 size={16}/>
-                                    </button>
+
+                                <div className="space-y-1.5">
+                                    <h4 className="text-base font-bold text-white tracking-tight truncate leading-tight group-hover:text-blue-400 transition-colors">{b.name}</h4>
+                                    <p className="text-xs text-slate-400 line-clamp-2 h-8 leading-normal font-normal">{b.description}</p>
                                 </div>
                             </div>
 
-                            <div className="relative z-10">
-                                <h4 className="text-lg lg:text-2xl font-black text-white italic uppercase tracking-tighter truncate leading-none mb-2 lg:mb-3 group-hover:text-brand transition-colors">{b.name}</h4>
-                                <p className="text-[9px] lg:text-[10px] text-slate-600 line-clamp-2 leading-relaxed font-bold uppercase italic h-8 lg:h-10">{b.description}</p>
-                            </div>
-
-                            <div className="flex items-center justify-between pt-4 lg:pt-6 border-t border-white/5 relative z-10">
+                            <div className="flex items-center justify-between pt-4 mt-6 border-t border-slate-800/50 relative z-10 leading-none">
                                 <div>
-                                    <p className="text-[8px] font-black text-slate-700 uppercase tracking-widest mb-1">FİYATLANDIRMA</p>
-                                    <p className="text-base lg:text-lg font-black uppercase text-brand italic tracking-tighter leading-none">{b.price > 0 ? `${b.price} TL` : 'ÜCRETSİZ'}</p>
+                                    <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Fiyatlandırma</p>
+                                    <p className="text-sm font-bold text-blue-400 tracking-tight">{b.price > 0 ? `${b.price} TL` : 'Ücretsiz'}</p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-[8px] font-black text-slate-700 uppercase tracking-widest mb-1">AKTİF PANEL</p>
-                                    <p className="text-base lg:text-lg font-black uppercase text-white italic tracking-tighter leading-none">{b.ownerCount || 0} <span className="text-[8px] text-slate-700">LİSANS</span></p>
+                                    <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Aktif Lisans</p>
+                                    <p className="text-sm font-bold text-slate-200 tracking-tight">{b.ownerCount || 0} <span className="text-[10px] text-slate-500 font-medium">Lisans</span></p>
                                 </div>
-                            </div>
-
-                            <div className="absolute inset-x-0 bottom-0 py-4 bg-brand text-white text-center translate-y-full group-hover:translate-y-0 transition-transform duration-300 flex items-center justify-center gap-3">
-                                <Edit3 size={14} />
-                                <span className="text-[9px] font-black uppercase tracking-[0.3em]">BOTU DÜZENLE</span>
                             </div>
                         </div>
                     ))}
@@ -1329,45 +1338,72 @@ const UserManagement = () => {
     );
 
     return (
-        <div className="space-y-10 animate-in fade-in">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
-                <h2 className="text-3xl font-black text-white italic uppercase tracking-tighter leading-none">Kullanıcı <span className="text-blue-500">Kayıtları</span></h2>
-                <div className="relative w-full sm:w-80">
-                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-700" size={18} />
-                    <input type="text" placeholder="Üye ara..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full h-14 bg-slate-900 border border-white/5 rounded-2xl py-4 pl-14 pr-6 text-[10px] outline-none focus:border-blue-500 text-white font-black italic uppercase" />
+        <div className="space-y-6 animate-in fade-in duration-200">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 className="text-xl lg:text-2xl font-bold text-white tracking-tight leading-none">Kullanıcı Kayıtları</h2>
+                    <p className="text-xs text-slate-400 mt-1 leading-normal">Platform kullanıcılarını, yetkilerini ve kısıtlamalarını yönetin</p>
+                </div>
+                <div className="relative w-full sm:w-64 group">
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors" size={16} />
+                    <input 
+                        type="text" 
+                        placeholder="Kullanıcı ara..." 
+                        value={searchTerm} 
+                        onChange={e => setSearchTerm(e.target.value)} 
+                        className="w-full h-11 bg-slate-950/70 border border-slate-800/80 rounded-xl pl-10 pr-4 text-xs font-normal text-white placeholder-slate-600 outline-none focus:border-blue-500 transition-all" 
+                    />
                 </div>
             </div>
-            <div className="bg-slate-900/40 border border-white/5 rounded-[44px] overflow-hidden ">
+
+            <div className="bg-[#101626]/40 border border-slate-800/60 rounded-xl overflow-hidden backdrop-blur-sm shadow-sm">
                 {/* Desktop Table */}
                 <div className="hidden lg:block overflow-x-auto">
                     <table className="w-full text-left">
-                        <thead className="bg-white/5 text-[9px] uppercase tracking-[0.4em] text-slate-700 font-black">
-                            <tr><th className="px-10 py-8">KİMLİK & ÜYE</th><th className="px-10 py-8">ROL</th><th className="px-10 py-8">DURUM</th><th className="px-10 py-8 text-right">AKSİYONLAR</th></tr>
+                        <thead className="bg-[#101a2e]/60 border-b border-slate-800 text-xs font-semibold text-slate-400">
+                            <tr>
+                                <th className="px-6 py-4">Kullanıcı</th>
+                                <th className="px-6 py-4">Rol</th>
+                                <th className="px-6 py-4">Hesap Durumu</th>
+                                <th className="px-6 py-4 text-right">İşlemler</th>
+                            </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/5">
+                        <tbody className="divide-y divide-slate-800/40">
                             {filtered.map(u => (
-                                <tr key={u.id} className="hover:bg-white/5 transition-all text-white">
-                                    <td className="px-10 py-8 font-black italic text-sm truncate max-w-[200px]">@{u.username}</td>
-                                    <td className="px-10 py-8"><span className="text-[10px] font-black text-slate-500 uppercase italic">{u.role === 'Admin' ? 'ADMİN' : 'ÜYE'}</span></td>
-                                    <td className="px-10 py-8">
-                                        <div className="flex flex-col gap-2">
-                                            <div className={`flex items-center gap-2.5 text-[10px] font-black uppercase tracking-widest ${u.status === 'Active' ? 'text-emerald-500' : 'text-red-500'}`}>
-                                                <div className={`w-2 h-2 rounded-full ${u.status === 'Active' ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`}></div>{u.status === 'Active' ? 'AKTİF' : 'PASİF'}
+                                <tr key={u.id} className="hover:bg-[#121c30]/20 transition-colors text-slate-200">
+                                    <td className="px-6 py-4 text-sm font-semibold text-white">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-lg bg-blue-600/10 text-blue-400 border border-blue-500/15 flex items-center justify-center font-bold text-sm shadow-sm select-none">
+                                                {u.username?.[0]?.toUpperCase() || 'U'}
                                             </div>
+                                            <span>@{u.username}</span>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <span className={`px-2 py-1 rounded-full text-[10px] font-semibold tracking-wide border ${u.role === 'Admin' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' : 'bg-slate-800/50 text-slate-300 border-slate-700/50'}`}>
+                                            {u.role === 'Admin' ? 'Admin' : 'Üye'}
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex flex-wrap gap-2 items-center">
+                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium border ${u.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20'}`}>
+                                                <span className={`w-1.5 h-1.5 rounded-full ${u.status === 'Active' ? 'bg-emerald-400 animate-pulse' : 'bg-red-400'}`}></span>
+                                                {u.status === 'Active' ? 'Aktif' : 'Pasif'}
+                                            </span>
                                             {u.isRestricted && (
-                                                <div className="flex items-center gap-2 text-[8px] font-black text-red-500 uppercase tracking-widest bg-red-500/10 px-2 py-0.5 rounded border border-red-500/20 w-fit">
-                                                    <ShieldAlert size={10} /> KISITLI
-                                                </div>
+                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-red-600/15 text-red-400 border border-red-500/15 select-none animate-pulse">
+                                                    <ShieldAlert size={11} /> Kısıtlı
+                                                </span>
                                             )}
                                         </div>
                                     </td>
-                                    <td className="px-10 py-8 text-right">
+                                    <td className="px-6 py-4 text-right">
                                         <div className="flex items-center justify-end gap-2">
                                             <button 
                                                 onClick={() => setSelectedUser(u)}
-                                                className="px-6 py-3 bg-white/5 rounded-xl text-[9px] font-black uppercase hover:bg-white/10 transition-all tracking-widest"
+                                                className="px-3.5 py-1.5 bg-blue-500/10 hover:bg-blue-600 hover:text-white rounded-lg text-xs font-semibold text-blue-400 transition-all border border-blue-500/10 text-center"
                                             >
-                                                YÖNET
+                                                Yönet
                                             </button>
                                             <button 
                                                 onClick={async () => {
@@ -1381,51 +1417,51 @@ const UserManagement = () => {
                                                         }
                                                     }
                                                 }}
-                                                className="p-3 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl transition-all"
+                                                className="p-1.5 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white rounded-lg border border-red-500/10 hover:border-transparent transition-all"
                                                 title="Sil"
                                             >
-                                                <Trash2 size={14} />
+                                                <Trash2 size={13} />
                                             </button>
                                         </div>
                                     </td>
                                 </tr>
-                            ))}
+                             ))}
                         </tbody>
                     </table>
                 </div>
 
                 {/* Mobile Card View */}
-                <div className="lg:hidden divide-y divide-white/5">
+                <div className="lg:hidden divide-y divide-slate-800/40">
                     {filtered.map(u => (
-                        <div key={u.id} className="p-6 space-y-4 hover:bg-white/5 transition-all">
+                        <div key={u.id} className="p-5 space-y-4 hover:bg-[#121c30]/10 transition-colors">
                             <div className="flex justify-between items-start">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center font-black text-white italic text-lg ">
+                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center font-bold text-white text-base">
                                         {u.username?.[0]?.toUpperCase() || 'U'}
                                     </div>
                                     <div>
-                                        <p className="text-sm font-black text-white italic uppercase tracking-tighter">@{u.username}</p>
-                                        <p className="text-[9px] text-slate-600 font-bold uppercase tracking-widest">{u.role === 'Admin' ? 'ADMİN' : 'ÜYE'}</p>
+                                        <p className="text-sm font-semibold text-white">@{u.username}</p>
+                                        <p className="text-xs text-slate-400 mt-0.5">{u.role === 'Admin' ? 'Admin' : 'Üye'}</p>
                                     </div>
                                 </div>
-                                <div className="flex flex-col items-end gap-2">
-                                    <div className={`flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest ${u.status === 'Active' ? 'text-emerald-500' : 'text-red-500'}`}>
-                                        <div className={`w-1.5 h-1.5 rounded-full ${u.status === 'Active' ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`}></div>
-                                        {u.status === 'Active' ? 'AKTİF' : 'PASİF'}
-                                    </div>
+                                <div className="flex flex-col items-end gap-1.5">
+                                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border ${u.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-red-500/10 text-red-500/20 border-red-500/10'}`}>
+                                        <span className={`w-1.5 h-1.5 rounded-full ${u.status === 'Active' ? 'bg-emerald-400 animate-pulse' : 'bg-red-400'}`}></span>
+                                        {u.status === 'Active' ? 'Aktif' : 'Pasif'}
+                                    </span>
                                     {u.isRestricted && (
-                                        <div className="text-[7px] font-black text-red-500 uppercase tracking-widest bg-red-500/10 px-1.5 py-0.5 rounded border border-red-500/20">
-                                            KISITLI
-                                        </div>
+                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-red-600/15 text-red-400 border border-red-500/15 animate-pulse">
+                                            Kısıtlı
+                                        </span>
                                     )}
                                 </div>
                             </div>
-                            <div className="flex gap-2">
+                            <div className="flex gap-2.5 pt-1.5">
                                 <button 
                                     onClick={() => setSelectedUser(u)}
-                                    className="flex-1 py-4 bg-white/5 rounded-2xl text-[9px] font-black uppercase tracking-widest hover:bg-white/10 transition-all border border-white/5"
+                                    className="flex-1 py-2.5 bg-blue-500/10 hover:bg-blue-600 hover:text-white rounded-xl text-xs font-semibold text-blue-400 transition-all border border-blue-500/10"
                                 >
-                                    YÖNET
+                                    Yönet
                                 </button>
                                 <button 
                                     onClick={async () => {
@@ -1436,9 +1472,9 @@ const UserManagement = () => {
                                             } catch (e) { alert("Hata oluştu"); }
                                         }
                                     }}
-                                    className="px-6 py-4 bg-red-500/10 text-red-500 rounded-2xl transition-all border border-red-500/10"
+                                    className="px-4 py-2.5 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white rounded-xl transition-all border border-red-500/10"
                                 >
-                                    <Trash2 size={16} />
+                                    <Trash2 size={14} />
                                 </button>
                             </div>
                         </div>
@@ -1490,63 +1526,63 @@ const SettingsManager = () => {
     if (isLoading) return <div className="flex justify-center py-24"><Loader2 className="animate-spin text-blue-500" size={32} /></div>;
 
     return (
-        <div className="space-y-10 animate-in fade-in">
-            <div className="flex flex-col gap-2">
-                <h2 className="text-3xl font-black text-white italic uppercase tracking-tighter leading-none">Sistem <span className="text-blue-500">Ayarları</span></h2>
-                <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em] mt-2 italic">Platform genel yapılandırmasını yönetin</p>
+        <div className="space-y-6 animate-in fade-in duration-200">
+            <div className="flex flex-col gap-1">
+                <h2 className="text-xl lg:text-2xl font-bold text-white tracking-tight leading-none">Sistem Ayarları</h2>
+                <p className="text-xs text-slate-400 mt-1 leading-normal">Platform genel yapılandırmasını yönetin</p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div className="bg-slate-900/40 border border-white/5 p-8 lg:p-12 rounded-[44px] space-y-8">
-                    <div className="flex items-center gap-6">
-                        <div className={`w-16 h-16 rounded-3xl flex items-center justify-center border transition-all ${settings?.maintenanceMode ? 'bg-red-500/10 border-red-500/20 text-red-500' : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500'}`}>
-                            <AlertTriangle size={32} />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="bg-[#101626]/40 border border-slate-800/60 p-6 rounded-2xl space-y-6 backdrop-blur-sm shadow-sm">
+                    <div className="flex items-center gap-4">
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center border transition-all ${settings?.maintenanceMode ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'}`}>
+                            <AlertTriangle size={22} />
                         </div>
                         <div>
-                            <h4 className="text-lg font-black text-white uppercase italic">Bakım Modu</h4>
-                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">Tüm kullanıcı erişimini kısıtlar</p>
+                            <h4 className="text-base font-bold text-white">Bakım Modu</h4>
+                            <p className="text-xs font-normal text-slate-500">Tüm kullanıcı erişimini kısıtlar</p>
                         </div>
                     </div>
 
-                    <div className="p-8 bg-slate-950/50 rounded-3xl border border-white/5 space-y-6">
-                        <p className="text-slate-400 text-xs font-bold leading-relaxed uppercase italic opacity-70">
-                            Bakım modu aktif edildiğinde, adminler hariç tüm kullanıcılar "Bakımdayız" sayfasıyla karşılaşır. Kritik güncellemeler sırasında kullanılması önerilir.
+                    <div className="p-5 bg-slate-950/40 rounded-xl border border-slate-800/80 space-y-5">
+                        <p className="text-slate-400 text-xs font-normal leading-relaxed">
+                            Bakım modu aktif edildiğinde, yöneticiler hariç tüm kullanıcılar "Hesap ve Panel Bakımdadır" bilgi ekranı ile karşılaşır. Kritik sistem güncellemeleri sırasında kullanılması önerilir.
                         </p>
                         
                         <button 
                             onClick={toggleMaintenance}
                             disabled={isSaving}
-                            className={`w-full py-6 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3  ${
+                            className={`w-full py-2.5 rounded-xl font-semibold text-xs transition-all flex items-center justify-center gap-2 h-11 ${
                                 settings?.maintenanceMode 
-                                ? 'bg-emerald-600 hover:bg-emerald-500 text-white ' 
-                                : 'bg-red-600 hover:bg-red-500 text-white '
+                                ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm' 
+                                : 'bg-red-600 hover:bg-red-500 text-white shadow-sm'
                             }`}
                         >
-                            {isSaving ? <Loader2 size={16} className="animate-spin" /> : (settings?.maintenanceMode ? <Check size={16} /> : <AlertTriangle size={16} />)}
-                            {settings?.maintenanceMode ? 'BAKIM MODUNU KAPAT' : 'BAKIM MODUNU AÇ'}
+                            {isSaving ? <Loader2 size={14} className="animate-spin" /> : (settings?.maintenanceMode ? <Check size={14} /> : <AlertTriangle size={14} />)}
+                            {settings?.maintenanceMode ? 'Bakım Modunu Kapat' : 'Bakım Modunu Etkinleştir'}
                         </button>
                     </div>
                 </div>
 
-                <div className="bg-slate-900/40 border border-white/5 p-8 lg:p-12 rounded-[44px] space-y-8">
-                    <div className="flex items-center gap-6">
-                        <div className="w-16 h-16 rounded-3xl flex items-center justify-center border bg-blue-500/10 border-blue-500/20 text-blue-500">
-                            <Megaphone size={32} />
+                <div className="bg-[#101626]/40 border border-slate-800/60 p-6 rounded-2xl space-y-6 backdrop-blur-sm shadow-sm">
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-xl flex items-center justify-center border bg-blue-500/10 border-blue-500/20 text-blue-400">
+                            <Megaphone size={22} />
                         </div>
                         <div>
-                            <h4 className="text-lg font-black text-white uppercase italic">Görsel & Metin</h4>
-                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">Versiyon yönetimi</p>
+                            <h4 className="text-base font-bold text-white">Görsel & Metin</h4>
+                            <p className="text-xs font-normal text-slate-500">Versiyon yönetimi</p>
                         </div>
                     </div>
 
                     <div className="space-y-6">
-                        <div className="space-y-2">
-                            <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">UYGULAMA VERSİYONU</label>
+                        <div className="space-y-1.5">
+                            <label className="text-xs font-semibold text-slate-400 tracking-tight ml-1">Uygulama Versiyonu</label>
                             <input 
                                 type="text"
                                 value={settings?.version || ''}
                                 onChange={e => setSettings({ ...settings, version: e.target.value })}
-                                className="w-full h-16 px-6 bg-slate-950/50 border border-white/5 rounded-2xl text-xs font-black text-white focus:border-blue-500/40 outline-none transition-all uppercase italic"
+                                className="w-full h-11 px-4 bg-slate-950/70 border border-slate-800/80 rounded-xl text-sm font-normal text-white placeholder-slate-600 focus:border-blue-500 outline-none transition-all placeholder:text-slate-600"
                                 placeholder="ÖRN: V3.1.2"
                             />
                         </div>
@@ -1567,10 +1603,10 @@ const SettingsManager = () => {
                                 }
                             }}
                             disabled={isSaving}
-                            className="w-full h-16 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-2xl text-[10px] uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-3  "
+                            className="w-full h-11 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl text-xs transition-all flex items-center justify-center gap-2 shadow-sm"
                         >
-                            {isSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-                            AYARLARI KAYDET
+                            {isSaving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                            Ayarları Güncelle
                         </button>
                     </div>
                 </div>
@@ -1630,38 +1666,38 @@ const ActivityCenter = ({ filterType }: { filterType: 'admin' | 'user' }) => {
     const types = ['all', ...Array.from(new Set(logs.map(l => l.type)))];
 
     return (
-        <div className="space-y-10 animate-in fade-in">
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div className="space-y-6 animate-in fade-in duration-200">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-3xl font-black text-white italic uppercase tracking-tighter leading-none">
-                        {filterType === 'admin' ? 'Yönetici' : 'Üye'} <span className="text-blue-500">Logları</span>
+                    <h2 className="text-xl lg:text-2xl font-bold text-white tracking-tight leading-none">
+                        {filterType === 'admin' ? 'Yönetici' : 'Üye'} Logları
                     </h2>
-                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em] mt-2 italic">
-                        {filterType === 'admin' ? 'Yönetici işlemlerini takip edin' : 'Kullanıcı hareketlerini detaylıca izleyin'}
+                    <p className="text-xs text-slate-400 mt-1 leading-normal">
+                        {filterType === 'admin' ? 'Yönetici işlemlerini ve sistem modifikasyonlarını takip edin' : 'Kullanıcı hareketlerini ve platform entegrasyonlarını izleyin'}
                     </p>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-4">
-                    <div className="relative group">
-                        <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-700 group-focus-within:text-blue-500 transition-colors" size={18} />
+                <div className="flex flex-col sm:flex-row gap-3">
+                    <div className="relative group w-full sm:w-64">
+                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors" size={16} />
                         <input 
                             type="text"
-                            placeholder="KULLANICI ID VEYA İŞLEM ARA..."
+                            placeholder="Kullanıcı veya işlem arayın..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full sm:w-80 h-14 bg-slate-950 border border-white/5 rounded-[22px] pl-14 pr-8 text-[11px] font-black text-white outline-none focus:border-blue-500 transition-all uppercase italic "
+                            className="w-full h-11 bg-slate-950/70 border border-slate-800/80 rounded-xl pl-10 pr-4 text-xs font-normal text-white placeholder-slate-600 outline-none focus:border-blue-500 transition-all"
                         />
                     </div>
                     
-                    <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 sm:pb-0">
+                    <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-1">
                         {types.map(t => (
                             <button
                                 key={t}
                                 onClick={() => setActiveTypeFilter(t)}
-                                className={`px-6 h-14 rounded-[22px] text-[9px] font-black uppercase tracking-widest transition-all whitespace-nowrap border ${
+                                className={`px-4 h-11 rounded-xl text-xs font-semibold tracking-wide transition-all whitespace-nowrap border ${
                                     activeTypeFilter === t 
-                                    ? 'bg-blue-600 border-blue-500 text-white  ' 
-                                    : 'bg-slate-900/40 border-white/5 text-slate-500 hover:border-white/10'
+                                    ? 'bg-blue-600/10 border-blue-500/20 text-blue-400 shadow-sm' 
+                                    : 'bg-[#101626]/40 border-slate-800/80 text-slate-400 hover:text-white'
                                 }`}
                             >
                                 {translateType(t)}
@@ -1672,46 +1708,46 @@ const ActivityCenter = ({ filterType }: { filterType: 'admin' | 'user' }) => {
             </div>
 
             {isLoading ? (
-                <div className="flex flex-col items-center justify-center py-32 gap-4">
-                    <Loader2 className="animate-spin text-blue-500" size={40} />
-                    <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">Loglar Yükleniyor...</span>
+                <div className="flex flex-col items-center justify-center py-24 gap-3">
+                    <Loader2 className="animate-spin text-blue-500" size={32} />
+                    <span className="text-xs text-slate-500 font-medium italic">Sistem logları taranıyor...</span>
                 </div>
             ) : filteredLogs.length === 0 ? (
-                <div className="py-32 text-center bg-slate-900/20 rounded-[44px] border-2 border-dashed border-slate-900">
-                    <History size={48} className="mx-auto text-slate-600 mb-4" />
-                    <p className="text-slate-500 text-sm font-bold uppercase tracking-widest">Sonuç Bulunamadı</p>
-                    <p className="text-[10px] text-slate-700 mt-2 italic font-medium">Arama kriterlerinizi değiştirmeyi deneyin.</p>
+                <div className="py-24 text-center bg-[#101626]/20 rounded-xl border border-dashed border-slate-800/80">
+                    <History size={40} className="mx-auto text-slate-600 mb-3" />
+                    <p className="text-slate-400 text-sm font-semibold">Log kaydı bulunamadı</p>
+                    <p className="text-xs text-slate-500 mt-1">Arama terimini değiştirmeyi veya farklı bir filtre seçmeyi deneyin.</p>
                 </div>
             ) : (
-                <div className="space-y-4">
+                <div className="space-y-3">
                     {filteredLogs.map(log => (
                         <div 
                             key={log.id} 
                             onClick={() => setSelectedLog(log)}
-                            className="bg-slate-900/40 border border-white/5 p-6 lg:p-8 rounded-[32px] lg:rounded-[40px] flex items-center gap-6 group hover:border-white/10 transition-all relative overflow-hidden cursor-pointer active:scale-[0.99]"
+                            className="bg-[#101626]/40 border border-slate-800/60 p-5 rounded-2xl flex items-center gap-5 group hover:border-blue-500/30 transition-all duration-300 relative overflow-hidden cursor-pointer select-none shadow-sm"
                         >
-                            <div className={`w-12 h-12 shrink-0 bg-white/5 rounded-2xl flex items-center justify-center ${typeColors[log.type] || 'text-white'} `}><Activity size={20} /></div>
+                            <div className={`w-10 h-10 shrink-0 bg-slate-900 border border-slate-800/50 rounded-xl flex items-center justify-center ${typeColors[log.type] || 'text-white'} `}><Activity size={18} /></div>
                             <div className="flex-1 min-w-0">
-                                <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-1 gap-2">
-                                    <div className="flex items-center gap-3">
-                                        <h4 className="font-black text-white italic text-sm lg:text-base uppercase truncate">{log.title}</h4>
-                                        <span className={`text-[8px] font-black px-2 py-0.5 rounded bg-white/5 border border-white/5 ${typeColors[log.type] || 'text-slate-500'} uppercase tracking-widest`}>{translateType(log.type)}</span>
+                                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-1 gap-1 leading-none">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <h4 className="font-bold text-slate-200 text-sm truncate max-w-[250px] group-hover:text-blue-400 transition-colors">{log.title}</h4>
+                                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-lg bg-slate-900/80 border border-slate-800 ${typeColors[log.type] || 'text-slate-500'}`}>{translateType(log.type)}</span>
                                     </div>
-                                    <span className="text-[8px] lg:text-[10px] font-black text-slate-700 uppercase tracking-widest flex items-center gap-2">
-                                        <Clock size={10} /> {new Date(log.created_at).toLocaleString()}
+                                    <span className="text-[11px] font-medium text-slate-500 flex items-center gap-1.5 self-start sm:self-center">
+                                        <Clock size={11} className="text-slate-600" /> {new Date(log.created_at).toLocaleString()}
                                     </span>
                                 </div>
-                                <p className="text-slate-500 text-[10px] font-bold uppercase italic truncate opacity-80 mb-2">{log.description}</p>
-                                <div className="flex items-center gap-4">
-                                    <div className="flex items-center gap-1.5">
-                                        <Users size={10} className="text-slate-700" />
-                                        <span className="text-[9px] font-black text-slate-600 uppercase tracking-tighter">
-                                            {log.user?.name ? `${log.user.name} (@${log.user.username})` : `ID: ${log.user_id}`}
+                                <p className="text-slate-400 text-xs font-normal truncate mt-1">{log.description}</p>
+                                <div className="flex items-center gap-4 mt-3">
+                                    <div className="flex items-center gap-1.5 leading-none">
+                                        <Users size={11} className="text-slate-650" />
+                                        <span className="text-[11px] font-medium text-slate-550">
+                                            {log.user?.name ? `${log.user.name} (@${log.user.username})` : `Kullanıcı ID: ${log.user_id}`}
                                         </span>
                                     </div>
-                                    <div className="flex items-center gap-1.5">
-                                        <Zap size={10} className="text-slate-700" />
-                                        <span className="text-[9px] font-black text-slate-600 uppercase tracking-tighter">ANAHTAR: {log.action_key}</span>
+                                    <div className="flex items-center gap-1.5 leading-none">
+                                        <Zap size={11} className="text-slate-650" />
+                                        <span className="text-[11px] font-medium text-slate-550">İşlem: {log.action_key}</span>
                                     </div>
                                 </div>
                             </div>
@@ -1721,79 +1757,79 @@ const ActivityCenter = ({ filterType }: { filterType: 'admin' | 'user' }) => {
             )}
 
             {selectedLog && (
-                <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 lg:p-10">
-                    <div className="absolute inset-0 bg-black/90 backdrop-blur-xl" onClick={() => setSelectedLog(null)}></div>
+                <div className="fixed inset-0 z-[150] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setSelectedLog(null)}></div>
                     <motion.div 
-                        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                        initial={{ opacity: 0, scale: 0.95, y: 10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
-                        className="relative w-full max-w-2xl bg-slate-900 border border-white/10 rounded-[40px] lg:rounded-[56px] overflow-hidden  flex flex-col max-h-[85vh]"
+                        className="relative w-full max-w-lg bg-[#0e121e] border border-slate-800/80 rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh]"
                     >
-                        <div className="p-8 lg:p-12 border-b border-white/5 flex items-center justify-between">
-                            <div className="flex items-center gap-5">
-                                <div className={`w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center ${typeColors[selectedLog.type] || 'text-white'}`}>
-                                    <Activity size={24} />
+                        <div className="p-5 border-b border-slate-800/60 flex items-center justify-between bg-slate-900/30">
+                            <div className="flex items-center gap-3">
+                                <div className={`w-9 h-9 bg-slate-950 border border-slate-850 rounded-xl flex items-center justify-center ${typeColors[selectedLog.type] || 'text-white'}`}>
+                                    <Activity size={18} />
                                 </div>
-                                <div>
-                                    <h3 className="text-xl lg:text-2xl font-black text-white uppercase italic tracking-tighter">İşlem <span className="text-blue-500">Detayı</span></h3>
-                                    <p className="text-[9px] font-black text-slate-700 uppercase tracking-[0.4em] mt-1 italic">LOG REF: {selectedLog.id.slice(0, 8)}</p>
+                                <div className="leading-tight">
+                                    <h3 className="text-sm font-bold text-white">İşlem Detay Raporu</h3>
+                                    <p className="text-[10px] font-medium text-slate-500 mt-0.5">Ref ID: {selectedLog.id.slice(0, 8).toUpperCase()}</p>
                                 </div>
                             </div>
-                            <button onClick={() => setSelectedLog(null)} className="p-3 bg-white/5 rounded-xl hover:bg-red-600 transition-all">
-                                <X size={20} />
+                            <button onClick={() => setSelectedLog(null)} className="p-1.5 bg-slate-900 border border-slate-800/60 rounded-lg text-slate-400 hover:text-white transition-all">
+                                <X size={15} />
                             </button>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto p-8 lg:p-12 space-y-8">
-                            <div className="space-y-6">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="bg-slate-950/50 border border-white/5 p-5 rounded-2xl space-y-1">
-                                        <span className="text-[9px] font-black text-slate-700 uppercase tracking-widest italic">İşlem Tipi</span>
-                                        <p className={`text-xs font-black uppercase italic ${typeColors[selectedLog.type]}`}>{translateType(selectedLog.type)}</p>
+                        <div className="flex-1 overflow-y-auto p-5 space-y-5">
+                            <div className="space-y-4">
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="bg-slate-950/40 border border-slate-850/70 p-3.5 rounded-xl space-y-0.5 leading-none">
+                                        <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">İşlem Tipi</span>
+                                        <p className={`text-xs font-bold pt-1 ${typeColors[selectedLog.type]}`}>{translateType(selectedLog.type)}</p>
                                     </div>
-                                    <div className="bg-slate-950/50 border border-white/5 p-5 rounded-2xl space-y-1">
-                                        <span className="text-[9px] font-black text-slate-700 uppercase tracking-widest italic">Tarih</span>
-                                        <p className="text-xs font-black text-white uppercase italic">{new Date(selectedLog.created_at).toLocaleString()}</p>
+                                    <div className="bg-slate-950/40 border border-slate-850/70 p-3.5 rounded-xl space-y-0.5 leading-none">
+                                        <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">İşlem Tarihi</span>
+                                        <p className="text-xs font-semibold text-slate-200 pt-1">{new Date(selectedLog.created_at).toLocaleString()}</p>
                                     </div>
                                 </div>
 
-                                <div className="bg-slate-950/50 border border-white/5 p-6 rounded-3xl space-y-2">
-                                    <span className="text-[9px] font-black text-slate-700 uppercase tracking-widest italic">Başlık</span>
-                                    <p className="text-sm font-black text-white uppercase italic leading-tight">{selectedLog.title}</p>
+                                <div className="bg-slate-950/40 border border-slate-850/70 p-4 rounded-xl space-y-1.5">
+                                    <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">İşlem Başlığı</span>
+                                    <p className="text-sm font-semibold text-white leading-tight">{selectedLog.title}</p>
                                 </div>
 
-                                <div className="bg-slate-950/50 border border-white/5 p-6 rounded-3xl space-y-2">
-                                    <span className="text-[9px] font-black text-slate-700 uppercase tracking-widest italic">Açıklama</span>
-                                    <p className="text-xs font-bold text-slate-400 uppercase italic leading-relaxed">{selectedLog.description}</p>
+                                <div className="bg-slate-950/40 border border-slate-850/70 p-4 rounded-xl space-y-1.5">
+                                    <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Açıklama</span>
+                                    <p className="text-xs font-normal text-slate-400 leading-relaxed">{selectedLog.description}</p>
                                 </div>
 
-                                <div className="bg-slate-950/50 border border-white/5 p-6 rounded-3xl space-y-4">
-                                    <span className="text-[9px] font-black text-slate-700 uppercase tracking-widest italic">Kullanıcı Bilgileri</span>
-                                    <div className="flex items-center gap-4">
-                                        <img src={selectedLog.user?.avatar || `https://ui-avatars.com/api/?name=${selectedLog.user_id}`} className="w-12 h-12 rounded-xl object-cover border border-white/10" />
-                                        <div>
-                                            <p className="text-xs font-black text-white uppercase italic">{selectedLog.user?.name || 'Bilinmeyen Kullanıcı'}</p>
-                                            <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest">@{selectedLog.user?.username || 'bilinmiyor'}</p>
-                                            <p className="text-[8px] font-bold text-slate-600 mt-1">KULLANICI ID: {selectedLog.user_id}</p>
+                                <div className="bg-slate-950/40 border border-slate-850/70 p-4 rounded-xl space-y-3">
+                                    <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">İşlem Sahibi</span>
+                                    <div className="flex items-center gap-3">
+                                        <img src={selectedLog.user?.avatar || `https://ui-avatars.com/api/?name=${selectedLog.user_id}`} className="w-10 h-10 rounded-xl object-cover border border-slate-800 bg-slate-950" referrerPolicy="no-referrer" />
+                                        <div className="leading-tight">
+                                            <p className="text-xs font-bold text-white">{selectedLog.user?.name || 'Sistem / Anonim'}</p>
+                                            <p className="text-10px text-slate-500 font-medium">@{selectedLog.user?.username || 'sistem'}</p>
+                                            <p className="text-[9px] text-slate-600 font-medium mt-0.5">Sanal ID: {selectedLog.user_id}</p>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="bg-slate-950/50 border border-white/5 p-6 rounded-3xl space-y-2">
-                                    <span className="text-[9px] font-black text-slate-700 uppercase tracking-widest italic">İşlem Anahtarı (Action Key)</span>
-                                    <div className="flex items-center gap-2 bg-slate-900 p-3 rounded-xl border border-white/5">
-                                        <Zap size={14} className="text-blue-500" />
-                                        <code className="text-[10px] font-black text-blue-400 uppercase tracking-widest">{selectedLog.action_key}</code>
+                                <div className="bg-slate-950/40 border border-slate-850/70 p-4 rounded-xl space-y-2">
+                                    <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">İşlem Anahtarı (Action Key)</span>
+                                    <div className="flex items-center gap-2 bg-slate-900/60 px-3 py-2 rounded-lg border border-slate-850/70 leading-none">
+                                        <Zap size={12} className="text-blue-400" />
+                                        <code className="text-xs font-semibold text-blue-400">{selectedLog.action_key}</code>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="p-8 lg:p-12 bg-slate-950/50 border-t border-white/5">
+                        <div className="p-4 bg-slate-900/30 border-t border-slate-800/60 flex items-center justify-end">
                             <button 
                                 onClick={() => setSelectedLog(null)}
-                                className="w-full h-14 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] transition-all"
+                                className="px-5 py-2 bg-slate-900 hover:bg-slate-850 text-slate-300 font-semibold border border-slate-800 rounded-xl text-xs transition-all h-10"
                             >
-                                KAPAT
+                                Kapat
                             </button>
                         </div>
                     </motion.div>
@@ -1830,101 +1866,106 @@ const SalesManagement = () => {
     };
 
     return (
-        <div className="space-y-10 animate-in fade-in">
-            <div className="flex flex-col gap-2">
-                <h2 className="text-3xl lg:text-4xl font-black text-white italic uppercase tracking-tighter leading-none">Finans <span className="text-blue-500">Merkezi</span></h2>
-                <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em] mt-2 italic">Platform gelirlerini ve ödeme akışlarını izleyin</p>
+        <div className="space-y-6 animate-in fade-in duration-200">
+            <div className="flex flex-col gap-1">
+                <h2 className="text-xl lg:text-2xl font-bold text-white tracking-tight leading-none">Finans Merkezi</h2>
+                <p className="text-xs text-slate-400 mt-1 leading-normal">Platform gelirlerini ve ödeme akışlarını izleyin</p>
             </div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8">
-                <StatCard icon={TrendingUp} label="TOPLAM CİRO (TRY)" value={`₺${stats.totalRevenue.toLocaleString()}`} color="emerald" />
-                <StatCard icon={Zap} label="TON GELİRİ" value={`${stats.tonRevenue.toLocaleString()} TON`} color="blue" />
-                <StatCard icon={Star} label="STARS GELİRİ" value={`${stats.starsRevenue.toLocaleString()} ⭐`} color="purple" />
-                <StatCard icon={Wallet} label="TRY GELİRİ" value={`₺${stats.tryRevenue.toLocaleString()}`} color="orange" />
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <StatCard icon={TrendingUp} label="Toplam Ciro (TRY)" value={`₺${stats.totalRevenue.toLocaleString()}`} color="emerald" />
+                <StatCard icon={Zap} label="TON Geliri" value={`${stats.tonRevenue.toLocaleString()} TON`} color="blue" />
+                <StatCard icon={Star} label="Stars Geliri" value={`${stats.starsRevenue.toLocaleString()} ⭐`} color="purple" />
+                <StatCard icon={Wallet} label="TRY Geliri" value={`₺${stats.tryRevenue.toLocaleString()}`} color="orange" />
             </div>
 
-            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+            <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-1">
                 {['all', 'completed', 'pending', 'failed'].map(f => (
                     <button
                         key={f}
                         onClick={() => setFilter(f as any)}
-                        className={`px-6 h-12 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all border ${
+                        className={`px-4 h-10 rounded-xl text-xs font-semibold tracking-wide transition-all border ${
                             filter === f 
-                            ? 'bg-blue-600 border-blue-500 text-white  ' 
-                            : 'bg-slate-900/40 border-white/5 text-slate-500 hover:border-white/10'
+                            ? 'bg-blue-600/10 border-blue-500/20 text-blue-400 shadow-sm' 
+                            : 'bg-[#101626]/40 border-slate-800/80 text-slate-400 hover:text-white'
                         }`}
                     >
-                        {f === 'all' ? 'TÜMÜ' : f === 'completed' ? 'TAMAMLANDI' : f === 'pending' ? 'BEKLEYEN' : 'İPTAL'}
+                        {f === 'all' ? 'Tümü' : f === 'completed' ? 'Tamamlandı' : f === 'pending' ? 'Bekleyen' : f === 'failed' ? 'İptal' : f}
                     </button>
                 ))}
             </div>
 
-            <div className="bg-slate-900/40 border border-white/5 rounded-[44px] overflow-hidden ">
+            <div className="bg-[#101626]/40 border border-slate-800/60 rounded-xl overflow-hidden backdrop-blur-sm shadow-sm">
                 {isLoading ? (
-                    <div className="flex flex-col items-center justify-center py-32 gap-4">
-                        <Loader2 className="animate-spin text-blue-500" size={40} />
-                        <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">İşlemler Yükleniyor...</span>
+                    <div className="flex flex-col items-center justify-center py-24 gap-3">
+                        <Loader2 className="animate-spin text-blue-500" size={32} />
+                        <span className="text-xs text-slate-500 font-medium">Finansal işlemler yükleniyor...</span>
                     </div>
                 ) : filtered.length === 0 ? (
-                    <div className="py-32 text-center">
-                        <History size={48} className="mx-auto text-slate-600 mb-4" />
-                        <p className="text-slate-500 text-sm font-bold uppercase tracking-widest">İşlem Bulunamadı</p>
+                    <div className="py-24 text-center">
+                        <History size={40} className="mx-auto text-slate-600 mb-3" />
+                        <p className="text-slate-400 text-sm font-semibold">İşlem kaydı bulunamadı</p>
                     </div>
                 ) : (
                     <>
                         {/* Desktop Table View */}
                         <div className="hidden lg:block overflow-x-auto">
                             <table className="w-full text-left">
-                                <thead className="bg-white/5 text-[9px] uppercase tracking-[0.4em] text-slate-700 font-black">
+                                <thead className="bg-[#101a2e]/60 border-b border-slate-800 text-xs font-semibold text-slate-400">
                                     <tr>
-                                        <th className="px-10 py-8">MÜŞTERİ</th>
-                                        <th className="px-10 py-8">ÜRÜN / TİP</th>
-                                        <th className="px-10 py-8">TARİH</th>
-                                        <th className="px-10 py-8">DURUM</th>
-                                        <th className="px-10 py-8 text-right">TUTAR</th>
+                                        <th className="px-6 py-4">Müşteri</th>
+                                        <th className="px-6 py-4">Ürün / Tip</th>
+                                        <th className="px-6 py-4">İşlem Tarihi</th>
+                                        <th className="px-6 py-4">Durum</th>
+                                        <th className="px-6 py-4 text-right">Tutar</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-white/5">
+                                <tbody className="divide-y divide-slate-800/40 text-slate-200">
                                     {filtered.map((t) => (
-                                        <tr key={t.id} className="hover:bg-white/5 transition-all text-white">
-                                            <td className="px-10 py-8">
-                                                <div className="flex items-center gap-4">
-                                                    <img src={t.user?.avatar || `https://ui-avatars.com/api/?name=${t.user?.username}`} className="w-10 h-10 rounded-xl border border-white/5" />
-                                                    <div>
-                                                        <p className="text-sm font-black italic uppercase tracking-tighter">@{t.user?.username || 'Guest'}</p>
-                                                        <p className="text-[8px] text-slate-600 font-bold uppercase tracking-widest">ID: {t.user_id}</p>
+                                        <tr key={t.id} className="hover:bg-[#121c30]/20 transition-colors">
+                                            <td className="px-6 py-4 text-sm font-semibold">
+                                                <div className="flex items-center gap-3">
+                                                    <img src={t.user?.avatar || `https://ui-avatars.com/api/?name=${t.user?.username}`} className="w-8 h-8 rounded-lg border border-slate-800 bg-slate-950" referrerPolicy="no-referrer" />
+                                                    <div className="leading-tight">
+                                                        <p className="text-sm font-semibold text-white">@{t.user?.username || 'Misafir'}</p>
+                                                        <p className="text-[10px] text-slate-500">ID: {t.user_id}</p>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-10 py-8">
-                                                <div className="flex flex-col gap-1">
-                                                    <span className="text-xs font-black uppercase tracking-tight">{t.item_id}</span>
-                                                    <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest">{t.item_type}</span>
+                                            <td className="px-6 py-4">
+                                                <div className="flex flex-col">
+                                                    <span className="text-xs font-semibold text-slate-200">{t.item_id}</span>
+                                                    <span className="text-[10px] text-slate-500">{t.item_type}</span>
                                                 </div>
                                             </td>
-                                            <td className="px-10 py-8">
-                                                <div className="flex flex-col gap-1">
-                                                    <span className="text-[10px] font-bold text-white uppercase tracking-widest">{new Date(t.created_at).toLocaleDateString()}</span>
-                                                    <span className="text-[8px] text-slate-600 font-bold uppercase tracking-widest">{new Date(t.created_at).toLocaleTimeString()}</span>
+                                            <td className="px-6 py-4">
+                                                <div className="flex flex-col">
+                                                    <span className="text-xs font-semibold text-slate-200">{new Date(t.created_at).toLocaleDateString()}</span>
+                                                    <span className="text-[10px] text-slate-500">{new Date(t.created_at).toLocaleTimeString()}</span>
                                                 </div>
                                             </td>
-                                            <td className="px-10 py-8">
-                                                <span className={`text-[9px] font-black px-3 py-1 rounded-lg border uppercase tracking-widest ${
-                                                    t.status === 'completed' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' :
-                                                    t.status === 'pending' ? 'bg-blue-500/10 border-blue-500/20 text-blue-500' :
-                                                    'bg-red-500/10 border-red-500/20 text-red-500'
+                                            <td className="px-6 py-4">
+                                                <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border ${
+                                                    t.status === 'completed' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' :
+                                                    t.status === 'pending' ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' :
+                                                    'bg-red-500/10 border-red-500/20 text-red-400'
                                                 }`}>
-                                                    {t.status === 'completed' ? 'BAŞARILI' : t.status === 'pending' ? 'BEKLEMEDE' : 'İPTAL'}
+                                                    <span className={`w-1 h-1 rounded-full ${
+                                                        t.status === 'completed' ? 'bg-emerald-400' :
+                                                        t.status === 'pending' ? 'bg-blue-400' :
+                                                        'bg-red-400'
+                                                    }`}></span>
+                                                    {t.status === 'completed' ? 'Başarılı' : t.status === 'pending' ? 'Beklemede' : 'İptal'}
                                                 </span>
                                             </td>
-                                            <td className="px-10 py-8 text-right">
-                                                <div className="flex flex-col items-end gap-1">
-                                                    <span className={`text-lg font-black italic ${t.status === 'completed' ? 'text-emerald-500' : 'text-slate-500'}`}>
+                                            <td className="px-6 py-4 text-right">
+                                                <div className="flex flex-col items-end leading-none">
+                                                    <span className={`text-sm font-bold ${t.status === 'completed' ? 'text-emerald-400' : 'text-slate-400'}`}>
                                                         {t.currency === 'TRY' ? '₺' : ''}{t.amount} {t.currency !== 'TRY' ? t.currency : ''}
                                                     </span>
                                                     {t.tx_hash && (
-                                                        <a href={`https://tonviewer.com/transaction/${t.tx_hash}`} target="_blank" className="text-[8px] text-blue-500 hover:underline uppercase font-black tracking-widest flex items-center gap-1">
-                                                            TX <ExternalLink size={8} />
+                                                        <a href={`https://tonviewer.com/transaction/${t.tx_hash}`} target="_blank" rel="noopener noreferrer" className="text-[10px] text-blue-400 hover:underline flex items-center gap-1 mt-1 leading-none">
+                                                            Ağ Detayı <ExternalLink size={10} />
                                                         </a>
                                                     )}
                                                 </div>
@@ -1936,50 +1977,50 @@ const SalesManagement = () => {
                         </div>
 
                         {/* Mobile Card View */}
-                        <div className="lg:hidden divide-y divide-white/5">
+                        <div className="lg:hidden divide-y divide-slate-800/40">
                             {filtered.map((t) => (
-                                <div key={t.id} className="p-6 space-y-4">
+                                <div key={t.id} className="p-5 space-y-4">
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-3">
-                                            <img src={t.user?.avatar || `https://ui-avatars.com/api/?name=${t.user?.username}`} className="w-10 h-10 rounded-xl border border-white/5" />
+                                            <img src={t.user?.avatar || `https://ui-avatars.com/api/?name=${t.user?.username}`} className="w-8 h-8 rounded-lg border border-slate-850" referrerPolicy="no-referrer" />
                                             <div>
-                                                <p className="text-sm font-black italic uppercase tracking-tighter text-white">@{t.user?.username || 'Guest'}</p>
-                                                <p className="text-[8px] text-slate-600 font-bold uppercase tracking-widest">ID: {t.user_id}</p>
+                                                <p className="text-sm font-semibold text-white">@{t.user?.username || 'Misafir'}</p>
+                                                <p className="text-[10px] text-slate-500">ID: {t.user_id}</p>
                                             </div>
                                         </div>
-                                        <span className={`text-[8px] font-black px-2 py-1 rounded border uppercase tracking-widest ${
-                                            t.status === 'completed' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' :
-                                            t.status === 'pending' ? 'bg-blue-500/10 border-blue-500/20 text-blue-500' :
-                                            'bg-red-500/10 border-red-500/20 text-red-500'
+                                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border ${
+                                            t.status === 'completed' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' :
+                                            t.status === 'pending' ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' :
+                                            'bg-red-500/10 border-red-500/20 text-red-400 border border-red-500/10'
                                         }`}>
-                                            {t.status === 'completed' ? 'BAŞARILI' : t.status === 'pending' ? 'BEKLEMEDE' : 'İPTAL'}
+                                            {t.status === 'completed' ? 'Başarılı' : t.status === 'pending' ? 'Beklemede' : 'İptal'}
                                         </span>
                                     </div>
 
                                     <div className="flex justify-between items-end">
-                                        <div className="space-y-1">
-                                            <p className="text-[9px] font-black text-slate-700 uppercase tracking-widest">ÜRÜN / TİP</p>
-                                            <div className="flex flex-col">
-                                                <span className="text-xs font-black uppercase tracking-tight text-white">{t.item_id}</span>
-                                                <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest">{t.item_type}</span>
+                                        <div>
+                                            <p className="text-[10px] font-semibold text-slate-500">Ürün / Tip</p>
+                                            <div className="flex flex-col mt-0.5">
+                                                <span className="text-xs font-semibold text-white">{t.item_id}</span>
+                                                <span className="text-[10px] text-slate-500">{t.item_type}</span>
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-[9px] font-black text-slate-700 uppercase tracking-widest mb-1">TUTAR</p>
-                                            <span className={`text-lg font-black italic ${t.status === 'completed' ? 'text-emerald-500' : 'text-slate-500'}`}>
+                                            <p className="text-[10px] font-semibold text-slate-500 mb-0.5">Tutar</p>
+                                            <span className={`text-base font-bold ${t.status === 'completed' ? 'text-emerald-400' : 'text-slate-400'}`}>
                                                 {t.currency === 'TRY' ? '₺' : ''}{t.amount} {t.currency !== 'TRY' ? t.currency : ''}
                                             </span>
                                         </div>
                                     </div>
 
-                                    <div className="flex justify-between items-center pt-2">
+                                    <div className="flex justify-between items-center pt-2 border-t border-slate-800/40">
                                         <div className="flex flex-col">
-                                            <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{new Date(t.created_at).toLocaleDateString()}</span>
-                                            <span className="text-[8px] text-slate-700 font-bold uppercase tracking-widest">{new Date(t.created_at).toLocaleTimeString()}</span>
+                                            <span className="text-[10px] font-medium text-slate-400">{new Date(t.created_at).toLocaleDateString()}</span>
+                                            <span className="text-[9px] text-slate-500">{new Date(t.created_at).toLocaleTimeString()}</span>
                                         </div>
                                         {t.tx_hash && (
-                                            <a href={`https://tonviewer.com/transaction/${t.tx_hash}`} target="_blank" className="h-8 px-4 bg-blue-600/10 text-blue-500 rounded-lg text-[8px] font-black uppercase tracking-widest flex items-center gap-2 border border-blue-500/20">
-                                                TX DETAY <ExternalLink size={10} />
+                                            <a href={`https://tonviewer.com/transaction/${t.tx_hash}`} target="_blank" rel="noopener noreferrer" className="h-8 px-3.5 bg-blue-500/10 text-blue-400 rounded-lg text-xs font-semibold flex items-center gap-1.5 border border-blue-500/10 transition-colors hover:bg-blue-600 hover:text-white">
+                                                Ağ Detayı <ExternalLink size={12} />
                                             </a>
                                         )}
                                     </div>
@@ -2053,55 +2094,60 @@ const AnnouncementCenter = () => {
     };
 
     return (
-        <div className="space-y-12 animate-in fade-in">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div className="space-y-6 animate-in fade-in duration-200">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h2 className="text-3xl lg:text-4xl font-black text-white italic uppercase tracking-tighter leading-none">Duyuru <span className="text-blue-500">Merkezi</span></h2>
-                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em] mt-2 italic">Global platform duyurularını yönetin</p>
+                    <h2 className="text-xl lg:text-2xl font-bold text-white tracking-tight leading-none">Duyuru Merkezi</h2>
+                    <p className="text-xs text-slate-400 mt-1 leading-normal">Global platform duyurularını yönetin</p>
                 </div>
                 <button 
                     onClick={openCreateModal}
-                    className="w-full md:w-auto bg-blue-600 hover:bg-blue-500 px-8 py-5 rounded-[24px] text-[10px] font-black uppercase tracking-[0.4em]   transition-all active:scale-95 flex items-center justify-center gap-3"
+                    className="w-full md:w-auto h-11 bg-blue-600 hover:bg-blue-500 px-5 rounded-xl text-xs font-semibold text-white transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm"
                 >
-                    <Plus size={18} /> YENİ DUYURU OLUŞTUR
+                    <Plus size={16} /> Yeni Duyuru Oluştur
                 </button>
             </div>
 
             {isLoading ? (
-                <div className="flex justify-center py-32"><Loader2 className="animate-spin text-blue-500" size={40} /></div>
+                <div className="flex flex-col items-center justify-center py-24 gap-3">
+                    <Loader2 className="animate-spin text-blue-500" size={32} />
+                    <span className="text-xs text-slate-500 font-medium italic">Duyurular yükleniyor...</span>
+                </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {anns.map(a => (
-                        <div key={a.id} className="bg-slate-900/40 border border-white/5 rounded-[44px] p-8 lg:p-10 flex flex-col gap-6 group hover:border-blue-500/30 transition-all relative overflow-hidden  backdrop-blur-sm">
+                        <div key={a.id} className="bg-[#101626]/40 border border-slate-800/60 rounded-2xl p-6 flex flex-col gap-4 group hover:border-blue-500/30 transition-all duration-300 relative overflow-hidden backdrop-blur-sm shadow-sm select-none">
                             {a.bg_image_url && (
                                 <div className="absolute inset-0 z-0">
-                                    <img src={a.bg_image_url} alt="" className="w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity" referrerPolicy="no-referrer" />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
+                                    <img src={a.bg_image_url} alt="" className="w-full h-full object-cover opacity-15 group-hover:opacity-25 transition-opacity duration-300" referrerPolicy="no-referrer" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-[#0e121e] via-[#0e121e]/80 to-[#0e121e]/40"></div>
                                 </div>
                             )}
                             <div className="flex justify-between items-start relative z-10">
-                                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center  border border-white/5 ${a.is_active ? (a.bg_image_url ? 'bg-white/10 text-white backdrop-blur-md' : `bg-gradient-to-br ${previewColors[a.color_scheme] || 'bg-blue-600'} text-white`) : 'bg-slate-800 text-slate-600'}`}>
-                                    {a.icon_name === 'None' ? null : (a.icon_name === 'Megaphone' ? <Megaphone size={24}/> : a.icon_name === 'Sparkles' ? <Sparkles size={24}/> : a.icon_name === 'Zap' ? <Zap size={24}/> : <Star size={24}/>)}
+                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center border border-slate-800/50 ${a.is_active ? (a.bg_image_url ? 'bg-slate-900/80 text-white' : `bg-gradient-to-br ${previewColors[a.color_scheme] || 'from-blue-600 to-indigo-600'} text-white`) : 'bg-slate-900 text-slate-600 border-slate-900'}`}>
+                                    {a.icon_name === 'None' ? <Megaphone size={18}/> : (a.icon_name === 'Megaphone' ? <Megaphone size={18}/> : a.icon_name === 'Sparkles' ? <Sparkles size={18}/> : a.icon_name === 'Zap' ? <Zap size={18}/> : <Star size={18}/>)}
                                 </div>
-                                <div className="flex gap-2">
-                                    <button onClick={() => { setEditingAnn(a); setIsModalOpen(true); }} className="p-3 bg-white/5 rounded-xl hover:bg-blue-600 text-slate-500 hover:text-white transition-all"><Edit3 size={18}/></button>
-                                    <button onClick={async () => { if(confirm('Silsin mi?')) { await DatabaseService.deleteAnnouncement(a.id); await DatabaseService.logActivity('admin', 'system', 'announcement_deleted', 'Duyuru Silindi', `${a.title} başlıklı duyuru silindi.`); load(); } }} className="p-3 bg-white/5 rounded-xl text-red-500 hover:bg-red-500 hover:text-white transition-all"><Trash2 size={18}/></button>
+                                <div className="flex gap-1.5">
+                                    <button onClick={() => { setEditingAnn(a); setIsModalOpen(true); }} className="w-8 h-8 rounded-lg bg-slate-900/60 border border-slate-800 hover:border-blue-500/30 text-slate-400 hover:text-white flex items-center justify-center transition-colors"><Edit3 size={14}/></button>
+                                    <button onClick={async () => { if(confirm('Silsin mi?')) { await DatabaseService.deleteAnnouncement(a.id); await DatabaseService.logActivity('admin', 'system', 'announcement_deleted', 'Duyuru Silindi', `${a.title} başlıklı duyuru silindi.`); load(); } }} className="w-8 h-8 rounded-lg bg-slate-900/60 border border-slate-800 hover:border-red-500/30 text-red-400 hover:bg-red-500/10 flex items-center justify-center transition-colors"><Trash2 size={14}/></button>
                                 </div>
                             </div>
 
-                            <div className="relative z-10">
-                                <div className="flex items-center gap-3 mb-3">
-                                    <h4 className="text-xl lg:text-2xl font-black text-white italic uppercase tracking-tighter truncate leading-none">{a.title}</h4>
-                                    {!a.is_active && <span className="text-[8px] font-black bg-red-500/10 text-red-500 px-2 py-0.5 rounded-md">PASİF</span>}
+                            <div className="relative z-10 flex-1 flex flex-col justify-between">
+                                <div className="space-y-1.5">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <h4 className="font-bold text-slate-200 text-sm truncate group-hover:text-blue-400 transition-colors leading-tight">{a.title}</h4>
+                                        {!a.is_active && <span className="text-[10px] font-semibold px-2 py-0.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400/90 leading-none">Pasif</span>}
+                                    </div>
+                                    <p className="text-slate-400 text-xs font-normal line-clamp-2 leading-relaxed h-8">{a.description}</p>
                                 </div>
-                                <p className="text-[10px] text-slate-600 line-clamp-2 leading-relaxed font-bold uppercase italic h-10">{a.description}</p>
                             </div>
 
-                            <div className="flex items-center justify-between pt-6 border-t border-white/5 relative z-10">
-                                <span className={`text-[9px] font-black uppercase tracking-widest ${a.bg_image_url ? 'text-blue-400' : (a.color_scheme === 'purple' ? 'text-purple-500' : a.color_scheme === 'emerald' ? 'text-emerald-500' : a.color_scheme === 'orange' ? 'text-orange-500' : 'text-blue-500')}`}>
-                                    {a.bg_image_url ? 'IMAGE BACKGROUND' : `${a.color_scheme.toUpperCase()} SCHEME`}
+                            <div className="flex items-center justify-between pt-4 border-t border-slate-800/60 relative z-10">
+                                <span className={`text-[10px] font-semibold tracking-wide ${a.bg_image_url ? 'text-blue-400' : (a.color_scheme === 'purple' ? 'text-purple-400' : a.color_scheme === 'emerald' ? 'text-emerald-400' : a.color_scheme === 'orange' ? 'text-orange-400' : 'text-blue-400')}`}>
+                                    {a.bg_image_url ? 'Görsel Arkaplan' : `${a.color_scheme.toUpperCase()} Tema`}
                                 </span>
-                                <ChevronRight size={18} className="text-slate-600" />
+                                <ChevronRight size={14} className="text-slate-500 group-hover:translate-x-1 transition-transform" />
                             </div>
                         </div>
                     ))}
@@ -2109,80 +2155,82 @@ const AnnouncementCenter = () => {
             )}
 
             {isModalOpen && editingAnn && (
-                <div className="fixed inset-0 z-[110] bg-black/95 flex items-end lg:items-center justify-center p-0 lg:p-8 backdrop-blur-3xl animate-in slide-in-from-bottom lg:fade-in">
-                    <div className="bg-[#020617] border-t lg:border border-white/10 rounded-t-[40px] lg:rounded-[64px] w-full max-w-6xl h-[94vh] lg:h-[90vh] flex flex-col lg:flex-row overflow-hidden  relative">
+                <div className="fixed inset-0 z-[150] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}></div>
+                    <div className="relative w-full max-w-4xl bg-[#0e121e] border border-slate-800/80 rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh]">
                         
-                        <button onClick={() => setIsModalOpen(false)} className="absolute top-6 right-6 lg:top-8 lg:right-8 z-[120] p-3 lg:p-4 bg-white/5 rounded-2xl hover:bg-red-600 transition-all active:scale-90">
-                            <X size={20} />
+                        <button onClick={() => setIsModalOpen(false)} className="absolute top-4 right-4 z-[120] p-1.5 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800 rounded-lg transition-all">
+                            <X size={14} />
                         </button>
 
                         <div className="flex-1 flex flex-col overflow-hidden">
-                            <div className="p-8 lg:p-12 pb-4 lg:pb-0 space-y-8">
-                                <div className="flex items-center gap-5">
-                                    <div className={`w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br ${previewColors[editingAnn.color_scheme] || 'from-purple-600 to-indigo-600'} rounded-[20px] flex items-center justify-center  rotate-3 transition-all duration-500`}>
+                            <div className="p-6 border-b border-slate-800/60 bg-slate-900/30 space-y-4">
+                                <div className="flex items-center gap-4">
+                                    <div className={`w-9 h-9 bg-gradient-to-br ${previewColors[editingAnn.color_scheme] || 'from-purple-600 to-indigo-600'} rounded-xl flex items-center justify-center`}>
                                         {editingAnn.icon_name !== 'None' && React.createElement(({ 
                                             Megaphone, Sparkles, Zap, Star, Gift, Info, BotIcon, Heart, Bell, Shield 
-                                        } as any)[editingAnn.icon_name] || Megaphone, { size: 24, className: "text-white" })}
+                                        } as any)[editingAnn.icon_name] || Megaphone, { size: 18, className: "text-white" })}
                                     </div>
                                     <div>
-                                        <h3 className="text-2xl lg:text-3xl font-black uppercase italic tracking-tighter">Broadcast <span className="text-blue-500">Forge</span></h3>
-                                        <p className="text-[9px] font-black text-slate-700 uppercase tracking-[0.4em] mt-1 italic">V3.1 BROADCASTER</p>
+                                        <h3 className="text-sm font-bold text-white">Duyuru Paneli</h3>
+                                        <p className="text-[10px] text-slate-500">Yayın parametrelerini ve görselleri özelleştirin</p>
                                     </div>
                                 </div>
 
-                                <div className="flex gap-2 bg-white/5 p-1.5 rounded-3xl border border-white/5">
+                                <div className="flex gap-1.5 p-1 bg-[#101626]/80 rounded-xl border border-slate-800/80 w-fit">
                                     {['info', 'style', 'action'].map(tab => (
                                         <button 
+                                            type="button"
                                             key={tab}
                                             onClick={() => setActiveTab(tab as any)}
-                                            className={`flex-1 py-3 lg:py-4 rounded-[20px] lg:rounded-[22px] text-[9px] font-black uppercase tracking-widest transition-all ${activeTab === tab ? 'bg-blue-600 text-white  ' : 'text-slate-500 hover:bg-white/5'}`}
+                                            className={`px-4 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all ${activeTab === tab ? 'bg-blue-600/10 border border-blue-500/10 text-blue-400' : 'text-slate-450 hover:text-white'}`}
                                         >
-                                            {tab === 'info' ? 'İÇERİK' : tab === 'style' ? 'GÖRÜNÜM' : 'EYLEM'}
+                                            {tab === 'info' ? 'İçerik' : tab === 'style' ? 'Görünüm' : 'Eylem'}
                                         </button>
                                     ))}
                                 </div>
                             </div>
 
-                            <div className="flex-1 overflow-y-auto p-8 lg:p-12 space-y-8 pb-32 lg:pb-12">
-                                <form onSubmit={handleSave} className="space-y-8">
+                            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                                <form onSubmit={handleSave} className="space-y-6">
                                     
                                     {activeTab === 'info' && (
-                                        <div className="space-y-8 animate-in slide-in-from-left-4">
-                                            <AdminInput label="BAŞLIK" value={editingAnn.title} onChange={(v:any)=>setEditingAnn({...editingAnn, title:v})} />
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                                <AdminInput label="ROZET METNİ (SPONSORLU YERİNE)" value={editingAnn.badge_text} onChange={(v:any)=>setEditingAnn({...editingAnn, badge_text:v})} placeholder="Sponsorlu" />
-                                                <AdminInput label="ETİKET (OPSİYONEL)" value={editingAnn.tag} onChange={(v:any)=>setEditingAnn({...editingAnn, tag:v})} placeholder="YENİ / SICAK" />
+                                        <div className="space-y-6 animate-in fade-in duration-200">
+                                            <AdminInput label="Başlık" value={editingAnn.title} onChange={(v:any)=>setEditingAnn({...editingAnn, title:v})} />
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <AdminInput label="Rozet Metni" value={editingAnn.badge_text} onChange={(v:any)=>setEditingAnn({...editingAnn, badge_text:v})} placeholder="Örn: Sponsorlu" />
+                                                <AdminInput label="Etiket (Opsiyonel)" value={editingAnn.tag} onChange={(v:any)=>setEditingAnn({...editingAnn, tag:v})} placeholder="Örn: YENİ" />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">KISA AÇIKLAMA</label>
-                                                <input value={editingAnn.description} onChange={e => setEditingAnn({...editingAnn, description: e.target.value})} className="w-full h-14 lg:h-18 bg-slate-950 border border-white/5 rounded-[22px] lg:rounded-[28px] px-8 text-[11px] font-black text-white outline-none focus:border-blue-500 uppercase italic " />
+                                                <label className="text-xs font-semibold text-slate-400">Kısa Açıklama</label>
+                                                <input value={editingAnn.description} onChange={e => setEditingAnn({...editingAnn, description: e.target.value})} className="w-full h-11 bg-slate-950/70 border border-slate-800/80 rounded-xl px-4 text-xs font-normal text-white outline-none focus:border-blue-500 transition-all" />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">DETAYLI İÇERİK (POPUP)</label>
-                                                <textarea value={editingAnn.content_detail} onChange={e => setEditingAnn({...editingAnn, content_detail: e.target.value})} className="w-full bg-slate-950 border border-white/5 p-8 rounded-[36px] lg:rounded-[44px] text-[11px] font-black h-32 lg:h-40 outline-none text-slate-400 focus:border-blue-500/30 uppercase italic leading-relaxed" />
+                                                <label className="text-xs font-semibold text-slate-400">Detaylı İçerik (Popup)</label>
+                                                <textarea value={editingAnn.content_detail} onChange={e => setEditingAnn({...editingAnn, content_detail: e.target.value})} className="w-full bg-[#101626]/40 border border-slate-800/80 p-4 rounded-xl text-xs font-normal h-32 outline-none text-slate-300 focus:border-blue-500 transition-all leading-relaxed" />
                                             </div>
                                         </div>
                                     )}
 
                                     {activeTab === 'style' && (
-                                        <div className="space-y-10 animate-in slide-in-from-left-4">
+                                        <div className="space-y-6 animate-in fade-in duration-200">
                                             {/* Arkaplan Tipi Seçimi */}
-                                            <div className="space-y-4">
-                                                <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">ARKAPLAN TİPİ</label>
-                                                <div className="flex gap-2 bg-white/5 p-1.5 rounded-3xl border border-white/5">
+                                            <div className="space-y-2">
+                                                <label className="text-xs font-semibold text-slate-400">Arkaplan Türü</label>
+                                                <div className="flex gap-1.5 p-1 bg-[#101626]/80 rounded-xl border border-slate-800/80 w-fit">
                                                     <button 
                                                         type="button"
                                                         onClick={() => setEditingAnn({ ...editingAnn, bg_image_url: '' })}
-                                                        className={`flex-1 py-3 rounded-[20px] text-[9px] font-black uppercase tracking-widest transition-all ${!editingAnn.bg_image_url ? 'bg-blue-600 text-white ' : 'text-slate-500 hover:bg-white/5'}`}
+                                                        className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${!editingAnn.bg_image_url ? 'bg-blue-600/10 border-blue-500/10 text-blue-400' : 'text-slate-500 hover:text-white'}`}
                                                     >
-                                                        RENK ŞEMASI
+                                                        Renk Şeması
                                                     </button>
                                                     <button 
                                                         type="button"
                                                         onClick={() => setEditingAnn({ ...editingAnn, bg_image_url: editingAnn.bg_image_url || 'https://' })}
-                                                        className={`flex-1 py-3 rounded-[20px] text-[9px] font-black uppercase tracking-widest transition-all ${editingAnn.bg_image_url ? 'bg-blue-600 text-white ' : 'text-slate-500 hover:bg-white/5'}`}
+                                                        className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${editingAnn.bg_image_url ? 'bg-blue-600/10 border-blue-500/10 text-blue-400' : 'text-slate-500 hover:text-white'}`}
                                                     >
-                                                        PNG GÖRSEL
+                                                        Görsel / PNG URL
                                                     </button>
                                                 </div>
                                             </div>
@@ -2239,17 +2287,17 @@ const AnnouncementCenter = () => {
                                                             )}
                                                         </div>
                                                         <div>
-                                                            <p className="text-[10px] font-black text-white uppercase italic">GÖRSEL ÖNİZLEME</p>
-                                                            <p className="text-[8px] font-bold text-slate-600 uppercase mt-1">Geçerli bir PNG URL'si girin.</p>
+                                                            <p className="text-xs font-semibold text-white">Görsel Önizleme</p>
+                                                            <p className="text-[10px] text-slate-505 mt-1">Girdiğiniz PNG URL'ye göre otomatik yenilenir.</p>
                                                         </div>
                                                     </div>
                                                 </div>
                                             )}
 
                                             {/* İkon Seçimi */}
-                                            <div className="space-y-4">
-                                                <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">İKON TİPİ</label>
-                                                <div className="grid grid-cols-5 gap-4">
+                                            <div className="space-y-2">
+                                                <label className="text-xs font-semibold text-slate-400">İkon Türü</label>
+                                                <div className="grid grid-cols-6 gap-2">
                                                     {[
                                                         { id: 'None', icon: X },
                                                         { id: 'Megaphone', icon: Megaphone },
@@ -2267,13 +2315,13 @@ const AnnouncementCenter = () => {
                                                             key={item.id}
                                                             type="button"
                                                             onClick={() => setEditingAnn({ ...editingAnn, icon_name: item.id })}
-                                                            className={`h-16 rounded-2xl flex items-center justify-center transition-all border ${
+                                                            className={`h-11 rounded-xl flex items-center justify-center transition-all border ${
                                                                 editingAnn.icon_name === item.id 
-                                                                ? 'bg-blue-600 border-blue-500 text-white  ' 
-                                                                : 'bg-slate-950 border-white/5 text-slate-600 hover:text-slate-400'
+                                                                ? 'bg-blue-600/10 border-blue-500/20 text-blue-400 shadow-sm' 
+                                                                : 'bg-slate-950 border-slate-800/85 text-slate-500 hover:text-slate-350'
                                                             }`}
                                                         >
-                                                            <item.icon size={20} />
+                                                            <item.icon size={16} />
                                                         </button>
                                                     ))}
                                                 </div>
@@ -2282,88 +2330,87 @@ const AnnouncementCenter = () => {
                                     )}
 
                                     {activeTab === 'action' && (
-                                        <div className="space-y-8 animate-in slide-in-from-left-4">
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                                <AdminInput label="BUTON METNİ" value={editingAnn.button_text} onChange={(v:any)=>setEditingAnn({...editingAnn, button_text:v})} />
-                                                <AdminInput label="HEDEF URL / KULLANICIADI" value={editingAnn.button_link} onChange={(v:any)=>setEditingAnn({...editingAnn, button_link:v})} />
+                                        <div className="space-y-6 animate-in fade-in duration-200">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <AdminInput label="Buton Metni" value={editingAnn.button_text} onChange={(v:any)=>setEditingAnn({...editingAnn, button_text:v})} />
+                                                <AdminInput label="Hedef URL / Kullanıcı Adı" value={editingAnn.button_link} onChange={(v:any)=>setEditingAnn({...editingAnn, button_link:v})} />
                                                 <div className="space-y-2">
-                                                    <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">AKSİYON TİPİ</label>
-                                                    <div className="flex gap-2">
+                                                    <label className="text-xs font-semibold text-slate-450">Aksiyon Tipi</label>
+                                                    <div className="flex gap-1.5 p-1 bg-[#101626]/80 rounded-xl border border-slate-800/80 w-fit">
                                                         {['link', 'popup'].map(type => (
                                                             <button 
                                                                 key={type}
                                                                 type="button" 
                                                                 onClick={()=>setEditingAnn({...editingAnn, action_type: type})} 
-                                                                className={`flex-1 h-14 rounded-2xl font-black text-[10px] uppercase transition-all ${editingAnn.action_type === type ? 'bg-blue-600 text-white ' : 'bg-slate-950 text-slate-700 border border-white/5'}`}
+                                                                className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${editingAnn.action_type === type ? 'bg-blue-600/10 border border-blue-500/10 text-blue-400' : 'text-slate-500 hover:text-slate-350'}`}
                                                             >
-                                                                {type === 'link' ? 'DIŞ BAĞLANTI' : 'İÇ POPUP'}
+                                                                {type === 'link' ? 'Dış Bağlantı' : 'İç Popup'}
                                                             </button>
                                                         ))}
                                                     </div>
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">DURUM</label>
-                                                    <button type="button" onClick={()=>setEditingAnn({...editingAnn, is_active: !editingAnn.is_active})} className={`w-full h-14 rounded-2xl flex items-center justify-center gap-3 transition-all font-black text-[10px] tracking-widest ${editingAnn.is_active ? 'bg-emerald-600 text-white  ' : 'bg-red-950/20 text-red-500 border border-red-500/20'}`}>
-                                                        {editingAnn.is_active ? 'YAYINDA' : 'DURDURULDU'}
+                                                    <label className="text-xs font-semibold text-slate-450">Yayın Durumu</label>
+                                                    <button type="button" onClick={()=>setEditingAnn({...editingAnn, is_active: !editingAnn.is_active})} className={`h-10 px-4 rounded-xl flex items-center justify-center gap-2 transition-all font-semibold text-xs leading-none ${editingAnn.is_active ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
+                                                        <span className={`w-1.5 h-1.5 rounded-full ${editingAnn.is_active ? 'bg-emerald-400' : 'bg-red-400'}`}></span>
+                                                        {editingAnn.is_active ? 'Yayında' : 'Yayını Durdur'}
                                                     </button>
                                                 </div>
                                             </div>
                                         </div>
                                     )}
 
-                                    <div className="fixed lg:relative bottom-0 left-0 right-0 p-6 lg:p-0 bg-gradient-to-t from-[#020617] lg:from-transparent via-[#020617]/90 lg:via-transparent to-transparent z-[130]">
-                                        <button type="submit" className="w-full h-16 lg:h-24 bg-blue-600 text-white rounded-2xl lg:rounded-[32px] font-black text-[12px] uppercase tracking-[0.4em]   transition-all border-b-8 border-blue-800 active:translate-y-1 active:border-b-4 flex items-center justify-center gap-4">
-                                            <Send size={20} /> DUYURUYU YAYINLA
+                                    <div className="pt-4 border-t border-slate-800/60">
+                                        <button type="submit" className="w-full h-11 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-semibold text-xs transition-all flex items-center justify-center gap-2 shadow-sm">
+                                            <Send size={14} /> Duyuruyu Kaydet
                                         </button>
                                     </div>
                                 </form>
                             </div>
                         </div>
 
-                        {/* RIGHT: LIVE HOLOGRAPHIC PREVIEW SIMULATOR */}
-                        <div className="hidden lg:flex w-[440px] bg-slate-950/40 border-l border-white/5 p-12 flex-col items-center justify-center bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/10 via-transparent to-transparent">
-                            <div className="text-center mb-16 space-y-3">
-                                <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.6em] italic block">LIVE PREVIEW</span>
-                                <h4 className="text-xl font-black text-white italic tracking-widest opacity-20 uppercase">Display Simulator</h4>
+                        {/* RIGHT: COMPACT PREVIEW SIMULATOR */}
+                        <div className="hidden lg:flex w-[320px] bg-slate-950/20 border-l border-slate-800/60 p-6 flex-col items-center justify-center">
+                            <div className="text-center mb-6 space-y-1 select-none">
+                                <span className="text-[10px] font-semibold text-blue-400 uppercase tracking-wider block">ÖNİZLEME</span>
+                                <h4 className="text-xs font-normal text-slate-500">Duyuru Görünümü</h4>
                             </div>
 
-                            <div className="w-full max-w-[320px] h-44 rounded-[40px] transition-all duration-700 p-8 relative overflow-hidden  transform hover:rotate-2 group">
+                            <div className="w-full max-w-[260px] h-36 rounded-xl p-5 relative overflow-hidden border border-slate-800 bg-[#101626]/40 flex flex-col justify-between group">
                                 {/* Dinamik Arkaplan */}
                                 {editingAnn.bg_image_url ? (
-                                    <div className="absolute inset-0 z-0">
-                                        <img src={editingAnn.bg_image_url} alt="" className="w-full h-full object-cover opacity-40" referrerPolicy="no-referrer" />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                                    <div className="absolute inset-0 z-0 select-none">
+                                        <img src={editingAnn.bg_image_url} alt="" className="w-full h-full object-cover opacity-10 group-hover:opacity-20 transition-opacity" referrerPolicy="no-referrer" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-[#0e121e] via-[#0e121e]/85 to-transparent"></div>
                                     </div>
                                 ) : (
-                                    <div className={`absolute inset-0 bg-gradient-to-br ${previewColors[editingAnn.color_scheme] || previewColors.purple} transition-all duration-700`}></div>
+                                    <div className={`absolute inset-0 bg-gradient-to-br ${previewColors[editingAnn.color_scheme] || previewColors.purple} opacity-80 group-hover:opacity-105 transition-all duration-300`}></div>
                                 )}
                                 
-                                <div className="relative z-10 flex flex-col h-full overflow-hidden">
-                                    <div className="flex items-center gap-2 mb-2">
+                                <div className="relative z-10 flex flex-col justify-between h-full">
+                                    <div className="flex items-center gap-1.5 flex-wrap">
                                         {editingAnn.badge_text && (
-                                            <div className="px-2 py-0.5 rounded-full bg-white/20 border border-white/20 flex items-center gap-1">
-                                                <span className="text-[7px] font-black text-white uppercase tracking-wider">{editingAnn.badge_text}</span>
-                                            </div>
+                                            <span className="text-[9px] font-semibold text-white/95 px-2 py-0.5 rounded-md bg-white/10 backdrop-blur-md border border-white/10">{editingAnn.badge_text}</span>
                                         )}
                                         {editingAnn.tag && (
-                                            <div className="px-2 py-0.5 rounded-full bg-white/10 border border-white/10">
-                                                <span className="text-[7px] font-black text-white/70 uppercase tracking-wider">{editingAnn.tag}</span>
-                                            </div>
+                                            <span className="text-[9px] font-semibold text-white/70 px-2 py-0.5 rounded-md bg-white/5 border border-white/10">{editingAnn.tag}</span>
                                         )}
                                     </div>
-                                    <h3 className="text-white font-black text-xl mb-1 tracking-tighter italic uppercase leading-tight line-clamp-2 shrink-0 whitespace-normal">{editingAnn.title || 'Başlık Yok'}</h3>
-                                    <p className="text-white/70 text-[9px] font-bold uppercase tracking-tight line-clamp-3 overflow-hidden whitespace-normal">{editingAnn.description || 'Açıklama girilmedi.'}</p>
+                                    <div>
+                                        <h3 className="text-white font-bold text-sm mb-0.5 truncate leading-tight">{editingAnn.title || 'Başlık Yok'}</h3>
+                                        <p className="text-white/60 text-[10px] leading-relaxed line-clamp-2 font-normal">{editingAnn.description || 'Açıklama girilmedi.'}</p>
+                                    </div>
                                 </div>
                                 {!editingAnn.bg_image_url && (
-                                    <div className="absolute -right-6 -bottom-6 opacity-20 transform rotate-12 transition-all duration-700 group-hover:scale-125">
+                                    <div className="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-300">
                                         {editingAnn.icon_name === 'None' ? null : React.createElement(({ 
                                             Megaphone, Sparkles, Zap, Star, Gift, Info, BotIcon, Heart, Bell, Shield 
-                                        } as any)[editingAnn.icon_name] || Megaphone, { size: 140, className: "text-white" })}
+                                        } as any)[editingAnn.icon_name] || Megaphone, { size: 90, className: "text-white" })}
                                     </div>
                                 )}
                             </div>
 
-                            <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mt-10 italic">Gerçek zamanlı görünüm simülasyonu</p>
+                            <p className="text-[10px] font-medium text-slate-500 mt-6 select-none leading-normal">Kullanıcı cihazlarında görünecek biçim</p>
                         </div>
                     </div>
                 </div>
@@ -2410,56 +2457,60 @@ const NotificationCenter = () => {
     };
 
     return (
-        <div className="space-y-12 animate-in fade-in">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div className="space-y-6 animate-in fade-in duration-200">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h2 className="text-3xl lg:text-4xl font-black text-white italic uppercase tracking-tighter leading-none">Inbox <span className="text-blue-500">Controller</span></h2>
-                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em] mt-2 italic">Kullanıcı bildirimlerini anlık yönetin</p>
+                    <h2 className="text-xl lg:text-2xl font-bold text-white tracking-tight leading-none">Bildirim Merkezi</h2>
+                    <p className="text-xs text-slate-400 mt-1 leading-normal">Kullanıcı bildirimlerini anlık yönetin</p>
                 </div>
                 <button 
                     onClick={() => { setNewNote({ title: '', message: '', type: 'system', target_type: 'global', user_id: '' }); setIsModalOpen(true); }}
-                    className="w-full md:w-auto bg-blue-600 hover:bg-blue-500 px-8 py-5 rounded-[24px] text-[10px] font-black uppercase tracking-[0.4em]   transition-all active:scale-95 flex items-center justify-center gap-3"
+                    className="w-full md:w-auto h-11 bg-blue-600 hover:bg-blue-500 px-5 rounded-xl text-xs font-semibold text-white transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm"
                 >
-                    <Plus size={18} /> YENİ BİLDİRİM TETİKLE
+                    <Plus size={16} /> Yeni Bildirim Tetikle
                 </button>
             </div>
 
-            <div className="bg-slate-900/40 border border-white/5 rounded-[44px] overflow-hidden ">
+            <div className="bg-[#101626]/40 border border-slate-800/60 rounded-2xl overflow-hidden backdrop-blur-sm">
                 <div className="hidden lg:block overflow-x-auto">
                     <table className="w-full text-left">
-                        <thead className="bg-white/5 text-[9px] uppercase tracking-[0.4em] text-slate-700 font-black">
+                        <thead className="bg-[#12192c]/50 text-[10px] font-semibold text-slate-400 border-b border-slate-800/80">
                             <tr>
-                                <th className="px-10 py-8">BAŞLIK & TİP</th>
-                                <th className="px-10 py-8">HEDEF</th>
-                                <th className="px-10 py-8 text-center">GÖRÜNTÜLENME</th>
-                                <th className="px-10 py-8">TARİH</th>
-                                <th className="px-10 py-8 text-right">AKSİYON</th>
+                                <th className="px-6 py-4">BAŞLIK & TÜR</th>
+                                <th className="px-6 py-4">HEDEF KİTLE</th>
+                                <th className="px-6 py-4 text-center">GÖRÜNTÜLENME</th>
+                                <th className="px-6 py-4">TARİH</th>
+                                <th className="px-6 py-4 text-right">EYLEMLER</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/5">
+                        <tbody className="divide-y divide-slate-800/40">
                             {notes.map(n => (
-                                <tr key={n.id} className="hover:bg-white/5 transition-all text-white group">
-                                    <td className="px-10 py-8">
-                                        <div className="flex items-center gap-4">
-                                            <div className={`p-3 rounded-xl bg-white/5 ${n.type === 'payment' ? 'text-emerald-500' : n.type === 'security' ? 'text-red-500' : 'text-blue-500'}`}>
-                                                {n.type === 'payment' ? <Wallet size={16}/> : n.type === 'security' ? <ShieldCheck size={16}/> : <Bell size={16}/>}
+                                <tr key={n.id} className="hover:bg-slate-900/30 transition-all text-slate-300 text-xs">
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className={`p-2 rounded-xl bg-slate-900/80 border border-slate-800/60 ${n.type === 'payment' ? 'text-emerald-400' : n.type === 'security' ? 'text-rose-450 text-red-450' : 'text-blue-400'}`}>
+                                                {n.type === 'payment' ? <Wallet size={14}/> : n.type === 'security' ? <ShieldCheck size={14}/> : <Bell size={14}/>}
                                             </div>
                                             <div>
-                                                <p className="font-black italic uppercase text-sm">{n.title}</p>
-                                                <p className="text-[9px] text-slate-600 font-bold uppercase">{n.type} LOG</p>
+                                                <p className="font-semibold text-slate-200">{n.title}</p>
+                                                <p className="text-[10px] text-slate-500">{n.type === 'payment' ? 'Finansal' : n.type === 'security' ? 'Güvenlik Log' : 'Sistem Gönderisi'}</p>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-10 py-8"><span className="text-[10px] font-black text-slate-400 uppercase italic">{n.target_type === 'global' ? 'GLOBAL' : `USER: ${n.user_id}`}</span></td>
-                                    <td className="px-10 py-8 text-center">
-                                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 rounded-lg border border-white/5">
-                                            <Eye size={12} className="text-blue-500" />
-                                            <span className="text-[11px] font-black text-white">{n.view_count || 0}</span>
+                                    <td className="px-6 py-4">
+                                        <span className={`text-[10px] font-semibold tracking-wide px-2 py-0.5 rounded-lg bg-slate-900 border border-slate-800 ${n.target_type === 'global' ? 'text-blue-400' : 'text-slate-450'}`}>
+                                            {n.target_type === 'global' ? 'Herkese Açık' : `Özel (Kullanıcı ID: ${n.user_id})`}
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-4 text-center">
+                                        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-slate-900 border border-slate-800/80 rounded-md select-none">
+                                            <Eye size={11} className="text-slate-400" />
+                                            <span className="text-[10px] font-bold text-slate-300">{n.view_count || 0}</span>
                                         </div>
                                     </td>
-                                    <td className="px-10 py-8 text-slate-600 text-[10px] font-bold uppercase">{new Date(n.date).toLocaleString()}</td>
-                                    <td className="px-10 py-8 text-right">
-                                        <button onClick={async () => { if(confirm('Silsin mi?')) { await DatabaseService.deleteNotification(n.id); await DatabaseService.logActivity('admin', 'system', 'notification_deleted', 'Bildirim Silindi', `${n.title} başlıklı bildirim silindi.`); load(); } }} className="p-3 bg-white/5 rounded-xl text-red-500 opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={16}/></button>
+                                    <td className="px-6 py-4 text-slate-400 font-medium text-[11px]">{new Date(n.date).toLocaleString()}</td>
+                                    <td className="px-6 py-4 text-right">
+                                        <button onClick={async () => { if(confirm('Silsin mi?')) { await DatabaseService.deleteNotification(n.id); await DatabaseService.logActivity('admin', 'system', 'notification_deleted', 'Bildirim Silindi', `${n.title} başlıklı bildirim silindi.`); load(); } }} className="w-8 h-8 rounded-lg bg-slate-900/60 border border-slate-800 hover:border-red-500/30 text-slate-400 hover:text-red-400 hover:bg-red-500/10 flex items-center justify-center transition-all ml-auto"><Trash2 size={13}/></button>
                                     </td>
                                 </tr>
                             ))}
@@ -2470,20 +2521,20 @@ const NotificationCenter = () => {
                 {/* Mobile Card List */}
                 <div className="lg:hidden p-4 space-y-3">
                     {notes.map(n => (
-                        <div key={n.id} className="p-6 bg-white/5 rounded-3xl space-y-4">
+                        <div key={n.id} className="p-4 bg-slate-900/30 border border-slate-800/60 rounded-xl space-y-3">
                             <div className="flex justify-between items-start">
-                                <div className="flex items-center gap-3">
-                                    <div className={`p-2 rounded-lg bg-white/5 ${n.type === 'payment' ? 'text-emerald-500' : n.type === 'security' ? 'text-red-500' : 'text-blue-500'}`}><Bell size={14}/></div>
-                                    <p className="font-black text-white italic uppercase text-xs">{n.title}</p>
+                                <div className="flex items-center gap-2">
+                                    <div className={`p-1.5 rounded-lg bg-slate-900 border border-slate-800 ${n.type === 'payment' ? 'text-emerald-400' : n.type === 'security' ? 'text-red-400' : 'text-blue-400'}`}><Bell size={12}/></div>
+                                    <p className="font-semibold text-slate-200 text-xs">{n.title}</p>
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <div className="flex items-center gap-1.5 text-[9px] font-black text-slate-500">
-                                        <Eye size={10}/> {n.view_count || 0}
+                                <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-1 text-[10px] text-slate-400">
+                                        <Eye size={11}/> {n.view_count || 0}
                                     </div>
-                                    <button onClick={async () => { await DatabaseService.deleteNotification(n.id); load(); }} className="text-red-500"><Trash2 size={14}/></button>
+                                    <button onClick={async () => { await DatabaseService.deleteNotification(n.id); load(); }} className="text-red-400 hover:text-red-300"><Trash2 size={12}/></button>
                                 </div>
                             </div>
-                            <p className="text-[10px] text-slate-600 uppercase font-black italic">{n.message}</p>
+                            <p className="text-[11px] text-slate-400 leading-normal">{n.message}</p>
                         </div>
                     ))}
                 </div>
@@ -2491,93 +2542,107 @@ const NotificationCenter = () => {
 
             {/* NOTIFICATION FORGE MODAL */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-[110] bg-black/95 flex items-end lg:items-center justify-center p-0 lg:p-8 backdrop-blur-3xl animate-in slide-in-from-bottom lg:fade-in">
-                    <div className="bg-[#020617] border-t lg:border border-white/10 rounded-t-[40px] lg:rounded-[64px] w-full max-w-6xl h-[94vh] lg:h-[90vh] flex flex-col lg:flex-row overflow-hidden  relative">
+                <div className="fixed inset-0 z-[110] bg-black/80 flex items-center justify-center p-4 backdrop-blur-md animate-in fade-in duration-200">
+                    <div className="bg-[#0b0f19] border border-slate-800/60 rounded-2xl w-full max-w-4xl h-[80vh] flex flex-col lg:flex-row overflow-hidden relative shadow-2xl">
                         
-                        <button onClick={() => setIsModalOpen(false)} className="absolute top-6 right-6 lg:top-8 lg:right-8 z-[120] p-3 lg:p-4 bg-white/5 rounded-2xl hover:bg-red-600 transition-all active:scale-90">
-                            <X size={20} />
+                        <button onClick={() => setIsModalOpen(false)} className="absolute top-4 right-4 z-[120] p-2 bg-slate-900 border border-slate-800 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white transition-all active:scale-95">
+                            <X size={15} />
                         </button>
 
                         <div className="flex-1 flex flex-col overflow-hidden">
-                            <div className="p-8 lg:p-12 pb-4 lg:pb-0 space-y-8">
-                                <div className="flex items-center gap-5">
-                                    <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-[20px] flex items-center justify-center  rotate-3">
-                                        <Bell size={24} className="text-white"/>
+                            <div className="p-6 border-b border-slate-800/60 space-y-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-blue-600/10 border border-blue-500/20 rounded-xl flex items-center justify-center text-blue-400">
+                                        <Bell size={18}/>
                                     </div>
                                     <div>
-                                        <h3 className="text-2xl lg:text-3xl font-black uppercase italic tracking-tighter">Inbox <span className="text-blue-500">Forge</span></h3>
-                                        <p className="text-[9px] font-black text-slate-700 uppercase tracking-[0.4em] mt-1 italic">V3.5 NOTIFIER</p>
+                                        <h3 className="text-base font-semibold text-white">Bildirim Oluştur</h3>
+                                        <p className="text-[10px] text-slate-500 leading-normal">Kullanıcılara anlık uyarı ve duyuru iletimi</p>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="flex-1 overflow-y-auto p-8 lg:p-12 space-y-8 pb-32 lg:pb-12">
-                                <form onSubmit={handleSend} className="space-y-8">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                        <div className="space-y-2">
-                                            <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">BİLDİRİM TİPİ</label>
-                                            <div className="flex gap-2">
+                            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                                <form onSubmit={handleSend} className="space-y-5">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                        <div className="space-y-1.5">
+                                            <label className="text-xs font-semibold text-slate-450">Bildirim Tipi</label>
+                                            <div className="flex gap-1.5 p-1 bg-[#101626]/80 rounded-xl border border-slate-800/80">
                                                 {['system', 'payment', 'security', 'bot'].map(t => (
-                                                    <button key={t} type="button" onClick={()=>setNewNote({...newNote, type: t})} className={`flex-1 py-4 rounded-2xl text-[8px] font-black uppercase tracking-widest transition-all ${newNote.type === t ? 'bg-blue-600 text-white  ' : 'bg-slate-950 text-slate-600 border border-white/5'}`}>{t}</button>
+                                                    <button 
+                                                        key={t} 
+                                                        type="button" 
+                                                        onClick={()=>setNewNote({...newNote, type: t})} 
+                                                        className={`flex-1 py-1 px-2 text-[10px] font-semibold rounded-lg capitalize transition-all ${newNote.type === t ? 'bg-blue-600/15 text-blue-400 border border-blue-500/10' : 'text-slate-500 hover:text-slate-350'}`}
+                                                    >
+                                                        {t === 'system' ? 'Sistem' : t === 'payment' ? 'Finansal' : t === 'security' ? 'Güvenlik' : 'Bot'}
+                                                    </button>
                                                 ))}
                                             </div>
                                         </div>
-                                        <div className="space-y-2">
-                                            <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">HEDEF KİTLE</label>
-                                            <div className="flex gap-2">
+                                        <div className="space-y-1.5">
+                                            <label className="text-xs font-semibold text-slate-450">Hedef Kitle</label>
+                                            <div className="flex gap-1.5 p-1 bg-[#101626]/80 rounded-xl border border-slate-800/80">
                                                 {['global', 'user'].map(t => (
-                                                    <button key={t} type="button" onClick={()=>setNewNote({...newNote, target_type: t})} className={`flex-1 py-4 rounded-2xl text-[8px] font-black uppercase tracking-widest transition-all ${newNote.target_type === t ? 'bg-blue-600 text-white ' : 'bg-slate-950 text-slate-600 border border-white/5'}`}>{t === 'global' ? 'HERKESE' : 'SPESİFİK'}</button>
+                                                    <button 
+                                                        key={t} 
+                                                        type="button" 
+                                                        onClick={()=>setNewNote({...newNote, target_type: t})} 
+                                                        className={`flex-1 py-1 px-2 text-[10px] font-semibold rounded-lg transition-all ${newNote.target_type === t ? 'bg-blue-600/15 text-blue-400 border border-blue-500/10' : 'text-slate-500 hover:text-slate-350'}`}
+                                                    >
+                                                        {t === 'global' ? 'Herkese' : 'Spesifik Limit'}
+                                                    </button>
                                                 ))}
                                             </div>
                                         </div>
                                     </div>
 
                                     {newNote.target_type === 'user' && (
-                                        <AdminInput label="HEDEF KULLANICI ID" value={newNote.user_id} onChange={(v:any)=>setNewNote({...newNote, user_id:v})} />
+                                        <AdminInput label="Hedef Kullanıcı ID" value={newNote.user_id} onChange={(v:any)=>setNewNote({...newNote, user_id:v})} />
                                     )}
 
-                                    <AdminInput label="BİLDİRİM BAŞLIĞI" value={newNote.title} onChange={(v:any)=>setNewNote({...newNote, title:v})} />
+                                    <AdminInput label="Bildirim Başlığı" value={newNote.title} onChange={(v:any)=>setNewNote({...newNote, title:v})} />
                                     
-                                    <div className="space-y-2">
-                                        <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">BİLDİRİM MESAJI</label>
-                                        <textarea value={newNote.message} onChange={e => setNewNote({...newNote, message: e.target.value})} className="w-full bg-slate-950 border border-white/5 p-8 rounded-[36px] lg:rounded-[44px] text-[11px] font-black h-32 lg:h-40 outline-none text-slate-400 focus:border-blue-500/30 uppercase italic leading-relaxed " />
+                                    <div className="space-y-1.5">
+                                        <label className="text-xs font-semibold text-slate-450">Bildirim Mesajı</label>
+                                        <textarea value={newNote.message} onChange={e => setNewNote({...newNote, message: e.target.value})} placeholder="Kullanıcıya iletilecek mesaj metni..." className="w-full bg-[#101626]/40 border border-slate-800 p-4 rounded-xl text-xs outline-none text-slate-350 focus:border-blue-500/30 h-24 placeholder:text-slate-600 leading-relaxed capitalize-none resize-none" />
                                     </div>
 
-                                    <div className="fixed lg:relative bottom-0 left-0 right-0 p-6 lg:p-0 bg-gradient-to-t from-[#020617] lg:from-transparent via-[#020617]/90 lg:via-transparent to-transparent z-[130]">
-                                        <button type="submit" className="w-full h-16 lg:h-24 bg-blue-600 text-white rounded-2xl lg:rounded-[32px] font-black text-[12px] uppercase tracking-[0.4em]   transition-all border-b-8 border-blue-800 active:translate-y-1 active:border-b-4 flex items-center justify-center gap-4">
-                                            <Send size={20} /> BİLDİRİMİ TETİKLE
+                                    <div className="pt-2 border-t border-slate-800/60">
+                                        <button type="submit" className="w-full h-10 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-semibold text-xs transition-all flex items-center justify-center gap-2 shadow-sm">
+                                            <Send size={13} /> Bildirimi Tetikle
                                         </button>
                                     </div>
                                 </form>
                             </div>
                         </div>
 
-                        {/* RIGHT: LIVE HOLOGRAPHIC INBOX SIMULATOR */}
-                        <div className="hidden lg:flex w-[480px] bg-slate-950/40 border-l border-white/5 p-12 flex-col items-center justify-center bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/10 via-transparent to-transparent">
-                            <div className="text-center mb-16 space-y-3">
-                                <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.6em] italic block">INBOX SYNC</span>
-                                <h4 className="text-xl font-black text-white italic tracking-widest opacity-20 uppercase">Simulator</h4>
+                        {/* RIGHT: COMPACT INBOX SIMULATOR */}
+                        <div className="hidden lg:flex w-[320px] bg-slate-950/20 border-l border-slate-800/60 p-6 flex-col items-center justify-center sticky right-0">
+                            <div className="text-center mb-6 space-y-1">
+                                <span className="text-[10px] font-semibold text-blue-400 uppercase tracking-wider block">ANLIK SİMÜLASYON</span>
+                                <h4 className="text-xs font-normal text-slate-500">Kullanıcı Bildirim Kutusu</h4>
                             </div>
 
-                            <div className="w-full max-w-[340px] perspective-1000 group">
-                                <div className="bg-slate-900/80 border border-white/10 rounded-[56px] p-8  transition-all duration-700 hover:rotate-1 hover:scale-105 backdrop-blur-md relative overflow-hidden">
-                                    <div className="absolute top-0 left-0 w-1.5 h-full bg-blue-600 "></div>
-                                    <div className="flex gap-5 mb-6 relative z-10">
-                                        <div className="w-14 h-14 bg-slate-950 rounded-2xl border border-white/5 flex items-center justify-center text-blue-500 ">
-                                            {newNote.type === 'payment' ? <Wallet size={24}/> : <Bell size={24}/>}
+                            <div className="w-full max-w-[260px] group select-none">
+                                <div className="bg-[#101626]/40 border border-slate-850 border-slate-800/80 rounded-xl p-4 transition-all duration-300 relative overflow-hidden backdrop-blur-sm">
+                                    <div className="absolute top-0 left-0 w-1 h-full bg-blue-600"></div>
+                                    <div className="flex gap-3 mb-4 relative z-10">
+                                        <div className="w-9 h-9 bg-slate-900 border border-slate-800 rounded-lg flex items-center justify-center text-blue-400 shrink-0">
+                                            {newNote.type === 'payment' ? <Wallet size={16}/> : <Bell size={16}/>}
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <div className="flex justify-between items-start mb-1">
-                                                <h5 className="text-sm font-black text-white italic uppercase tracking-tighter truncate leading-none">{newNote.title || 'Bildirim Başlığı'}</h5>
-                                                <span className="text-[8px] text-slate-600 font-bold uppercase mt-1">NOW</span>
+                                            <div className="flex justify-between items-start mb-0.5">
+                                                <h5 className="text-xs font-bold text-slate-200 truncate leading-tight pr-1">{newNote.title || 'Bildirim Başlığı'}</h5>
+                                                <span className="text-[8px] text-slate-500 whitespace-nowrap mt-0.5 font-medium">Şimdi</span>
                                             </div>
-                                            <p className="text-[10px] text-slate-500 font-bold uppercase italic leading-relaxed line-clamp-2">{newNote.message || 'Bildirim içeriği burada görünecek...'}</p>
+                                            <p className="text-[10px] text-slate-400 leading-normal line-clamp-2">{newNote.message || 'Harika bir mesaj içeriği girildi.'}</p>
                                         </div>
                                     </div>
-                                    <div className="pt-4 border-t border-white/5 flex justify-between items-center relative z-10">
-                                        <span className="text-[8px] font-black text-blue-500 uppercase tracking-widest">{newNote.type} LOG</span>
+                                    <div className="pt-2 border-t border-slate-800/60 flex justify-between items-center relative z-10 text-[9px] text-slate-500 font-medium">
+                                        <span>{newNote.type === 'payment' ? 'Finansal' : 'Sistem Gönderisi'}</span>
                                         <div className="flex gap-1">
-                                            <div className="w-1 h-1 rounded-full bg-blue-600"></div>
+                                            <div className="w-1 h-1 rounded-full bg-blue-500"></div>
                                             <div className="w-1 h-1 rounded-full bg-slate-800"></div>
                                         </div>
                                     </div>
@@ -2738,18 +2803,18 @@ const PromotionManagement = () => {
     };
 
     return (
-        <div className="space-y-12 animate-in fade-in">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div className="space-y-6 animate-in fade-in duration-200">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h2 className="text-4xl font-black text-white italic uppercase tracking-tighter leading-none">Promo <span className="text-blue-500">Engine</span></h2>
-                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em] mt-2 italic">Kanallar üzerinden toplu reklam dağıtımı yapın</p>
+                    <h2 className="text-xl lg:text-2xl font-bold text-white tracking-tight leading-none">Kampanyalar ve Reklamlar</h2>
+                    <p className="text-xs text-slate-400 mt-1 leading-normal">Kanallar üzerinden toplu reklam ve sponsorlu gönderi dağıtımı yapın</p>
                 </div>
-                <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+                <div className="flex flex-col sm:flex-row gap-2.5 w-full md:w-auto">
                     <button 
                         onClick={openAIModal} 
-                        className="w-full md:w-auto bg-blue-600 hover:bg-blue-500 px-8 py-5 rounded-[28px] text-[11px] font-black uppercase tracking-widest  active:scale-95 border-b-4 border-blue-900 transition-all flex items-center justify-center gap-3"
+                        className="w-full md:w-auto h-11 bg-blue-600/10 hover:bg-blue-600/15 border border-blue-500/20 px-5 rounded-xl text-xs font-semibold text-blue-400 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm"
                     >
-                        <Sparkles size={18} /> AI İLE OLUŞTUR
+                        <Sparkles size={14} /> AI ile Oluştur
                     </button>
                     <button 
                         onClick={() => { 
@@ -2768,89 +2833,89 @@ const PromotionManagement = () => {
                             }); 
                             setIsModalOpen(true); 
                         }} 
-                        className="w-full md:w-auto bg-emerald-600 hover:bg-emerald-500 px-8 py-5 rounded-[28px] text-[11px] font-black uppercase tracking-widest  active:scale-95 border-b-4 border-emerald-900 transition-all flex items-center justify-center gap-3"
+                        className="w-full md:w-auto h-11 bg-blue-600 hover:bg-blue-500 px-5 rounded-xl text-xs font-semibold text-white transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm"
                     >
-                        <Plus size={18} /> MANUEL OLUŞTUR
+                        <Plus size={14} /> Manuel Oluştur
                     </button>
                 </div>
             </div>
 
             {isLoading && updatingId === null ? (
-                <div className="flex flex-col items-center justify-center py-24 gap-4">
-                    <Loader2 className="animate-spin text-blue-500" size={32} />
-                    <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">Senkronize Ediliyor...</span>
+                <div className="flex flex-col items-center justify-center py-16 gap-3">
+                    <Loader2 className="animate-spin text-blue-500" size={24} />
+                    <span className="text-[11px] text-slate-500 font-medium">Kampanyalar yükleniyor...</span>
                 </div>
             ) : promos.length === 0 ? (
-                <div className="bg-slate-900/20 border-2 border-dashed border-slate-800 rounded-[48px] p-24 text-center">
-                    <Megaphone size={48} className="text-slate-600 mx-auto mb-6" />
-                    <p className="text-slate-600 font-black uppercase italic tracking-widest">Henüz bir kampanya tanımlanmadı.</p>
+                <div className="bg-[#101626]/25 border border-dashed border-slate-800 rounded-2xl p-16 text-center">
+                    <Megaphone size={36} className="text-slate-600 mx-auto mb-4 animate-bounce" />
+                    <p className="text-slate-400 text-xs font-medium">Henüz aktif veya pasif bir reklam kampanyası tanımlanmadı.</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 gap-6">
+                <div className="grid grid-cols-1 gap-4">
                     {promos.map(p => (
-                        <div key={p.id} className="bg-slate-900/40 border border-white/5 rounded-[48px] p-6 lg:p-10 flex flex-col lg:flex-row items-center justify-between group  hover:border-blue-500/20 transition-all gap-8">
-                            <div className="flex-1 min-w-0 text-center lg:text-left w-full">
-                                <div className="flex items-center justify-center lg:justify-start gap-3 mb-6">
+                        <div key={p.id} className="bg-[#101626]/40 border border-slate-800/60 rounded-2xl p-5 lg:p-6 flex flex-col lg:flex-row items-start lg:items-center justify-between group hover:border-slate-800 transition-all gap-5">
+                            <div className="flex-1 min-w-0 w-full">
+                                <div className="flex items-center gap-2.5 mb-3 flex-wrap">
                                     {getStatusBadge(p.status)}
-                                    <span className="text-[10px] font-bold text-slate-700 uppercase tracking-[0.2em]">{new Date(p.created_at).toLocaleDateString()}</span>
+                                    <span className="text-[10px] font-semibold text-slate-500">{new Date(p.created_at).toLocaleDateString()}</span>
                                 </div>
-                                <h4 className="text-xl lg:text-2xl font-black italic uppercase text-white truncate mb-6">{p.title}</h4>
-                                <div className="grid grid-cols-2 md:grid-cols-3 lg:flex lg:items-center gap-4 lg:gap-8">
-                                    <div className="flex items-center gap-2 justify-center lg:justify-start bg-white/5 p-3 lg:p-0 rounded-2xl lg:bg-transparent">
-                                        <Monitor size={14} className="text-slate-500" />
-                                        <span className="text-[9px] lg:text-[10px] font-black text-slate-500 uppercase">{p.channel_count || 0} KANAL</span>
+                                <h4 className="text-base font-semibold text-slate-200 mb-4">{p.title}</h4>
+                                <div className="grid grid-cols-2 md:grid-cols-5 gap-2.5">
+                                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/60 border border-slate-800/50 text-slate-405 text-slate-400">
+                                        <Monitor size={12} className="text-slate-550 text-slate-500" />
+                                        <span className="text-[10px] font-bold">{p.channel_count || 0} Kanal</span>
                                     </div>
-                                    <div className="flex items-center gap-2 justify-center lg:justify-start bg-white/5 p-3 lg:p-0 rounded-2xl lg:bg-transparent">
-                                        <TrendingUp size={14} className="text-blue-500" />
-                                        <span className="text-[9px] lg:text-[10px] font-black text-blue-500 uppercase">{p.total_reach?.toLocaleString() || 0} ERİŞİM</span>
+                                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/60 border border-slate-800/50 text-blue-400">
+                                        <TrendingUp size={12} className="text-blue-500" />
+                                        <span className="text-[10px] font-bold">{p.total_reach?.toLocaleString() || 0} Erişim</span>
                                     </div>
-                                    <div className="flex items-center gap-2 justify-center lg:justify-start bg-white/5 p-3 lg:p-0 rounded-2xl lg:bg-transparent">
-                                        <Eye size={14} className="text-emerald-500" />
-                                        <span className="text-[9px] lg:text-[10px] font-black text-emerald-500 uppercase">{p.total_views?.toLocaleString() || 0} GÖRÜNTÜ</span>
+                                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/60 border border-slate-800/50 text-emerald-400">
+                                        <Eye size={12} className="text-emerald-500" />
+                                        <span className="text-[10px] font-bold">{p.total_views?.toLocaleString() || 0} Görsel</span>
                                     </div>
-                                    <div className="flex items-center gap-2 justify-center lg:justify-start bg-white/5 p-3 lg:p-0 rounded-2xl lg:bg-transparent">
-                                        <Heart size={14} className="text-rose-500" />
-                                        <span className="text-[9px] lg:text-[10px] font-black text-rose-500 uppercase">{p.total_reactions?.toLocaleString() || 0} TEPKİ</span>
+                                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/60 border border-slate-800/50 text-rose-455 text-rose-400">
+                                        <Heart size={12} className="text-rose-500" />
+                                        <span className="text-[10px] font-bold">{p.total_reactions?.toLocaleString() || 0} Tepki</span>
                                     </div>
-                                    <div className="flex items-center gap-2 justify-center lg:justify-start bg-white/5 p-3 lg:p-0 rounded-2xl lg:bg-transparent">
-                                        <MousePointer2 size={14} className="text-emerald-500" />
-                                        <span className="text-[9px] lg:text-[10px] font-black text-emerald-500 uppercase">{p.click_count || 0} TIK</span>
+                                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#101626] border border-slate-800 text-teal-400">
+                                        <MousePointer2 size={12} className="text-teal-550 text-teal-500" />
+                                        <span className="text-[10px] font-bold">{p.click_count || 0} Tık</span>
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                            <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
                                 <button 
                                     disabled={updatingId === p.id}
                                     onClick={() => handleToggleStatus(p)} 
-                                    className={`flex-1 lg:flex-none px-8 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 flex items-center gap-2 min-w-[160px] justify-center ${
+                                    className={`h-9 px-4 rounded-xl text-xs font-semibold transition-all active:scale-95 flex items-center gap-1.5 min-w-[110px] justify-center ${
                                         updatingId === p.id 
                                         ? 'bg-slate-800 text-slate-600 opacity-50' 
                                         : p.status === 'sending' 
-                                          ? 'bg-orange-500/10 text-orange-500 border border-orange-500/20 ' 
-                                          : 'bg-blue-600 text-white   hover:bg-blue-500'
+                                          ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' 
+                                          : 'bg-blue-600 text-white hover:bg-blue-500 shadow-sm'
                                     }`}
                                 >
                                     {updatingId === p.id ? (
-                                        <Loader2 className="animate-spin" size={14} />
+                                        <Loader2 className="animate-spin" size={12} />
                                     ) : (
                                         <>
-                                            {p.status === 'sending' ? 'DURDUR' : 'YAYINA AL'}
-                                            <Send size={14} />
+                                            {p.status === 'sending' ? 'Duraklat' : 'Yayınla'}
+                                            <Send size={12} />
                                         </>
                                     )}
                                 </button>
-                                <div className="flex gap-3 flex-1 lg:flex-none">
+                                <div className="flex gap-2 shrink-0">
                                     <button 
                                         onClick={() => { setEditingPromo(p); setIsModalOpen(true); }}
-                                        className="flex-1 lg:flex-none p-5 bg-white/5 rounded-2xl text-blue-400 hover:bg-blue-600 hover:text-white transition-all  flex items-center justify-center"
+                                        className="w-9 h-9 bg-slate-900 hover:bg-slate-800 border border-slate-800/80 rounded-xl text-blue-400 hover:text-blue-300 flex items-center justify-center transition-all"
                                     >
-                                        <Edit3 size={20}/>
+                                        <Edit3 size={14}/>
                                     </button>
                                     <button 
                                         onClick={async () => { if(confirm('Bu kampanya silinsin mi?')) { await DatabaseService.deletePromotion(p.id); await DatabaseService.logActivity('admin', 'bot_manage', 'promotion_deleted', 'Tanıtım Silindi', `${p.title} kampanyası silindi.`); load(); } }} 
-                                        className="flex-1 lg:flex-none p-5 bg-white/5 rounded-2xl text-red-500 hover:bg-red-500 hover:text-white transition-all  flex items-center justify-center"
+                                        className="w-9 h-9 bg-slate-900 hover:bg-red-500/15 border border-slate-800/80 hover:border-red-500/30 rounded-xl text-rose-455 text-red-400 flex items-center justify-center transition-all"
                                     >
-                                        <Trash2 size={20}/>
+                                        <Trash2 size={14}/>
                                     </button>
                                 </div>
                             </div>
@@ -2860,55 +2925,55 @@ const PromotionManagement = () => {
             )}
 
             {isAIModalOpen && (
-                <div className="fixed inset-0 z-[120] bg-black/95 flex items-center justify-center p-6 backdrop-blur-xl animate-in fade-in">
-                    <div className="bg-[#020617] p-10 lg:p-16 rounded-[64px] w-full max-w-3xl border border-white/10  relative">
-                        <button onClick={() => setIsAIModalOpen(false)} className="absolute top-8 right-8 p-4 bg-white/5 rounded-2xl text-slate-500 hover:text-white transition-all">
-                            <X size={24}/>
+                <div className="fixed inset-0 z-[120] bg-black/85 flex items-center justify-center p-4 backdrop-blur-md animate-in fade-in duration-200">
+                    <div className="bg-[#0b0f19] p-6 lg:p-8 rounded-2xl w-full max-w-lg border border-slate-805 border-slate-800/60 relative shadow-2xl">
+                        <button onClick={() => setIsAIModalOpen(false)} className="absolute top-4 right-4 p-2 bg-slate-900 border border-slate-800 rounded-xl text-slate-450 hover:text-white transition-all active:scale-95">
+                            <X size={14}/>
                         </button>
                         
-                        <div className="text-center space-y-8">
-                            <div className="inline-flex p-6 bg-blue-500/10 rounded-[32px] border border-blue-500/20 mb-4">
-                                <Sparkles size={48} className="text-blue-500" />
+                        <div className="text-center space-y-5">
+                            <div className="inline-flex p-3 bg-blue-600/10 rounded-xl border border-blue-500/20 mb-1">
+                                <Sparkles size={24} className="text-blue-400" />
                             </div>
                             <div>
-                                <h3 className="text-4xl font-black text-white italic uppercase tracking-tighter mb-4">AI <span className="text-blue-500">Ad Generator</span></h3>
-                                <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">Reklam fikrinizi yazın, gerisini yapay zekaya bırakın</p>
+                                <h3 className="text-lg font-bold text-white">Yapay Zeka Reklam Sihirbazı</h3>
+                                <p className="text-slate-500 text-xs mt-1 leading-normal">Kanal ve kampanyanız için otomatik çarpıcı metin ve görseller üretin</p>
                             </div>
 
                             {aiError && (
-                                <div className="bg-red-500/10 border border-red-500/20 p-6 rounded-[32px] text-left space-y-4 animate-in slide-in-from-top-2">
-                                    <div className="flex items-start gap-4">
-                                        <AlertCircle className="text-red-500 shrink-0 mt-1" size={20} />
-                                        <div className="space-y-1">
-                                            <p className="text-red-500 text-sm font-bold uppercase tracking-widest">Hata Oluştu</p>
-                                            <p className="text-slate-400 text-xs leading-relaxed">{aiError}</p>
+                                <div className="bg-red-500/10 border border-red-500/15 p-4 rounded-xl text-left space-y-3 animate-in slide-in-from-top-2">
+                                    <div className="flex items-start gap-3">
+                                        <AlertCircle className="text-red-400 shrink-0 mt-0.5" size={16} />
+                                        <div className="space-y-0.5">
+                                            <p className="text-red-400 text-xs font-bold">Hata Oluştu</p>
+                                            <p className="text-slate-400 text-[11px] leading-relaxed">{aiError}</p>
                                         </div>
                                     </div>
                                     {showKeySelection && (
                                         <button 
                                             onClick={handleKeySelection}
-                                            className="w-full bg-white/5 hover:bg-white/10 border border-white/10 px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white transition-all flex items-center justify-center gap-3"
+                                            className="w-full h-8 bg-white/5 hover:bg-white/10 border border-white/10 px-3 rounded-lg text-[10px] font-semibold text-white transition-all flex items-center justify-center gap-1.5"
                                         >
-                                            <Key size={14} /> API ANAHTARINI GÜNCELLE
+                                            <Key size={11} /> API Anahtarını Güncelle
                                         </button>
                                     )}
                                 </div>
                             )}
 
                             {showKeySelection && !aiError && (
-                                <div className="bg-blue-500/10 border border-blue-500/20 p-6 rounded-[32px] text-left space-y-4">
-                                    <div className="flex items-start gap-4">
-                                        <Info className="text-blue-500 shrink-0 mt-1" size={20} />
-                                        <div className="space-y-1">
-                                            <p className="text-blue-500 text-sm font-bold uppercase tracking-widest">API Anahtarı Gerekli</p>
-                                            <p className="text-slate-400 text-xs leading-relaxed">AI özelliklerini kullanmak için bir API anahtarı seçmelisiniz.</p>
+                                <div className="bg-blue-500/10 border border-blue-500/15 p-4 rounded-xl text-left space-y-3">
+                                    <div className="flex items-start gap-3">
+                                        <Info className="text-blue-400 shrink-0 mt-0.5" size={16} />
+                                        <div className="space-y-0.5">
+                                            <p className="text-blue-400 text-xs font-bold">API Anahtarı Gerekli</p>
+                                            <p className="text-slate-400 text-[11px] leading-relaxed">AI özelliklerini kullanmak için bir API anahtarı seçmelisiniz.</p>
                                         </div>
                                     </div>
                                     <button 
                                         onClick={handleKeySelection}
-                                        className="w-full bg-white/5 hover:bg-white/10 border border-white/10 px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white transition-all flex items-center justify-center gap-3"
+                                        className="w-full h-8 bg-white/5 hover:bg-white/10 border border-white/10 px-3 rounded-lg text-[10px] font-semibold text-white transition-all flex items-center justify-center gap-1.5"
                                     >
-                                        <Key size={14} /> API ANAHTARI SEÇ
+                                        <Key size={11} /> API Anahtarı Seç
                                     </button>
                                 </div>
                             )}
@@ -2917,61 +2982,57 @@ const PromotionManagement = () => {
                                 <textarea 
                                     value={aiPrompt}
                                     onChange={(e) => setAiPrompt(e.target.value)}
-                                    placeholder="Örn: Yeni bir kripto cüzdanı için dikkat çekici bir reklam oluştur..."
-                                    className="w-full bg-white/5 border border-white/10 rounded-[32px] p-8 text-white text-lg font-medium focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none min-h-[200px] resize-none"
+                                    placeholder="Örn: Yeni çıkacak Telegram botumuz için yüksek erişim sağlayacak, kripto borsalarını hedefleyen çekici bir kampanya başlığı oluştur..."
+                                    className="w-full bg-[#101626]/40 border border-slate-800 rounded-xl p-4 text-xs text-slate-300 focus:border-blue-500/50 transition-all outline-none h-28 resize-none leading-relaxed placeholder:text-slate-600"
                                 />
                                 
-                                <div className="flex items-center justify-center gap-3 p-4 bg-white/5 rounded-[24px] border border-white/10">
+                                <div className="flex items-center justify-center gap-2 p-2.5 bg-[#101626]/50 rounded-xl border border-slate-800/80">
                                     <input 
                                         type="checkbox" 
                                         id="ai-image-toggle"
                                         checked={generateImage}
                                         onChange={(e) => setGenerateImage(e.target.checked)}
-                                        className="w-5 h-5 rounded-lg bg-slate-900 border-white/10 text-blue-600 focus:ring-blue-500/20"
+                                        className="w-4 h-4 rounded bg-slate-900 border-slate-800 text-blue-600 focus:ring-blue-500/10 focus:ring-offset-0"
                                     />
-                                    <label htmlFor="ai-image-toggle" className="text-[11px] font-black text-slate-400 uppercase tracking-widest cursor-pointer select-none">
-                                        AI Görseli de Oluşturulsun
+                                    <label htmlFor="ai-image-toggle" className="text-[11px] font-medium text-slate-400 cursor-pointer select-none">
+                                        Benzersiz bir AI görseli de üretilsin
                                     </label>
                                 </div>
 
                                 <button 
                                     disabled={isGenerating || !aiPrompt.trim()}
                                     onClick={generateAIAd}
-                                    className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:hover:bg-blue-600 px-10 py-6 rounded-[32px] text-sm font-black uppercase tracking-[0.2em]  active:scale-95 transition-all flex items-center justify-center gap-4"
+                                    className="w-full h-10 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:hover:bg-blue-600 rounded-xl text-xs font-semibold text-white transition-all flex items-center justify-center gap-1.5 shadow-sm"
                                 >
                                     {isGenerating ? (
                                         <>
-                                            <Loader2 size={20} className="animate-spin" />
-                                            OLUŞTURULUYOR...
+                                            <Loader2 size={13} className="animate-spin" />
+                                            Oluşturuluyor...
                                         </>
                                     ) : (
                                         <>
-                                            <Zap size={20} /> REKLAMI OLUŞTUR
+                                            <Zap size={13} /> İçeriği Oluştur ve Aktar
                                         </>
                                     )}
                                 </button>
                             </div>
-                            
-                            <p className="text-[10px] font-bold text-slate-700 uppercase tracking-widest">
-                                * Seçiminize göre yapay zeka görsel ve metin içeriği üretecektir.
-                            </p>
                         </div>
                     </div>
                 </div>
             )}
 
             {isModalOpen && editingPromo && (
-                <div className="fixed inset-0 z-[110] bg-black/98 flex items-center justify-center p-0 lg:p-6 backdrop-blur-3xl animate-in fade-in">
-                    <div className="bg-[#020617] p-8 lg:p-14 rounded-t-[40px] lg:rounded-[64px] w-full max-w-7xl h-[94vh] lg:h-[90vh] overflow-hidden border-t lg:border border-white/10  relative flex flex-col lg:flex-row gap-12">
-                        <button onClick={() => setIsModalOpen(false)} className="absolute top-8 right-8 p-4 bg-white/5 rounded-2xl text-slate-500 hover:text-white z-50 transition-all">
-                            <X size={24}/>
+                <div className="fixed inset-0 z-[110] bg-black/85 flex items-center justify-center p-4 backdrop-blur-md animate-in fade-in duration-200">
+                    <div className="bg-[#0b0f19] rounded-2xl w-full max-w-5xl h-[82vh] overflow-hidden border border-slate-800/60 relative flex flex-col lg:flex-row shadow-2xl">
+                        <button onClick={() => setIsModalOpen(false)} className="absolute top-4 right-4 p-2 bg-slate-900 border border-slate-800 rounded-xl text-slate-450 hover:text-white z-50 transition-all active:scale-95">
+                            <X size={14}/>
                         </button>
                         
                         {/* LEFT: Ad Composer Form */}
-                        <div className="flex-1 overflow-y-auto pr-2 space-y-8">
-                            <div>
-                                <h3 className="text-3xl font-black mb-2 uppercase italic tracking-tighter">Campaign <span className="text-emerald-500">Forge</span></h3>
-                                <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">Yayınlanacak reklamın içeriğini tasarlayın</p>
+                        <div className="flex-1 overflow-y-auto p-6 space-y-6 flex flex-col">
+                            <div className="border-b border-slate-800/60 pb-4">
+                                <h3 className="text-base font-semibold text-white">Kampanya Düzenleyici</h3>
+                                <p className="text-[11px] text-slate-500 leading-normal mt-0.5">Gönderi metnini, kanalları ve buton aksiyonlarını belirleyin</p>
                             </div>
 
                             <form onSubmit={(e) => {
@@ -2981,83 +3042,81 @@ const PromotionManagement = () => {
                                     return;
                                 }
                                 handleSave(e);
-                            }} className="space-y-8 pb-10">
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                    <AdminInput label="REKLAM BAŞLIĞI" value={editingPromo.title} onChange={(v:any)=>setEditingPromo({...editingPromo, title:v})} placeholder="Örn: Haftalık Kampanya" />
+                            }} className="space-y-4 pb-4">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <AdminInput label="Reklam Başlığı" value={editingPromo.title} onChange={(v:any)=>setEditingPromo({...editingPromo, title:v})} placeholder="Örn: Hafta Sonu Fırsatı" />
                                     <div className="relative">
-                                        <AdminInput label="ANA PAYLAŞIM KANALI" value={editingPromo.source_channel} onChange={(v:any)=>setEditingPromo({...editingPromo, source_channel:v})} placeholder="-1003826684282" />
-                                        <div className="absolute top-0 right-0 mt-1 mr-4">
-                                            <span className="text-[8px] font-black text-blue-500 uppercase bg-blue-500/10 px-2 py-1 rounded-full">SİSTEM KANALI</span>
+                                        <AdminInput label="Ana Paylaşım Kanalı ID" value={editingPromo.source_channel} onChange={(v:any)=>setEditingPromo({...editingPromo, source_channel:v})} placeholder="-1003826684282" />
+                                        <div className="absolute top-0 right-0 mt-1.5 mr-2">
+                                            <span className="text-[8px] font-bold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-500/5">Sistem</span>
                                         </div>
                                     </div>
-                                    <AdminInput label="GÖRÜNTÜLENME BİRİM FİYATI" value={editingPromo.price_per_view} onChange={(v:any)=>setEditingPromo({...editingPromo, price_per_view:v})} placeholder="0.005" icon={TrendingUp} />
+                                    <AdminInput label="Görüntülenme Birim Fiyatı ($)" value={editingPromo.price_per_view} onChange={(v:any)=>setEditingPromo({...editingPromo, price_per_view:v})} placeholder="0.005" icon={TrendingUp} />
                                 </div>
                                 
-                                <div className="space-y-2">
-                                    <label className="text-[9px] font-black text-slate-600 uppercase tracking-widest ml-4 italic">ANA MESAJ (HTML DESTEKLİ)</label>
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-semibold text-slate-450">Paylaşım Gönderi İçeriği (HTML Destekli)</label>
                                     <textarea 
                                         value={editingPromo.content} 
                                         onChange={e => setEditingPromo({...editingPromo, content: e.target.value})} 
-                                        className="w-full bg-slate-950 border border-white/5 p-8 rounded-[36px] text-[11px] font-black h-40 outline-none text-slate-400 focus:border-emerald-500/30 uppercase italic leading-relaxed" 
-                                        placeholder="Kanalda görünecek reklam metni..." 
+                                        className="w-full bg-[#101626]/40 border border-slate-800 p-4 rounded-xl text-xs outline-none text-slate-300 focus:border-blue-500/30 h-28 leading-relaxed resize-none placeholder:text-slate-600" 
+                                        placeholder="Kanalda paylaşılacak sponsorlu gönderi gövdesi..." 
                                     />
                                 </div>
 
-                                <AdminInput label="GÖRSEL URL (OPSİYONEL)" value={editingPromo.image_url} onChange={(v:any)=>setEditingPromo({...editingPromo, image_url:v})} icon={ImageIcon} placeholder="https://..." />
+                                <AdminInput label="Giriş Görsel Bağlantısı (Opsiyonel URL)" value={editingPromo.image_url} onChange={(v:any)=>setEditingPromo({...editingPromo, image_url:v})} icon={ImageIcon} placeholder="https://resim-kaynagi.com/gorsel.jpg" />
                                 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <AdminInput label="BUTON METNİ" value={editingPromo.button_text} onChange={(v:any)=>setEditingPromo({...editingPromo, button_text:v})} placeholder="İNCELE" />
-                                    <AdminInput label="BUTON LİNKİ" value={editingPromo.button_link} onChange={(v:any)=>setEditingPromo({...editingPromo, button_link:v})} icon={Link2} placeholder="https://t.me/..." />
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <AdminInput label="Buton Metni" value={editingPromo.button_text} onChange={(v:any)=>setEditingPromo({...editingPromo, button_text:v})} placeholder="Hemen İncele" />
+                                    <AdminInput label="Buton Hedef Linki" value={editingPromo.button_link} onChange={(v:any)=>setEditingPromo({...editingPromo, button_link:v})} icon={Link2} placeholder="https://t.me/kanal_linki" />
                                 </div>
 
-                                <div className="bg-blue-600/5 border border-blue-500/10 p-6 rounded-[32px] flex items-start gap-4">
-                                    <div className="p-3 bg-blue-600/10 rounded-2xl text-blue-500">
-                                        <Zap size={20} />
+                                <div className="bg-[#101626]/45 border border-slate-800/80 p-4 rounded-xl flex items-start gap-3">
+                                    <div className="p-2 bg-blue-600/10 rounded-lg text-blue-400 shrink-0">
+                                        <Zap size={14} />
                                     </div>
-                                    <div>
-                                        <p className="text-[11px] font-black text-blue-500 uppercase tracking-widest mb-1">BotlyHub Reklam Ağı</p>
-                                        <p className="text-[9px] text-slate-500 font-bold uppercase italic leading-relaxed">
-                                            Reklamlar otomatik olarak <b>BotlyHub Reklam</b> kanalında ({editingPromo.source_channel}) paylaşılacak ve tüm alt kanallara bu kanal üzerinden iletilecektir.
+                                    <div className="space-y-1">
+                                        <p className="text-xs font-semibold text-blue-400">BotlyHub Reklam Entegratörü</p>
+                                        <p className="text-[10px] text-slate-450 leading-relaxed">
+                                            Reklam paylaşımları seçtiğiniz ana referans kanalı ({editingPromo.source_channel}) üzerinden tüm bağlı diğer alt ağlara otomatik kaskat edilecektir.
                                         </p>
-                                        <div className="mt-4 p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-start gap-3">
-                                            <AlertTriangle size={16} className="text-amber-500 shrink-0" />
-                                            <p className="text-[8px] text-amber-500/80 font-black uppercase italic leading-normal">
-                                                ÖNEMLİ: İstatistik takibi (Görüntülenme/Gelir) için ana kanalın <b>KAMUYA AÇIK (PUBLIC)</b> olması ve bir <b>@kullanıcıadı</b> olması zorunludur. Gizli kanallarda istatistik çalışmaz.
+                                        <div className="mt-2.5 p-3 bg-amber-500/5 border border-amber-500/15 rounded-xl flex items-start gap-2">
+                                            <AlertTriangle size={13} className="text-amber-500 shrink-0 mt-0.5" />
+                                            <p className="text-[9px] text-amber-500/80 leading-normal">
+                                                İstatistiksel izleyicilerin sağlıklı çalışması için ana referans kanalınız mutlaka <b>KAMUYA AÇIK (PUBLIC)</b> olmalıdır. Özel gizli kanallarda erişim grafikleri dökülmeyebilir.
                                             </p>
                                         </div>
                                     </div>
                                 </div>
 
-                                <button type="submit" className="w-full h-20 bg-blue-600 hover:bg-blue-500 rounded-[32px] font-black text-[12px] uppercase tracking-[0.4em]  border-b-8 border-blue-900 transition-all active:translate-y-1 active:border-b-4">KAMPANYAYI SİSTEME KAYDET</button>
+                                <button type="submit" className="w-full h-10 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-semibold text-xs transition-all flex items-center justify-center gap-1.5 shadow-sm">Kampanyayı Kaydet</button>
                             </form>
                         </div>
 
-                        {/* RIGHT: LIVE HOLOGRAPHIC TELEGRAM SIMULATOR */}
-                        <div className="hidden lg:flex w-[460px] flex-col items-center justify-center bg-slate-900/20 border-l border-white/5 p-12 relative overflow-hidden">
-                            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-emerald-600/5 via-transparent to-transparent"></div>
-                            
-                            <div className="text-center mb-12 space-y-2">
-                                <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.5em] italic block">TELEGRAM PREVIEW</span>
-                                <p className="text-[9px] font-black text-slate-700 uppercase tracking-widest">REAL-TIME SIMULATOR</p>
+                        {/* RIGHT: LIVE TELEGRAM SIMULATOR */}
+                        <div className="hidden lg:flex w-[320px] bg-slate-950/20 border-l border-slate-800/60 p-6 flex-col items-center justify-center sticky right-0">
+                            <div className="text-center mb-6 space-y-1">
+                                <span className="text-[10px] font-semibold text-blue-400 uppercase tracking-wider block">ANLIK TELEGRAM SİMÜLATÖRÜ</span>
+                                <h4 className="text-[10px] text-slate-500 font-normal">Kanal İçi Mobil Gönderi</h4>
                             </div>
 
                             {/* Telegram Message UI */}
-                            <div className="w-full bg-[#020617] border border-white/10 rounded-[40px] overflow-hidden  animate-in zoom-in-95">
+                            <div className="w-full bg-[#101626]/40 border border-slate-800/80 rounded-xl overflow-hidden animate-in zoom-in-95">
                                 {editingPromo.image_url && editingPromo.image_url.startsWith('http') ? (
-                                    <img src={editingPromo.image_url} className="w-full h-48 object-cover border-b border-white/5" onError={(e)=>(e.target as any).src=''} />
+                                    <img src={editingPromo.image_url} className="w-full h-32 object-cover border-b border-slate-800/80" onError={(e)=>(e.target as any).src=''} />
                                 ) : (
-                                    <div className="w-full h-32 bg-slate-900/40 flex flex-col items-center justify-center border-b border-white/5">
-                                        <ImageIcon className="text-slate-600 mb-2" size={32} />
-                                        <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest">Görsel Alanı</span>
+                                    <div className="w-full h-24 bg-slate-900/40 flex flex-col items-center justify-center border-b border-slate-800/80 text-slate-600">
+                                        <ImageIcon className="mb-1" size={20} />
+                                        <span className="text-[9px] font-medium uppercase tracking-wider">Reklam Görseli</span>
                                     </div>
                                 )}
-                                <div className="p-8 space-y-4">
-                                    <h5 className="text-white font-black text-lg italic uppercase tracking-tighter truncate leading-none">{editingPromo.title || 'REKLAM BAŞLIĞI'}</h5>
-                                    <p className="text-slate-400 text-[10px] font-bold uppercase italic leading-relaxed line-clamp-4 min-h-[60px] whitespace-pre-wrap">{editingPromo.content || 'Yayın içeriği burada görünecek...'}</p>
+                                <div className="p-4 space-y-2.5">
+                                    <h5 className="text-slate-200 font-semibold text-xs truncate leading-normal">{editingPromo.title || 'REKLAM BAŞLIĞI'}</h5>
+                                    <p className="text-slate-400 text-[10px] leading-relaxed line-clamp-3 min-h-[45px] whitespace-pre-wrap">{editingPromo.content || 'Gönderi içeriği burada canlı simüle ediliyor...'}</p>
                                     
                                     {editingPromo.button_text && (
-                                        <div className="pt-4">
-                                            <div className="w-full py-4 bg-blue-600/10 border border-blue-500/30 rounded-2xl text-blue-500 text-[9px] font-black text-center uppercase tracking-widest">
+                                        <div className="pt-2">
+                                            <div className="w-full py-1.5 bg-blue-600/10 border border-blue-500/20 rounded-xl text-blue-400 text-[10px] font-semibold text-center uppercase tracking-wider">
                                                 {editingPromo.button_text}
                                             </div>
                                         </div>
@@ -3065,9 +3124,9 @@ const PromotionManagement = () => {
                                 </div>
                             </div>
 
-                            <div className="mt-12 flex items-center gap-3 opacity-30">
-                                <AlertCircle size={14} className="text-slate-500" />
-                                <span className="text-[8px] font-black text-slate-500 uppercase tracking-[0.3em]">Görünüm Telegram istemcisine göre değişebilir</span>
+                            <div className="mt-6 flex items-center gap-1.5 opacity-40">
+                                <AlertCircle size={11} className="text-slate-550 text-slate-500" />
+                                <span className="text-[9px] text-slate-550 text-slate-500 uppercase">Görünüm Telegram istemcisine göre değişebilir</span>
                             </div>
                         </div>
                     </div>
@@ -3124,98 +3183,98 @@ const ReferralManagement = () => {
     const filtered = referrals.filter(r => filter === 'all' || r.status === filter);
 
     return (
-        <div className="space-y-12 animate-in fade-in">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div className="space-y-6 animate-in fade-in duration-200">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h2 className="text-3xl lg:text-4xl font-black text-white italic uppercase tracking-tighter leading-none">Referral <span className="text-blue-500">Network</span></h2>
-                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em] mt-2 italic">Referans sistemini ve ödülleri yönetin</p>
+                    <h2 className="text-xl lg:text-2xl font-bold text-white tracking-tight leading-none">Referans ve Davet Ödülleri</h2>
+                    <p className="text-xs text-slate-400 mt-1 leading-normal">Kullanıcı davet zincirini, katılım doğrulamalarını ve ödül baremlerini yönetin</p>
                 </div>
                 <button 
                     onClick={() => setIsSettingsModalOpen(true)}
-                    className="w-full md:w-auto bg-blue-600 hover:bg-blue-500 px-8 py-5 rounded-[24px] text-[10px] font-black uppercase tracking-[0.4em]   transition-all active:scale-95 flex items-center justify-center gap-3"
+                    className="w-full md:w-auto h-11 bg-slate-900 hover:bg-slate-800 border border-slate-800 px-5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white transition-all active:scale-95 flex items-center justify-center gap-2"
                 >
-                    <SettingsIcon size={18} /> SİSTEM AYARLARI
+                    <SettingsIcon size={14} /> Sistem Ayarları
                 </button>
             </div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard icon={Users} label="TOPLAM REFERANS" value={referrals.length.toString()} color="blue" />
                 <StatCard icon={CheckCircle2} label="ONAYLANAN" value={referrals.filter(r => r.status === 'confirmed').length.toString()} color="emerald" />
                 <StatCard icon={Clock} label="BEKLEYEN" value={referrals.filter(r => r.status === 'pending').length.toString()} color="orange" />
                 <StatCard icon={TrendingUp} label="TOPLAM ÖDÜL" value={`₺${referrals.filter(r => r.status === 'confirmed').reduce((acc, r) => acc + r.reward_amount, 0).toLocaleString()}`} color="purple" />
             </div>
 
-            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+            <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-1">
                 {['all', 'pending', 'confirmed', 'rejected'].map(f => (
                     <button
                         key={f}
                         onClick={() => setFilter(f as any)}
-                        className={`px-6 h-12 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all border ${
+                        className={`px-4 h-9 rounded-xl text-xs font-semibold transition-all border ${
                             filter === f 
-                            ? 'bg-blue-600 border-blue-500 text-white  ' 
-                            : 'bg-slate-900/40 border-white/5 text-slate-500 hover:border-white/10'
+                            ? 'bg-blue-600/10 border-blue-500/20 text-blue-400 shadow-sm' 
+                            : 'bg-[#101626]/40 border-slate-800 text-slate-500 hover:text-slate-350 hover:border-slate-800'
                         }`}
                     >
-                        {f === 'all' ? 'TÜMÜ' : f === 'pending' ? 'BEKLEYEN' : f === 'confirmed' ? 'ONAYLI' : 'REDDEDİLEN'}
+                        {f === 'all' ? 'Tümü' : f === 'pending' ? 'Bekleyen' : f === 'confirmed' ? 'Onaylı' : 'Reddedilen'}
                     </button>
                 ))}
             </div>
 
-            <div className="bg-slate-900/40 border border-white/5 rounded-[44px] overflow-hidden ">
+            <div className="bg-[#101626]/40 border border-slate-800/60 rounded-xl overflow-hidden ">
                 {/* Desktop Table */}
                 <div className="hidden lg:block overflow-x-auto">
                     <table className="w-full text-left">
-                        <thead className="bg-white/5 text-[9px] uppercase tracking-[0.4em] text-slate-700 font-black">
+                        <thead className="bg-[#101626] border-b border-slate-800/60 text-[10px] text-slate-400 font-semibold">
                             <tr>
-                                <th className="px-10 py-8">DAVET EDEN</th>
-                                <th className="px-10 py-8">KATILAN ÜYE</th>
-                                <th className="px-10 py-8">TARİH</th>
-                                <th className="px-10 py-8">DURUM</th>
-                                <th className="px-10 py-8 text-right">AKSİYON</th>
+                                <th className="px-5 py-3">DAVET EDEN</th>
+                                <th className="px-5 py-3">KATILAN ÜYE</th>
+                                <th className="px-5 py-3">TARİH</th>
+                                <th className="px-5 py-3">DURUM</th>
+                                <th className="px-5 py-3 text-right">AKSİYON</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/5">
+                        <tbody className="divide-y divide-slate-800/40">
                             {isLoading ? (
-                                <tr><td colSpan={5} className="py-20 text-center"><Loader2 className="animate-spin text-blue-500 mx-auto" size={32} /></td></tr>
+                                <tr><td colSpan={5} className="py-16 text-center"><Loader2 className="animate-spin text-blue-500 mx-auto" size={24} /></td></tr>
                             ) : filtered.length === 0 ? (
-                                <tr><td colSpan={5} className="py-20 text-center text-slate-500 font-black uppercase tracking-widest italic">Kayıt Bulunamadı</td></tr>
+                                <tr><td colSpan={5} className="py-16 text-center text-slate-500 text-xs font-medium">Referans kaydı veya başvuru bulunmuyor.</td></tr>
                             ) : filtered.map(r => (
-                                <tr key={r.id} className="hover:bg-white/5 transition-all text-white group">
-                                    <td className="px-10 py-8">
-                                        <div className="flex items-center gap-4">
-                                            <img src={r.referrer?.avatar || `https://ui-avatars.com/api/?name=${r.referrer?.username}`} className="w-10 h-10 rounded-xl border border-white/5" />
+                                <tr key={r.id} className="hover:bg-slate-900/10 transition-all text-slate-300 text-xs">
+                                    <td className="px-5 py-4">
+                                        <div className="flex items-center gap-3">
+                                            <img src={r.referrer?.avatar || `https://ui-avatars.com/api/?name=${r.referrer?.username}`} className="w-8 h-8 rounded-lg border border-slate-800" />
                                             <div>
-                                                <p className="text-sm font-black italic uppercase tracking-tighter">@{r.referrer?.username || 'Unknown'}</p>
-                                                <p className="text-[8px] text-slate-600 font-bold uppercase tracking-widest">ID: {r.referrer_id}</p>
+                                                <p className="font-semibold text-slate-200">@{r.referrer?.username || 'Bilinmiyor'}</p>
+                                                <p className="text-[10px] text-slate-500">ID: {r.referrer_id}</p>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-10 py-8">
-                                        <div className="flex items-center gap-4">
-                                            <img src={r.referred?.avatar || `https://ui-avatars.com/api/?name=${r.referred?.username}`} className="w-10 h-10 rounded-xl border border-white/5" />
+                                    <td className="px-5 py-4">
+                                        <div className="flex items-center gap-3">
+                                            <img src={r.referred?.avatar || `https://ui-avatars.com/api/?name=${r.referred?.username}`} className="w-8 h-8 rounded-lg border border-slate-800" />
                                             <div>
-                                                <p className="text-sm font-black italic uppercase tracking-tighter">@{r.referred?.username || 'Unknown'}</p>
-                                                <p className="text-[8px] text-slate-600 font-bold uppercase tracking-widest">ID: {r.referred_id}</p>
+                                                <p className="font-semibold text-slate-200">@{r.referred?.username || 'Bilinmiyor'}</p>
+                                                <p className="text-[10px] text-slate-500">ID: {r.referred_id}</p>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-10 py-8 text-slate-600 text-[10px] font-bold uppercase">{new Date(r.created_at).toLocaleString()}</td>
-                                    <td className="px-10 py-8">
-                                        <span className={`text-[9px] font-black px-3 py-1 rounded-lg border uppercase tracking-widest ${
-                                            r.status === 'confirmed' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' :
-                                            r.status === 'pending' ? 'bg-orange-500/10 border-orange-500/20 text-orange-500' :
-                                            'bg-red-500/10 border-red-500/20 text-red-500'
+                                    <td className="px-5 py-4 text-slate-400 text-[11px]">{new Date(r.created_at).toLocaleString()}</td>
+                                    <td className="px-5 py-4">
+                                        <span className={`text-[10px] font-semibold px-2.5 py-0.5 rounded-full border ${
+                                            r.status === 'confirmed' ? 'bg-emerald-500/10 border-emerald-500/10 text-emerald-400' :
+                                            r.status === 'pending' ? 'bg-amber-500/10 border-amber-500/10 text-amber-500' :
+                                            'bg-rose-500/10 border-rose-500/10 text-rose-400'
                                         }`}>
-                                            {r.status === 'confirmed' ? 'ONAYLI' : r.status === 'pending' ? 'BEKLEMEDE' : 'REDDEDİLDİ'}
+                                            {r.status === 'confirmed' ? 'Onaylı' : r.status === 'pending' ? 'Beklemede' : 'Reddedildi'}
                                         </span>
                                     </td>
-                                    <td className="px-10 py-8 text-right">
+                                    <td className="px-5 py-4 text-right">
                                         {r.status === 'pending' && (
                                             <button 
                                                 onClick={() => handleConfirm(r.id)}
-                                                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-[9px] font-black uppercase tracking-widest transition-all"
+                                                className="h-7 px-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[10px] font-semibold transition-all shadow-sm"
                                             >
-                                                ONAYLA
+                                                Onayla
                                             </button>
                                         )}
                                     </td>
@@ -3226,47 +3285,47 @@ const ReferralManagement = () => {
                 </div>
 
                 {/* Mobile Card View */}
-                <div className="lg:hidden divide-y divide-white/5">
+                <div className="lg:hidden divide-y divide-slate-800/40">
                     {isLoading ? (
-                        <div className="py-20 text-center"><Loader2 className="animate-spin text-blue-500 mx-auto" size={32} /></div>
+                        <div className="py-16 text-center"><Loader2 className="animate-spin text-blue-500 mx-auto" size={24} /></div>
                     ) : filtered.length === 0 ? (
-                        <div className="py-20 text-center text-slate-500 font-black uppercase tracking-widest italic">Kayıt Bulunamadı</div>
+                        <div className="py-16 text-center text-slate-505 text-slate-500 text-xs font-medium">Referans kaydı bulunmuyor</div>
                     ) : filtered.map(r => (
-                        <div key={r.id} className="p-6 space-y-6 hover:bg-white/5 transition-all">
+                        <div key={r.id} className="p-4 space-y-4 hover:bg-slate-900/10 transition-all text-xs">
                             <div className="flex justify-between items-start">
-                                <div className="space-y-4 flex-1">
-                                    <div className="flex items-center gap-3">
-                                        <img src={r.referrer?.avatar || `https://ui-avatars.com/api/?name=${r.referrer?.username}`} className="w-8 h-8 rounded-lg border border-white/5" />
+                                <div className="space-y-3 flex-1">
+                                    <div className="flex items-center gap-2.5">
+                                        <img src={r.referrer?.avatar || `https://ui-avatars.com/api/?name=${r.referrer?.username}`} className="w-7 h-7 rounded border border-slate-800" />
                                         <div>
-                                            <p className="text-[8px] text-slate-600 font-black uppercase tracking-widest">DAVET EDEN</p>
-                                            <p className="text-xs font-black text-white italic uppercase">@{r.referrer?.username || 'Unknown'}</p>
+                                            <p className="text-[10px] text-slate-500">DAVET EDEN</p>
+                                            <p className="font-semibold text-slate-205 text-slate-200">@{r.referrer?.username || 'Bilinmiyor'}</p>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-3">
-                                        <img src={r.referred?.avatar || `https://ui-avatars.com/api/?name=${r.referred?.username}`} className="w-8 h-8 rounded-lg border border-white/5" />
+                                    <div className="flex items-center gap-2.5">
+                                        <img src={r.referred?.avatar || `https://ui-avatars.com/api/?name=${r.referred?.username}`} className="w-7 h-7 rounded border border-slate-800" />
                                         <div>
-                                            <p className="text-[8px] text-slate-600 font-black uppercase tracking-widest">KATILAN ÜYE</p>
-                                            <p className="text-xs font-black text-white italic uppercase">@{r.referred?.username || 'Unknown'}</p>
+                                            <p className="text-[10px] text-slate-500">KATILAN ÜYE</p>
+                                            <p className="font-semibold text-slate-205 text-slate-200">@{r.referred?.username || 'Bilinmiyor'}</p>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="flex flex-col items-end gap-2">
-                                    <span className={`text-[8px] font-black px-2 py-1 rounded-md border uppercase tracking-widest ${
-                                        r.status === 'confirmed' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' :
-                                        r.status === 'pending' ? 'bg-orange-500/10 border-orange-500/20 text-orange-500' :
-                                        'bg-red-500/10 border-red-500/20 text-red-500'
+                                <div className="flex flex-col items-end gap-1.5 shrink-0">
+                                    <span className={`text-[9px] font-semibold px-2 py-0.5 rounded-full border ${
+                                        r.status === 'confirmed' ? 'bg-emerald-500/10 border-emerald-500/10 text-emerald-400' :
+                                        r.status === 'pending' ? 'bg-amber-500/10 border-amber-500/10 text-amber-500' :
+                                        'bg-rose-500/10 border-rose-500/10 text-rose-400'
                                     }`}>
-                                        {r.status === 'confirmed' ? 'ONAYLI' : r.status === 'pending' ? 'BEKLEMEDE' : 'REDDEDİLDİ'}
+                                        {r.status === 'confirmed' ? 'Onaylı' : r.status === 'pending' ? 'Beklemede' : 'Reddedildi'}
                                     </span>
-                                    <p className="text-[8px] text-slate-600 font-bold uppercase">{new Date(r.created_at).toLocaleDateString()}</p>
+                                    <p className="text-[10px] text-slate-500">{new Date(r.created_at).toLocaleDateString()}</p>
                                 </div>
                             </div>
                             {r.status === 'pending' && (
                                 <button 
                                     onClick={() => handleConfirm(r.id)}
-                                    className="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl text-[9px] font-black uppercase tracking-[0.2em] transition-all  "
+                                    className="w-full h-8 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-[10px] font-semibold transition-all shadow-sm"
                                 >
-                                    REFERANSI ONAYLA
+                                    Referansı Onayla ve Ödül Tanımla
                                 </button>
                             )}
                         </div>
@@ -3275,50 +3334,50 @@ const ReferralManagement = () => {
             </div>
 
             {isSettingsModalOpen && settings && (
-                <div className="fixed inset-0 z-[110] bg-black/95 flex items-center justify-center p-4 lg:p-8 backdrop-blur-3xl animate-in fade-in">
-                    <div className="bg-[#020617] border border-white/10 rounded-[40px] lg:rounded-[64px] w-full max-w-2xl overflow-hidden  relative">
-                        <button onClick={() => setIsSettingsModalOpen(false)} className="absolute top-6 right-6 p-3 bg-white/5 rounded-2xl hover:bg-red-600 transition-all">
-                            <X size={20} />
+                <div className="fixed inset-0 z-[110] bg-black/80 flex items-center justify-center p-4 backdrop-blur-md animate-in fade-in duration-200">
+                    <div className="bg-[#0b0f19] border border-slate-802 border-slate-800/60 rounded-2xl w-full max-w-xl overflow-hidden relative shadow-2xl p-6 space-y-5">
+                        <button onClick={() => setIsSettingsModalOpen(false)} className="absolute top-4 right-4 p-2 bg-slate-900 border border-slate-800 rounded-xl text-slate-450 hover:text-white transition-all active:scale-95">
+                            <X size={14} />
                         </button>
                         
-                        <div className="p-8 lg:p-12 space-y-8">
-                            <div className="flex items-center gap-5">
-                                <div className="w-12 h-12 bg-blue-600 rounded-[20px] flex items-center justify-center ">
-                                    <SettingsIcon size={24} className="text-white"/>
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-blue-600/10 border border-blue-500/20 rounded-xl flex items-center justify-center text-blue-400">
+                                    <SettingsIcon size={18} />
                                 </div>
                                 <div>
-                                    <h3 className="text-2xl font-black uppercase italic tracking-tighter">Referral <span className="text-blue-500">Settings</span></h3>
-                                    <p className="text-[9px] font-black text-slate-700 uppercase tracking-[0.4em] mt-1 italic">SİSTEM PARAMETRELERİ</p>
+                                    <h3 className="text-sm font-semibold text-white">Referans Sistemi Kuralları</h3>
+                                    <p className="text-[10px] text-slate-500 leading-normal">Davet ve ödül kazanma mekanizması kuralları</p>
                                 </div>
                             </div>
 
-                            <form onSubmit={handleUpdateSettings} className="space-y-6">
-                                <div className="grid grid-cols-2 gap-6">
-                                    <AdminInput label="STANDART ÖDÜL (TRY)" value={settings.standard_reward} onChange={(v:any)=>setSettings({...settings, standard_reward: Number(v)})} />
-                                    <AdminInput label="PREMIUM ÖDÜL (TRY)" value={settings.premium_reward} onChange={(v:any)=>setSettings({...settings, premium_reward: Number(v)})} />
+                            <form onSubmit={handleUpdateSettings} className="space-y-4 pt-1">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <AdminInput label="Standart Davet Ödülü (TRY)" value={settings.standard_reward} onChange={(v:any)=>setSettings({...settings, standard_reward: Number(v)})} />
+                                    <AdminInput label="Premium Üye Ödülü (TRY)" value={settings.premium_reward} onChange={(v:any)=>setSettings({...settings, premium_reward: Number(v)})} />
                                 </div>
-                                <div className="grid grid-cols-2 gap-6">
-                                    <AdminInput label="MİN. AKTİF GÜN" value={settings.min_days_active} onChange={(v:any)=>setSettings({...settings, min_days_active: Number(v)})} />
-                                    <AdminInput label="BEKLEME SÜRESİ (SAAT)" value={settings.pending_duration_hours} onChange={(v:any)=>setSettings({...settings, pending_duration_hours: Number(v)})} />
+                                <div className="grid grid-cols-2 gap-4">
+                                    <AdminInput label="Minimum Aktiflik Günü" value={settings.min_days_active} onChange={(v:any)=>setSettings({...settings, min_days_active: Number(v)})} />
+                                    <AdminInput label="Bekleme Süresi (Cüzdan Saati)" value={settings.pending_duration_hours} onChange={(v:any)=>setSettings({...settings, pending_duration_hours: Number(v)})} />
                                 </div>
-                                <AdminInput label="TELEGRAM GRUP ID" value={settings.group_id} onChange={(v:any)=>setSettings({...settings, group_id: v})} />
+                                <AdminInput label="Telegram Doğrulama Grup ID" value={settings.group_id} onChange={(v:any)=>setSettings({...settings, group_id: v})} />
                                 
-                                <div className="flex items-center justify-between p-6 bg-white/5 rounded-3xl border border-white/5">
-                                    <div className="flex flex-col gap-1">
-                                        <span className="text-[10px] font-black text-white uppercase tracking-widest">GRUP KATILIM ZORUNLULUĞU</span>
-                                        <span className="text-[8px] text-slate-600 font-bold uppercase italic">Üye ödülden önce gruba katılmalı mı?</span>
+                                <div className="flex items-center justify-between p-3 bg-[#101626]/40 border border-slate-800/80 rounded-xl">
+                                    <div className="flex flex-col gap-0.5 max-w-[70%]">
+                                        <span className="text-xs font-semibold text-slate-200">Grup Katılım Zorunluluğu</span>
+                                        <span className="text-[9px] text-slate-500 leading-normal">Kullanıcı daveti kabul etmeden önce doğrulama grubuna katılmak zorundadır.</span>
                                     </div>
                                     <button 
                                         type="button"
                                         onClick={() => setSettings({...settings, require_group_join: !settings.require_group_join})}
-                                        className={`w-14 h-8 rounded-full transition-all relative ${settings.require_group_join ? 'bg-blue-600' : 'bg-slate-800'}`}
+                                        className={`w-10 h-6 rounded-full transition-all relative ${settings.require_group_join ? 'bg-blue-600' : 'bg-slate-800'}`}
                                     >
-                                        <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-all ${settings.require_group_join ? 'left-7' : 'left-1'}`} />
+                                        <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full transition-all ${settings.require_group_join ? 'left-4.5' : 'left-0.5'}`} />
                                     </button>
                                 </div>
 
-                                <button type="submit" className="w-full h-16 bg-blue-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-[0.4em]  border-b-4 border-blue-800 active:translate-y-1 active:border-b-0 transition-all">
-                                    AYARLARI KAYDET
+                                <button type="submit" className="w-full h-10 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-semibold text-xs transition-all shadow-sm">
+                                    Kuralları ve Ayarları Kaydet
                                 </button>
                             </form>
                         </div>
@@ -3431,7 +3490,7 @@ const BlogManagement = () => {
                 delete payload.id;
             }
             await DatabaseService.saveBlog(payload);
-            await DatabaseService.logActivity('admin', 'system', 'blog_saved', 'Blog Kaydedildi', `${editingBlog.title} başlıklı blog güncellendi/oluşturuldu.`);
+            await DatabaseService.logActivity('admin', 'system', 'blog_saved', 'Blog Kaydedildi', `${editingBlog.title} başlıklı blog guncellendi/olusturuldu.`);
             setIsModalOpen(false);
             load();
             alert('Blog başarıyla kaydedildi.');
@@ -3448,147 +3507,99 @@ const BlogManagement = () => {
     );
 
     return (
-        <div className="space-y-12 animate-in fade-in">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div className="space-y-6 animate-in fade-in duration-200">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h2 className="text-3xl lg:text-4xl font-black text-white italic uppercase tracking-tighter leading-none">Blog <span className="text-blue-500">Merkezi</span></h2>
-                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em] mt-2 italic">İçerik stratejinizi ve blog yazılarını yönetin</p>
+                    <h2 className="text-xl lg:text-2xl font-bold text-white tracking-tight leading-none">Blog ve Yayın Yönetimi</h2>
+                    <p className="text-xs text-slate-400 mt-1 leading-normal">Portal blog yazılarını, duyuruları, SEO etiketlerini ve makaleleri düzenleyin</p>
                 </div>
-                <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-                    <div className="relative group">
-                        <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-700 group-focus-within:text-blue-500 transition-colors" size={18} />
+                <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                    <div className="relative">
+                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" size={14} />
                         <input 
                             type="text"
-                            placeholder="BLOG ARA..."
+                            placeholder="Makalelerde ara..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full sm:w-80 h-14 bg-slate-950 border border-white/5 rounded-[22px] pl-14 pr-8 text-[11px] font-black text-white outline-none focus:border-blue-500 transition-all uppercase italic "
+                            className="w-full sm:w-64 h-10 bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-4 text-xs font-medium text-slate-200 placeholder-slate-500 outline-none focus:border-slate-700 transition-all"
                         />
                     </div>
                     <button 
                         onClick={openCreateModal}
-                        className="bg-blue-600 hover:bg-blue-500 px-8 py-5 rounded-[24px] text-[10px] font-black uppercase tracking-[0.4em] transition-all active:scale-95 flex items-center justify-center gap-3 border-b-4 border-blue-800"
+                        className="h-10 bg-blue-600 hover:bg-blue-500 px-4 rounded-xl text-xs font-semibold text-white transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm"
                     >
-                        <Plus size={18} /> YENİ YAZI OLUŞTUR
+                        <Plus size={14} /> Yeni Yazı Oluştur
                     </button>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-slate-900/40 p-8 rounded-[44px] border border-white/5 backdrop-blur-sm">
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 italic text-blue-500">YAZI İSTATİSTİKLERİ</p>
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <span className="text-4xl font-black text-white italic tracking-tighter block">{blogs.length}</span>
-                            <span className="text-[9px] font-black text-slate-600 uppercase italic">TOPLAM İÇERİK</span>
-                        </div>
-                        <div className="p-4 bg-blue-500/10 rounded-2xl text-blue-500">
-                            <FileText size={24} />
-                        </div>
-                    </div>
-                </div>
-                <div className="bg-slate-900/40 p-8 rounded-[44px] border border-white/5 backdrop-blur-sm">
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 italic text-emerald-500">ERİŞİM VERİLERİ</p>
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <span className="text-4xl font-black text-white italic tracking-tighter block">
-                                {blogs.reduce((acc, b) => acc + (b.views_count || 0), 0)}
-                            </span>
-                            <span className="text-[9px] font-black text-slate-600 uppercase italic">GÖRÜNTÜLENME</span>
-                        </div>
-                        <div className="p-4 bg-emerald-500/10 rounded-2xl text-emerald-500">
-                            <TrendingUp size={24} />
-                        </div>
-                    </div>
-                </div>
-                <div className="bg-slate-900/40 p-8 rounded-[44px] border border-white/5 backdrop-blur-sm">
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 italic text-red-500">ETKİLEŞİM SKORU</p>
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <span className="text-4xl font-black text-white italic tracking-tighter block">
-                                {blogs.reduce((acc, b) => acc + (b.likes_count || 0), 0)}
-                            </span>
-                            <span className="text-[9px] font-black text-slate-600 uppercase italic">TOPLAM BEĞENİ</span>
-                        </div>
-                        <div className="p-4 bg-red-500/10 rounded-2xl text-red-500">
-                            <Heart size={24} />
-                        </div>
-                    </div>
-                </div>
-                <div className="bg-slate-900/40 p-8 rounded-[44px] border border-white/5 backdrop-blur-sm">
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 italic text-amber-500">KATEGORİ YÖNETİMİ</p>
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <span className="text-4xl font-black text-white italic tracking-tighter block">
-                                {new Set(blogs.map(b => b.category)).size}
-                            </span>
-                            <span className="text-[9px] font-black text-slate-600 uppercase italic">AKTİF DAL</span>
-                        </div>
-                        <div className="p-4 bg-amber-500/10 rounded-2xl text-amber-500">
-                            <Zap size={24} />
-                        </div>
-                    </div>
-                </div>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <StatCard icon={FileText} label="TOPLAM İÇERİK" value={blogs.length.toString()} color="blue" />
+                <StatCard icon={TrendingUp} label="GÖRÜNTÜLENME" value={blogs.reduce((acc, b) => acc + (b.views_count || 0), 0).toString()} color="emerald" />
+                <StatCard icon={Heart} label="TOPLAM BEĞENİ" value={blogs.reduce((acc, b) => acc + (b.likes_count || 0), 0).toString()} color="red" />
+                <StatCard icon={Zap} label="AKTİF KATEGORİ" value={new Set(blogs.map(b => b.category)).size.toString()} color="amber" />
             </div>
 
             {isLoading ? (
-                <div className="flex justify-center py-32"><Loader2 className="animate-spin text-blue-500" size={40} /></div>
+                <div className="flex justify-center py-20"><Loader2 className="animate-spin text-blue-500" size={28} /></div>
             ) : filteredBlogs.length === 0 ? (
-                <div className="py-32 text-center bg-slate-900/20 rounded-[44px] border-2 border-dashed border-slate-900">
-                    <FileText size={48} className="mx-auto text-slate-600 mb-4" />
-                    <p className="text-slate-500 text-sm font-bold uppercase tracking-widest">Blog Yazısı Bulunmuyor</p>
-                    <p className="text-[10px] text-slate-700 mt-2 italic font-medium">İlk blog yazınızı oluşturarak başlayın.</p>
+                <div className="py-16 text-center bg-[#101626]/20 rounded-xl border border-dashed border-slate-800">
+                    <FileText size={36} className="mx-auto text-slate-600 mb-3" />
+                    <p className="text-slate-400 text-xs font-semibold uppercase">Yayınlanmış Blog Bulunmuyor</p>
+                    <p className="text-[11px] text-slate-500 mt-1">İlk makalenizi veya blog yazınızı oluşturarak başlayın.</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                     {filteredBlogs.map(blog => (
-                        <div key={blog.id} className="bg-slate-900/40 border border-white/5 rounded-[44px] overflow-hidden flex flex-col group hover:border-blue-500/30 transition-all relative backdrop-blur-sm">
-                            <div className="h-48 relative overflow-hidden">
+                        <div key={blog.id} className="bg-[#101626]/40 border border-slate-800/60 rounded-xl overflow-hidden flex flex-col group hover:border-slate-800 transition-all duration-300 relative">
+                            <div className="h-40 relative overflow-hidden bg-slate-950 shrink-0">
                                 {blog.image ? (
-                                    <img src={blog.image} alt={blog.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" referrerPolicy="no-referrer" />
+                                    <img src={blog.image} alt={blog.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" referrerPolicy="no-referrer" />
                                 ) : (
-                                    <div className="w-full h-full bg-slate-950 flex items-center justify-center text-slate-800">
-                                        <BookOpen size={48} />
+                                    <div className="w-full h-full bg-slate-900/60 flex items-center justify-center text-slate-700">
+                                        <BookOpen size={28} />
                                     </div>
                                 )}
                                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent"></div>
-                                <div className="absolute top-6 left-6">
-                                    <span className="bg-blue-600/90 backdrop-blur-md text-white text-[8px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border border-white/10">{blog.category}</span>
+                                <div className="absolute top-4 left-4">
+                                    <span className="bg-slate-900/80 backdrop-blur-md text-slate-300 text-[10px] font-semibold px-2.5 py-0.5 rounded-full border border-slate-800">{blog.category}</span>
                                 </div>
                                 {blog.is_featured && (
-                                    <div className="absolute top-6 right-6">
-                                        <div className="bg-amber-500 p-2 rounded-xl text-white shadow-lg shadow-amber-500/20">
-                                            <Star size={14} />
+                                    <div className="absolute top-4 right-4">
+                                        <div className="bg-amber-500/10 border border-amber-500/25 p-1.5 rounded-lg text-amber-500 backdrop-blur-md">
+                                            <Star size={12} fill="currentColor" />
                                         </div>
                                     </div>
                                 )}
                             </div>
 
-                            <div className="p-8 space-y-4 flex-1 flex flex-col">
-                                <h4 className="text-xl font-black text-white italic uppercase tracking-tighter leading-tight group-hover:text-blue-400 transition-colors line-clamp-2">
-                                    {blog.title}
-                                </h4>
-                                <p className="text-[10px] text-slate-500 line-clamp-2 leading-relaxed font-bold uppercase italic flex-1">
-                                    {blog.excerpt || 'Özet belirtilmemiş.'}
-                                </p>
+                            <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
+                                <div className="space-y-1">
+                                    <h4 className="text-sm font-semibold text-white leading-snug group-hover:text-blue-400 transition-colors line-clamp-2">
+                                        {blog.title}
+                                    </h4>
+                                    <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
+                                        {blog.excerpt || 'Özet belirtilmemiş.'}
+                                    </p>
+                                </div>
 
-                                <div className="pt-6 border-t border-white/5 flex items-center justify-between">
-                                    <div className="flex gap-2">
-                                        <div className="flex items-center gap-2">
-                                            <Eye size={12} className="text-slate-600" />
-                                            <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">{blog.views_count || 0}</span>
+                                <div className="pt-3 border-t border-slate-800/50 flex items-center justify-between">
+                                    <div className="flex gap-2.5">
+                                        <div className="flex items-center gap-1">
+                                            <Eye size={12} className="text-slate-500" />
+                                            <span className="text-[11px] font-medium text-slate-500">{blog.views_count || 0} okuma</span>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            <Clock size={12} className="text-slate-600" />
-                                            <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">{blog.readTime || '1 dk'}</span>
+                                        <div className="flex items-center gap-1">
+                                            <Clock size={12} className="text-slate-500" />
+                                            <span className="text-[11px] font-medium text-slate-500">{blog.readTime || '1 dk'}</span>
                                         </div>
                                     </div>
-                                    <div className="flex gap-2">
-                                        <button onClick={() => { setEditingBlog(blog); setIsModalOpen(true); setActiveTab('content'); }} className="p-3 bg-white/5 rounded-xl hover:bg-blue-600 text-slate-500 hover:text-white transition-all">
-                                            <Edit3 size={18}/>
+                                    <div className="flex gap-1.5">
+                                        <button onClick={() => { setEditingBlog(blog); setIsModalOpen(true); setActiveTab('content'); }} className="h-7 w-7 bg-slate-900 border border-slate-800 text-slate-400 hover:text-white rounded-lg flex items-center justify-center transition-all">
+                                            <Edit3 size={13}/>
                                         </button>
-                                        <button onClick={async () => { if(confirm('Bu yazıyı silmek istediğinizde emin misiniz?')) { await DatabaseService.deleteBlog(blog.id); await DatabaseService.logActivity('admin', 'system', 'blog_deleted', 'Blog Silindi', `${blog.title} başlıklı blog silindi.`); load(); } }} className="p-3 bg-white/5 rounded-xl text-red-500 hover:bg-red-500 hover:text-white transition-all">
-                                            <Trash2 size={18}/>
+                                        <button onClick={async () => { if(confirm('Bu yazıyı silmek istediğinizde emin misiniz?')) { await DatabaseService.deleteBlog(blog.id); await DatabaseService.logActivity('admin', 'system', 'blog_deleted', 'Blog Silindi', `${blog.title} başlıklı blog silindi.`); load(); } }} className="h-7 w-7 bg-slate-900 border border-slate-850 text-rose-500/80 hover:text-rose-400 rounded-lg flex items-center justify-center transition-all">
+                                            <Trash2 size={13}/>
                                         </button>
                                     </div>
                                 </div>
@@ -3599,50 +3610,49 @@ const BlogManagement = () => {
             )}
 
             {isModalOpen && editingBlog && (
-                <div className="fixed inset-0 z-[110] bg-black/95 flex items-end lg:items-center justify-center p-0 lg:p-8 backdrop-blur-3xl animate-in slide-in-from-bottom lg:fade-in">
-                    <div className="bg-[#020617] border-t lg:border border-white/10 rounded-t-[40px] lg:rounded-[64px] w-full max-w-6xl h-[94vh] lg:h-[90vh] flex flex-col lg:flex-row overflow-hidden relative">
+                <div className="fixed inset-0 z-[110] bg-black/80 flex items-end lg:items-center justify-center p-0 lg:p-6 backdrop-blur-md animate-in duration-250">
+                    <div className="bg-[#0b0f19] border-t lg:border border-slate-800 rounded-t-2xl lg:rounded-2xl w-full max-w-5xl h-[92vh] lg:h-[82vh] flex flex-col lg:flex-row overflow-hidden relative shadow-2xl">
                         
-                        <button onClick={() => setIsModalOpen(false)} className="absolute top-6 right-6 lg:top-8 lg:right-8 z-[120] p-3 lg:p-4 bg-white/5 rounded-2xl hover:bg-red-600 transition-all active:scale-90">
-                            <X size={20} />
+                        <button onClick={() => setIsModalOpen(false)} className="absolute top-4 right-4 z-[120] p-2 bg-slate-900 border border-slate-800 rounded-xl text-slate-450 hover:text-white transition-all active:scale-95">
+                            <X size={14} />
                         </button>
 
                         <div className="flex-1 flex flex-col overflow-hidden">
-                            <div className="p-8 lg:p-12 pb-4 lg:pb-0 space-y-8">
-                                <div className="flex items-center gap-5">
-                                    <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-[20px] flex items-center justify-center rotate-3">
-                                        <BookOpen size={24} className="text-white"/>
+                            <div className="p-6 pb-2 shrink-0">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-9 h-9 bg-blue-600/10 border border-blue-500/20 rounded-xl flex items-center justify-center text-blue-400">
+                                        <BookOpen size={16} />
                                     </div>
                                     <div>
-                                        <h3 className="text-2xl lg:text-3xl font-black uppercase italic tracking-tighter">İçerik <span className="text-blue-500">Editörü</span></h3>
-                                        <p className="text-[9px] font-black text-slate-700 uppercase tracking-[0.4em] mt-1 italic">BLOG POST COMPOSER V1.0</p>
+                                        <h3 className="text-sm font-semibold text-white">Blog Yazarı & Editör</h3>
+                                        <p className="text-[10px] text-slate-500 uppercase tracking-widest italic">POST COMPOSER</p>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="flex-1 overflow-y-auto p-12 no-scrollbar">
-                                <div className="max-w-4xl mx-auto space-y-12">
-                                    <div className="flex gap-2 bg-slate-950/50 p-1.5 rounded-[28px] border border-white/5">
+                            <div className="flex-1 overflow-y-auto p-6 no-scrollbar">
+                                <div className="space-y-6">
+                                    <div className="flex gap-1 bg-[#101626]/60 p-1 rounded-xl border border-slate-800/60 shrink-0">
                                         {['content', 'meta', 'hashtags', 'settings'].map(tab => (
                                             <button 
                                                 key={tab}
                                                 type="button"
                                                 onClick={() => setActiveTab(tab as any)}
-                                                className={`flex-1 py-4 lg:py-5 rounded-[22px] lg:rounded-[24px] text-[9px] font-black uppercase tracking-[0.2em] transition-all relative ${activeTab === tab ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/20' : 'text-slate-500 hover:bg-white/5 hover:text-slate-400'}`}
+                                                className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-all relative ${activeTab === tab ? 'bg-blue-600 text-white' : 'text-slate-550 text-slate-500 hover:text-slate-300'}`}
                                             >
-                                                {tab === 'content' ? 'İÇERİK FABRİKASI' : tab === 'meta' ? 'YAYIN BİLGİLERİ' : tab === 'hashtags' ? 'TAG ANALİZİ' : 'GELİŞMİŞ'}
-                                                {activeTab === tab && <motion.div layoutId="activeTab" className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-white rounded-full" />}
+                                                {tab === 'content' ? 'İçerik' : tab === 'meta' ? 'Yayın Bilgileri' : tab === 'hashtags' ? 'Etiketler' : 'Gelişmiş'}
                                             </button>
                                         ))}
                                     </div>
 
-                                    <form onSubmit={handleSave} className="space-y-12">
+                                    <form onSubmit={handleSave} className="space-y-6">
                                         
                                         {activeTab === 'content' && (
-                                            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                                <div className="space-y-4">
-                                                    <div className="flex items-center justify-between px-4">
-                                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Yazı Başlığı</label>
-                                                        <span className="text-[8px] font-black text-blue-500/50 uppercase tracking-widest italic">{(editingBlog.title || '').length} Karakter</span>
+                                            <div className="space-y-4 animate-in fade-in duration-200">
+                                                <div className="space-y-1.5">
+                                                    <div className="flex items-center justify-between">
+                                                        <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Yazı Başlığı</label>
+                                                        <span className="text-[9px] text-slate-500">{(editingBlog.title || '').length} Karakter</span>
                                                     </div>
                                                     <input 
                                                         value={editingBlog.title} 
@@ -3652,209 +3662,211 @@ const BlogManagement = () => {
                                                                 generateAISlug(editingBlog.title);
                                                             }
                                                         }}
-                                                        placeholder="Etkileyici bir başlık girin..."
-                                                        className="w-full h-20 lg:h-24 bg-slate-950 border border-white/5 p-8 rounded-[36px] text-xl lg:text-3xl font-black text-white outline-none focus:border-blue-500/30 uppercase italic leading-tight placeholder:opacity-20" 
+                                                        placeholder="Manşet başlığı..."
+                                                        className="w-full h-11 bg-slate-900 border border-slate-800 rounded-xl px-4 text-xs font-medium text-white placeholder-slate-600 outline-none focus:border-slate-700 transition-all" 
                                                     />
                                                 </div>
                                                 
-                                                <div className="space-y-4">
-                                                    <div className="flex items-center justify-between px-4">
-                                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Ana İçerik (Markdown/HTML)</label>
-                                                        <div className="flex items-center gap-3">
-                                                            <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest italic">{(editingBlog.content || '').length} Karakter</span>
+                                                <div className="space-y-1.5">
+                                                    <div className="flex items-center justify-between">
+                                                        <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Ana İçerik (Markdown/HTML)</label>
+                                                        <div className="flex items-center gap-2 text-[9px] text-slate-500">
+                                                            <span>{(editingBlog.content || '').length} Karakter</span>
                                                             <div className="w-1 h-1 rounded-full bg-slate-800" />
-                                                            <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest italic">{editingBlog.readTime} Tahmini</span>
+                                                            <span className="text-emerald-500 font-semibold">{editingBlog.readTime}</span>
                                                         </div>
                                                     </div>
                                                     <textarea 
                                                         value={editingBlog.content} 
                                                         onChange={e => setEditingBlog({...editingBlog, content: e.target.value})} 
-                                                        className="w-full bg-slate-950 border border-white/5 p-8 rounded-[44px] text-[12px] font-medium h-[400px] lg:h-[500px] outline-none text-slate-300 focus:border-blue-500/20 italic leading-relaxed no-scrollbar resize-none" 
+                                                        placeholder="Makale metnini markdown veya HTML formatında yazabilirsiniz..."
+                                                        className="w-full bg-slate-900 border border-slate-800 p-4 rounded-xl text-xs font-normal h-64 lg:h-80 outline-none text-slate-300 focus:border-slate-700 leading-relaxed no-scrollbar resize-none" 
                                                     />
                                                 </div>
                                             </div>
                                         )}
 
-                                    {activeTab === 'meta' && (
-                                        <div className="space-y-8 animate-in slide-in-from-left-4">
-                                            <div className="space-y-2">
-                                                <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">ÖZET (EXCERPT)</label>
-                                                <textarea 
-                                                    value={editingBlog.excerpt} 
-                                                    onChange={e => setEditingBlog({...editingBlog, excerpt: e.target.value})} 
-                                                    className="w-full h-32 bg-slate-950 border border-white/5 rounded-[22px] lg:rounded-[28px] px-8 py-6 text-[11px] font-black text-white outline-none focus:border-blue-500 uppercase italic " 
-                                                />
-                                            </div>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                                <AdminInput label="KATEGORİ" value={editingBlog.category} onChange={(v:any)=>setEditingBlog({...editingBlog, category:v})} />
-                                                <div className="space-y-2">
-                                                    <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">OKUMA SÜRESİ (OTOMATİK)</label>
-                                                    <input 
-                                                        readOnly
-                                                        value={editingBlog.readTime} 
-                                                        className="w-full h-14 lg:h-18 bg-slate-950/50 border border-white/5 rounded-[22px] lg:rounded-[28px] px-8 text-[11px] font-black text-slate-500 outline-none uppercase italic" 
+                                        {activeTab === 'meta' && (
+                                            <div className="space-y-4 animate-in fade-in duration-200">
+                                                <div className="space-y-1.5">
+                                                    <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Özet (Excerpt)</label>
+                                                    <textarea 
+                                                        value={editingBlog.excerpt} 
+                                                        onChange={e => setEditingBlog({...editingBlog, excerpt: e.target.value})} 
+                                                        placeholder="Listeleme sayfasında listelenecek kısa özet cümle..."
+                                                        className="w-full h-20 bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 outline-none focus:border-slate-700 resize-none font-medium" 
                                                     />
                                                 </div>
-                                            </div>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                                <AdminInput label="YAZAR" value={editingBlog.author} onChange={(v:any)=>setEditingBlog({...editingBlog, author:v})} />
-                                                <div className="space-y-4">
-                                                    <div className="flex items-center justify-between px-4">
-                                                        <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest italic">SLUG (OPSİYONEL)</label>
-                                                        <button 
-                                                            type="button"
-                                                            onClick={() => generateAISlug()}
-                                                            disabled={isGeneratingSlug}
-                                                            className="text-[9px] font-black text-blue-500 uppercase tracking-widest flex items-center gap-2 hover:text-blue-400 transition-colors disabled:opacity-50"
-                                                        >
-                                                            {isGeneratingSlug ? <Loader2 size={12} className="animate-spin" /> : <Zap size={12} />}
-                                                            YAPAY ZEKA İLE OLUŞTUR
-                                                        </button>
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <AdminInput label="Kategori" value={editingBlog.category} onChange={(v:any)=>setEditingBlog({...editingBlog, category:v})} />
+                                                    <div className="space-y-1.5">
+                                                        <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Okuma Süresi (Oto)</label>
+                                                        <input 
+                                                            readOnly
+                                                            value={editingBlog.readTime} 
+                                                            className="w-full h-10 bg-slate-900/60 border border-slate-800 rounded-xl px-4 text-xs font-semibold text-slate-500 outline-none" 
+                                                        />
                                                     </div>
-                                                    <input 
-                                                        value={editingBlog.slug} 
-                                                        onChange={(e) => setEditingBlog({...editingBlog, slug: e.target.value})} 
-                                                        placeholder="baslik-url-formatinda"
-                                                        className="w-full h-14 lg:h-18 bg-slate-950 border border-white/5 rounded-[22px] lg:rounded-[28px] px-8 text-[11px] font-black text-white outline-none focus:border-blue-500 transition-all uppercase italic "
-                                                    />
                                                 </div>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {activeTab === 'hashtags' && (
-                                        <div className="space-y-8 animate-in slide-in-from-left-4">
-                                            <div className="space-y-4">
-                                                <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 italic">ETIKETLER (VIRGÜL ILE AYIRIN)</label>
-                                                <div className="flex flex-wrap gap-2 p-6 bg-slate-950 border border-white/5 rounded-[32px]">
-                                                    {editingBlog.hashtags?.map((tag: string, i: number) => (
-                                                        <span key={i} className="flex items-center gap-2 bg-blue-500/10 text-blue-500 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border border-blue-500/20">
-                                                            #{tag}
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <AdminInput label="Yazar İsmi" value={editingBlog.author} onChange={(v:any)=>setEditingBlog({...editingBlog, author:v})} />
+                                                    <div className="space-y-1.5">
+                                                        <div className="flex items-center justify-between">
+                                                            <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Kalıcı Bağlantı (Slug)</label>
                                                             <button 
-                                                                type="button" 
-                                                                onClick={() => setEditingBlog({...editingBlog, hashtags: editingBlog.hashtags.filter((_:any, idx:any) => idx !== i)})}
-                                                                className="hover:text-red-500"
+                                                                type="button"
+                                                                onClick={() => generateAISlug()}
+                                                                disabled={isGeneratingSlug}
+                                                                className="text-[10px] font-semibold text-blue-400 hover:text-blue-300 flex items-center gap-1 disabled:opacity-50"
                                                             >
-                                                                <X size={12} />
+                                                                {isGeneratingSlug ? <Loader2 size={11} className="animate-spin" /> : <Zap size={11} />}
+                                                                AI ile Oluştur
                                                             </button>
-                                                        </span>
-                                                    ))}
-                                                    <input 
-                                                        type="text"
-                                                        placeholder="YENİ ETİKET EKLE..."
-                                                        onKeyDown={(e) => {
-                                                            if (e.key === 'Enter' || e.key === ',') {
-                                                                e.preventDefault();
-                                                                const val = e.currentTarget.value.trim().replace(/#/g, '').replace(/,/g, '');
-                                                                if (val && !editingBlog.hashtags?.includes(val)) {
-                                                                    setEditingBlog({
-                                                                        ...editingBlog,
-                                                                        hashtags: [...(editingBlog.hashtags || []), val]
-                                                                    });
+                                                        </div>
+                                                        <input 
+                                                            value={editingBlog.slug} 
+                                                            onChange={(e) => setEditingBlog({...editingBlog, slug: e.target.value})} 
+                                                            placeholder="baslik-url-formatinda"
+                                                            className="w-full h-10 bg-slate-900 border border-slate-800 rounded-xl px-4 text-xs font-medium text-white placeholder-slate-650 outline-none focus:border-slate-700"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {activeTab === 'hashtags' && (
+                                            <div className="space-y-4 animate-in fade-in duration-200">
+                                                <div className="space-y-1.5">
+                                                    <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Etiketler (Enter ile Ekleyin)</label>
+                                                    <div className="flex flex-wrap gap-1.5 p-3 bg-slate-900 border border-slate-800 rounded-xl">
+                                                        {editingBlog.hashtags?.map((tag: string, i: number) => (
+                                                            <span key={i} className="flex items-center gap-1 bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded-md text-[11px] font-medium border border-blue-500/15">
+                                                                #{tag}
+                                                                <button 
+                                                                    type="button" 
+                                                                    onClick={() => setEditingBlog({...editingBlog, hashtags: editingBlog.hashtags.filter((_:any, idx:any) => idx !== i)})}
+                                                                    className="hover:text-red-400 shrink-0"
+                                                                >
+                                                                    <X size={10} />
+                                                                </button>
+                                                            </span>
+                                                        ))}
+                                                        <input 
+                                                            type="text"
+                                                            placeholder="Yeni etiket ismi..."
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === 'Enter' || e.key === ',') {
+                                                                    e.preventDefault();
+                                                                    const val = e.currentTarget.value.trim().replace(/#/g, '').replace(/,/g, '');
+                                                                    if (val && !editingBlog.hashtags?.includes(val)) {
+                                                                        setEditingBlog({
+                                                                            ...editingBlog,
+                                                                            hashtags: [...(editingBlog.hashtags || []), val]
+                                                                        });
+                                                                    }
+                                                                    e.currentTarget.value = '';
                                                                 }
-                                                                e.currentTarget.value = '';
-                                                            }
-                                                        }}
-                                                        className="bg-transparent border-none outline-none text-[10px] font-black uppercase tracking-widest text-white ml-2 flex-1 min-w-[120px]"
-                                                    />
+                                                            }}
+                                                            className="bg-transparent border-none outline-none text-xs text-white ml-1 flex-1 min-w-[120px]"
+                                                        />
+                                                    </div>
+                                                    <p className="text-[10px] text-slate-500">Virgül veya Enter tuşuna basarak ardarda kelimeler ekleyebilirsiniz.</p>
                                                 </div>
-                                                <p className="text-[9px] text-slate-600 italic px-4">Enter veya virgül ile yeni etiket ekleyebilirsiniz.</p>
                                             </div>
+                                        )}
+
+                                        {activeTab === 'settings' && (
+                                            <div className="space-y-4 animate-in fade-in duration-200">
+                                                <AdminInput label="Öne Çıkan Görsel URL" value={editingBlog.image} onChange={(v:any)=>setEditingBlog({...editingBlog, image:v})} icon={ImageIcon} />
+                                                
+                                                <div className="flex items-center justify-between p-4 bg-[#101626]/40 border border-slate-800/80 rounded-xl">
+                                                    <div>
+                                                        <p className="text-xs font-semibold text-slate-200">Öne Çıkan Makale</p>
+                                                        <p className="text-[10px] text-slate-500 mt-0.5">Blog sayfasında manşetten büyük gösterilir</p>
+                                                    </div>
+                                                    <button 
+                                                        type="button"
+                                                        onClick={() => setEditingBlog({...editingBlog, isFeatured: !editingBlog.isFeatured})}
+                                                        className={`w-10 h-6 rounded-full transition-all relative ${editingBlog.isFeatured ? 'bg-amber-500' : 'bg-slate-800'}`}
+                                                    >
+                                                        <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full transition-all ${editingBlog.isFeatured ? 'left-4.5' : 'left-0.5'}`} />
+                                                    </button>
+                                                </div>
+
+                                                <div className="p-4 bg-blue-500/5 border border-blue-500/10 rounded-xl flex items-start gap-3">
+                                                    <div className="p-2 bg-blue-500/10 rounded-lg text-blue-400 shrink-0">
+                                                        <Info size={14} />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-[10px] font-semibold text-blue-400 uppercase tracking-wide">SEO İpucu</p>
+                                                        <p className="text-[10px] text-slate-500 leading-normal mt-0.5">
+                                                            Google arama sonuçlarında üst sıralarda yer bulmak için ana başlığınızı (H1) yazı içinde hiyerarşik alt başlıklar (H2, H3) ve organik SEO anahtar kelimeleriyle desteklemek zengin indeksleme sağlar.
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        <div className="fixed lg:relative bottom-0 left-0 right-0 p-4 lg:p-0 bg-gradient-to-t from-[#0b0f19] lg:from-transparent via-[#0b0f19] lg:via-transparent to-transparent z-[130]">
+                                            <button type="submit" className="w-full h-11 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-semibold text-xs transition-all shadow-sm flex items-center justify-center gap-2">
+                                                <Send size={13} /> Değişiklikleri Kaydet ve Yayınla
+                                            </button>
                                         </div>
-                                    )}
-
-                                    {activeTab === 'settings' && (
-                                        <div className="space-y-8 animate-in slide-in-from-left-4">
-                                            <AdminInput label="ÖNE ÇIKAN GÖRSEL URL" value={editingBlog.image} onChange={(v:any)=>setEditingBlog({...editingBlog, image:v})} icon={ImageIcon} />
-                                            
-                                            <div className="flex items-center justify-between p-8 bg-white/5 rounded-[36px] border border-white/5">
-                                                <div>
-                                                    <p className="text-sm font-black text-white italic uppercase tracking-tighter">ÖNE ÇIKAN YAZI</p>
-                                                    <p className="text-[10px] text-slate-500 font-bold uppercase mt-1 italic tracking-widest">BLOG ANA SAYFASINDA EN ÜSTTE GÖRÜNÜR</p>
-                                                </div>
-                                                <button 
-                                                    type="button"
-                                                    onClick={() => setEditingBlog({...editingBlog, isFeatured: !editingBlog.isFeatured})}
-                                                    className={`w-16 h-8 rounded-full transition-all relative ${editingBlog.isFeatured ? 'bg-amber-500' : 'bg-slate-800'}`}
-                                                >
-                                                    <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-all ${editingBlog.isFeatured ? 'left-9' : 'left-1'}`} />
-                                                </button>
-                                            </div>
-
-                                            <div className="p-8 bg-blue-500/5 border border-blue-500/10 rounded-[36px] flex items-start gap-4">
-                                                <div className="p-3 bg-blue-500/10 rounded-2xl text-blue-500">
-                                                    <Info size={20} />
-                                                </div>
-                                                <div>
-                                                    <p className="text-[11px] font-black text-blue-500 uppercase tracking-widest mb-1">SEO İPUCU</p>
-                                                    <p className="text-[9px] text-slate-500 font-bold uppercase italic leading-relaxed">
-                                                        Blog yazısı yayınlandığında ana sayfa ve bot detay sayfalarında çapraz referans olarak görünecektir. Google SEO puanını artırmak için açıklayıcı başlıklar (H1, H2) kullanmaya özen gösterin.
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    <div className="fixed lg:relative bottom-0 left-0 right-0 p-6 lg:p-0 bg-gradient-to-t from-[#020617] lg:from-transparent via-[#020617]/90 lg:via-transparent to-transparent z-[130]">
-                                        <button type="submit" className="w-full h-16 lg:h-24 bg-blue-600 text-white rounded-2xl lg:rounded-[32px] font-black text-[12px] uppercase tracking-[0.4em] transition-all border-b-8 border-blue-800 active:translate-y-1 active:border-b-4 flex items-center justify-center gap-4">
-                                            <Send size={20} /> YAZIYI YAYINLA
-                                        </button>
-                                    </div>
-                                </form>
+                                    </form>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
                         {/* RIGHT: LIVE BLOG PREVIEW SIMULATOR */}
-                        <div className="hidden lg:flex w-[480px] bg-slate-950/40 border-l border-white/5 p-12 flex-col items-center justify-center bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/10 via-transparent to-transparent">
-                            <div className="text-center mb-12 space-y-3">
-                                <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.6em] italic block">PREVIEW ENGINE</span>
-                                <h4 className="text-xl font-black text-white italic tracking-widest opacity-20 uppercase">Mobile Simulator</h4>
+                        <div className="hidden lg:flex w-80 bg-slate-950/20 border-l border-slate-800/60 p-6 flex-col items-center justify-center shrink-0">
+                            <div className="text-center mb-6 space-y-1">
+                                <span className="text-[9px] font-semibold text-blue-400 uppercase tracking-wildest block">ÖNİZLEME MOTORU</span>
+                                <h4 className="text-xs font-semibold text-slate-500 uppercase">Mobil Simülasyonu</h4>
                             </div>
 
-                            <div className="w-full max-w-[320px] aspect-[9/16] bg-slate-900 border-4 border-slate-800 rounded-[56px] overflow-hidden shadow-2xl relative">
-                                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-slate-800 rounded-b-2xl z-20"></div>
+                            <div className="w-full max-w-[210px] aspect-[9/16] bg-slate-900 border-2 border-slate-800 rounded-3xl overflow-hidden shadow-xl relative">
+                                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-4 bg-slate-800 rounded-b-xl z-20"></div>
                                 
-                                <div className="h-full flex flex-col bg-[#020617]">
-                                    <div className="h-40 bg-slate-800 relative shrink-0">
+                                <div className="h-full flex flex-col bg-[#020617] text-left">
+                                    <div className="h-24 bg-slate-800/80 relative shrink-0">
                                         {editingBlog.image ? (
-                                            <img src={editingBlog.image} alt="" className="w-full h-full object-cover opacity-60" referrerPolicy="no-referrer" />
+                                            <img src={editingBlog.image} alt="" className="w-full h-full object-cover opacity-65 animate-fade-in" referrerPolicy="no-referrer" />
                                         ) : (
-                                            <div className="w-full h-full flex items-center justify-center">
-                                                <ImageIcon size={32} className="text-slate-700" />
+                                            <div className="w-full h-full flex items-center justify-center text-slate-700">
+                                                <ImageIcon size={20} />
                                             </div>
                                         )}
-                                        <div className="absolute bottom-4 left-6">
-                                            <span className="bg-blue-600 text-[7px] font-black p-1.5 rounded-md text-white uppercase">{editingBlog.category || 'Haberler'}</span>
+                                        <div className="absolute bottom-2 left-3">
+                                            <span className="bg-blue-600 px-1.5 py-0.5 rounded text-[8px] font-semibold text-white uppercase">{editingBlog.category || 'Haberler'}</span>
                                         </div>
                                     </div>
                                     
-                                    <div className="p-6 space-y-4">
-                                        <h5 className="text-white font-black text-lg italic uppercase leading-tight line-clamp-3">
-                                            {editingBlog.title || 'TASLAK BAŞLIK'}
+                                    <div className="p-3 space-y-2 flex-grow">
+                                        <h5 className="text-white font-semibold text-xs leading-tight line-clamp-3">
+                                            {editingBlog.title || 'Manşet Başlığı Yok'}
                                         </h5>
-                                        <div className="flex items-center gap-3 text-slate-500">
-                                            <div className="w-4 h-4 rounded-full bg-blue-600/20 flex items-center justify-center">
-                                                <UserPlus size={8} className="text-blue-500" />
+                                        <div className="flex items-center gap-1.5 text-slate-500 text-[9px]">
+                                            <div className="w-3.5 h-3.5 rounded-full bg-blue-500/10 flex items-center justify-center">
+                                                <UserPlus size={8} className="text-blue-400" />
                                             </div>
-                                            <span className="text-[8px] font-black uppercase text-slate-600 italic">@{editingBlog.author.replace(/ /g, '').toLowerCase()}</span>
+                                            <span className="truncate">@{editingBlog.author.replace(/ /g, '').toLowerCase() || 'yazar'}</span>
                                         </div>
-                                        <div className="space-y-2 opacity-30">
-                                            <div className="h-2 w-full bg-slate-700 rounded-full"></div>
-                                            <div className="h-2 w-full bg-slate-700 rounded-full"></div>
-                                            <div className="h-2 w-3/4 bg-slate-700 rounded-full"></div>
+                                        <div className="space-y-1.5 opacity-20">
+                                            <div className="h-1 w-full bg-slate-700 rounded-full"></div>
+                                            <div className="h-1 w-full bg-slate-700 rounded-full"></div>
+                                            <div className="h-1 w-2/3 bg-slate-700 rounded-full"></div>
                                         </div>
                                     </div>
 
-                                    <div className="mt-auto p-6">
-                                        <div className="w-full h-10 bg-blue-600/10 border border-blue-500/20 rounded-xl flex items-center justify-center">
-                                            <span className="text-blue-500 text-[8px] font-black uppercase tracking-widest">DEVAMINI OKU</span>
+                                    <div className="p-3 mt-auto shrink-0">
+                                        <div className="w-full h-7 bg-blue-500/10 border border-blue-500/15 rounded-lg flex items-center justify-center">
+                                            <span className="text-blue-400 text-[9px] font-semibold">OKUMAYA BAŞLA</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             
-                            <p className="text-[9px] font-black text-slate-700 uppercase tracking-widest mt-12 italic">Cihaz bazlı görünüm simülasyonu</p>
+                            <p className="text-[10px] text-slate-500 mt-6 leading-normal text-center">İçeriklerin masaüstü ve mobil ekranlardaki anlık hiyerarşik dizilimi</p>
                         </div>
                     </div>
                 </div>
