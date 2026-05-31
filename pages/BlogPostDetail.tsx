@@ -45,6 +45,7 @@ import { SEO } from '../components/SEO';
 import { Logo } from '../components/Logo';
 import { DatabaseService } from '../services/DatabaseService';
 import { BlogPost, BlogComment } from '../types';
+import { UserHoverCard } from '../components/UserHoverCard';
 
 const UserIcon = User;
 
@@ -789,16 +790,20 @@ const BlogPostDetail: React.FC = () => {
                     key={comment.id || idx} 
                     className="flex gap-4 group"
                   >
-                    <div className="w-10 h-10 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 shrink-0 overflow-hidden shadow-sm">
-                      {comment.user_avatar ? (
-                        <img src={comment.user_avatar} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                      ) : (
-                        <UserIcon size={20} />
-                      )}
-                    </div>
+                    <UserHoverCard userId={comment.user_id} user={{ name: comment.user_name, avatar: comment.user_avatar }}>
+                      <div className="w-10 h-10 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 shrink-0 overflow-hidden shadow-sm cursor-pointer">
+                        {comment.user_avatar ? (
+                          <img src={comment.user_avatar} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                        ) : (
+                          <UserIcon size={20} />
+                        )}
+                      </div>
+                    </UserHoverCard>
                     <div className="flex-1 bg-slate-50 dark:bg-white/5 p-4 rounded-2xl rounded-tl-none border border-transparent group-hover:border-blue-500/20 transition-all">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">{comment.user_name}</span>
+                        <UserHoverCard userId={comment.user_id} user={{ name: comment.user_name, avatar: comment.user_avatar }}>
+                          <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider cursor-pointer hover:text-blue-500 transition-colors">{comment.user_name}</span>
+                        </UserHoverCard>
                         <span className="text-[10px] font-bold text-slate-400">{new Date(comment.created_at).toLocaleDateString(language === 'tr' ? 'tr-TR' : 'en-US')}</span>
                       </div>
                       <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-medium">

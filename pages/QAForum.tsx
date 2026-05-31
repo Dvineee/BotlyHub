@@ -16,6 +16,7 @@ import Logo from '../components/Logo';
 import { categories, appsSubCategories } from '../data';
 import { API_BASE_URL } from '../constants';
 import LoginModal from '../components/LoginModal';
+import { UserHoverCard } from '../components/UserHoverCard';
 
 interface QTag {
   type: 'bot' | 'channel' | 'general';
@@ -943,24 +944,26 @@ export default function QAForum() {
                               <div className="flex items-center justify-between gap-2 mb-2">
                                 <div className="flex items-center gap-2">
                                   {/* Small simple avatar with link */}
-                                  <div 
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      haptic('light');
-                                      navigate(`/user/${topic.author_id}`);
-                                    }}
-                                    className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer group/author"
-                                  >
-                                    <img 
-                                      src={topic.author_avatar} 
-                                      className="w-5 h-5 rounded-full object-cover bg-slate-100 border border-slate-200/45 dark:border-slate-800"
-                                      alt=""
-                                      referrerPolicy="no-referrer"
-                                    />
-                                    <span className="text-xs font-bold text-slate-500 dark:text-slate-400 group-hover/author:text-indigo-500 transition-colors">
-                                      {formatDisplayAuthor(topic.author_name)}
-                                    </span>
-                                  </div>
+                                  <UserHoverCard userId={topic.author_id} user={{ name: topic.author_name, avatar: topic.author_avatar }}>
+                                    <div 
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        haptic('light');
+                                        navigate(`/user/${topic.author_id}`);
+                                      }}
+                                      className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer group/author"
+                                    >
+                                      <img 
+                                        src={topic.author_avatar} 
+                                        className="w-5 h-5 rounded-full object-cover bg-slate-100 border border-slate-200/45 dark:border-slate-800"
+                                        alt=""
+                                        referrerPolicy="no-referrer"
+                                      />
+                                      <span className="text-xs font-bold text-slate-500 dark:text-slate-400 group-hover/author:text-indigo-500 transition-colors">
+                                        {formatDisplayAuthor(topic.author_name)}
+                                      </span>
+                                    </div>
+                                  </UserHoverCard>
                                   <span className="text-[10px] text-slate-300 dark:text-slate-600">•</span>
                                   <span className="text-xs text-slate-400">
                                     {formatTimeRelative(topic.created_at)}
@@ -1069,24 +1072,26 @@ export default function QAForum() {
                     <div className="fancy-glass-card mb-6">
                       {/* Detailed Card Top author information matching top part of Image 3 */}
                       <div className="flex items-start justify-between gap-4 border-b border-slate-200/40 dark:border-slate-800/20 pb-4.5 mb-5 select-none">
-                        <div 
-                          onClick={() => {
-                            haptic('light');
-                            navigate(`/user/${activeTopic.author_id}`);
-                          }}
-                          className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity group/author-detail"
-                        >
-                          <img 
-                            src={activeTopic.author_avatar} 
-                            className="w-10 h-10 rounded-full object-cover bg-slate-50 border border-slate-200/60 dark:border-slate-800"
-                            alt=""
-                          />
-                          <div>
-                            <h3 className="text-sm font-black text-slate-800 dark:text-white leading-tight group-hover/author-detail:text-indigo-500 transition-colors">
-                              {formatDisplayAuthor(activeTopic.author_name)}
-                            </h3>
+                        <UserHoverCard userId={activeTopic.author_id} user={{ name: activeTopic.author_name, avatar: activeTopic.author_avatar }}>
+                          <div 
+                            onClick={() => {
+                              haptic('light');
+                              navigate(`/user/${activeTopic.author_id}`);
+                            }}
+                            className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity group/author-detail"
+                          >
+                            <img 
+                              src={activeTopic.author_avatar} 
+                              className="w-10 h-10 rounded-full object-cover bg-slate-50 border border-slate-200/60 dark:border-slate-800"
+                              alt=""
+                            />
+                            <div>
+                              <h3 className="text-sm font-black text-slate-800 dark:text-white leading-tight group-hover/author-detail:text-indigo-500 transition-colors">
+                                {formatDisplayAuthor(activeTopic.author_name)}
+                              </h3>
+                            </div>
                           </div>
-                        </div>
+                        </UserHoverCard>
                         <span className="text-xs text-slate-400 font-medium shrink-0">
                           {formatTimeRelative(activeTopic.created_at)}
                         </span>
@@ -1217,26 +1222,30 @@ export default function QAForum() {
                                 <div key={comment.id} className="p-4 mb-4 rounded-2xl bg-white/5 dark:bg-slate-900/40 border border-slate-200/40 dark:border-slate-800/40 hover:border-slate-300 dark:hover:border-slate-700/60 transition-all">
                                   {/* Main Root Comment */}
                                   <div className="flex items-start gap-3">
-                                    <img 
-                                      onClick={() => {
-                                        haptic('light');
-                                        navigate(`/user/${comment.author_id}`);
-                                      }}
-                                      src={comment.author_avatar} 
-                                      className="w-8 h-8 rounded-full object-cover bg-slate-50 border border-slate-200/50 dark:border-slate-800 shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
-                                      alt=""
-                                    />
+                                    <UserHoverCard userId={comment.author_id} user={{ name: comment.author_name, avatar: comment.author_avatar }}>
+                                      <img 
+                                        onClick={() => {
+                                          haptic('light');
+                                          navigate(`/user/${comment.author_id}`);
+                                        }}
+                                        src={comment.author_avatar} 
+                                        className="w-8 h-8 rounded-full object-cover bg-slate-50 border border-slate-200/50 dark:border-slate-800 shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+                                        alt=""
+                                      />
+                                    </UserHoverCard>
                                     <div className="flex-1 min-w-0">
                                       <div className="flex items-center gap-2 mb-1 justify-between sm:justify-start">
-                                        <span 
-                                          onClick={() => {
-                                            haptic('light');
-                                            navigate(`/user/${comment.author_id}`);
-                                          }}
-                                          className="text-xs font-black text-slate-800 dark:text-white cursor-pointer hover:text-indigo-500 transition-colors"
-                                        >
-                                          {formatDisplayAuthor(comment.author_name)}
-                                        </span>
+                                        <UserHoverCard userId={comment.author_id} user={{ name: comment.author_name, avatar: comment.author_avatar }}>
+                                          <span 
+                                            onClick={() => {
+                                              haptic('light');
+                                              navigate(`/user/${comment.author_id}`);
+                                            }}
+                                            className="text-xs font-black text-slate-800 dark:text-white cursor-pointer hover:text-indigo-500 transition-colors"
+                                          >
+                                            {formatDisplayAuthor(comment.author_name)}
+                                          </span>
+                                        </UserHoverCard>
                                         <span className="text-[10px] text-slate-400 font-medium font-mono">
                                           {formatTimeRelative(comment.created_at)}
                                         </span>
@@ -1306,26 +1315,30 @@ export default function QAForum() {
                                     <div className="mt-3 ml-8 sm:ml-11 pl-4 border-l-2 border-slate-100 dark:border-slate-800/40 space-y-3 pt-1">
                                       {replies.map(reply => (
                                         <div key={reply.id} className="flex items-start gap-2.5 py-1.5">
-                                          <img 
-                                            onClick={() => {
-                                              haptic('light');
-                                              navigate(`/user/${reply.author_id}`);
-                                            }}
-                                            src={reply.author_avatar} 
-                                            className="w-6 h-6 rounded-full object-cover bg-slate-50 border border-slate-200/50 dark:border-slate-800 shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
-                                            alt=""
-                                          />
+                                          <UserHoverCard userId={reply.author_id} user={{ name: reply.author_name, avatar: reply.author_avatar }}>
+                                            <img 
+                                              onClick={() => {
+                                                haptic('light');
+                                                navigate(`/user/${reply.author_id}`);
+                                              }}
+                                              src={reply.author_avatar} 
+                                              className="w-6 h-6 rounded-full object-cover bg-slate-50 border border-slate-200/50 dark:border-slate-800 shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+                                              alt=""
+                                            />
+                                          </UserHoverCard>
                                           <div className="flex-1 min-w-0">
                                             <div className="flex items-center gap-2 mb-0.5 justify-between sm:justify-start">
-                                              <span 
-                                                onClick={() => {
-                                                  haptic('light');
-                                                  navigate(`/user/${reply.author_id}`);
-                                                }}
-                                                className="text-[11px] font-black text-slate-800 dark:text-slate-200 cursor-pointer hover:text-indigo-500 transition-colors"
-                                              >
-                                                {formatDisplayAuthor(reply.author_name)}
-                                              </span>
+                                              <UserHoverCard userId={reply.author_id} user={{ name: reply.author_name, avatar: reply.author_avatar }}>
+                                                <span 
+                                                  onClick={() => {
+                                                    haptic('light');
+                                                    navigate(`/user/${reply.author_id}`);
+                                                  }}
+                                                  className="text-[11px] font-black text-slate-800 dark:text-slate-200 cursor-pointer hover:text-indigo-500 transition-colors"
+                                                >
+                                                  {formatDisplayAuthor(reply.author_name)}
+                                                </span>
+                                              </UserHoverCard>
                                               <span className="text-[9px] text-slate-400 font-medium font-mono">
                                                 {formatTimeRelative(reply.created_at)}
                                               </span>

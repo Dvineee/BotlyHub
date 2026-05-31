@@ -5,6 +5,7 @@ import { Search, SlidersHorizontal, Plus } from 'lucide-react';
 import * as Router from 'react-router-dom';
 import { User } from '../types';
 import { DatabaseService } from '../services/DatabaseService';
+import { UserHoverCard } from '../components/UserHoverCard';
 
 const { useNavigate } = Router as any;
 
@@ -157,23 +158,25 @@ const UserList = () => {
                 onClick={() => navigate(`/users/${user.id}`)}
                 className="flex items-center justify-between p-5 rounded-xl bg-white dark:bg-slate-900/40 border border-black/5 dark:border-white/5 hover:border-purple-500/30 dark:hover:border-purple-500/30 hover:bg-slate-50 dark:hover:bg-slate-900/60 transition-all cursor-pointer group "
               >
-                <div className="flex items-center gap-5">
-                  <div className="relative">
-                    <img 
-                        src={getUserAvatar(user)} 
-                        alt={getDisplayName(user)} 
-                        className="w-14 h-14 rounded-xl object-cover border border-black/5 dark:border-white/10 group-hover:scale-105 transition-transform " 
-                        referrerPolicy="no-referrer"
-                    />
-                    {user.status === 'Active' && (
-                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 border-4 border-white dark:border-slate-950 rounded-full "></div>
-                    )}
+                <UserHoverCard user={user}>
+                  <div className="flex items-center gap-5">
+                    <div className="relative">
+                      <img 
+                          src={getUserAvatar(user)} 
+                          alt={getDisplayName(user)} 
+                          className="w-14 h-14 rounded-xl object-cover border border-black/5 dark:border-white/10 group-hover:scale-105 transition-transform " 
+                          referrerPolicy="no-referrer"
+                      />
+                      {user.status === 'Active' && (
+                          <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 border-4 border-white dark:border-slate-950 rounded-full "></div>
+                      )}
+                    </div>
+                    <div className="space-y-1">
+                      <h3 className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">{getDisplayName(user)}</h3>
+                      <p className="text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest">{getDisplayUsername(user)}</p>
+                    </div>
                   </div>
-                  <div className="space-y-1">
-                    <h3 className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">{getDisplayName(user)}</h3>
-                    <p className="text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest">{getDisplayUsername(user)}</p>
-                  </div>
-                </div>
+                </UserHoverCard>
                 
                 <div className="flex gap-2">
                     {(user.badges || []).includes('Premium') && (
