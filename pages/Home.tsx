@@ -1269,7 +1269,20 @@ const Home = () => {
 
   const [homeSearchQuery, setHomeSearchQuery] = useState('');
   const [showHomeSearchDropdown, setShowHomeSearchDropdown] = useState(false);
+  const [isSearchLoading, setIsSearchLoading] = useState(false);
   const homeSearchRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (homeSearchQuery.trim()) {
+        setIsSearchLoading(true);
+        const timer = setTimeout(() => {
+            setIsSearchLoading(false);
+        }, 300);
+        return () => clearTimeout(timer);
+    } else {
+        setIsSearchLoading(false);
+    }
+  }, [homeSearchQuery]);
 
   const filteredDropdownBots = useMemo(() => {
     if (!homeSearchQuery.trim()) return [];
@@ -1685,7 +1698,11 @@ const Home = () => {
                       {/* Tablet/PC View - Instant Search Dropdown */}
                       <div ref={homeSearchRef} className="hidden md:block md:flex-1 md:max-w-[280px] lg:max-w-[320px] relative z-[130]">
                           <div className="relative flex items-center bg-[#eeefef] dark:bg-slate-800 rounded-xl group transition-all h-[42px] px-3 focus-within:ring-2 focus-within:ring-blue-500/20">
-                              <Search size={16} className="text-[#8e8e93] dark:text-slate-400 group-hover:text-blue-500 transition-colors shrink-0 mr-2" />
+                              {isSearchLoading ? (
+                                  <Loader2 size={16} className="text-blue-500 animate-spin shrink-0 mr-2" />
+                              ) : (
+                                  <Search size={16} className="text-[#8e8e93] dark:text-slate-400 group-hover:text-blue-500 transition-colors shrink-0 mr-2" />
+                              )}
                               <input 
                                   type="text"
                                   value={homeSearchQuery}
@@ -1695,7 +1712,7 @@ const Home = () => {
                                   }}
                                   onFocus={() => setShowHomeSearchDropdown(true)}
                                   placeholder="Herşeyi ara"
-                                  className="w-full bg-transparent border-none outline-none text-[13px] text-[#2c2c2e] dark:text-slate-300 font-bold tracking-wide placeholder-[#8e8e93] dark:placeholder-slate-400 shrink min-w-0"
+                                  className="w-full h-full bg-transparent border-none outline-none text-[13px] text-[#2c2c2e] dark:text-slate-300 font-bold tracking-wide placeholder-[#8e8e93] dark:placeholder-slate-400 shrink min-w-0 py-0"
                               />
 
                               {homeSearchQuery && (
@@ -1733,9 +1750,12 @@ const Home = () => {
                                                   Herhangi bir sonuç bulunamadı
                                               </div>
                                           ) : (
-                                              filteredDropdownBots.map((bot) => (
-                                                  <div 
+                                              filteredDropdownBots.map((bot, index) => (
+                                                  <motion.div 
                                                       key={bot.id}
+                                                      initial={{ opacity: 0, y: 6 }}
+                                                      animate={{ opacity: 1, y: 0 }}
+                                                      transition={{ duration: 0.18, delay: index * 0.03, ease: 'easeOut' }}
                                                       onClick={() => {
                                                           haptic('light');
                                                           navigate(`/bot/${bot.slug}`);
@@ -1764,7 +1784,7 @@ const Home = () => {
                                                               {bot.description.startsWith('bot_') ? t(bot.description) : bot.description}
                                                           </p>
                                                       </div>
-                                                  </div>
+                                                  </motion.div>
                                               ))
                                           )}
                                       </div>

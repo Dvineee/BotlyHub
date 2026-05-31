@@ -2185,6 +2185,15 @@ html:not(.dark) .fixed select:focus {
     background-color: rgba(148, 163, 184, 0.1) !important;
 }
 
+/* Highly selective CSS for QA Forum 24h commented area to have no border */
+div.qa-last-24h-box, 
+.qa-last-24h-box {
+    border: none !important;
+    border-width: 0px !important;
+    border-style: none !important;
+    border-color: transparent !important;
+}
+
 
 
 

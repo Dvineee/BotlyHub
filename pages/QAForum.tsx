@@ -951,7 +951,7 @@ export default function QAForum() {
                         return (
                           <React.Fragment key={topic.id}>
                             {showSpecialBoxHere && last24hCommentedTopics.length > 0 && (
-                              <div className="bg-white dark:bg-[#111214] border border-slate-100 dark:border-slate-800/80 rounded-2xl p-5 shadow-xs space-y-4 my-6">
+                              <div className="bg-white dark:bg-[#111214] rounded-2xl p-5 shadow-xs space-y-4 my-6 qa-last-24h-box">
                                 <div className="space-y-4">
                                   {last24hCommentedTopics.map(h24Topic => {
                                     const sortedComments = [...(h24Topic.comments || [])].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
