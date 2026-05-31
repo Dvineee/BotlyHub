@@ -2198,6 +2198,12 @@ div.qa-last-24h-box,
     padding-bottom: 0;
 }
 
+@media (min-width: 1024px) {
+    .lg\:gap-16 {
+        gap: 2rem;
+    }
+}
+
 
 
 
