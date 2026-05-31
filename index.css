@@ -2192,6 +2192,12 @@ div.qa-last-24h-box,
     border-color: transparent !important;
 }
 
+.py-0 {
+    padding-left: 6px;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
 
 
 
