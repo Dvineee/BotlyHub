@@ -2200,7 +2200,7 @@ div.qa-last-24h-box,
 
 @media (min-width: 1024px) {
     .lg\:gap-16 {
-        gap: 2rem;
+        gap: 2rem !important;
     }
 }
 
