@@ -247,33 +247,9 @@ input, textarea, select {
   color: #94a3b8 !important;
 } */
 
-.opacity-40 {
-    opacity: 1 !important;
-}
-
-.tracking-tighter {
-    letter-spacing: 0.05em;
-}
-
-.text-\[8px\] {
-    font-size: 10px;
-}
-
 .featured-bot-card-img {
     border-radius: 12px !important;
     background: none !important;
-}
-
-.text-\[10px\] {
-    font-size: 13px !important;
-}
-
-.uppercase {
-    text-transform: none !important;
-}
-
-.text-\[13px\] {
-    font-size: 15px;
 }
 
 .sponsored-badge {
@@ -426,10 +402,6 @@ svg.lucide.lucide-chevron-right:focus {
     padding-top: 1rem;
 }
 
-.pb-32 {
-    padding-bottom: 0;
-}
-
 .border-emerald-800 {
     height: 60px;
     letter-spacing: 0.2em !important;
@@ -461,12 +433,6 @@ svg.lucide.lucide-chevron-right:focus {
 }
 
 /* Margin and padding custom overrides removed for layout flexibility */
-
-.px-8 {
-    margin-bottom: 21px;
-    margin-top: 12px;
-    padding-left: 2rem;
-}
 
 h3.text-white.font-bold.text-xl.mb-1.tracking-tight {
     font-size: 16px;
@@ -547,13 +513,6 @@ span.text-\[10px\].font-bold.text-slate-500.dark\:text-slate-400.uppercase.track
 }
 /* Removed secondary vertical padding overrides */
 
-.font-extrabold {
-    font-weight: 600 !important;
-}
-.text-lg {
-    font-size: 1rem;
-    line-height: 1.4rem;
-}
 p.text-\[10px\].text-slate-400.dark\:text-slate-500.font-medium.uppercase.tracking-wider.truncate.mb-2 {
     font-size: 12px;
 }
@@ -630,19 +589,6 @@ button.w-full.flex.items-center.gap-3.px-4.py-3.hover\:bg-slate-50.dark\:hover\:
     color: #2F88FF !important;
     background-color: #ffffff00 !important;
     --tw-border-opacity: 1;
-}
-
-.text-xs {
-    font-size: 0.87rem !important;
-    line-height: 1rem !important;
-}
-
-.aspect-\[9\/19\] {
-    aspect-ratio: inherit;
-} 
-.blur-\[40px\] {
-    --tw-blur: blur(3px);
-    filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
 
 .lg\:w-\[480px\] {

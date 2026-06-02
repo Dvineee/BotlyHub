@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { Megaphone, Users, Loader2, RefreshCw, AlertCircle, CheckCircle2, X, Bot as BotIcon, Info, Fingerprint, Zap, AlertTriangle, TrendingUp, MoreVertical } from 'lucide-react';
+import { Megaphone, Users, Loader2, RefreshCw, AlertCircle, CheckCircle2, X, Bot as BotIcon, Info, Fingerprint, Zap, AlertTriangle, TrendingUp, MoreVertical, ChevronLeft } from 'lucide-react';
 import * as Router from 'react-router-dom';
 import { Channel } from '../types';
 import { DatabaseService, supabase } from '../services/DatabaseService';
@@ -131,6 +131,28 @@ const MyChannels = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 px-5 sm:px-8 pt-6 md:pt-10 pb-32 animate-in fade-in transition-colors duration-300" onClick={() => setOpenSettingsId(null)}>
+      {/* Dynamic Sub Header */}
+      <div className="max-w-7xl mx-auto w-full mb-10">
+        <div className="flex items-center justify-between border-b border-black/[0.03] dark:border-white/5 pb-4">
+          <button 
+            onClick={() => { haptic('light'); navigate(-1); }}
+            className="group flex items-center gap-2.5 text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-blue-500 transition-colors bg-transparent border-none outline-none cursor-pointer"
+          >
+            <span className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-white/5 shadow-inner group-hover:bg-slate-50 dark:group-hover:bg-slate-800 transition-colors flex items-center justify-center">
+              <ChevronLeft size={16} />
+            </span>
+            Geri
+          </button>
+          
+          <div className="flex items-center gap-2 select-none">
+            <span className="text-[10px] sm:text-[11px] font-mono font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest bg-slate-100/60 dark:bg-slate-900/40 px-3 py-1.5 rounded-full flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse inline-block"></span>
+              BOTLY HUB
+            </span>
+          </div>
+        </div>
+      </div>
+
       <div className="flex items-center justify-between mb-10 px-1">
         <div className="flex items-center gap-4">
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Kanallarım</h1>

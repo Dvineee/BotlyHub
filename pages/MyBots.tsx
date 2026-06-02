@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { ShoppingBag, TrendingUp, Bot, Send, Activity, Trash2, AlertTriangle, X, Loader2, Lock, Clock, Info, Settings, LayoutDashboard } from 'lucide-react';
+import { ShoppingBag, TrendingUp, Bot, Send, Activity, Trash2, AlertTriangle, X, Loader2, Lock, Clock, Info, Settings, LayoutDashboard, ChevronLeft } from 'lucide-react';
 import { UserBot, Bot as BotType } from '../types';
 import { DatabaseService } from '../services/DatabaseService';
 import { useTelegram } from '../hooks/useTelegram';
@@ -168,7 +168,29 @@ const MyBots = () => {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 px-5 sm:px-8 pt-6 md:pt-10 pb-32 animate-in fade-in transition-colors duration-300" onClick={() => setOpenSettingsId(null)}>
       <div className="max-w-7xl mx-auto">
-      <div className="flex items-center justify-between mb-8 px-1">
+        {/* Dynamic Sub Header */}
+        <div className="w-full mb-10">
+          <div className="flex items-center justify-between border-b border-black/[0.03] dark:border-white/5 pb-4">
+            <button 
+              onClick={() => { haptic('light'); navigate(-1); }}
+              className="group flex items-center gap-2.5 text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-blue-500 transition-colors bg-transparent border-none outline-none cursor-pointer"
+            >
+              <span className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-white/5 shadow-inner group-hover:bg-slate-50 dark:group-hover:bg-slate-800 transition-colors flex items-center justify-center">
+                <ChevronLeft size={16} />
+              </span>
+              Geri
+            </button>
+            
+            <div className="flex items-center gap-2 select-none">
+              <span className="text-[10px] sm:text-[11px] font-mono font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest bg-slate-100/60 dark:bg-slate-900/40 px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse inline-block"></span>
+                BOTLY HUB
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between mb-8 px-1">
         <div className="flex items-center gap-4">
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Botlarım</h1>
         </div>
