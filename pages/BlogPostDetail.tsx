@@ -46,6 +46,7 @@ import { Logo } from '../components/Logo';
 import { DatabaseService } from '../services/DatabaseService';
 import { BlogPost, BlogComment } from '../types';
 import { UserHoverCard } from '../components/UserHoverCard';
+import { Skeleton, SkeletonText, LazyImage } from '../components/Preload';
 
 const UserIcon = User;
 
@@ -290,9 +291,19 @@ const BlogPostDetail: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="bg-[#fcfcfc] dark:bg-slate-950 min-h-screen flex flex-col items-center justify-center space-y-6">
-        <Loader2 className="animate-spin text-blue-500" size={48} />
-        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 animate-pulse">{t('blog_loading')}</p>
+      <div className="bg-[#fcfcfc] dark:bg-slate-950 min-h-screen py-10 px-5 sm:px-8 max-w-4xl mx-auto flex flex-col gap-6">
+        <Skeleton className="w-[125px] h-6 rounded-lg" />
+        <Skeleton className="w-11/12 h-10 rounded-xl" />
+        <div className="flex items-center gap-3">
+          <Skeleton className="w-10 h-10 rounded-full" />
+          <div className="flex flex-col gap-1.5 flex-1">
+            <Skeleton className="w-1/3 h-4" />
+            <Skeleton className="w-1/4 h-3" />
+          </div>
+        </div>
+        <Skeleton className="w-full aspect-[21/9] rounded-3xl mt-4" />
+        <SkeletonText lines={8} className="mt-6" />
+        <SkeletonText lines={6} className="mt-4" />
       </div>
     );
   }

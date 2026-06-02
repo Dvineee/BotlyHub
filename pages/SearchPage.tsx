@@ -15,6 +15,7 @@ import { FilterMenu } from '../components/FilterMenu';
 import { useTheme } from '../ThemeContext';
 import LoginModal from '../components/LoginModal';
 import Logo from '../components/Logo';
+import { Skeleton, LazyImage } from '../components/Preload';
 
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { SEO } from '../components/SEO';
@@ -79,11 +80,12 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number }> = ({ bot, tonRate }) => {
         {/* Top: bot identity (avatar + name) + category badge inline */}
         <div className="flex items-start justify-between gap-3 w-full mb-3.5 min-w-0">
             <div className="flex items-center gap-3 min-w-0">
-                <img 
+                <LazyImage 
                     src={getLiveBotIcon(bot)} 
                     alt={bot.name} 
-                    loading="lazy"
-                    className="w-10 h-10 rounded-xl object-cover bg-slate-50 dark:bg-slate-800 border border-black/[0.04] dark:border-white/[0.06] shrink-0" 
+                    className="w-10 h-10 rounded-xl object-cover border border-black/[0.04] dark:border-white/[0.06] shrink-0" 
+                    containerClass="w-10 h-10 rounded-xl shrink-0"
+                    skeletonClass="rounded-xl"
                     onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
                 />
                 <div className="min-w-0">
@@ -879,7 +881,17 @@ const SearchPage = () => {
         </div>
 
         {isLoading ? (
-            <div className="flex justify-center py-24"><Loader2 className="animate-spin text-blue-500" /></div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="flex gap-4 p-5 bg-white dark:bg-[#0F1623] border border-black/[0.06] dark:border-white/[0.06] rounded-[16px]">
+                  <Skeleton className="w-10 h-10 rounded-xl shrink-0" />
+                  <div className="flex-1 flex flex-col gap-2">
+                    <Skeleton className="w-[140px] h-5 rounded-md" />
+                    <Skeleton className="w-[180px] h-3.5 rounded-md" />
+                  </div>
+                </div>
+              ))}
+            </div>
         ) : filteredBots.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-in slide-in-from-bottom-4">
                 {filteredBots.map(bot => <BotCard key={bot.id} bot={bot} tonRate={tonRate} />)}

@@ -24,6 +24,7 @@ import Logo from '../components/Logo';
 import { useRef } from 'react';
 import { SEO } from '../components/SEO';
 import LoginModal from '../components/LoginModal';
+import { BotDetailSkeleton, LazyImage } from '../components/Preload';
 
 const getLiveBotIcon = (bot: Bot) => {
     if (bot.bot_link) {
@@ -788,11 +789,7 @@ const BotDetail = () => {
     return PriceService.convert(bot.price, tonRate);
   }, [bot, tonRate]);
 
-  if (isLoading) return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
-        <Loader2 className="animate-spin text-blue-500/50" size={32} />
-    </div>
-  );
+  if (isLoading) return <BotDetailSkeleton />;
 
   if (!bot) return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
@@ -842,10 +839,11 @@ const BotDetail = () => {
             <div className="flex items-start gap-6 min-w-0">
           <div className="flex flex-col gap-4 shrink-0 w-24">
               <div className="relative">
-                  <img 
+                  <LazyImage 
                     src={getLiveBotIcon(bot)} 
-                    loading="lazy"
-                    className="w-24 h-24 rounded-xl !p-0 border border-black/10 dark:border-white/10 object-cover bg-slate-200 dark:bg-slate-900" 
+                    className="w-24 h-24 rounded-xl !p-0 border border-black/10 dark:border-white/10 object-cover" 
+                    containerClass="w-24 h-24 rounded-xl"
+                    skeletonClass="rounded-xl"
                     onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=1e293b&color=fff&bold=true`; }}
                   />
                   {isOwned && (

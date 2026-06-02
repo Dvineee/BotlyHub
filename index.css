@@ -2204,6 +2204,11 @@ div.qa-last-24h-box,
     }
 }
 
+.bg-slate-100 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(241 245 249 / 0%);
+}
+
 
 
 

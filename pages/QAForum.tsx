@@ -17,6 +17,7 @@ import { categories, appsSubCategories } from '../data';
 import { API_BASE_URL } from '../constants';
 import LoginModal from '../components/LoginModal';
 import { UserHoverCard } from '../components/UserHoverCard';
+import { QASkeleton, LazyImage } from '../components/Preload';
 
 interface QTag {
   type: 'bot' | 'channel' | 'general';
@@ -939,10 +940,7 @@ export default function QAForum() {
 
                   {/* Discussions List Loading State */}
                   {loading ? (
-                    <div className="py-20 flex flex-col items-center justify-center gap-3">
-                      <div className="w-8 h-8 border-4 border-indigo-600/30 border-t-indigo-600 rounded-full animate-spin"></div>
-                      <p className="text-xs text-slate-400 italic">Yükleniyor...</p>
-                    </div>
+                    <QASkeleton />
                   ) : topics.length > 0 ? (
                     <div className="space-y-4">
                       {topics.map((topic, index) => {

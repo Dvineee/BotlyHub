@@ -45,6 +45,7 @@ import { DatabaseService } from '../services/DatabaseService';
 import { BlogPost } from '../types';
 import { AnimatePresence } from 'motion/react';
 import { Loader2 } from 'lucide-react';
+import { BlogSkeleton, LazyImage } from '../components/Preload';
 
 const categories = [
   { id: 'all', translationKey: 'cat_all', icon: Layout, color: 'text-slate-600' },
@@ -611,10 +612,7 @@ const BlogPage: React.FC = () => {
 
           <div className="space-y-12">
             {isLoading ? (
-              <div className="py-32 flex flex-col items-center justify-center space-y-6">
-                 <Loader2 className="animate-spin text-blue-500" size={48} />
-                 <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 animate-pulse">{t('blog_loading_content')}</p>
-              </div>
+              <BlogSkeleton />
             ) : filteredPosts.length === 0 ? (
               <div className="py-20 text-center">
                 <p className="text-slate-400 font-bold uppercase tracking-widest">{t('blog_no_posts_cat')}</p>

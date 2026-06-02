@@ -16,6 +16,7 @@ import { useTheme } from '../ThemeContext';
 import Logo from '../components/Logo';
 import { SEO } from '../components/SEO';
 import LoginModal from '../components/LoginModal';
+import { HomeSkeleton, LazyImage } from '../components/Preload';
 
 const iconMap: Record<string, any> = {
   Sparkles, Megaphone, Zap, Gift, Star, Info, BotIcon, Heart, Bell, Shield
@@ -442,11 +443,12 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number, featuredRank?: number }> = 
         {/* Top: bot identity (avatar + name) + category badge inline */}
         <div className="flex items-start justify-between gap-3 w-full mb-3.5 min-w-0">
             <div className="flex items-center gap-3 min-w-0">
-                <img 
+                <LazyImage 
                     src={getLiveBotIcon(bot)} 
                     alt={bot.name} 
-                    loading="lazy"
-                    className="w-10 h-10 rounded-xl object-cover bg-slate-50 dark:bg-slate-800 border border-black/[0.04] dark:border-white/[0.06] shrink-0" 
+                    className="w-10 h-10 rounded-xl object-cover border border-black/[0.04] dark:border-white/[0.06] shrink-0" 
+                    containerClass="w-10 h-10 rounded-xl shrink-0"
+                    skeletonClass="rounded-xl"
                     onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
                 />
                 <div className="min-w-0">
@@ -521,11 +523,12 @@ const CategoryBotCard: React.FC<{ bot: Bot, rank: number }> = React.memo(({ bot,
       className="flex items-center cursor-pointer group hover:bg-slate-100/50 dark:hover:bg-slate-900/40 border border-transparent hover:border-black/[0.03] dark:hover:border-white/[0.03] transition-all duration-300 rounded-2xl p-3 select-none active:scale-[0.98] transform-gpu"
     >
         <div className="relative shrink-0 select-none">
-            <img 
+            <LazyImage 
                 src={getLiveBotIcon(bot)} 
                 alt={bot.name} 
-                loading="lazy"
-                className="w-12 h-12 sm:w-[54px] sm:h-[54px] rounded-[11px] sm:rounded-[13px] object-cover bg-slate-100 dark:bg-slate-900 border border-black/[0.04] dark:border-white/[0.06] transition-transform" 
+                className="w-12 h-12 sm:w-[54px] sm:h-[54px] rounded-[11px] sm:rounded-[13px] object-cover border border-black/[0.04] dark:border-white/[0.06] transition-transform" 
+                containerClass="w-12 h-12 sm:w-[54px] sm:h-[54px] rounded-[11px] sm:rounded-[13px]"
+                skeletonClass="rounded-[11px] sm:rounded-[13px]"
                 onError={(e) => { (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`; }}
             />
             <div className="absolute -right-1.5 -bottom-1.5 w-[18px] h-[18px] sm:w-[20px] sm:h-[20px] rounded-full bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 flex items-center justify-center font-[900] text-[10px] sm:text-[11px] shadow-[0_2px_5px_rgba(0,0,0,0.12)] border border-slate-100 dark:border-slate-700/50">
@@ -2079,7 +2082,7 @@ const Home = () => {
           </AnimatePresence>
       </div>
         {isLoading ? (
-            <div className="flex flex-col items-center justify-center py-24 gap-4"><Loader2 className="animate-spin text-blue-500" size={32} /></div>
+            <HomeSkeleton />
         ) : (
             <>
               {announcements.length > 0 && (
