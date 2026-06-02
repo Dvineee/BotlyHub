@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Search, ChevronLeft, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, Send, Link, CheckCircle2, ChevronDown, Sun, Moon, Wallet, Menu, Plus, LogOut, Compass, Coins, BarChart3, Binoculars, Share2, Briefcase, MousePointer2, ExternalLink, ArrowUpRight, ArrowLeft, MessageSquare, SlidersHorizontal, Sliders, Settings } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, LayoutGrid, DollarSign, Loader2, Store, User, Bot as BotIcon, Megaphone, X, Info, Sparkles, Zap, Gift, Star, Heart, Bell, Shield, TrendingUp, Radio, Send, Link, CheckCircle2, ChevronDown, Sun, Moon, Wallet, Menu, Plus, LogOut, Compass, Coins, BarChart3, Binoculars, Share2, Briefcase, MousePointer2, ExternalLink, ArrowUpRight, ArrowLeft, MessageSquare, SlidersHorizontal, Sliders, Settings, Globe } from 'lucide-react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Bot, Announcement, Notification, BlogPost } from '../types';
@@ -336,7 +336,7 @@ const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = React.memo(({ bots }) => {
                             initial={{ opacity: 0 }} 
                             animate={{ opacity: 1 }} 
                             exit={{ opacity: 0 }}
-                            className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[#ffffff] dark:from-[#1e293b] via-[#ffffff]/80 dark:via-[#1e293b]/80 to-transparent z-40 pointer-events-none flex items-center pl-2"
+                            className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-slate-50 dark:from-slate-950 via-slate-50/80 dark:via-slate-950/80 to-transparent z-40 pointer-events-none flex items-center pl-2"
                         >
                             <button 
                                 onClick={(e) => { e.stopPropagation(); scroll.ref.current?.scrollBy({ left: -300, behavior: 'smooth' }); }}
@@ -355,7 +355,7 @@ const FeaturedBotsSlider: React.FC<{ bots: Bot[] }> = React.memo(({ bots }) => {
                             initial={{ opacity: 0 }} 
                             animate={{ opacity: 1 }} 
                             exit={{ opacity: 0 }}
-                            className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#ffffff] dark:from-[#1e293b] via-[#ffffff]/80 dark:via-[#1e293b]/80 to-transparent z-40 pointer-events-none flex items-center justify-end pr-2"
+                            className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-slate-50 dark:from-slate-950 via-slate-50/80 dark:via-slate-950/80 to-transparent z-40 pointer-events-none flex items-center justify-end pr-2"
                         >
                             <button 
                                 onClick={(e) => { e.stopPropagation(); scroll.ref.current?.scrollBy({ left: 300, behavior: 'smooth' }); }}
@@ -421,8 +421,8 @@ const BotCard: React.FC<{ bot: Bot, tonRate: number, featuredRank?: number }> = 
   };
 
   const firstCatId = bot.category?.[0];
-  const catLabelObj = categories.find(c => c.id === firstCatId);
-  const catLabel = catLabelObj ? t(catLabelObj.label) : firstCatId;
+  const catLabelObj = categories.find(c => c.id === firstCatId) || appsSubCategories.find(c => c.id === firstCatId);
+  const catLabel = catLabelObj ? t(catLabelObj.label) : (firstCatId ? (t(`cat_${firstCatId}`) === `cat_${firstCatId}` ? firstCatId : t(`cat_${firstCatId}`)) : '');
 
   const formattedUserCount = useMemo(() => {
     if (!bot.user_count) return null;
@@ -627,7 +627,11 @@ const NavMenu = ({
     mobileModal: 'kesfet' | 'investors' | null,
     setMobileModal: (v: 'kesfet' | 'investors' | null) => void
 }) => {
-    const { t } = useTranslation();
+    const { t, language, setLanguage } = useTranslation();
+    const toggleLanguage = () => {
+        haptic('light');
+        setLanguage(language === 'tr' ? 'en' : 'tr');
+    };
     const navigate = useNavigate();
     const internalMenuRef = useRef<HTMLDivElement>(null);
 
@@ -1106,145 +1110,171 @@ const NavMenu = ({
         {/* Mobile Modal for Categories */}
         <AnimatePresence>
             {mobileModal && (
-                <div className="fixed inset-0 z-[200] flex items-end justify-center p-0 md:hidden">
-                    <motion.div 
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={() => { setMobileModal(null); setNavState('main'); }}
-                        className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"
-                    />
-                    <motion.div 
-                        initial={{ y: "100%" }}
-                        animate={{ y: 0 }}
-                        exit={{ y: "100%" }}
-                        transition={{ type: "spring", damping: 30, stiffness: 300 }}
-                        className="relative w-full bg-white dark:bg-slate-900 rounded-t-[32px] overflow-y-auto max-h-[85vh] pt-4 pb-12 border-t border-black/10 dark:border-white/10"
-                    >
-                        {/* Drag Handle */}
-                        <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mb-8" />
+                <motion.div 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.22 }}
+                    className="fixed inset-0 z-[250] w-full h-full bg-white dark:bg-slate-950 flex flex-col md:hidden overflow-hidden"
+                >
+                    {/* Top Header of Menu Modal */}
+                    <div className="flex justify-between items-center px-6 py-5 border-b border-black/[0.04] dark:border-white/[0.04] shrink-0">
+                        <Logo onClick={() => { setMobileModal(null); setNavState('main'); navigate('/'); }} className="cursor-pointer scale-95" />
                         
-                        <div className="flex justify-between items-center mb-6 px-8">
-                            <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-widest uppercase italic">
-                                {mobileModal === 'kesfet' ? 'KEŞFET' : 'YATIRIMCILAR'}
-                            </h3>
-                            <button onClick={() => { setMobileModal(null); setNavState('main'); }} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-500 active:scale-90 transition-all">
-                                <X size={20} />
+                        <div className="flex items-center gap-2">
+                            {user ? (
+                                <button 
+                                    onClick={() => { haptic('light'); navigate('/earnings'); setMobileModal(null); }}
+                                    className="px-3.5 py-1.5 bg-slate-50 dark:bg-white/5 border border-black/[0.04] dark:border-white/5 rounded-full text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1 active:scale-95 transition-all"
+                                >
+                                    @{user.username || user.first_name || 'Profil'}
+                                </button>
+                            ) : (
+                                <button 
+                                    onClick={() => { haptic('light'); setIsLoginModalOpen(true); setMobileModal(null); }}
+                                    className="px-3.5 py-1.5 bg-blue-500 text-white rounded-full text-xs font-bold transition-all active:scale-95 text-center flex items-center"
+                                >
+                                    {t('login') || 'Giriş Yap'}
+                                </button>
+                            )}
+                            
+                            <button 
+                                onClick={() => { haptic('light'); navigate('/search'); setMobileModal(null); }}
+                                className="w-10 h-10 rounded-full flex items-center justify-center text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 active:scale-95 transition-all shrink-0"
+                                title="Ara"
+                            >
+                                <Search size={21} />
+                            </button>
+                            
+                            <button 
+                                onClick={() => { haptic('light'); setMobileModal(null); setNavState('main'); }} 
+                                className="w-10 h-10 rounded-full flex items-center justify-center text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 active:scale-95 transition-all shrink-0"
+                            >
+                                <X size={26} strokeWidth={2.5} />
                             </button>
                         </div>
-                        
-                        <div className="max-h-[70vh] overflow-y-auto px-6 pb-4">
-                            <AnimatePresence mode="wait">
-                                {navState === 'main' ? (
-                                    <motion.div 
-                                        key="mobile-main"
-                                        initial={{ opacity: 0, x: -20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: -20 }}
-                                        className="grid grid-cols-1 gap-3"
+                    </div>
+                    
+                    {/* Menu Core Content Area */}
+                    <div className="flex-1 overflow-y-auto flex flex-col justify-between py-6">
+                        <AnimatePresence mode="wait">
+                            {navState === 'main' ? (
+                                <motion.div 
+                                    key="mobile-main"
+                                    initial={{ opacity: 0, x: -15 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -15 }}
+                                    className="flex-1 flex flex-col justify-center px-8 sm:px-12 py-4 gap-6 sm:gap-8"
+                                >
+                                    <button 
+                                        onClick={() => { haptic('light'); navigate('/'); setMobileModal(null); }}
+                                        className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase leading-none"
                                     >
-                                        {(mobileModal === 'kesfet' ? discoverItems : investorItems).map((item) => (
-                                            <button
-                                                key={item.id}
-                                                onClick={() => {
-                                                    if (item.action) item.action();
-                                                    else if (item.path) { navigate(item.path); setMobileModal(null); }
-                                                }}
-                                                className="w-full flex items-center gap-4 p-4 hover:bg-slate-50 dark:hover:bg-white/5 active:bg-slate-100 dark:active:bg-white/10 transition-all rounded-2xl border border-black/5 dark:border-white/5 group mobile-menu-item"
+                                        {t('nav_explore') || 'Keşfet'}
+                                    </button>
+                                    
+                                    <button 
+                                        onClick={() => { haptic('light'); setNavState('bots'); }}
+                                        className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase flex items-center gap-3 leading-none"
+                                    >
+                                        <span>{t('bots') || 'Bot Market'}</span>
+                                        <span className="text-[10px] font-black tracking-widest bg-blue-500 text-white px-2 py-0.5 rounded-md uppercase">BOTS</span>
+                                    </button>
+
+                                    <button 
+                                        onClick={() => { haptic('light'); setNavState('apps'); }}
+                                        className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-emerald-500 transition-colors uppercase flex items-center gap-3 leading-none"
+                                    >
+                                        <span>{t('apps') || 'Uygulamalar'}</span>
+                                        <span className="text-[10px] font-black tracking-widest bg-emerald-500 text-white px-2 py-0.5 rounded-md uppercase">APPS</span>
+                                    </button>
+
+                                    <button 
+                                        onClick={() => { haptic('light'); navigate('/qa'); setMobileModal(null); }}
+                                        className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase leading-none"
+                                    >
+                                        {t('qa_forum') || 'Soru & Cevap'}
+                                    </button>
+
+                                    <button 
+                                        onClick={() => { haptic('light'); navigate('/blog'); setMobileModal(null); }}
+                                        className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase flex items-center gap-3 leading-none"
+                                    >
+                                        <span>{t('blog') || 'Günlük'}</span>
+                                        <span className="text-[10px] font-black tracking-widest bg-blue-500 text-white px-2 py-0.5 rounded-md uppercase leading-none animate-pulse">NEW</span>
+                                    </button>
+
+                                    <button 
+                                        onClick={() => { haptic('light'); navigate('/settings'); setMobileModal(null); }}
+                                        className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase leading-none"
+                                    >
+                                        Uygulama Ekle
+                                  </button>
+                                </motion.div>
+                            ) : (
+                                <motion.div 
+                                    key="mobile-categories"
+                                    initial={{ opacity: 0, x: 15 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: 15 }}
+                                    className="flex flex-col w-full h-full px-6"
+                                >
+                                    <button 
+                                        onClick={() => setNavState('main')}
+                                        className="flex items-center gap-2 text-blue-500 dark:text-blue-400 font-[900] uppercase tracking-widest text-xs mb-6 px-1"
+                                    >
+                                        <ArrowLeft size={16} strokeWidth={3} /> Geri
+                                    </button>
+                                    
+                                    <div className="grid grid-cols-2 gap-3.5 max-h-[58vh] overflow-y-auto pr-1">
+                                        {(navState === 'bots' ? botsCategories : appsCategories).map(cat => (
+                                            <button 
+                                                key={cat.id}
+                                                onClick={() => handleCategoryClick(cat.id, navState)}
+                                                className="flex flex-col items-start gap-4 p-5 bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 active:scale-[0.97] transition-all rounded-[24px] border border-black/5 dark:border-white/5 text-left group"
                                             >
-                                                <div className={`mobile-menu-icon-container flex items-center justify-center rounded-xl shrink-0 ${mobileModal === 'kesfet' ? 'text-blue-500' : 'text-emerald-500'}`}>
-                                                    <item.icon size={22} className="menu-item-icon" />
+                                                <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${navState === 'bots' ? 'text-blue-500 bg-blue-500/10' : 'text-emerald-500 bg-emerald-500/10'}`}>
+                                                    <cat.icon size={18} />
                                                 </div>
-                                                <div className="flex flex-col items-start min-w-0">
-                                                    <span className="text-[13px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider truncate w-full">
-                                                        {item.label}
-                                                    </span>
-                                                </div>
-                                                {item.action && <ChevronRight size={16} className="ml-auto text-slate-300 dark:text-slate-700" />}
+                                                <span className="text-xs font-[900] uppercase tracking-tight text-slate-800 dark:text-slate-200 leading-snug">{t(cat.label)}</span>
                                             </button>
                                         ))}
-                                    </motion.div>
-                                ) : navState === 'bots' ? (
-                                    <motion.div 
-                                        key="mobile-bots"
-                                        initial={{ opacity: 0, x: 20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: 20 }}
-                                        className="flex flex-col gap-4"
-                                    >
-                                        <button 
-                                            onClick={() => setNavState('main')}
-                                            className="flex items-center gap-2 text-blue-500 font-black uppercase tracking-widest text-[11px] mb-2"
-                                        >
-                                            <ArrowLeft size={16} /> Geri
-                                        </button>
-                                        <div className="grid grid-cols-2 gap-3">
-                                            {botsCategories.map(cat => (
-                                                <button 
-                                                    key={cat.id}
-                                                    onClick={() => handleCategoryClick(cat.id, 'bots')}
-                                                    className="flex flex-col items-start gap-3 p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5 mobile-menu-item"
-                                                >
-                                                    <div className="mobile-menu-icon-container flex items-center justify-center text-blue-500">
-                                                        <cat.icon size={20} />
-                                                    </div>
-                                                    <span className="text-[10px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300">{t(cat.label)}</span>
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </motion.div>
-                                ) : (
-                                    <motion.div 
-                                        key="mobile-apps"
-                                        initial={{ opacity: 0, x: 20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: 20 }}
-                                        className="flex flex-col gap-4"
-                                    >
-                                        <button 
-                                            onClick={() => setNavState('main')}
-                                            className="flex items-center gap-2 text-blue-500 font-black uppercase tracking-widest text-[11px] mb-2"
-                                        >
-                                            <ArrowLeft size={16} /> Geri
-                                        </button>
-                                        <div className="grid grid-cols-2 gap-3">
-                                            {appsCategories.map(cat => (
-                                                <button 
-                                                    key={cat.id}
-                                                    onClick={() => handleCategoryClick(cat.id, 'apps')}
-                                                    className="flex flex-col items-start gap-3 p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5 mobile-menu-item"
-                                                >
-                                                    <div className="mobile-menu-icon-container flex items-center justify-center text-emerald-500">
-                                                        <cat.icon size={20} />
-                                                    </div>
-                                                    <span className="text-[10px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300">{t(cat.label)}</span>
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                            
-                            {navState === 'main' && (
-                                <div className="mt-8 pt-6 border-t border-black/5 dark:border-white/5">
-                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-600 block mb-4">Hızlı Bağlantılar</span>
-                                    <div className="grid grid-cols-1 gap-2">
-                                        {simpleLinks.map((link, i) => (
-                                            <a 
-                                                key={i}
-                                                href={link.path}
-                                                className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-slate-300 font-bold text-xs uppercase"
-                                            >
-                                                {link.label}
-                                                <ExternalLink size={14} />
-                                            </a>
-                                        ))}
                                     </div>
-                                </div>
+                                </motion.div>
                             )}
+                        </AnimatePresence>
+                        
+                        {/* Menu Footer Row */}
+                        <div className="border-t border-slate-100 dark:border-white/5 px-8 pt-6 flex items-center gap-3 shrink-0">
+                            {/* Language Selector Pill */}
+                            <button 
+                                onClick={toggleLanguage}
+                                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-50 dark:bg-white/5 border border-black/[0.04] dark:border-white/[0.04] text-xs font-bold text-slate-700 dark:text-slate-300 transition-all active:scale-95"
+                            >
+                                <Globe size={15} />
+                                <span>{language.toUpperCase()}</span>
+                            </button>
+
+                            {/* Theme Toggle Pill */}
+                            <button 
+                                onClick={() => { haptic('light'); toggleTheme(); }}
+                                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-50 dark:bg-white/5 border border-black/[0.04] dark:border-white/[0.04] text-xs font-bold text-slate-700 dark:text-slate-300 transition-all active:scale-95"
+                            >
+                                {theme === 'dark' ? (
+                                    <>
+                                        <Moon size={15} className="text-blue-400" />
+                                        <span>Gece Modu</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Sun size={15} className="text-amber-500" />
+                                        <span>Gündüz Modu</span>
+                                    </>
+                                )}
+                            </button>
                         </div>
-                    </motion.div>
-                </div>
+                    </div>
+                </motion.div>
             )}
         </AnimatePresence>
         </>
@@ -1253,9 +1283,14 @@ const NavMenu = ({
 
 const Home = () => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, language, setLanguage } = useTranslation();
   const { user, haptic, isTelegram, setWebAuthUser } = useTelegram();
   const { toggleTheme, theme } = useTheme();
+  
+  const toggleLanguage = () => {
+    haptic('light');
+    setLanguage(language === 'tr' ? 'en' : 'tr');
+  };
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState<'kesfet' | 'investors' | null>(null);
@@ -1326,6 +1361,7 @@ const Home = () => {
 
   const loadData = useCallback(async () => {
     // İlk yüklemede sadece botları, duyuruları ve son blogları çek, fiyatı arka planda güncelle
+    const startTime = Date.now();
     const [botData, annData, blogData] = await Promise.all([
         DatabaseService.getBots(),
         DatabaseService.getAnnouncements(),
@@ -1340,6 +1376,15 @@ const Home = () => {
     ];
     setAnnouncements(combinedAnns);
     setHomeBlogs(blogData);
+    
+    // Sağlıklı ve gerçekçi bir yükleme deneyimi için minimum 500ms'lik bir ön yükleme süresi uyguluyoruz.
+    // Bu sayede, internet hızlı olsa bile arayüzde rahatsız edici bir anlık kırpışma (flicker) yaşanmaz.
+    const elapsedTime = Date.now() - startTime;
+    const minDelay = 500;
+    if (elapsedTime < minDelay) {
+        await new Promise(resolve => setTimeout(resolve, minDelay - elapsedTime));
+    }
+    
     setIsLoading(false);
 
     // Fiyat ve bildirimleri arka planda çek
@@ -2081,12 +2126,28 @@ const Home = () => {
               )}
           </AnimatePresence>
       </div>
+      <AnimatePresence mode="wait">
         {isLoading ? (
-            <HomeSkeleton />
+            <motion.div
+                key="skeleton"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="w-full"
+            >
+                <HomeSkeleton />
+            </motion.div>
         ) : (
-            <>
+            <motion.div
+                key="content"
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.45, ease: "easeOut" }}
+                className="w-full"
+            >
               {announcements.length > 0 && (
-                  <div className="pb-8 pt-4 max-w-7xl mx-auto w-full px-5 sm:px-8 overflow-hidden select-none animate-in fade-in duration-500">
+                  <div className="pb-8 pt-4 max-w-7xl mx-auto w-full px-5 sm:px-8 overflow-hidden select-none">
                       <AnnouncementsCarousel 
                           announcements={announcements} 
                           scroll={annScroll} 
@@ -2094,16 +2155,10 @@ const Home = () => {
                       />
                   </div>
               )}
-            </>
-          )}
 
-
-
-      {/* Bottom Section */}
-      <div className="bg-white dark:bg-slate-950 w-full py-24 shadow-[0_-1px_0_0_rgba(0,0,0,0.015)]">
-          <div className="max-w-6xl mx-auto px-6 sm:px-8">
-              {!isLoading && (
-                  <>
+              {/* Bottom Section */}
+              <div className="bg-white dark:bg-slate-950 w-full py-24 shadow-[0_-1px_0_0_rgba(0,0,0,0.015)]">
+                  <div className="max-w-6xl mx-auto px-6 sm:px-8">
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700 relative z-10 text-center lg:text-left">
                         <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left">
                             <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-[-0.04em] md:leading-[1.1] leading-[1.2] text-slate-900 dark:text-white max-w-2xl">
@@ -2574,13 +2629,14 @@ const Home = () => {
                 </script>
             </div>
 
-            <div className="mt-16">
-                <div className="pb-32" />
+              <div className="mt-16">
+                  <div className="pb-32" />
+              </div>
             </div>
-          </>
-        )}
-        </div>
-      </div>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
 
       <AnimatePresence>
         {selectedAnn && (
@@ -2686,142 +2742,171 @@ const Home = () => {
       {/* Mobile Modal for Categories */}
       <AnimatePresence>
           {mobileModal && (
-              <div className="fixed inset-0 z-[200] overflow-hidden md:hidden">
-                  <motion.div 
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      onClick={() => { setMobileModal(null); setNavState('main'); }}
-                      className="absolute inset-0 bg-slate-950/80 backdrop-blur-md"
-                  />
-                  <motion.div 
-                      initial={{ y: "-100%" }}
-                      animate={{ y: 0 }}
-                      exit={{ y: "-100%" }}
-                      transition={{ type: "spring", damping: 28, stiffness: 280 }}
-                      className="absolute top-0 left-0 w-full bg-white dark:bg-[#0c0e14] rounded-b-[32px] overflow-y-auto max-h-[85vh] pt-6 pb-10 border-b border-black/10 dark:border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.3)]"
-                  >
-                      <div className="flex justify-between items-center mb-6 px-6">
-                          <h3 className="text-lg font-black text-slate-900 dark:text-white tracking-widest uppercase italic bg-transparent border-none outline-none">
-                              {mobileModal === 'kesfet' ? 'KEŞFET' : 'YATIRIMCILAR'}
-                          </h3>
-                          <button onClick={() => { setMobileModal(null); setNavState('main'); }} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-500 active:scale-95 transition-all">
-                              <X size={20} />
+              <motion.div 
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.22 }}
+                  className="fixed inset-0 z-[250] w-full h-full bg-white dark:bg-slate-950 flex flex-col md:hidden overflow-hidden"
+              >
+                  {/* Top Header of Menu Modal */}
+                  <div className="flex justify-between items-center px-6 py-5 border-b border-black/[0.04] dark:border-white/[0.04] shrink-0">
+                      <Logo onClick={() => { setMobileModal(null); setNavState('main'); navigate('/'); }} className="cursor-pointer scale-95" />
+                      
+                      <div className="flex items-center gap-2">
+                          {user ? (
+                              <button 
+                                  onClick={() => { haptic('light'); navigate('/earnings'); setMobileModal(null); }}
+                                  className="px-3.5 py-1.5 bg-slate-50 dark:bg-white/5 border border-black/[0.04] dark:border-white/5 rounded-full text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1 active:scale-95 transition-all"
+                              >
+                                  @{user.username || user.first_name || 'Profil'}
+                              </button>
+                          ) : (
+                              <button 
+                                  onClick={() => { haptic('light'); setIsLoginModalOpen(true); setMobileModal(null); }}
+                                  className="px-3.5 py-1.5 bg-blue-500 text-white rounded-full text-xs font-bold transition-all active:scale-95 text-center flex items-center"
+                              >
+                                  {t('login') || 'Giriş Yap'}
+                              </button>
+                          )}
+                          
+                          <button 
+                              onClick={() => { haptic('light'); navigate('/search'); setMobileModal(null); }}
+                              className="w-10 h-10 rounded-full flex items-center justify-center text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 active:scale-95 transition-all shrink-0"
+                              title="Ara"
+                          >
+                              <Search size={21} />
+                          </button>
+                          
+                          <button 
+                              onClick={() => { haptic('light'); setMobileModal(null); setNavState('main'); }} 
+                              className="w-10 h-10 rounded-full flex items-center justify-center text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 active:scale-95 transition-all shrink-0"
+                          >
+                              <X size={26} strokeWidth={2.5} />
                           </button>
                       </div>
-                      
-                      <div className="max-h-[70vh] overflow-y-auto px-6 pb-4">
-                          <AnimatePresence mode="wait">
-                              {navState === 'main' ? (
-                                  <motion.div 
-                                      key="mobile-main"
-                                      initial={{ opacity: 0, x: -20 }}
-                                      animate={{ opacity: 1, x: 0 }}
-                                      exit={{ opacity: 0, x: -20 }}
-                                      className="grid grid-cols-1 gap-3"
+                  </div>
+                  
+                  {/* Menu Core Content Area */}
+                  <div className="flex-1 overflow-y-auto flex flex-col justify-between py-6">
+                      <AnimatePresence mode="wait">
+                          {navState === 'main' ? (
+                              <motion.div 
+                                  key="mobile-main"
+                                  initial={{ opacity: 0, x: -15 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  exit={{ opacity: 0, x: -15 }}
+                                  className="flex-1 flex flex-col justify-center px-8 sm:px-12 py-4 gap-6 sm:gap-8"
+                              >
+                                  <button 
+                                      onClick={() => { haptic('light'); navigate('/'); setMobileModal(null); }}
+                                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase leading-none"
                                   >
-                                      {(mobileModal === 'kesfet' ? discoverItems : investorItems).map((item) => (
-                                          <button
-                                              key={item.id}
-                                              onClick={() => {
-                                                  if (item.action) item.action();
-                                                  else if (item.path) { navigate(item.path); setMobileModal(null); }
-                                              }}
-                                              className="w-full flex items-center gap-4 p-4 hover:bg-slate-50 dark:hover:bg-white/5 active:bg-slate-100 dark:active:bg-white/10 transition-all rounded-2xl border border-black/5 dark:border-white/5 group mobile-menu-item"
+                                      {t('nav_explore') || 'Keşfet'}
+                                  </button>
+                                  
+                                  <button 
+                                      onClick={() => { haptic('light'); setNavState('bots'); }}
+                                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase flex items-center gap-3 leading-none"
+                                  >
+                                      <span>{t('bots') || 'Bot Market'}</span>
+                                      <span className="text-[10px] font-black tracking-widest bg-blue-500 text-white px-2 py-0.5 rounded-md uppercase">BOTS</span>
+                                  </button>
+
+                                  <button 
+                                      onClick={() => { haptic('light'); setNavState('apps'); }}
+                                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-emerald-500 transition-colors uppercase flex items-center gap-3 leading-none"
+                                  >
+                                      <span>{t('apps') || 'Uygulamalar'}</span>
+                                      <span className="text-[10px] font-black tracking-widest bg-emerald-500 text-white px-2 py-0.5 rounded-md uppercase">APPS</span>
+                                  </button>
+
+                                  <button 
+                                      onClick={() => { haptic('light'); navigate('/qa'); setMobileModal(null); }}
+                                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase leading-none"
+                                  >
+                                      {t('qa_forum') || 'Soru & Cevap'}
+                                  </button>
+
+                                  <button 
+                                      onClick={() => { haptic('light'); navigate('/blog'); setMobileModal(null); }}
+                                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase flex items-center gap-3 leading-none"
+                                  >
+                                      <span>{t('blog') || 'Günlük'}</span>
+                                      <span className="text-[10px] font-black tracking-widest bg-blue-500 text-white px-2 py-0.5 rounded-md uppercase leading-none animate-pulse">NEW</span>
+                                  </button>
+
+                                  <button 
+                                      onClick={() => { haptic('light'); navigate('/settings'); setMobileModal(null); }}
+                                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase leading-none"
+                                  >
+                                      Uygulama Ekle
+                                  </button>
+                              </motion.div>
+                          ) : (
+                              <motion.div 
+                                  key="mobile-categories"
+                                  initial={{ opacity: 0, x: 15 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  exit={{ opacity: 0, x: 15 }}
+                                  className="flex flex-col w-full h-full px-6"
+                              >
+                                  <button 
+                                      onClick={() => setNavState('main')}
+                                      className="flex items-center gap-2 text-blue-500 dark:text-blue-400 font-[900] uppercase tracking-widest text-xs mb-6 px-1"
+                                  >
+                                      <ArrowLeft size={16} strokeWidth={3} /> Geri
+                                  </button>
+                                  
+                                  <div className="grid grid-cols-2 gap-3.5 max-h-[58vh] overflow-y-auto pr-1">
+                                      {(navState === 'bots' ? botsCategories : appsCategories).map(cat => (
+                                          <button 
+                                              key={cat.id}
+                                              onClick={() => handleCategoryClick(cat.id, navState)}
+                                              className="flex flex-col items-start gap-4 p-5 bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 active:scale-[0.97] transition-all rounded-[24px] border border-black/5 dark:border-white/5 text-left group"
                                           >
-                                              <div className={`mobile-menu-icon-container flex items-center justify-center rounded-xl shrink-0 ${mobileModal === 'kesfet' ? 'text-blue-500 bg-blue-500/10 dark:bg-blue-500/20' : 'text-emerald-500 bg-emerald-500/10 dark:bg-emerald-500/20'}`}>
-                                                  <item.icon size={22} className="menu-item-icon" />
+                                              <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${navState === 'bots' ? 'text-blue-500 bg-blue-500/10' : 'text-emerald-500 bg-emerald-500/10'}`}>
+                                                  <cat.icon size={18} />
                                               </div>
-                                              <div className="flex flex-col items-start min-w-0">
-                                                  <span className="text-[13px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider truncate w-full">
-                                                      {item.label}
-                                                  </span>
-                                              </div>
-                                              {item.action && <ChevronRight size={16} className="ml-auto text-slate-300 dark:text-slate-700" />}
+                                              <span className="text-xs font-[900] uppercase tracking-tight text-slate-800 dark:text-slate-200 leading-snug">{t(cat.label)}</span>
                                           </button>
                                       ))}
-                                  </motion.div>
-                              ) : navState === 'bots' ? (
-                                  <motion.div 
-                                      key="mobile-bots"
-                                      initial={{ opacity: 0, x: 20 }}
-                                      animate={{ opacity: 1, x: 0 }}
-                                      exit={{ opacity: 0, x: 20 }}
-                                      className="flex flex-col gap-4"
-                                  >
-                                      <button 
-                                          onClick={() => setNavState('main')}
-                                          className="flex items-center gap-2 text-blue-500 font-black uppercase tracking-widest text-[11px] mb-2"
-                                      >
-                                          <ArrowLeft size={16} /> Geri
-                                      </button>
-                                      <div className="grid grid-cols-2 gap-3">
-                                          {botsCategories.map(cat => (
-                                              <button 
-                                                  key={cat.id}
-                                                  onClick={() => handleCategoryClick(cat.id, 'bots')}
-                                                  className="flex flex-col items-start gap-3 p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5 mobile-menu-item"
-                                              >
-                                                  <div className="mobile-menu-icon-container flex items-center justify-center text-blue-500 bg-blue-500/10 dark:bg-blue-500/20">
-                                                      <cat.icon size={20} />
-                                                  </div>
-                                                  <span className="text-[10px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300">{t(cat.label)}</span>
-                                              </button>
-                                          ))}
-                                      </div>
-                                  </motion.div>
-                              ) : (
-                                  <motion.div 
-                                      key="mobile-apps"
-                                      initial={{ opacity: 0, x: 20 }}
-                                      animate={{ opacity: 1, x: 0 }}
-                                      exit={{ opacity: 0, x: 20 }}
-                                      className="flex flex-col gap-4"
-                                  >
-                                      <button 
-                                          onClick={() => setNavState('main')}
-                                          className="flex items-center gap-2 text-blue-500 font-black uppercase tracking-widest text-[11px] mb-2"
-                                      >
-                                          <ArrowLeft size={16} /> Geri
-                                      </button>
-                                      <div className="grid grid-cols-2 gap-3">
-                                          {appsCategories.map(cat => (
-                                              <button 
-                                                  key={cat.id}
-                                                  onClick={() => handleCategoryClick(cat.id, 'apps')}
-                                                  className="flex flex-col items-start gap-3 p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5 mobile-menu-item"
-                                              >
-                                                  <div className="mobile-menu-icon-container flex items-center justify-center text-emerald-500 bg-emerald-500/10 dark:bg-emerald-500/20">
-                                                      <cat.icon size={20} />
-                                                  </div>
-                                                  <span className="text-[10px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300">{t(cat.label)}</span>
-                                              </button>
-                                          ))}
-                                      </div>
-                                  </motion.div>
-                              )}
-                          </AnimatePresence>
-                          
-                          {navState === 'main' && (
-                              <div className="mt-8 pt-6 border-t border-black/5 dark:border-white/5">
-                                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-600 block mb-4">Hızlı Bağlantılar</span>
-                                  <div className="grid grid-cols-1 gap-2">
-                                      {simpleLinks.map((link, i) => (
-                                          <a 
-                                              key={i}
-                                              href={link.path}
-                                              className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-slate-300 font-bold text-xs uppercase"
-                                          >
-                                              {link.label}
-                                              <ExternalLink size={14} />
-                                          </a>
-                                      ))}
                                   </div>
-                              </div>
+                              </motion.div>
                           )}
+                      </AnimatePresence>
+                      
+                      {/* Menu Footer Row */}
+                      <div className="border-t border-slate-100 dark:border-white/5 px-8 pt-6 flex items-center gap-3 shrink-0">
+                          {/* Language Selector Pill */}
+                          <button 
+                              onClick={toggleLanguage}
+                              className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-50 dark:bg-white/5 border border-black/[0.04] dark:border-white/[0.04] text-xs font-bold text-slate-700 dark:text-slate-300 transition-all active:scale-95"
+                          >
+                              <Globe size={15} />
+                              <span>{language.toUpperCase()}</span>
+                          </button>
+
+                          {/* Theme Toggle Pill */}
+                          <button 
+                              onClick={() => { haptic('light'); toggleTheme(); }}
+                              className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-50 dark:bg-white/5 border border-black/[0.04] dark:border-white/[0.04] text-xs font-bold text-slate-700 dark:text-slate-300 transition-all active:scale-95"
+                          >
+                              {theme === 'dark' ? (
+                                  <>
+                                      <Moon size={15} className="text-blue-400" />
+                                      <span>Gece Modu</span>
+                                  </>
+                              ) : (
+                                  <>
+                                      <Sun size={15} className="text-amber-500" />
+                                      <span>Gündüz Modu</span>
+                                  </>
+                              )}
+                          </button>
                       </div>
-                  </motion.div>
-              </div>
+                  </div>
+              </motion.div>
           )}
       </AnimatePresence>
     </div>

@@ -30,6 +30,7 @@ import { DatabaseService } from '../services/DatabaseService';
 import { SEO } from '../components/SEO';
 import { Bot, BlogComment, BlogPost } from '../types';
 import { API_BASE_URL } from '../constants';
+import { categories, appsSubCategories } from '../data';
 
 function formatRelativeTime(dateString: string): string {
     try {
@@ -642,7 +643,12 @@ export default function UserProfile() {
                                                                         )}
                                                                     </div>
                                                                     <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mt-0.5 truncate max-w-[170px]">
-                                                                        {Array.isArray(bot.category) ? bot.category[0] : (bot.category || 'Bot')}
+                                                                        {(() => {
+                                                                            const rawCat = Array.isArray(bot.category) ? bot.category[0] : bot.category;
+                                                                            if (!rawCat) return 'Bot';
+                                                                            const found = categories.find(c => c.id === rawCat) || appsSubCategories.find(c => c.id === rawCat);
+                                                                            return found ? t(found.label) : (t(`cat_${rawCat}`) === `cat_${rawCat}` ? rawCat : t(`cat_${rawCat}`));
+                                                                        })()}
                                                                     </p>
                                                                 </div>
                                                             </div>

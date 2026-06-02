@@ -77,6 +77,7 @@ const BlogPage: React.FC = () => {
   useEffect(() => {
     const fetchBlogs = async () => {
       setIsLoading(true);
+      const startTime = Date.now();
       try {
         // Fetch limited blogs for faster initial load
         const [data, trendingTags] = await Promise.all([
@@ -88,6 +89,11 @@ const BlogPage: React.FC = () => {
       } catch (err) {
         console.error("Fetch Blogs Error:", err);
       } finally {
+        const elapsedTime = Date.now() - startTime;
+        const minDelay = 500;
+        if (elapsedTime < minDelay) {
+            await new Promise(resolve => setTimeout(resolve, minDelay - elapsedTime));
+        }
         setIsLoading(false);
       }
     };
@@ -213,12 +219,13 @@ const BlogPage: React.FC = () => {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[1000] bg-white dark:bg-slate-950 lg:hidden flex flex-col p-6"
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ type: "spring", damping: 28, stiffness: 280 }}
+            className="fixed inset-0 z-[1000] bg-white dark:bg-slate-950 lg:hidden flex flex-col p-6 overflow-y-auto"
           >
-            <div className="flex items-center justify-between mb-10">
+            <div className="flex items-center justify-between mb-10 shrink-0">
               <Logo />
               <button 
                 onClick={() => setIsMobileMenuOpen(false)}

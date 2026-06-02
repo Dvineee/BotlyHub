@@ -24,6 +24,7 @@ import { useTheme } from '../ThemeContext';
 import { DatabaseService } from '../services/DatabaseService';
 import { SEO } from '../components/SEO';
 import { Bot } from '../types';
+import { categories, appsSubCategories } from '../data';
 
 export default function Statistics() {
     const navigate = useNavigate();
@@ -468,7 +469,14 @@ export default function Statistics() {
                                                             </div>
                                                             <div>
                                                                 <h4 className="text-xs font-black uppercase tracking-tight text-slate-900 dark:text-white">{bot.name}</h4>
-                                                                <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">{bot.category[0] || 'Bot'}</p>
+                                                                <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">
+                                                                    {(() => {
+                                                                        const rawCat = bot.category?.[0];
+                                                                        if (!rawCat) return 'Bot';
+                                                                        const found = categories.find(c => c.id === rawCat) || appsSubCategories.find(c => c.id === rawCat);
+                                                                        return found ? t(found.label) : (t(`cat_${rawCat}`) === `cat_${rawCat}` ? rawCat : t(`cat_${rawCat}`));
+                                                                    })()}
+                                                                </p>
                                                             </div>
                                                         </div>
                                                         <span className="text-[10px] font-mono font-black text-slate-400">{bot.views?.toLocaleString()} Views</span>
@@ -494,7 +502,14 @@ export default function Statistics() {
                                                             </div>
                                                             <div>
                                                                 <h4 className="text-xs font-black uppercase tracking-tight text-slate-900 dark:text-white">{bot.name}</h4>
-                                                                <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">{bot.category[0] || 'Bot'}</p>
+                                                                <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">
+                                                                    {(() => {
+                                                                        const rawCat = bot.category?.[0];
+                                                                        if (!rawCat) return 'Bot';
+                                                                        const found = categories.find(c => c.id === rawCat) || appsSubCategories.find(c => c.id === rawCat);
+                                                                        return found ? t(found.label) : (t(`cat_${rawCat}`) === `cat_${rawCat}` ? rawCat : t(`cat_${rawCat}`));
+                                                                    })()}
+                                                                </p>
                                                             </div>
                                                         </div>
                                                         <div className="flex items-center gap-1">

@@ -62,23 +62,6 @@ export const LazyImage: React.FC<LazyImageProps> = ({
 // 1. Home Page Loading Skeleton
 export const HomeSkeleton = () => (
   <div className="w-full min-h-screen bg-slate-50 dark:bg-slate-950 px-5 sm:px-8 py-6 flex flex-col gap-8 max-w-7xl mx-auto overflow-hidden">
-    {/* Page Header Skeleton */}
-    <div className="flex justify-between items-center w-full mb-4">
-      <div className="flex items-center gap-3">
-        <Skeleton className="w-[120px] h-8 rounded-lg" />
-      </div>
-      <div className="flex items-center gap-2">
-        <Skeleton className="w-[100px] h-10 rounded-xl" />
-        <Skeleton className="w-10 h-10 rounded-xl" />
-      </div>
-    </div>
-
-    {/* Search Box Skeleton */}
-    <div className="w-full max-w-2xl mx-auto flex flex-col items-center gap-4 mb-8">
-      <Skeleton className="w-3/4 h-12 rounded-2xl" />
-      <Skeleton className="w-1/2 h-6 rounded-lg" />
-    </div>
-
     {/* Main Promo Banner/Carousel Skeleton */}
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full mb-6">
       <div className="md:col-span-2 h-[220px] bg-slate-200 dark:bg-slate-900/60 rounded-[2rem] p-6 flex flex-col gap-4 justify-between">
