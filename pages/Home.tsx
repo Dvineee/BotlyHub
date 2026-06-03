@@ -318,17 +318,17 @@ const PromoCard: React.FC<{
   let cardBgClass =
     "bg-[#f4f7f5] dark:bg-[#1a231d] border-[#e5ece8]/50 dark:border-white/5";
   let btnClass =
-    "bg-[#34c759] hover:bg-[#2eb850] text-white shadow-emerald-500/10";
+    "text-[#34c759] hover:text-[#2eb850]";
 
   if (isStars) {
     cardBgClass =
       "bg-[#fbf7ee] dark:bg-[#201d16] border-[#f3eccf]/50 dark:border-white/5";
     btnClass =
-      "bg-[#ff9f0a] hover:bg-[#e08a00] text-white shadow-orange-500/10";
+      "text-[#ff9f0a] hover:text-[#e08a00]";
   } else if (isTon) {
     cardBgClass =
       "bg-[#f1f6fb] dark:bg-[#151c24] border-[#e3ebf4]/50 dark:border-white/5";
-    btnClass = "bg-[#2f80ed] hover:bg-[#1b6cd5] text-white shadow-blue-500/10";
+    btnClass = "text-[#2f80ed] hover:text-[#1b6cd5]";
   }
 
   return (
@@ -350,14 +350,22 @@ const PromoCard: React.FC<{
 
         <button
           onClick={handleAction}
-          className={`flex items-center gap-1.5 px-[15px] py-[7px] sm:px-[18px] sm:py-[8px] rounded-full text-xs sm:text-[13px] font-[900] tracking-wide transition-all active:scale-95 shadow-md ${btnClass}`}
+          className={`flex items-center gap-1.5 px-0 py-1 rounded-none text-xs sm:text-[13px] font-[900] tracking-wide transition-all active:scale-95 bg-transparent shadow-none hover:shadow-none border-0 ${btnClass} group/btn`}
         >
-          <ArrowUpRight
-            size={14}
-            strokeWidth={3}
-            className="shrink-0 scale-105"
-          />
           <span>{ann.button_text}</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="w-4 h-4 transition-all duration-200 transform group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 select-none shrink-0"
+          >
+            <line x1="7" y1="17" x2="17" y2="7"></line>
+            <polyline points="7 7 17 7 17 17"></polyline>
+          </svg>
         </button>
       </div>
 
