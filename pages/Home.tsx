@@ -3158,6 +3158,20 @@ const Home = () => {
                                 </>
                               );
                             })()}
+
+                            {/* "Tümünü Gör" (See All) Button for Apps */}
+                            <div className="flex justify-center pt-2">
+                              <button
+                                onClick={() => {
+                                  haptic("medium");
+                                  navigate(`/search?mode=apps&category=all`);
+                                }}
+                                className="inline-flex items-center gap-2 px-6 py-2.5 bg-slate-50 hover:bg-slate-100 dark:bg-white/5 dark:hover:bg-white/10 text-slate-800 dark:text-slate-200 text-[13px] font-bold rounded-xl transition-all border border-black/10 dark:border-white/10 hover:scale-[1.02] active:scale-[0.98] shadow-sm cursor-pointer group"
+                              >
+                                {t("detail_show_all") || "Tümünü Gör"}
+                                <ChevronRight size={14} className="text-slate-400 dark:text-slate-500 group-hover:translate-x-0.5 transition-transform" />
+                              </button>
+                            </div>
                           </div>
                         );
                       })()}
@@ -3289,6 +3303,20 @@ const Home = () => {
                                 </>
                               );
                             })()}
+
+                            {/* "Tümünü Gör" (See All) Button for Bots */}
+                            <div className="flex justify-center pt-2">
+                              <button
+                                onClick={() => {
+                                  haptic("medium");
+                                  navigate(`/search?mode=bots&category=all`);
+                                }}
+                                className="inline-flex items-center gap-2 px-6 py-2.5 bg-slate-50 hover:bg-slate-100 dark:bg-white/5 dark:hover:bg-white/10 text-slate-800 dark:text-slate-200 text-[13px] font-bold rounded-xl transition-all border border-black/10 dark:border-white/10 hover:scale-[1.02] active:scale-[0.98] shadow-sm cursor-pointer group"
+                              >
+                                {t("detail_show_all") || "Tümünü Gör"}
+                                <ChevronRight size={14} className="text-slate-400 dark:text-slate-500 group-hover:translate-x-0.5 transition-transform" />
+                              </button>
+                            </div>
                           </div>
                         );
                       })()}
