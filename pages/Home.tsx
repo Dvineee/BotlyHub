@@ -338,6 +338,11 @@ const PromoCard: React.FC<{
       onClick={handleAction}
       className={`w-full h-[185px] sm:h-[195px] shrink-0 rounded-[24px] border border-solid p-6 pb-5 sm:p-7 sm:pb-6 relative overflow-hidden flex flex-col justify-between cursor-pointer select-none transition-all duration-305 hover:shadow-lg dark:hover:shadow-black/20 group backdrop-blur-md ${cardBgClass}`}
     >
+      {ann.badge_text && (
+        <div className="absolute top-4 right-4 z-30 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-black/5 dark:border-white/10 text-slate-600 dark:text-slate-300 shadow-xs pointer-events-none select-none">
+          {ann.badge_text}
+        </div>
+      )}
       <div className="z-10 max-w-[58%] sm:max-w-[61%] flex flex-col items-start h-full justify-between">
         <div className="flex flex-col gap-1.5">
           <h3 className="text-[#0f172a] dark:text-white font-[900] text-[15px] sm:text-[17px] tracking-tight leading-snug font-sans group-hover:text-black dark:group-hover:text-slate-100 transition-colors">
