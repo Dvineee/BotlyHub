@@ -3034,7 +3034,7 @@ const Home = () => {
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[300px] bg-blue-500/10 dark:bg-blue-500/5 rounded-full blur-[80px] pointer-events-none select-none z-0" />
                   
                   {/* Decorative Background SVG Watermark */}
-                  <div className="absolute right-[-20px] bottom-[-20px] sm:right-6 sm:bottom-[-20px] w-48 h-48 sm:w-60 sm:h-60 opacity-[0.04] dark:opacity-[0.025] rotate-12 pointer-events-none select-none z-0">
+                  <div className="absolute right-[-20px] top-[-20px] sm:right-6 sm:top-[-20px] w-48 h-48 sm:w-60 sm:h-60 opacity-[0.04] dark:opacity-[0.025] rotate-12 pointer-events-none select-none z-0">
                     <svg width="100%" height="100%" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <style>{`
                         .logo-plate-path {

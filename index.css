@@ -2203,6 +2203,13 @@ div.qa-last-24h-box,
     background: #20212370 !important;
 }
 
+.dark\:bg-\[\#111622\]\/50:is(.dark *) {
+    border: 1px solid var(--border-color) !important;
+    border-radius: 18px;
+    mask-image: linear-gradient(to bottom, #11162280 0, #000 60%, #00000000 100%);
+    background-color: #11162280;
+}
+
 
 
 
