@@ -1259,7 +1259,7 @@ const SearchPage = () => {
           {/* Results */}
           <div className="sticky top-0 z-30 bg-white dark:bg-slate-950 py-3 -mx-5 px-5 md:relative md:top-auto md:z-auto md:py-0 md:px-0 md:mx-0 flex items-center gap-3 mb-10 border-b border-black/[0.03] dark:border-white/5 md:border-b-0 transition-colors">
             <div className="flex-1 relative">
-              <div className="relative flex items-center bg-white dark:bg-slate-900 border border-slate-300 dark:border-white/10 rounded-xl p-1.5 transition-all group focus-within:ring-2 focus-within:ring-blue-500/15 focus-within:border-blue-500 shadow-sm focus-within:shadow-md">
+              <div className="relative flex items-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl p-1 transition-all group custom-search-outline">
                 <div className="ml-2 w-8 h-8 flex items-center justify-center text-slate-400 group-focus-within:text-blue-500 shrink-0">
                   <SearchIcon size={18} />
                 </div>

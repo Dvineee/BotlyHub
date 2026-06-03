@@ -634,7 +634,8 @@ const BotCard: React.FC<{ bot: Bot; tonRate: number; featuredRank?: number }> =
     return (
       <div
         onClick={() => navigate(`/bot/${bot.slug}`)}
-        className="flex flex-col p-5 bg-white dark:bg-[#0F1623] rounded-[16px] transition-all duration-[180ms] ease-out mt-card-elevated active:scale-[0.98] transform-gpu cursor-pointer select-none group w-full relative min-h-[175px]"
+        className="flex flex-col p-5 bg-white dark:bg-[#0F1623] rounded-[16px] transition-all duration-[180ms] ease-out shadow-none hover:shadow-none active:scale-[0.98] transform-gpu cursor-pointer select-none group w-full relative min-h-[175px]"
+        style={{ border: '1px solid var(--Card-Border, rgba(255, 255, 255, .06))' }}
       >
         {/* Top: bot identity (avatar + name) + category badge inline */}
         <div className="flex items-start justify-between gap-3 w-full mb-3.5 min-w-0">
@@ -704,7 +705,7 @@ const BotCard: React.FC<{ bot: Bot; tonRate: number; featuredRank?: number }> =
           <button
             className={
               featuredRank
-                ? "px-4 py-1.5 bg-orange-500/10 hover:bg-orange-500 text-orange-600 hover:text-white dark:bg-orange-500/15 dark:text-orange-400 dark:hover:bg-orange-500 dark:hover:text-white rounded-lg transition-all text-[12px] font-extrabold leading-none active:scale-95 border border-orange-500/20 flex items-center justify-center gap-1"
+                ? "px-4 py-1.5 bg-blue-500/10 hover:bg-blue-500 text-blue-600 hover:text-white dark:bg-blue-500/15 dark:text-blue-400 dark:hover:bg-blue-500 dark:hover:text-white rounded-lg transition-all text-[12px] font-extrabold leading-none active:scale-95 border border-blue-500/20 flex items-center justify-center gap-1"
                 : "px-4 py-1.5 bg-blue-500/10 hover:bg-blue-500 text-blue-600 hover:text-white dark:bg-blue-500/15 dark:text-blue-400 dark:hover:bg-blue-500 dark:hover:text-white rounded-lg transition-all text-[12px] font-extrabold leading-none active:scale-95 border border-blue-500/20"
             }
             onClick={(e) => {
@@ -743,7 +744,8 @@ const CategoryBotCard: React.FC<{ bot: Bot; rank: number }> = React.memo(
     return (
       <div
         onClick={() => navigate(`/bot/${bot.slug}`)}
-        className="flex items-center cursor-pointer group hover:bg-slate-100/50 dark:hover:bg-slate-900/40 transition-all duration-300 rounded-2xl p-3 select-none active:scale-[0.98] transform-gpu mt-card-elevated"
+        className="flex items-center cursor-pointer group hover:bg-slate-100/50 dark:hover:bg-slate-900/40 transition-all duration-300 rounded-2xl p-3 select-none active:scale-[0.98] transform-gpu"
+        style={{ border: '1px solid var(--Card-Border, rgba(255, 255, 255, .06))' }}
       >
         <div className="relative shrink-0 select-none">
           <LazyImage
@@ -2327,7 +2329,7 @@ const Home = () => {
                   ref={homeSearchRef}
                   className="hidden md:block md:flex-1 md:max-w-[280px] lg:max-w-[320px] relative z-[130]"
                 >
-                  <div className="relative flex items-center bg-white dark:bg-slate-900 border border-slate-300 dark:border-white/10 rounded-xl group transition-all h-[42px] px-3 focus-within:ring-2 focus-within:focus-within:ring-blue-500/15 focus-within:border-blue-500 shadow-sm">
+                  <div className="relative flex items-center bg-[#eeefef] dark:bg-slate-800 rounded-xl group transition-all h-[42px] px-3 focus-within:ring-2 focus-within:ring-blue-500/20">
                     {isSearchLoading ? (
                       <Loader2
                         size={16}
@@ -2962,7 +2964,7 @@ const Home = () => {
       </div>
       {/* Mobile-only Sticky Search Bar */}
       <div className="sticky top-0 z-[110] block md:hidden bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl border-b border-black/[0.03] dark:border-white/5 p-3 shadow-xs">
-        <div className="relative flex items-center bg-white dark:bg-slate-900 border border-slate-300 dark:border-white/10 rounded-xl group transition-all h-[42px] px-3 shadow-xs">
+        <div className="relative flex items-center bg-[#eeefef] dark:bg-slate-800 rounded-xl group transition-all h-[42px] px-3">
           <div
             onClick={() => {
               haptic("light");
