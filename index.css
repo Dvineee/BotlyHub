@@ -923,15 +923,17 @@ h2.text-lg.sm\:text-xl.font-extrabold.text-slate-900.dark\:text-white.tracking-t
 }
 
 .category-filter-item.active {
-    border-color: rgba(0, 0, 0, 0);
-    background-color: #0000000a;
-    color: #000000;
+    border-color: transparent !important;
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 10px -2px rgba(59, 130, 246, 0.35) !important;
 }
 
 .dark .category-filter-item.active {
-    border-color: rgba(255, 255, 255, 0.1);
-    background-color: rgba(255, 255, 255, 0.05);
-    color: #ffffff;
+    border-color: transparent !important;
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px -2px rgba(59, 130, 246, 0.45) !important;
 }
 
 @media (min-width: 769px) {
@@ -2171,6 +2173,88 @@ div.qa-last-24h-box,
 .shadow-lg {
     --tw-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
     --tw-shadow-colored: 0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);
+}
+
+/* Material Tailwind Design Language Helpers */
+.mt-card-elevated {
+    background-color: var(--card-bg) !important;
+    border: 1px solid var(--Card-Border, rgba(255, 255, 255, .06)) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05) !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.mt-card-elevated:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.08) !important;
+    border-color: rgba(59, 130, 246, 0.25) !important;
+}
+
+.mt-btn-filled {
+    border-radius: 8px !important;
+    font-weight: 700 !important;
+    font-size: 12px !important;
+    letter-spacing: 0.06em !important;
+    text-transform: uppercase !important;
+    padding: 10px 20px !important;
+    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.12), 0 2px 4px -1px rgba(59, 130, 246, 0.08) !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    user-select: none !important;
+}
+.mt-btn-filled:hover {
+    box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.2), 0 4px 6px -2px rgba(59, 130, 246, 0.12) !important;
+    transform: translateY(-1px) !important;
+    filter: brightness(1.05) !important;
+}
+.mt-btn-filled:active {
+    transform: translateY(0) scale(0.97) !important;
+}
+
+.mt-btn-outlined {
+    border-radius: 8px !important;
+    font-weight: 700 !important;
+    font-size: 12px !important;
+    letter-spacing: 0.06em !important;
+    text-transform: uppercase !important;
+    padding: 9px 19px !important;
+    background-color: transparent !important;
+    border: 1px solid var(--btn-border, rgba(0, 0, 0, 0.12)) !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    user-select: none !important;
+}
+.mt-btn-outlined:hover {
+    background-color: rgba(59, 130, 246, 0.04) !important;
+    border-color: rgba(59, 130, 246, 0.4) !important;
+    transform: translateY(-1px) !important;
+}
+.mt-btn-outlined:active {
+    transform: translateY(0) scale(0.97) !important;
+}
+
+.mt-badge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 9999px !important;
+    padding: 4px 10px !important;
+    font-size: 10px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.05em !important;
+    text-transform: uppercase !important;
+    line-height: 1 !important;
+}
+
+.mt-input-field {
+    border-radius: 8px !important;
+    border: 1px solid rgba(0, 0, 0, 0.12) !important;
+    background-color: var(--bg-primary) !important;
+    transition: all 0.2s ease !important;
+}
+.dark .mt-input-field {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+.mt-input-field:focus {
+    border-color: rgb(59, 130, 246) !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+    outline: none !important;
 }
 
 

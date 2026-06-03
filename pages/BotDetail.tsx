@@ -1984,7 +1984,7 @@ const BotDetail = () => {
               </div>
 
               <div className="w-full">
-                <div className="flex flex-col bg-white dark:bg-slate-900/60 rounded-xl border border-black/5 dark:border-white/5 backdrop-blur-xl overflow-hidden fancy-glass-card stats-card-bg">
+                <div className="flex flex-col bg-white dark:bg-slate-900/60 rounded-xl border border-black/5 dark:border-white/5 backdrop-blur-xl overflow-hidden mt-card-elevated">
                   <div className="flex items-center justify-between p-6">
                     <div className="flex flex-col items-center flex-1 border-r border-black/5 dark:border-white/5">
                       <span className="text-slate-900 dark:text-white font-bold text-base">
