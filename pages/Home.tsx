@@ -705,7 +705,7 @@ const BotCard: React.FC<{ bot: Bot; tonRate: number; featuredRank?: number }> =
           <button
             className={
               featuredRank
-                ? "px-4 py-1.5 bg-blue-500/10 hover:bg-blue-500 text-blue-600 hover:text-white dark:bg-blue-500/15 dark:text-blue-400 dark:hover:bg-blue-500 dark:hover:text-white rounded-lg transition-all text-[12px] font-extrabold leading-none active:scale-95 border border-blue-500/20 flex items-center justify-center gap-1"
+                ? "px-4 py-1.5 bg-orange-500/10 hover:bg-orange-500 text-orange-600 hover:text-white dark:bg-orange-500/15 dark:text-orange-400 dark:hover:bg-orange-500 dark:hover:text-white rounded-lg transition-all text-[12px] font-extrabold leading-none active:scale-95 border border-orange-500/20 flex items-center justify-center gap-1"
                 : "px-4 py-1.5 bg-blue-500/10 hover:bg-blue-500 text-blue-600 hover:text-white dark:bg-blue-500/15 dark:text-blue-400 dark:hover:bg-blue-500 dark:hover:text-white rounded-lg transition-all text-[12px] font-extrabold leading-none active:scale-95 border border-blue-500/20"
             }
             onClick={(e) => {

@@ -30,30 +30,23 @@ body {
 
 @layer base {
   :root {
-    --bg-main: #070A12;
-    --bg-secondary: #0B1020;
-    --bg-elevated: #0F172A;
-    --text-primary: #E5E7EB;
-    --text-secondary: #94A3B8;
-    --text-muted: #64748B;
-    --border-main: rgba(148, 163, 184, 0.12);
-    --border-hover: rgba(59, 130, 246, 0.35);
-    --input-bg: #0B1020;
-    --btn-primary: #3B82F6;
-    --border-color: rgba(148, 163, 184, 0.12);
-    --btn-bg: #E5E7EB;
-    --btn-text: #070A12;
-    --accent: #3B82F6;
-    --accent-2: #3B82F6;
-    --item-border-color: rgba(148, 163, 184, 0.08);
-    --Card-Border: rgba(148, 163, 184, 0.12);
-
-    /* Single cohesive Primary Glow & Motion configuration */
-    --primary-glow: rgba(59, 130, 246, 0.15);
-    --primary-glow-hover: rgba(59, 130, 246, 0.25);
-    --motion-easing: cubic-bezier(0.16, 1, 0.3, 1);
-    --motion-duration: 220ms;
-    --motion-transition: all 220ms cubic-bezier(0.16, 1, 0.3, 1);
+    --bg-main: #0A0A0B;
+    --bg-secondary: #111214;
+    --bg-elevated: #16181D;
+    --text-primary: #F5F7FA;
+    --text-secondary: #9CA3AF;
+    --text-muted: #6B7280;
+    --border-main: rgba(255, 255, 255, 0.08);
+    --border-hover: rgba(255, 255, 255, 0.14);
+    --input-bg: #16181D;
+    --btn-primary: #60A5FA;
+    --border-color: rgba(255, 255, 255, 0.08);
+    --btn-bg: #F5F7FA;
+    --btn-text: #0A0A0B;
+    --accent: #5EEAD4;
+    --accent-2: #60A5FA;
+    --item-border-color: rgba(255, 255, 255, 0.05);
+    --Card-Border: rgba(255, 255, 255, 0.06);
 
     /* general spacing system variables */
     --space-8: 8px;
@@ -70,30 +63,23 @@ body {
   }
 
   .dark {
-    --bg-main: #070A12;
-    --bg-secondary: #0B1020;
-    --bg-elevated: #0F172A;
-    --text-primary: #E5E7EB;
-    --text-secondary: #94A3B8;
-    --text-muted: #64748B;
-    --border-main: rgba(148, 163, 184, 0.12);
-    --border-hover: rgba(59, 130, 246, 0.35);
-    --input-bg: #0B1020;
-    --btn-primary: #3B82F6;
-    --border-color: rgba(148, 163, 184, 0.12);
-    --btn-bg: #E5E7EB;
-    --btn-text: #070A12;
-    --accent: #3B82F6;
-    --accent-2: #3B82F6;
-    --item-border-color: rgba(148, 163, 184, 0.08);
-    --Card-Border: rgba(148, 163, 184, 0.12);
-
-    /* Single cohesive Primary Glow & Motion configuration */
-    --primary-glow: rgba(59, 130, 246, 0.15);
-    --primary-glow-hover: rgba(59, 130, 246, 0.25);
-    --motion-easing: cubic-bezier(0.16, 1, 0.3, 1);
-    --motion-duration: 220ms;
-    --motion-transition: all 220ms cubic-bezier(0.16, 1, 0.3, 1);
+    --bg-main: #0A0A0B;
+    --bg-secondary: #111214;
+    --bg-elevated: #16181D;
+    --text-primary: #F5F7FA;
+    --text-secondary: #9CA3AF;
+    --text-muted: #6B7280;
+    --border-main: rgba(255, 255, 255, 0.08);
+    --border-hover: rgba(255, 255, 255, 0.14);
+    --input-bg: #16181D;
+    --btn-primary: #60A5FA;
+    --border-color: rgba(255, 255, 255, 0.08);
+    --btn-bg: #F5F7FA;
+    --btn-text: #0A0A0B;
+    --accent: #5EEAD4;
+    --accent-2: #60A5FA;
+    --item-border-color: rgba(255, 255, 255, 0.05);
+    --Card-Border: rgba(255, 255, 255, 0.06);
 
     --text-main: var(--text-primary);
     --card-bg: var(--bg-secondary);
@@ -107,23 +93,16 @@ body {
     --text-secondary: #64748B;
     --text-muted: #94A3B8;
     --border-main: rgba(15, 23, 42, 0.08);
-    --border-hover: rgba(59, 130, 246, 0.2);
+    --border-hover: rgba(15, 23, 42, 0.14);
     --input-bg: #F1F5F9;
     --btn-primary: #3B82F6;
     --border-color: rgba(15, 23, 42, 0.08);
     --btn-bg: #0F172A;
     --btn-text: #FFFFFF;
-    --accent: #3B82F6;
+    --accent: #5EEAD4;
     --accent-2: #3B82F6;
     --item-border-color: rgba(15, 23, 42, 0.05);
     --Card-Border: rgba(15, 23, 42, 0.06);
-
-    /* Single cohesive Primary Glow & Motion configuration */
-    --primary-glow: rgba(59, 130, 246, 0.08);
-    --primary-glow-hover: rgba(59, 130, 246, 0.18);
-    --motion-easing: cubic-bezier(0.16, 1, 0.3, 1);
-    --motion-duration: 220ms;
-    --motion-transition: all 220ms cubic-bezier(0.16, 1, 0.3, 1);
 
     --text-main: var(--text-primary);
     --card-bg: var(--bg-secondary);
@@ -1411,36 +1390,24 @@ button.bg-brand:hover, button.bg-blue-500:hover, button.bg-blue-600:hover, a.bg-
 
 /* Force backgrounds of sections/cards and secondary elements */
 .fancy-glass-card, .stats-card-bg, .official-links-box, .popular-content-card, .similar-post-card, .bot-card {
-  background-color: rgba(15, 23, 42, 0.6) !important;
-  border: 1px solid rgba(148, 163, 184, 0.12) !important;
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid rgba(255, 255, 255, .08) !important;
+  border-color: var(--border-color) !important;
 }
 
-.light .fancy-glass-card, .light .stats-card-bg, .light .official-links-box, .light .popular-content-card, .light .similar-post-card, .light .bot-card {
-  background-color: rgba(255, 255, 255, 0.8) !important;
-  border: 1px solid rgba(15, 23, 42, 0.08) !important;
-}
-
-/* Force transitions and premium unified motion on all cards/interactive elements */
-.fancy-glass-card, .stats-card-bg, .official-links-box, .popular-content-card, .similar-post-card, .bot-card, button, a, input, select {
-  transition: all 220ms ease-out !important;
-}
-
-/* Force standard, premium hover styling across cards with unified primary glow */
-.fancy-glass-card:hover, .stats-card-bg:hover, .official-links-box:hover, .popular-content-card:hover, .similar-post-card:hover, .bot-card:hover, .hover\:border-blue-500:hover {
-  transform: translateY(-3px) scale(1.01) !important;
-  border-color: rgba(59, 130, 246, 0.35) !important;
-  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.15), 0 20px 60px rgba(59, 130, 246, 0.08) !important;
+/* Force transitions and premium feel on all cards */
+.fancy-glass-card, .stats-card-bg, .official-links-box, .popular-content-card, .similar-post-card, .bot-card {
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 /* Clean overrides for .light and .dark specifically for card backgrounds */
 .light .bg-slate-50, .light .bg-slate-100, .light .bg-slate-200, .light .bg-white, .light .bg-slate-100\/50, .light .bg-white\/80, .light .fancy-glass-card, .light .stats-card-bg, .light .official-links-box, .light .popular-content-card, .light .similar-post-card, .light .bot-card {
     color: var(--text-primary) !important;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02), 0 4px 16px rgba(15, 23, 42, 0.02) !important;
+    box-shadow: 0 1px 2px #0f172a04, 0 4px 16px #0f172a05 !important;
 }
 
 .light .fancy-glass-card:hover, .light .stats-card-bg:hover, .light .popular-content-card:hover, .light .similar-post-card:hover, .light .bot-card:hover {
-  border-color: rgba(59, 130, 246, 0.25) !important;
-  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.1), 0 12px 32px rgba(59, 130, 246, 0.05) !important;
+  border-color: rgba(15, 23, 42, 0.12) !important;
 }
 
 .mb-4 {
@@ -1449,6 +1416,12 @@ button.bg-brand:hover, button.bg-blue-500:hover, button.bg-blue-600:hover, a.bg-
 
 .light .bg-white\/5, .light .bg-black\/5, .light .bg-slate-500\/5, .light .bg-slate-900\/5 {
   background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+
+
+.dark .fancy-glass-card:hover, .dark .stats-card-bg:hover, .dark .popular-content-card:hover, .dark .similar-post-card:hover, .dark .bot-card:hover {
+  border-color: rgba(255, 255, 255, 0.14) !important;
 }
 
 .dark .official-links-box {
@@ -1828,7 +1801,7 @@ img.rounded-\[13px\],
 
 /* 5. Clean Transitions システム */
 .fancy-glass-card, .stats-card-bg, .official-links-box, .popular-content-card, .similar-post-card, .bot-card, button, a {
-  transition: var(--motion-transition) !important;
+  transition: background 180ms ease, border-color 180ms ease, transform 180ms ease, opacity 180ms ease, box-shadow 180ms ease !important;
 }
 
 /* 6. Soluk Meta Datası (Kategori/Tag/Count Satırı) */
