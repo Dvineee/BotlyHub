@@ -27,6 +27,24 @@ export default {
           950: '#020617', // Explicitly defined to match your app
         }
       },
+      spacing: {
+        'space-8': '8px',
+        'space-12': '12px',
+        'space-16': '16px',
+        'space-24': '24px',
+        'space-32': '32px',
+        'space-48': '48px',
+        'space-64': '64px',
+        'space-96': '96px',
+        '8px': '8px',
+        '12px': '12px',
+        '16px': '16px',
+        '24px': '24px',
+        '32px': '32px',
+        '48px': '48px',
+        '64px': '64px',
+        '96px': '96px',
+      },
       fontFamily: {
         poppins: ['Poppins', 'sans-serif'],
         inter: ['Inter', 'sans-serif'],

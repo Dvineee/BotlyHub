@@ -46,6 +46,17 @@ body {
     --accent: #5EEAD4;
     --accent-2: #60A5FA;
     --item-border-color: rgba(255, 255, 255, 0.05);
+    --Card-Border: rgba(255, 255, 255, 0.06);
+
+    /* general spacing system variables */
+    --space-8: 8px;
+    --space-12: 12px;
+    --space-16: 16px;
+    --space-24: 24px;
+    --space-32: 32px;
+    --space-48: 48px;
+    --space-64: 64px;
+    --space-96: 96px;
 
     --text-main: var(--text-primary);
     --card-bg: var(--bg-secondary);
@@ -68,6 +79,7 @@ body {
     --accent: #5EEAD4;
     --accent-2: #60A5FA;
     --item-border-color: rgba(255, 255, 255, 0.05);
+    --Card-Border: rgba(255, 255, 255, 0.06);
 
     --text-main: var(--text-primary);
     --card-bg: var(--bg-secondary);
@@ -90,6 +102,7 @@ body {
     --accent: #5EEAD4;
     --accent-2: #3B82F6;
     --item-border-color: rgba(15, 23, 42, 0.05);
+    --Card-Border: rgba(15, 23, 42, 0.06);
 
     --text-main: var(--text-primary);
     --card-bg: var(--bg-secondary);
