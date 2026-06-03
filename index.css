@@ -2198,6 +2198,11 @@ div.qa-last-24h-box,
   }
 }
 
+.dark\:bg-slate-900:is(.dark *), .dark .dark\:bg-slate-900, .dark .bg-slate-900, .dark [class*="dark:bg-slate-900"] {
+    --tw-bg-opacity: 1 !important;
+    background: #20212370 !important;
+}
+
 
 
 

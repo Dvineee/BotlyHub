@@ -674,11 +674,17 @@ const BotCard: React.FC<{ bot: Bot; tonRate: number; featuredRank?: number }> =
               </div>
             </div>
           </div>
-          {catLabel && (
-            <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-white/[0.04] px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0 transition-opacity">
-              {catLabel}
+          <div className="relative flex items-center min-w-0">
+            {catLabel && (
+              <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-white/[0.04] px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0 transition-all duration-200 group-hover:opacity-0 group-hover:scale-90 select-none">
+                {catLabel}
+              </span>
+            )}
+            <span className="absolute right-0 opacity-0 scale-90 group-hover:opacity-100 group-hover:scale-100 transition-all duration-200 text-[11px] font-extrabold bg-blue-500 text-white px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm shrink-0 whitespace-nowrap">
+              <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+              {t("try_btn") || "Dene"}
             </span>
-          )}
+          </div>
         </div>
 
         {/* Middle: 1 line "personality text" -> Handles Telegram automation in seconds */}
@@ -3021,6 +3027,119 @@ const Home = () => {
             {/* Bottom Section */}
             <div className="bg-white dark:bg-slate-950 w-full pt-4 pb-20 shadow-[0_-1px_0_0_rgba(0,0,0,0.015)]">
               <div className="max-w-6xl mx-auto px-6 sm:px-8 relative">
+
+                {/* 🧠 Hero Section - High Conversion, Clear Segment Positioning */}
+                <div className="mb-14 py-14 px-6 sm:px-10 rounded-2xl bg-slate-50/50 dark:bg-[#111622]/50 border border-black/[0.03] dark:border-white/[0.04] text-center relative overflow-hidden flex flex-col items-center">
+                  {/* Glowing decorative background circles */}
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[300px] bg-blue-500/10 dark:bg-blue-500/5 rounded-full blur-[80px] pointer-events-none select-none z-0" />
+                  
+                  {/* Decorative Background SVG Watermark */}
+                  <div className="absolute right-[-20px] bottom-[-20px] sm:right-6 sm:bottom-[-20px] w-48 h-48 sm:w-60 sm:h-60 opacity-[0.04] dark:opacity-[0.025] rotate-12 pointer-events-none select-none z-0">
+                    <svg width="100%" height="100%" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <style>{`
+                        .logo-plate-path {
+                          fill: #000000;
+                          transition: fill 0.3s ease;
+                        }
+                        .logo-stroke-path {
+                          fill: #000000;
+                          transition: fill 0.3s ease;
+                        }
+                        .dark .logo-plate-path {
+                          fill: #ffffff;
+                        }
+                        .dark .logo-stroke-path {
+                          fill: #ffffff;
+                        }
+                      `}</style>
+                      <defs>
+                        <mask id="linear-cuts">
+                          <rect x="0" y="0" width="60" height="60" fill="#ffffff" />
+                          <g stroke="#000000" strokeWidth="3.5" strokeLinecap="round">
+                            <line x1="-5" y1="22" x2="30" y2="22" />
+                            <line x1="-5" y1="28" x2="35" y2="28" />
+                            <line x1="-5" y1="34" x2="30" y2="34" />
+                          </g>
+                        </mask>
+                      </defs>
+                      <g mask="url(#linear-cuts)" transform="translate(0, 4)">
+                        <path d="M33.638,9.147,50.362,20.853A3.844,3.844,0,0,1,52,24a3.844,3.844,0,0,1-1.638,3.147L33.638,38.853A6.338,6.338,0,0,1,30,40a6.338,6.338,0,0,1-3.638-1.147L9.638,27.147A3.844,3.844,0,0,1,8,24a3.844,3.844,0,0,1,1.638-3.147L26.362,9.147A6.338,6.338,0,0,1,30,8A6.338,6.338,0,0,1,33.638,9.147Z" className="logo-plate-path" />
+                        <path d="M30,41.5a7.818,7.818,0,0,1-4.5-1.417L8.778,28.375a5.34,5.34,0,0,1,0-8.75L25.5,7.918a7.972,7.972,0,0,1,9,0h0L51.222,19.625a5.34,5.34,0,0,1,0,8.75L34.5,40.082A7.811,7.811,0,0,1,30,41.5Zm0-32a4.825,4.825,0,0,0-2.779.876L10.5,22.082a2.341,2.341,0,0,0,0,3.836L27.222,37.625a4.921,4.921,0,0,0,5.557,0L49.5,25.918a2.341,2.341,0,0,0,0-3.836L32.779,10.376A4.825,4.825,0,0,0,30,9.5Z" className="logo-stroke-path" />
+                      </g>
+                    </svg>
+                  </div>
+
+                  {/* Micro Badge */}
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/10 dark:bg-blue-500/15 border border-blue-500/20 text-blue-600 dark:text-blue-400 text-[10.5px] font-black uppercase tracking-widest mb-6 select-none z-10 animate-pulse">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                    🌐 THE PREMIUM AI DIRECTORY
+                  </div>
+
+                  {/* Core Value Title */}
+                  <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-slate-800 dark:text-slate-100 max-w-3xl z-10 leading-[1.12] font-sans">
+                    {t("home_hero_title")}
+                  </h1>
+
+                  {/* Clarifying Short Description */}
+                  <p className="mt-4 text-[14px] sm:text-[15px] text-slate-500/90 dark:text-slate-400/90 leading-[1.62] font-semibold max-w-[62ch] z-10 transition-colors">
+                    {t("home_hero_desc")}
+                  </p>
+
+                  {/* 2 Conversion CTAs (Single line on mobile through grid-cols-2) */}
+                  <div className="mt-8 grid grid-cols-2 gap-3 z-10 w-full max-w-[340px] sm:max-w-md">
+                    <button
+                      onClick={() => {
+                        haptic("medium");
+                        navigate("/search?mode=bots");
+                      }}
+                      className="px-2 sm:px-6 h-12 bg-blue-600 hover:bg-blue-700 text-white text-[12.5px] sm:text-[14px] font-extrabold rounded-xl transition-all shadow-[0_4px_12px_rgba(37,99,235,0.2)] hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-1.5 min-w-0 cursor-pointer hover:shadow-[0_8px_20px_rgba(37,99,235,0.25)]"
+                    >
+                      <Compass size={15} className="shrink-0" />
+                      <span className="truncate">
+                        {t("home_explore_now") === "Şimdi Keşfet" ? "Botları Keşfet" : "Explore Bots"}
+                      </span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        haptic("light");
+                        navigate("/bot/task-master");
+                      }}
+                      className="px-2 sm:px-6 h-12 bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-850 text-slate-700 dark:text-slate-300 text-[12.5px] sm:text-[14px] font-extrabold rounded-xl transition-all border border-black/15 dark:border-white/10 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-1.5 min-w-0 cursor-pointer shadow-sm"
+                    >
+                      <Sparkles size={15} className="text-amber-500 shrink-0" />
+                      <span className="truncate">
+                        {t("try_demo") || "Demo Dene"}
+                      </span>
+                    </button>
+                  </div>
+
+                  {/* Categories Segment Quick Segment Tags */}
+                  <div className="mt-10 pt-8 border-t border-black/[0.04] dark:border-white/[0.04] w-full max-w-2xl z-10">
+                    <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-4 select-none font-mono">
+                      {t("discover_by_vertical") || "CATEGORIES & SEGMENTATION"}
+                    </p>
+                    <div className="flex flex-wrap items-center justify-center gap-2.5">
+                      {[
+                        { id: "ai_services", label: "💬 Chatbots" },
+                        { id: "productivity", label: "⚡ Productivity" },
+                        { id: "utilities", label: "🛠️ Utilities" },
+                        { id: "finance", label: "📈 Finance" },
+                      ].map((tag) => (
+                        <button
+                          key={tag.id}
+                          onClick={() => {
+                            haptic("light");
+                            navigate(`/search?mode=bots&category=${tag.id}`);
+                          }}
+                          className="px-4 py-2 rounded-full text-xs font-bold bg-white dark:bg-slate-900 border border-black/[0.05] dark:border-white/[0.05] text-slate-700 dark:text-slate-300 hover:border-blue-500 hover:text-blue-500 dark:hover:border-blue-400 dark:hover:text-blue-400 cursor-pointer shadow-sm active:scale-95 duration-150 transition-all select-none"
+                        >
+                          {tag.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={activeFilter}
@@ -3157,7 +3276,7 @@ const Home = () => {
                               );
                             })()}
 
-                            {/* "Tümünü Gör" (See All) Button for Apps */}
+                             {/* "Explore Apps" Button */}
                             <div className="flex justify-center pt-2">
                               <button
                                 onClick={() => {
@@ -3166,7 +3285,7 @@ const Home = () => {
                                 }}
                                 className="inline-flex items-center gap-2 px-6 py-2.5 bg-slate-50 hover:bg-slate-100 dark:bg-white/5 dark:hover:bg-white/10 text-slate-800 dark:text-slate-200 text-[13px] font-bold rounded-xl transition-all border border-black/10 dark:border-white/10 hover:scale-[1.02] active:scale-[0.98] shadow-sm cursor-pointer group"
                               >
-                                {t("detail_show_all") || "Tümünü Gör"}
+                                {t("explore_ai_apps") || (t("detail_show_all") === "Tümünü Gör" ? "Tüm Uygulamaları Keşfet" : "Explore All Mini Apps")}
                                 <ChevronRight size={14} className="text-slate-400 dark:text-slate-500 group-hover:translate-x-0.5 transition-transform" />
                               </button>
                             </div>
@@ -3302,7 +3421,7 @@ const Home = () => {
                               );
                             })()}
 
-                            {/* "Tümünü Gör" (See All) Button for Bots */}
+                             {/* "Explore & Chat" Button */}
                             <div className="flex justify-center pt-2">
                               <button
                                 onClick={() => {
@@ -3311,7 +3430,7 @@ const Home = () => {
                                 }}
                                 className="inline-flex items-center gap-2 px-6 py-2.5 bg-slate-50 hover:bg-slate-100 dark:bg-white/5 dark:hover:bg-white/10 text-slate-800 dark:text-slate-200 text-[13px] font-bold rounded-xl transition-all border border-black/10 dark:border-white/10 hover:scale-[1.02] active:scale-[0.98] shadow-sm cursor-pointer group"
                               >
-                                {t("detail_show_all") || "Tümünü Gör"}
+                                {t("start_chatting_btn") || (t("detail_show_all") === "Tümünü Gör" ? "Botları Keşfet & Sohbete Başla" : "Explore & Start Chatting")}
                                 <ChevronRight size={14} className="text-slate-400 dark:text-slate-500 group-hover:translate-x-0.5 transition-transform" />
                               </button>
                             </div>
