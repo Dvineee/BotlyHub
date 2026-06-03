@@ -635,7 +635,6 @@ const BotCard: React.FC<{ bot: Bot; tonRate: number; featuredRank?: number }> =
       <div
         onClick={() => navigate(`/bot/${bot.slug}`)}
         className="flex flex-col p-5 bg-white dark:bg-[#0F1623] rounded-[16px] transition-all duration-[180ms] ease-out shadow-none hover:shadow-none active:scale-[0.98] transform-gpu cursor-pointer select-none group w-full relative min-h-[175px]"
-        style={{ border: '1px solid var(--Card-Border, rgba(255, 255, 255, .06))' }}
       >
         {/* Top: bot identity (avatar + name) + category badge inline */}
         <div className="flex items-start justify-between gap-3 w-full mb-3.5 min-w-0">
@@ -745,7 +744,6 @@ const CategoryBotCard: React.FC<{ bot: Bot; rank: number }> = React.memo(
       <div
         onClick={() => navigate(`/bot/${bot.slug}`)}
         className="flex items-center cursor-pointer group hover:bg-slate-100/50 dark:hover:bg-slate-900/40 transition-all duration-300 rounded-2xl p-3 select-none active:scale-[0.98] transform-gpu"
-        style={{ border: '1px solid var(--Card-Border, rgba(255, 255, 255, .06))' }}
       >
         <div className="relative shrink-0 select-none">
           <LazyImage

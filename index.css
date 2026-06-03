@@ -2173,6 +2173,31 @@ div.qa-last-24h-box,
     --tw-shadow-colored: 0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);
 }
 
+/* Card border removal as requested */
+.fancy-glass-card, .stats-card-bg, .popular-content-card, .similar-post-card, .bot-card {
+    border: none !important;
+    border-width: 0px !important;
+}
+
+/* Mobile-only adjustments requested by user */
+@media (max-width: 767px) {
+  .gap-5 {
+    gap: 5px !important;
+  }
+  .gap-4 {
+    gap: 10px !important;
+  }
+  .mb-1 {
+    margin-bottom: 0rem !important;
+  }
+  .w-12 {
+    width: 4rem !important;
+  }
+  .h-12 {
+    height: 4rem !important;
+  }
+}
+
 
 
 
