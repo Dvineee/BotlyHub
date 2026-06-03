@@ -168,7 +168,7 @@ export default function Statistics() {
             />
 
             {/* Sticky Header */}
-            <header className="sticky top-0 z-50 backdrop-blur-md bg-white/70 dark:bg-slate-950/70 border-b border-black/[0.04] dark:border-white/[0.04] px-4 py-4 mb-8">
+            <header className="relative md:sticky md:top-0 z-50 backdrop-blur-md bg-white/70 dark:bg-slate-950/70 border-b border-black/[0.04] dark:border-white/[0.04] px-4 py-4 mb-8">
                 <div className="max-w-7xl mx-auto flex items-center justify-between">
                     <button 
                         onClick={() => { haptic('medium'); navigate('/'); }}

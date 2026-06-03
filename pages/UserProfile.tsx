@@ -337,7 +337,7 @@ export default function UserProfile() {
             />
 
             {/* Premium Sticky Navigation Header */}
-            <header className="sticky top-0 z-50 backdrop-blur-lg bg-white/70 dark:bg-slate-950/70 border-b border-slate-200/40 dark:border-slate-800/20 px-4 py-3.5 transition-all">
+            <header className="relative md:sticky md:top-0 z-50 backdrop-blur-lg bg-white/70 dark:bg-slate-950/70 border-b border-slate-200/40 dark:border-slate-800/20 px-4 py-3.5 transition-all">
                 <div className="max-w-5xl mx-auto flex items-center justify-between">
                     <button 
                         onClick={() => { haptic('light'); navigate(-1); }}

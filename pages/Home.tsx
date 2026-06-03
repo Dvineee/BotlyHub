@@ -2291,7 +2291,7 @@ const Home = () => {
       </svg>
       {/* Top Background Wrapper (Sticky Header on Desktop and Mobile) */}
       <div
-        className="sticky top-0 z-[120] min-h-[64px] md:h-[72px] py-2 md:py-0 flex items-center bg-white dark:bg-slate-950 border-b border-black/[0.03] dark:border-white/5 transition-all shadow-sm"
+        className="relative md:sticky md:top-0 z-[120] min-h-[56px] md:min-h-[64px] md:h-[72px] py-2 md:py-0 flex items-center bg-white dark:bg-slate-950 border-b border-black/[0.03] dark:border-white/5 transition-all shadow-sm"
         onMouseLeave={() => {
           setOpenMenu(null);
           setNavState("main");
@@ -2300,7 +2300,7 @@ const Home = () => {
         {/* Top Section */}
         <div className="w-full relative z-[120]">
           <div className="max-w-7xl mx-auto px-5 sm:px-8">
-            <div className="flex flex-wrap md:flex-nowrap items-center justify-between px-1 gap-y-4 md:gap-x-6">
+            <div className="flex items-center justify-between px-1 md:gap-x-6">
               <div className="flex items-center order-1 md:w-36 lg:w-48 shrink-0">
                 <Logo
                   onClick={() => navigate("/")}
@@ -2308,34 +2308,7 @@ const Home = () => {
                 />
               </div>
 
-              <div className="w-full md:flex-1 md:max-w-4xl order-3 md:order-2 flex items-center gap-4 lg:gap-8 font-sans justify-center">
-                {/* Search Bar Container */}
-                {/* Mobile View - Default Behavior */}
-                <div className="flex-1 block md:hidden relative z-[130]">
-                  <div className="relative flex items-center bg-[#eeefef] dark:bg-slate-800 rounded-xl group transition-all h-[42px] px-3">
-                    <div
-                      onClick={() => navigate("/search")}
-                      className="flex items-center flex-1 min-w-0 cursor-pointer active:scale-[0.98] transition-transform"
-                    >
-                      <Search
-                        size={16}
-                        className="text-[#8e8e93] dark:text-slate-400 group-hover:text-blue-500 transition-colors shrink-0 mr-2"
-                      />
-                      <div className="w-full text-[13px] text-[#2c2c2e] dark:text-slate-300 font-bold truncate min-w-0 tracking-wide">
-                        Herşeyi ara
-                      </div>
-                    </div>
-
-                    {/* Vertical Divider */}
-                    <div className="w-px h-5 bg-black/[0.08] dark:bg-white/[0.08] mx-1 shrink-0" />
-
-                    {/* Filter Menu */}
-                    <div className="shrink-0 relative z-[140]">
-                      <FilterMenu />
-                    </div>
-                  </div>
-                </div>
-
+              <div className="hidden md:flex md:flex-1 md:max-w-4xl order-3 md:order-2 items-center gap-4 lg:gap-8 font-sans justify-center">
                 {/* Tablet/PC View - Instant Search Dropdown */}
                 <div
                   ref={homeSearchRef}
@@ -2973,6 +2946,34 @@ const Home = () => {
             </motion.div>
           )}
         </AnimatePresence>
+      </div>
+      {/* Mobile-only Sticky Search Bar */}
+      <div className="sticky top-0 z-[110] block md:hidden bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl border-b border-black/[0.03] dark:border-white/5 p-3 shadow-xs">
+        <div className="relative flex items-center bg-[#eeefef] dark:bg-slate-800 rounded-xl group transition-all h-[42px] px-3">
+          <div
+            onClick={() => {
+              haptic("light");
+              navigate("/search");
+            }}
+            className="flex items-center flex-1 min-w-0 cursor-pointer active:scale-[0.98] transition-transform"
+          >
+            <Search
+              size={16}
+              className="text-[#8e8e93] dark:text-slate-400 group-hover:text-blue-500 transition-colors shrink-0 mr-2"
+            />
+            <div className="w-full text-[13px] text-[#2c2c2e] dark:text-slate-300 font-bold truncate min-w-0 tracking-wide">
+              Herşeyi ara
+            </div>
+          </div>
+
+          {/* Vertical Divider */}
+          <div className="w-px h-5 bg-black/[0.08] dark:bg-white/[0.08] mx-1 shrink-0" />
+
+          {/* Filter Menu */}
+          <div className="shrink-0 relative z-[140]">
+            <FilterMenu />
+          </div>
+        </div>
       </div>
       <AnimatePresence mode="wait">
         {isLoading ? (
