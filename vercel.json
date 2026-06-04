@@ -2,6 +2,14 @@
   "version": 2,
   "routes": [
     {
+      "src": "/api/group-users/([^/]+)/seed",
+      "dest": "/api/group-users/seed.ts?channelId=$1"
+    },
+    {
+      "src": "/api/group-users/([^/]+)",
+      "dest": "/api/group-users/[groupId].ts?groupId=$1"
+    },
+    {
       "src": "/api/(.*)",
       "dest": "/api/index.ts"
     },
