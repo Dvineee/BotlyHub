@@ -1018,56 +1018,125 @@ const AnalysisView = () => (
                   <div>
                     <h4 className="text-sm font-bold text-white mb-0.5">Sistem Güncellemesi</h4>
                     <span className="text-[10px] text-slate-500 font-medium uppercase tracking-widest">12:45 • Otomatik Yedekleme</span>
-                  </div>
-               </div>
-             ))}
-          </div>
-       </div>
-    </div>
-  </div>
+                   </div>
+                </div>
+              ))}
+           </div>
+        </div>
+     </div>
+   </div>
 );
 
 const UsersView = ({ channel }: { channel: any }) => {
   const { groupId } = useParams();
+  const { notification } = useTelegram();
   const [groupUsers, setGroupUsers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSeeding, setIsSeeding] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const targetGroupId = channel?.telegram_id || groupId || '';
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      if (!targetGroupId) return;
-      setIsLoading(true);
-      try {
-        const data = await DatabaseService.getGroupUsers(targetGroupId);
-        setGroupUsers(data || []);
-      } catch (err) {
-        console.error("Error fetching group users:", err);
-      } finally {
-        setIsLoading(false);
+  const fetchUsers = async () => {
+    if (!targetGroupId) return;
+    setIsLoading(true);
+    setErrorMsg(null);
+    try {
+      const data = await DatabaseService.getGroupUsers(targetGroupId);
+      setGroupUsers(data || []);
+    } catch (err: any) {
+      console.error("Error fetching group users:", err);
+      setErrorMsg(err?.message || "Kullanıcı listesi yüklenirken bir hata oluştu.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSeed = async () => {
+    if (!targetGroupId) return;
+    setIsSeeding(true);
+    setErrorMsg(null);
+    try {
+      const res = await DatabaseService.seedGroupUsers(targetGroupId);
+      if (notification) {
+        notification('success');
       }
-    };
+      alert('5 adet örnek grup üyesi veritabanına eklendi!');
+      await fetchUsers();
+    } catch (err: any) {
+      console.error("Error seeding group users:", err);
+      setErrorMsg(err?.message || "Örnek kullanıcılar oluşturulurken bir hata oluştu.");
+    } finally {
+      setIsSeeding(false);
+    }
+  };
+
+  useEffect(() => {
     fetchUsers();
   }, [targetGroupId]);
 
-  // Filter users by search term
-  const displayedUsers = groupUsers.filter(u => 
-    (u.name && u.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (u.username && u.username.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (u.user_id && String(u.user_id).includes(searchTerm))
-  );
+  // Reset page when search term changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  // Reset page when group ID changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [targetGroupId]);
+
+  // Safeguarded filter against null / undefined fields
+  const displayedUsers = groupUsers.filter(u => {
+    if (!u) return false;
+    const nameStr = String(u.name || '').toLowerCase();
+    const usernameStr = String(u.username || '').toLowerCase();
+    const userIdStr = String(u.user_id || '').toLowerCase();
+    const lastMsgStr = String(u.last_message || '').toLowerCase();
+    const langStr = String(u.language || '').toLowerCase();
+    const term = searchTerm.toLowerCase();
+    return (
+      nameStr.includes(term) || 
+      usernameStr.includes(term) || 
+      userIdStr.includes(term) ||
+      lastMsgStr.includes(term) ||
+      langStr.includes(term)
+    );
+  });
+
+  // Dynamic pagination math
+  const totalPages = Math.ceil(displayedUsers.length / itemsPerPage) || 1;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedUsers = displayedUsers.slice(startIndex, startIndex + itemsPerPage);
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="bg-[#14181f] border border-white/5 rounded-[40px] overflow-hidden">
+      {errorMsg && (
+        <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-3 text-red-400 text-xs animate-in fade-in">
+          <AlertCircle size={16} className="shrink-0 text-red-500" />
+          <div className="flex-1">
+            <span className="font-bold">Bağlantı Hatası:</span> {errorMsg}
+          </div>
+          <button 
+            onClick={fetchUsers} 
+            className="px-3 py-1 bg-red-500/10 hover:bg-red-500/20 rounded-lg text-[10px] uppercase font-black tracking-widest transition-all"
+          >
+            Yeniden Dene
+          </button>
+        </div>
+      )}
+
+      <div className="bg-[#14181f] border border-white/5 rounded-[40px] overflow-hidden animate-in fade-in duration-300">
         <div className="p-8 border-b border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h3 className="text-lg font-black text-white italic uppercase tracking-tighter">
-              Üye Yönetimi
+            <h3 className="text-lg font-black text-white italic uppercase tracking-tighter flex items-center gap-2">
+              <Users size={20} className="text-blue-500" />
+              Grup Üyeleri (group_users)
             </h3>
             <p className="text-xs text-slate-500 font-medium mt-1">
-              {channel ? `${channel.name} grubuna ait kullanıcı listesi` : 'Grup kullanıcı listesi'} ({targetGroupId})
+              {channel ? `${channel.name} grubuna ait aktif üyeler` : 'Grup kullanıcı listesi'} ({targetGroupId})
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
@@ -1077,77 +1146,202 @@ const UsersView = ({ channel }: { channel: any }) => {
                   type="text" 
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Üye ara..." 
-                  className="bg-[#0f1218] border border-white/5 rounded-xl pl-10 pr-4 h-10 text-xs text-white outline-none focus:border-blue-500/30 w-64" 
+                  placeholder="Kullanıcı adı, isim, ID veya son mesaj..." 
+                  className="bg-[#0f1218] border border-white/5 rounded-xl pl-10 pr-4 h-10 text-xs text-white outline-none focus:border-blue-500/30 w-72 placeholder:text-slate-650" 
                 />
              </div>
+             
+             {/* Refresh Button */}
+             <button 
+                onClick={fetchUsers} 
+                disabled={isLoading}
+                title="Listeyi Yenile"
+                className="h-10 w-10 bg-white/5 hover:bg-white/10 active:scale-95 text-white rounded-xl flex items-center justify-center transition-all disabled:opacity-50"
+             >
+                <RotateCcw size={14} className={isLoading ? "animate-spin text-blue-500" : ""} />
+             </button>
+
              <button className="h-10 px-4 bg-white/5 hover:bg-white/10 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2">
-               <Filter size={14} />
-               Filtrele
+                <Filter size={14} />
+                Filtrele
              </button>
           </div>
         </div>
 
         {isLoading ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="animate-spin text-blue-500" size={32} />
+          <div className="flex flex-col items-center justify-center py-24 gap-4">
+            <Loader2 className="animate-spin text-blue-500" size={36} />
+            <p className="text-xs text-slate-500 font-bold uppercase tracking-widest italic animate-pulse">group_users tablosu yükleniyor...</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-white/2 border-b border-white/5">
-                   <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">ID</th>
                    <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Kullanıcı</th>
-                   <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Karma (XP)</th>
-                   <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Katılım Tarihi</th>
+                   <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Telegram ID</th>
+                   <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Mesaj Sayısı</th>
+                   <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Son Mesaj</th>
+                   <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Seviye (XP)</th>
+                   <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Katılım</th>
                    <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest text-right">İşlem</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {displayedUsers.map((gUser, i) => (
-                  <tr key={gUser.user_id || i} className="hover:bg-white/2 transition-colors">
-                    <td className="px-8 py-5 text-[10px] font-medium text-slate-500 tracking-widest">
-                      {gUser.user_id}
-                    </td>
-                    <td className="px-8 py-5">
-                       <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center font-black text-white italic text-xs uppercase">
-                            {gUser.name?.[0] || 'U'}
-                          </div>
-                          <div>
-                            <h4 className="text-xs font-bold text-white">{gUser.name}</h4>
-                            <span className="text-[10px] text-blue-500 font-bold lowercase tracking-wider">
-                              @{gUser.username || 'user'}
-                            </span>
-                          </div>
-                       </div>
-                    </td>
-                    <td className="px-8 py-5 text-xs font-black text-amber-500 italic">
-                      {gUser.xp !== undefined ? gUser.xp : 0} XP
-                    </td>
-                    <td className="px-8 py-5 text-[10px] font-medium text-slate-500 uppercase tracking-widest">
-                      {gUser.joined_at ? new Date(gUser.joined_at).toLocaleString('tr-TR') : 'Bilinmiyor'}
-                    </td>
-                    <td className="px-8 py-5 text-right">
-                      <button className="text-slate-600 hover:text-white transition-colors"><MoreVertical size={16} /></button>
+                {paginatedUsers.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="px-8 py-20 text-center">
+                      <div className="flex flex-col items-center justify-center max-w-md mx-auto py-6">
+                        <div className="w-16 h-16 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-500 mb-4 animate-bounce">
+                          <Users size={28} />
+                        </div>
+                        <h4 className="text-sm font-black text-white italic uppercase tracking-wider mb-2">Grupta Kullanıcı Bulunmuyor</h4>
+                        <p className="text-xs text-slate-500 leading-relaxed mb-6">
+                          <strong>{targetGroupId}</strong> grubu için henüz veritabanında aktif kullanıcı kaydı yok. Test etmek için 5 adet yüksek etkileşimli örnek üye oluşturabilirsiniz.
+                        </p>
+                        <button 
+                          onClick={handleSeed}
+                          disabled={isSeeding || isLoading}
+                          className="px-6 h-11 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-900 text-white font-black uppercase text-[10px] tracking-widest rounded-xl transition-all shadow-lg shadow-blue-500/10 hover:shadow-blue-500/20 hover:scale-105 active:scale-95 disabled:opacity-50 flex items-center justify-center mx-auto gap-2"
+                        >
+                          {isSeeding ? (
+                            <>
+                              <Loader2 className="animate-spin" size={14} />
+                              Üretiliyor...
+                            </>
+                          ) : (
+                            <>
+                              <UserPlus size={14} />
+                              5 Örnek Üye Ekle / Üret
+                            </>
+                          )}
+                        </button>
+                      </div>
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  paginatedUsers.map((gUser, i) => (
+                    <tr key={gUser.user_id || i} className="hover:bg-white/[0.01] transition-colors">
+                      {/* Name & Username with beautiful avatar */}
+                      <td className="px-8 py-5">
+                         <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-full bg-slate-900 border border-white/5 flex items-center justify-center font-black text-white italic text-xs uppercase shadow-inner relative overflow-hidden">
+                              {/* Soft dynamic color overlay based on name letters */}
+                              <div className="absolute inset-0 opacity-10 bg-gradient-to-tr from-blue-500 to-amber-500" />
+                              {gUser.name?.[0] || 'U'}
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-1.5">
+                                <h4 className="text-xs font-bold text-white transition-colors hover:text-blue-400 cursor-pointer">
+                                  {gUser.name || 'İsimsiz Kullanıcı'}
+                                </h4>
+                                {gUser.language && (
+                                  <span className="text-[8px] font-black px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase tracking-tight">
+                                    {gUser.language}
+                                  </span>
+                                )}
+                              </div>
+                              <span className="text-[10px] text-slate-500 font-bold lowercase tracking-wider block mt-0.5 select-all">
+                                {gUser.username ? `@${gUser.username}` : '@kullanici'}
+                              </span>
+                            </div>
+                         </div>
+                      </td>
+
+                      {/* User Telegram ID */}
+                      <td className="px-8 py-5 text-[11px] font-mono text-slate-400 tracking-wide select-all">
+                        {gUser.user_id}
+                      </td>
+
+                      {/* Total Message Count */}
+                      <td className="px-8 py-5">
+                        <div className="flex items-center gap-2 font-mono">
+                          <MessageSquare size={13} className="text-slate-500" />
+                          <span className="text-xs font-bold text-slate-200">
+                             {gUser.total_messages !== undefined ? gUser.total_messages : (gUser.mes !== undefined ? gUser.mes : 0)}
+                          </span>
+                        </div>
+                      </td>
+
+                      {/* Last Message and time */}
+                      <td className="px-8 py-5 max-w-[200px]">
+                        {gUser.last_message ? (
+                          <div className="space-y-1">
+                            <p className="text-xs text-slate-300 font-medium truncate italic" title={gUser.last_message}>
+                              "{gUser.last_message}"
+                            </p>
+                            {gUser.last_message_at && (
+                              <span className="text-[9px] text-slate-500 font-semibold block capitalize">
+                                 {new Date(gUser.last_message_at).toLocaleDateString("tr-TR")} {new Date(gUser.last_message_at).toLocaleTimeString("tr-TR", {hour: '2-digit', minute:'2-digit'})}
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-[10px] text-slate-600 font-bold uppercase tracking-wider">-</span>
+                        )}
+                      </td>
+
+                      {/* XP & Level Badge */}
+                      <td className="px-8 py-5">
+                        <div className="flex items-center gap-2">
+                           <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                           <span className="text-xs font-black text-amber-500 italic uppercase">
+                             {gUser.xp !== undefined ? gUser.xp : 0} XP
+                           </span>
+                        </div>
+                      </td>
+
+                      {/* Joined Date */}
+                      <td className="px-8 py-5 text-[10px] font-medium text-slate-500 uppercase tracking-widest whitespace-nowrap">
+                        {gUser.joined_at ? new Date(gUser.joined_at).toLocaleDateString('tr-TR') : 'Bilinmiyor'}
+                      </td>
+
+                      {/* More actions buttons */}
+                      <td className="px-8 py-5 text-right">
+                        <button className="text-slate-600 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/5"><MoreVertical size={16} /></button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
         )}
 
-        <div className="p-8 bg-white/2 border-t border-white/5 flex items-center justify-between">
+        <div className="p-8 bg-white/2 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest italic">
-             Veritabanından Çekilen Aktif Üyeler ({displayedUsers.length} kişi listeleniyor)
+             Veritabanı Tablosu: group_users ({displayedUsers.length} kişi, {currentPage}/{totalPages} sayfa listeleniyor)
            </span>
            <div className="flex items-center gap-2">
-              <button className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white disabled:opacity-20"><ChevronRight size={16} className="rotate-180" /></button>
-              <button className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white font-black italic">1</button>
-              <button className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white font-black italic">2</button>
-              <button className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white disabled:opacity-20"><ChevronRight size={16} /></button>
+              <button 
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 disabled:opacity-20 disabled:hover:bg-white/5 flex items-center justify-center text-white transition-all"
+              >
+                <ChevronRight size={16} className="rotate-180" />
+              </button>
+              
+              {Array.from({ length: totalPages }, (_, idx) => idx + 1).map(page => (
+                <button 
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center font-black italic transition-all text-xs ${
+                    currentPage === page 
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' 
+                      : 'bg-white/5 hover:bg-white/10 text-white'
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+              
+              <button 
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                className="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 disabled:opacity-20 disabled:hover:bg-white/5 flex items-center justify-center text-white transition-all"
+              >
+                <ChevronRight size={16} />
+              </button>
            </div>
         </div>
       </div>

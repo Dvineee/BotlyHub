@@ -441,6 +441,7 @@ export class DatabaseService {
   static async getGroupUsers(channelId: string): Promise<any[]> {
     try {
       const fetchUrl = `${API_BASE_URL}/api/group-users/${encodeURIComponent(channelId)}`;
+      console.log(`[DatabaseService] Fetching group users from: ${fetchUrl}`);
       const res = await fetch(fetchUrl);
       if (!res.ok) {
         throw new Error(`API error: ${res.statusText}`);
@@ -449,17 +450,31 @@ export class DatabaseService {
       return data || [];
     } catch (e) {
       console.error("[DatabaseService] Error fetching group users via proxy API, falling back to direct client query:", e);
-      const { data, error } = await supabase
-        .from('group_users')
-        .select('*')
-        .eq('channel_id', channelId.toString());
-      
-      if (error) {
-        console.error("[DatabaseService] Anonymous query fallback error:", error);
+      try {
+        const { data, error } = await supabase
+          .from('group_users')
+          .select('*')
+          .eq('channel_id', channelId.toString());
+        
+        if (error) {
+          console.error("[DatabaseService] Anonymous query fallback error:", error);
+          return [];
+        }
+        return data || [];
+      } catch (fallbackErr) {
+        console.error("[DatabaseService] Supabase direct query fallback exception:", fallbackErr);
         return [];
       }
-      return data || [];
     }
+  }
+
+  static async seedGroupUsers(channelId: string): Promise<{ status: string; message: string }> {
+    const fetchUrl = `${API_BASE_URL}/api/group-users/${encodeURIComponent(channelId)}/seed`;
+    const res = await fetch(fetchUrl, { method: 'POST' });
+    if (!res.ok) {
+      throw new Error(`Seed API error: ${res.statusText}`);
+    }
+    return res.json();
   }
 
   // --- BOTS ---

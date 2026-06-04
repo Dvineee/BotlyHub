@@ -195,6 +195,130 @@ async function startServer() {
     }
   });
 
+  app.post("/api/group-users/:channelId/seed", async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    try {
+      const { channelId } = req.params;
+      if (!channelId) {
+        return res.status(400).json({ error: "channelId is required" });
+      }
+
+      let targetTelegramId = channelId.toString();
+
+      // If channelId is a UUID, look up the corresponding telegram_id
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(channelId);
+      if (isUuid) {
+        const { data: channelData } = await supabaseAdmin
+          .from('channels')
+          .select('telegram_id')
+          .eq('id', channelId)
+          .maybeSingle();
+        if (channelData?.telegram_id) {
+          targetTelegramId = channelData.telegram_id.toString();
+        }
+      }
+
+      // Check if group already has users
+      const { data: existingUsers } = await supabaseAdmin
+        .from('group_users')
+        .select('user_id')
+        .eq('channel_id', targetTelegramId)
+        .limit(1);
+
+      if (existingUsers && existingUsers.length > 0) {
+        return res.json({ message: "Bu grup için zaten kullanıcı bulunuyor.", count: existingUsers.length });
+      }
+
+      // Insert 5 beautiful sample users
+      const sampleUsers = [
+        {
+          channel_id: targetTelegramId,
+          user_id: "8099071818",
+          name: "Kaju",
+          username: "Kajusoft",
+          mes: 42,
+          xp: 420,
+          total_messages: 42,
+          last_message: "BotlyHub v3 gerçekten çok stabil olmuş!",
+          last_message_at: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+          joined_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+          language: "tr",
+          updated_at: new Date().toISOString()
+        },
+        {
+          channel_id: targetTelegramId,
+          user_id: "8426134237",
+          name: "KAJU TEST",
+          username: "kajju66",
+          mes: 28,
+          xp: 280,
+          total_messages: 28,
+          last_message: "Admin paneli hızı mükemmel.",
+          last_message_at: new Date(Date.now() - 12 * 60 * 1000).toISOString(),
+          joined_at: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
+          language: "tr",
+          updated_at: new Date().toISOString()
+        },
+        {
+          channel_id: targetTelegramId,
+          user_id: "1092837482",
+          name: "Selin Yılmaz",
+          username: "selin_ylmz",
+          mes: 15,
+          xp: 150,
+          total_messages: 15,
+          last_message: "Ben de yeni katıldım gruba, merhabalar.",
+          last_message_at: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
+          joined_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+          language: "tr",
+          updated_at: new Date().toISOString()
+        },
+        {
+          channel_id: targetTelegramId,
+          user_id: "542389104",
+          name: "Seyyid Ahmed",
+          username: "seyyidahmed",
+          mes: 9,
+          xp: 90,
+          total_messages: 9,
+          last_message: "Herkese hayırlı akşamlar dostlar.",
+          last_message_at: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
+          joined_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+          language: "en",
+          updated_at: new Date().toISOString()
+        },
+        {
+          channel_id: targetTelegramId,
+          user_id: "671239841",
+          name: "Michael Chen",
+          username: "mikechen",
+          mes: 3,
+          xp: 35,
+          total_messages: 3,
+          last_message: "How does the referral system work inside Telegram groups?",
+          last_message_at: new Date(Date.now() - 5 * 3600 * 1000).toISOString(),
+          joined_at: new Date(Date.now() - 12 * 3600 * 1000).toISOString(),
+          language: "en",
+          updated_at: new Date().toISOString()
+        }
+      ];
+
+      const { error: insErr } = await supabaseAdmin
+        .from('group_users')
+        .insert(sampleUsers);
+
+      if (insErr) {
+        console.error("[SERVER] Error seeding group users:", insErr);
+        return res.status(500).json({ error: insErr.message });
+      }
+
+      return res.json({ status: "success", message: "Grup için 5 adet örnek kullanıcı başarıyla üretildi!" });
+    } catch (err: any) {
+      console.error("[SERVER] Error in group-users seed endpoint:", err);
+      return res.status(500).json({ error: err.message });
+    }
+  });
+
   // --- DISCUSSION FORUM FILE PERSISTENCE ---
   const DISCUSSIONS_FILE = path.join(process.cwd(), "discussions.json");
 
