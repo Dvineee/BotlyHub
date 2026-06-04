@@ -1598,19 +1598,6 @@ img.rounded-xl, img.rounded-3xl, img.rounded-2xl, img.rounded-\[11px\], img.roun
   color: inherit !important;
 }
 
-html:not(.dark) .fixed .bg-white:not(.bottom-nav-container), html:not(.dark) .absolute[class*="bg-white"]:not(.bottom-nav-container), html:not(.dark) .mega-menu-container, html:not(.dark) [role="dialog"], html:not(.dark) .modal-content, html:not(.dark) [class*="dropdown-menu"] {
-  position: absolute;
-  border-radius: 0 12px;
-  right: 0;
-  top: 0;
-  background: linear-gradient(180deg, #fff, #fcfcfc) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px)!important;
-  color: #0f172a !important;
-  box-shadow: 0 10px 40px -10px #0f172a1f, 0 1px 3px #0f172a0a !important;
-  border: 1px solid rgba(15, 23, 42, .08) !important;
-}
-
 .dark .fixed .bg-white:not(.bottom-nav-container), .dark .fixed [class*="bg-[#14181f]"]:not(.bottom-nav-container), .dark .fixed [class*="bg-slate-900"]:not(.bottom-nav-container), .dark .fixed [class*="bg-[#0c0e14]"]:not(.bottom-nav-container), .dark .absolute[class*="bg-white"]:not(.bottom-nav-container), .dark .absolute[class*="bg-slate-900"]:not(.bottom-nav-container), .dark .absolute[class*="bg-slate-950"]:not(.bottom-nav-container), .dark .absolute[class*="bg-[#0c0e14]"]:not(.bottom-nav-container), .dark .mega-menu-container, .dark [role="dialog"], .dark .modal-content, .dark [class*="dropdown-menu"] {
   background: linear-gradient(180deg, #0c0e14, #06080c) !important;
   backdrop-filter: blur(24px) !important;

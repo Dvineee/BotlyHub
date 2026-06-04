@@ -3069,12 +3069,6 @@ const Home = () => {
                     </svg>
                   </div>
 
-                  {/* Micro Badge */}
-                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/10 dark:bg-blue-500/15 border border-blue-500/20 text-blue-600 dark:text-blue-400 text-[10.5px] font-black uppercase tracking-widest mb-6 select-none z-10 animate-pulse">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                    🌐 THE PREMIUM AI DIRECTORY
-                  </div>
-
                   {/* Core Value Title */}
                   <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-slate-800 dark:text-slate-100 max-w-3xl z-10 leading-[1.12] font-sans">
                     {t("home_hero_title")}
