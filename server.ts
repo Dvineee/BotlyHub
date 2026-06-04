@@ -156,6 +156,96 @@ async function startServer() {
     res.json({ status: "ok", time: new Date().toISOString() });
   });
 
+  // --- CHAT PHOTO PROXY CACHE ---
+  const chatPhotoCache: Record<string, { buffer: Buffer; contentType: string; expiresAt: number }> = {};
+
+  app.get("/api/telegram/chat-photo", async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    const chatId = req.query.chatId;
+    if (!chatId) {
+      return res.status(400).json({ error: "chatId query parameter is required" });
+    }
+
+    const cacheKey = chatId.toString().trim();
+    const now = Date.now();
+
+    // 1. Check Cache
+    if (chatPhotoCache[cacheKey] && chatPhotoCache[cacheKey].expiresAt > now) {
+      const cached = chatPhotoCache[cacheKey];
+      res.setHeader('Content-Type', cached.contentType);
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+      return res.send(cached.buffer);
+    }
+
+    // fallback check for bot token
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    if (!botToken) {
+      console.warn("[SERVER CHAT-PHOTO] TELEGRAM_BOT_TOKEN is not configured.");
+      return res.status(500).json({ error: "Telegram bot token is not configured on the server." });
+    }
+
+    try {
+      // 2. Retrieve Chat Info
+      const getChatUrl = `https://api.telegram.org/bot${botToken}/getChat?chat_id=${encodeURIComponent(cacheKey)}`;
+      const getChatRes = await fetch(getChatUrl);
+      if (!getChatRes.ok) {
+        throw new Error(`getChat API returned status ${getChatRes.status}`);
+      }
+
+      const getChatData = await getChatRes.json() as any;
+      if (!getChatData.ok || !getChatData.result || !getChatData.result.photo) {
+        return res.status(404).json({ error: "Chat has no profile photo or is private." });
+      }
+
+      const fileId = getChatData.result.photo.small_file_id;
+      if (!fileId) {
+        return res.status(404).json({ error: "small_file_id not found on chat photo" });
+      }
+
+      // 3. Retrieve File Path
+      const getFileUrl = `https://api.telegram.org/bot${botToken}/getFile?file_id=${encodeURIComponent(fileId)}`;
+      const getFileRes = await fetch(getFileUrl);
+      if (!getFileRes.ok) {
+        throw new Error(`getFile API returned status ${getFileRes.status}`);
+      }
+
+      const getFileData = await getFileRes.json() as any;
+      if (!getFileData.ok || !getFileData.result || !getFileData.result.file_path) {
+        return res.status(404).json({ error: "Could not retrieve file path for Telegram photo." });
+      }
+
+      const filePath = getFileData.result.file_path;
+
+      // 4. Download file bytes
+      const downloadUrl = `https://api.telegram.org/file/bot${botToken}/${filePath}`;
+      const downloadRes = await fetch(downloadUrl);
+      if (!downloadRes.ok) {
+        throw new Error(`Failed to download Telegram file with status ${downloadRes.status}`);
+      }
+
+      const arrayBuffer = await downloadRes.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      const contentType = downloadRes.headers.get('content-type') || 'image/jpeg';
+
+      // 5. Store in cache (valid for 10 minutes)
+      chatPhotoCache[cacheKey] = {
+        buffer,
+        contentType,
+        expiresAt: now + 10 * 60 * 1000,
+      };
+
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+      return res.send(buffer);
+    } catch (err: any) {
+      console.error(`[SERVER] Error proxying Telegram chat photo for ${chatId}:`, err.message);
+      return res.status(500).json({ error: "Telegram chat photo proxy failed", details: err.message });
+    }
+  });
+
   app.get("/api/group-users/:channelId", async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     try {
@@ -315,6 +405,63 @@ async function startServer() {
       return res.json({ status: "success", message: "Grup için 5 adet örnek kullanıcı başarıyla üretildi!" });
     } catch (err: any) {
       console.error("[SERVER] Error in group-users seed endpoint:", err);
+      return res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.post("/api/admin/add-admin", async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    try {
+      const { channelId, userId, action = "promote" } = req.body;
+
+      if (!channelId || !userId) {
+        return res.status(400).json({ error: "channelId and userId are required parameters" });
+      }
+
+      let targetTelegramId = channelId.toString();
+
+      // If channelId is a UUID, look up the corresponding telegram_id
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(channelId);
+      if (isUuid) {
+        const { data: channelData } = await supabaseAdmin
+          .from("channels")
+          .select("telegram_id")
+          .eq("id", channelId)
+          .maybeSingle();
+        if (channelData?.telegram_id) {
+          targetTelegramId = channelData.telegram_id.toString();
+        }
+      }
+
+      // Insert action into `pending_admin_actions` table
+      const { data, error } = await supabaseAdmin
+        .from("pending_admin_actions")
+        .insert([
+          {
+            channel_id: targetTelegramId,
+            user_id: userId.toString(),
+            action: action,
+            status: "pending",
+            created_at: new Date().toISOString(),
+          }
+        ])
+        .select();
+
+      if (error) {
+        console.error("[SERVER] Error inserting pending admin action:", error);
+        return res.status(500).json({ error: error.message });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "Yönetici yapma talebi başarıyla oluşturuldu.",
+        data: data?.[0] || null,
+      });
+    } catch (err: any) {
+      console.error("[SERVER] Unexpected error in add-admin endpoint:", err);
       return res.status(500).json({ error: err.message });
     }
   });

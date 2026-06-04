@@ -711,7 +711,19 @@ export default function UserProfile() {
                                                             <div className="flex items-center gap-3">
                                                                 <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 font-bold text-xs border border-slate-200/40 dark:border-slate-800/65 overflow-hidden">
                                                                     {(channel.icon || channel.photo_url || channel.avatar) ? (
-                                                                        <img src={channel.icon || channel.photo_url || channel.avatar} className="w-full h-full object-cover" alt="" referrerPolicy="no-referrer" />
+                                                                        <img 
+                                                                            src={channel.icon || channel.photo_url || channel.avatar} 
+                                                                            className="w-full h-full object-cover" 
+                                                                            alt="" 
+                                                                            referrerPolicy="no-referrer" 
+                                                                            onError={(e) => {
+                                                                                (e.target as any).style.display = 'none';
+                                                                                const parent = (e.target as any).parentElement;
+                                                                                if (parent) {
+                                                                                    parent.innerText = channel.name.charAt(0).toUpperCase();
+                                                                                }
+                                                                            }}
+                                                                        />
                                                                     ) : (
                                                                         channel.name.charAt(0).toUpperCase()
                                                                     )}

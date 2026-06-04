@@ -2,6 +2,10 @@
   "version": 2,
   "routes": [
     {
+      "src": "/api/admin/add-admin",
+      "dest": "/api/admin/add-admin.ts"
+    },
+    {
       "src": "/api/group-users/([^/]+)/seed",
       "dest": "/api/group-users/seed.ts?channelId=$1"
     },

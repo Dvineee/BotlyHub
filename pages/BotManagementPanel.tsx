@@ -11,9 +11,10 @@ import {
 } from 'lucide-react';
 import LoginModal from '../components/LoginModal';
 import { useTelegram } from '../hooks/useTelegram';
-import { DatabaseService } from '../services/DatabaseService';
+import { DatabaseService, supabase } from '../services/DatabaseService';
 import { UserBot, Channel } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
+import { API_BASE_URL } from '../constants';
 
 const SidebarItem = ({ icon: Icon, label, path, active, badge, color, external }: any) => (
   <Link 
@@ -206,7 +207,7 @@ const BotManagementPanel = () => {
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full border border-white/10 overflow-hidden bg-slate-800 shrink-0 flex items-center justify-center font-black text-white italic text-sm">
                        {activeChannel?.icon ? (
-                         <img src={activeChannel.icon} alt={activeChannel.name} className="w-full h-full object-cover" />
+                         <img src={activeChannel.icon} alt={activeChannel.name} className="w-full h-full object-cover" onError={(e) => { (e.target as any).style.display = 'none'; const parent = (e.target as any).parentElement; if (parent) parent.innerText = (activeChannel?.name?.[0] || 'G').toUpperCase(); }} />
                        ) : (
                          (activeChannel?.name?.[0] || 'G').toUpperCase()
                        )}
@@ -405,6 +406,88 @@ const GroupSettingsView = ({ channel }: { channel: any }) => {
     const { groupId } = useParams();
     const displayGroupId = channel ? channel.telegram_id : (groupId || '-1003360909133');
 
+    // Functional Admin states
+    const [pendingList, setPendingList] = useState<any[]>([]);
+    const [loadingAdmins, setLoadingAdmins] = useState(false);
+    const [showAddForm, setShowAddForm] = useState(false);
+    const [newAdminId, setNewAdminId] = useState('');
+    const [submittingAdmin, setSubmittingAdmin] = useState(false);
+
+    const fetchPendingAdmins = async () => {
+        if (!displayGroupId) return;
+        setLoadingAdmins(true);
+        try {
+            let targetTelegramId = displayGroupId.toString();
+            // If UUID, look up channel first
+            const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(displayGroupId);
+            if (isUuid) {
+                const { data: channelData } = await supabase
+                    .from('channels')
+                    .select('telegram_id')
+                    .eq('id', displayGroupId)
+                    .maybeSingle();
+                if (channelData?.telegram_id) {
+                    targetTelegramId = channelData.telegram_id.toString();
+                }
+            }
+
+            const { data, error } = await supabase
+                .from('pending_admin_actions')
+                .select('*')
+                .eq('channel_id', targetTelegramId)
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error("Error fetching pending admins:", error);
+            } else {
+                setPendingList(data || []);
+            }
+        } catch (err) {
+            console.error("Failed to load team actions:", err);
+        } finally {
+            setLoadingAdmins(false);
+        }
+    };
+
+    useEffect(() => {
+        if (activeTab === 'team') {
+            fetchPendingAdmins();
+        }
+    }, [activeTab, displayGroupId]);
+
+    const handleAddNewAdmin = async () => {
+        if (!newAdminId.trim() || !displayGroupId) return;
+        setSubmittingAdmin(true);
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/admin/add-admin`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    channelId: displayGroupId,
+                    userId: newAdminId.trim().toString(),
+                    action: "promote",
+                }),
+            });
+
+            const result = await response.json();
+            if (!response.ok) {
+                throw new Error(result.error || "Talep eklenirken bir hata oluştu.");
+            }
+
+            alert("Yönetici yapma talebi veritabanına başarıyla eklendi! Telegram botu 5 saniye içinde yetki tanıtacaktır.");
+            setNewAdminId('');
+            setShowAddForm(false);
+            fetchPendingAdmins();
+        } catch (err: any) {
+            console.error("Error creating promote action from panel:", err);
+            alert(err.message || "İşlem sırasında bir hata oluştu.");
+        } finally {
+            setSubmittingAdmin(false);
+        }
+    };
+
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-5xl">
             <div className="flex items-center gap-2 mb-8 bg-[#14181f] p-1.5 rounded-2xl w-fit border border-white/5">
@@ -546,40 +629,132 @@ const GroupSettingsView = ({ channel }: { channel: any }) => {
                             </p>
                         </div>
                         <div className="flex items-center gap-2">
-                             <button className="h-10 px-4 bg-white/5 hover:bg-white/10 text-white rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all">
-                                <RotateCcw size={14} />
+                             <button 
+                                onClick={fetchPendingAdmins}
+                                disabled={loadingAdmins}
+                                className="h-10 px-4 bg-white/5 hover:bg-white/10 text-white rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all disabled:opacity-50"
+                             >
+                                <RotateCcw size={14} className={loadingAdmins ? "animate-spin" : ""} />
                                 Yenile
                              </button>
-                             <button className="h-10 px-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all shadow-lg shadow-blue-500/20">
-                                <Plus size={14} />
-                                Yönetici ekle
+                             <button 
+                                onClick={() => setShowAddForm(!showAddForm)}
+                                className="h-10 px-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all shadow-lg shadow-blue-500/20"
+                             >
+                                {showAddForm ? <X size={14} /> : <Plus size={14} />}
+                                {showAddForm ? "Vazgeç" : "Yönetici ekle"}
                              </button>
                         </div>
                     </div>
 
-                    <div className="space-y-3">
-                        {[
-                            { id: '210944655', name: 'BotlyHub', user: '@botlyhub', isBot: true },
-                            { id: '842614237', name: 'KAJU', user: '@kajju66', isBot: false },
-                        ].map((admin, i) => (
-                            <div key={i} className="bg-[#14181f] border border-white/5 rounded-[24px] p-4 flex items-center gap-4 group hover:border-blue-500/30 transition-all cursor-pointer">
-                                <div className="w-10 h-10 bg-slate-900 rounded-full flex items-center justify-center p-1 overflow-hidden">
-                                    <div className="w-full h-full bg-slate-800 rounded-full flex items-center justify-center font-black text-white italic text-xs">
-                                        {admin.name[0]}
+                    <AnimatePresence>
+                        {showAddForm && (
+                            <motion.div 
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: "auto" }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="overflow-hidden mb-6"
+                            >
+                                <div 
+                                    style={{ outline: "solid 1px rgba(59, 130, 246, 0.2)" }} 
+                                    className="bg-blue-950/20 border border-blue-500/10 p-6 rounded-[24px]"
+                                >
+                                    <h4 className="text-[10px] font-black text-white italic uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                                        <Shield size={14} className="text-blue-500" />
+                                        YÖNETİCİ EKLE (PROMOTE MEMBER)
+                                    </h4>
+                                    <p className="text-[11px] text-slate-400 mb-4 leading-relaxed italic">
+                                        Telegram grubunuzda yönetici yapmak istediğiniz kullanıcının Telegram ID bilgisini girin. Botumuz yetki yükseltme işlemini anında gerçekleştirecektir.
+                                    </p>
+                                    <div className="flex flex-col sm:flex-row gap-3">
+                                        <input 
+                                            type="text"
+                                            value={newAdminId}
+                                            onChange={(e) => setNewAdminId(e.target.value)}
+                                            placeholder="Telegram Kullanıcı ID (ör. 842614237)"
+                                             className="flex-1 h-11 bg-[#14181f] border border-white/5 rounded-xl px-4 text-xs font-mono text-white placeholder-slate-600 focus:outline-none focus:border-blue-500/50 transition-all"
+                                        />
+                                        <button 
+                                            onClick={handleAddNewAdmin}
+                                            disabled={submittingAdmin || !newAdminId.trim()}
+                                            className="h-11 px-5 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-900 border border-blue-500/10 text-white font-black uppercase text-[9px] tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 shrink-0 disabled:opacity-50"
+                                        >
+                                            {submittingAdmin ? (
+                                                <Loader2 size={12} className="animate-spin text-white" />
+                                            ) : (
+                                                <Check size={12} />
+                                            )}
+                                            Sisteme Gönder
+                                        </button>
                                     </div>
                                 </div>
-                                <div className="flex-1">
-                                    <div className="flex items-center gap-2 mb-0.5">
-                                        <span className="text-xs font-black text-blue-500 italic tracking-tighter">{admin.id}</span>
-                                        <h4 className="text-sm font-bold text-white">{admin.name}</h4>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
+                    <div className="space-y-6">
+                        <div>
+                            <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">TEMEL GRUP YÖNETİCİLERİ</h3>
+                            <div className="space-y-3">
+                                {[
+                                    { id: '210944655', name: 'BotlyHub', user: '@botlyhub', isBot: true },
+                                    { id: '842614237', name: 'KAJU', user: '@kajju66', isBot: false },
+                                ].map((admin, i) => (
+                                    <div key={i} className="bg-[#14181f] border border-white/5 rounded-[24px] p-4 flex items-center gap-4 group hover:border-blue-500/30 transition-all cursor-pointer">
+                                        <div className="w-10 h-10 bg-slate-900 rounded-full flex items-center justify-center p-1 overflow-hidden">
+                                            <div className="w-full h-full bg-slate-800 rounded-full flex items-center justify-center font-black text-white italic text-xs">
+                                                {admin.name[0]}
+                                             </div>
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-2 mb-0.5">
+                                                <span className="text-xs font-black text-blue-500 italic tracking-tighter">{admin.id}</span>
+                                                <h4 className="text-sm font-bold text-white">{admin.name}</h4>
+                                            </div>
+                                            <span className="text-[10px] text-slate-500 font-medium">{admin.user}</span>
+                                        </div>
+                                         <div className="p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                             <MoreVertical size={16} className="text-slate-600" />
+                                         </div>
                                     </div>
-                                    <span className="text-[10px] text-slate-500 font-medium">{admin.user}</span>
-                                </div>
-                                <div className="p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <MoreVertical size={16} className="text-slate-600" />
+                                ))}
+                            </div>
+                        </div>
+
+                        {pendingList.length > 0 && (
+                            <div>
+                                <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">TALEPLER & İŞLEM GEÇMİŞİ</h3>
+                                <div className="space-y-2 max-h-96 overflow-y-auto">
+                                    {pendingList.map((act) => (
+                                        <div key={act.id} className="bg-[#14181f]/40 border border-white/5 hover:border-white/10 rounded-xl p-3 flex items-center justify-between gap-3 text-xs">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 font-bold font-mono text-[10px]">
+                                                    {act.action === 'promote' ? 'PROM' : 'DEMO'}
+                                                </div>
+                                                <div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-mono text-[11px] font-semibold text-white">ID: {act.user_id}</span>
+                                                        <span className="text-[10px] text-slate-500">• {new Date(act.created_at).toLocaleTimeString()}</span>
+                                                    </div>
+                                                    {act.error_log && (
+                                                        <p className="text-[9px] text-red-500 italic max-w-sm overflow-hidden text-ellipsis whitespace-nowrap">{act.error_log}</p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div>
+                                                {act.status === 'pending' ? (
+                                                    <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-yellow-500/10 text-yellow-500 border border-yellow-500/15 animate-pulse">BEKLENİYOR</span>
+                                                ) : act.status === 'completed' ? (
+                                                    <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-green-500/10 text-green-500 border border-green-500/15">TAMAMLANDI</span>
+                                                ) : (
+                                                    <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-red-500/10 text-red-500 border border-red-500/15">BAŞARISIZ</span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
-                        ))}
+                        )}
                     </div>
                 </div>
             )}
@@ -1033,6 +1208,7 @@ const UsersView = ({ channel }: { channel: any }) => {
   const [groupUsers, setGroupUsers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSeeding, setIsSeeding] = useState(false);
+  const [promotingUserId, setPromotingUserId] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -1071,6 +1247,39 @@ const UsersView = ({ channel }: { channel: any }) => {
       setErrorMsg(err?.message || "Örnek kullanıcılar oluşturulurken bir hata oluştu.");
     } finally {
       setIsSeeding(false);
+    }
+  };
+
+  const handlePromoteAdmin = async (userId: string, userName: string) => {
+    if (!targetGroupId) return;
+    const confirmMsg = `"${userName}" (ID: ${userId}) adlı kullanıcıyı grupta Yönetici (Admin) yapmak istediğinize emin misiniz? (Bot 5 saniye içinde yetki tanıtacaktır)`;
+    if (!window.confirm(confirmMsg)) return;
+
+    setPromotingUserId(userId);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/add-admin`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          channelId: targetGroupId,
+          userId: userId,
+          action: "promote",
+        }),
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.error || "Yönetici ekleme talebi başarısız oldu.");
+      }
+
+      alert("Yönetici yapma talebi veritabanına başarıyla eklendi! Telegram botu 5 saniye içinde işlemi tamamlayacaktır.");
+    } catch (err: any) {
+      console.error("Error creating promote admin action:", err);
+      alert(err.message || "İşlem yapılırken bir hata oluştu.");
+    } finally {
+      setPromotingUserId(null);
     }
   };
 
@@ -1297,8 +1506,24 @@ const UsersView = ({ channel }: { channel: any }) => {
                       </td>
 
                       {/* More actions buttons */}
-                      <td className="px-8 py-5 text-right">
-                        <button className="text-slate-600 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/5"><MoreVertical size={16} /></button>
+                      <td className="px-8 py-5 text-right whitespace-nowrap">
+                        <button 
+                          onClick={() => handlePromoteAdmin(gUser.user_id, gUser.name || gUser.username || "Kullanıcı")}
+                          disabled={promotingUserId === gUser.user_id}
+                          className="px-3 py-1.5 bg-blue-600/10 hover:bg-blue-600 text-blue-400 hover:text-white border border-blue-500/15 disabled:bg-blue-900/40 disabled:text-slate-500 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all inline-flex items-center gap-1.5 active:scale-95 disabled:scale-100 disabled:opacity-50"
+                        >
+                          {promotingUserId === gUser.user_id ? (
+                            <>
+                              <Loader2 size={10} className="animate-spin text-blue-400" />
+                              Ekleniyor...
+                            </>
+                          ) : (
+                            <>
+                              <Shield size={10} />
+                              Yönetici Yap
+                            </>
+                          )}
+                        </button>
                       </td>
                     </tr>
                   ))

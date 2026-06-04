@@ -368,7 +368,7 @@ export class DatabaseService {
         telegram_id: String(c.telegram_id), 
         name: c.name, 
         memberCount: Number(c.member_count || 0), 
-        icon: c.icon || '', 
+        icon: c.icon || (c.telegram_id ? `${API_BASE_URL}/api/telegram/chat-photo?chatId=${encodeURIComponent(c.telegram_id)}` : ''), 
         revenueEnabled: c.revenue_enabled, 
         connectedBotIds: c.connected_bot_ids || [], 
         revenue: Number(c.revenue || 0) 
