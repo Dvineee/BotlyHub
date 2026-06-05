@@ -3131,32 +3131,6 @@ const Home = () => {
                       </div>
                     </div>
 
-                    {/* Bottom: Categories Segment Quick Segment Tags */}
-                    <div className="col-span-12 mt-4 pt-6 border-t border-black/[0.04] dark:border-white/[0.04] w-full text-center">
-                      <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-4 select-none font-mono">
-                        {t("discover_by_vertical") || "CATEGORIES & SEGMENTATION"}
-                      </p>
-                      <div className="flex flex-wrap items-center justify-center gap-2 md:gap-2.5 max-w-full">
-                        {[
-                          { id: "ai_services", label: "💬 Chatbots" },
-                          { id: "productivity", label: "⚡ Productivity" },
-                          { id: "utilities", label: "🛠️ Utilities" },
-                          { id: "finance", label: "📈 Finance" },
-                        ].map((tag) => (
-                          <button
-                            key={tag.id}
-                            onClick={() => {
-                              haptic("light");
-                              navigate(`/search?mode=bots&category=${tag.id}`);
-                            }}
-                            className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-slate-50 dark:bg-slate-900 border border-black/[0.04] dark:border-white/[0.05] text-slate-700 dark:text-slate-300 hover:border-blue-500 hover:text-blue-500 dark:hover:border-blue-400 dark:hover:text-blue-400 cursor-pointer shadow-sm active:scale-95 duration-150 transition-all select-none"
-                          >
-                            {tag.label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
                   </div>
                 </div>
 
