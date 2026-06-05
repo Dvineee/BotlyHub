@@ -1956,4 +1956,15 @@ div.qa-last-24h-box, .qa-last-24h-box {
   gap: 6px !important;
 }
 
+.text-\[\#34c759\] {
+  --tw-text-opacity: 1 !important;
+  color: #000000 !important;
+}
+
+.dark .text-\[\#34c759\] {
+  --tw-text-opacity: 1 !important;
+  color: #34c759 !important;
+}
+
+
 
