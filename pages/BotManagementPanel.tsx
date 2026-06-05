@@ -777,7 +777,7 @@ const GroupSettingsView = ({ channel }: { channel: any }) => {
                                                         if (filtered.length === 0) return null;
 
                                                         return (
-                                                            <div className="absolute left-0 right-0 mt-2 bg-[#0c0f14] border border-blue-500/25 rounded-2xl overflow-hidden z-50 shadow-2xl max-h-60 overflow-y-auto">
+                                                            <div className="absolute left-0 right-0 mt-2 bg-[#0c0f14] border border-blue-500/25 rounded-2xl overflow-hidden z-50 shadow-2xl max-h-60 overflow-y-auto" style="position: relative;" >
                                                                 <div className="px-3 py-1.5 text-[9px] font-black text-slate-500 uppercase tracking-widest border-b border-white/5 bg-[#14181f]/40">
                                                                     EŞLEŞEN GRUP ÜYELERİ
                                                                 </div>
