@@ -1657,28 +1657,50 @@ async function startServer() {
 
       let targetTelegramId = groupId.toString();
       // If groupId is a UUID, look up the corresponding telegram_id
-      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(groupId);
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(groupId) || (groupId.length >= 32 && groupId.includes('-'));
       if (isUuid) {
-        const { data: channelData } = await supabaseAdmin
-          .from('channels')
-          .select('telegram_id')
-          .eq('id', groupId)
-          .maybeSingle();
-        if (channelData?.telegram_id) {
-          targetTelegramId = channelData.telegram_id.toString();
+        try {
+          const { data: channelData } = await supabaseAdmin
+            .from('channels')
+            .select('telegram_id')
+            .eq('id', groupId)
+            .maybeSingle();
+          if (channelData?.telegram_id) {
+            targetTelegramId = channelData.telegram_id.toString();
+          }
+        } catch (err) {
+          console.warn("[SERVER] UUID channel resolution failed, fallback to raw groupId:", err);
         }
       }
 
       const { welcome_enabled, welcome_message, delete_old_welcome, delete_old, welcome_delay, delay_seconds, last_welcome_message_id } = req.body;
 
       // Extract existing settings to avoid overwriting nested properties like last_welcome_message_id if not supplied
-      const { data: existing } = await supabaseAdmin
-        .from('pending_admin_actions')
-        .select('*')
-        .eq('channel_id', targetTelegramId)
-        .eq('user_id', 'system')
-        .eq('action', 'welcome_settings')
-        .maybeSingle();
+      let existing = null;
+      try {
+        const { data } = await supabaseAdmin
+          .from('pending_admin_actions')
+          .select('*')
+          .eq('channel_id', targetTelegramId)
+          .eq('user_id', 'system')
+          .eq('action', 'welcome_settings')
+          .maybeSingle();
+        existing = data;
+      } catch (err: any) {
+        console.warn("[SERVER] Error querying pending_admin_actions list, trying standard client fallback:", err.message);
+        try {
+          const { data } = await supabase
+            .from('pending_admin_actions')
+            .select('*')
+            .eq('channel_id', targetTelegramId)
+            .eq('user_id', 'system')
+            .eq('action', 'welcome_settings')
+            .maybeSingle();
+          existing = data;
+        } catch (fail) {
+          console.error("[SERVER] Both database clients failed to select from pending_admin_actions table:", fail);
+        }
+      }
 
       const existingPermissions = existing?.permissions || {};
       
@@ -1701,39 +1723,71 @@ async function startServer() {
         last_welcome_message_id: last_welcome_message_id !== undefined ? last_welcome_message_id : (existingPermissions.last_welcome_message_id || null)
       };
 
-      let saveResult;
-      if (existing) {
-        saveResult = await supabaseAdmin
-          .from('pending_admin_actions')
-          .update({
-            permissions: newPermissions,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', existing.id)
-          .select();
-      } else {
-        saveResult = await supabaseAdmin
-          .from('pending_admin_actions')
-          .insert({
-            channel_id: targetTelegramId,
-            user_id: 'system',
-            action: 'welcome_settings',
-            status: 'active',
-            permissions: newPermissions,
-            created_at: new Date().toISOString()
-          })
-          .select();
+      let saveResult: { error: any } = { error: null };
+      
+      try {
+        if (existing) {
+          const resFromDb = await supabaseAdmin
+            .from('pending_admin_actions')
+            .update({
+              permissions: newPermissions,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', existing.id);
+          saveResult = { error: resFromDb.error };
+        } else {
+          const resFromDb = await supabaseAdmin
+            .from('pending_admin_actions')
+            .insert({
+              channel_id: targetTelegramId,
+              user_id: 'system',
+              action: 'welcome_settings',
+              status: 'active',
+              permissions: newPermissions,
+              created_at: new Date().toISOString()
+            });
+          saveResult = { error: resFromDb.error };
+        }
+      } catch (err: any) {
+        console.warn("[SERVER] Primary db client failed to write, falling back to standard client:", err.message);
+        try {
+          if (existing) {
+            const resFromDb = await supabase
+              .from('pending_admin_actions')
+              .update({
+                permissions: newPermissions,
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', existing.id);
+            saveResult = { error: resFromDb.error };
+          } else {
+            const resFromDb = await supabase
+              .from('pending_admin_actions')
+              .insert({
+                channel_id: targetTelegramId,
+                user_id: 'system',
+                action: 'welcome_settings',
+                status: 'active',
+                permissions: newPermissions,
+                created_at: new Date().toISOString()
+              });
+            saveResult = { error: resFromDb.error };
+          }
+        } catch (subErr: any) {
+          console.error("[SERVER] Both db write clients failed:", subErr);
+          return res.status(500).json({ error: "Veritabanı bağlantı hatası: " + subErr.message });
+        }
       }
 
-      if (saveResult.error) {
-        console.error("[SERVER] Error saving welcome settings:", saveResult.error);
-        return res.status(500).json({ error: saveResult.error.message });
+      if (saveResult && saveResult.error) {
+        console.error("[SERVER] Error saving welcome settings via database result:", saveResult.error);
+        return res.status(500).json({ error: saveResult.error.message || "Kaydetme başarısız." });
       }
 
       return res.json({ success: true, settings: newPermissions });
     } catch (err: any) {
       console.error("[SERVER] Error in POST welcome settings:", err);
-      return res.status(500).json({ error: err.message });
+      return res.status(500).json({ error: err.message || "Beklenmeyen sunucu hatası." });
     }
   });
 

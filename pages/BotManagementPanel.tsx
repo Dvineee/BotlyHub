@@ -1484,8 +1484,17 @@ const ModerationView = () => {
         setSaveStatus('success');
         setTimeout(() => setSaveStatus('idle'), 3000);
       } else {
-        const errData = await res.json();
-        setErrorMessage(errData.error || 'Ayarlar kaydedilemedi.');
+        let errorMsg = 'Ayarlar kaydedilemedi.';
+        try {
+          const errData = await res.json();
+          errorMsg = errData.error || errorMsg;
+        } catch (_) {
+          try {
+            const errText = await res.text();
+            errorMsg = errText || errorMsg;
+          } catch (_) {}
+        }
+        setErrorMessage(errorMsg);
         setSaveStatus('error');
       }
     } catch (err) {
