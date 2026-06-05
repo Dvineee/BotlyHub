@@ -417,6 +417,11 @@ const GroupSettingsView = ({ channel }: { channel: any }) => {
     const [rightsModalData, setRightsModalData] = useState<{ userId: string; userName: string; initialPermissions?: any } | null>(null);
     const [submittingRights, setSubmittingRights] = useState(false);
 
+    // Dynamic states for live Telegram profiles mapping
+    const [liveAdmins, setLiveAdmins] = useState<any[]>([]);
+    const [groupUsers, setGroupUsers] = useState<any[]>([]);
+    const [imgError, setImgError] = useState<Record<string, boolean>>({});
+
     const fetchPendingAdmins = async () => {
         if (!displayGroupId) return;
         setLoadingAdmins(true);
@@ -435,6 +440,7 @@ const GroupSettingsView = ({ channel }: { channel: any }) => {
                 }
             }
 
+            // 1. Fetch admin actions from our database
             const { data, error } = await supabase
                 .from('pending_admin_actions')
                 .select('*')
@@ -446,6 +452,22 @@ const GroupSettingsView = ({ channel }: { channel: any }) => {
             } else {
                 setPendingList(data || []);
             }
+
+            // 2. Fetch group member records from `group_users` to dynamically map username/display name
+            try {
+                const usersData = await DatabaseService.getGroupUsers(targetTelegramId);
+                setGroupUsers(usersData || []);
+            } catch (uErr) {
+                console.error("Error fetching group users for name mapping:", uErr);
+            }
+
+            // 3. Fetch active administrators directly via our telegram/chat-admins endpoint
+            try {
+                const adminsData = await DatabaseService.getChatAdministrators(targetTelegramId);
+                setLiveAdmins(adminsData || []);
+            } catch (aErr) {
+                console.warn("Could not fetch active Telegram admins, using static fallback info.", aErr);
+            }
         } catch (err) {
             console.error("Failed to load team actions:", err);
         } finally {
@@ -454,10 +476,16 @@ const GroupSettingsView = ({ channel }: { channel: any }) => {
     };
 
     useEffect(() => {
+        if (displayGroupId) {
+            fetchPendingAdmins();
+        }
+    }, [displayGroupId]);
+
+    useEffect(() => {
         if (activeTab === 'team') {
             fetchPendingAdmins();
         }
-    }, [activeTab, displayGroupId]);
+    }, [activeTab]);
 
     const handleAddNewAdmin = () => {
         if (!newAdminId.trim() || !displayGroupId) return;
@@ -724,28 +752,91 @@ const GroupSettingsView = ({ channel }: { channel: any }) => {
                                         YÖNETİCİ EKLE (PROMOTE MEMBER)
                                     </h4>
                                     <p className="text-[11px] text-slate-400 mb-4 leading-relaxed italic">
-                                        Telegram grubunuzda yönetici yapmak istediğiniz kullanıcının Telegram ID bilgisini girin. Botumuz yetki yükseltme işlemini anında gerçekleştirecektir.
+                                        Telegram grubunuzda yetki vermek istediğiniz kullanıcının adını, kullanıcı adını veya Telegram ID değerini yazın. Aşağıda çıkan öneriye tıklayarak anında seçebilirsiniz!
                                     </p>
-                                    <div className="flex flex-col sm:flex-row gap-3">
-                                        <input 
-                                            type="text"
-                                            value={newAdminId}
-                                            onChange={(e) => setNewAdminId(e.target.value)}
-                                            placeholder="Telegram Kullanıcı ID (ör. 842614237)"
-                                             className="flex-1 h-11 bg-[#14181f] border border-white/5 rounded-xl px-4 text-xs font-mono text-white placeholder-slate-600 focus:outline-none focus:border-blue-500/50 transition-all"
-                                        />
-                                        <button 
-                                            onClick={handleAddNewAdmin}
-                                            disabled={submittingAdmin || !newAdminId.trim()}
-                                            className="h-11 px-5 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-900 border border-blue-500/10 text-white font-black uppercase text-[9px] tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 shrink-0 disabled:opacity-50"
-                                        >
-                                            {submittingAdmin ? (
-                                                <Loader2 size={12} className="animate-spin text-white" />
-                                            ) : (
-                                                <Check size={12} />
-                                            )}
-                                            Sisteme Gönder
-                                        </button>
+                                    <div className="flex flex-col gap-3 relative">
+                                        <div className="flex flex-col sm:flex-row gap-3 relative">
+                                            <div className="flex-1 relative">
+                                                <input 
+                                                    type="text"
+                                                    value={newAdminId}
+                                                    onChange={(e) => setNewAdminId(e.target.value)}
+                                                    placeholder="Aramak için yazın (İsim, @KullanıcıAdı veya ID)..."
+                                                    className="w-full h-11 bg-[#14181f] border border-white/5 rounded-xl px-4 text-xs font-mono text-white placeholder-slate-600 focus:outline-none focus:border-blue-500/50 transition-all"
+                                                />
+                                                {/* Autocomplete dropdown suggestions */}
+                                                {newAdminId.trim() !== '' && (
+                                                    (() => {
+                                                        const term = newAdminId.toLowerCase();
+                                                        const filtered = groupUsers.filter(u => 
+                                                            String(u.user_id).includes(term) || 
+                                                            String(u.name || '').toLowerCase().includes(term) || 
+                                                            String(u.username || '').toLowerCase().includes(term)
+                                                        ).slice(0, 5);
+
+                                                        if (filtered.length === 0) return null;
+
+                                                        return (
+                                                            <div className="absolute left-0 right-0 mt-2 bg-[#0c0f14] border border-blue-500/25 rounded-2xl overflow-hidden z-50 shadow-2xl max-h-60 overflow-y-auto">
+                                                                <div className="px-3 py-1.5 text-[9px] font-black text-slate-500 uppercase tracking-widest border-b border-white/5 bg-[#14181f]/40">
+                                                                    EŞLEŞEN GRUP ÜYELERİ
+                                                                </div>
+                                                                {filtered.map((user) => (
+                                                                    <button 
+                                                                        key={user.user_id}
+                                                                        type="button"
+                                                                        onClick={() => {
+                                                                            setNewAdminId(String(user.user_id));
+                                                                        }}
+                                                                        className="w-full text-left px-4 py-3 hover:bg-blue-500/10 flex items-center justify-between border-b border-white/[0.03] transition-all group"
+                                                                    >
+                                                                        <div className="flex items-center gap-3">
+                                                                            <div className="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center p-0.5 overflow-hidden border border-white/5 shrink-0">
+                                                                                {!imgError[user.user_id] ? (
+                                                                                    <img 
+                                                                                        src={`${API_BASE_URL}/api/telegram/chat-photo?chatId=${user.user_id}`} 
+                                                                                        onError={() => setImgError(prev => ({ ...prev, [user.user_id]: true }))}
+                                                                                        className="w-full h-full object-cover rounded-full" 
+                                                                                        referrerPolicy="no-referrer"
+                                                                                    />
+                                                                                ) : (
+                                                                                    <div className="w-full h-full bg-slate-800 rounded-full flex items-center justify-center font-black text-white italic text-[11px]">
+                                                                                        {(user.name || 'Y')[0].toUpperCase()}
+                                                                                    </div>
+                                                                                )}
+                                                                            </div>
+                                                                            <div>
+                                                                                <h5 className="text-xs font-bold text-white group-hover:text-blue-400 transition-colors leading-none mb-1">
+                                                                                    {user.name || 'Grup Üyesi'}
+                                                                                </h5>
+                                                                                <span className="text-[10px] text-slate-500">
+                                                                                    {user.username ? `@${user.username}` : 'Kullanıcı adı yok'}
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <span className="text-[10px] font-mono text-slate-500 font-bold group-hover:text-blue-400/80 transition-colors">
+                                                                            ID: {user.user_id}
+                                                                        </span>
+                                                                    </button>
+                                                                ))}
+                                                            </div>
+                                                        );
+                                                    })()
+                                                )}
+                                            </div>
+                                            <button 
+                                                onClick={handleAddNewAdmin}
+                                                disabled={submittingAdmin || !newAdminId.trim()}
+                                                className="h-11 px-5 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-900 border border-blue-500/10 text-white font-black uppercase text-[9px] tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 shrink-0 disabled:opacity-50"
+                                            >
+                                                {submittingAdmin ? (
+                                                    <Loader2 size={12} className="animate-spin text-white" />
+                                                ) : (
+                                                    <Check size={12} />
+                                                )}
+                                                Sisteme Gönder
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </motion.div>
@@ -756,28 +847,54 @@ const GroupSettingsView = ({ channel }: { channel: any }) => {
                         <div>
                             <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">TEMEL GRUP YÖNETİCİLERİ</h3>
                             <div className="space-y-3">
-                                {[
-                                    { id: '210944655', name: 'BotlyHub', user: '@botlyhub', isBot: true },
-                                    { id: '842614237', name: 'KAJU', user: '@kajju66', isBot: false },
-                                ].map((admin, i) => (
-                                    <div key={i} className="bg-[#14181f] border border-white/5 rounded-[24px] p-4 flex items-center gap-4 group hover:border-blue-500/30 transition-all cursor-pointer">
-                                        <div className="w-10 h-10 bg-slate-900 rounded-full flex items-center justify-center p-1 overflow-hidden">
-                                            <div className="w-full h-full bg-slate-800 rounded-full flex items-center justify-center font-black text-white italic text-xs">
-                                                {admin.name[0]}
+                                {(() => {
+                                    const itemsToRender = liveAdmins.length > 0 ? liveAdmins.map(admin => ({
+                                        id: String(admin.user.id),
+                                        name: admin.user.first_name + (admin.user.last_name ? ' ' + admin.user.last_name : ''),
+                                        user: admin.user.username ? `@${admin.user.username}` : 'Kullanıcı adı yok',
+                                        isBot: admin.user.is_bot || false,
+                                        customTitle: admin.custom_title || (admin.status === 'creator' ? 'Kurucu' : 'Yönetici')
+                                    })) : [
+                                        { id: '210944655', name: 'BotlyHub', user: '@botlyhub', isBot: true, customTitle: 'Sistem Botu' },
+                                        { id: '842614237', name: 'KAJU', user: '@kajju66', isBot: false, customTitle: 'Kurucu' },
+                                    ];
+
+                                    return itemsToRender.map((admin, i) => (
+                                        <div key={i} className="bg-[#14181f] border border-white/5 rounded-[24px] p-4 flex items-center justify-between gap-4 group hover:border-blue-500/30 transition-all">
+                                            <div className="flex items-center gap-4 flex-1">
+                                                <div className="w-10 h-10 bg-slate-900 rounded-full flex items-center justify-center p-0.5 overflow-hidden border border-white/5 shrink-0">
+                                                    {!imgError[admin.id] ? (
+                                                        <img 
+                                                            src={`${API_BASE_URL}/api/telegram/chat-photo?chatId=${admin.id}`} 
+                                                            onError={() => setImgError(prev => ({ ...prev, [admin.id]: true }))}
+                                                            className="w-full h-full object-cover rounded-full" 
+                                                            referrerPolicy="no-referrer"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full bg-slate-800 rounded-full flex items-center justify-center font-black text-white italic text-xs">
+                                                            {admin.name[0].toUpperCase()}
+                                                         </div>
+                                                    )}
+                                                </div>
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-2 mb-0.5">
+                                                        <h4 className="text-sm font-bold text-white leading-none">{admin.name}</h4>
+                                                        <span className="text-[8px] font-bold bg-[#14181f]/40 text-blue-400 border border-blue-500/10 px-1.5 py-0.5 rounded uppercase tracking-wider">{admin.customTitle}</span>
+                                                        {admin.isBot && <span className="text-[7.5px] font-black bg-blue-500/10 text-blue-400 px-1 py-0.2 rounded">BOT</span>}
+                                                    </div>
+                                                    <div className="flex items-center gap-2 text-[10px] text-slate-500 font-medium">
+                                                        <span>{admin.user}</span>
+                                                        <span>•</span>
+                                                        <span className="font-mono text-[9px]">ID: {admin.id}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                             <div className="p-2 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                                                 <Shield size={14} className="text-blue-500" />
                                              </div>
                                         </div>
-                                        <div className="flex-1">
-                                            <div className="flex items-center gap-2 mb-0.5">
-                                                <span className="text-xs font-black text-blue-500 italic tracking-tighter">{admin.id}</span>
-                                                <h4 className="text-sm font-bold text-white">{admin.name}</h4>
-                                            </div>
-                                            <span className="text-[10px] text-slate-500 font-medium">{admin.user}</span>
-                                        </div>
-                                         <div className="p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                             <MoreVertical size={16} className="text-slate-600" />
-                                         </div>
-                                    </div>
-                                ))}
+                                    ));
+                                })()}
                              </div>
                         </div>
 
@@ -792,75 +909,95 @@ const GroupSettingsView = ({ channel }: { channel: any }) => {
                                 </div>
                             ) : (
                                 <div className="space-y-3">
-                                    {getActiveCustomAdmins().map((admin) => (
-                                        <div 
-                                            key={admin.user_id} 
-                                            className="bg-[#14181f] border border-white/5 rounded-[24px] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 group hover:border-blue-500/30 transition-all"
-                                        >
-                                            <div 
-                                                onClick={() => {
-                                                    setRightsModalData({ 
-                                                        userId: admin.user_id, 
-                                                        userName: `Yönetici ID: ${admin.user_id}`,
-                                                        initialPermissions: admin.permissions
-                                                    });
-                                                }}
-                                                className="flex items-center gap-4 cursor-pointer flex-1"
-                                            >
-                                                <div className="w-10 h-10 bg-teal-500/10 border border-teal-500/20 rounded-full flex items-center justify-center font-black text-teal-400 italic text-sm shrink-0">
-                                                    Y
-                                                </div>
-                                                <div className="flex-1">
-                                                    <div className="flex items-center gap-2 mb-0.5">
-                                                        <span className="text-xs font-black text-teal-400 italic tracking-tighter">ID: {admin.user_id}</span>
-                                                        {admin.status === 'completed' ? (
-                                                            <span className="text-[8px] font-bold bg-green-500/10 text-green-400 px-1.5 py-0.5 rounded uppercase tracking-wider scale-90">AKTİF</span>
-                                                        ) : (
-                                                            <span className="text-[8px] font-bold bg-yellow-500/10 text-yellow-500 px-1.5 py-0.5 rounded uppercase tracking-wider scale-90 animate-pulse">TANITILIYOR...</span>
-                                                        )}
-                                                    </div>
-                                                    <p className="text-[10px] text-slate-500 font-medium">
-                                                        Üzerine tıklayarak yetkilerini düzenleyebilirsiniz.
-                                                    </p>
-                                                    {admin.permissions && (
-                                                        <div className="flex flex-wrap gap-1 mt-1.5">
-                                                            {Object.entries(admin.permissions)
-                                                                .filter(([_, val]) => val === true)
-                                                                .map(([key]) => (
-                                                                    <span key={key} className="text-[8.5px] font-black bg-white/5 text-slate-400 px-1.5 py-0.5 rounded border border-white/[0.03]">
-                                                                        {key.replace('can_', '').replace('is_', '').replace(/_/g, ' ')}
-                                                                    </span>
-                                                                ))
-                                                            }
+                                    {(() => {
+                                        const customAdmins = getActiveCustomAdmins();
+                                        return customAdmins.map((admin) => {
+                                            const matchingUser = groupUsers.find(u => String(u.user_id) === String(admin.user_id));
+                                            const adminName = matchingUser?.name || `Yönetici ID: ${admin.user_id}`;
+                                            const adminUsername = matchingUser?.username ? `@${matchingUser.username.replace('@', '')}` : 'Veritabanında bulunamadı';
+
+                                            return (
+                                                <div 
+                                                    key={admin.user_id} 
+                                                    className="bg-[#14181f] border border-white/5 rounded-[24px] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 group hover:border-blue-500/30 transition-all"
+                                                >
+                                                    <div 
+                                                        onClick={() => {
+                                                            setRightsModalData({ 
+                                                                userId: admin.user_id, 
+                                                                userName: adminName,
+                                                                initialPermissions: admin.permissions
+                                                            });
+                                                        }}
+                                                        className="flex items-center gap-4 cursor-pointer flex-1"
+                                                    >
+                                                        <div className="w-10 h-10 bg-[#14181f] rounded-full flex items-center justify-center p-0.5 overflow-hidden border border-teal-500/10 shrink-0">
+                                                            {!imgError[admin.user_id] ? (
+                                                                <img 
+                                                                    src={`${API_BASE_URL}/api/telegram/chat-photo?chatId=${admin.user_id}`} 
+                                                                    onError={() => setImgError(prev => ({ ...prev, [admin.user_id]: true }))}
+                                                                    className="w-full h-full object-cover rounded-full" 
+                                                                    referrerPolicy="no-referrer"
+                                                                />
+                                                            ) : (
+                                                                <div className="w-full h-full bg-teal-500/10 border border-teal-500/20 rounded-full flex items-center justify-center font-black text-teal-400 italic text-sm">
+                                                                    {adminName[0].toUpperCase()}
+                                                                </div>
+                                                            )}
                                                         </div>
-                                                    )}
+                                                        <div className="flex-1">
+                                                            <div className="flex items-center gap-2 mb-0.5">
+                                                                <span className="text-xs font-black text-teal-400 italic tracking-tighter">{adminName}</span>
+                                                                {admin.status === 'completed' ? (
+                                                                    <span className="text-[8px] font-bold bg-green-500/10 text-green-400 px-1.5 py-0.5 rounded uppercase tracking-wider scale-90">AKTİF</span>
+                                                                ) : (
+                                                                    <span className="text-[8px] font-bold bg-yellow-500/10 text-yellow-500 px-1.5 py-0.5 rounded uppercase tracking-wider scale-90 animate-pulse">TANITILIYOR...</span>
+                                                                )}
+                                                            </div>
+                                                            <p className="text-[10px] text-slate-500 font-medium">
+                                                                {adminUsername} • <span className="font-mono">ID: {admin.user_id}</span>
+                                                            </p>
+                                                            {admin.permissions && (
+                                                                <div className="flex flex-wrap gap-1 mt-1.5">
+                                                                    {Object.entries(admin.permissions)
+                                                                        .filter(([_, val]) => val === true)
+                                                                        .map(([key]) => (
+                                                                            <span key={key} className="text-[8.5px] font-black bg-white/5 text-slate-400 px-1.5 py-0.5 rounded border border-white/[0.03]">
+                                                                                {key.replace('can_', '').replace('is_', '').replace(/_/g, ' ')}
+                                                                            </span>
+                                                                        ))
+                                                                    }
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+                                                        <button
+                                                            onClick={() => {
+                                                                setRightsModalData({ 
+                                                                    userId: admin.user_id, 
+                                                                    userName: adminName,
+                                                                    initialPermissions: admin.permissions
+                                                                });
+                                                            }}
+                                                            className="h-8 px-3 bg-white/5 hover:bg-white/10 text-xs font-bold text-slate-300 rounded-lg flex items-center gap-1.5 transition-all"
+                                                        >
+                                                            <Shield size={12} className="text-teal-400" />
+                                                            Yetkiler
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDemoteAdmin(admin.user_id)}
+                                                            className="h-8 px-3 bg-rose-500/10 hover:bg-rose-500/20 text-xs font-bold text-rose-400 rounded-lg flex items-center gap-1.5 transition-all"
+                                                        >
+                                                            <Trash2 size={12} />
+                                                            Kaldır
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            
-                                            <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
-                                                <button
-                                                    onClick={() => {
-                                                        setRightsModalData({ 
-                                                            userId: admin.user_id, 
-                                                            userName: `Yönetici ID: ${admin.user_id}`,
-                                                            initialPermissions: admin.permissions
-                                                        });
-                                                    }}
-                                                    className="h-8 px-3 bg-white/5 hover:bg-white/10 text-xs font-bold text-slate-300 rounded-lg flex items-center gap-1.5 transition-all"
-                                                >
-                                                    <Shield size={12} className="text-teal-400" />
-                                                    Yetkiler
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDemoteAdmin(admin.user_id)}
-                                                    className="h-8 px-3 bg-rose-500/10 hover:bg-rose-500/20 text-xs font-bold text-rose-400 rounded-lg flex items-center gap-1.5 transition-all"
-                                                >
-                                                    <Trash2 size={12} />
-                                                    Kaldır
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))}
+                                            );
+                                        });
+                                    })()}
                                 </div>
                             )}
                         </div>
