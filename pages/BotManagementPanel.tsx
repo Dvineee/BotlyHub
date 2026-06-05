@@ -7,7 +7,7 @@ import {
   ChevronRight, Save, Download, Upload, RotateCcw, AlertCircle, Info, Star,
   Search, Filter, List, MoreVertical, Plus, Check, X, ShieldCheck, Zap,
   ExternalLink, ListOrdered, Sticker, Lightbulb, Shield, Columns, UserPlus, Trophy, Clock,
-  Loader2
+  Loader2, Trash2, Trash
 } from 'lucide-react';
 import LoginModal from '../components/LoginModal';
 import { useTelegram } from '../hooks/useTelegram';
@@ -414,7 +414,7 @@ const GroupSettingsView = ({ channel }: { channel: any }) => {
     const [submittingAdmin, setSubmittingAdmin] = useState(false);
 
     // States for custom AdminRightsModal inside GroupSettingsView
-    const [rightsModalData, setRightsModalData] = useState<{ userId: string; userName: string } | null>(null);
+    const [rightsModalData, setRightsModalData] = useState<{ userId: string; userName: string; initialPermissions?: any } | null>(null);
     const [submittingRights, setSubmittingRights] = useState(false);
 
     const fetchPendingAdmins = async () => {
@@ -498,6 +498,53 @@ const GroupSettingsView = ({ channel }: { channel: any }) => {
         } finally {
             setSubmittingAdmin(false);
             setSubmittingRights(false);
+        }
+    };
+
+    // Reconstruct active custom admins list dynamically
+    const getActiveCustomAdmins = () => {
+        const userActions: Record<string, any> = {};
+        // Sort from oldest to newest so the latest state is captured correctly
+        const sorted = [...pendingList].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+        sorted.forEach(act => {
+            if (act.status === 'completed' || act.status === 'pending') {
+                userActions[act.user_id] = act;
+            }
+        });
+        return Object.values(userActions).filter(act => act.action === 'promote');
+    };
+
+    const handleDemoteAdmin = async (userId: string) => {
+        if (!displayGroupId) return;
+        const confirmMsg = `${userId} adlı kullanıcıyı grupta yöneticilikten kaldırmak istediğinize emin misiniz? (Telegram botu 5 saniye içinde yetki kaldırma işlemini tamamlayacaktır)`;
+        if (!window.confirm(confirmMsg)) return;
+
+        setLoadingAdmins(true);
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/admin/add-admin`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    channelId: displayGroupId,
+                    userId: userId,
+                    action: "demote",
+                }),
+            });
+
+            const result = await response.json();
+            if (!response.ok) {
+                throw new Error(result.error || "Yöneticilikten kaldırma talebi başarısız oldu.");
+            }
+
+            alert("Yöneticilikten kaldırma talebi veritabanına başarıyla eklendi! Telegram botu 5 saniye içinde yetkiyi kaldıracaktır.");
+            fetchPendingAdmins();
+        } catch (err: any) {
+            console.error("Error creating demote action:", err);
+            alert(err.message || "İşlem yapılırken bir hata oluştu.");
+        } finally {
+            setLoadingAdmins(false);
         }
     };
 
@@ -731,7 +778,91 @@ const GroupSettingsView = ({ channel }: { channel: any }) => {
                                          </div>
                                     </div>
                                 ))}
-                            </div>
+                             </div>
+                        </div>
+
+                        {/* Custom Created Admins Section */}
+                        <div>
+                            <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 flex items-center gap-1.5">
+                                <ShieldCheck size={12} className="text-teal-400" /> SİZİN EKLEDİĞİNİZ YÖNETİCİLER
+                            </h3>
+                            {getActiveCustomAdmins().length === 0 ? (
+                                <div className="bg-[#14181f]/40 border border-white/5 rounded-[24px] p-6 text-center text-xs text-slate-500 italic">
+                                    Henüz bu panel üzerinden eklenmiş bir yönetici bulunmuyor. "Yönetici ekle" butonunu kullanarak yeni bir yönetici atayabilirsiniz.
+                                </div>
+                            ) : (
+                                <div className="space-y-3">
+                                    {getActiveCustomAdmins().map((admin) => (
+                                        <div 
+                                            key={admin.user_id} 
+                                            className="bg-[#14181f] border border-white/5 rounded-[24px] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 group hover:border-blue-500/30 transition-all"
+                                        >
+                                            <div 
+                                                onClick={() => {
+                                                    setRightsModalData({ 
+                                                        userId: admin.user_id, 
+                                                        userName: `Yönetici ID: ${admin.user_id}`,
+                                                        initialPermissions: admin.permissions
+                                                    });
+                                                }}
+                                                className="flex items-center gap-4 cursor-pointer flex-1"
+                                            >
+                                                <div className="w-10 h-10 bg-teal-500/10 border border-teal-500/20 rounded-full flex items-center justify-center font-black text-teal-400 italic text-sm shrink-0">
+                                                    Y
+                                                </div>
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-2 mb-0.5">
+                                                        <span className="text-xs font-black text-teal-400 italic tracking-tighter">ID: {admin.user_id}</span>
+                                                        {admin.status === 'completed' ? (
+                                                            <span className="text-[8px] font-bold bg-green-500/10 text-green-400 px-1.5 py-0.5 rounded uppercase tracking-wider scale-90">AKTİF</span>
+                                                        ) : (
+                                                            <span className="text-[8px] font-bold bg-yellow-500/10 text-yellow-500 px-1.5 py-0.5 rounded uppercase tracking-wider scale-90 animate-pulse">TANITILIYOR...</span>
+                                                        )}
+                                                    </div>
+                                                    <p className="text-[10px] text-slate-500 font-medium">
+                                                        Üzerine tıklayarak yetkilerini düzenleyebilirsiniz.
+                                                    </p>
+                                                    {admin.permissions && (
+                                                        <div className="flex flex-wrap gap-1 mt-1.5">
+                                                            {Object.entries(admin.permissions)
+                                                                .filter(([_, val]) => val === true)
+                                                                .map(([key]) => (
+                                                                    <span key={key} className="text-[8.5px] font-black bg-white/5 text-slate-400 px-1.5 py-0.5 rounded border border-white/[0.03]">
+                                                                        {key.replace('can_', '').replace('is_', '').replace(/_/g, ' ')}
+                                                                    </span>
+                                                                ))
+                                                            }
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+                                                <button
+                                                    onClick={() => {
+                                                        setRightsModalData({ 
+                                                            userId: admin.user_id, 
+                                                            userName: `Yönetici ID: ${admin.user_id}`,
+                                                            initialPermissions: admin.permissions
+                                                        });
+                                                    }}
+                                                    className="h-8 px-3 bg-white/5 hover:bg-white/10 text-xs font-bold text-slate-300 rounded-lg flex items-center gap-1.5 transition-all"
+                                                >
+                                                    <Shield size={12} className="text-teal-400" />
+                                                    Yetkiler
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDemoteAdmin(admin.user_id)}
+                                                    className="h-8 px-3 bg-rose-500/10 hover:bg-rose-500/20 text-xs font-bold text-rose-400 rounded-lg flex items-center gap-1.5 transition-all"
+                                                >
+                                                    <Trash2 size={12} />
+                                                    Kaldır
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
 
                         {pendingList.length > 0 && (
@@ -776,6 +907,7 @@ const GroupSettingsView = ({ channel }: { channel: any }) => {
                 isOpen={rightsModalData !== null}
                 userId={rightsModalData?.userId || ''}
                 userName={rightsModalData?.userName || ''}
+                initialPermissions={rightsModalData?.initialPermissions}
                 onClose={() => setRightsModalData(null)}
                 onConfirm={handleConfirmAddNewAdmin}
                 isSubmitting={submittingRights}
@@ -1632,9 +1764,10 @@ interface AdminRightsModalProps {
   onClose: () => void;
   onConfirm: (permissions: Record<string, boolean>) => Promise<void>;
   isSubmitting: boolean;
+  initialPermissions?: Record<string, boolean> | null;
 }
 
-const AdminRightsModal = ({ isOpen, userId, userName, onClose, onConfirm, isSubmitting }: AdminRightsModalProps) => {
+const AdminRightsModal = ({ isOpen, userId, userName, onClose, onConfirm, isSubmitting, initialPermissions }: AdminRightsModalProps) => {
   const [rights, setRights] = useState<Record<string, boolean>>({
     can_change_info: false,
     can_delete_messages: true,
@@ -1646,6 +1779,36 @@ const AdminRightsModal = ({ isOpen, userId, userName, onClose, onConfirm, isSubm
     is_anonymous: false,
     can_promote_members: false
   });
+
+  useEffect(() => {
+    if (isOpen) {
+      if (initialPermissions) {
+        setRights({
+          can_change_info: initialPermissions.can_change_info ?? false,
+          can_delete_messages: initialPermissions.can_delete_messages ?? true,
+          can_restrict_members: initialPermissions.can_restrict_members ?? true,
+          can_invite_users: initialPermissions.can_invite_users ?? true,
+          can_pin_messages: initialPermissions.can_pin_messages ?? true,
+          can_post_stories: initialPermissions.can_post_stories ?? false,
+          can_manage_video_chats: initialPermissions.can_manage_video_chats ?? false,
+          is_anonymous: initialPermissions.is_anonymous ?? false,
+          can_promote_members: initialPermissions.can_promote_members ?? false,
+        });
+      } else {
+        setRights({
+          can_change_info: false,
+          can_delete_messages: true,
+          can_restrict_members: true,
+          can_invite_users: true,
+          can_pin_messages: true,
+          can_post_stories: false,
+          can_manage_video_chats: false,
+          is_anonymous: false,
+          can_promote_members: false
+        });
+      }
+    }
+  }, [isOpen, initialPermissions]);
 
   const toggleRight = (key: string) => {
     setRights(prev => ({
