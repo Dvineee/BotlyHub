@@ -1827,6 +1827,7 @@ div.qa-last-24h-box, .qa-last-24h-box {
 .shadow-lg {
   --tw-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
   --tw-shadow-colored: 0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);
+  box-shadow: none;
 }
 
 .fancy-glass-card, .stats-card-bg, .popular-content-card, .similar-post-card, .bot-card {
@@ -1965,6 +1966,13 @@ div.qa-last-24h-box, .qa-last-24h-box {
 .dark .text-\[\#34c759\] {
   --tw-text-opacity: 1 !important;
   color: #34c759 !important;
+}
+
+/* Slider kartlarındaki sponsorlu etiketleri için özel konumlandırma */
+.slider-sponsored-badge {
+  top: 5px !important;
+  right: 5px !important;
+  position: absolute !important;
 }
 
 
