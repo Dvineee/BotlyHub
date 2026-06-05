@@ -676,14 +676,10 @@ const BotCard: React.FC<{ bot: Bot; tonRate: number; featuredRank?: number }> =
           </div>
           <div className="relative flex items-center min-w-0">
             {catLabel && (
-              <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-white/[0.04] px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0 transition-all duration-200 group-hover:opacity-0 group-hover:scale-90 select-none">
+              <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-white/[0.04] px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0 select-none">
                 {catLabel}
               </span>
             )}
-            <span className="absolute right-0 opacity-0 scale-90 group-hover:opacity-100 group-hover:scale-100 transition-all duration-200 text-[11px] font-extrabold bg-blue-500 text-white px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm shrink-0 whitespace-nowrap">
-              <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-              {t("try_btn") || "Dene"}
-            </span>
           </div>
         </div>
 
@@ -1830,6 +1826,8 @@ const Home = () => {
   const [selectedAnn, setSelectedAnn] = useState<Announcement | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const appsSectionRef = useRef<HTMLDivElement>(null);
+  const botsSectionRef = useRef<HTMLDivElement>(null);
 
   const [homeSearchQuery, setHomeSearchQuery] = useState("");
   const [showHomeSearchDropdown, setShowHomeSearchDropdown] = useState(false);
@@ -3043,9 +3041,7 @@ const Home = () => {
               <div className="max-w-6xl mx-auto px-6 sm:px-8 relative">
 
                 {/* 🧠 Hero Section - High Conversion, Clear Segment Positioning */}
-                <div className="mb-14 py-14 px-6 sm:px-10 rounded-2xl bg-slate-50/50 dark:bg-[#111622]/50 border border-black/[0.03] dark:border-white/[0.04] text-center relative overflow-hidden flex flex-col items-center">
-                  {/* Glowing decorative background circles */}
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[300px] bg-blue-500/10 dark:bg-blue-500/5 rounded-full blur-[80px] pointer-events-none select-none z-0" />
+                <div className="mb-14 relative overflow-hidden home-hero-container w-full">
                   
                   {/* Decorative Background SVG Watermark */}
                   <div className="absolute right-[-20px] top-[-20px] sm:right-6 sm:top-[-20px] w-48 h-48 sm:w-60 sm:h-60 opacity-[0.04] dark:opacity-[0.025] rotate-12 pointer-events-none select-none z-0">
@@ -3083,68 +3079,84 @@ const Home = () => {
                     </svg>
                   </div>
 
-                  {/* Core Value Title */}
-                  <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-slate-800 dark:text-slate-100 max-w-3xl z-10 leading-[1.12] font-sans">
-                    {t("home_hero_title")}
-                  </h1>
-
-                  {/* Clarifying Short Description */}
-                  <p className="mt-4 text-[14px] sm:text-[15px] text-slate-500/90 dark:text-slate-400/90 leading-[1.62] font-semibold max-w-[62ch] z-10 transition-colors">
-                    {t("home_hero_desc")}
-                  </p>
-
-                  {/* 2 Conversion CTAs (Single line on mobile through grid-cols-2) */}
-                  <div className="mt-8 grid grid-cols-2 gap-3 z-10 w-full max-w-[340px] sm:max-w-md">
-                    <button
-                      onClick={() => {
-                        haptic("medium");
-                        navigate("/search?mode=bots");
-                      }}
-                      className="px-2 sm:px-6 h-12 bg-blue-600 hover:bg-blue-700 text-white text-[12.5px] sm:text-[14px] font-extrabold rounded-xl transition-all shadow-[0_4px_12px_rgba(37,99,235,0.2)] hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-1.5 min-w-0 cursor-pointer hover:shadow-[0_8px_20px_rgba(37,99,235,0.25)]"
-                    >
-                      <Compass size={15} className="shrink-0" />
-                      <span className="truncate">
-                        {t("home_explore_now") === "Şimdi Keşfet" ? "Botları Keşfet" : "Explore Bots"}
-                      </span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        haptic("light");
-                        navigate("/bot/task-master");
-                      }}
-                      className="px-2 sm:px-6 h-12 bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-850 text-slate-700 dark:text-slate-300 text-[12.5px] sm:text-[14px] font-extrabold rounded-xl transition-all border border-black/15 dark:border-white/10 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-1.5 min-w-0 cursor-pointer shadow-sm"
-                    >
-                      <Sparkles size={15} className="text-amber-500 shrink-0" />
-                      <span className="truncate">
-                        {t("try_demo") || "Demo Dene"}
-                      </span>
-                    </button>
-                  </div>
-
-                  {/* Categories Segment Quick Segment Tags */}
-                  <div className="mt-10 pt-8 border-t border-black/[0.04] dark:border-white/[0.04] w-full max-w-2xl z-10">
-                    <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-4 select-none font-mono">
-                      {t("discover_by_vertical") || "CATEGORIES & SEGMENTATION"}
-                    </p>
-                    <div className="flex flex-wrap items-center justify-center gap-2.5">
-                      {[
-                        { id: "ai_services", label: "💬 Chatbots" },
-                        { id: "productivity", label: "⚡ Productivity" },
-                        { id: "utilities", label: "🛠️ Utilities" },
-                        { id: "finance", label: "📈 Finance" },
-                      ].map((tag) => (
-                        <button
-                          key={tag.id}
-                          onClick={() => {
-                            haptic("light");
-                            navigate(`/search?mode=bots&category=${tag.id}`);
-                          }}
-                          className="px-4 py-2 rounded-full text-xs font-bold bg-white dark:bg-slate-900 border border-black/[0.05] dark:border-white/[0.05] text-slate-700 dark:text-slate-300 hover:border-blue-500 hover:text-blue-500 dark:hover:border-blue-400 dark:hover:text-blue-400 cursor-pointer shadow-sm active:scale-95 duration-150 transition-all select-none"
-                        >
-                          {tag.label}
-                        </button>
-                      ))}
+                  <div className="flex flex-col md:grid md:grid-cols-12 gap-y-5 md:gap-10 items-start z-10 relative w-full">
+                    {/* Left Column: Huge Elegant Title */}
+                    <div className="w-full md:col-span-6 flex flex-col justify-center text-left">
+                      <h1 className="text-[25px] xs:text-[27px] sm:text-3xl md:text-4xl font-extrabold sm:font-black tracking-tight text-slate-850 dark:text-white leading-[1.2] font-sans">
+                        {t("home_hero_title")}
+                      </h1>
                     </div>
+
+                    {/* Right Column: Description + Side-by-Side CTAs */}
+                    <div className="w-full md:col-span-6 flex flex-col justify-start text-left md:pl-4">
+                      <p className="text-[13.5px] sm:text-[14.5px] text-slate-500/90 dark:text-[#8a8f98] leading-[1.62] font-semibold">
+                        {t("home_hero_desc")}
+                      </p>
+
+                      {/* Explore buttons side-by-side as requested with screenshot visual fidelity */}
+                      <div className="mt-6 flex flex-row items-center gap-x-6 sm:gap-x-8 gap-y-3.5 flex-wrap">
+                        {/* Botları Keşfet */}
+                        <button
+                          onClick={() => {
+                            haptic("medium");
+                            botsSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                          }}
+                          className="hero-cta-btn select-none active:scale-[0.98]"
+                        >
+                          <div className="hero-cta-circle">
+                            6
+                          </div>
+                          <span className="hero-cta-label">
+                            {language === "tr" ? "Botları Keşfet" : "Explore Bots"}
+                            <span className="opacity-75">→</span>
+                          </span>
+                        </button>
+
+                        {/* Uygulamaları Keşfet */}
+                        <button
+                          onClick={() => {
+                            haptic("medium");
+                            appsSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                          }}
+                          className="hero-cta-btn select-none active:scale-[0.98]"
+                        >
+                          <div className="hero-cta-circle">
+                            4
+                          </div>
+                          <span className="hero-cta-label">
+                            {language === "tr" ? "Uygulamaları Keşfet" : "Explore Apps"}
+                            <span className="opacity-75">→</span>
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Bottom: Categories Segment Quick Segment Tags */}
+                    <div className="col-span-12 mt-4 pt-6 border-t border-black/[0.04] dark:border-white/[0.04] w-full text-center">
+                      <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-4 select-none font-mono">
+                        {t("discover_by_vertical") || "CATEGORIES & SEGMENTATION"}
+                      </p>
+                      <div className="flex flex-wrap items-center justify-center gap-2 md:gap-2.5 max-w-full">
+                        {[
+                          { id: "ai_services", label: "💬 Chatbots" },
+                          { id: "productivity", label: "⚡ Productivity" },
+                          { id: "utilities", label: "🛠️ Utilities" },
+                          { id: "finance", label: "📈 Finance" },
+                        ].map((tag) => (
+                          <button
+                            key={tag.id}
+                            onClick={() => {
+                              haptic("light");
+                              navigate(`/search?mode=bots&category=${tag.id}`);
+                            }}
+                            className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-slate-50 dark:bg-slate-900 border border-black/[0.04] dark:border-white/[0.05] text-slate-700 dark:text-slate-300 hover:border-blue-500 hover:text-blue-500 dark:hover:border-blue-400 dark:hover:text-blue-400 cursor-pointer shadow-sm active:scale-95 duration-150 transition-all select-none"
+                          >
+                            {tag.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
                   </div>
                 </div>
 
@@ -3170,7 +3182,7 @@ const Home = () => {
                         }
 
                         return (
-                          <div className="my-12 md:my-16 space-y-6 md:space-y-8">
+                          <div ref={appsSectionRef} className="my-12 md:my-16 space-y-6 md:space-y-8 scroll-mt-20">
                             <div className="flex flex-col gap-6 overflow-hidden">
                               <div
                                 className="flex flex-col gap-2 cursor-pointer group shrink-0"
@@ -3315,7 +3327,7 @@ const Home = () => {
                         }
 
                         return (
-                          <div className="my-12 md:my-16 space-y-6 md:space-y-8">
+                          <div ref={botsSectionRef} className="my-12 md:my-16 space-y-6 md:space-y-8 scroll-mt-20">
                             <div className="flex flex-col gap-6 overflow-hidden">
                               <div
                                 className="flex flex-col gap-2 cursor-pointer group shrink-0"

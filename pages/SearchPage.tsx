@@ -260,6 +260,20 @@ const NavMenu = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    if (mobileModal) {
+      document.body.style.overflow = "hidden";
+      document.body.style.height = "100vh";
+    } else {
+      document.body.style.overflow = "";
+      document.body.style.height = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+      document.body.style.height = "";
+    };
+  }, [mobileModal]);
+
   const currentUser = {
     id: user?.id?.toString() || "user-active-session",
     name: user?.username
@@ -572,7 +586,7 @@ const NavMenu = ({
                     haptic("light");
                     setIsLoginModalOpen(true);
                   }}
-                  className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white border-none text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-blue-500/20 active:scale-95 transition-all whitespace-nowrap"
+                  className="h-10 px-4 flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white border-none text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-blue-500/20 active:scale-95 transition-all whitespace-nowrap"
                   id="header-login-btn"
                 >
                   {t("home_login")}
@@ -584,7 +598,7 @@ const NavMenu = ({
                       haptic("light");
                       setIsMenuOpen(!isMenuOpen);
                     }}
-                    className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 bg-slate-50 dark:bg-slate-900 border border-slate-200/40 dark:border-slate-800/20 rounded-xl transition-all active:scale-95 duration-150 shadow-xs"
+                    className="flex items-center gap-2 px-3 h-10 text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 bg-slate-50 dark:bg-slate-900 border border-slate-200/40 dark:border-slate-800/20 rounded-xl transition-all active:scale-95 duration-150 shadow-xs"
                     id="header-profile-menu-btn"
                   >
                     <img
@@ -787,7 +801,7 @@ const NavMenu = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.22 }}
-            className="fixed inset-0 z-[250] w-full h-full bg-white dark:bg-slate-950 flex flex-col md:hidden overflow-hidden"
+            className="fixed inset-0 z-[250] w-screen h-[100dvh] bg-white dark:bg-slate-950 flex flex-col md:hidden overflow-hidden"
           >
             {/* Top Header of Menu Modal */}
             <div className="flex justify-between items-center px-6 py-5 border-b border-black/[0.04] dark:border-white/[0.04] shrink-0">
@@ -851,7 +865,7 @@ const NavMenu = ({
             </div>
 
             {/* Menu Core Content Area */}
-            <div className="flex-1 overflow-y-auto flex flex-col justify-between py-6">
+            <div className="flex-1 overflow-y-auto py-6">
               <AnimatePresence mode="wait">
                 {navState === "main" ? (
                   <motion.div
@@ -859,7 +873,7 @@ const NavMenu = ({
                     initial={{ opacity: 0, x: -15 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -15 }}
-                    className="flex-1 flex flex-col justify-center px-8 sm:px-12 py-4 gap-6 sm:gap-8"
+                    className="flex flex-col justify-center px-8 sm:px-12 py-4 gap-6 sm:gap-8"
                   >
                     <button
                       onClick={() => {
@@ -942,7 +956,7 @@ const NavMenu = ({
                     initial={{ opacity: 0, x: 15 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 15 }}
-                    className="flex flex-col w-full h-full px-6"
+                    className="flex flex-col w-full px-6"
                   >
                     <button
                       onClick={() => setNavState("main")}
@@ -951,7 +965,7 @@ const NavMenu = ({
                       <ArrowLeft size={16} strokeWidth={3} /> Geri
                     </button>
 
-                    <div className="grid grid-cols-2 gap-3.5 max-h-[58vh] overflow-y-auto pr-1">
+                    <div className="grid grid-cols-2 gap-3.5 pr-1">
                       {(navState === "bots"
                         ? botsCategories
                         : appsCategories
@@ -975,39 +989,39 @@ const NavMenu = ({
                   </motion.div>
                 )}
               </AnimatePresence>
+            </div>
 
-              {/* Menu Footer Row */}
-              <div className="border-t border-slate-100 dark:border-white/5 px-8 pt-6 flex items-center gap-3 shrink-0">
-                {/* Language Selector Pill */}
-                <button
-                  onClick={toggleLanguage}
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-50 dark:bg-white/5 border border-black/[0.04] dark:border-white/[0.04] text-xs font-bold text-slate-700 dark:text-slate-300 transition-all active:scale-95"
-                >
-                  <Globe size={15} />
-                  <span>{language.toUpperCase()}</span>
-                </button>
+            {/* Menu Footer Row - Always pinned to the bottom safely */}
+            <div className="border-t border-slate-100 dark:border-white/5 px-8 py-5 flex items-center gap-3 shrink-0 bg-white/95 dark:bg-slate-950/95 pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
+              {/* Language Selector Pill */}
+              <button
+                onClick={toggleLanguage}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-50 dark:bg-white/5 border border-black/[0.04] dark:border-white/[0.04] text-xs font-bold text-slate-700 dark:text-slate-300 transition-all active:scale-95"
+              >
+                <Globe size={15} />
+                <span>{language.toUpperCase()}</span>
+              </button>
 
-                {/* Theme Toggle Pill */}
-                <button
-                  onClick={() => {
-                    haptic("light");
-                    toggleTheme();
-                  }}
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-50 dark:bg-white/5 border border-black/[0.04] dark:border-white/[0.04] text-xs font-bold text-slate-700 dark:text-slate-300 transition-all active:scale-95"
-                >
-                  {theme === "dark" ? (
-                    <>
-                      <Moon size={15} className="text-blue-400" />
-                      <span>Gece Modu</span>
-                    </>
-                  ) : (
-                    <>
-                      <Sun size={15} className="text-amber-500" />
-                      <span>Gündüz Modu</span>
-                    </>
-                  )}
-                </button>
-              </div>
+              {/* Theme Toggle Pill */}
+              <button
+                onClick={() => {
+                  haptic("light");
+                  toggleTheme();
+                }}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-50 dark:bg-white/5 border border-black/[0.04] dark:border-white/[0.04] text-xs font-bold text-slate-700 dark:text-slate-300 transition-all active:scale-95"
+              >
+                {theme === "dark" ? (
+                  <>
+                    <Moon size={15} className="text-blue-400" />
+                    <span>Gece Modu</span>
+                  </>
+                ) : (
+                  <>
+                    <Sun size={15} className="text-amber-500" />
+                    <span>Gündüz Modu</span>
+                  </>
+                )}
+              </button>
             </div>
           </motion.div>
         )}

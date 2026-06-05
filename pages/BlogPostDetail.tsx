@@ -295,6 +295,20 @@ const BlogPostDetail: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+      document.body.style.height = "100vh";
+    } else {
+      document.body.style.overflow = "";
+      document.body.style.height = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+      document.body.style.height = "";
+    };
+  }, [isMobileMenuOpen]);
+
   if (isLoading) {
     return (
       <div className="bg-[#fcfcfc] dark:bg-slate-950 min-h-screen py-10 px-5 sm:px-8 max-w-4xl mx-auto flex flex-col gap-6">
@@ -427,95 +441,211 @@ const BlogPostDetail: React.FC = () => {
       {/* Mobile Sidebar Overlay */}
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <motion.div 
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "100%" }}
-            transition={{ type: "spring", damping: 28, stiffness: 280 }}
-            className="fixed inset-0 z-[1000] bg-white dark:bg-slate-950 lg:hidden flex flex-col p-6 overflow-y-auto"
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.22 }}
+            className="fixed inset-0 z-[1000] w-screen h-[100dvh] bg-white dark:bg-slate-950 lg:hidden flex flex-col overflow-hidden"
           >
-            <div className="flex items-center justify-between mb-10 shrink-0">
-              <Logo />
-              <button 
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="p-3 bg-slate-100 dark:bg-white/10 rounded-2xl text-slate-900 dark:text-white"
-              >
-                <X size={24} />
-              </button>
+            {/* Top Header of Menu Modal */}
+            <div className="flex justify-between items-center px-6 py-5 border-b border-black/[0.04] dark:border-white/[0.04] shrink-0">
+              <Logo
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  navigate("/");
+                }}
+                className="cursor-pointer scale-95"
+              />
+
+              <div className="flex items-center gap-2">
+                {user ? (
+                  <button
+                    onClick={() => {
+                      haptic("light");
+                      navigate("/earnings");
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="px-3.5 py-1.5 bg-slate-50 dark:bg-white/5 border border-black/[0.04] dark:border-white/5 rounded-full text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1 active:scale-95 transition-all"
+                  >
+                    @{user.username || user.first_name || "Profil"}
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      haptic("light");
+                      navigate("/login");
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="px-3.5 py-1.5 bg-blue-500 text-white rounded-full text-xs font-bold transition-all active:scale-95 text-center flex items-center"
+                  >
+                    {t("login") || "Giriş Yap"}
+                  </button>
+                )}
+
+                <button
+                  onClick={() => {
+                    haptic("light");
+                    setIsSearchModalOpen(true);
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 active:scale-95 transition-all shrink-0"
+                  title="Ara"
+                >
+                  <Search size={21} />
+                </button>
+
+                <button
+                  onClick={() => {
+                    haptic("light");
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 active:scale-95 transition-all shrink-0"
+                >
+                  <X size={26} strokeWidth={2.5} />
+                </button>
+              </div>
             </div>
 
-            <nav className="flex-1 space-y-4 overflow-y-auto no-scrollbar">
-              <button
-                 onClick={() => { haptic('light'); navigate('/'); }}
-                 className="w-full flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 text-lg font-bold"
-              >
-                <Home size={24} className="text-blue-500" />
-                {t('blog_home')}
-              </button>
-              <button
-                 onClick={() => { haptic('light'); navigate('/blog'); }}
-                 className="w-full flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 text-lg font-bold"
-              >
-                <FileText size={24} className="text-blue-500" />
-                {t('blog_all_articles')}
-              </button>
-
-              <div className="pt-4 pb-2 px-2 text-xs font-black uppercase tracking-widest text-slate-400">{t('blog_categories')}</div>
-              
-              <div className="grid grid-cols-1 gap-2">
-                {categories.slice(1, 6).map((cat) => (
-                  <button
-                    key={cat.id}
-                    onClick={() => { haptic('light'); navigate('/blog'); setIsMobileMenuOpen(false); }}
-                    className="w-full flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-slate-400 transition-all font-bold"
-                  >
-                    <div className="flex items-center gap-4">
-                      <cat.icon size={22} className="text-slate-400" />
-                      {t(cat.translationKey)}
-                    </div>
-                    <ChevronRight size={18} />
-                  </button>
-                ))}
-              </div>
-            </nav>
-
-            <div className="mt-6 flex flex-col gap-3">
-              <div className="grid grid-cols-2 gap-3">
+            {/* Menu Core Content Area */}
+            <div className="flex-1 overflow-y-auto py-6">
+              <div className="flex flex-col justify-center px-8 sm:px-12 py-4 gap-6 sm:gap-8">
                 <button
-                  onClick={() => { haptic('light'); toggleTheme(); }}
-                  className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white font-bold"
+                  onClick={() => {
+                    haptic("light");
+                    navigate("/");
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase leading-none"
                 >
-                  {theme === 'dark' ? <Sun size={24} className="text-yellow-400" /> : <Moon size={24} className="text-blue-500" />}
-                  {theme === 'dark' ? t('blog_day_mode') : t('blog_night_mode')}
+                  {t("nav_explore") || "Keşfet"}
                 </button>
 
                 <button
-                  onClick={() => { haptic('light'); setIsSearchModalOpen(true); setIsMobileMenuOpen(false); }}
-                  className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white font-bold"
+                  onClick={() => {
+                    haptic("light");
+                    navigate("/search?mode=bots");
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase flex items-center gap-3 leading-none"
                 >
-                  <Search size={24} className="text-blue-500" />
-                  {t('blog_explore')}
+                  <span>{t("bots") || "Bot Market"}</span>
+                  <span className="text-[10px] font-black tracking-widest bg-blue-500 text-white px-2 py-0.5 rounded-md uppercase">
+                    BOTS
+                  </span>
                 </button>
-              </div>
 
-              <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 overflow-x-auto no-scrollbar">
-                <Globe size={24} className="text-slate-400 shrink-0" />
-                <div className="flex gap-2">
-                  {(['tr', 'en', 'ru'] as const).map((lang) => (
-                    <button
-                      key={lang}
-                      onClick={() => { haptic('light'); setLanguage(lang); }}
-                      className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
-                        language === lang 
-                          ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' 
-                          : 'bg-white dark:bg-white/5 text-slate-400'
-                      }`}
-                    >
-                      {lang === 'tr' ? 'Türkçe' : lang === 'en' ? 'English' : 'Русский'}
-                    </button>
-                  ))}
+                <button
+                  onClick={() => {
+                    haptic("light");
+                    navigate("/search?mode=apps");
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-emerald-500 transition-colors uppercase flex items-center gap-3 leading-none"
+                >
+                  <span>{t("apps") || "Uygulamalar"}</span>
+                  <span className="text-[10px] font-black tracking-widest bg-emerald-500 text-white px-2 py-0.5 rounded-md uppercase">
+                    APPS
+                  </span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    haptic("light");
+                    navigate("/qa");
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase leading-none"
+                >
+                  {t("qa_forum") || "Soru & Cevap"}
+                </button>
+
+                <button
+                  onClick={() => {
+                    haptic("light");
+                    navigate("/blog");
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase flex items-center gap-3 leading-none"
+                >
+                  <span>{t("blog") || "Günlük"}</span>
+                  <span className="text-[10px] font-black tracking-widest bg-blue-500 text-white px-2 py-0.5 rounded-md uppercase leading-none animate-pulse">
+                    NEW
+                  </span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    haptic("light");
+                    navigate("/settings");
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase leading-none"
+                >
+                  Uygulama Ekle
+                </button>
+
+                {/* Blog Categories Section inside Mobile Menu */}
+                <div className="mt-4 pt-6 border-t border-black/[0.04] dark:border-white/[0.04]">
+                  <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-4 px-1">{t('blog_categories')}</div>
+                  <div className="grid grid-cols-2 gap-3.5 pr-1">
+                    {categories.map((cat) => (
+                      <button
+                        key={cat.id}
+                        onClick={() => {
+                          haptic('light');
+                          navigate('/blog', { state: { categoryId: cat.id } });
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="flex flex-col items-start gap-4 p-5 bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 active:scale-[0.97] transition-all rounded-[24px] border border-black/5 dark:border-white/5 text-left group w-full"
+                      >
+                        <div className="w-9 h-9 rounded-xl flex items-center justify-center text-blue-500 bg-blue-500/10">
+                          <cat.icon size={18} />
+                        </div>
+                        <span className="text-xs font-[900] uppercase tracking-tight text-slate-800 dark:text-slate-200 leading-snug">
+                          {t(cat.translationKey)}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
+            </div>
+
+            {/* Menu Footer Row - Always pinned to the bottom safely */}
+            <div className="border-t border-slate-100 dark:border-white/5 px-8 py-5 flex items-center gap-3 shrink-0 bg-white/95 dark:bg-slate-950/95 pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
+              {/* Language Selector Pill */}
+              <button
+                onClick={() => {
+                  haptic("light");
+                  setLanguage(language === 'tr' ? 'en' : language === 'en' ? 'ru' : 'tr');
+                }}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-50 dark:bg-white/5 border border-black/[0.04] dark:border-white/[0.04] text-xs font-bold text-slate-700 dark:text-slate-300 transition-all active:scale-95"
+              >
+                <Globe size={15} />
+                <span>{language.toUpperCase()}</span>
+              </button>
+
+              {/* Theme Toggle Pill */}
+              <button
+                onClick={() => {
+                  haptic("light");
+                  toggleTheme();
+                }}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-50 dark:bg-white/5 border border-black/[0.04] dark:border-white/[0.04] text-xs font-bold text-slate-700 dark:text-slate-300 transition-all active:scale-95"
+              >
+                {theme === "dark" ? (
+                  <>
+                    <Moon size={15} className="text-blue-400" />
+                    <span>Gece Modu</span>
+                  </>
+                ) : (
+                  <>
+                    <Sun size={15} className="text-amber-500" />
+                    <span>Gündüz Modu</span>
+                  </>
+                )}
+              </button>
             </div>
           </motion.div>
         )}

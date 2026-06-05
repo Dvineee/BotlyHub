@@ -850,7 +850,7 @@ export default function QAForum() {
                     haptic("light");
                     setIsLoginModalOpen(true);
                   }}
-                  className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white border-none text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-blue-500/20 active:scale-95 transition-all whitespace-nowrap"
+                  className="h-10 px-4 flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white border-none text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-blue-500/20 active:scale-95 transition-all whitespace-nowrap"
                 >
                   {t("home_login")}
                 </button>
@@ -861,7 +861,7 @@ export default function QAForum() {
                       haptic("light");
                       setIsMenuOpen(!isMenuOpen);
                     }}
-                    className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 bg-slate-50 dark:bg-slate-900 border border-slate-200/40 dark:border-slate-800/20 rounded-xl transition-all active:scale-95 duration-150 shadow-xs"
+                    className="flex items-center gap-2 px-3 h-10 text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 bg-slate-50 dark:bg-slate-900 border border-slate-200/40 dark:border-slate-800/20 rounded-xl transition-all active:scale-95 duration-150 shadow-xs"
                   >
                     <img
                       src={currentUser.avatar}

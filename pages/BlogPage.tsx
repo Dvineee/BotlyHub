@@ -35,7 +35,7 @@ import {
   LogOut,
   Users
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from '../TranslationContext';
 import { useTheme } from '../ThemeContext';
 import { useTelegram } from '../hooks/useTelegram';
@@ -61,6 +61,7 @@ const categories = [
 
 const BlogPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { t, language, setLanguage } = useTranslation();
   const { theme, toggleTheme } = useTheme();
   const { haptic, user, setWebAuthUser } = useTelegram();
@@ -73,6 +74,12 @@ const BlogPage: React.FC = () => {
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [trendHashtags, setTrendHashtags] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (location.state && (location.state as any).categoryId) {
+      setActiveCategory((location.state as any).categoryId);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     const fetchBlogs = async () => {
@@ -113,6 +120,20 @@ const BlogPage: React.FC = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
+
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+      document.body.style.height = "100vh";
+    } else {
+      document.body.style.overflow = "";
+      document.body.style.height = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+      document.body.style.height = "";
+    };
+  }, [isMobileMenuOpen]);
 
   const filteredPosts = blogs.filter(post => {
     const activeCatObj = categories.find(c => c.id === activeCategory);
@@ -218,172 +239,224 @@ const BlogPage: React.FC = () => {
       {/* Mobile Sidebar Overlay */}
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <motion.div 
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "100%" }}
-            transition={{ type: "spring", damping: 28, stiffness: 280 }}
-            className="fixed inset-0 z-[1000] bg-white dark:bg-slate-950 lg:hidden flex flex-col p-6 overflow-y-auto"
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.22 }}
+            className="fixed inset-0 z-[1000] w-screen h-[100dvh] bg-white dark:bg-slate-950 lg:hidden flex flex-col overflow-hidden"
           >
-            <div className="flex items-center justify-between mb-10 shrink-0">
-              <Logo />
-              <button 
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="p-3 bg-slate-100 dark:bg-white/10 rounded-2xl text-slate-900 dark:text-white"
-              >
-                <X size={24} />
-              </button>
-            </div>
+            {/* Top Header of Menu Modal */}
+            <div className="flex justify-between items-center px-6 py-5 border-b border-black/[0.04] dark:border-white/[0.04] shrink-0">
+              <Logo
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  navigate("/");
+                }}
+                className="cursor-pointer scale-95"
+              />
 
-            <nav className="flex-1 space-y-4 overflow-y-auto no-scrollbar">
-              <button
-                 onClick={() => { haptic('light'); navigate('/'); }}
-                 className="w-full flex items-center gap-3 p-3.5 rounded-2xl text-base font-bold mobile-menu-item"
-              >
-                <div className="mobile-menu-icon-container flex items-center justify-center rounded-xl shrink-0">
-                  <Home size={22} className="text-blue-500" />
-                </div>
-                {t('blog_home')}
-              </button>
-
-              <div className="pt-4 pb-2 px-2 text-xs font-black uppercase tracking-widest text-slate-400">{t('blog_categories')}</div>
-              
-              <div className="grid grid-cols-1 gap-2">
-                {categories.map((cat) => (
+              <div className="flex items-center gap-2">
+                {user ? (
                   <button
-                    key={cat.id}
-                    onClick={() => { haptic('light'); setActiveCategory(cat.id); setIsMobileMenuOpen(false); }}
-                    className={`w-full flex items-center justify-between p-3.5 rounded-2xl transition-all text-sm font-bold mobile-menu-item ${
-                      activeCategory === cat.id 
-                      ? 'text-slate-900 dark:text-white' 
-                      : 'text-slate-600 dark:text-slate-400'
-                    }`}
+                    onClick={() => {
+                      haptic("light");
+                      navigate("/earnings");
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="px-3.5 py-1.5 bg-slate-50 dark:bg-white/5 border border-black/[0.04] dark:border-white/5 rounded-full text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1 active:scale-95 transition-all"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="mobile-menu-icon-container flex items-center justify-center rounded-xl shrink-0">
-                        <cat.icon size={22} className={activeCategory === cat.id ? 'text-[#2563eb]' : 'text-slate-400'} />
-                      </div>
-                      {t(cat.translationKey)}
-                    </div>
+                    @{user.username || user.first_name || "Profil"}
                   </button>
-                ))}
-              </div>
-            </nav>
+                ) : (
+                  <button
+                    onClick={() => {
+                      haptic("light");
+                      navigate("/login");
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="px-3.5 py-1.5 bg-blue-500 text-white rounded-full text-xs font-bold transition-all active:scale-95 text-center flex items-center"
+                  >
+                    {t("login") || "Giriş Yap"}
+                  </button>
+                )}
 
-            <div className="mt-auto pt-6 border-t border-slate-100 dark:border-white/5 space-y-4">
-               {user ? (
-                 <div className="flex items-center gap-3 mobile-menu-profile rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 pr-4">
-                    <div className="w-12 h-12 rounded-2xl overflow-hidden shrink-0 border-2 border-white dark:border-slate-800 shadow-xl">
-                      {user.photo_url ? (
-                        <img src={user.photo_url} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                      ) : (
-                        <div className="w-full h-full bg-blue-500 flex items-center justify-center text-white font-bold text-xl uppercase">
-                          {user.first_name?.[0] || 'U'}
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1 overflow-hidden">
-                      <p className="text-sm font-black text-slate-900 dark:text-white truncate uppercase tracking-widest">{user.first_name} {user.last_name || ''}</p>
-                      <p className="text-[10px] font-bold text-slate-400">@{user.username || 'kullanici'}</p>
-                    </div>
-                    <button 
-                      onClick={() => { haptic('medium'); setWebAuthUser(null); setIsMobileMenuOpen(false); }}
-                      className="p-3 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500/20 transition-all shrink-0"
-                      title={t('logout')}
-                    >
-                      <LogOut size={18} />
-                    </button>
-                 </div>
-               ) : (
-                 <div className="mobile-menu-profile bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-500/10 dark:to-blue-500/10 rounded-2xl border border-blue-100/50 dark:border-blue-500/20">
-                    <button onClick={() => { haptic('light'); navigate('/login'); }} className="w-full mobile-login-btn bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2">
-                      <User size={16} />
-                      {t('login')}
-                    </button>
-                 </div>
-               )}
-
-              <div className="grid grid-cols-3 gap-1.5 mt-auto">
                 <button
-                  onClick={() => { haptic('light'); toggleTheme(); }}
-                  className="flex items-center gap-1.5 p-2 mobile-menu-actions-btn rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white justify-center"
+                  onClick={() => {
+                    haptic("light");
+                    setIsSearchModalOpen(true);
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 active:scale-95 transition-all shrink-0"
+                  title="Ara"
                 >
-                  <div className="shrink-0 flex items-center justify-center">
-                    {theme === 'dark' ? <Sun size={14} className="text-yellow-400" /> : <Moon size={14} className="text-blue-500" />}
-                  </div>
-                  <span className="text-[8px] font-black uppercase tracking-tight truncate">{theme === 'dark' ? t('blog_day_mode').split(' ')[0] : t('blog_night_mode').split(' ')[0]}</span>
+                  <Search size={21} />
                 </button>
 
                 <button
-                  onClick={() => { haptic('light'); setIsSearchModalOpen(true); setIsMobileMenuOpen(false); }}
-                  className="flex items-center gap-1.5 p-2 mobile-menu-actions-btn rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white justify-center"
+                  onClick={() => {
+                    haptic("light");
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 active:scale-95 transition-all shrink-0"
                 >
-                  <div className="shrink-0 flex items-center justify-center">
-                    <Search size={14} className="text-blue-500" />
-                  </div>
-                  <span className="text-[8px] font-black uppercase tracking-tight text-slate-400 truncate">{t('blog_explore')}</span>
-                </button>
-
-                <button
-                  onClick={() => { haptic('light'); setIsLangPickerOpen(true); }}
-                  className="flex items-center gap-1.5 p-2 mobile-menu-actions-btn rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white justify-center"
-                >
-                  <div className="shrink-0 flex items-center justify-center">
-                    <Globe size={14} className="text-slate-400" />
-                  </div>
-                  <span className="text-[8px] font-black uppercase tracking-tight text-slate-400 truncate">{t('blog_lang_selection').split(' ')[0]}</span>
+                  <X size={26} strokeWidth={2.5} />
                 </button>
               </div>
             </div>
 
-            {/* Language Picker Bottom Sheet */}
-            <AnimatePresence>
-              {isLangPickerOpen && (
-                <>
-                  <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    onClick={() => setIsLangPickerOpen(false)}
-                    className="fixed inset-0 z-[1100] bg-black/40 backdrop-blur-sm"
-                  />
-                  <motion.div 
-                    initial={{ y: "100%" }}
-                    animate={{ y: 0 }}
-                    exit={{ y: "100%" }}
-                    transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                    className="fixed bottom-0 left-0 right-0 z-[1101] bg-white dark:bg-slate-900 rounded-t-[40px] border-t border-slate-100 dark:border-white/10 p-8 pb-12 shadow-2xl"
-                  >
-                    <div className="w-12 h-1 bg-slate-200 dark:bg-white/10 rounded-full mx-auto mb-8"></div>
-                    <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-[0.2em] mb-6 text-center">{t('blog_lang_selection')}</h3>
-                    <div className="grid grid-cols-1 gap-3">
-                      {(['tr', 'en', 'ru'] as const).map((lang) => (
-                        <button
-                          key={lang}
-                          onClick={() => { haptic('medium'); setLanguage(lang); setIsLangPickerOpen(false); }}
-                          className={`w-full flex items-center justify-between p-5 rounded-2xl transition-all ${
-                            language === lang 
-                              ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/30' 
-                              : 'bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-slate-400'
+            {/* Menu Core Content Area */}
+            <div className="flex-1 overflow-y-auto py-6">
+              <div className="flex flex-col justify-center px-8 sm:px-12 py-4 gap-6 sm:gap-8">
+                <button
+                  onClick={() => {
+                    haptic("light");
+                    navigate("/");
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase leading-none"
+                >
+                  {t("nav_explore") || "Keşfet"}
+                </button>
+
+                <button
+                  onClick={() => {
+                    haptic("light");
+                    navigate("/search?mode=bots");
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase flex items-center gap-3 leading-none"
+                >
+                  <span>{t("bots") || "Bot Market"}</span>
+                  <span className="text-[10px] font-black tracking-widest bg-blue-500 text-white px-2 py-0.5 rounded-md uppercase">
+                    BOTS
+                  </span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    haptic("light");
+                    navigate("/search?mode=apps");
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-emerald-500 transition-colors uppercase flex items-center gap-3 leading-none"
+                >
+                  <span>{t("apps") || "Uygulamalar"}</span>
+                  <span className="text-[10px] font-black tracking-widest bg-emerald-500 text-white px-2 py-0.5 rounded-md uppercase">
+                    APPS
+                  </span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    haptic("light");
+                    navigate("/qa");
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase leading-none"
+                >
+                  {t("qa_forum") || "Soru & Cevap"}
+                </button>
+
+                <button
+                  onClick={() => {
+                    haptic("light");
+                    navigate("/blog");
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase flex items-center gap-3 leading-none"
+                >
+                  <span>{t("blog") || "Günlük"}</span>
+                  <span className="text-[10px] font-black tracking-widest bg-blue-500 text-white px-2 py-0.5 rounded-md uppercase leading-none animate-pulse">
+                    NEW
+                  </span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    haptic("light");
+                    navigate("/settings");
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase leading-none"
+                >
+                  Uygulama Ekle
+                </button>
+
+                {/* Blog Categories Section inside Mobile Menu */}
+                <div className="mt-4 pt-6 border-t border-black/[0.04] dark:border-white/[0.04]">
+                  <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-4 px-1">{t('blog_categories')}</div>
+                  <div className="grid grid-cols-2 gap-3.5 pr-1">
+                    {categories.map((cat) => (
+                      <button
+                        key={cat.id}
+                        onClick={() => {
+                          haptic('light');
+                          setActiveCategory(cat.id);
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className={`flex flex-col items-start gap-4 p-5 transition-all rounded-[24px] border text-left group w-full ${
+                          activeCategory === cat.id
+                            ? 'bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-500/10'
+                            : 'bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-800 dark:text-slate-200 border-black/5 dark:border-white/5'
+                        }`}
+                      >
+                        <div
+                          className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${
+                            activeCategory === cat.id
+                              ? 'bg-white/20 text-white'
+                              : 'text-blue-500 bg-blue-500/10'
                           }`}
                         >
-                          <span className="text-sm font-bold uppercase tracking-widest">
-                            {lang === 'tr' ? 'Türkçe' : lang === 'en' ? 'English' : 'Русский'}
-                          </span>
-                          {language === lang && <Globe size={20} />}
-                        </button>
-                      ))}
-                    </div>
-                    <button 
-                      onClick={() => setIsLangPickerOpen(false)}
-                      className="w-full mt-6 py-4 text-slate-400 text-[10px] font-black uppercase tracking-widest"
-                    >
-                      {t('cancel')}
-                    </button>
-                  </motion.div>
-                </>
-              )}
-            </AnimatePresence>
+                          <cat.icon size={18} />
+                        </div>
+                        <span className={`text-xs font-[900] uppercase tracking-tight leading-snug ${
+                          activeCategory === cat.id ? 'text-white' : 'text-slate-800 dark:text-slate-200'
+                        }`}>
+                          {t(cat.translationKey)}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Menu Footer Row - Always pinned to the bottom safely */}
+            <div className="border-t border-slate-100 dark:border-white/5 px-8 py-5 flex items-center gap-3 shrink-0 bg-white/95 dark:bg-slate-950/95 pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
+              {/* Language Selector Pill */}
+              <button
+                onClick={() => {
+                  haptic("light");
+                  setLanguage(language === 'tr' ? 'en' : language === 'en' ? 'ru' : 'tr');
+                }}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-50 dark:bg-white/5 border border-black/[0.04] dark:border-white/[0.04] text-xs font-bold text-slate-700 dark:text-slate-300 transition-all active:scale-95"
+              >
+                <Globe size={15} />
+                <span>{language.toUpperCase()}</span>
+              </button>
+
+              {/* Theme Toggle Pill */}
+              <button
+                onClick={() => {
+                  haptic("light");
+                  toggleTheme();
+                }}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-50 dark:bg-white/5 border border-black/[0.04] dark:border-white/[0.04] text-xs font-bold text-slate-700 dark:text-slate-300 transition-all active:scale-95"
+              >
+                {theme === "dark" ? (
+                  <>
+                    <Moon size={15} className="text-blue-400" />
+                    <span>Gece Modu</span>
+                  </>
+                ) : (
+                  <>
+                    <Sun size={15} className="text-amber-500" />
+                    <span>Gündüz Modu</span>
+                  </>
+                )}
+              </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
