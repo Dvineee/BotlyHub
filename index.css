@@ -1956,4 +1956,9 @@ div.qa-last-24h-box, .qa-last-24h-box {
   gap: 6px !important;
 }
 
+.bg-slate-50 {
+  --tw-bg-opacity: 1 !important;
+  background-color: rgb(255 255 255) !important;
+}
+
 
