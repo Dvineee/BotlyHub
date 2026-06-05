@@ -1615,9 +1615,11 @@ async function startServer() {
       // Standard defaults if not configured
       const defaultSettings = {
         welcome_enabled: false,
-        welcome_message: "Selam {name}! Grubumuza hoş geldin! 🎉",
+        welcome_message: "Doğu ve Batı'nın eşsiz buluşma noktası grubumuza hoş geldin, {fullname}! 🎉",
         delete_old_welcome: true,
+        delete_old: true,
         welcome_delay: 0,
+        delay_seconds: 0,
         last_welcome_message_id: null
       };
 
@@ -1625,9 +1627,19 @@ async function startServer() {
         return res.json(defaultSettings);
       }
 
+      const perms = data.permissions || {};
+      const actualDeleteOld = typeof perms.delete_old === 'boolean' ? perms.delete_old : 
+                               (typeof perms.delete_old_welcome === 'boolean' ? perms.delete_old_welcome : true);
+      const actualDelay = typeof perms.delay_seconds === 'number' ? perms.delay_seconds : 
+                          (typeof perms.welcome_delay === 'number' ? perms.welcome_delay : 0);
+
       return res.json({
         ...defaultSettings,
-        ...(data.permissions || {})
+        ...perms,
+        delete_old: actualDeleteOld,
+        delete_old_welcome: actualDeleteOld,
+        delay_seconds: actualDelay,
+        welcome_delay: actualDelay
       });
     } catch (err: any) {
       console.error("[SERVER] Error in GET welcome settings:", err);
@@ -1657,7 +1669,7 @@ async function startServer() {
         }
       }
 
-      const { welcome_enabled, welcome_message, delete_old_welcome, welcome_delay, last_welcome_message_id } = req.body;
+      const { welcome_enabled, welcome_message, delete_old_welcome, delete_old, welcome_delay, delay_seconds, last_welcome_message_id } = req.body;
 
       // Extract existing settings to avoid overwriting nested properties like last_welcome_message_id if not supplied
       const { data: existing } = await supabaseAdmin
@@ -1669,11 +1681,23 @@ async function startServer() {
         .maybeSingle();
 
       const existingPermissions = existing?.permissions || {};
+      
+      const isWelcomeEnabled = typeof welcome_enabled === 'boolean' ? welcome_enabled : !!existingPermissions.welcome_enabled;
+      const finalWelcomeMsg = welcome_message !== undefined ? welcome_message : (existingPermissions.welcome_message || "Doğu ve Batı'nın eşsiz buluşma noktası grubumuza hoş geldin, {fullname}! 🎉");
+      
+      const isDeleteOld = typeof delete_old === 'boolean' ? delete_old : 
+                          (typeof delete_old_welcome === 'boolean' ? delete_old_welcome : (existingPermissions.delete_old !== false));
+                          
+      const finalDelay = typeof delay_seconds === 'number' ? delay_seconds : 
+                         (typeof welcome_delay === 'number' ? welcome_delay : (existingPermissions.delay_seconds || 0));
+
       const newPermissions = {
-        welcome_enabled: typeof welcome_enabled === 'boolean' ? welcome_enabled : !!existingPermissions.welcome_enabled,
-        welcome_message: welcome_message || existingPermissions.welcome_message || "Selam {name}! Grubumuza hoş geldin! 🎉",
-        delete_old_welcome: typeof delete_old_welcome === 'boolean' ? delete_old_welcome : (existingPermissions.delete_old_welcome !== false),
-        welcome_delay: typeof welcome_delay === 'number' ? welcome_delay : (existingPermissions.welcome_delay || 0),
+        welcome_enabled: isWelcomeEnabled,
+        welcome_message: finalWelcomeMsg,
+        delete_old_welcome: isDeleteOld,
+        delete_old: isDeleteOld,
+        welcome_delay: finalDelay,
+        delay_seconds: finalDelay,
         last_welcome_message_id: last_welcome_message_id !== undefined ? last_welcome_message_id : (existingPermissions.last_welcome_message_id || null)
       };
 
@@ -1769,12 +1793,12 @@ async function startServer() {
 
           // If Welcome Message is enabled, trigger greeting!
           if (config.welcome_enabled) {
-            const delayMs = (config.welcome_delay || 0) * 1000;
+            const delayMs = (config.welcome_delay || config.delay_seconds || 0) * 1000;
             
             setTimeout(async () => {
               try {
                 // Formatting message variables
-                const name = member.first_name;
+                const name = member.first_name + (member.last_name ? ' ' + member.last_name : '');
                 const username = member.username ? `@${member.username}` : `[${member.first_name}](tg://user?id=${member.id})`;
                 const group_name = chat.title || 'grup';
                 const user_id = member.id.toString();
@@ -1782,12 +1806,16 @@ async function startServer() {
                 let formattedMessage = config.welcome_message || "Selam {name}! Grubumuza hoş geldin! 🎉";
                 formattedMessage = formattedMessage
                   .replace(/{name}/g, name)
+                  .replace(/{fullname}/g, name)
                   .replace(/{username}/g, username)
                   .replace(/{group_name}/g, group_name)
-                  .replace(/{userId}/g, user_id);
+                  .replace(/{userId}/g, user_id)
+                  .replace(/{userid}/g, user_id)
+                  .replace(/{userId}/gi, user_id);
 
                 // Delete old welcome message if requested
-                if (config.delete_old_welcome && config.last_welcome_message_id) {
+                const shouldDeleteOld = config.delete_old_welcome !== false || config.delete_old === true;
+                if (shouldDeleteOld && config.last_welcome_message_id) {
                   try {
                     await fetch(`https://api.telegram.org/bot${botToken}/deleteMessage`, {
                       method: "POST",
