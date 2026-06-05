@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS public.pending_admin_actions (
     user_id TEXT NOT NULL,
     action TEXT NOT NULL DEFAULT 'promote',
     status TEXT NOT NULL DEFAULT 'pending', -- 'pending', 'completed', 'failed'
+    permissions JSONB,                      -- Customized administrative rights
     error_log TEXT,                         -- To record telegram errors if any
     created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
     updated_at TIMESTAMPTZ

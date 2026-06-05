@@ -413,6 +413,10 @@ const GroupSettingsView = ({ channel }: { channel: any }) => {
     const [newAdminId, setNewAdminId] = useState('');
     const [submittingAdmin, setSubmittingAdmin] = useState(false);
 
+    // States for custom AdminRightsModal inside GroupSettingsView
+    const [rightsModalData, setRightsModalData] = useState<{ userId: string; userName: string } | null>(null);
+    const [submittingRights, setSubmittingRights] = useState(false);
+
     const fetchPendingAdmins = async () => {
         if (!displayGroupId) return;
         setLoadingAdmins(true);
@@ -455,9 +459,15 @@ const GroupSettingsView = ({ channel }: { channel: any }) => {
         }
     }, [activeTab, displayGroupId]);
 
-    const handleAddNewAdmin = async () => {
+    const handleAddNewAdmin = () => {
         if (!newAdminId.trim() || !displayGroupId) return;
+        setRightsModalData({ userId: newAdminId.trim(), userName: `Özel Kullanıcı ID: ${newAdminId.trim()}` });
+    };
+
+    const handleConfirmAddNewAdmin = async (permissions: Record<string, boolean>) => {
+        if (!rightsModalData || !displayGroupId) return;
         setSubmittingAdmin(true);
+        setSubmittingRights(true);
         try {
             const response = await fetch(`${API_BASE_URL}/api/admin/add-admin`, {
                 method: "POST",
@@ -466,8 +476,9 @@ const GroupSettingsView = ({ channel }: { channel: any }) => {
                 },
                 body: JSON.stringify({
                     channelId: displayGroupId,
-                    userId: newAdminId.trim().toString(),
+                    userId: rightsModalData.userId,
                     action: "promote",
+                    permissions,
                 }),
             });
 
@@ -476,15 +487,17 @@ const GroupSettingsView = ({ channel }: { channel: any }) => {
                 throw new Error(result.error || "Talep eklenirken bir hata oluştu.");
             }
 
-            alert("Yönetici yapma talebi veritabanına başarıyla eklendi! Telegram botu 5 saniye içinde yetki tanıtacaktır.");
+            alert("Yönetici yapma talebi veritabanına başarıyla eklendi! Özel belirlediğiniz yetkiler kaydedildi. Telegram botu 5 saniye içinde yetki tanıtacaktır.");
             setNewAdminId('');
             setShowAddForm(false);
+            setRightsModalData(null);
             fetchPendingAdmins();
         } catch (err: any) {
             console.error("Error creating promote action from panel:", err);
             alert(err.message || "İşlem sırasında bir hata oluştu.");
         } finally {
             setSubmittingAdmin(false);
+            setSubmittingRights(false);
         }
     };
 
@@ -758,6 +771,15 @@ const GroupSettingsView = ({ channel }: { channel: any }) => {
                     </div>
                 </div>
             )}
+
+            <AdminRightsModal
+                isOpen={rightsModalData !== null}
+                userId={rightsModalData?.userId || ''}
+                userName={rightsModalData?.userName || ''}
+                onClose={() => setRightsModalData(null)}
+                onConfirm={handleConfirmAddNewAdmin}
+                isSubmitting={submittingRights}
+            />
         </div>
     );
 };
@@ -1214,6 +1236,10 @@ const UsersView = ({ channel }: { channel: any }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
+  // New states for interactive AdminRightsModal
+  const [rightsModalData, setRightsModalData] = useState<{ userId: string; userName: string } | null>(null);
+  const [submittingRights, setSubmittingRights] = useState(false);
+
   const targetGroupId = channel?.telegram_id || groupId || '';
 
   const fetchUsers = async () => {
@@ -1250,12 +1276,14 @@ const UsersView = ({ channel }: { channel: any }) => {
     }
   };
 
-  const handlePromoteAdmin = async (userId: string, userName: string) => {
-    if (!targetGroupId) return;
-    const confirmMsg = `"${userName}" (ID: ${userId}) adlı kullanıcıyı grupta Yönetici (Admin) yapmak istediğinize emin misiniz? (Bot 5 saniye içinde yetki tanıtacaktır)`;
-    if (!window.confirm(confirmMsg)) return;
+  const handlePromoteAdmin = (userId: string, userName: string) => {
+    setRightsModalData({ userId, userName });
+  };
 
-    setPromotingUserId(userId);
+  const handleConfirmPromote = async (permissions: Record<string, boolean>) => {
+    if (!targetGroupId || !rightsModalData) return;
+    setSubmittingRights(true);
+    setPromotingUserId(rightsModalData.userId);
     try {
       const response = await fetch(`${API_BASE_URL}/api/admin/add-admin`, {
         method: "POST",
@@ -1264,8 +1292,9 @@ const UsersView = ({ channel }: { channel: any }) => {
         },
         body: JSON.stringify({
           channelId: targetGroupId,
-          userId: userId,
+          userId: rightsModalData.userId,
           action: "promote",
+          permissions,
         }),
       });
 
@@ -1274,11 +1303,13 @@ const UsersView = ({ channel }: { channel: any }) => {
         throw new Error(result.error || "Yönetici ekleme talebi başarısız oldu.");
       }
 
-      alert("Yönetici yapma talebi veritabanına başarıyla eklendi! Telegram botu 5 saniye içinde işlemi tamamlayacaktır.");
+      alert("Yönetici yapma talebi veritabanına başarıyla eklendi! Özel belirlediğiniz yetkiler kaydedildi. Telegram botu 5 saniye içinde yetki yükseltme işlemini tamamlayacaktır.");
+      setRightsModalData(null);
     } catch (err: any) {
       console.error("Error creating promote admin action:", err);
       alert(err.message || "İşlem yapılırken bir hata oluştu.");
     } finally {
+      setSubmittingRights(false);
       setPromotingUserId(null);
     }
   };
@@ -1570,6 +1601,15 @@ const UsersView = ({ channel }: { channel: any }) => {
            </div>
         </div>
       </div>
+
+      <AdminRightsModal
+        isOpen={rightsModalData !== null}
+        userId={rightsModalData?.userId || ''}
+        userName={rightsModalData?.userName || ''}
+        onClose={() => setRightsModalData(null)}
+        onConfirm={handleConfirmPromote}
+        isSubmitting={submittingRights}
+      />
     </div>
   );
 };
@@ -1583,5 +1623,173 @@ const EmptyModule = ({ title }: { title?: string }) => (
     </p>
   </div>
 );
+
+// High-fidelity dynamic AdminRightsModal mimicking official Telegram admin configuration UI
+interface AdminRightsModalProps {
+  isOpen: boolean;
+  userId: string;
+  userName: string;
+  onClose: () => void;
+  onConfirm: (permissions: Record<string, boolean>) => Promise<void>;
+  isSubmitting: boolean;
+}
+
+const AdminRightsModal = ({ isOpen, userId, userName, onClose, onConfirm, isSubmitting }: AdminRightsModalProps) => {
+  const [rights, setRights] = useState<Record<string, boolean>>({
+    can_change_info: false,
+    can_delete_messages: true,
+    can_restrict_members: true,
+    can_invite_users: true,
+    can_pin_messages: true,
+    can_post_stories: false,
+    can_manage_video_chats: false,
+    is_anonymous: false,
+    can_promote_members: false
+  });
+
+  const toggleRight = (key: string) => {
+    setRights(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
+  if (!isOpen) return null;
+
+  const rightsList = [
+    { key: 'can_change_info', label: 'Grup bilgisini değiştirme', desc: 'Grup ismi, açıklaması ve resmini değiştirme yetkisi' },
+    { key: 'can_delete_messages', label: 'Mesajları silme', desc: 'Diğer üyelerin gönderdiği mesajları kaldırma yetkisi' },
+    { key: 'can_restrict_members', label: 'Üyeleri yasaklama', desc: 'Kullanıcıları gruptan yasaklama veya kısıtlama yetkisi' },
+    { key: 'can_invite_users', label: 'Üyeler ekleme', desc: 'Gruba yeni kullanıcı davet etme ve ekleme yetkisi' },
+    { key: 'can_pin_messages', label: 'Mesajları sabitleme', desc: 'Önemli mesajları sohbetin üstüne sabitleme yetkisi' },
+    { key: 'can_post_stories', label: 'Hikayeleri yönetme', desc: 'Grup adına hikayeler paylaşma ve düzenleme' },
+    { key: 'can_manage_video_chats', label: 'Görüntülü sohbetleri yönetme', desc: 'Sesli ve görüntülü sohbet oturumları başlatma ve yönetme' },
+    { key: 'is_anonymous', label: 'Anonim kal', desc: 'Grupta mesaj gönderirken kendi adı yerine grup adını kullanma' },
+    { key: 'can_promote_members', label: 'Yeni yöneticiler ekleme', desc: 'Gruptaki diğer kullanıcılara yeni yöneticiler atayabilme yetkisi' },
+  ];
+
+  return (
+    <AnimatePresence>
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        {/* Backdrop overlay */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+          className="absolute inset-0 bg-[#07090c]/80 backdrop-blur-md"
+        />
+
+        {/* Modal Window Container */}
+        <motion.div
+          initial={{ scale: 0.95, opacity: 0, y: 15 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          exit={{ scale: 0.95, opacity: 0, y: 15 }}
+          transition={{ type: "spring", duration: 0.4 }}
+          className="relative max-w-md w-full bg-[#10141b] border border-blue-500/20 rounded-[32px] shadow-2xl shadow-blue-900/10 overflow-hidden flex flex-col max-h-[90vh]"
+        >
+          {/* Header */}
+          <div className="p-6 pb-4 border-b border-white/5 bg-gradient-to-b from-blue-950/20 to-transparent">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-blue-600/10 flex items-center justify-center text-blue-500 border border-blue-500/20">
+                  <Shield size={20} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black text-white uppercase tracking-wider">Yönetici Hakları</h3>
+                  <p className="text-xs font-bold text-blue-400 italic mt-0.5">{userName || 'Grup Üyesi'}</p>
+                </div>
+              </div>
+              <button 
+                onClick={onClose}
+                className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white flex items-center justify-center transition-all"
+              >
+                <X size={16} />
+              </button>
+            </div>
+          </div>
+
+          {/* Subheader info block similar to official Telegram mobile app */}
+          <div className="bg-[#151c27] px-6 py-4 border-b border-white/5 flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-600/10 rounded-full flex items-center justify-center font-black text-blue-500 italic text-sm border border-blue-500/10 shrink-0">
+              {userName ? userName[0].toUpperCase() : 'U'}
+            </div>
+            <div>
+              <p className="text-xs text-slate-300 font-semibold leading-relaxed">
+                <span className="text-blue-500 font-bold">BotlyHub</span> tarafından atanan yöneticilik haklarını yapılandırın.
+              </p>
+              <span className="text-[10px] text-slate-500 font-mono italic">Kullanıcı ID: {userId}</span>
+            </div>
+          </div>
+
+          {/* Section Heading */}
+          <div className="px-6 pt-5 pb-2">
+            <h4 className="text-[10px] font-black text-teal-400 uppercase tracking-widest italic">BU YÖNETİCİ NE YAPABİLİR?</h4>
+          </div>
+
+          {/* Rights Toggle List with custom styled toggles */}
+          <div className="flex-1 overflow-y-auto px-6 space-y-3.5 pb-6">
+            {rightsList.map((item) => {
+              const active = rights[item.key];
+              return (
+                <div key={item.key} className="flex items-center justify-between gap-4 py-1.5 border-b border-white/[0.02] last:border-0">
+                  <div className="flex-1">
+                    <p className="text-sm font-bold text-white tracking-tight">{item.label}</p>
+                    <p className="text-[10px] text-slate-500 font-medium leading-tight mt-0.5 max-w-[280px]">{item.desc}</p>
+                  </div>
+                  
+                  {/* Telegram Style Premium Toggle Switch */}
+                  <button
+                    type="button"
+                    onClick={() => toggleRight(item.key)}
+                    className={`w-11 h-6 flex items-center rounded-full p-0.5 transition-all duration-300 relative shrink-0 ${
+                      active ? 'bg-teal-500/20 border border-teal-500/40' : 'bg-rose-500/10 border border-rose-500/25'
+                    }`}
+                  >
+                    <div
+                      className={`w-4.5 h-4.5 rounded-full flex items-center justify-center transition-all duration-300 transform select-none ${
+                        active 
+                          ? 'translate-x-5.5 bg-teal-500 border border-teal-400' 
+                          : 'translate-x-0.5 bg-rose-500 border border-rose-450'
+                      }`}
+                    >
+                      {active ? (
+                        <Check size={9} className="text-white" strokeWidth={4} />
+                      ) : (
+                        <X size={9} className="text-white" strokeWidth={4} />
+                      )}
+                    </div>
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Bottom actions CTA */}
+          <div className="p-6 border-t border-white/5 bg-[#0b0d12] flex gap-3">
+            <button
+              onClick={onClose}
+              className="flex-1 h-11 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all"
+            >
+              Vazgeç
+            </button>
+            <button
+              onClick={() => onConfirm(rights)}
+              disabled={isSubmitting}
+              className="flex-1 h-11 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-900 border border-blue-500/20 text-white font-black uppercase text-xs tracking-widest rounded-xl transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              {isSubmitting ? (
+                <Loader2 size={14} className="animate-spin text-white" />
+              ) : (
+                <ShieldCheck size={14} />
+              )}
+              Yetkileri Kaydet
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    </AnimatePresence>
+  );
+};
 
 export default BotManagementPanel;

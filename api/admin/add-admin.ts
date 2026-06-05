@@ -55,6 +55,7 @@ export default async function handler(req: any, res: any) {
           user_id: userId.toString(),
           action: action,
           status: "pending",
+          permissions: req.body.permissions || null,
           created_at: new Date().toISOString(),
         }
       ])

@@ -445,6 +445,7 @@ async function startServer() {
             user_id: userId.toString(),
             action: action,
             status: "pending",
+            permissions: req.body.permissions || null,
             created_at: new Date().toISOString(),
           }
         ])
