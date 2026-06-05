@@ -7,7 +7,7 @@ import {
   ChevronRight, Save, Download, Upload, RotateCcw, AlertCircle, Info, Star,
   Search, Filter, List, MoreVertical, Plus, Check, X, ShieldCheck, Zap,
   ExternalLink, ListOrdered, Sticker, Lightbulb, Shield, Columns, UserPlus, Trophy, Clock,
-  Loader2, Trash2, Trash
+  Loader2, Trash2, Trash, Menu, AlertTriangle
 } from 'lucide-react';
 import LoginModal from '../components/LoginModal';
 import { useTelegram } from '../hooks/useTelegram';
@@ -71,6 +71,106 @@ const GroupCard = ({ name, username, members, active, onClick }: any) => (
   </motion.div>
 );
 
+const CustomAdminItem = ({ admin, groupUsers, fetchedUserInfos, fetchUserInfo, imgError, setImgError, setRightsModalData, API_BASE_URL, handleDemoteAdmin, Shield, Trash2 }: any) => {
+    const matchingUser = groupUsers.find((u: any) => String(u.user_id) === String(admin.user_id)) || fetchedUserInfos[admin.user_id];
+    const adminName = matchingUser ? (matchingUser.name || (matchingUser.first_name + (matchingUser.last_name ? ' ' + matchingUser.last_name : ''))) : `Yönetici ID: ${admin.user_id}`;
+    let adminUsername = 'Veritabanında aranıyor...';
+    if (matchingUser) {
+        if (matchingUser.username) {
+            adminUsername = `@${matchingUser.username.replace('@', '')}`;
+        } else {
+            adminUsername = 'Kullanıcı adı yok';
+        }
+    }
+
+    useEffect(() => {
+        const isInDb = groupUsers.some((u: any) => String(u.user_id) === String(admin.user_id));
+        if (!isInDb) {
+            fetchUserInfo(admin.user_id);
+        }
+    }, [admin.user_id, groupUsers]);
+
+    return (
+        <div 
+            className="bg-[#14181f] border border-white/5 rounded-[24px] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 group hover:border-blue-500/30 transition-all transform-gpu backface-visibility-hidden"
+        >
+            <div 
+                onClick={() => {
+                    setRightsModalData({ 
+                        userId: admin.user_id, 
+                        userName: adminName,
+                        initialPermissions: admin.permissions
+                    });
+                }}
+                className="flex items-center gap-4 cursor-pointer flex-1"
+            >
+                <div className="w-10 h-10 bg-[#14181f] rounded-full flex items-center justify-center p-0.5 overflow-hidden border border-teal-500/10 shrink-0">
+                    {!imgError[admin.user_id] ? (
+                        <img 
+                            src={`${API_BASE_URL}/api/telegram/chat-photo?chatId=${admin.user_id}`} 
+                            onError={() => setImgError((prev: any) => ({ ...prev, [admin.user_id]: true }))}
+                            className="w-full h-full object-cover rounded-full" 
+                            referrerPolicy="no-referrer"
+                        />
+                    ) : (
+                        <div className="w-full h-full bg-teal-500/10 border border-teal-500/20 rounded-full flex items-center justify-center font-black text-teal-400 italic text-sm">
+                            {adminName[0].toUpperCase()}
+                        </div>
+                    )}
+                </div>
+                <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-0.5">
+                        <span className="text-xs font-black text-teal-400 italic tracking-tighter">{adminName}</span>
+                        {admin.status === 'completed' ? (
+                            <span className="text-[8px] font-bold bg-green-500/10 text-green-400 px-1.5 py-0.5 rounded uppercase tracking-wider scale-90">AKTİF</span>
+                        ) : (
+                            <span className="text-[8px] font-bold bg-yellow-500/10 text-yellow-500 px-1.5 py-0.5 rounded uppercase tracking-wider scale-90 animate-pulse">TANITILIYOR...</span>
+                        )}
+                    </div>
+                    <p className="text-[10px] text-slate-500 font-medium">
+                        {adminUsername} • <span className="font-mono">ID: {admin.user_id}</span>
+                    </p>
+                    {admin.permissions && (
+                        <div className="flex flex-wrap gap-1 mt-1.5">
+                            {Object.entries(admin.permissions)
+                                .filter(([_, val]) => val === true)
+                                .map(([key]) => (
+                                    <span key={key} className="text-[8.5px] font-black bg-white/5 text-slate-400 px-1.5 py-0.5 rounded border border-white/[0.03]">
+                                        {key.replace('can_', '').replace('is_', '').replace(/_/g, ' ')}
+                                    </span>
+                                ))
+                            }
+                        </div>
+                    )}
+                </div>
+            </div>
+            
+            <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+                <button
+                    onClick={() => {
+                        setRightsModalData({ 
+                            userId: admin.user_id, 
+                            userName: adminName,
+                            initialPermissions: admin.permissions
+                        });
+                    }}
+                    className="h-8 px-3 bg-white/5 hover:bg-white/10 text-xs font-bold text-slate-300 rounded-lg flex items-center gap-1.5 transition-all"
+                >
+                    <Shield size={12} className="text-teal-400" />
+                    Yetkiler
+                </button>
+                <button
+                    onClick={() => handleDemoteAdmin(admin.user_id)}
+                    className="h-8 px-3 bg-rose-500/10 hover:bg-rose-500/20 text-xs font-bold text-rose-400 rounded-lg flex items-center gap-1.5 transition-all"
+                >
+                    <Trash2 size={12} />
+                    Kaldır
+                </button>
+            </div>
+        </div>
+    );
+};
+
 const BotManagementPanel = () => {
   const { botId, groupId: routeGroupId } = useParams();
   const navigate = useNavigate();
@@ -86,6 +186,11 @@ const BotManagementPanel = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [channels, setChannels] = useState<Channel[]>([]);
   const [activeChannel, setActiveChannel] = useState<Channel | null>(null);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    setIsMobileSidebarOpen(false);
+  }, [location.pathname]);
 
   useEffect(() => {
     const fetchBotAndChannels = async () => {
@@ -169,8 +274,20 @@ const BotManagementPanel = () => {
             height: 1.75rem !important;
         }
       ` }} />
+      {/* Backdrop */}
+      {isMobileSidebarOpen && (
+        <div 
+          onClick={() => setIsMobileSidebarOpen(false)} 
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-35 md:hidden" 
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-60 bg-[#11141a] border-r border-white/5 flex flex-col sticky top-0 h-screen overflow-y-auto no-scrollbar">
+      <aside 
+        className={`fixed md:sticky top-0 left-0 h-screen z-40 w-60 bg-[#11141a] border-r border-white/5 flex flex-col overflow-y-auto no-scrollbar transition-transform duration-350 md:translate-x-0 ${
+          isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
         <div className="p-4 flex-1">
           {/* Brand Header */}
           <Link to="/" className="flex items-center gap-2 px-3 mb-6">
@@ -300,13 +417,20 @@ const BotManagementPanel = () => {
       {/* Main Content */}
       <main className="flex-1 flex flex-col max-h-screen overflow-hidden">
         {/* Top Header */}
-        <header className="h-20 bg-[#14181f]/80 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-8 z-20">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center font-black text-white italic overflow-hidden shadow-lg shadow-black/20">
+        <header className="h-20 bg-[#14181f]/80 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-4 sm:px-8 z-20">
+          <div className="flex items-center gap-3 sm:gap-4">
+            {/* Hamburger button */}
+            <button 
+              onClick={() => { haptic('light'); setIsMobileSidebarOpen(true); }}
+              className="p-2 sm:p-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white md:hidden transition-colors shrink-0"
+            >
+              <Menu size={18} />
+            </button>
+            <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center font-black text-white italic overflow-hidden shadow-lg shadow-black/20 shrink-0">
                {bot.icon ? <img src={bot.icon} alt={bot.name} className="w-full h-full object-cover" /> : bot.name[0].toUpperCase()}
             </div>
             <div>
-              <h2 className="text-sm font-black text-white uppercase italic tracking-widest">{bot.name}</h2>
+              <h2 className="text-sm font-black text-white uppercase italic tracking-widest leading-none mb-1">{bot.name}</h2>
               <span className="text-[10px] text-slate-500 font-bold tracking-widest">{groupId ? 'Grup Yönetimi' : 'Yönetim Paneli'}</span>
             </div>
           </div>
@@ -324,25 +448,25 @@ const BotManagementPanel = () => {
                 </div>
              ) : (
                 <button 
-                    onClick={() => setIsLoginModalOpen(true)}
+                    onClick={() => { haptic('medium'); setIsLoginModalOpen(true); }}
                     className="h-10 px-6 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all mr-3 shadow-lg shadow-blue-500/20"
                 >
                     Giriş Yap
                 </button>
              )}
-             <button className="h-10 px-4 flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
+             <button className="h-10 px-4 hidden md:flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
                <Save size={14} />
                Kaydet
              </button>
-             <button className="h-10 px-4 flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
-               <Download size={14} />
-               Alıntı
+             <button className="h-10 px-4 hidden md:flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
+                <Download size={14} />
+                Alıntı
              </button>
-             <button className="h-10 px-4 flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
-               <Upload size={14} />
-               Çıktı
+             <button className="h-10 px-4 hidden md:flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
+                <Upload size={14} />
+                Çıktı
              </button>
-             <button className="h-10 px-4 flex items-center gap-2 bg-red-600/10 hover:bg-red-600/20 text-red-500 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
+             <button className="h-10 px-4 hidden md:flex items-center gap-2 bg-red-600/10 hover:bg-red-600/20 text-red-500 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
                <RotateCcw size={14} />
                Sıfırla
              </button>
@@ -421,6 +545,25 @@ const GroupSettingsView = ({ channel }: { channel: any }) => {
     const [liveAdmins, setLiveAdmins] = useState<any[]>([]);
     const [groupUsers, setGroupUsers] = useState<any[]>([]);
     const [imgError, setImgError] = useState<Record<string, boolean>>({});
+
+    const [fetchedUserInfos, setFetchedUserInfos] = useState<Record<string, any>>({});
+    const [loadingUsersState, setLoadingUsersState] = useState<Record<string, boolean>>({});
+
+    const fetchUserInfo = async (userId: string) => {
+        if (fetchedUserInfos[userId] || loadingUsersState[userId]) return;
+        setLoadingUsersState(prev => ({ ...prev, [userId]: true }));
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/telegram/user-info?userId=${userId}`);
+            if (res.ok) {
+                const data = await res.json();
+                setFetchedUserInfos(prev => ({ ...prev, [userId]: data }));
+            }
+        } catch (err) {
+            console.error("Failed to lazy load user details from telegram:", err);
+        } finally {
+            setLoadingUsersState(prev => ({ ...prev, [userId]: false }));
+        }
+    };
 
     const fetchPendingAdmins = async () => {
         if (!displayGroupId) return;
@@ -777,7 +920,7 @@ const GroupSettingsView = ({ channel }: { channel: any }) => {
                                                         if (filtered.length === 0) return null;
 
                                                         return (
-                                                            <div className="absolute left-0 right-0 mt-2 bg-[#0c0f14] border border-blue-500/25 rounded-2xl overflow-hidden z-50 shadow-2xl max-h-60 overflow-y-auto" style="position: relative;" >
+                                                            <div className="absolute left-0 right-0 mt-2 bg-[#0c0f14] border border-blue-500/25 rounded-2xl overflow-hidden z-50 shadow-2xl max-h-60 overflow-y-auto" style={{ position: 'relative' }} >
                                                                 <div className="px-3 py-1.5 text-[9px] font-black text-slate-500 uppercase tracking-widest border-b border-white/5 bg-[#14181f]/40">
                                                                     EŞLEŞEN GRUP ÜYELERİ
                                                                 </div>
@@ -911,92 +1054,22 @@ const GroupSettingsView = ({ channel }: { channel: any }) => {
                                 <div className="space-y-3">
                                     {(() => {
                                         const customAdmins = getActiveCustomAdmins();
-                                        return customAdmins.map((admin) => {
-                                            const matchingUser = groupUsers.find(u => String(u.user_id) === String(admin.user_id));
-                                            const adminName = matchingUser?.name || `Yönetici ID: ${admin.user_id}`;
-                                            const adminUsername = matchingUser?.username ? `@${matchingUser.username.replace('@', '')}` : 'Veritabanında bulunamadı';
-
-                                            return (
-                                                <div 
-                                                    key={admin.user_id} 
-                                                    className="bg-[#14181f] border border-white/5 rounded-[24px] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 group hover:border-blue-500/30 transition-all"
-                                                >
-                                                    <div 
-                                                        onClick={() => {
-                                                            setRightsModalData({ 
-                                                                userId: admin.user_id, 
-                                                                userName: adminName,
-                                                                initialPermissions: admin.permissions
-                                                            });
-                                                        }}
-                                                        className="flex items-center gap-4 cursor-pointer flex-1"
-                                                    >
-                                                        <div className="w-10 h-10 bg-[#14181f] rounded-full flex items-center justify-center p-0.5 overflow-hidden border border-teal-500/10 shrink-0">
-                                                            {!imgError[admin.user_id] ? (
-                                                                <img 
-                                                                    src={`${API_BASE_URL}/api/telegram/chat-photo?chatId=${admin.user_id}`} 
-                                                                    onError={() => setImgError(prev => ({ ...prev, [admin.user_id]: true }))}
-                                                                    className="w-full h-full object-cover rounded-full" 
-                                                                    referrerPolicy="no-referrer"
-                                                                />
-                                                            ) : (
-                                                                <div className="w-full h-full bg-teal-500/10 border border-teal-500/20 rounded-full flex items-center justify-center font-black text-teal-400 italic text-sm">
-                                                                    {adminName[0].toUpperCase()}
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                        <div className="flex-1">
-                                                            <div className="flex items-center gap-2 mb-0.5">
-                                                                <span className="text-xs font-black text-teal-400 italic tracking-tighter">{adminName}</span>
-                                                                {admin.status === 'completed' ? (
-                                                                    <span className="text-[8px] font-bold bg-green-500/10 text-green-400 px-1.5 py-0.5 rounded uppercase tracking-wider scale-90">AKTİF</span>
-                                                                ) : (
-                                                                    <span className="text-[8px] font-bold bg-yellow-500/10 text-yellow-500 px-1.5 py-0.5 rounded uppercase tracking-wider scale-90 animate-pulse">TANITILIYOR...</span>
-                                                                )}
-                                                            </div>
-                                                            <p className="text-[10px] text-slate-500 font-medium">
-                                                                {adminUsername} • <span className="font-mono">ID: {admin.user_id}</span>
-                                                            </p>
-                                                            {admin.permissions && (
-                                                                <div className="flex flex-wrap gap-1 mt-1.5">
-                                                                    {Object.entries(admin.permissions)
-                                                                        .filter(([_, val]) => val === true)
-                                                                        .map(([key]) => (
-                                                                            <span key={key} className="text-[8.5px] font-black bg-white/5 text-slate-400 px-1.5 py-0.5 rounded border border-white/[0.03]">
-                                                                                {key.replace('can_', '').replace('is_', '').replace(/_/g, ' ')}
-                                                                            </span>
-                                                                        ))
-                                                                    }
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                    
-                                                    <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
-                                                        <button
-                                                            onClick={() => {
-                                                                setRightsModalData({ 
-                                                                    userId: admin.user_id, 
-                                                                    userName: adminName,
-                                                                    initialPermissions: admin.permissions
-                                                                });
-                                                            }}
-                                                            className="h-8 px-3 bg-white/5 hover:bg-white/10 text-xs font-bold text-slate-300 rounded-lg flex items-center gap-1.5 transition-all"
-                                                        >
-                                                            <Shield size={12} className="text-teal-400" />
-                                                            Yetkiler
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleDemoteAdmin(admin.user_id)}
-                                                            className="h-8 px-3 bg-rose-500/10 hover:bg-rose-500/20 text-xs font-bold text-rose-400 rounded-lg flex items-center gap-1.5 transition-all"
-                                                        >
-                                                            <Trash2 size={12} />
-                                                            Kaldır
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            );
-                                        });
+                                        return customAdmins.map((admin) => (
+                                            <CustomAdminItem
+                                                key={admin.user_id}
+                                                admin={admin}
+                                                groupUsers={groupUsers}
+                                                fetchedUserInfos={fetchedUserInfos}
+                                                fetchUserInfo={fetchUserInfo}
+                                                imgError={imgError}
+                                                setImgError={setImgError}
+                                                setRightsModalData={setRightsModalData}
+                                                API_BASE_URL={API_BASE_URL}
+                                                handleDemoteAdmin={handleDemoteAdmin}
+                                                Shield={Shield}
+                                                Trash2={Trash2}
+                                            />
+                                        ));
                                     })()}
                                 </div>
                             )}
@@ -1342,10 +1415,21 @@ const GroupsView = ({ channels, isLoading }: { channels: Channel[], isLoading: b
 };
 
 const ModerationView = () => {
-  const [activeTab, setActiveTab] = useState('general');
+  const { groupId } = useParams();
+  const [activeTab, setActiveTab] = useState('users');
+  const [isLoading, setIsLoading] = useState(false);
+  const [settings, setSettings] = useState({
+    welcome_enabled: false,
+    welcome_message: 'Doğu ve Batı\'nın eşsiz buluşma noktası grubumuza hoş geldin, {fullname}! 🎉',
+    delete_old: true,
+    delay_seconds: 0
+  });
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
+
   const tabs = [
-    { id: 'general', label: 'Temel Ayarlar' },
     { id: 'users', label: 'Yeni Üyeler' },
+    { id: 'general', label: 'Temel Ayarlar' },
     { id: 'filters', label: 'Filtreler' },
     { id: 'fun', label: 'Eğlence' },
     { id: 'comments', label: 'Yorumlar' },
@@ -1353,9 +1437,67 @@ const ModerationView = () => {
     { id: 'triggers', label: 'Tetikleyiciler V2', premium: true },
   ];
 
+  useEffect(() => {
+    if (activeTab === 'users' && groupId) {
+      fetchSettings();
+    }
+  }, [activeTab, groupId]);
+
+  const fetchSettings = async () => {
+    setIsLoading(true);
+    setErrorMessage('');
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/groups/${groupId}/moderation-settings`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data) {
+          setSettings({
+            welcome_enabled: data.welcome_enabled === true,
+            welcome_message: data.welcome_message || 'Doğu ve Batı\'nın eşsiz buluşma noktası grubumuza hoş geldin, {fullname}! 🎉',
+            delete_old: data.delete_old !== false,
+            delay_seconds: Number(data.delay_seconds) || 0
+          });
+        }
+      } else {
+        const errorText = await res.text();
+        console.warn("Failed to fetch settings from server:", errorText);
+      }
+    } catch (err) {
+      console.error("Failed to load moderation settings:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    setSaveStatus('saving');
+    setErrorMessage('');
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/groups/${groupId}/moderation-settings`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(settings)
+      });
+      if (res.ok) {
+        setSaveStatus('success');
+        setTimeout(() => setSaveStatus('idle'), 3000);
+      } else {
+        const errData = await res.json();
+        setErrorMessage(errData.error || 'Ayarlar kaydedilemedi.');
+        setSaveStatus('error');
+      }
+    } catch (err) {
+      console.error("Failed to save moderation settings:", err);
+      setErrorMessage('Ağ sunucu hatası oluştu.');
+      setSaveStatus('error');
+    }
+  };
+
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-8 no-scrollbar">
+      <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-4 sm:mb-8 no-scrollbar">
         {tabs.map((tab) => (
           <button 
             key={tab.id}
@@ -1372,38 +1514,185 @@ const ModerationView = () => {
         ))}
       </div>
 
-      <div className="bg-[#14181f] border border-white/5 rounded-[40px] p-10">
-        <div className="flex items-center gap-2 mb-8">
-           <LayoutDashboard className="text-blue-500" size={20} />
-           <h2 className="text-2xl font-black text-white italic uppercase tracking-tighter">Beyaz Liste</h2>
-        </div>
-
-        <div className="space-y-6">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between px-2">
-               <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Kullanıcı Listesi</label>
-               <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">3 Kullanıcı</span>
+      {activeTab === 'users' ? (
+        <div className="bg-[#14181f] border border-white/5 rounded-[32px] sm:rounded-[40px] p-6 sm:p-10">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 border-b border-white/5 pb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-teal-500/10 flex items-center justify-center border border-teal-500/20 text-teal-400">
+                <UserPlus size={22} />
+              </div>
+              <div>
+                <h2 className="text-xl font-black text-white italic uppercase tracking-tighter">Yeni Üye Karşılama</h2>
+                <p className="text-[11px] text-slate-500 font-medium">Gruba yeni katılan üyelere otomatik hoş geldin mesajı gönderin.</p>
+              </div>
             </div>
-            <textarea 
-               className="w-full h-40 bg-[#0f1218] border border-white/5 rounded-3xl p-6 text-sm text-white outline-none focus:border-blue-500/30 transition-all placeholder:text-slate-700"
-               placeholder="Telegram ID veya kullanıcı adlarını alt alta yazarak ekleyin..."
-            ></textarea>
-            <p className="text-[10px] text-slate-600 font-medium italic">
-              Beyaz listeye giren kullanıcılar denetime tabi değildir. Sistem onları güvenilir olarak işaretler.
-            </p>
+
+            <button
+              onClick={() => setSettings(prev => ({ ...prev, welcome_enabled: !prev.welcome_enabled }))}
+              className={`h-10 px-5 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all flex items-center gap-2 self-start sm:self-auto ${
+                settings.welcome_enabled 
+                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' 
+                  : 'bg-white/5 border-white/10 text-slate-400'
+              }`}
+            >
+              <Check size={12} className={settings.welcome_enabled ? 'opacity-100' : 'opacity-40'} />
+              {settings.welcome_enabled ? 'Hoş Geldin Aktif' : 'Pasif Durumda'}
+            </button>
           </div>
 
-          <label className="flex items-center gap-4 group cursor-pointer w-fit p-4 bg-white/5 rounded-2xl border border-transparent hover:border-white/10 transition-all">
-             <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center group-hover:bg-slate-700 transition-colors">
-                <input type="checkbox" className="w-5 h-5 rounded accent-blue-600" />
-             </div>
-             <div>
-                <h4 className="text-sm font-bold text-white group-hover:text-blue-500 transition-colors">Yalnızca Beyaz Liste</h4>
-                <p className="text-[10px] text-slate-500 font-medium">Sadece listedeki kullanıcılar mesaj gönderebilir.</p>
-             </div>
-          </label>
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-20 gap-3">
+              <Loader2 className="animate-spin text-teal-400" size={32} />
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-widest select-none">Karşılama Ayarları Yükleniyor...</span>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between px-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Karşılama Mesajı</label>
+                  <span className="text-[9px] font-mono text-slate-500">Değişkenler: {'{fullname}'}, {'{username}'}, {'{userid}'}</span>
+                </div>
+                <textarea 
+                  className="w-full h-40 bg-[#0f1218] border border-white/5 rounded-3xl p-6 text-sm text-white outline-none focus:border-teal-500/30 transition-all placeholder:text-slate-705 font-sans leading-relaxed"
+                  value={settings.welcome_message}
+                  onChange={(e) => setSettings(prev => ({ ...prev, welcome_message: e.target.value }))}
+                  placeholder="Doğu ve Batı'nın eşsiz buluşma noktası grubumuza hoş geldin, {fullname}! 🎉"
+                  disabled={!settings.welcome_enabled}
+                />
+                <div className="p-4 bg-slate-800/20 border border-white/[0.03] rounded-2xl flex items-start gap-3">
+                  <Info size={16} className="text-teal-400 shrink-0 mt-0.5" />
+                  <p className="text-[10.5px] text-slate-400 leading-relaxed font-normal">
+                    Karşılama mesajlarında biçimlendirme desteklenir. Kullanıcıların isimlerini çekmek için <code className="text-teal-400 font-mono text-[10px] px-1 py-0.5 bg-white/5 rounded">{'{fullname}'}</code>, kullanıcı adlarını çekmek için ise <code className="text-teal-400 font-mono text-[10px] px-1 py-0.5 bg-white/5 rounded">{'{username}'}</code> etiketini yazabilirsiniz.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div 
+                  onClick={() => settings.welcome_enabled && setSettings(prev => ({ ...prev, delete_old: !prev.delete_old }))}
+                  className={`p-5 rounded-3xl border transition-all cursor-pointer flex flex-col justify-between h-28 ${
+                    !settings.welcome_enabled 
+                      ? 'opacity-40 pointer-events-none bg-[#14181f] border-transparent'
+                      : settings.delete_old 
+                        ? 'bg-blue-500/10 border-blue-500/30' 
+                        : 'bg-white/5 border-white/5 hover:border-white/10'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className={`p-2 rounded-xl ${settings.delete_old ? 'bg-blue-500/20 text-blue-400' : 'bg-white/5 text-slate-500'} border border-white/5`}>
+                      <Trash size={16} />
+                    </div>
+                    <div className={`w-8 h-4 rounded-full p-0.5 transition-colors ease-in-out duration-200 ${settings.delete_old ? 'bg-blue-500' : 'bg-slate-700'}`}>
+                      <div className={`w-3 h-3 rounded-full bg-white transform transition-transform ease-in-out duration-200 ${settings.delete_old ? 'translate-x-4' : 'translate-x-0'}`} />
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-white tracking-tight">Önceki Karşılamayı Sil</h4>
+                    <p className="text-[10px] text-slate-500 mt-0.5 font-medium leading-relaxed">Yeni üye katıldığında, bir önceki hoş geldin mesajını silerek gruptaki kalabalığı önler.</p>
+                  </div>
+                </div>
+
+                <div 
+                  className={`p-5 rounded-3xl border transition-all flex flex-col justify-between h-28 ${
+                    !settings.welcome_enabled 
+                      ? 'opacity-40 pointer-events-none bg-[#14181f] border-transparent'
+                      : 'bg-white/5 border-white/5 hover:border-white/10'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="p-2 rounded-xl bg-white/5 text-slate-400 border border-white/5">
+                      <Clock size={16} />
+                    </div>
+                    <div className="flex items-center gap-1.5 bg-black/40 rounded-lg p-1 border border-white/5">
+                      <input 
+                        type="number" 
+                        min="0" 
+                        max="300" 
+                        value={settings.delay_seconds}
+                        onChange={(e) => setSettings(prev => ({ ...prev, delay_seconds: Math.max(0, Number(e.target.value)) }))}
+                        className="w-12 text-center bg-transparent border-none text-xs text-white font-mono font-black focus:outline-none"
+                      />
+                      <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest pr-1">SN</span>
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-white tracking-tight">Gönderme Gecikmesi</h4>
+                    <p className="text-[10px] text-slate-500 mt-0.5 font-medium leading-relaxed">Karşılama mesajının grupta kaç saniye bekledikten sonra atılacağını ayarlar (0: anında).</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t border-white/5 pt-6 mt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                {saveStatus === 'error' && (
+                  <div className="text-xs text-rose-400 font-bold bg-rose-500/10 border border-rose-500/20 px-4 py-2 rounded-xl flex items-center gap-2">
+                    <AlertTriangle size={14} />
+                    {errorMessage}
+                  </div>
+                )}
+                {saveStatus === 'success' && (
+                  <div className="text-xs text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 rounded-xl flex items-center gap-2 animate-in fade-in">
+                    <Check size={14} />
+                    Ayarlar başarıyla kaydedildi!
+                  </div>
+                )}
+                <div className="hidden sm:block" />
+
+                <button
+                  onClick={handleSave}
+                  disabled={saveStatus === 'saving'}
+                  className="w-full sm:w-auto h-12 px-8 bg-teal-500 hover:bg-teal-400 text-slate-900 font-black text-xs uppercase tracking-widest rounded-2xl flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50"
+                >
+                  {saveStatus === 'saving' ? (
+                    <>
+                      <Loader2 className="animate-spin" size={14} />
+                      Kaydediliyor...
+                    </>
+                  ) : (
+                    <>
+                      <Save size={14} />
+                      AYARLARI KAYDET
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
-      </div>
+      ) : (
+        <div className="bg-[#14181f] border border-white/5 rounded-[32px] sm:rounded-[40px] p-10">
+          <div className="flex items-center gap-2 mb-8">
+             <LayoutDashboard className="text-blue-500" size={20} />
+             <h2 className="text-2xl font-black text-white italic uppercase tracking-tighter">Beyaz Liste</h2>
+          </div>
+
+          <div className="space-y-6">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between px-2">
+                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Kullanıcı Listesi</label>
+                 <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">3 Kullanıcı</span>
+              </div>
+              <textarea 
+                 className="w-full h-40 bg-[#0f1218] border border-white/5 rounded-3xl p-6 text-sm text-white outline-none focus:border-blue-500/30 transition-all placeholder:text-slate-700"
+                 placeholder="Telegram ID veya kullanıcı adlarını alt alta yazarak ekleyin..."
+                 defaultValue=""
+              ></textarea>
+              <p className="text-[10px] text-slate-600 font-medium italic">
+                Beyaz listeye giren kullanıcılar denetime tabi değildir. Sistem onları güvenilir olarak işaretler.
+              </p>
+            </div>
+
+            <label className="flex items-center gap-4 group cursor-pointer w-fit p-4 bg-white/5 rounded-2xl border border-transparent hover:border-white/10 transition-all">
+               <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center group-hover:bg-slate-700 transition-colors">
+                  <input type="checkbox" className="w-5 h-5 rounded accent-blue-600" />
+               </div>
+               <div>
+                  <h4 className="text-sm font-bold text-white group-hover:text-blue-500 transition-colors">Yalnızca Beyaz Liste</h4>
+                  <p className="text-[10px] text-slate-500 font-medium">Sadece listedeki kullanıcılar mesaj gönderebilir.</p>
+               </div>
+            </label>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -94,8 +94,8 @@
   html {
     background-color: var(--bg-main);
     min-height: 100%;
-    overscroll-behavior-y: none;
-    transition: background-color 0.3s ease;
+    scroll-behavior: smooth;
+    overscroll-behavior-y: auto;
   }
 
   body {
@@ -115,7 +115,6 @@
     overflow-x: hidden;
     position: relative;
     -webkit-overflow-scrolling: touch;
-    transition: background-color 0.3s ease, color 0.3s ease;
     padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
   }
@@ -1600,11 +1599,13 @@ img.rounded-xl, img.rounded-3xl, img.rounded-2xl, img.rounded-\[11px\], img.roun
 
 .dark .fixed .bg-white:not(.bottom-nav-container), .dark .fixed [class*="bg-[#14181f]"]:not(.bottom-nav-container), .dark .fixed [class*="bg-slate-900"]:not(.bottom-nav-container), .dark .fixed [class*="bg-[#0c0e14]"]:not(.bottom-nav-container), .dark .absolute[class*="bg-white"]:not(.bottom-nav-container), .dark .absolute[class*="bg-slate-900"]:not(.bottom-nav-container), .dark .absolute[class*="bg-slate-950"]:not(.bottom-nav-container), .dark .absolute[class*="bg-[#0c0e14]"]:not(.bottom-nav-container), .dark .mega-menu-container, .dark [role="dialog"], .dark .modal-content, .dark [class*="dropdown-menu"] {
   background: linear-gradient(180deg, #0c0e14, #06080c) !important;
-  backdrop-filter: blur(24px) !important;
-  -webkit-backdrop-filter: blur(24px) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
   color: var(--text-primary) !important;
   box-shadow: 0 15px 50px -15px rgba(0, 0, 0, 0.6), 0 1px 3px rgba(255, 255, 255, 0.04) !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
 }
 
 .dark .absolute[class*="dropdown-menu"] button, .dark [class*="dropdown-menu"] a, .dark .mega-menu-container button, .dark .mega-menu-container a {
@@ -1866,3 +1867,41 @@ div.qa-last-24h-box, .qa-last-24h-box {
   border-radius: 18px;
   background-color: rgba(17, 22, 34, 0.5);
 }
+
+/* Mobile & WebKit scroll performance layer */
+@media (max-width: 1024px) {
+  /* Prevent fixed & sticky elements from bouncing, jumping, or clipping during scroll inertia */
+  .fixed,
+  .sticky,
+  .bottom-nav-container,
+  [class*="fixed"],
+  [class*="sticky"] {
+    -webkit-transform: translate3d(0, 0, 0) !important;
+    transform: translate3d(0, 0, 0) !important;
+    -webkit-backface-visibility: hidden !important;
+    backface-visibility: hidden !important;
+    will-change: transform !important;
+  }
+
+  /* Stabilize animations and page transitions on mobile screens */
+  .animate-in,
+  .fade-in,
+  [class*="animate-in"],
+  [class*="fade-in"] {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    will-change: opacity, transform;
+  }
+
+  /* Optimize overflow scroll momentum & prevent layout jitter */
+  [class*="overflow-y-auto"],
+  [class*="overflow-x-auto"],
+  .overflow-y-auto,
+  .overflow-x-auto {
+    -webkit-overflow-scrolling: touch !important;
+    overflow-anchor: none;
+  }
+}
+

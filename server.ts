@@ -159,6 +159,45 @@ async function startServer() {
   // --- CHAT PHOTO PROXY CACHE ---
   const chatPhotoCache: Record<string, { buffer: Buffer; contentType: string; expiresAt: number }> = {};
 
+  app.get("/api/telegram/user-info", async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    const userId = req.query.userId;
+    if (!userId) {
+      return res.status(400).json({ error: "userId query parameter is required" });
+    }
+
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    if (!botToken) {
+      return res.status(500).json({ error: "Telegram bot token is not configured on the server." });
+    }
+
+    try {
+      const getChatUrl = `https://api.telegram.org/bot${botToken}/getChat?chat_id=${encodeURIComponent(userId.toString().trim())}`;
+      const response = await fetch(getChatUrl);
+      if (!response.ok) {
+        throw new Error(`getChat returned status ${response.status}`);
+      }
+      const data = await response.json() as any;
+      if (data.ok && data.result) {
+        return res.json({
+          id: data.result.id,
+          first_name: data.result.first_name || '',
+          last_name: data.result.last_name || '',
+          username: data.result.username || '',
+          photo: data.result.photo || null
+        });
+      } else {
+        return res.status(404).json({ error: "User info not found or not visible" });
+      }
+    } catch (err: any) {
+      console.error(`[SERVER] Error looking up Telegram user ${userId}:`, err.message);
+      return res.status(500).json({ error: "Failed to fetch user details from Telegram", details: err.message });
+    }
+  });
+
   app.get("/api/telegram/chat-photo", async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -188,21 +227,48 @@ async function startServer() {
     }
 
     try {
-      // 2. Retrieve Chat Info
-      const getChatUrl = `https://api.telegram.org/bot${botToken}/getChat?chat_id=${encodeURIComponent(cacheKey)}`;
-      const getChatRes = await fetch(getChatUrl);
-      if (!getChatRes.ok) {
-        throw new Error(`getChat API returned status ${getChatRes.status}`);
+      let fileId: string | null = null;
+      const isGroup = cacheKey.startsWith('-');
+
+      if (isGroup) {
+        // 2a. Retrieve Chat Info for Groups/Channels
+        const getChatUrl = `https://api.telegram.org/bot${botToken}/getChat?chat_id=${encodeURIComponent(cacheKey)}`;
+        const getChatRes = await fetch(getChatUrl);
+        if (getChatRes.ok) {
+          const getChatData = await getChatRes.json() as any;
+          if (getChatData.ok && getChatData.result && getChatData.result.photo) {
+            fileId = getChatData.result.photo.small_file_id;
+          }
+        }
+      } else {
+        // 2b. Retrieve User Profile Photo via getUserProfilePhotos
+        const getUserPhotosUrl = `https://api.telegram.org/bot${botToken}/getUserProfilePhotos?user_id=${encodeURIComponent(cacheKey)}&limit=1`;
+        const getUserPhotosRes = await fetch(getUserPhotosUrl);
+        if (getUserPhotosRes.ok) {
+          const userData = await getUserPhotosRes.json() as any;
+          if (userData.ok && userData.result && userData.result.photos && userData.result.photos.length > 0) {
+            const firstPhotoSet = userData.result.photos[0];
+            if (firstPhotoSet && firstPhotoSet.length > 0) {
+              fileId = firstPhotoSet[0].file_id;
+            }
+          }
+        }
+
+        // 2c. If the user profile photo retrieval yielded nothing, fallback to getChat as a retry
+        if (!fileId) {
+          const getChatUrl = `https://api.telegram.org/bot${botToken}/getChat?chat_id=${encodeURIComponent(cacheKey)}`;
+          const getChatRes = await fetch(getChatUrl);
+          if (getChatRes.ok) {
+            const getChatData = await getChatRes.json() as any;
+            if (getChatData.ok && getChatData.result && getChatData.result.photo) {
+              fileId = getChatData.result.photo.small_file_id;
+            }
+          }
+        }
       }
 
-      const getChatData = await getChatRes.json() as any;
-      if (!getChatData.ok || !getChatData.result || !getChatData.result.photo) {
-        return res.status(404).json({ error: "Chat has no profile photo or is private." });
-      }
-
-      const fileId = getChatData.result.photo.small_file_id;
       if (!fileId) {
-        return res.status(404).json({ error: "small_file_id not found on chat photo" });
+        return res.status(404).json({ error: "Profile photo not found." });
       }
 
       // 3. Retrieve File Path
@@ -241,8 +307,8 @@ async function startServer() {
       res.setHeader('Cache-Control', 'public, max-age=3600');
       return res.send(buffer);
     } catch (err: any) {
-      console.error(`[SERVER] Error proxying Telegram chat photo for ${chatId}:`, err.message);
-      return res.status(500).json({ error: "Telegram chat photo proxy failed", details: err.message });
+      console.error(`[SERVER] Error proxying Telegram photo for ${chatId}:`, err.message);
+      return res.status(200).send(Buffer.from([])); // Return empty/fallback gracefully on error to prevent layout breakages
     }
   });
 
@@ -1507,6 +1573,313 @@ async function startServer() {
     // Map txHash to transactionHash for consistency
     if (req.body.txHash) req.body.transactionHash = req.body.txHash;
     return app._router.handle(req, res, () => {});
+  });
+
+  // --- WELCOME & MODERATION SETTINGS API ---
+  app.get("/api/groups/:groupId/moderation-settings", async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    try {
+      const { groupId } = req.params;
+      if (!groupId) {
+        return res.status(400).json({ error: "groupId is required" });
+      }
+
+      let targetTelegramId = groupId.toString();
+      // If groupId is a UUID, look up the corresponding telegram_id
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(groupId);
+      if (isUuid) {
+        const { data: channelData } = await supabaseAdmin
+          .from('channels')
+          .select('telegram_id')
+          .eq('id', groupId)
+          .maybeSingle();
+        if (channelData?.telegram_id) {
+          targetTelegramId = channelData.telegram_id.toString();
+        }
+      }
+
+      // Fetch welcome settings from pending_admin_actions
+      const { data, error } = await supabaseAdmin
+        .from('pending_admin_actions')
+        .select('*')
+        .eq('channel_id', targetTelegramId)
+        .eq('user_id', 'system')
+        .eq('action', 'welcome_settings')
+        .maybeSingle();
+
+      if (error) {
+        console.error("[SERVER] Error fetching welcome settings:", error);
+        return res.status(500).json({ error: error.message });
+      }
+
+      // Standard defaults if not configured
+      const defaultSettings = {
+        welcome_enabled: false,
+        welcome_message: "Selam {name}! Grubumuza hoş geldin! 🎉",
+        delete_old_welcome: true,
+        welcome_delay: 0,
+        last_welcome_message_id: null
+      };
+
+      if (!data) {
+        return res.json(defaultSettings);
+      }
+
+      return res.json({
+        ...defaultSettings,
+        ...(data.permissions || {})
+      });
+    } catch (err: any) {
+      console.error("[SERVER] Error in GET welcome settings:", err);
+      return res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.post("/api/groups/:groupId/moderation-settings", async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    try {
+      const { groupId } = req.params;
+      if (!groupId) {
+        return res.status(400).json({ error: "groupId is required" });
+      }
+
+      let targetTelegramId = groupId.toString();
+      // If groupId is a UUID, look up the corresponding telegram_id
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(groupId);
+      if (isUuid) {
+        const { data: channelData } = await supabaseAdmin
+          .from('channels')
+          .select('telegram_id')
+          .eq('id', groupId)
+          .maybeSingle();
+        if (channelData?.telegram_id) {
+          targetTelegramId = channelData.telegram_id.toString();
+        }
+      }
+
+      const { welcome_enabled, welcome_message, delete_old_welcome, welcome_delay, last_welcome_message_id } = req.body;
+
+      // Extract existing settings to avoid overwriting nested properties like last_welcome_message_id if not supplied
+      const { data: existing } = await supabaseAdmin
+        .from('pending_admin_actions')
+        .select('*')
+        .eq('channel_id', targetTelegramId)
+        .eq('user_id', 'system')
+        .eq('action', 'welcome_settings')
+        .maybeSingle();
+
+      const existingPermissions = existing?.permissions || {};
+      const newPermissions = {
+        welcome_enabled: typeof welcome_enabled === 'boolean' ? welcome_enabled : !!existingPermissions.welcome_enabled,
+        welcome_message: welcome_message || existingPermissions.welcome_message || "Selam {name}! Grubumuza hoş geldin! 🎉",
+        delete_old_welcome: typeof delete_old_welcome === 'boolean' ? delete_old_welcome : (existingPermissions.delete_old_welcome !== false),
+        welcome_delay: typeof welcome_delay === 'number' ? welcome_delay : (existingPermissions.welcome_delay || 0),
+        last_welcome_message_id: last_welcome_message_id !== undefined ? last_welcome_message_id : (existingPermissions.last_welcome_message_id || null)
+      };
+
+      let saveResult;
+      if (existing) {
+        saveResult = await supabaseAdmin
+          .from('pending_admin_actions')
+          .update({
+            permissions: newPermissions,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', existing.id)
+          .select();
+      } else {
+        saveResult = await supabaseAdmin
+          .from('pending_admin_actions')
+          .insert({
+            channel_id: targetTelegramId,
+            user_id: 'system',
+            action: 'welcome_settings',
+            status: 'active',
+            permissions: newPermissions,
+            created_at: new Date().toISOString()
+          })
+          .select();
+      }
+
+      if (saveResult.error) {
+        console.error("[SERVER] Error saving welcome settings:", saveResult.error);
+        return res.status(500).json({ error: saveResult.error.message });
+      }
+
+      return res.json({ success: true, settings: newPermissions });
+    } catch (err: any) {
+      console.error("[SERVER] Error in POST welcome settings:", err);
+      return res.status(500).json({ error: err.message });
+    }
+  });
+
+  // --- TELEGRAM BOT WEBHOOK (REAL-TIME JOINS HANDLING) ---
+  app.post("/api/telegram/webhook", async (req, res) => {
+    // Acknowledge receipt of update immediately to avoid Telegram retrying
+    res.status(200).json({ ok: true });
+
+    const update = req.body;
+    if (!update || !update.message) return;
+
+    const message = update.message;
+    const chat = message.chat;
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+
+    if (!chat || !botToken) return;
+
+    // A. Sync new member joins on webhook
+    if (message.new_chat_members && message.new_chat_members.length > 0) {
+      const chatIdStr = chat.id.toString();
+
+      // 1. Log and fetch welcome settings for this group
+      try {
+        const { data: configRow } = await supabaseAdmin
+          .from('pending_admin_actions')
+          .select('*')
+          .eq('channel_id', chatIdStr)
+          .eq('user_id', 'system')
+          .eq('action', 'welcome_settings')
+          .maybeSingle();
+
+        const config = configRow?.permissions || {};
+
+        for (const member of message.new_chat_members) {
+          if (member.is_bot) continue;
+
+          // Sync joined user directly into `group_users` table
+          try {
+            await supabaseAdmin.from('group_users').upsert({
+              channel_id: chatIdStr,
+              user_id: member.id.toString(),
+              name: member.first_name + (member.last_name ? ' ' + member.last_name : ''),
+              username: member.username || '',
+              joined_at: new Date().toISOString(),
+              total_messages: 0,
+              last_message: 'Gruba yeni katıldı 🎉',
+              last_message_at: new Date().toISOString(),
+              xp: 0,
+              mes: 0,
+              language: member.language_code || 'tr',
+              updated_at: new Date().toISOString()
+            }, { onConflict: 'channel_id,user_id' });
+            console.log(`[WEBHOOK] synced new member ${member.id} into group_users table.`);
+          } catch (syncErr: any) {
+            console.warn(`[WEBHOOK] failed to sync group user ${member.id}:`, syncErr.message);
+          }
+
+          // If Welcome Message is enabled, trigger greeting!
+          if (config.welcome_enabled) {
+            const delayMs = (config.welcome_delay || 0) * 1000;
+            
+            setTimeout(async () => {
+              try {
+                // Formatting message variables
+                const name = member.first_name;
+                const username = member.username ? `@${member.username}` : `[${member.first_name}](tg://user?id=${member.id})`;
+                const group_name = chat.title || 'grup';
+                const user_id = member.id.toString();
+
+                let formattedMessage = config.welcome_message || "Selam {name}! Grubumuza hoş geldin! 🎉";
+                formattedMessage = formattedMessage
+                  .replace(/{name}/g, name)
+                  .replace(/{username}/g, username)
+                  .replace(/{group_name}/g, group_name)
+                  .replace(/{userId}/g, user_id);
+
+                // Delete old welcome message if requested
+                if (config.delete_old_welcome && config.last_welcome_message_id) {
+                  try {
+                    await fetch(`https://api.telegram.org/bot${botToken}/deleteMessage`, {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        chat_id: chatIdStr,
+                        message_id: config.last_welcome_message_id
+                      })
+                    });
+                  } catch (delErr: any) {
+                    // Suppress error if already deleted or expired
+                    console.log("[WEBHOOK] Suppressed deleteMessage error:", delErr.message);
+                  }
+                }
+
+                // Send the new welcome message
+                const sendRes = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    chat_id: chatIdStr,
+                    text: formattedMessage,
+                    parse_mode: "Markdown"
+                  })
+                });
+
+                if (sendRes.ok) {
+                  const sendData = await sendRes.json() as any;
+                  if (sendData.ok && sendData.result) {
+                    const newMsgId = sendData.result.message_id;
+
+                    // Save new last_welcome_message_id
+                    const updatedPermissions = {
+                      ...config,
+                      last_welcome_message_id: newMsgId
+                    };
+
+                    await supabaseAdmin
+                      .from('pending_admin_actions')
+                      .update({
+                        permissions: updatedPermissions,
+                        updated_at: new Date().toISOString()
+                      })
+                      .eq('id', configRow.id);
+                  }
+                }
+              } catch (greetErr: any) {
+                console.error("[WEBHOOK] Welcome message greeting failed:", greetErr.message);
+              }
+            }, delayMs);
+          }
+        }
+      } catch (err: any) {
+        console.error("[WEBHOOK] error processing joinees list:", err.message);
+      }
+    }
+
+    // B. Normal chat text synchronization (optional but keeps DB active!)
+    if (message.text && message.from && !message.from.is_bot) {
+      const chatIdStr = chat.id.toString();
+      const sender = message.from;
+      
+      try {
+        // Find existing user message counts
+        const { data: existingUser } = await supabaseAdmin
+          .from('group_users')
+          .select('total_messages, xp, mes')
+          .eq('channel_id', chatIdStr)
+          .eq('user_id', sender.id.toString())
+          .maybeSingle();
+
+        const current_msgs = Number(existingUser?.total_messages || 0) + 1;
+        const current_xp = Number(existingUser?.xp || 0) + 10;
+        const current_mes = Number(existingUser?.mes || 0) + 1;
+
+        await supabaseAdmin.from('group_users').upsert({
+          channel_id: chatIdStr,
+          user_id: sender.id.toString(),
+          name: sender.first_name + (sender.last_name ? ' ' + sender.last_name : ''),
+          username: sender.username || '',
+          total_messages: current_msgs,
+          last_message: message.text.substring(0, 100),
+          last_message_at: new Date().toISOString(),
+          xp: current_xp,
+          mes: current_mes,
+          language: sender.language_code || 'tr',
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'channel_id,user_id' });
+      } catch (syncTextErr: any) {
+        // Silent catch to prevent logs spamming
+      }
+    }
   });
 
   // Global Error Handler - Moved to end of API section
