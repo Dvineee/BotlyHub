@@ -1968,11 +1968,16 @@ div.qa-last-24h-box, .qa-last-24h-box {
   color: #34c759 !important;
 }
 
-/* Slider kartlarındaki sponsorlu etiketleri için özel konumlandırma */
-.slider-sponsored-badge {
+/* Slider kartlarındaki rozet etiketleri için özel konumlandırma */
+.slider-badge-custom-pos {
   top: 5px !important;
   right: 5px !important;
   position: absolute !important;
+}
+
+/* Duyuru kartları için kenarlık stili */
+.announcement-card {
+  border: 1px solid var(--border-color) !important;
 }
 
 

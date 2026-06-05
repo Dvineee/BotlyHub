@@ -336,10 +336,10 @@ const PromoCard: React.FC<{
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       onClick={handleAction}
-      className={`w-full h-[185px] sm:h-[195px] shrink-0 rounded-[24px] border border-solid p-6 pb-5 sm:p-7 sm:pb-6 relative overflow-hidden flex flex-col justify-between cursor-pointer select-none transition-all duration-305 hover:shadow-lg dark:hover:shadow-black/20 group backdrop-blur-md ${cardBgClass}`}
+      className={`w-full h-[185px] sm:h-[195px] shrink-0 rounded-[24px] border border-solid p-6 pb-5 sm:p-7 sm:pb-6 relative overflow-hidden flex flex-col justify-between cursor-pointer select-none transition-all duration-305 hover:shadow-lg dark:hover:shadow-black/20 group backdrop-blur-md announcement-card ${cardBgClass}`}
     >
       {ann.badge_text && (
-        <div className={`absolute top-4 right-4 z-30 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-black/5 dark:border-white/10 text-slate-600 dark:text-slate-300 shadow-xs pointer-events-none select-none ${ann.badge_text.toLowerCase() === "sponsorlu" ? "slider-sponsored-badge" : ""}`}>
+        <div className={`absolute top-4 right-4 z-30 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-black/5 dark:border-white/10 text-slate-600 dark:text-slate-300 shadow-xs pointer-events-none select-none slider-badge-custom-pos`}>
           {ann.badge_text}
         </div>
       )}
