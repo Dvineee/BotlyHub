@@ -1525,7 +1525,6 @@ const BotDetail = () => {
                         className="w-full h-14 bg-white dark:bg-slate-900 rounded-xl border border-black/5 dark:border-white/10 flex items-center justify-between px-5 text-[11px] font-black tracking-[0.2em] transition-all active:scale-[0.98] stats-card-bg"
                       >
                         <div className="flex items-center gap-3">
-                          <LinkIcon size={18} className="text-brand" />
                           <span>
                             {t("detail_official_links") || "Resmi Linkler"}
                           </span>
@@ -2097,75 +2096,7 @@ const BotDetail = () => {
           </div>
         </div>
 
-        {/* Sticky Action Bar */}
-        <div className="fixed bottom-0 inset-x-0 p-6 z-[70] bg-gradient-to-t from-white dark:from-slate-950 via-white/95 dark:via-slate-950/95 to-transparent pb-[calc(env(safe-area-inset-bottom)+1rem)] lg:hidden bot-sticky-action-bar">
-          <div className="max-w-md mx-auto flex items-center gap-3">
-            <button
-              onClick={handleAction}
-              disabled={isProcessing}
-              className={`flex-1 h-14 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 border-b-4 ${
-                isOwned
-                  ? "bg-emerald-600 text-white border-emerald-800"
-                  : bot.price === 0
-                  ? "bg-slate-900 dark:bg-white text-white dark:text-slate-950 border-slate-700 dark:border-slate-300 shadow-lg shadow-brand/20 ucretsiz-edin-btn"
-                  : "bg-slate-900 dark:bg-white text-white dark:text-slate-950 border-slate-700 dark:border-slate-300 shadow-lg shadow-brand/20"
-              }`}
-            >
-              {isProcessing ? (
-                <Loader2 className="animate-spin" />
-              ) : isOwned ? (
-                <>
-                  <Send size={18} /> {t("launch_bot")}
-                </>
-              ) : bot.price === 0 ? (
-                <>
-                  <PlusCircle size={18} /> {t("get_free")}
-                </>
-              ) : (
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xl font-black italic tracking-tighter leading-none">
-                      {Number(prices.ton).toFixed(1)}
-                    </span>
-                    <svg
-                      fill="none"
-                      height="14"
-                      width="14"
-                      viewBox="0 0 16 16"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="opacity-90"
-                    >
-                      <title>Payment TON icon</title>
-                      <g clipPath="url(#a_ton_buy)" fill="currentColor">
-                        <path d="M7.5 11.015V5.963H5.268a.31.31 0 0 0-.272.463l1.772 3.17.734 1.419ZM9.232 9.596l1.771-3.17a.31.31 0 0 0-.272-.463H8.498v5.053l.734-1.42Z"></path>
-                        <path
-                          clipRule="evenodd"
-                          d="M16 8.5a8 8 0 1 1-16 0 8 8 0 0 1 16 0ZM5.268 4.965h5.464c1.004 0 1.64 1.085 1.136 1.96l-3.372 5.844a.572.572 0 0 1-.992 0L4.132 6.925c-.505-.876.132-1.96 1.136-1.96Z"
-                          fill-rule="evenodd"
-                        ></path>
-                      </g>
-                      <defs>
-                        <clipPath id="a_ton_buy">
-                          <path
-                            d="M0 0h16v16H0z"
-                            fill="#fff"
-                            transform="translate(0 .5)"
-                          ></path>
-                        </clipPath>
-                      </defs>
-                    </svg>
-                  </div>
-                  <div className="flex items-center gap-2 border-l border-white/20 dark:border-slate-400/20 pl-4">
-                    <span className="font-black tracking-[0.2em]">
-                      {t("buy")}
-                    </span>
-                    <ChevronRight size={18} className="opacity-40" />
-                  </div>
-                </div>
-              )}
-            </button>
-          </div>
-        </div>
+
 
         {/* Onboarding Guide Modal */}
         <AnimatePresence>
@@ -2343,6 +2274,76 @@ const BotDetail = () => {
             </motion.div>
           )}
         </AnimatePresence>
+      </div>
+
+      {/* Sticky Action Bar (Moved Outside to be truly fixed at the very bottom on mobile without layout or overflow issues) */}
+      <div className="fixed bottom-0 inset-x-0 p-6 z-[70] bg-gradient-to-t from-white dark:from-slate-950 via-white/95 dark:via-slate-950/95 to-transparent pb-[calc(env(safe-area-inset-bottom)+1rem)] lg:hidden bot-sticky-action-bar">
+        <div className="max-w-md mx-auto flex items-center gap-3">
+          <button
+            onClick={handleAction}
+            disabled={isProcessing}
+            className={`flex-1 h-14 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 border-b-4 ${
+              isOwned
+                ? "bg-emerald-600 text-white border-emerald-800"
+                : bot.price === 0
+                ? "bg-slate-900 dark:bg-white text-white dark:text-slate-950 border-slate-700 dark:border-slate-300 shadow-lg shadow-brand/20 ucretsiz-edin-btn"
+                : "bg-slate-900 dark:bg-white text-white dark:text-slate-950 border-slate-700 dark:border-slate-300 shadow-lg shadow-brand/20"
+            }`}
+          >
+            {isProcessing ? (
+              <Loader2 className="animate-spin" />
+            ) : isOwned ? (
+              <>
+                <Send size={18} /> {t("detail_launch")}
+              </>
+            ) : bot.price === 0 ? (
+              <>
+                <PlusCircle size={18} /> {t("detail_get_free")}
+              </>
+            ) : (
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xl font-black italic tracking-tighter leading-none">
+                    {Number(prices.ton).toFixed(1)}
+                  </span>
+                  <svg
+                    fill="none"
+                    height="14"
+                    width="14"
+                    viewBox="0 0 16 16"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="opacity-90"
+                  >
+                    <title>Payment TON icon</title>
+                    <g clipPath="url(#a_ton_buy)" fill="currentColor">
+                      <path d="M7.5 11.015V5.963H5.268a.31.31 0 0 0-.272.463l1.772 3.17.734 1.419ZM9.232 9.596l1.771-3.17a.31.31 0 0 0-.272-.463H8.498v5.053l.734-1.42Z"></path>
+                      <path
+                        clipRule="evenodd"
+                        d="M16 8.5a8 8 0 1 1-16 0 8 8 0 0 1 16 0ZM5.268 4.965h5.464c1.004 0 1.64 1.085 1.136 1.96l-3.372 5.844a.572.572 0 0 1-.992 0L4.132 6.925c-.505-.876.132-1.96 1.136-1.96Z"
+                        fill-rule="evenodd"
+                      ></path>
+                    </g>
+                    <defs>
+                      <clipPath id="a_ton_buy">
+                        <path
+                          d="M0 0h16v16H0z"
+                          fill="#fff"
+                          transform="translate(0 .5)"
+                        ></path>
+                      </clipPath>
+                    </defs>
+                  </svg>
+                </div>
+                <div className="flex items-center gap-2 border-l border-white/20 dark:border-slate-400/20 pl-4">
+                  <span className="font-black tracking-[0.2em]">
+                    {t("buy")}
+                  </span>
+                  <ChevronRight size={18} className="opacity-40" />
+                </div>
+              </div>
+            )}
+          </button>
+        </div>
       </div>
     </>
   );

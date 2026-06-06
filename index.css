@@ -924,13 +924,11 @@ img[src$=".png"] {
 }
 
 /* Ücretsiz Edin button styling for dark mode and all viewports */
-.ucretsiz-edin-btn,
-.dark .ucretsiz-edin-btn,
-button.ucretsiz-edin-btn,
-.dark button.ucretsiz-edin-btn {
+.ucretsiz-edin-btn, .dark .ucretsiz-edin-btn, button.ucretsiz-edin-btn, .dark button.ucretsiz-edin-btn {
     --tw-bg-opacity: 1;
     background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1)) !important;
     color: #000000 !important;
+    letter-spacing: 0.05em;
 }
 
 .md\:p-8 {
@@ -2007,6 +2005,10 @@ div.qa-last-24h-box, .qa-last-24h-box {
 /* Duyuru kartları için kenarlık stili */
 .announcement-card {
   border: 1px solid var(--border-color) !important;
+}
+
+.tracking-\[0\.2em\] {
+    letter-spacing: 0.05em;
 }
 
 
