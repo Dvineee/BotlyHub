@@ -16,9 +16,10 @@ import { UserBot, Channel } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 import { API_BASE_URL } from '../constants';
 
-const SidebarItem = ({ icon: Icon, label, path, active, badge, color, external }: any) => (
+const SidebarItem = ({ icon: Icon, label, path, active, badge, color, external, onClick }: any) => (
   <Link 
     to={path} 
+    onClick={onClick}
     className={`flex items-center justify-between px-3 py-1.5 transition-all group rounded-lg ${
       active 
         ? 'bg-[#1e2430] text-blue-500 font-medium' 
@@ -278,30 +279,43 @@ const BotManagementPanel = () => {
       {isMobileSidebarOpen && (
         <div 
           onClick={() => setIsMobileSidebarOpen(false)} 
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-35 md:hidden" 
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-45 md:hidden transition-opacity duration-300" 
         />
       )}
 
       {/* Sidebar */}
       <aside 
-        className={`fixed md:sticky top-0 left-0 h-screen z-40 w-60 bg-[#11141a] border-r border-white/5 flex flex-col overflow-y-auto no-scrollbar transition-transform duration-350 md:translate-x-0 ${
+        className={`fixed md:sticky top-0 left-0 h-screen z-50 w-60 bg-[#11141a] border-r border-white/5 flex flex-col overflow-y-auto no-scrollbar transition-transform duration-300 transform md:translate-x-0 ${
           isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         <div className="p-4 flex-1">
-          {/* Brand Header */}
-          <Link to="/" className="flex items-center gap-2 px-3 mb-6">
-            <div className="w-8 h-8 rounded-full border-2 border-white/10 flex items-center justify-center p-1 overflow-hidden shrink-0">
-               <div className="w-full h-full bg-blue-600 rounded-full flex items-center justify-center">
-                 <div className="flex gap-0.5">
-                   <div className="w-0.5 h-3 bg-white/20"></div>
-                   <div className="w-0.5 h-4 bg-white"></div>
-                   <div className="w-0.5 h-2 bg-white/40"></div>
+          {/* Brand Header & Mobile Close */}
+          <div className="flex items-center justify-between px-3 mb-6">
+            <Link 
+              to="/" 
+              onClick={() => setIsMobileSidebarOpen(false)}
+              className="flex items-center gap-2"
+            >
+              <div className="w-8 h-8 rounded-full border-2 border-white/10 flex items-center justify-center p-1 overflow-hidden shrink-0">
+                 <div className="w-full h-full bg-blue-600 rounded-full flex items-center justify-center">
+                   <div className="flex gap-0.5">
+                     <div className="w-0.5 h-3 bg-white/20"></div>
+                     <div className="w-0.5 h-4 bg-white"></div>
+                     <div className="w-0.5 h-2 bg-white/40"></div>
+                   </div>
                  </div>
-               </div>
-            </div>
-            <span className="font-bold text-white text-lg tracking-tight">BotlyHub</span>
-          </Link>
+              </div>
+              <span className="font-bold text-white text-lg tracking-tight">BotlyHub</span>
+            </Link>
+            <button 
+              onClick={() => setIsMobileSidebarOpen(false)} 
+              className="p-1.5 rounded-lg bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 md:hidden transition-colors"
+              aria-label="Kapat"
+            >
+              <X size={16} />
+            </button>
+          </div>
 
           <div className="space-y-4">
             {/* Global Nav */}
@@ -313,6 +327,7 @@ const BotManagementPanel = () => {
                   label={item.label}
                   path={`/bot-panel/${botId}/${item.path}`}
                   active={location.pathname.includes(`/${item.path}`) && !groupId}
+                  onClick={() => setIsMobileSidebarOpen(false)}
                 />
               ))}
             </div>
@@ -351,6 +366,7 @@ const BotManagementPanel = () => {
                       badge={item.highlight ? 'Pro' : undefined}
                       path={`/bot-panel/${botId}/${item.path}`}
                       active={location.pathname.includes(`/${item.path.split('/').pop()}`)}
+                      onClick={() => setIsMobileSidebarOpen(false)}
                     />
                   ))}
                 </div>
@@ -370,6 +386,7 @@ const BotManagementPanel = () => {
                   label={item.label}
                   path="#"
                   external={true}
+                  onClick={() => setIsMobileSidebarOpen(false)}
                 />
               ))}
             </div>
@@ -382,11 +399,11 @@ const BotManagementPanel = () => {
              <h3 className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">Kaju</h3>
           </div>
           <div className="space-y-0.5">
-            <SidebarItem icon={Settings} label="Ayarlar" path={`/bot-panel/${botId}/bot-settings`} active={location.pathname.includes('bot-settings')} />
-            <SidebarItem icon={CreditCard} label="Faturalandırma" path={`/bot-panel/${botId}/billing`} active={location.pathname.includes('billing')} />
+            <SidebarItem icon={Settings} label="Ayarlar" path={`/bot-panel/${botId}/bot-settings`} active={location.pathname.includes('bot-settings')} onClick={() => setIsMobileSidebarOpen(false)} />
+            <SidebarItem icon={CreditCard} label="Faturalandırma" path={`/bot-panel/${botId}/billing`} active={location.pathname.includes('billing')} onClick={() => setIsMobileSidebarOpen(false)} />
             {user ? (
               <button 
-                onClick={() => { haptic('medium'); setWebAuthUser(null); }}
+                onClick={() => { haptic('medium'); setWebAuthUser(null); setIsMobileSidebarOpen(false); }}
                 className="w-full flex items-center gap-3 px-3 py-1.5 text-slate-500 hover:text-red-400 transition-all group"
               >
                 <LogOut size={16} className="text-slate-500 group-hover:text-red-400" />
@@ -394,7 +411,7 @@ const BotManagementPanel = () => {
               </button>
             ) : (
                 <button 
-                onClick={() => { haptic('medium'); setIsLoginModalOpen(true); }}
+                onClick={() => { haptic('medium'); setIsLoginModalOpen(true); setIsMobileSidebarOpen(false); }}
                 className="w-full flex items-center gap-3 px-3 py-1.5 text-blue-500 hover:text-blue-400 transition-all group"
               >
                 <ShieldCheck size={16} className="text-blue-500 group-hover:text-blue-400" />
@@ -1981,7 +1998,9 @@ const UsersView = ({ channel }: { channel: any }) => {
             <p className="text-xs text-slate-500 font-bold uppercase tracking-widest italic animate-pulse">group_users tablosu yükleniyor...</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <>
+            {/* Desktop Responsive Table */}
+            <div className="hidden lg:block overflow-x-auto">
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-white/2 border-b border-white/5">
@@ -2129,6 +2148,106 @@ const UsersView = ({ channel }: { channel: any }) => {
               </tbody>
             </table>
           </div>
+
+          {/* Mobile Optimized Rich Card Layout List */}
+          <div className="block lg:hidden divide-y divide-white/5 bg-[#11141a]/40">
+            {paginatedUsers.length === 0 ? (
+               <div className="p-12 text-center text-xs text-slate-500 font-bold uppercase tracking-widest leading-relaxed">
+                 Grupta Kullanıcı Bulunmuyor
+                 <button 
+                   onClick={handleSeed}
+                   disabled={isSeeding || isLoading}
+                   className="mt-4 px-6 h-10 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-900 text-white font-black uppercase text-[10px] tracking-widest rounded-xl transition-all flex items-center justify-center mx-auto gap-2"
+                 >
+                   {isSeeding ? <Loader2 className="animate-spin" size={12} /> : <UserPlus size={12} />}
+                   Örnek Veri Üret
+                 </button>
+               </div>
+            ) : (
+               paginatedUsers.map((gUser, i) => (
+                 <div key={gUser.user_id || i} className="p-4 flex flex-col gap-3.5 bg-white/[0.01]">
+                   <div className="flex items-center justify-between">
+                     <div className="flex items-center gap-2.5">
+                       <div className="w-9 h-9 rounded-full bg-slate-900 border border-white/5 flex items-center justify-center font-black text-white italic text-xs uppercase shadow-inner relative overflow-hidden shrink-0">
+                         <div className="absolute inset-0 opacity-10 bg-gradient-to-tr from-blue-500 to-amber-500" />
+                         {gUser.name?.[0] || 'U'}
+                       </div>
+                       <div>
+                         <div className="flex items-center gap-1.5 flex-wrap">
+                           <h4 className="text-xs font-bold text-white truncate max-w-[140px]">
+                             {gUser.name || 'İsimsiz'}
+                           </h4>
+                           {gUser.language && (
+                             <span className="text-[8px] font-black px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase tracking-tight scale-90">
+                               {gUser.language}
+                             </span>
+                           )}
+                         </div>
+                         <span className="text-[9px] text-slate-500 font-bold tracking-wider block mt-0.5 select-all">
+                           {gUser.username ? `@${gUser.username}` : '@kullanici'}
+                         </span>
+                       </div>
+                     </div>
+                     <div className="text-right">
+                       <span className="text-[9px] font-black text-amber-500 italic uppercase bg-amber-500/10 border border-amber-500/25 px-2 py-0.5 rounded">
+                         {gUser.xp !== undefined ? gUser.xp : 0} XP
+                       </span>
+                     </div>
+                   </div>
+
+                   <div className="grid grid-cols-2 gap-2 bg-[#0d1014] p-2.5 border border-white/5 rounded-xl text-[10px]">
+                     <div>
+                       <span className="text-slate-500 block">Telegram ID:</span>
+                       <span className="font-mono font-bold text-slate-300 select-all block mt-0.5">{gUser.user_id}</span>
+                     </div>
+                     <div>
+                       <span className="text-slate-500 block">Mesaj Sayısı:</span>
+                       <span className="font-bold text-slate-300 flex items-center gap-1 mt-0.5">
+                         <MessageSquare size={10} className="text-slate-500" />
+                         {gUser.total_messages !== undefined ? gUser.total_messages : (gUser.mes !== undefined ? gUser.mes : 0)}
+                       </span>
+                     </div>
+                   </div>
+
+                   {gUser.last_message && (
+                     <div className="bg-[#0f1218]/50 border border-white/[0.02] p-2 rounded-lg text-[10px]">
+                       <span className="text-slate-500 block mb-0.5">Son Mesaj:</span>
+                       <p className="text-slate-300 italic line-clamp-2">"{gUser.last_message}"</p>
+                       {gUser.last_message_at && (
+                         <span className="text-[8px] text-slate-500 font-medium block mt-1">
+                           {new Date(gUser.last_message_at).toLocaleDateString("tr-TR")} {new Date(gUser.last_message_at).toLocaleTimeString("tr-TR", {hour: '2-digit', minute:'2-digit'})}
+                         </span>
+                       )}
+                     </div>
+                   )}
+
+                   <div className="flex justify-between items-center pt-1">
+                     <span className="text-[8px] text-slate-500 font-bold uppercase tracking-widest">
+                       Katılım: {gUser.joined_at ? new Date(gUser.joined_at).toLocaleDateString('tr-TR') : 'Bilinmeyen'}
+                     </span>
+                     <button 
+                       onClick={() => handlePromoteAdmin(gUser.user_id, gUser.name || gUser.username || "Kullanıcı")}
+                       disabled={promotingUserId === gUser.user_id}
+                       className="px-2.5 py-1.5 bg-blue-600/10 hover:bg-blue-600 text-blue-400 hover:text-white border border-blue-500/15 disabled:bg-blue-900/40 disabled:text-slate-500 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all inline-flex items-center gap-1.5 active:scale-95 disabled:scale-100 disabled:opacity-50"
+                     >
+                       {promotingUserId === gUser.user_id ? (
+                         <>
+                           <Loader2 size={8} className="animate-spin text-blue-400" />
+                           Ekleniyor...
+                         </>
+                       ) : (
+                         <>
+                           <Shield size={8} />
+                           Yönetici Yap
+                         </>
+                       )}
+                     </button>
+                   </div>
+                 </div>
+               ))
+            )}
+          </div>
+          </>
         )}
 
         <div className="p-8 bg-white/2 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
