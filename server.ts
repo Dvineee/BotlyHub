@@ -1602,17 +1602,31 @@ async function startServer() {
       }
 
       // Fetch welcome settings from pending_admin_actions
-      const { data, error } = await supabaseAdmin
+      const { data: rows, error } = await supabaseAdmin
         .from('pending_admin_actions')
         .select('*')
         .eq('channel_id', targetTelegramId)
         .eq('user_id', 'system')
-        .eq('action', 'welcome_settings')
-        .maybeSingle();
+        .eq('action', 'welcome_settings');
 
       if (error) {
         console.error("[SERVER] Error fetching welcome settings:", error);
         return res.status(500).json({ error: error.message });
+      }
+
+      const data = rows && rows.length > 0 ? rows[0] : null;
+
+      // Clean up extra duplicate rows in the background if they exist
+      if (rows && rows.length > 1) {
+        (async () => {
+          try {
+            const deleteIds = rows.slice(1).map(r => r.id);
+            console.log(`[CLEANUP] Deleting duplicate welcome settings IDs: ${deleteIds.join(', ')}`);
+            await supabaseAdmin.from('pending_admin_actions').delete().in('id', deleteIds);
+          } catch (cleanupErr) {
+            console.error("[CLEANUP] Error deleting duplicate welcome settings:", cleanupErr);
+          }
+        })();
       }
 
       // Standard defaults if not configured
@@ -1681,25 +1695,45 @@ async function startServer() {
       // Extract existing settings to avoid overwriting nested properties like last_welcome_message_id if not supplied
       let existing = null;
       try {
-        const { data } = await supabaseAdmin
+        const { data: rows, error: selectError } = await supabaseAdmin
           .from('pending_admin_actions')
           .select('*')
           .eq('channel_id', targetTelegramId)
           .eq('user_id', 'system')
-          .eq('action', 'welcome_settings')
-          .maybeSingle();
-        existing = data;
+          .eq('action', 'welcome_settings');
+
+        if (selectError) {
+          throw new Error(selectError.message);
+        }
+
+        if (rows && rows.length > 0) {
+          existing = rows[0];
+          // Clean up extra duplicate rows in the background if they exist
+          if (rows.length > 1) {
+            (async () => {
+              try {
+                const deleteIds = rows.slice(1).map(r => r.id);
+                console.log(`[POST CLEANUP] Deleting duplicate welcome settings IDs: ${deleteIds.join(', ')}`);
+                await supabaseAdmin.from('pending_admin_actions').delete().in('id', deleteIds);
+              } catch (cleanupErr) {
+                console.error("[POST CLEANUP] Error deleting duplicate welcome settings:", cleanupErr);
+              }
+            })();
+          }
+        }
       } catch (err: any) {
         console.warn("[SERVER] Error querying pending_admin_actions list, trying standard client fallback:", err.message);
         try {
-          const { data } = await supabase
+          const { data: rowsFallback } = await supabase
             .from('pending_admin_actions')
             .select('*')
             .eq('channel_id', targetTelegramId)
             .eq('user_id', 'system')
-            .eq('action', 'welcome_settings')
-            .maybeSingle();
-          existing = data;
+            .eq('action', 'welcome_settings');
+          
+          if (rowsFallback && rowsFallback.length > 0) {
+            existing = rowsFallback[0];
+          }
         } catch (fail) {
           console.error("[SERVER] Both database clients failed to select from pending_admin_actions table:", fail);
         }
@@ -1814,13 +1848,14 @@ async function startServer() {
 
       // 1. Log and fetch welcome settings for this group
       try {
-        const { data: configRow } = await supabaseAdmin
+        const { data: configRows } = await supabaseAdmin
           .from('pending_admin_actions')
           .select('*')
           .eq('channel_id', chatIdStr)
           .eq('user_id', 'system')
-          .eq('action', 'welcome_settings')
-          .maybeSingle();
+          .eq('action', 'welcome_settings');
+
+        const configRow = configRows && configRows.length > 0 ? configRows[0] : null;
 
         const config = configRow?.permissions || {};
 
