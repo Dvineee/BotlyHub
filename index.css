@@ -923,8 +923,14 @@ img[src$=".png"] {
     background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1)) !important;
 }
 
-/* Ücretsiz Edin button styling for dark mode and all viewports */
-.ucretsiz-edin-btn, .dark .ucretsiz-edin-btn, button.ucretsiz-edin-btn, .dark button.ucretsiz-edin-btn {
+/* Ücretsiz Edin button styling */
+.ucretsiz-edin-btn, button.ucretsiz-edin-btn {
+    background-color: #3b82f6 !important;
+    color: #ffffff !important;
+    letter-spacing: 0.05em;
+}
+
+.dark .ucretsiz-edin-btn, .dark button.ucretsiz-edin-btn {
     --tw-bg-opacity: 1;
     background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1)) !important;
     color: #000000 !important;
@@ -2011,6 +2017,10 @@ div.qa-last-24h-box, .qa-last-24h-box {
     letter-spacing: -0.013em;
 }
 
+.tracking-\[0\.3em\] {
+    letter-spacing: 0.013em;
+}
+
 .text-xs {
     font-size: 13px;
     line-height: 1rem;
@@ -2019,6 +2029,10 @@ div.qa-last-24h-box, .qa-last-24h-box {
 .h-20 {
     background-color: #f4f6f8;
     height: 3.5rem;
+}
+
+.mb-12 {
+    margin-bottom: 40px;
 }
 
 
