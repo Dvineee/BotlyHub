@@ -2016,5 +2016,10 @@ div.qa-last-24h-box, .qa-last-24h-box {
     line-height: 1rem;
 }
 
+.h-20 {
+    background-color: #f4f6f8;
+    height: 3.5rem;
+}
+
 
 
