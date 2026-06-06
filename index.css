@@ -2008,7 +2008,12 @@ div.qa-last-24h-box, .qa-last-24h-box {
 }
 
 .tracking-\[0\.2em\] {
-    letter-spacing: 0.05em;
+    letter-spacing: -0.013em;
+}
+
+.text-xs {
+    font-size: 13px;
+    line-height: 1rem;
 }
 
 
