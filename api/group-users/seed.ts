@@ -3,6 +3,10 @@ import { createClient } from "@supabase/supabase-js";
 const SUPABASE_URL = process.env.SUPABASE_URL || "https://yrbnzyvbhitlquaxnruc.supabase.co";
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || "sb_publishable_h9QTmZjwi0pH_JX6i4xfWg_LJFY86GP";
 
+if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  console.warn("[WARNING] SUPABASE_SERVICE_ROLE_KEY is missing on serverless environment! Falling back to anon key. Seeding group_users may fail due to lack of write privileges.");
+}
+
 const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
   auth: {
     persistSession: false,

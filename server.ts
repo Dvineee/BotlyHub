@@ -363,7 +363,7 @@ async function startServer() {
       let targetTelegramId = channelId.toString();
 
       // If channelId is a UUID, look up the corresponding telegram_id
-      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(channelId);
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(channelId) || (channelId.length >= 32 && channelId.includes('-'));
       if (isUuid) {
         const { data: channelData } = await supabaseAdmin
           .from('channels')
@@ -402,7 +402,7 @@ async function startServer() {
       let targetTelegramId = channelId.toString();
 
       // If channelId is a UUID, look up the corresponding telegram_id
-      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(channelId);
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(channelId) || (channelId.length >= 32 && channelId.includes('-'));
       if (isUuid) {
         const { data: channelData } = await supabaseAdmin
           .from('channels')
@@ -530,7 +530,7 @@ async function startServer() {
       let targetTelegramId = channelId.toString();
 
       // If channelId is a UUID, look up the corresponding telegram_id
-      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(channelId);
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(channelId) || (channelId.length >= 32 && channelId.includes('-'));
       if (isUuid) {
         const { data: channelData } = await supabaseAdmin
           .from("channels")
@@ -662,6 +662,9 @@ async function startServer() {
 
   // --- SUPABASE ADMIN CLIENT FOR Q&A DATABASE ACCESS ---
   const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || 'sb_publishable_h9QTmZjwi0pH_JX6i4xfWg_LJFY86GP';
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    console.warn("[WARNING] SUPABASE_SERVICE_ROLE_KEY is missing in Express server environment! Falling back to anon key. Admin features and moderation saving will be restricted by RLS.");
+  }
   const supabaseAdmin = createClient(process.env.SUPABASE_URL || 'https://yrbnzyvbhitlquaxnruc.supabase.co', SUPABASE_SERVICE_ROLE_KEY, {
     auth: {
       persistSession: false,
@@ -1576,7 +1579,7 @@ async function startServer() {
   });
 
   // --- WELCOME & MODERATION SETTINGS API ---
-  app.get("/api/groups/:groupId/moderation-settings", async (req, res) => {
+  app.get(["/api/groups/:groupId/moderation-settings", "/api/groups/:groupId/moderation"], async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     try {
       const { groupId } = req.params;
@@ -1647,7 +1650,7 @@ async function startServer() {
     }
   });
 
-  app.post("/api/groups/:groupId/moderation-settings", async (req, res) => {
+  app.post(["/api/groups/:groupId/moderation-settings", "/api/groups/:groupId/moderation"], async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     try {
       const { groupId } = req.params;

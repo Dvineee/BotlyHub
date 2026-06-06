@@ -2158,29 +2158,23 @@ export default function QAForum() {
                     <button
                       onClick={() => {
                         haptic("light");
-                        navigate("/search?mode=bots");
-                        setMobileModal(null);
+                        setNavState("bots");
                       }}
-                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase flex items-center gap-3 leading-none"
+                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase flex items-center justify-between gap-3 leading-none"
                     >
                       <span>{t("bots") || "Bot Market"}</span>
-                      <span className="text-[10px] font-black tracking-widest bg-blue-500 text-white px-2 py-0.5 rounded-md uppercase">
-                        BOTS
-                      </span>
+                      <ChevronRight size={24} className="text-slate-400" />
                     </button>
 
                     <button
                       onClick={() => {
                         haptic("light");
-                        navigate("/search?mode=apps");
-                        setMobileModal(null);
+                        setNavState("apps");
                       }}
-                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-emerald-500 transition-colors uppercase flex items-center gap-3 leading-none"
+                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-emerald-500 transition-colors uppercase flex items-center justify-between gap-3 leading-none"
                     >
                       <span>{t("apps") || "Uygulamalar"}</span>
-                      <span className="text-[10px] font-black tracking-widest bg-emerald-500 text-white px-2 py-0.5 rounded-md uppercase">
-                        APPS
-                      </span>
+                      <ChevronRight size={24} className="text-slate-400" />
                     </button>
 
                     <button
@@ -2227,12 +2221,24 @@ export default function QAForum() {
                     exit={{ opacity: 0, x: 15 }}
                     className="flex flex-col w-full h-full px-6"
                   >
-                    <button
-                      onClick={() => setNavState("main")}
-                      className="flex items-center gap-2 text-blue-500 dark:text-blue-400 font-[900] uppercase tracking-widest text-xs mb-6 px-1"
-                    >
-                      <ArrowLeft size={16} strokeWidth={3} /> Geri
-                    </button>
+                    <div className="flex items-center justify-between mb-6 px-1">
+                      <button
+                        onClick={() => setNavState("main")}
+                        className="flex items-center gap-2 text-blue-500 dark:text-blue-400 font-[900] uppercase tracking-widest text-xs"
+                      >
+                        <ArrowLeft size={16} strokeWidth={3} /> Geri
+                      </button>
+                      <button
+                        onClick={() => handleCategoryClick("all", navState === "bots" ? "bots" : "apps")}
+                        className="text-xs font-[900] uppercase tracking-widest text-blue-500 dark:text-blue-400"
+                      >
+                        Tümünü Gör
+                      </button>
+                    </div>
+
+                    <h3 className="text-base font-[900] uppercase tracking-tight text-slate-900 dark:text-white mb-4 px-1">
+                      {navState === "bots" ? "Bot Kategorileri" : "Uygulama Kategorileri"}
+                    </h3>
 
                     <div className="grid grid-cols-2 gap-3.5 max-h-[58vh] overflow-y-auto pr-1">
                       {(navState === "bots"

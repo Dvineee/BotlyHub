@@ -235,8 +235,15 @@ const NavMenu = ({
                     <button
                       key={item.id}
                       onClick={() => {
-                        if (item.action) item.action();
-                        else if (item.path) {
+                        if (item.id === "bots") {
+                          haptic("light");
+                          setNavState("bots");
+                        } else if (item.id === "apps") {
+                          haptic("light");
+                          setNavState("apps");
+                        } else if (item.action) {
+                          item.action();
+                        } else if (item.path) {
                           navigate(item.path);
                           setOpenMenu(null);
                         }
@@ -265,16 +272,24 @@ const NavMenu = ({
                   exit={{ opacity: 0, x: 20 }}
                   className="flex flex-col gap-6"
                 >
-                  <div className="flex items-center gap-4 mb-2">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-4">
+                      <button
+                        onClick={() => setNavState("main")}
+                        className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full text-slate-500 transition-colors"
+                      >
+                        <ArrowLeft size={20} />
+                      </button>
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-tight">
+                        Bot Kategorileri
+                      </h3>
+                    </div>
                     <button
-                      onClick={() => setNavState("main")}
-                      className="p-2 hover:bg-white/10 rounded-full text-slate-500 transition-colors"
+                      onClick={() => handleCategoryClick("all", "bots")}
+                      className="text-xs font-black uppercase tracking-widest text-blue-500 hover:text-blue-600 dark:text-blue-400 cursor-pointer px-3 py-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-all duration-150"
                     >
-                      <ArrowLeft size={20} />
+                      Tümünü Gör
                     </button>
-                    <h3 className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-tight">
-                      Bot Kategorileri
-                    </h3>
                   </div>
                   <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                     {botsCategories.map((cat) => (
@@ -301,16 +316,24 @@ const NavMenu = ({
                   exit={{ opacity: 0, x: 20 }}
                   className="flex flex-col gap-6"
                 >
-                  <div className="flex items-center gap-4 mb-2">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-4">
+                      <button
+                        onClick={() => setNavState("main")}
+                        className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full text-slate-500 transition-colors"
+                      >
+                        <ArrowLeft size={20} />
+                      </button>
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-tight">
+                        Uygulama Kategorileri
+                      </h3>
+                    </div>
                     <button
-                      onClick={() => setNavState("main")}
-                      className="p-2 hover:bg-white/10 rounded-full text-slate-500 transition-colors"
+                      onClick={() => handleCategoryClick("all", "apps")}
+                      className="text-xs font-black uppercase tracking-widest text-blue-500 hover:text-blue-600 dark:text-blue-400 cursor-pointer px-3 py-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-all duration-150"
                     >
-                      <ArrowLeft size={20} />
+                      Tümünü Gör
                     </button>
-                    <h3 className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-tight">
-                      Uygulama Kategorileri
-                    </h3>
                   </div>
                   <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                     {appsCategories.map((cat) => (
@@ -759,29 +782,23 @@ const NavMenu = ({
                     <button
                       onClick={() => {
                         haptic("light");
-                        navigate("/search?mode=bots");
-                        setMobileModal(null);
+                        setNavState("bots");
                       }}
-                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase flex items-center gap-3 leading-none"
+                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase flex items-center justify-between gap-3 leading-none"
                     >
                       <span>{t("bots") || "Bot Market"}</span>
-                      <span className="text-[10px] font-black tracking-widest bg-blue-500 text-white px-2 py-0.5 rounded-md uppercase">
-                        BOTS
-                      </span>
+                      <ChevronRight size={24} className="text-slate-400" />
                     </button>
 
                     <button
                       onClick={() => {
                         haptic("light");
-                        navigate("/search?mode=apps");
-                        setMobileModal(null);
+                        setNavState("apps");
                       }}
-                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-emerald-500 transition-colors uppercase flex items-center gap-3 leading-none"
+                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-emerald-500 transition-colors uppercase flex items-center justify-between gap-3 leading-none"
                     >
                       <span>{t("apps") || "Uygulamalar"}</span>
-                      <span className="text-[10px] font-black tracking-widest bg-emerald-500 text-white px-2 py-0.5 rounded-md uppercase">
-                        APPS
-                      </span>
+                      <ChevronRight size={24} className="text-slate-400" />
                     </button>
 
                     <button
@@ -826,16 +843,28 @@ const NavMenu = ({
                     initial={{ opacity: 0, x: 15 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 15 }}
-                    className="flex flex-col w-full px-6"
+                    className="flex flex-col w-full h-full px-6"
                   >
-                    <button
-                      onClick={() => setNavState("main")}
-                      className="flex items-center gap-2 text-blue-500 dark:text-blue-400 font-[900] uppercase tracking-widest text-xs mb-6 px-1"
-                    >
-                      <ArrowLeft size={16} strokeWidth={3} /> Geri
-                    </button>
+                    <div className="flex items-center justify-between mb-6 px-1">
+                      <button
+                        onClick={() => setNavState("main")}
+                        className="flex items-center gap-2 text-blue-500 dark:text-blue-400 font-[900] uppercase tracking-widest text-xs"
+                      >
+                        <ArrowLeft size={16} strokeWidth={3} /> Geri
+                      </button>
+                      <button
+                        onClick={() => handleCategoryClick("all", navState === "bots" ? "bots" : "apps")}
+                        className="text-xs font-[900] uppercase tracking-widest text-blue-500 dark:text-blue-400"
+                      >
+                        Tümünü Gör
+                      </button>
+                    </div>
 
-                    <div className="grid grid-cols-2 gap-3.5 pr-1">
+                    <h3 className="text-base font-[900] uppercase tracking-tight text-slate-900 dark:text-white mb-4 px-1">
+                      {navState === "bots" ? "Bot Kategorileri" : "Uygulama Kategorileri"}
+                    </h3>
+
+                    <div className="grid grid-cols-2 gap-3.5 pr-1 max-h-[58vh] overflow-y-auto">
                       {(navState === "bots"
                         ? botsCategories
                         : appsCategories
@@ -1844,6 +1873,8 @@ const BotDetail = () => {
                   className={`w-full h-20 rounded-xl text-[11px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 border-b-8 ${
                     isOwned
                       ? "bg-emerald-600 text-white border-emerald-800"
+                      : bot.price === 0
+                      ? "bg-slate-900 dark:bg-white text-white dark:text-slate-950 border-slate-700 dark:border-slate-300 ucretsiz-edin-btn"
                       : "bg-slate-900 dark:bg-white text-white dark:text-slate-950 border-slate-700 dark:border-slate-300"
                   }`}
                 >
@@ -2075,6 +2106,8 @@ const BotDetail = () => {
               className={`flex-1 h-14 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-4 transition-all active:scale-95 disabled:opacity-50 border-b-4 ${
                 isOwned
                   ? "bg-emerald-600 text-white border-emerald-800"
+                  : bot.price === 0
+                  ? "bg-slate-900 dark:bg-white text-white dark:text-slate-950 border-slate-700 dark:border-slate-300 shadow-lg shadow-brand/20 ucretsiz-edin-btn"
                   : "bg-slate-900 dark:bg-white text-white dark:text-slate-950 border-slate-700 dark:border-slate-300 shadow-lg shadow-brand/20"
               }`}
             >

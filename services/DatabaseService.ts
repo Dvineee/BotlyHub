@@ -466,10 +466,23 @@ export class DatabaseService {
     } catch (e) {
       console.error("[DatabaseService] Error fetching group users via proxy API, falling back to direct client query:", e);
       try {
+        let targetId = channelId.toString();
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(targetId) || (targetId.length >= 32 && targetId.includes('-'));
+        if (isUuid) {
+          const { data: channelData } = await supabase
+            .from('channels')
+            .select('telegram_id')
+            .eq('id', targetId)
+            .maybeSingle();
+          if (channelData?.telegram_id) {
+            targetId = channelData.telegram_id.toString();
+          }
+        }
+
         const { data, error } = await supabase
           .from('group_users')
           .select('*')
-          .eq('channel_id', channelId.toString());
+          .eq('channel_id', targetId);
         
         if (error) {
           console.error("[DatabaseService] Anonymous query fallback error:", error);

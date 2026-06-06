@@ -647,9 +647,15 @@ h2.text-lg.sm\:text-xl.font-extrabold.text-slate-900.dark\:text-white.tracking-t
   padding-bottom: 0.75rem;
 }
 
-.home-page .px-5, .search-page .px-5 {
+.home-page .px-5 {
   padding-left: 1.25rem;
   padding-right: 1.25rem;
+}
+
+.search-page .px-5 {
+    padding-left: 0rem;
+    border-radius: 12px;
+    padding-right: 0rem;
 }
 
 .bot-detail-page > div.px-5 {
@@ -902,6 +908,29 @@ img[src$=".png"] {
 
 .text-\[11px\] {
   font-size: 13px;
+}
+
+.text-\[10px\] {
+  font-size: 13px;
+}
+
+.uppercase {
+  text-transform: inherit;
+}
+
+.dark\:bg-white:is(.dark *) {
+    --tw-bg-opacity: 1;
+    background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1)) !important;
+}
+
+/* Ücretsiz Edin button styling for dark mode and all viewports */
+.ucretsiz-edin-btn,
+.dark .ucretsiz-edin-btn,
+button.ucretsiz-edin-btn,
+.dark button.ucretsiz-edin-btn {
+    --tw-bg-opacity: 1;
+    background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1)) !important;
+    color: #000000 !important;
 }
 
 .md\:p-8 {

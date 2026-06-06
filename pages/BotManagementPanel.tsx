@@ -210,7 +210,7 @@ const BotManagementPanel = () => {
 
   useEffect(() => {
     if (groupId && channels.length > 0) {
-      const found = channels.find(c => String(c.telegram_id) === String(groupId));
+      const found = channels.find(c => String(c.telegram_id) === String(groupId) || String(c.id) === String(groupId));
       setActiveChannel(found || null);
     } else {
       setActiveChannel(null);
@@ -474,7 +474,7 @@ const BotManagementPanel = () => {
         </header>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-8 custom-scrollbar">
           <Routes>
             <Route index element={<NavigateToGroups botId={botId} />} />
             <Route path="groups" element={<GroupsView channels={channels} isLoading={isLoading} />} />
@@ -493,23 +493,23 @@ const BotManagementPanel = () => {
         </div>
 
         {/* Footer */}
-        <footer className="h-10 bg-[#14181f] border-t border-white/5 flex items-center justify-between px-8 shrink-0">
-          <div className="flex items-center gap-6">
+        <footer className="py-4 sm:h-10 bg-[#14181f] border-t border-white/5 flex flex-col sm:flex-row items-center justify-between px-4 sm:px-8 shrink-0 gap-3">
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-6 text-center sm:text-left">
             <span className="text-[9px] font-bold text-slate-600 uppercase tracking-widest">[0.091]</span>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap justify-center items-center gap-x-3 gap-y-1.5">
               <a href="#" className="text-[9px] font-black text-slate-500 hover:text-white uppercase tracking-widest transition-colors">İade Politikası</a>
-              <span className="text-slate-800">|</span>
+              <span className="text-slate-800 text-[9px]">|</span>
               <a href="#" className="text-[9px] font-black text-slate-500 hover:text-white uppercase tracking-widest transition-colors">gizlilik politikası</a>
-              <span className="text-slate-800">|</span>
+              <span className="text-slate-800 text-[9px]">|</span>
               <a href="#" className="text-[9px] font-black text-slate-500 hover:text-white uppercase tracking-widest transition-colors">hizmet şartları</a>
-              <span className="text-slate-800">|</span>
+              <span className="text-slate-800 text-[9px]">|</span>
               <a href="#" className="text-[9px] font-black text-slate-500 hover:text-white uppercase tracking-widest transition-colors">@botlyhubchat</a>
-              <span className="text-slate-800">|</span>
+              <span className="text-slate-800 text-[9px]">|</span>
               <a href="#" className="text-[9px] font-black text-slate-500 hover:text-white uppercase tracking-widest transition-colors">@botlyhubnews</a>
             </div>
           </div>
           <div className="flex items-center gap-3">
-             <span className="text-[9px] font-bold text-slate-600 uppercase tracking-widest tracking-widest">v3.4.1</span>
+             <span className="text-[9px] font-bold text-slate-600 uppercase tracking-widest">v3.4.1</span>
           </div>
         </footer>
       </main>
@@ -721,10 +721,10 @@ const GroupSettingsView = ({ channel }: { channel: any }) => {
 
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-5xl">
-            <div className="flex items-center gap-2 mb-8 bg-[#14181f] p-1.5 rounded-2xl w-fit border border-white/5">
+            <div className="flex items-center gap-1.5 sm:gap-2 mb-6 sm:mb-8 bg-[#14181f] p-1.5 rounded-2xl w-full sm:w-fit border border-white/5">
                 <button 
                   onClick={() => setActiveTab('basic')}
-                  className={`h-11 px-6 rounded-xl flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all ${
+                  className={`h-11 px-4 sm:px-6 rounded-xl flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all flex-1 sm:flex-initial ${
                     activeTab === 'basic' ? 'bg-slate-800 text-white shadow-lg' : 'text-slate-500 hover:text-white'
                   }`}
                 >
@@ -733,7 +733,7 @@ const GroupSettingsView = ({ channel }: { channel: any }) => {
                 </button>
                 <button 
                   onClick={() => setActiveTab('team')}
-                  className={`h-11 px-6 rounded-xl flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all ${
+                  className={`h-11 px-4 sm:px-6 rounded-xl flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all flex-1 sm:flex-initial ${
                     activeTab === 'team' ? 'bg-slate-800 text-white shadow-lg' : 'text-slate-500 hover:text-white'
                   }`}
                 >
@@ -835,7 +835,7 @@ const GroupSettingsView = ({ channel }: { channel: any }) => {
                     </div>
 
                     {/* Custom Bot Section */}
-                    <div className="group bg-gradient-to-br from-slate-900 to-[#0f1218] border border-white/5 p-8 rounded-[40px] relative overflow-hidden">
+                    <div className="group bg-gradient-to-br from-slate-900 to-[#0f1218] border border-white/5 p-6 sm:p-8 rounded-[24px] sm:rounded-[40px] relative overflow-hidden">
                         <div className="relative z-10">
                             <div className="flex items-center gap-3 mb-4">
                                 <h3 className="text-xl font-black text-white italic uppercase tracking-tighter">Özel Bot</h3>
@@ -852,25 +852,25 @@ const GroupSettingsView = ({ channel }: { channel: any }) => {
                 </div>
             ) : (
                 <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-                    <div className="flex items-center justify-between mb-8">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                         <div>
                             <h2 className="text-xl font-black text-white italic uppercase tracking-tighter mb-1">Yöneticiler</h2>
                             <p className="text-xs text-slate-500 font-medium flex items-center gap-1 italic">
                                 <Info size={12} /> BotlyHub'ı yönetebilen yöneticiler
                             </p>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 w-full sm:w-auto">
                              <button 
                                 onClick={fetchPendingAdmins}
                                 disabled={loadingAdmins}
-                                className="h-10 px-4 bg-white/5 hover:bg-white/10 text-white rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all disabled:opacity-50"
+                                className="h-10 flex-1 sm:flex-initial px-4 bg-white/5 hover:bg-white/10 text-white rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all disabled:opacity-50"
                              >
                                 <RotateCcw size={14} className={loadingAdmins ? "animate-spin" : ""} />
                                 Yenile
                              </button>
                              <button 
                                 onClick={() => setShowAddForm(!showAddForm)}
-                                className="h-10 px-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all shadow-lg shadow-blue-500/20"
+                                className="h-10 flex-1 sm:flex-initial px-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-500/20"
                              >
                                 {showAddForm ? <X size={14} /> : <Plus size={14} />}
                                 {showAddForm ? "Vazgeç" : "Yönetici ekle"}
@@ -920,7 +920,7 @@ const GroupSettingsView = ({ channel }: { channel: any }) => {
                                                         if (filtered.length === 0) return null;
 
                                                         return (
-                                                            <div className="absolute left-0 right-0 mt-2 bg-[#0c0f14] border border-blue-500/25 rounded-2xl overflow-hidden z-50 shadow-2xl max-h-60 overflow-y-auto" style={{ position: 'relative' }} >
+                                                            <div className="absolute left-0 right-0 mt-2 bg-[#0c0f14] border border-blue-500/25 rounded-2xl overflow-hidden z-50 shadow-2xl max-h-60 overflow-y-auto" >
                                                                 <div className="px-3 py-1.5 text-[9px] font-black text-slate-500 uppercase tracking-widest border-b border-white/5 bg-[#14181f]/40">
                                                                     EŞLEŞEN GRUP ÜYELERİ
                                                                 </div>
@@ -1139,7 +1139,7 @@ const BotSettingsView = ({ bot }: { bot: UserBot }) => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Visual Settings */}
                 <div className="lg:col-span-1 space-y-6">
-                    <div className="bg-[#14181f] border border-white/5 rounded-[40px] p-8 text-center">
+                    <div className="bg-[#14181f] border border-white/5 rounded-[24px] sm:rounded-[40px] p-6 sm:p-8 text-center">
                         <div className="w-24 h-24 bg-slate-900 rounded-full mx-auto mb-6 flex items-center justify-center border-4 border-white/5 relative group cursor-pointer overflow-hidden shadow-2xl">
                             {botData.icon ? <img src={botData.icon} className="w-full h-full object-cover" /> : botData.name[0].toUpperCase()}
                             <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -1164,7 +1164,7 @@ const BotSettingsView = ({ bot }: { bot: UserBot }) => {
 
                 {/* Information Settings */}
                 <div className="lg:col-span-2 space-y-8">
-                    <div className="bg-[#14181f] border border-white/5 rounded-[40px] p-8 space-y-6">
+                    <div className="bg-[#14181f] border border-white/5 rounded-[24px] sm:rounded-[40px] p-6 sm:p-8 space-y-6">
                         <div className="space-y-2">
                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Bot Adı</label>
                             <input 
@@ -1195,7 +1195,7 @@ const BotSettingsView = ({ bot }: { bot: UserBot }) => {
                             ></textarea>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Kategori</label>
                                 <select className="w-full h-12 bg-[#0f1218] border border-white/5 rounded-2xl px-4 text-sm text-white appearance-none outline-none">
@@ -1216,7 +1216,7 @@ const BotSettingsView = ({ bot }: { bot: UserBot }) => {
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-end gap-3">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3">
                         <button className="h-12 px-8 flex items-center gap-2 bg-[#14181f] text-slate-400 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all">
                              İptal Et
                         </button>
@@ -1242,7 +1242,7 @@ const BillingView = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-6">
                     {/* Active Subscription Card */}
-                    <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[40px] p-10 text-white relative overflow-hidden shadow-2xl shadow-blue-600/20">
+                    <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[24px] sm:rounded-[40px] p-6 sm:p-10 text-white relative overflow-hidden shadow-2xl shadow-blue-600/20">
                         <div className="relative z-10">
                             <div className="flex items-center gap-3 mb-8">
                                 <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
@@ -1254,7 +1254,7 @@ const BillingView = () => {
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-3 gap-8 mb-10">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 mb-10">
                                 <div>
                                     <span className="text-[10px] font-black opacity-60 uppercase tracking-widest block mb-1">Durum</span>
                                     <p className="text-base font-bold italic">Yayında</p>
@@ -1269,11 +1269,11 @@ const BillingView = () => {
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-4">
-                                <button className="h-12 px-8 bg-white text-blue-600 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-slate-100 transition-all">
+                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+                                <button className="h-12 px-8 bg-white text-blue-600 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-slate-100 transition-all text-center flex items-center justify-center">
                                     Planı Değiştir
                                 </button>
-                                <button className="h-12 px-8 bg-black/20 hover:bg-black/30 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all">
+                                <button className="h-12 px-8 bg-black/20 hover:bg-black/30 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all text-center flex items-center justify-center">
                                     Aboneliği Yönet
                                 </button>
                             </div>
@@ -1284,7 +1284,7 @@ const BillingView = () => {
                     </div>
 
                     {/* Usage Stats */}
-                    <div className="bg-[#14181f] border border-white/5 rounded-[40px] p-8">
+                    <div className="bg-[#14181f] border border-white/5 rounded-[24px] sm:rounded-[40px] p-6 sm:p-8">
                         <h4 className="text-sm font-black text-white italic uppercase tracking-widest mb-8">Kullanım Limitleri</h4>
                         <div className="space-y-6">
                             <div className="space-y-3">
@@ -1310,7 +1310,7 @@ const BillingView = () => {
                 </div>
 
                 <div className="space-y-6">
-                    <div className="bg-[#14181f] border border-white/5 rounded-[40px] p-8">
+                    <div className="bg-[#14181f] border border-white/5 rounded-[24px] sm:rounded-[40px] p-6 sm:p-8">
                         <h4 className="text-sm font-black text-white italic uppercase tracking-widest mb-6">Ödeme Yöntemi</h4>
                         <div className="flex items-center gap-4 p-4 bg-[#0f1218] border border-white/5 rounded-2xl mb-6">
                             <div className="w-10 h-6 bg-slate-800 rounded-md flex items-center justify-center overflow-hidden">
@@ -1326,7 +1326,7 @@ const BillingView = () => {
                         </button>
                     </div>
 
-                    <div className="bg-[#14181f] border border-white/5 rounded-[40px] p-8">
+                    <div className="bg-[#14181f] border border-white/5 rounded-[24px] sm:rounded-[40px] p-6 sm:p-8">
                         <h4 className="text-sm font-black text-white italic uppercase tracking-widest mb-6">Son İşlemler</h4>
                         <div className="space-y-4">
                             {[1, 2].map(i => (
@@ -1356,12 +1356,12 @@ const GroupsView = ({ channels, isLoading }: { channels: Channel[], isLoading: b
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-black text-white italic uppercase tracking-tighter mb-1">Gruplar</h1>
           <p className="text-sm text-slate-500 font-medium">Botunuzun bağlı olduğu grupları ve kanalları yönetin.</p>
         </div>
-        <button className="h-12 px-6 flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-500/20">
+        <button className="h-12 px-6 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-500/20 w-full sm:w-auto">
           <Plus size={16} />
           Yeni Grup / Kanal Ekle
         </button>
@@ -1385,7 +1385,7 @@ const GroupsView = ({ channels, isLoading }: { channels: Channel[], isLoading: b
           ))}
         </div>
       ) : (
-        <div className="bg-[#14181f]/40 border border-dashed border-white/5 p-12 rounded-[32px] text-center mb-8">
+        <div className="bg-[#14181f]/40 border border-dashed border-white/5 p-6 sm:p-12 rounded-[24px] sm:rounded-[32px] text-center mb-8">
           <Users size={48} className="text-slate-700 mx-auto mb-4" />
           <h3 className="text-base font-bold text-white mb-2">Henüz Grup veya Kanal Bulunmuyor</h3>
           <p className="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed mb-6">
@@ -1708,23 +1708,23 @@ const ModerationView = () => {
 
 const AnalysisView = () => (
   <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-    <div className="flex items-center justify-between mb-8">
+    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8">
        <div>
          <h1 className="text-2xl font-black text-white italic uppercase tracking-tighter mb-1">Analiz</h1>
          <p className="text-sm text-slate-500 font-medium">Grubunuzun büyüme ve etkileşim verilerini takip edin.</p>
        </div>
-       <div className="flex items-center gap-3">
-          <div className="bg-[#14181f] border border-white/5 rounded-xl px-4 h-10 flex items-center gap-3">
+       <div className="flex flex-wrap items-center gap-3">
+          <div className="bg-[#14181f] border border-white/5 rounded-xl px-4 h-10 flex items-center justify-between gap-3 w-full sm:w-auto">
              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Son 7 gün</span>
-             <ChevronRight size={14} className="rotate-90 text-slate-500" />
+             <ChevronRight size={14} className="rotate-90 text-slate-500 z-10" />
           </div>
-          <div className="bg-[#14181f] border border-white/5 rounded-xl px-4 h-10 flex items-center gap-3">
+          <div className="bg-[#14181f] border border-white/5 rounded-xl px-4 h-10 flex items-center justify-center gap-3 w-full sm:w-auto">
              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">11.05.2026 - 17.05.2026</span>
           </div>
-          <div className="flex items-center gap-2 ml-4">
+          <div className="flex flex-wrap items-center gap-2 sm:ml-4 w-full sm:w-auto">
              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Ort. DAU</span>
              <span className="text-sm font-black text-white italic">0</span>
-             <span className="mx-2 text-slate-800">|</span>
+             <span className="mx-2 text-slate-800 hidden sm:inline">|</span>
              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Ort. Günlük Mesaj</span>
              <span className="text-sm font-black text-white italic">0</span>
           </div>
@@ -1732,28 +1732,28 @@ const AnalysisView = () => (
     </div>
 
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-       <div className="bg-[#14181f] border border-white/5 rounded-3xl p-8">
+       <div className="bg-[#14181f] border border-white/5 rounded-3xl p-6 sm:p-8">
           <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Toplam Mesaj</span>
           <div className="flex items-end gap-3 px-1">
              <h2 className="text-4xl font-black text-white italic tracking-tighter">84.2k</h2>
              <span className="text-xs font-bold text-emerald-500 mb-2">+12%</span>
           </div>
        </div>
-       <div className="bg-[#14181f] border border-white/5 rounded-3xl p-8">
+       <div className="bg-[#14181f] border border-white/5 rounded-3xl p-6 sm:p-8">
           <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Aktif Üye</span>
           <div className="flex items-end gap-3 px-1">
              <h2 className="text-4xl font-black text-white italic tracking-tighter">1.2k</h2>
              <span className="text-xs font-bold text-blue-500 mb-2">~ Stabil</span>
           </div>
        </div>
-       <div className="bg-[#14181f] border border-white/5 rounded-3xl p-8">
+       <div className="bg-[#14181f] border border-white/5 rounded-3xl p-6 sm:p-8">
           <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Engellenen Spam</span>
           <div className="flex items-end gap-3 px-1">
              <h2 className="text-4xl font-black text-white italic tracking-tighter">3.5k</h2>
              <span className="text-xs font-bold text-red-500 mb-2">+5.4%</span>
           </div>
        </div>
-       <div className="bg-[#14181f] border border-white/5 rounded-3xl p-8">
+       <div className="bg-[#14181f] border border-white/5 rounded-3xl p-6 sm:p-8">
           <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Sunucu Gecikme</span>
           <div className="flex items-end gap-3 px-1">
              <h2 className="text-4xl font-black text-white italic tracking-tighter">42ms</h2>
@@ -1763,7 +1763,7 @@ const AnalysisView = () => (
     </div>
 
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-       <div className="bg-[#14181f] border border-white/5 rounded-[40px] p-10 h-96 flex flex-col items-center justify-center relative overflow-hidden">
+       <div className="bg-[#14181f] border border-white/5 rounded-[24px] sm:rounded-[40px] p-6 sm:p-10 h-96 flex flex-col items-center justify-center relative overflow-hidden">
           <div className="relative z-10 text-center">
              <BarChart3 size={48} className="text-blue-500/20 mx-auto mb-4" />
              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Büyüme Grafiği</span>
@@ -1771,7 +1771,7 @@ const AnalysisView = () => (
           </div>
           <div className="absolute inset-0 opacity-10 bg-[linear-gradient(45deg,transparent_25%,rgba(59,130,246,.05)_50%,transparent_75%)] bg-[length:20px_20px]"></div>
        </div>
-       <div className="bg-[#14181f] border border-white/5 rounded-[40px] p-10 h-96">
+       <div className="bg-[#14181f] border border-white/5 rounded-[24px] sm:rounded-[40px] p-6 sm:p-10 h-96">
           <h3 className="text-lg font-black text-white italic uppercase tracking-tighter mb-8">Etkinlik Zaman Çizelgesi</h3>
           <div className="space-y-6">
              {[1,2,3,4].map(i => (
@@ -1935,8 +1935,8 @@ const UsersView = ({ channel }: { channel: any }) => {
         </div>
       )}
 
-      <div className="bg-[#14181f] border border-white/5 rounded-[40px] overflow-hidden animate-in fade-in duration-300">
-        <div className="p-8 border-b border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-[#14181f] border border-white/5 rounded-[24px] sm:rounded-[40px] overflow-hidden animate-in fade-in duration-300">
+        <div className="p-4 sm:p-8 border-b border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h3 className="text-lg font-black text-white italic uppercase tracking-tighter flex items-center gap-2">
               <Users size={20} className="text-blue-500" />
@@ -1946,15 +1946,15 @@ const UsersView = ({ channel }: { channel: any }) => {
               {channel ? `${channel.name} grubuna ait aktif üyeler` : 'Grup kullanıcı listesi'} ({targetGroupId})
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-3">
-             <div className="relative">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full md:w-auto">
+             <div className="relative flex-1 md:flex-initial">
                 <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
                 <input 
                   type="text" 
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Kullanıcı adı, isim, ID veya son mesaj..." 
-                  className="bg-[#0f1218] border border-white/5 rounded-xl pl-10 pr-4 h-10 text-xs text-white outline-none focus:border-blue-500/30 w-72 placeholder:text-slate-650" 
+                  className="bg-[#0f1218] border border-white/5 rounded-xl pl-10 pr-4 h-10 text-xs text-white outline-none focus:border-blue-500/30 w-full md:w-72 placeholder:text-slate-650" 
                 />
              </div>
              
@@ -1985,13 +1985,13 @@ const UsersView = ({ channel }: { channel: any }) => {
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-white/2 border-b border-white/5">
-                   <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Kullanıcı</th>
-                   <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Telegram ID</th>
-                   <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Mesaj Sayısı</th>
-                   <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Son Mesaj</th>
-                   <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Seviye (XP)</th>
-                   <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Katılım</th>
-                   <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest text-right">İşlem</th>
+                   <th className="px-4 sm:px-8 py-4 sm:py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Kullanıcı</th>
+                   <th className="px-4 sm:px-8 py-4 sm:py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Telegram ID</th>
+                   <th className="px-4 sm:px-8 py-4 sm:py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Mesaj Sayısı</th>
+                   <th className="px-4 sm:px-8 py-4 sm:py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Son Mesaj</th>
+                   <th className="px-4 sm:px-8 py-4 sm:py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Seviye (XP)</th>
+                   <th className="px-4 sm:px-8 py-4 sm:py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Katılım</th>
+                   <th className="px-4 sm:px-8 py-4 sm:py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest text-right">İşlem</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
@@ -2030,7 +2030,7 @@ const UsersView = ({ channel }: { channel: any }) => {
                   paginatedUsers.map((gUser, i) => (
                     <tr key={gUser.user_id || i} className="hover:bg-white/[0.01] transition-colors">
                       {/* Name & Username with beautiful avatar */}
-                      <td className="px-8 py-5">
+                      <td className="px-4 sm:px-8 py-3.5 sm:py-5">
                          <div className="flex items-center gap-3">
                             <div className="w-9 h-9 rounded-full bg-slate-900 border border-white/5 flex items-center justify-center font-black text-white italic text-xs uppercase shadow-inner relative overflow-hidden">
                               {/* Soft dynamic color overlay based on name letters */}
@@ -2056,12 +2056,12 @@ const UsersView = ({ channel }: { channel: any }) => {
                       </td>
 
                       {/* User Telegram ID */}
-                      <td className="px-8 py-5 text-[11px] font-mono text-slate-400 tracking-wide select-all">
+                      <td className="px-4 sm:px-8 py-3.5 sm:py-5 text-[11px] font-mono text-slate-400 tracking-wide select-all">
                         {gUser.user_id}
                       </td>
 
                       {/* Total Message Count */}
-                      <td className="px-8 py-5">
+                      <td className="px-4 sm:px-8 py-3.5 sm:py-5">
                         <div className="flex items-center gap-2 font-mono">
                           <MessageSquare size={13} className="text-slate-500" />
                           <span className="text-xs font-bold text-slate-200">
@@ -2071,7 +2071,7 @@ const UsersView = ({ channel }: { channel: any }) => {
                       </td>
 
                       {/* Last Message and time */}
-                      <td className="px-8 py-5 max-w-[200px]">
+                      <td className="px-4 sm:px-8 py-3.5 sm:py-5 max-w-[200px]">
                         {gUser.last_message ? (
                           <div className="space-y-1">
                             <p className="text-xs text-slate-300 font-medium truncate italic" title={gUser.last_message}>
@@ -2089,7 +2089,7 @@ const UsersView = ({ channel }: { channel: any }) => {
                       </td>
 
                       {/* XP & Level Badge */}
-                      <td className="px-8 py-5">
+                      <td className="px-4 sm:px-8 py-3.5 sm:py-5">
                         <div className="flex items-center gap-2">
                            <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
                            <span className="text-xs font-black text-amber-500 italic uppercase">
@@ -2099,12 +2099,12 @@ const UsersView = ({ channel }: { channel: any }) => {
                       </td>
 
                       {/* Joined Date */}
-                      <td className="px-8 py-5 text-[10px] font-medium text-slate-500 uppercase tracking-widest whitespace-nowrap">
+                      <td className="px-4 sm:px-8 py-3.5 sm:py-5 text-[10px] font-medium text-slate-500 uppercase tracking-widest whitespace-nowrap">
                         {gUser.joined_at ? new Date(gUser.joined_at).toLocaleDateString('tr-TR') : 'Bilinmiyor'}
                       </td>
 
                       {/* More actions buttons */}
-                      <td className="px-8 py-5 text-right whitespace-nowrap">
+                      <td className="px-4 sm:px-8 py-3.5 sm:py-5 text-right whitespace-nowrap">
                         <button 
                           onClick={() => handlePromoteAdmin(gUser.user_id, gUser.name || gUser.username || "Kullanıcı")}
                           disabled={promotingUserId === gUser.user_id}

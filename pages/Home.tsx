@@ -970,8 +970,15 @@ const NavMenu = ({
                     <button
                       key={item.id}
                       onClick={() => {
-                        if (item.action) item.action();
-                        else if (item.path) {
+                        if (item.id === "bots") {
+                          haptic("light");
+                          setNavState("bots");
+                        } else if (item.id === "apps") {
+                          haptic("light");
+                          setNavState("apps");
+                        } else if (item.action) {
+                          item.action();
+                        } else if (item.path) {
                           navigate(item.path);
                           setOpenMenu(null);
                         }
@@ -1000,16 +1007,24 @@ const NavMenu = ({
                   exit={{ opacity: 0, x: 20 }}
                   className="flex flex-col gap-6"
                 >
-                  <div className="flex items-center gap-4 mb-2">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-4">
+                      <button
+                        onClick={() => setNavState("main")}
+                        className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full text-slate-500 transition-colors"
+                      >
+                        <ArrowLeft size={20} />
+                      </button>
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-tight">
+                        Bot Kategorileri
+                      </h3>
+                    </div>
                     <button
-                      onClick={() => setNavState("main")}
-                      className="p-2 hover:bg-white/10 rounded-full text-slate-500 transition-colors"
+                      onClick={() => handleCategoryClick("all", "bots")}
+                      className="text-xs font-black uppercase tracking-widest text-blue-500 hover:text-blue-600 dark:text-blue-400 cursor-pointer px-3 py-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-all duration-150"
                     >
-                      <ArrowLeft size={20} />
+                      Tümünü Gör
                     </button>
-                    <h3 className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-tight">
-                      Bot Kategorileri
-                    </h3>
                   </div>
                   <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                     {botsCategories.map((cat) => (
@@ -1036,16 +1051,24 @@ const NavMenu = ({
                   exit={{ opacity: 0, x: 20 }}
                   className="flex flex-col gap-6"
                 >
-                  <div className="flex items-center gap-4 mb-2">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-4">
+                      <button
+                        onClick={() => setNavState("main")}
+                        className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full text-slate-500 transition-colors"
+                      >
+                        <ArrowLeft size={20} />
+                      </button>
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-tight">
+                        Uygulama Kategorileri
+                      </h3>
+                    </div>
                     <button
-                      onClick={() => setNavState("main")}
-                      className="p-2 hover:bg-white/10 rounded-full text-slate-500 transition-colors"
+                      onClick={() => handleCategoryClick("all", "apps")}
+                      className="text-xs font-black uppercase tracking-widest text-blue-500 hover:text-blue-600 dark:text-blue-400 cursor-pointer px-3 py-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-all duration-150"
                     >
-                      <ArrowLeft size={20} />
+                      Tümünü Gör
                     </button>
-                    <h3 className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-tight">
-                      Uygulama Kategorileri
-                    </h3>
                   </div>
                   <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                     {appsCategories.map((cat) => (
@@ -1661,29 +1684,23 @@ const NavMenu = ({
                     <button
                       onClick={() => {
                         haptic("light");
-                        navigate("/search?mode=bots");
-                        setMobileModal(null);
+                        setNavState("bots");
                       }}
-                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase flex items-center gap-3 leading-none"
+                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase flex items-center justify-between gap-3 leading-none"
                     >
                       <span>{t("bots") || "Bot Market"}</span>
-                      <span className="text-[10px] font-black tracking-widest bg-blue-500 text-white px-2 py-0.5 rounded-md uppercase">
-                        BOTS
-                      </span>
+                      <ChevronRight size={24} className="text-slate-400" />
                     </button>
 
                     <button
                       onClick={() => {
                         haptic("light");
-                        navigate("/search?mode=apps");
-                        setMobileModal(null);
+                        setNavState("apps");
                       }}
-                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-emerald-500 transition-colors uppercase flex items-center gap-3 leading-none"
+                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-emerald-500 transition-colors uppercase flex items-center justify-between gap-3 leading-none"
                     >
                       <span>{t("apps") || "Uygulamalar"}</span>
-                      <span className="text-[10px] font-black tracking-widest bg-emerald-500 text-white px-2 py-0.5 rounded-md uppercase">
-                        APPS
-                      </span>
+                      <ChevronRight size={24} className="text-slate-400" />
                     </button>
 
                     <button
@@ -1730,14 +1747,26 @@ const NavMenu = ({
                     exit={{ opacity: 0, x: 15 }}
                     className="flex flex-col w-full h-full px-6"
                   >
-                    <button
-                      onClick={() => setNavState("main")}
-                      className="flex items-center gap-2 text-blue-500 dark:text-blue-400 font-[900] uppercase tracking-widest text-xs mb-6 px-1"
-                    >
-                      <ArrowLeft size={16} strokeWidth={3} /> Geri
-                    </button>
+                    <div className="flex items-center justify-between mb-6 px-1">
+                      <button
+                        onClick={() => setNavState("main")}
+                        className="flex items-center gap-2 text-blue-500 dark:text-blue-400 font-[900] uppercase tracking-widest text-xs"
+                      >
+                        <ArrowLeft size={16} strokeWidth={3} /> Geri
+                      </button>
+                      <button
+                        onClick={() => handleCategoryClick("all", navState === "bots" ? "bots" : "apps")}
+                        className="text-xs font-[900] uppercase tracking-widest text-blue-500 dark:text-blue-400"
+                      >
+                        Tümünü Gör
+                      </button>
+                    </div>
 
-                    <div className="grid grid-cols-2 gap-3.5 max-h-[58vh] overflow-y-auto pr-1">
+                    <h3 className="text-base font-[900] uppercase tracking-tight text-slate-900 dark:text-white mb-4 px-1">
+                      {navState === "bots" ? "Bot Kategorileri" : "Uygulama Kategorileri"}
+                    </h3>
+
+                    <div className="grid grid-cols-2 gap-3.5 pr-1 max-h-[58vh] overflow-y-auto">
                       {(navState === "bots"
                         ? botsCategories
                         : appsCategories
@@ -2180,8 +2209,15 @@ const Home = () => {
                     <button
                       key={item.id}
                       onClick={() => {
-                        if (item.action) item.action();
-                        else if (item.path) {
+                        if (item.id === "bots") {
+                          haptic("light");
+                          setNavState("bots");
+                        } else if (item.id === "apps") {
+                          haptic("light");
+                          setNavState("apps");
+                        } else if (item.action) {
+                          item.action();
+                        } else if (item.path) {
                           navigate(item.path);
                           setOpenMenu(null);
                         }
@@ -2210,16 +2246,24 @@ const Home = () => {
                   exit={{ opacity: 0, x: 20 }}
                   className="flex flex-col gap-6"
                 >
-                  <div className="flex items-center gap-4 mb-2">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-4">
+                      <button
+                        onClick={() => setNavState("main")}
+                        className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full text-slate-500 transition-colors"
+                      >
+                        <ArrowLeft size={20} />
+                      </button>
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-tight">
+                        Bot Kategorileri
+                      </h3>
+                    </div>
                     <button
-                      onClick={() => setNavState("main")}
-                      className="p-2 hover:bg-white/10 rounded-full text-slate-500 transition-colors"
+                      onClick={() => handleCategoryClick("all", "bots")}
+                      className="text-xs font-black uppercase tracking-widest text-blue-500 hover:text-blue-600 dark:text-blue-400 cursor-pointer px-3 py-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-all duration-150"
                     >
-                      <ArrowLeft size={20} />
+                      Tümünü Gör
                     </button>
-                    <h3 className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-tight">
-                      Bot Kategorileri
-                    </h3>
                   </div>
                   <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                     {botsCategories.map((cat) => (
@@ -2246,16 +2290,24 @@ const Home = () => {
                   exit={{ opacity: 0, x: 20 }}
                   className="flex flex-col gap-6"
                 >
-                  <div className="flex items-center gap-4 mb-2">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-4">
+                      <button
+                        onClick={() => setNavState("main")}
+                        className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full text-slate-500 transition-colors"
+                      >
+                        <ArrowLeft size={20} />
+                      </button>
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-tight">
+                        Uygulama Kategorileri
+                      </h3>
+                    </div>
                     <button
-                      onClick={() => setNavState("main")}
-                      className="p-2 hover:bg-white/10 rounded-full text-slate-500 transition-colors"
+                      onClick={() => handleCategoryClick("all", "apps")}
+                      className="text-xs font-black uppercase tracking-widest text-blue-500 hover:text-blue-600 dark:text-blue-400 cursor-pointer px-3 py-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-all duration-150"
                     >
-                      <ArrowLeft size={20} />
+                      Tümünü Gör
                     </button>
-                    <h3 className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-tight">
-                      Uygulama Kategorileri
-                    </h3>
                   </div>
                   <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                     {appsCategories.map((cat) => (
@@ -3161,7 +3213,7 @@ const Home = () => {
                               <div
                                 className="flex flex-col gap-2 cursor-pointer group shrink-0"
                                 onClick={() =>
-                                  navigate(`/search?mode=apps&category=all`)
+                                  navigate(`/search?mode=apps&category=${selectedAppsCategory}`)
                                 }
                               >
                                 <div className="flex items-center gap-2">
@@ -3275,7 +3327,7 @@ const Home = () => {
                               <button
                                 onClick={() => {
                                   haptic("medium");
-                                  navigate(`/search?mode=apps&category=all`);
+                                  navigate(`/search?mode=apps&category=${selectedAppsCategory}`);
                                 }}
                                 className="inline-flex items-center gap-2 px-6 py-2.5 bg-slate-50 hover:bg-slate-100 dark:bg-white/5 dark:hover:bg-white/10 text-slate-800 dark:text-slate-200 text-[13px] font-bold rounded-xl transition-all border border-black/10 dark:border-white/10 hover:scale-[1.02] active:scale-[0.98] shadow-sm cursor-pointer group"
                               >
@@ -3306,7 +3358,7 @@ const Home = () => {
                               <div
                                 className="flex flex-col gap-2 cursor-pointer group shrink-0"
                                 onClick={() =>
-                                  navigate(`/search?mode=bots&category=all`)
+                                  navigate(`/search?mode=bots&category=${selectedBotsCategory}`)
                                 }
                               >
                                 <div className="flex items-center gap-2">
@@ -3420,7 +3472,7 @@ const Home = () => {
                               <button
                                 onClick={() => {
                                   haptic("medium");
-                                  navigate(`/search?mode=bots&category=all`);
+                                  navigate(`/search?mode=bots&category=${selectedBotsCategory}`);
                                 }}
                                 className="inline-flex items-center gap-2 px-6 py-2.5 bg-slate-50 hover:bg-slate-100 dark:bg-white/5 dark:hover:bg-white/10 text-slate-800 dark:text-slate-200 text-[13px] font-bold rounded-xl transition-all border border-black/10 dark:border-white/10 hover:scale-[1.02] active:scale-[0.98] shadow-sm cursor-pointer group"
                               >
@@ -3870,29 +3922,23 @@ const Home = () => {
                     <button
                       onClick={() => {
                         haptic("light");
-                        navigate("/search?mode=bots");
-                        setMobileModal(null);
+                        setNavState("bots");
                       }}
-                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase flex items-center gap-3 leading-none"
+                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase flex items-center justify-between gap-3 leading-none"
                     >
                       <span>{t("bots") || "Bot Market"}</span>
-                      <span className="text-[10px] font-black tracking-widest bg-blue-500 text-white px-2 py-0.5 rounded-md uppercase">
-                        BOTS
-                      </span>
+                      <ChevronRight size={24} className="text-slate-400" />
                     </button>
 
                     <button
                       onClick={() => {
                         haptic("light");
-                        navigate("/search?mode=apps");
-                        setMobileModal(null);
+                        setNavState("apps");
                       }}
-                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-emerald-500 transition-colors uppercase flex items-center gap-3 leading-none"
+                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-emerald-500 transition-colors uppercase flex items-center justify-between gap-3 leading-none"
                     >
                       <span>{t("apps") || "Uygulamalar"}</span>
-                      <span className="text-[10px] font-black tracking-widest bg-emerald-500 text-white px-2 py-0.5 rounded-md uppercase">
-                        APPS
-                      </span>
+                      <ChevronRight size={24} className="text-slate-400" />
                     </button>
 
                     <button
@@ -3937,16 +3983,28 @@ const Home = () => {
                     initial={{ opacity: 0, x: 15 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 15 }}
-                    className="flex flex-col w-full px-6"
+                    className="flex flex-col w-full h-full px-6"
                   >
-                    <button
-                      onClick={() => setNavState("main")}
-                      className="flex items-center gap-2 text-blue-500 dark:text-blue-400 font-[900] uppercase tracking-widest text-xs mb-6 px-1"
-                    >
-                      <ArrowLeft size={16} strokeWidth={3} /> Geri
-                    </button>
+                    <div className="flex items-center justify-between mb-6 px-1">
+                      <button
+                        onClick={() => setNavState("main")}
+                        className="flex items-center gap-2 text-blue-500 dark:text-blue-400 font-[900] uppercase tracking-widest text-xs"
+                      >
+                        <ArrowLeft size={16} strokeWidth={3} /> Geri
+                      </button>
+                      <button
+                        onClick={() => handleCategoryClick("all", navState === "bots" ? "bots" : "apps")}
+                        className="text-xs font-[900] uppercase tracking-widest text-blue-500 dark:text-blue-400"
+                      >
+                        Tümünü Gör
+                      </button>
+                    </div>
 
-                    <div className="grid grid-cols-2 gap-3.5 pr-1">
+                    <h3 className="text-base font-[900] uppercase tracking-tight text-slate-900 dark:text-white mb-4 px-1">
+                      {navState === "bots" ? "Bot Kategorileri" : "Uygulama Kategorileri"}
+                    </h3>
+
+                    <div className="grid grid-cols-2 gap-3.5 pr-1 max-h-[58vh] overflow-y-auto">
                       {(navState === "bots"
                         ? botsCategories
                         : appsCategories
