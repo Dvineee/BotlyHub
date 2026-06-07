@@ -1616,8 +1616,8 @@ img.rounded-xl, img.rounded-3xl, img.rounded-2xl, img.rounded-\[11px\], img.roun
 }
 
 .dark\:bg-\[\#0F1623\]:is(.dark *) {
-  border: 1px solid var(--item-border-color) !important;
-  background-color: #11121400 !important;
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
 }
 
 .hover\:shadow-none:hover {
