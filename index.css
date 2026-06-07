@@ -1844,7 +1844,7 @@ html:not(.dark) .fixed input:focus, html:not(.dark) .fixed textarea:focus, html:
 }
 
 .official-links-box button.group {
-  outline: 1px solid var(--border-color) !important;
+  outline: 1px solid var(--item-border-color) !important;
   padding: 4px !important;
 }
 
