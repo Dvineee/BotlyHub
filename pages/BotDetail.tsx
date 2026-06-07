@@ -1840,13 +1840,13 @@ const BotDetail = () => {
               )}
 
               {/* Description */}
-              <div className="px-6 mb-10">
-                <div className="flex items-center justify-between mb-4 px-2">
-                  <h3 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-                    {t("detail_about_label")}
-                  </h3>
+              <div className="px-6 mb-12">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-[0.2em]">
+                    {bot.name} Hakkında
+                  </h2>
                 </div>
-                <div className="p-[11px] bg-white dark:bg-slate-900/60 rounded-xl border border-black/5 dark:border-white/5 text-sm text-slate-600 dark:text-slate-400 leading-[1.6]">
+                <div className="p-6 bg-slate-100/40 dark:bg-slate-900/40 rounded-2xl border border-slate-200/50 dark:border-white/5 text-sm text-slate-700 dark:text-slate-400 leading-relaxed transition-colors duration-300">
                   <div className="whitespace-pre-wrap">
                     {bot.description.length > 250 && !isDescriptionExpanded
                       ? `${bot.description.slice(0, 250)}...`
@@ -1858,7 +1858,7 @@ const BotDetail = () => {
                         haptic("light");
                         setIsDescriptionExpanded(!isDescriptionExpanded);
                       }}
-                      className="mt-3 text-xs font-bold text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1 active:scale-95 transition-all select-none"
+                      className="mt-4 text-xs font-bold text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1 active:scale-95 transition-all select-none cursor-pointer"
                     >
                       {isDescriptionExpanded ? (
                         <>{t("show_less") || "Daha az göster"}</>
