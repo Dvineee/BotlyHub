@@ -1846,7 +1846,7 @@ const BotDetail = () => {
                     {bot.name} Hakkında
                   </h2>
                 </div>
-                <div className="p-6 bg-slate-100/40 dark:bg-slate-900/40 rounded-2xl border border-slate-200/50 dark:border-white/5 text-sm text-slate-700 dark:text-slate-400 leading-relaxed transition-colors duration-300">
+                <div className="p-6 bg-slate-100/40 dark:bg-slate-900/40 rounded-2xl border border-slate-200/50 dark:border-white/5 text-sm text-slate-700 dark:text-slate-400 leading-relaxed transition-colors duration-300 bot-detail-about-box">
                   <div className="whitespace-pre-wrap">
                     {bot.description.length > 250 && !isDescriptionExpanded
                       ? `${bot.description.slice(0, 250)}...`
@@ -1957,9 +1957,9 @@ const BotDetail = () => {
                   bot.website_url ||
                   bot.app_url ||
                   bot.social_url) && (
-                  <div className="flex flex-col bg-white dark:bg-slate-900/40 rounded-xl border border-black/5 dark:border-white/5 p-4 pt-5 gap-[0.6em] official-links-box">
-                    <div className="px-2 mb-1">
-                      <h4 className="text-[10px] font-black text-slate-400 dark:text-slate-500 tracking-[0.2em]">
+                  <div className="flex flex-col bg-slate-100/40 dark:bg-slate-900/40 rounded-2xl border border-slate-200/50 dark:border-white/5 p-6 gap-[0.6em] official-links-box transition-colors duration-300">
+                    <div className="mb-4">
+                      <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-[0.2em]">
                         {t("detail_official_links")}
                       </h4>
                     </div>
@@ -1971,7 +1971,7 @@ const BotDetail = () => {
                             : bot.telegram_group;
                           window.open(url, "_blank");
                         }}
-                        className="w-full flex items-center gap-4 pl-2 pr-6 py-4.5 hover:bg-slate-50 dark:hover:bg-transparent rounded-2xl transition-all text-left group"
+                        className="w-full flex items-center gap-4 px-3 py-3 hover:bg-slate-200/50 dark:hover:bg-white/5 rounded-xl transition-all text-left group cursor-pointer"
                       >
                         <div className="w-8 h-8 rounded-xl bg-slate-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
                           <Send
@@ -1979,7 +1979,7 @@ const BotDetail = () => {
                             className="text-slate-500 dark:text-slate-400"
                           />
                         </div>
-                        <span className="text-[10px] font-black tracking-widest italic text-slate-700 dark:text-slate-300">
+                        <span className="text-[10px] font-black tracking-widest uppercase text-slate-700 dark:text-slate-300">
                           {t("detail_tg_group")}
                         </span>
                       </button>
@@ -1987,7 +1987,7 @@ const BotDetail = () => {
                     {bot.website_url && (
                       <button
                         onClick={() => window.open(bot.website_url, "_blank")}
-                        className="w-full flex items-center gap-4 pl-2 pr-6 py-4.5 hover:bg-slate-50 dark:hover:bg-transparent rounded-2xl transition-all text-left group"
+                        className="w-full flex items-center gap-4 px-3 py-3 hover:bg-slate-200/50 dark:hover:bg-white/5 rounded-xl transition-all text-left group cursor-pointer"
                       >
                         <div className="w-8 h-8 rounded-xl bg-slate-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
                           <Globe
@@ -1995,7 +1995,7 @@ const BotDetail = () => {
                             className="text-slate-500 dark:text-slate-400"
                           />
                         </div>
-                        <span className="text-[10px] font-black tracking-widest italic text-slate-700 dark:text-slate-300">
+                        <span className="text-[10px] font-black tracking-widest uppercase text-slate-700 dark:text-slate-300">
                           {t("detail_website")}
                         </span>
                       </button>
@@ -2003,7 +2003,7 @@ const BotDetail = () => {
                     {bot.app_url && (
                       <button
                         onClick={() => window.open(bot.app_url, "_blank")}
-                        className="w-full flex items-center gap-4 pl-2 pr-6 py-4.5 hover:bg-slate-50 dark:hover:bg-transparent rounded-2xl transition-all text-left group"
+                        className="w-full flex items-center gap-4 px-3 py-3 hover:bg-slate-200/50 dark:hover:bg-white/5 rounded-xl transition-all text-left group cursor-pointer"
                       >
                         <div className="w-8 h-8 rounded-xl bg-slate-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
                           <PlusCircle
@@ -2011,7 +2011,7 @@ const BotDetail = () => {
                             className="text-slate-500 dark:text-slate-400"
                           />
                         </div>
-                        <span className="text-[10px] font-black tracking-widest italic text-slate-700 dark:text-slate-300">
+                        <span className="text-[10px] font-black tracking-widest uppercase text-slate-700 dark:text-slate-300">
                           {t("detail_app_bot")}
                         </span>
                       </button>
@@ -2019,7 +2019,7 @@ const BotDetail = () => {
                     {bot.social_url && (
                       <button
                         onClick={() => window.open(bot.social_url, "_blank")}
-                        className="w-full flex items-center gap-4 pl-2 pr-6 py-4.5 hover:bg-slate-50 dark:hover:bg-transparent rounded-2xl transition-all text-left group"
+                        className="w-full flex items-center gap-4 px-3 py-3 hover:bg-slate-200/50 dark:hover:bg-white/5 rounded-xl transition-all text-left group cursor-pointer"
                       >
                         <div className="w-8 h-8 rounded-xl bg-slate-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
                           <Share2
@@ -2027,7 +2027,7 @@ const BotDetail = () => {
                             className="text-slate-500 dark:text-slate-400"
                           />
                         </div>
-                        <span className="text-[10px] font-black tracking-widest italic text-slate-700 dark:text-slate-300">
+                        <span className="text-[10px] font-black tracking-widest uppercase text-slate-700 dark:text-slate-300">
                           {t("detail_social")}
                         </span>
                       </button>
@@ -2036,21 +2036,21 @@ const BotDetail = () => {
                 )}
                 {/* Languages Section for Desktop */}
                 {bot.languages && bot.languages.length > 0 && (
-                  <div className="flex flex-col bg-white dark:bg-slate-900/40 rounded-xl border border-black/5 dark:border-white/5 p-4 stats-card-bg">
-                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                  <div className="flex flex-col bg-slate-100/40 dark:bg-slate-900/40 rounded-2xl border border-slate-200/50 dark:border-white/5 p-6 stats-card-bg transition-colors duration-300">
+                    <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-[0.2em] mb-2">
                       {t("detail_languages") || "Diller"}
                     </span>
-                    <span className="text-[13px] font-medium text-slate-800 dark:text-slate-200 mt-1">
+                    <span className="text-sm font-medium text-slate-700 dark:text-slate-400 leading-relaxed">
                       {bot.languages.join(", ")}
                     </span>
                   </div>
                 )}
               </div>
-
+ 
               <div className="w-full">
-                <div className="flex flex-col bg-white dark:bg-slate-900/60 rounded-xl border border-black/5 dark:border-white/5 backdrop-blur-xl overflow-hidden fancy-glass-card stats-card-bg">
+                <div className="flex flex-col bg-slate-100/40 dark:bg-slate-900/40 rounded-2xl border border-slate-200/50 dark:border-white/5 backdrop-blur-xl overflow-hidden fancy-glass-card stats-card-bg transition-colors duration-300">
                   <div className="flex items-center justify-between p-6">
-                    <div className="flex flex-col items-center flex-1 border-r border-black/5 dark:border-white/5">
+                    <div className="flex flex-col items-center flex-1 border-r border-slate-200/50 dark:border-white/5">
                       <span className="text-slate-900 dark:text-white font-bold text-base">
                         {bot.rating || "0.0"}{" "}
                         <Star
@@ -2062,7 +2062,7 @@ const BotDetail = () => {
                         {bot.rating_count || 0} {t("detail_vote")}
                       </span>
                     </div>
-                    <div className="flex flex-col items-center flex-1 border-r border-black/5 dark:border-white/5">
+                    <div className="flex flex-col items-center flex-1 border-r border-slate-200/50 dark:border-white/5">
                       <span className="text-slate-900 dark:text-white font-bold text-base">
                         {bot.user_count && bot.user_count > 1000
                           ? `${(bot.user_count / 1000).toFixed(1)}K`
