@@ -732,8 +732,8 @@ h2.text-lg.sm\:text-xl.font-extrabold.text-slate-900.dark\:text-white.tracking-t
 }
 
 .px-6 {
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
+  padding-left: 0rem;
+  padding-right: 0rem;
 }
 
 .gap-6 {
