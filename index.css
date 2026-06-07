@@ -710,6 +710,7 @@ h2.text-lg.sm\:text-xl.font-extrabold.text-slate-900.dark\:text-white.tracking-t
 
 .bot-detail-page .absolute.inset-0.flex.items-center.justify-center.p-0.z-10 {
   padding: 0rem !important;
+  filter: drop-shadow(2px 4px 6px black);
 }
 
 .bot-detail-page .rounded-\[2\.5rem\] {
@@ -1630,7 +1631,7 @@ img.rounded-xl, img.rounded-3xl, img.rounded-2xl, img.rounded-\[11px\], img.roun
   color: inherit !important;
 }
 
-.dark .fixed .bg-white:not(.bottom-nav-container), .dark .fixed [class*="bg-[#14181f]"]:not(.bottom-nav-container), .dark .fixed [class*="bg-slate-900"]:not(.bottom-nav-container), .dark .fixed [class*="bg-[#0c0e14]"]:not(.bottom-nav-container), .dark .absolute[class*="bg-white"]:not(.bottom-nav-container), .dark .absolute[class*="bg-slate-900"]:not(.bottom-nav-container), .dark .absolute[class*="bg-slate-950"]:not(.bottom-nav-container), .dark .absolute[class*="bg-[#0c0e14]"]:not(.bottom-nav-container), .dark .mega-menu-container, .dark [role="dialog"], .dark .modal-content, .dark [class*="dropdown-menu"] {
+.dark .fixed .bg-white:not(.bottom-nav-container), .dark .fixed [class*="bg-[#14181f]"]:not(.bottom-nav-container), .dark .fixed [class*="bg-slate-900"]:not(.bottom-nav-container), .dark .fixed [class*="bg-[#0c0e14]"]:not(.bottom-nav-container), .dark .absolute[class*="bg-slate-900"]:not(.bottom-nav-container), .dark .absolute[class*="bg-slate-950"]:not(.bottom-nav-container), .dark .absolute[class*="bg-[#0c0e14]"]:not(.bottom-nav-container), .dark .mega-menu-container, .dark [role="dialog"], .dark .modal-content, .dark [class*="dropdown-menu"] {
   background: linear-gradient(180deg, #0c0e14, #06080c) !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;

@@ -1718,8 +1718,7 @@ const BotDetail = () => {
                       ? bot.screenshots.map((s, i) => (
                           <motion.div
                             key={i}
-                            whileHover={{ scale: 1.02, y: -4 }}
-                            className="h-[260px] w-[380px] rounded-[2.5rem] bg-slate-200 dark:bg-slate-950 border border-black/5 dark:border-white/10 overflow-hidden snap-center shrink-0 cursor-zoom-in group relative DappScreenshotsCarousel_emblaItem__s30Gy"
+                            className="h-[260px] w-[380px] rounded-[2.5rem] bg-slate-200 dark:bg-slate-950 border border-black/5 dark:border-white/10 overflow-hidden snap-center shrink-0 cursor-pointer group relative DappScreenshotsCarousel_emblaItem__s30Gy"
                             onClick={() => openLightbox(i)}
                           >
                             {/* Blurred Background Layer - Using the image itself */}
