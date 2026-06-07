@@ -2099,7 +2099,7 @@ div.qa-last-24h-box, .qa-last-24h-box {
     -moz-user-select: none !important;
     user-select: none !important;
     color: #0f172a !important;
-    font-weight: 700 !important;
+    font-weight: 500 !important;
 }
 
 .official-links-box button:hover {
@@ -2114,6 +2114,17 @@ div.qa-last-24h-box, .qa-last-24h-box {
 
 .dark .official-links-box button:hover {
     background-color: #262629 !important;
+}
+
+/* Bot Detail Page Headings Custom Styling */
+.bot-detail-page h2:not(.text-2xl),
+.bot-detail-page h3:not(.text-base),
+.bot-detail-page h4,
+.bot-detail-page .stats-card-bg span.text-xs,
+.bot-detail-page .official-links-box h4,
+.bot-detail-section-title {
+    letter-spacing: -0.013em !important;
+    font-size: 13px !important;
 }
 
 

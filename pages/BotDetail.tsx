@@ -1710,7 +1710,7 @@ const BotDetail = () => {
               {/* Gallery Section */}
               <div className="mb-12 relative group/gallery DappScreenshot_root__FSZyc">
                 <div className="px-6 mb-6 flex items-center justify-between">
-                  <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-[0.2em]">
+                  <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase bot-detail-section-title">
                     {t("preview")}
                   </h3>
 
@@ -1819,7 +1819,7 @@ const BotDetail = () => {
                     <div className="relative z-10">
                       <div className="flex items-center justify-between mb-5">
                         <div className="flex flex-col gap-0.5">
-                          <h3 className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+                          <h3 className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase bot-detail-section-title">
                             Deneyimi Puanla
                           </h3>
                         </div>
@@ -1884,7 +1884,7 @@ const BotDetail = () => {
               {/* Description */}
               <div className="px-6 mb-12">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-[0.2em]">
+                  <h2 className="text-sm font-black text-slate-900 dark:text-white uppercase bot-detail-section-title">
                     {bot.name} Hakkında
                   </h2>
                 </div>
@@ -2037,7 +2037,7 @@ const BotDetail = () => {
               {/* Languages Section for Desktop */}
               {bot.languages && bot.languages.length > 0 && (
                 <div className="flex flex-col bg-slate-100/40 dark:bg-slate-900/40 rounded-2xl border border-slate-200/50 dark:border-white/5 p-6 stats-card-bg transition-colors duration-300 font-medium">
-                  <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-[0.2em] mb-2">
+                  <span className="text-xs font-black text-slate-900 dark:text-white uppercase bot-detail-section-title mb-2">
                     {t("detail_languages") || "Diller"}
                   </span>
                   <span className="text-sm font-medium text-slate-700 dark:text-slate-400 leading-relaxed">
@@ -2053,7 +2053,7 @@ const BotDetail = () => {
                 bot.social_url) && (
                 <div className="flex flex-col bg-slate-100/40 dark:bg-slate-900/40 rounded-2xl border border-slate-200/50 dark:border-white/5 p-6 transition-colors duration-300 official-links-box">
                   <div className="mb-3">
-                    <h4 className="text-sm font-bold text-slate-900 dark:text-white tracking-wide leading-none mb-1">
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-white leading-none mb-1 bot-detail-section-title">
                       {t("detail_official_links") || "Resmi Linkler"}
                     </h4>
                   </div>
