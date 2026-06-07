@@ -1616,8 +1616,8 @@ img.rounded-xl, img.rounded-3xl, img.rounded-2xl, img.rounded-\[11px\], img.roun
 }
 
 .dark\:bg-\[\#0F1623\]:is(.dark *) {
-  border: 1px solid var(--border-color) !important;
-  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--item-border-color) !important;
+  background-color: #11121400 !important;
 }
 
 .hover\:shadow-none:hover {
@@ -2057,6 +2057,63 @@ div.qa-last-24h-box, .qa-last-24h-box {
 
 .mb-12 {
     margin-bottom: 20px;
+}
+
+.dark\:bg-slate-900\/40:is(.dark *) {
+    background-color: #1c1c1d;
+}
+
+.dark\:bg-\[\#111214\]\/40:is(.dark *) {
+    display: grid;
+    border: 1px solid #ffffff0d !important;
+    align-items: center;
+    padding: 6px 8px;
+    background-color: #1c1c1d !important;
+    border-radius: 8px;
+    cursor: pointer;
+    grid-auto-flow: column;
+    grid-gap: 4px;
+    transition: background-color .2s;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
+/* Light mode adjustments for these elements */
+.bg-slate-100\/40 {
+    background-color: #f8fafc;
+}
+
+.official-links-box button {
+    display: grid !important;
+    border: 1px solid #0000000d !important;
+    align-items: center !important;
+    padding: 6px 12px !important;
+    background-color: #f1f5f9 !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    grid-auto-flow: column !important;
+    grid-gap: 6px !important;
+    transition: background-color .2s !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    user-select: none !important;
+    color: #0f172a !important;
+    font-weight: 700 !important;
+}
+
+.official-links-box button:hover {
+    background-color: #e2e8f0 !important;
+}
+
+.dark .official-links-box button {
+    background-color: #1c1c1d !important;
+    border: 1px solid #ffffff0d !important;
+    color: #ffffff !important;
+}
+
+.dark .official-links-box button:hover {
+    background-color: #262629 !important;
 }
 
 

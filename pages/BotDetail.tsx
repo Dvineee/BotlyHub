@@ -49,6 +49,8 @@ import {
   LogOut,
   Plus,
   ArrowLeft,
+  Terminal,
+  Link2,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useNavigate, useParams, Link as RouterLink } from "react-router-dom";
@@ -81,6 +83,46 @@ const getLiveBotIcon = (bot: Bot) => {
     bot.icon ||
     `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=1e293b&color=fff&bold=true`
   );
+};
+
+const formatLanguages = (langs: string[] | undefined): string => {
+  if (!langs || langs.length === 0) return "";
+  const map: Record<string, string> = {
+    '🇬🇧': 'İngilizce',
+    'en': 'İngilizce',
+    'english': 'İngilizce',
+    'ing': 'İngilizce',
+    'ingilizce': 'İngilizce',
+    '🇷🇺': 'Rusça',
+    'ru': 'Rusça',
+    'russian': 'Rusça',
+    'rusça': 'Rusça',
+    '🇹🇷': 'Türkçe',
+    'tr': 'Türkçe',
+    'turkish': 'Türkçe',
+    'türkçe': 'Türkçe',
+    '🇮🇷': 'Farsça',
+    'fa': 'Farsça',
+    'persian': 'Farsça',
+    'farsça': 'Farsça',
+    '🇮🇳': 'Hintçe',
+    'hi': 'Hintçe',
+    'hindi': 'Hintçe',
+    'hintçe': 'Hintçe',
+    '🇪🇸': 'İspanyolca',
+    'es': 'İspanyolca',
+    'spanish': 'İspanyolca',
+    'ispanyolca': 'İspanyolca'
+  };
+
+  return langs
+    .map(l => {
+      const clean = l.trim().toLowerCase();
+      if (map[l]) return map[l];
+      if (map[clean]) return map[clean];
+      return l.charAt(0).toUpperCase() + l.slice(1);
+    })
+    .join(", ");
 };
 
 const NavMenu = ({
@@ -1658,7 +1700,7 @@ const BotDetail = () => {
                         {t("detail_languages") || "Diller"}
                       </span>
                       <span className="text-[13px] font-medium text-slate-800 dark:text-slate-200 mt-1">
-                        {bot.languages.join(", ")}
+                        {formatLanguages(bot.languages)}
                       </span>
                     </div>
                   )}
@@ -1951,100 +1993,6 @@ const BotDetail = () => {
                     <Flag size={20} />
                   </button>
                 </div>
-
-                {/* Direct Link Buttons for Sidebar (PC/Large Screens) */}
-                {(bot.telegram_group ||
-                  bot.website_url ||
-                  bot.app_url ||
-                  bot.social_url) && (
-                  <div className="flex flex-col bg-slate-100/40 dark:bg-slate-900/40 rounded-2xl border border-slate-200/50 dark:border-white/5 p-6 gap-[0.6em] official-links-box transition-colors duration-300">
-                    <div className="mb-4">
-                      <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-[0.2em]">
-                        {t("detail_official_links")}
-                      </h4>
-                    </div>
-                    {bot.telegram_group && (
-                      <button
-                        onClick={() => {
-                          const url = bot.telegram_group!.startsWith("@")
-                            ? `https://t.me/${bot.telegram_group!.substring(1)}`
-                            : bot.telegram_group;
-                          window.open(url, "_blank");
-                        }}
-                        className="w-full flex items-center gap-4 px-3 py-3 hover:bg-slate-200/50 dark:hover:bg-white/5 rounded-xl transition-all text-left group cursor-pointer"
-                      >
-                        <div className="w-8 h-8 rounded-xl bg-slate-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                          <Send
-                            size={16}
-                            className="text-slate-500 dark:text-slate-400"
-                          />
-                        </div>
-                        <span className="text-[10px] font-black tracking-widest uppercase text-slate-700 dark:text-slate-300">
-                          {t("detail_tg_group")}
-                        </span>
-                      </button>
-                    )}
-                    {bot.website_url && (
-                      <button
-                        onClick={() => window.open(bot.website_url, "_blank")}
-                        className="w-full flex items-center gap-4 px-3 py-3 hover:bg-slate-200/50 dark:hover:bg-white/5 rounded-xl transition-all text-left group cursor-pointer"
-                      >
-                        <div className="w-8 h-8 rounded-xl bg-slate-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                          <Globe
-                            size={16}
-                            className="text-slate-500 dark:text-slate-400"
-                          />
-                        </div>
-                        <span className="text-[10px] font-black tracking-widest uppercase text-slate-700 dark:text-slate-300">
-                          {t("detail_website")}
-                        </span>
-                      </button>
-                    )}
-                    {bot.app_url && (
-                      <button
-                        onClick={() => window.open(bot.app_url, "_blank")}
-                        className="w-full flex items-center gap-4 px-3 py-3 hover:bg-slate-200/50 dark:hover:bg-white/5 rounded-xl transition-all text-left group cursor-pointer"
-                      >
-                        <div className="w-8 h-8 rounded-xl bg-slate-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                          <PlusCircle
-                            size={16}
-                            className="text-slate-500 dark:text-slate-400"
-                          />
-                        </div>
-                        <span className="text-[10px] font-black tracking-widest uppercase text-slate-700 dark:text-slate-300">
-                          {t("detail_app_bot")}
-                        </span>
-                      </button>
-                    )}
-                    {bot.social_url && (
-                      <button
-                        onClick={() => window.open(bot.social_url, "_blank")}
-                        className="w-full flex items-center gap-4 px-3 py-3 hover:bg-slate-200/50 dark:hover:bg-white/5 rounded-xl transition-all text-left group cursor-pointer"
-                      >
-                        <div className="w-8 h-8 rounded-xl bg-slate-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                          <Share2
-                            size={16}
-                            className="text-slate-500 dark:text-slate-400"
-                          />
-                        </div>
-                        <span className="text-[10px] font-black tracking-widest uppercase text-slate-700 dark:text-slate-300">
-                          {t("detail_social")}
-                        </span>
-                      </button>
-                    )}
-                  </div>
-                )}
-                {/* Languages Section for Desktop */}
-                {bot.languages && bot.languages.length > 0 && (
-                  <div className="flex flex-col bg-slate-100/40 dark:bg-slate-900/40 rounded-2xl border border-slate-200/50 dark:border-white/5 p-6 stats-card-bg transition-colors duration-300">
-                    <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-[0.2em] mb-2">
-                      {t("detail_languages") || "Diller"}
-                    </span>
-                    <span className="text-sm font-medium text-slate-700 dark:text-slate-400 leading-relaxed">
-                      {bot.languages.join(", ")}
-                    </span>
-                  </div>
-                )}
               </div>
  
               <div className="w-full">
@@ -2085,6 +2033,75 @@ const BotDetail = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Languages Section for Desktop */}
+              {bot.languages && bot.languages.length > 0 && (
+                <div className="flex flex-col bg-slate-100/40 dark:bg-slate-900/40 rounded-2xl border border-slate-200/50 dark:border-white/5 p-6 stats-card-bg transition-colors duration-300 font-medium">
+                  <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-[0.2em] mb-2">
+                    {t("detail_languages") || "Diller"}
+                  </span>
+                  <span className="text-sm font-medium text-slate-700 dark:text-slate-400 leading-relaxed">
+                    {formatLanguages(bot.languages)}
+                  </span>
+                </div>
+              )}
+
+              {/* Direct Link Buttons for Sidebar (PC/Large Screens) - Moved to bottom & styled horizontally */}
+              {(bot.telegram_group ||
+                bot.website_url ||
+                bot.app_url ||
+                bot.social_url) && (
+                <div className="flex flex-col bg-slate-100/40 dark:bg-slate-900/40 rounded-2xl border border-slate-200/50 dark:border-white/5 p-6 transition-colors duration-300 official-links-box">
+                  <div className="mb-3">
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-white tracking-wide leading-none mb-1">
+                      {t("detail_official_links") || "Resmi Linkler"}
+                    </h4>
+                  </div>
+                  <div className="flex flex-wrap gap-2.5">
+                    {bot.app_url && (
+                      <button
+                        onClick={() => window.open(bot.app_url, "_blank")}
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200/50 dark:border-white/10 text-xs font-bold text-slate-700 dark:text-white bg-white/5 dark:bg-[#111214]/40 hover:bg-slate-205/50 dark:hover:bg-white/5 cursor-pointer backdrop-blur-md transition-all active:scale-95 duration-200"
+                      >
+                        <Terminal size={14} className="text-slate-400 dark:text-slate-500" />
+                        <span>{t("detail_app_bot") || "Uygulama Bot"}</span>
+                      </button>
+                    )}
+                    {bot.website_url && (
+                      <button
+                        onClick={() => window.open(bot.website_url, "_blank")}
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200/50 dark:border-white/10 text-xs font-bold text-slate-700 dark:text-white bg-white/5 dark:bg-[#111214]/40 hover:bg-slate-205/50 dark:hover:bg-white/5 cursor-pointer backdrop-blur-md transition-all active:scale-95 duration-200"
+                      >
+                        <Link2 size={14} className="text-slate-400 dark:text-slate-500" />
+                        <span>{t("detail_website") || "Web Site"}</span>
+                      </button>
+                    )}
+                    {bot.telegram_group && (
+                      <button
+                        onClick={() => {
+                          const url = bot.telegram_group!.startsWith("@")
+                            ? `https://t.me/${bot.telegram_group!.substring(1)}`
+                            : bot.telegram_group;
+                          window.open(url, "_blank");
+                        }}
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200/50 dark:border-white/10 text-xs font-bold text-slate-700 dark:text-white bg-white/5 dark:bg-[#111214]/40 hover:bg-slate-205/50 dark:hover:bg-white/5 cursor-pointer backdrop-blur-md transition-all active:scale-95 duration-200"
+                      >
+                        <Send size={14} className="text-slate-400 dark:text-slate-500" />
+                        <span>{t("detail_tg_group") || "Telegram Grubu"}</span>
+                      </button>
+                    )}
+                    {bot.social_url && (
+                      <button
+                        onClick={() => window.open(bot.social_url, "_blank")}
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200/50 dark:border-white/10 text-xs font-bold text-slate-700 dark:text-white bg-white/5 dark:bg-[#111214]/40 hover:bg-slate-205/50 dark:hover:bg-white/5 cursor-pointer backdrop-blur-md transition-all active:scale-95 duration-200"
+                      >
+                        <Share2 size={14} className="text-slate-400 dark:text-slate-500" />
+                        <span>{t("detail_social") || "Sosyal Medya"}</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
             </aside>
           </div>
         </div>
