@@ -1390,47 +1390,76 @@ const NavMenu = ({
                           )}
 
                           {mobileMenuPanel === "categories" && (
-                            <div className="space-y-1">
+                            <div className="space-y-4">
                               {/* Back button */}
                               <button
                                 onClick={() => {
                                   haptic("light");
                                   setMobileMenuPanel("main");
                                 }}
-                                className="w-full flex items-center gap-2 p-3 text-slate-500 dark:text-slate-400 hover:text-slate-700 border-b border-slate-100 dark:border-white/5 mb-2 font-bold text-xs uppercase"
+                                className="w-full flex items-center gap-2 p-3 text-slate-500 dark:text-slate-400 hover:text-slate-700 border-b border-slate-100 dark:border-white/5 font-bold text-xs uppercase"
                               >
                                 <ArrowLeft size={16} />
                                 <span>Geri</span>
                               </button>
 
-                              {/* Bot ve Uygulama kategorileri */}
-                              <button
-                                onClick={() => {
-                                  haptic("light");
-                                  setMobileMenuPanel("bots");
-                                }}
-                                className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 font-bold text-xs uppercase text-left"
-                              >
-                                <div className="flex items-center gap-3">
-                                  <BotIcon size={18} className="text-slate-400" />
-                                  <span>Bot Kategorileri</span>
-                                </div>
-                                <ChevronRight size={14} className="text-slate-400" />
-                              </button>
+                              {/* Mega Menu Options */}
+                              <div className="space-y-2">
+                                {discoverItems.map((item) => (
+                                  <button
+                                    key={item.id}
+                                    onClick={() => {
+                                      haptic("light");
+                                      if (item.id === "bots") {
+                                        setMobileMenuPanel("bots");
+                                      } else if (item.id === "apps") {
+                                        setMobileMenuPanel("apps");
+                                      } else if (item.path) {
+                                        navigate(item.path);
+                                        setIsMenuOpen(false);
+                                      }
+                                    }}
+                                    className="flex items-center gap-4 p-3 hover:bg-slate-50 dark:hover:bg-white/5 rounded-2xl transition-all border border-black/5 dark:border-white/5 text-left w-full group"
+                                  >
+                                    <div className="shrink-0 w-10 h-10 rounded-xl bg-black/[0.03] dark:bg-white/5 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
+                                      <item.icon size={20} />
+                                    </div>
+                                    <div className="flex flex-col min-w-0 flex-1">
+                                      <span className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-tight">
+                                        {item.label}
+                                      </span>
+                                      <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                                        {item.desc}
+                                      </span>
+                                    </div>
+                                    {(item.id === "bots" || item.id === "apps") && (
+                                      <ChevronRight size={14} className="text-slate-400 shrink-0" />
+                                    )}
+                                  </button>
+                                ))}
+                              </div>
 
-                              <button
-                                onClick={() => {
-                                  haptic("light");
-                                  setMobileMenuPanel("apps");
-                                }}
-                                className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 font-bold text-xs uppercase text-left"
-                              >
-                                <div className="flex items-center gap-3">
-                                  <LayoutGrid size={18} className="text-slate-400" />
-                                  <span>Uygulama Kategorileri</span>
-                                </div>
-                                <ChevronRight size={14} className="text-slate-400" />
-                              </button>
+                              {/* Hızlı Bağlantılar / Quick Links */}
+                              <div className="pt-3 border-t border-slate-100 dark:border-white/5 flex flex-col gap-1.5">
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-600 pl-2">
+                                  Hızlı Bağlantılar
+                                </span>
+                                {simpleLinks.map((link, i) => (
+                                  <a
+                                    key={i}
+                                    href={link.path}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-blue-500 transition-all font-bold text-xs uppercase group"
+                                  >
+                                    {link.label}
+                                    <ExternalLink
+                                      size={14}
+                                      className="opacity-0 group-hover:opacity-100 transition-all"
+                                    />
+                                  </a>
+                                ))}
+                              </div>
                             </div>
                           )}
 
@@ -3068,47 +3097,76 @@ const Home = () => {
                         )}
 
                         {mobileMenuPanel === "categories" && (
-                          <div className="space-y-1">
+                          <div className="space-y-4">
                             {/* Back button */}
                             <button
                               onClick={() => {
                                 haptic("light");
                                 setMobileMenuPanel("main");
                               }}
-                              className="w-full flex items-center gap-2 p-3 text-slate-500 dark:text-slate-400 hover:text-slate-700 border-b border-slate-100 dark:border-white/5 mb-2 font-bold text-xs uppercase"
+                              className="w-full flex items-center gap-2 p-3 text-slate-500 dark:text-slate-400 hover:text-slate-700 border-b border-slate-100 dark:border-white/5 font-bold text-xs uppercase"
                             >
                               <ArrowLeft size={16} />
                               <span>Geri</span>
                             </button>
 
-                            {/* Bot ve Uygulama kategorileri şeklinde mega menü seçenekleri */}
-                            <button
-                              onClick={() => {
-                                haptic("light");
-                                setMobileMenuPanel("bots");
-                              }}
-                              className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 font-bold text-xs uppercase text-left"
-                            >
-                              <div className="flex items-center gap-3">
-                                <BotIcon size={18} className="text-slate-400" />
-                                <span>Bot Kategorileri</span>
-                              </div>
-                              <ChevronRight size={14} className="text-slate-400" />
-                            </button>
+                            {/* Mega Menu Options */}
+                            <div className="space-y-2">
+                              {discoverItems.map((item) => (
+                                <button
+                                  key={item.id}
+                                  onClick={() => {
+                                    haptic("light");
+                                    if (item.id === "bots") {
+                                      setMobileMenuPanel("bots");
+                                    } else if (item.id === "apps") {
+                                      setMobileMenuPanel("apps");
+                                    } else if (item.path) {
+                                      navigate(item.path);
+                                      setIsMenuOpen(false);
+                                    }
+                                  }}
+                                  className="flex items-center gap-4 p-3 hover:bg-slate-50 dark:hover:bg-white/5 rounded-2xl transition-all border border-black/5 dark:border-white/5 text-left w-full group"
+                                >
+                                  <div className="shrink-0 w-10 h-10 rounded-xl bg-black/[0.03] dark:bg-white/5 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
+                                    <item.icon size={20} />
+                                  </div>
+                                  <div className="flex flex-col min-w-0 flex-1">
+                                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-tight">
+                                      {item.label}
+                                    </span>
+                                    <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                                      {item.desc}
+                                    </span>
+                                  </div>
+                                  {(item.id === "bots" || item.id === "apps") && (
+                                    <ChevronRight size={14} className="text-slate-400 shrink-0" />
+                                  )}
+                                </button>
+                              ))}
+                            </div>
 
-                            <button
-                              onClick={() => {
-                                haptic("light");
-                                setMobileMenuPanel("apps");
-                              }}
-                              className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 font-bold text-xs uppercase text-left"
-                            >
-                              <div className="flex items-center gap-3">
-                                <LayoutGrid size={18} className="text-slate-400" />
-                                <span>Uygulama Kategorileri</span>
-                              </div>
-                              <ChevronRight size={14} className="text-slate-400" />
-                            </button>
+                            {/* Hızlı Bağlantılar / Quick Links */}
+                            <div className="pt-3 border-t border-slate-100 dark:border-white/5 flex flex-col gap-1.5">
+                              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-600 pl-2">
+                                Hızlı Bağlantılar
+                              </span>
+                              {simpleLinks.map((link, i) => (
+                                <a
+                                  key={i}
+                                  href={link.path}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-blue-500 transition-all font-bold text-xs uppercase group"
+                                >
+                                  {link.label}
+                                  <ExternalLink
+                                    size={14}
+                                    className="opacity-0 group-hover:opacity-100 transition-all"
+                                  />
+                                </a>
+                              ))}
+                            </div>
                           </div>
                         )}
 
