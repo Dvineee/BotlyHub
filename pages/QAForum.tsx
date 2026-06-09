@@ -1076,7 +1076,7 @@ export default function QAForum() {
                       haptic("medium");
                       setShowCreateModal(true);
                     }}
-                    className="cursor-pointer fancy-glass-card flex items-center justify-between transition-all duration-300 group hover:border-indigo-500/30"
+                    className="qa-start-discussion-box cursor-pointer fancy-glass-card flex items-center justify-between transition-all duration-300 group hover:border-indigo-500/30"
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-full bg-indigo-550/10 dark:bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center font-bold text-indigo-650 dark:text-indigo-400">
@@ -1857,7 +1857,7 @@ export default function QAForum() {
           {/* Right Column: Sidebar featuring Popüler Etiketler & En Çok Tartışılanlar */}
           <div className="lg:col-span-4 space-y-6 hidden lg:block select-none sticky top-24 h-fit">
             {/* 🏷️ Popüler Etiketler Widget */}
-            <div className="fancy-glass-card">
+            <div className="qa-sidebar-widget fancy-glass-card">
               <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100 dark:border-slate-800/30">
                 <Sparkles
                   size={16}
@@ -1889,7 +1889,7 @@ export default function QAForum() {
             </div>
 
             {/* 💬 En Çok Tartışılanlar (Most Discussed) Widget */}
-            <div className="fancy-glass-card">
+            <div className="qa-sidebar-widget fancy-glass-card">
               <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100 dark:border-slate-800/30">
                 <MessageSquare size={16} className="text-indigo-500" />
                 <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white font-mono">
