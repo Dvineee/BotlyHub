@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { API_BASE_URL } from '../constants';
 import { X, Bell, Edit3, Download, ExternalLink, ShieldCheck, Loader2, Info, AlertCircle, Send, LogIn } from 'lucide-react';
@@ -93,7 +94,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onAuth }) => {
     }
   };
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 sm:p-0">
@@ -108,11 +109,11 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onAuth }) => {
             initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            className="bg-white dark:bg-[#14181f] w-full max-w-lg rounded-3xl overflow-hidden relative shadow-2xl border border-black/5 dark:border-white/5"
+            className="bg-white dark:bg-[#14181f] w-full max-w-lg rounded-3xl overflow-y-auto max-h-[90vh] md:max-h-none md:overflow-visible relative shadow-2xl border border-black/5 dark:border-white/5"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-6 sm:p-10">
-              <div className="flex justify-between items-start mb-8">
+            <div className="p-6 sm:p-8">
+              <div className="flex justify-between items-start mb-6">
                 <div>
                    <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight uppercase italic">Giriş Yap</h2>
                    <p className="text-xs text-slate-500 font-medium mt-1">Telegram ile güvenli ve hızlı erişim</p>
@@ -125,8 +126,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onAuth }) => {
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-6 hidden md:block">
                     {benefits.map((item, idx) => (
                     <div key={idx} className="flex items-center gap-3">
                         <div className={`w-8 h-8 rounded-lg ${item.color} flex items-center justify-center shrink-0`}>
@@ -185,7 +186,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onAuth }) => {
                                 {isLoading ? <Loader2 className="animate-spin" size={16} /> : (
                                     <>
                                         <Send size={16} />
-                                        <span className="hidden sm:inline">Kod Gönder</span>
+                                        <span>Kod Gönder</span>
                                     </>
                                 )}
                             </button>
@@ -213,7 +214,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onAuth }) => {
                                 {isLoading ? <Loader2 className="animate-spin" size={16} /> : (
                                     <>
                                         <LogIn size={16} />
-                                        <span className="hidden sm:inline">Giriş Yap</span>
+                                        <span>Giriş Yap</span>
                                     </>
                                 )}
                             </button>
@@ -231,7 +232,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onAuth }) => {
           </motion.div>
         </div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };
 

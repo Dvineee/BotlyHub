@@ -151,6 +151,7 @@ const NavMenu = ({
   menuRef: React.RefObject<HTMLDivElement>;
 }) => {
   const { t, language, setLanguage } = useTranslation();
+  const [mobileMenuPanel, setMobileMenuPanel] = useState<"main" | "categories" | "bots" | "apps">("main");
   const toggleLanguage = () => {
     haptic("light");
     setLanguage(language === "tr" ? "en" : "tr");
@@ -160,6 +161,12 @@ const NavMenu = ({
   const [mobileModal, setMobileModal] = useState<"kesfet" | null>(null);
   const [navState, setNavState] = useState<"main" | "bots" | "apps">("main");
   const internalMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isMenuOpen) {
+      setMobileMenuPanel("main");
+    }
+  }, [isMenuOpen]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -430,7 +437,7 @@ const NavMenu = ({
       >
         <div className="max-w-7xl mx-auto px-5 sm:px-8 flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-0">
           {/* Section 1: Center Navigation links */}
-          <div className="flex items-center justify-center gap-4 md:gap-14 order-1 md:order-2 w-full md:w-auto pb-1.5 md:pb-0 border-b md:border-b-0 border-slate-100 dark:border-white/5 md:border-transparent">
+          <div className="hidden md:flex items-center justify-center gap-4 md:gap-14 order-1 md:order-2 w-full md:w-auto pb-1.5 md:pb-0 border-b md:border-b-0 border-slate-100 dark:border-white/5 md:border-transparent">
             {/* Discover / Keşfet */}
             <button
               onClick={() => {
@@ -454,7 +461,8 @@ const NavMenu = ({
                 onClick={() => {
                   if (window.innerWidth < 768) {
                     haptic("light");
-                    setMobileModal("kesfet");
+                    setIsMenuOpen(true);
+                    setMobileMenuPanel("categories");
                   } else {
                     setOpenMenu(openMenu === "kesfet" ? null : "kesfet");
                   }
@@ -526,34 +534,354 @@ const NavMenu = ({
                 >
                   {t("home_login")}
                 </button>
-              ) : (
-                <div className="relative" ref={parentMenuRef}>
-                  <button
-                    onClick={() => {
-                      haptic("light");
-                      setIsMenuOpen(!isMenuOpen);
-                    }}
-                    className="flex items-center gap-2 px-3 h-10 text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 bg-slate-50 dark:bg-slate-900 border border-slate-200/40 dark:border-slate-800/20 rounded-xl transition-all active:scale-95 duration-150 shadow-xs"
-                    id="header-profile-menu-btn"
-                  >
-                    <img
-                      src={currentUser.avatar}
-                      className="w-5 h-5 rounded-full object-cover"
-                      alt=""
-                      referrerPolicy="no-referrer"
-                    />
-                    <span className="max-w-[70px] sm:max-w-[100px] truncate">
-                      {currentUser.name}
-                    </span>
-                    <ChevronDown
-                      size={12}
-                      className={`text-slate-400 dark:text-slate-500 transition-transform duration-200 ${isMenuOpen ? "rotate-180" : ""}`}
-                    />
-                  </button>
+              ) : null}
+
+              <div className="relative" ref={parentMenuRef}>
+                <button
+                  onClick={() => {
+                    haptic("light");
+                    setIsMenuOpen(!isMenuOpen);
+                  }}
+                  className="flex items-center gap-2 px-3 h-10 text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 bg-slate-50 dark:bg-slate-900 border border-slate-200/40 dark:border-slate-800/20 rounded-xl transition-all active:scale-95 duration-150 shadow-xs"
+                  id="header-profile-menu-btn"
+                >
+                  {/* Mobile Icons */}
+                  <div className="flex md:hidden items-center gap-1.5">
+                    {isMenuOpen ? (
+                      <X
+                        size={18}
+                        className="text-slate-700 dark:text-slate-300"
+                      />
+                    ) : user && user.id && user.id !== "guest_user" ? (
+                      <>
+                        <span className="text-[11px] font-black uppercase tracking-wide">
+                          {(
+                            user.username ||
+                            user.first_name ||
+                            user.name ||
+                            ""
+                          ).slice(0, 5)}
+                          {(
+                            user.username ||
+                            user.first_name ||
+                            user.name ||
+                            ""
+                          ).length > 5
+                            ? ".."
+                            : ""}
+                        </span>
+                        <ChevronDown
+                          size={12}
+                          className="text-slate-400 dark:text-slate-500 transition-transform duration-200"
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <Menu
+                          size={18}
+                          className="text-slate-700 dark:text-slate-300"
+                        />
+                        <ChevronDown
+                          size={12}
+                          className="text-slate-400 dark:text-slate-500 transition-transform duration-200"
+                        />
+                      </>
+                    )}
+                  </div>
+
+                  {/* Desktop Icons */}
+                  <div className="hidden md:flex items-center gap-1.5">
+                    {user && user.id && user.id !== "guest_user" ? (
+                      <>
+                        <img
+                          src={currentUser.avatar}
+                          className="w-5 h-5 rounded-full object-cover"
+                          alt=""
+                          referrerPolicy="no-referrer"
+                        />
+                        <span className="max-w-[70px] sm:max-w-[100px] truncate">
+                          {currentUser.name}
+                        </span>
+                        <ChevronDown
+                          size={12}
+                          className={`text-slate-400 dark:text-slate-500 transition-transform duration-200 ${isMenuOpen ? "rotate-180" : ""}`}
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <Compass
+                          size={18}
+                          className="text-slate-700 dark:text-slate-300"
+                        />
+                        <ChevronDown
+                          size={12}
+                          className={`text-slate-400 dark:text-slate-500 transition-transform duration-200 ${isMenuOpen ? "rotate-180" : ""}`}
+                        />
+                      </>
+                    )}
+                  </div>
+                </button>
 
                   {isMenuOpen && (
-                    <div className="absolute right-0 top-full mt-2 w-60 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-2xl shadow-2xl p-2 z-[100] animate-in fade-in zoom-in-95 duration-200">
-                      <div className="p-4 border-b border-slate-100 dark:border-white/5 mb-2">
+                    <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-2xl shadow-2xl p-3 z-[150] animate-in fade-in slide-in-from-right-3 duration-200">
+                      {/* Mobile View */}
+                      <div className="block md:hidden">
+                        {mobileMenuPanel === "main" && (
+                          <div className="space-y-1">
+                            {/* Keşfet */}
+                            <button
+                              onClick={() => {
+                                haptic("light");
+                                navigate("/");
+                                setIsMenuOpen(false);
+                              }}
+                              className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 transition-all group text-left"
+                            >
+                              <Compass
+                                size={18}
+                                className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors"
+                              />
+                              <span className="text-xs font-bold uppercase tracking-tight font-sans">
+                                Keşfet
+                              </span>
+                            </button>
+
+                            {/* Kategoriler */}
+                            <button
+                              onClick={() => {
+                                haptic("light");
+                                setMobileMenuPanel("categories");
+                              }}
+                              className="w-full flex items-center justify-between gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 transition-all group text-left"
+                            >
+                              <div className="flex items-center gap-3">
+                                <LayoutGrid
+                                  size={18}
+                                  className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors"
+                                />
+                                <span className="text-xs font-bold uppercase tracking-tight font-sans">
+                                  Kategoriler
+                                </span>
+                              </div>
+                              <ChevronRight size={14} className="text-slate-400" />
+                            </button>
+
+                            {/* Botlarım */}
+                            <button
+                              onClick={() => {
+                                haptic("light");
+                                navigate(user && user.id && user.id !== "guest_user" ? "/my-bots" : "/");
+                                setIsMenuOpen(false);
+                              }}
+                              className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 transition-all group text-left"
+                            >
+                              <BotIcon
+                                size={18}
+                                className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors"
+                              />
+                              <span className="text-xs font-bold uppercase tracking-tight font-sans">
+                                {t("my_bots") || "Botlarım"}
+                              </span>
+                            </button>
+
+                            {/* Gece Modu */}
+                            <button
+                              onClick={() => {
+                                haptic("light");
+                                toggleTheme();
+                              }}
+                              className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 transition-all group text-left"
+                            >
+                              {theme === "dark" ? (
+                                <>
+                                  <Sun
+                                    size={18}
+                                    className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors"
+                                  />
+                                  <span className="text-xs font-bold uppercase tracking-tight font-sans">
+                                    {t("light_mode") || "Gündüz Modu"}
+                                  </span>
+                                </>
+                              ) : (
+                                <>
+                                  <Moon
+                                    size={18}
+                                    className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors"
+                                  />
+                                  <span className="text-xs font-bold uppercase tracking-tight font-sans">
+                                    {t("dark_mode") || "Gece Modu"}
+                                  </span>
+                                </>
+                              )}
+                            </button>
+
+                            {/* Botunu Ekle */}
+                            <button
+                              onClick={() => {
+                                haptic("light");
+                                navigate("/settings");
+                                setIsMenuOpen(false);
+                              }}
+                              className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 transition-all group text-left"
+                            >
+                              <Plus
+                                size={18}
+                                className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors"
+                              />
+                              <span className="text-xs font-bold uppercase tracking-tight font-sans">
+                                Botunu Ekle
+                              </span>
+                            </button>
+                          </div>
+                        )}
+
+                        {mobileMenuPanel === "categories" && (
+                          <div className="space-y-1">
+                            {/* Back button */}
+                            <button
+                              onClick={() => {
+                                haptic("light");
+                                setMobileMenuPanel("main");
+                              }}
+                              className="w-full flex items-center gap-2 p-3 text-slate-500 dark:text-slate-400 hover:text-slate-700 border-b border-slate-100 dark:border-white/5 mb-2 font-bold text-xs uppercase"
+                            >
+                              <ArrowLeft size={16} />
+                              <span>Geri</span>
+                            </button>
+
+                            {/* Bot ve Uygulama kategorileri */}
+                            <button
+                              onClick={() => {
+                                haptic("light");
+                                setMobileMenuPanel("bots");
+                              }}
+                              className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 font-bold text-xs uppercase text-left"
+                            >
+                              <div className="flex items-center gap-3">
+                                <BotIcon size={18} className="text-slate-400" />
+                                <span>Bot Kategorileri</span>
+                              </div>
+                              <ChevronRight size={14} className="text-slate-400" />
+                            </button>
+
+                            <button
+                              onClick={() => {
+                                haptic("light");
+                                setMobileMenuPanel("apps");
+                              }}
+                              className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 font-bold text-xs uppercase text-left"
+                            >
+                              <div className="flex items-center gap-3">
+                                <LayoutGrid size={18} className="text-slate-400" />
+                                <span>Uygulama Kategorileri</span>
+                              </div>
+                              <ChevronRight size={14} className="text-slate-400" />
+                            </button>
+                          </div>
+                        )}
+
+                        {mobileMenuPanel === "bots" && (
+                          <div className="space-y-1">
+                            {/* Back button */}
+                            <button
+                              onClick={() => {
+                                haptic("light");
+                                setMobileMenuPanel("categories");
+                              }}
+                              className="w-full flex items-center gap-2 p-3 text-slate-500 dark:text-slate-400 hover:text-slate-700 border-b border-slate-100 dark:border-white/5 mb-2 font-bold text-xs uppercase"
+                            >
+                              <ArrowLeft size={16} />
+                              <span>Kategoriler</span>
+                            </button>
+
+                            <div className="max-h-[300px] overflow-y-auto pr-1 space-y-1">
+                              <button
+                                onClick={() => {
+                                  haptic("light");
+                                  navigate("/search?mode=bots");
+                                  setIsMenuOpen(false);
+                                }}
+                                className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 font-bold text-xs uppercase text-left"
+                              >
+                                <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
+                                  <Compass size={16} className="text-blue-500" />
+                                </div>
+                                <span>Tüm Botlar</span>
+                              </button>
+
+                              {botsCategories.map((cat) => (
+                                <button
+                                  key={cat.id}
+                                  onClick={() => {
+                                    haptic("light");
+                                    navigate(`/search?mode=bots&category=${cat.id}`);
+                                    setIsMenuOpen(false);
+                                  }}
+                                  className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 font-bold text-xs uppercase text-left"
+                                >
+                                  <div className="w-8 h-8 rounded-lg bg-black/[0.04] dark:bg-white/5 flex items-center justify-center shrink-0">
+                                    {cat.icon && <cat.icon size={16} className="text-slate-400" />}
+                                  </div>
+                                  <span className="truncate">{t(cat.label) || cat.label}</span>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {mobileMenuPanel === "apps" && (
+                          <div className="space-y-1">
+                            {/* Back button */}
+                            <button
+                              onClick={() => {
+                                haptic("light");
+                                setMobileMenuPanel("categories");
+                              }}
+                              className="w-full flex items-center gap-2 p-3 text-slate-500 dark:text-slate-400 hover:text-slate-700 border-b border-slate-100 dark:border-white/5 mb-2 font-bold text-xs uppercase"
+                            >
+                              <ArrowLeft size={16} />
+                              <span>Kategoriler</span>
+                            </button>
+
+                            <div className="max-h-[300px] overflow-y-auto pr-1 space-y-1">
+                              <button
+                                onClick={() => {
+                                  haptic("light");
+                                  navigate("/search?mode=apps");
+                                  setIsMenuOpen(false);
+                                }}
+                                className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 font-bold text-xs uppercase text-left"
+                              >
+                                <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
+                                  <Compass size={16} className="text-blue-500" />
+                                </div>
+                                <span>Tüm Uygulamalar</span>
+                              </button>
+
+                              {appsCategories.map((cat) => (
+                                <button
+                                  key={cat.id}
+                                  onClick={() => {
+                                    haptic("light");
+                                    navigate(`/search?mode=apps&category=${cat.id}`);
+                                    setIsMenuOpen(false);
+                                  }}
+                                  className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 font-bold text-xs uppercase text-left"
+                                >
+                                  <div className="w-8 h-8 rounded-lg bg-black/[0.04] dark:bg-white/5 flex items-center justify-center shrink-0">
+                                    {cat.icon && <cat.icon size={16} className="text-slate-400" />}
+                                  </div>
+                                  <span className="truncate">{t(cat.label) || cat.label}</span>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Desktop View */}
+                      <div className="hidden md:block">
+                        <div className="p-4 border-b border-slate-100 dark:border-white/5 mb-2">
                         <div className="flex items-center gap-3">
                           <img
                             src={currentUser.avatar}
@@ -700,10 +1028,10 @@ const NavMenu = ({
                           {t("home_logout")}
                         </span>
                       </button>
+                      </div>
                     </div>
                   )}
                 </div>
-              )}
             </div>
           </div>
         </div>
@@ -727,247 +1055,6 @@ const NavMenu = ({
           )}
         </AnimatePresence>
       </header>
-
-      {/* Mobile Mega Menus */}
-      <AnimatePresence>
-        {mobileModal && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.22 }}
-            className="fixed inset-0 z-[250] w-screen h-[100dvh] bg-white dark:bg-slate-950 flex flex-col md:hidden overflow-hidden"
-          >
-            {/* Top Header of Menu Modal */}
-            <div className="flex justify-between items-center px-6 py-5 border-b border-black/[0.04] dark:border-white/[0.04] shrink-0">
-              <Logo
-                onClick={() => {
-                  setMobileModal(null);
-                  setNavState("main");
-                  navigate("/");
-                }}
-                className="cursor-pointer scale-95"
-              />
-
-              <div className="flex items-center gap-2">
-                {user ? (
-                  <button
-                    onClick={() => {
-                      haptic("light");
-                      navigate("/earnings");
-                      setMobileModal(null);
-                    }}
-                    className="px-3.5 py-1.5 bg-slate-50 dark:bg-white/5 border border-black/[0.04] dark:border-white/5 rounded-full text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1 active:scale-95 transition-all"
-                  >
-                    @{user.username || user.first_name || "Profil"}
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => {
-                      haptic("light");
-                      setIsLoginModalOpen(true);
-                      setMobileModal(null);
-                    }}
-                    className="px-3.5 py-1.5 bg-blue-500 text-white rounded-full text-xs font-bold transition-all active:scale-95 text-center flex items-center"
-                  >
-                    {t("login") || "Giriş Yap"}
-                  </button>
-                )}
-
-                <button
-                  onClick={() => {
-                    haptic("light");
-                    navigate("/search");
-                    setMobileModal(null);
-                  }}
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 active:scale-95 transition-all shrink-0"
-                  title="Ara"
-                >
-                  <Search size={21} />
-                </button>
-
-                <button
-                  onClick={() => {
-                    haptic("light");
-                    setMobileModal(null);
-                    setNavState("main");
-                  }}
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 active:scale-95 transition-all shrink-0"
-                >
-                  <X size={26} strokeWidth={2.5} />
-                </button>
-              </div>
-            </div>
-
-            {/* Menu Core Content Area */}
-            <div className="flex-1 overflow-y-auto py-6">
-              <AnimatePresence mode="wait">
-                {navState === "main" ? (
-                  <motion.div
-                    key="mobile-main"
-                    initial={{ opacity: 0, x: -15 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -15 }}
-                    className="flex flex-col justify-center px-8 sm:px-12 py-4 gap-6 sm:gap-8"
-                  >
-                    <button
-                      onClick={() => {
-                        haptic("light");
-                        navigate("/");
-                        setMobileModal(null);
-                      }}
-                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase leading-none"
-                    >
-                      {t("nav_explore") || "Keşfet"}
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        haptic("light");
-                        setNavState("bots");
-                      }}
-                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase flex items-center justify-between gap-3 leading-none"
-                    >
-                      <span>{t("bots") || "Bot Market"}</span>
-                      <ChevronRight size={24} className="text-slate-400" />
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        haptic("light");
-                        setNavState("apps");
-                      }}
-                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-emerald-500 transition-colors uppercase flex items-center justify-between gap-3 leading-none"
-                    >
-                      <span>{t("apps") || "Uygulamalar"}</span>
-                      <ChevronRight size={24} className="text-slate-400" />
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        haptic("light");
-                        navigate("/qa");
-                        setMobileModal(null);
-                      }}
-                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase leading-none"
-                    >
-                      {t("qa_forum") || "Soru & Cevap"}
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        haptic("light");
-                        navigate("/blog");
-                        setMobileModal(null);
-                      }}
-                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase flex items-center gap-3 leading-none"
-                    >
-                      <span>{t("blog") || "Günlük"}</span>
-                      <span className="text-[10px] font-black tracking-widest bg-blue-500 text-white px-2 py-0.5 rounded-md uppercase leading-none animate-pulse">
-                        NEW
-                      </span>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        haptic("light");
-                        navigate("/settings");
-                        setMobileModal(null);
-                      }}
-                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase leading-none"
-                    >
-                      Uygulama Ekle
-                    </button>
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="mobile-categories"
-                    initial={{ opacity: 0, x: 15 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 15 }}
-                    className="flex flex-col w-full h-full px-6"
-                  >
-                    <div className="flex items-center justify-between mb-6 px-1">
-                      <button
-                        onClick={() => setNavState("main")}
-                        className="flex items-center gap-2 text-blue-500 dark:text-blue-400 font-[900] uppercase tracking-widest text-xs"
-                      >
-                        <ArrowLeft size={16} strokeWidth={3} /> Geri
-                      </button>
-                      <button
-                        onClick={() => handleCategoryClick("all", navState === "bots" ? "bots" : "apps")}
-                        className="text-xs font-[900] uppercase tracking-widest text-blue-500 dark:text-blue-400"
-                      >
-                        Tümünü Gör
-                      </button>
-                    </div>
-
-                    <h3 className="text-base font-[900] uppercase tracking-tight text-slate-900 dark:text-white mb-4 px-1">
-                      {navState === "bots" ? "Bot Kategorileri" : "Uygulama Kategorileri"}
-                    </h3>
-
-                    <div className="grid grid-cols-2 gap-3.5 pr-1 max-h-[58vh] overflow-y-auto">
-                      {(navState === "bots"
-                        ? botsCategories
-                        : appsCategories
-                      ).map((cat) => (
-                        <button
-                          key={cat.id}
-                          onClick={() => handleCategoryClick(cat.id, navState)}
-                          className="flex flex-col items-start gap-4 p-5 bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 active:scale-[0.97] transition-all rounded-[24px] border border-black/5 dark:border-white/5 text-left group"
-                        >
-                          <div
-                            className={`w-9 h-9 rounded-xl flex items-center justify-center ${navState === "bots" ? "text-blue-500 bg-blue-500/10" : "text-emerald-500 bg-emerald-500/10"}`}
-                          >
-                            <cat.icon size={18} />
-                          </div>
-                          <span className="text-xs font-[900] uppercase tracking-tight text-slate-800 dark:text-slate-200 leading-snug">
-                            {t(cat.label)}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            {/* Menu Footer Row - Always pinned to the bottom safely */}
-            <div className="border-t border-slate-100 dark:border-white/5 px-8 py-5 flex items-center gap-3 shrink-0 bg-white/95 dark:bg-slate-950/95 pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
-              {/* Language Selector Pill */}
-              <button
-                onClick={toggleLanguage}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-50 dark:bg-white/5 border border-black/[0.04] dark:border-white/[0.04] text-xs font-bold text-slate-700 dark:text-slate-300 transition-all active:scale-95"
-              >
-                <Globe size={15} />
-                <span>{language.toUpperCase()}</span>
-              </button>
-
-              {/* Theme Toggle Pill */}
-              <button
-                onClick={() => {
-                  haptic("light");
-                  toggleTheme();
-                }}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-50 dark:bg-white/5 border border-black/[0.04] dark:border-white/[0.04] text-xs font-bold text-slate-700 dark:text-slate-300 transition-all active:scale-95"
-              >
-                {theme === "dark" ? (
-                  <>
-                    <Moon size={15} className="text-blue-400" />
-                    <span>Gece Modu</span>
-                  </>
-                ) : (
-                  <>
-                    <Sun size={15} className="text-amber-500" />
-                    <span>Gündüz Modu</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      {/* OLD MENU STUB REMOVED */}
     </>
   );
 };
@@ -2355,6 +2442,12 @@ const BotDetail = () => {
           </button>
         </div>
       </div>
+
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onAuth={setWebAuthUser}
+      />
     </>
   );
 };

@@ -16,7 +16,6 @@ const BottomNav: React.FC = () => {
         { id: 'home', icon: Store, path: '/', label: t('nav_market') },
         { id: 'search', icon: Search, path: '/search', label: t('nav_explore') },
         { id: 'earnings', icon: Wallet, path: '/earnings', label: t('nav_wallet') },
-        { id: 'notifications', icon: Bell, path: '/notifications', label: t('nav_announcements') },
         { id: 'profile', icon: User, path: '/profile', label: t('nav_profile') },
     ];
 

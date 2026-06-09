@@ -742,20 +742,20 @@ h2.text-lg.sm\:text-xl.font-extrabold.text-slate-900.dark\:text-white.tracking-t
   height: 124px;
 }
 
-.px-6 {
+.bot-detail-page .px-6 {
   padding-left: 0rem;
   padding-right: 0rem;
 }
 
-.p-6 {
+.bot-detail-page .p-6 {
   padding: 1rem;
 }
 
-.mb-6 {
+.bot-detail-page .mb-6 {
   margin-bottom: 1rem;
 }
 
-.gap-6 {
+.bot-detail-page .gap-6 {
     gap: 0.5rem;
 }
 
@@ -1925,12 +1925,8 @@ div.qa-last-24h-box, .qa-last-24h-box {
 
 /* Mobile & WebKit scroll performance layer */
 @media (max-width: 1024px) {
-  /* Prevent fixed & sticky elements from bouncing, jumping, or clipping during scroll inertia */
-  .fixed,
-  .sticky,
-  .bottom-nav-container,
-  [class*="fixed"],
-  [class*="sticky"] {
+  /* Prevent fixed bottom navigation from bouncing or clipping */
+  .bottom-nav-container {
     -webkit-transform: translate3d(0, 0, 0) !important;
     transform: translate3d(0, 0, 0) !important;
     -webkit-backface-visibility: hidden !important;
@@ -2034,25 +2030,25 @@ div.qa-last-24h-box, .qa-last-24h-box {
   border: 1px solid var(--border-color) !important;
 }
 
-.tracking-\[0\.2em\] {
+.bot-detail-page .tracking-\[0\.2em\] {
     letter-spacing: -0.013em;
 }
 
-.tracking-\[0\.3em\] {
+.bot-detail-page .tracking-\[0\.3em\] {
     letter-spacing: 0.013em;
 }
 
-.text-xs {
+.bot-detail-page .text-xs {
     font-size: 13px;
     line-height: 1rem;
 }
 
-.h-20 {
+.bot-detail-page .h-20 {
     background-color: #f4f6f8;
     height: 3.5rem;
 }
 
-.mb-12 {
+.bot-detail-page .mb-12 {
     margin-bottom: 20px;
 }
 
