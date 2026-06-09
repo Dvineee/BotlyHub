@@ -97,6 +97,24 @@ span.text-xs.text-slate-400.font-medium {
   white-space: pre-wrap !important;
 }
 
+@media (min-width: 768px) {
+  .md\:grid-cols-4 {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  }
+}
+
+.pt-12 {
+  padding-top: 1rem !important;
+}
+
+.pb-32 {
+  padding-bottom: 5rem !important;
+}
+
+.pb-20 {
+  padding-bottom: 1rem !important;
+}
+
 @layer base {
 
   :root {
