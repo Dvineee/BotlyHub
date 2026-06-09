@@ -1902,6 +1902,12 @@ div.qa-last-24h-box, .qa-last-24h-box {
   border-width: 0px !important;
 }
 
+.fancy-glass-card {
+  outline: 1px solid var(--border-color) !important;
+  border-radius: 12px !important;
+  padding: 6px !important;
+}
+
 @media (max-width: 767px) {
 
   .gap-5 {
