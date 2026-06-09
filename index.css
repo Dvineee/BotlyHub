@@ -15,6 +15,20 @@
 @tailwind components;
 @tailwind utilities;
 
+.tracking-\[0\.3em\] {
+  letter-spacing: 0.013em;
+}
+.tracking-\[0\.2em\] {
+  letter-spacing: 0.013em;
+}
+
+.footer-title {
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  text-transform: none !important;
+  letter-spacing: 0.02em !important;
+}
+
 @layer base {
 
   :root {
@@ -473,7 +487,7 @@ p.text-\[10px\].text-slate-400.dark\:text-slate-500.font-medium.uppercase.tracki
 }
 
 .dark\:bg-slate-900\/60:is(.dark *) {
-  outline: none;
+  background-color: rgb(255 255 255 / 0.05) !important;
 }
 
 .user-hover-card-inner {
@@ -1570,7 +1584,6 @@ header, nav, .sticky-nav {
 
 .dark\:bg-slate-800:is(.dark *) {
   background-color: #151617 !important;
-  border: 1px solid var(--border-color) !important;
   --tw-bg-opacity: 1;
 }
 

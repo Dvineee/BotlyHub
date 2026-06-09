@@ -546,47 +546,32 @@ const NavMenu = ({
                   id="header-profile-menu-btn"
                 >
                   {/* Mobile Icons */}
-                  <div className="flex md:hidden items-center gap-1.5">
-                    {isMenuOpen ? (
-                      <X
-                        size={18}
-                        className="text-slate-700 dark:text-slate-300"
-                      />
-                    ) : user && user.id && user.id !== "guest_user" ? (
-                      <>
-                        <span className="text-[11px] font-black uppercase tracking-wide">
-                          {(
-                            user.username ||
-                            user.first_name ||
-                            user.name ||
-                            ""
-                          ).slice(0, 5)}
-                          {(
-                            user.username ||
-                            user.first_name ||
-                            user.name ||
-                            ""
-                          ).length > 5
-                            ? ".."
-                            : ""}
-                        </span>
-                        <ChevronDown
-                          size={12}
-                          className="text-slate-400 dark:text-slate-500 transition-transform duration-200"
-                        />
-                      </>
-                    ) : (
-                      <>
-                        <Menu
-                          size={18}
-                          className="text-slate-700 dark:text-slate-300"
-                        />
-                        <ChevronDown
-                          size={12}
-                          className="text-slate-400 dark:text-slate-500 transition-transform duration-200"
-                        />
-                      </>
-                    )}
+                  <div className="flex md:hidden items-center justify-center">
+                    <div className="w-5 h-5 relative flex items-center justify-center">
+                      <AnimatePresence mode="wait">
+                        {isMenuOpen ? (
+                          <motion.div
+                            key="close"
+                            initial={{ rotate: -90, opacity: 0, scale: 0.8 }}
+                            animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                            exit={{ rotate: 90, opacity: 0, scale: 0.8 }}
+                            transition={{ duration: 0.15, ease: "easeOut" }}
+                          >
+                            <X size={18} className="text-slate-700 dark:text-slate-300" />
+                          </motion.div>
+                        ) : (
+                          <motion.div
+                            key="menu"
+                            initial={{ rotate: 90, opacity: 0, scale: 0.8 }}
+                            animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                            exit={{ rotate: -90, opacity: 0, scale: 0.8 }}
+                            transition={{ duration: 0.15, ease: "easeOut" }}
+                          >
+                            <Menu size={18} className="text-slate-700 dark:text-slate-300" />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   </div>
 
                   {/* Desktop Icons */}

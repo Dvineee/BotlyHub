@@ -24,7 +24,7 @@ const Footer: React.FC = () => {
         </div>
 
         <div className="space-y-4">
-            <h4 className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-[0.3em] font-mono">{t('footer_links')}</h4>
+            <h4 className="footer-title text-slate-900 dark:text-white">{t('footer_links')}</h4>
             <div className="flex flex-col gap-3">
                 <button onClick={() => navigate('/')} className="text-[11px] font-bold text-slate-400 hover:text-blue-500 text-left uppercase tracking-widest transition-colors">{t('footer_home')}</button>
                 <button onClick={() => navigate('/blog')} className="text-[11px] font-bold text-slate-400 hover:text-blue-500 text-left uppercase tracking-widest transition-colors">{t('footer_blog')}</button>
@@ -36,7 +36,7 @@ const Footer: React.FC = () => {
         </div>
 
         <div className="space-y-4">
-            <h4 className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-[0.3em] font-mono">{t('footer_categories')}</h4>
+            <h4 className="footer-title text-slate-900 dark:text-white">{t('footer_categories')}</h4>
             <div className="flex flex-col gap-3">
                 <button onClick={() => navigate('/search?category=bots')} className="text-[11px] font-bold text-slate-400 hover:text-blue-500 text-left uppercase tracking-widest transition-colors">{t('footer_tg_bots')}</button>
                 <button onClick={() => navigate('/search?category=apps')} className="text-[11px] font-bold text-slate-400 hover:text-blue-500 text-left uppercase tracking-widest transition-colors">{t('footer_mini_apps')}</button>
@@ -46,7 +46,7 @@ const Footer: React.FC = () => {
         </div>
 
         <div className="space-y-4">
-            <h4 className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-[0.3em] font-mono">{t('footer_contact')}</h4>
+            <h4 className="footer-title text-slate-900 dark:text-white">{t('footer_contact')}</h4>
             <div className="flex flex-col gap-3">
                 <a href="https://t.me/botlyhub" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[11px] font-bold text-slate-400 hover:text-blue-500 uppercase tracking-widest transition-colors"><Send size={14} /> {t('footer_tg_announcement')}</a>
                 <a href="#" className="flex items-center gap-2 text-[11px] font-bold text-slate-400 hover:text-blue-500 uppercase tracking-widest transition-colors"><Share2 size={14} /> {t('footer_twitter')}</a>
