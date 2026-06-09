@@ -53,6 +53,50 @@
   letter-spacing: -.13px !important;
 }
 
+.ring-2 {
+  background-color: #8c8c8c !important;
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+}
+
+.w-4 {
+  width: 1.1rem !important;
+}
+
+.h-4 {
+  height: 1.1rem !important;
+}
+
+span.text-xs.text-slate-400.font-medium {
+  font-family: 'Raleway', sans-serif !important;
+  font-size: .821rem !important;
+  font-weight: 500 !important;
+  color: #62666d !important;
+}
+
+.gap-6 {
+  gap: 1rem !important;
+}
+
+.bot-description-collapsed {
+  white-space: inherit !important;
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  -webkit-line-clamp: 4 !important;
+}
+
+@media (min-width: 640px) {
+  .bot-description-collapsed {
+    -webkit-line-clamp: 3 !important;
+  }
+}
+
+.bot-description-expanded {
+  white-space: pre-wrap !important;
+}
+
 @layer base {
 
   :root {
@@ -826,7 +870,7 @@ h2.text-lg.sm\:text-xl.font-extrabold.text-slate-900.dark\:text-white.tracking-t
   }
 
   .pt-3 {
-    padding-top: 0rem;
+    padding-top: .5rem;
   }
 
   .pb-5 {
@@ -1322,7 +1366,7 @@ button.bg-brand:hover, button.bg-blue-500:hover, button.bg-blue-600:hover, a.bg-
 
 .light .bg-slate-50, .light .bg-slate-100, .light .bg-slate-200, .light .bg-white, .light .bg-slate-100\/50, .light .bg-white\/80, .light .fancy-glass-card, .light .stats-card-bg, .light .official-links-box, .light .popular-content-card, .light .similar-post-card, .light .bot-card {
   color: var(--text-primary) !important;
-  box-shadow: 0 1px 2px #0f172a04, 0 4px 16px #0f172a05 !important;
+  box-shadow: 0 1px 2px #0f172a04, 0 4px 16px #0f172a05;
 }
 
 .light .fancy-glass-card:hover, .light .stats-card-bg:hover, .light .popular-content-card:hover, .light .similar-post-card:hover, .light .bot-card:hover {

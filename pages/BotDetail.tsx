@@ -1990,10 +1990,8 @@ const BotDetail = () => {
                   </h2>
                 </div>
                 <div className="p-6 bg-slate-100/40 dark:bg-slate-900/40 rounded-2xl border border-slate-200/50 dark:border-white/5 text-sm text-slate-700 dark:text-slate-400 leading-relaxed transition-colors duration-300 bot-detail-about-box">
-                  <div className="whitespace-pre-wrap">
-                    {bot.description.length > 250 && !isDescriptionExpanded
-                      ? `${bot.description.slice(0, 250)}...`
-                      : bot.description}
+                  <div className={!isDescriptionExpanded ? "bot-description-collapsed" : "bot-description-expanded"}>
+                    {bot.description}
                   </div>
                   {bot.description.length > 250 && (
                     <button
