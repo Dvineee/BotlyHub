@@ -207,7 +207,7 @@ span.text-xs.text-slate-400.font-medium {
     background-color: var(--bg-main);
     color: var(--text-main);
     font-size: 14px;
-    line-height: 1.5;
+    line-height: normal;
     margin: 0;
     padding: 0;
     min-height: 100vh;
@@ -2230,6 +2230,32 @@ div.qa-last-24h-box, .qa-last-24h-box {
 .flex.items-center.gap-3.p-3.bg-slate-50.hover\:bg-slate-100\/60.dark\:bg-slate-900\/40.dark\:hover\:bg-slate-800\/40.rounded-2xl.cursor-pointer.transition-all.duration-300.group.active\:scale-\[0\.98\].select-none,
 .similar-bot-card {
     border: none !important;
+}
+
+@media (min-width: 768px) {
+    .md\:pb-2 {
+        padding-bottom: revert-rule !important;
+    }
+}
+
+.pr-24 {
+    padding-right: 1rem;
+}
+
+@media (min-width: 1280px) {
+    .xl\:w-\[320px\] {
+        width: 230px !important;
+    }
+}
+
+.-mx-6 {
+    margin-left: -0.5rem;
+    margin-right: -1.5rem;
+}
+
+.flex.flex-wrap.items-center.gap-2.mt-6 button  {
+    box-shadow: none !important;
+    background-color: rgb(255 255 255 / 0.05) !important;
 }
 
 

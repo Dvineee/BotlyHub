@@ -2006,37 +2006,37 @@ const BotDetail = () => {
                   </h2>
                 </div>
                 <div className="p-6 bg-slate-100/40 dark:bg-slate-900/40 rounded-2xl border border-slate-200/50 dark:border-white/5 text-sm text-slate-700 dark:text-slate-400 leading-relaxed transition-colors duration-300 bot-detail-about-box">
-                  <p className="text-sm text-slate-700 dark:text-slate-400 leading-relaxed inline">
-                    {!isDescriptionExpanded && bot.description.length > 180 ? (
-                      <>
-                        <span>{bot.description.slice(0, 180)}... </span>
+                  {!isDescriptionExpanded && bot.description.length > 180 ? (
+                    <div className="relative">
+                      <p className="text-sm text-slate-700 dark:text-slate-400 leading-relaxed line-clamp-3 pr-24">
+                        {bot.description}
+                      </p>
+                      <button
+                        onClick={() => {
+                          if (haptic) haptic("light");
+                          setIsDescriptionExpanded(true);
+                        }}
+                        className="absolute bottom-0 right-0 inline-flex items-center text-xs font-bold text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 active:scale-95 transition-all select-none cursor-pointer bg-gradient-to-l from-[#f1f3f7] via-[#f1f3f7] to-transparent dark:from-[#0f0f12] dark:via-[#0f0f12] to-transparent pl-8 pt-0.5"
+                      >
+                        {t("show_more") || "Daha fazla göster"}
+                      </button>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-slate-700 dark:text-slate-400 leading-relaxed whitespace-pre-wrap">
+                      {bot.description}
+                      {bot.description.length > 180 && isDescriptionExpanded && (
                         <button
                           onClick={() => {
                             if (haptic) haptic("light");
-                            setIsDescriptionExpanded(true);
+                            setIsDescriptionExpanded(false);
                           }}
-                          className="inline text-xs font-bold text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 active:scale-95 transition-all select-none cursor-pointer align-baseline"
+                          className="inline text-xs font-bold text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 active:scale-95 transition-all select-none cursor-pointer align-baseline ml-2"
                         >
-                          {t("show_more") || "Daha fazla göster"}
+                          {t("show_less") || "Daha az göster"}
                         </button>
-                      </>
-                    ) : (
-                      <>
-                        <span className="whitespace-pre-wrap">{bot.description} </span>
-                        {bot.description.length > 180 && isDescriptionExpanded && (
-                          <button
-                            onClick={() => {
-                              if (haptic) haptic("light");
-                              setIsDescriptionExpanded(false);
-                            }}
-                            className="inline text-xs font-bold text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 active:scale-95 transition-all select-none cursor-pointer align-baseline ml-1"
-                          >
-                            {t("show_less") || "Daha az göster"}
-                          </button>
-                        )}
-                      </>
-                    )}
-                  </p>
+                      )}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -2049,7 +2049,7 @@ const BotDetail = () => {
                     </h2>
                   </div>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+                  <div className="grid grid-rows-2 grid-flow-col gap-3 sm:gap-4 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory pb-3 -mx-6 px-6">
                     {similarBots.map((item) => (
                       <div
                         key={item.id}
@@ -2058,27 +2058,25 @@ const BotDetail = () => {
                           navigate(`/bot/${item.slug}`);
                           window.scrollTo({ top: 0, behavior: "smooth" });
                         }}
-                        className="similar-bot-card flex items-center gap-3 p-3 bg-slate-50 hover:bg-slate-100/60 dark:bg-slate-900/40 dark:hover:bg-slate-800/40 rounded-2xl cursor-pointer transition-all duration-300 group active:scale-[0.98] select-none"
+                        className="similar-bot-card flex items-center p-2 sm:p-2.5 md:p-3 bg-slate-50 hover:bg-slate-100/60 dark:bg-slate-900/40 dark:hover:bg-slate-800/40 rounded-2xl cursor-pointer transition-all duration-300 group active:scale-[0.98] select-none shrink-0 snap-start border border-transparent dark:border-white/5 gap-1.5 sm:gap-2 md:gap-3 w-[165px] sm:w-[200px] md:w-[245px] lg:w-[300px] xl:w-[320px]"
                       >
                         <img
                           src={getLiveBotIcon(item)}
                           alt={item.name}
-                          className="w-12 h-12 rounded-xl object-cover bg-slate-100 dark:bg-slate-800 shrink-0"
+                          className="w-9 h-9 sm:w-10 sm:h-10 md:w-11 md:h-11 lg:w-12 lg:h-12 rounded-lg sm:rounded-xl object-cover bg-slate-100 dark:bg-slate-800 shrink-0"
                           onError={(e) => {
                             (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name)}&background=1e293b&color=fff&bold=true`;
                           }}
                         />
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1">
-                            <h4 className="text-[13px] font-bold text-slate-900 dark:text-white truncate group-hover:text-blue-500 dark:group-hover:text-blue-450 transition-colors">
+                            <h4 className="text-[11px] sm:text-[12px] md:text-[12.5px] lg:text-[13px] font-bold text-slate-900 dark:text-white truncate group-hover:text-blue-500 dark:group-hover:text-blue-450 transition-colors">
                               {item.name}
                             </h4>
                             <svg
-                              width="12"
-                              height="12"
                               viewBox="0 0 16 16"
                               fill="none"
-                              className="text-[#139fec] shrink-0"
+                              className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#139fec] shrink-0"
                             >
                               <path
                                 fillRule="evenodd"
@@ -2088,8 +2086,8 @@ const BotDetail = () => {
                               />
                             </svg>
                           </div>
-                          <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 leading-normal line-clamp-1 truncate">
-                            <span className="font-extrabold text-slate-800 dark:text-slate-200 mr-1 text-[11.5px]">
+                          <p className="text-[9px] sm:text-[10px] md:text-[10.5px] lg:text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 leading-normal line-clamp-1 truncate">
+                            <span className="font-extrabold text-slate-800 dark:text-slate-200 mr-0.5 sm:mr-1 text-[9.5px] sm:text-[10.5px] md:text-[11px] lg:text-[11.5px]">
                               {item.user_count !== undefined 
                                 ? (item.user_count >= 1000000
                                   ? (item.user_count / 1000000).toFixed(1).replace(/\.0$/, "") + "M"
