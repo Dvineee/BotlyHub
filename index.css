@@ -504,10 +504,6 @@ h3.text-white.font-bold.text-xl.mb-1.tracking-tight {
   border-color: rgb(255 255 255) !important;
 }
 
-.dark\:hover\:bg-slate-900\/60:hover:is(.dark *) {
-  background-color: rgb(15 23 42 / 0.6) !important;
-}
-
 .dark\:hover\:border-slate-800\/50:hover:is(.dark *) {
   border-color: rgb(30 41 59 / 0.5) !important;
 }
@@ -2153,7 +2149,7 @@ div.qa-last-24h-box, .qa-last-24h-box {
 }
 
 .dark\:bg-slate-900\/40:is(.dark *) {
-    background-color: #1c1c1d;
+    background-color: rgb(15 23 42 / 0%) !important;
 }
 
 .dark\:bg-\[\#111214\]\/40:is(.dark *) {
@@ -2218,6 +2214,22 @@ div.qa-last-24h-box, .qa-last-24h-box {
 .bot-detail-section-title {
     letter-spacing: -0.013em !important;
     font-size: 13px !important;
+}
+
+.dark\:text-slate-500:is(.dark *) {
+    --tw-text-opacity: 1;
+    color: #8c8c8c !important;
+}
+
+.grid.grid-cols-1.sm\:grid-cols-2.md\:grid-cols-3.lg\:grid-cols-4.gap-4.sm\:gap-6 {
+    gap: 12px;
+    position: relative;
+    left: -13px;
+}
+
+.flex.items-center.gap-3.p-3.bg-slate-50.hover\:bg-slate-100\/60.dark\:bg-slate-900\/40.dark\:hover\:bg-slate-800\/40.rounded-2xl.cursor-pointer.transition-all.duration-300.group.active\:scale-\[0\.98\].select-none,
+.similar-bot-card {
+    border: none !important;
 }
 
 

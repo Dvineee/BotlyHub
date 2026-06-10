@@ -840,7 +840,6 @@ export default function UserProfile() {
                                                     <div className="w-7 h-7 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-100/10">
                                                         <MessageSquare size={14} />
                                                     </div>
-                                                    <h2 className="text-sm font-bold text-slate-900 dark:text-white">{t('profile_comments') || 'Yorumlar'}</h2>
                                                 </div>
 
                                                 {/* Separator filter pills segment */}
