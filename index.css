@@ -1039,18 +1039,13 @@ img[src$=".png"] {
     background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1)) !important;
 }
 
-/* Ücretsiz Edin button styling */
-.ucretsiz-edin-btn, button.ucretsiz-edin-btn {
+/* Ücretsiz Edin button styling (Unified on all screens, themes, and states as requested) */
+.ucretsiz-edin-btn, button.ucretsiz-edin-btn,
+.dark .ucretsiz-edin-btn, .dark button.ucretsiz-edin-btn {
     background-color: #3b82f6 !important;
     color: #ffffff !important;
-    letter-spacing: 0.05em;
-}
-
-.dark .ucretsiz-edin-btn, .dark button.ucretsiz-edin-btn {
-    --tw-bg-opacity: 1;
-    background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1)) !important;
-    color: #000000 !important;
-    letter-spacing: 0.05em;
+    border-color: #1d4ed8 !important;
+    letter-spacing: 0.05em !important;
 }
 
 .md\:p-8 {
@@ -2257,6 +2252,13 @@ div.qa-last-24h-box, .qa-last-24h-box {
     box-shadow: none !important;
     background-color: rgb(255 255 255 / 0.05) !important;
 }
+
+.bot-detail-page h4 {
+    font-size: 15px !important;
+}
+
+
+
 
 
 

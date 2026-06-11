@@ -1106,6 +1106,7 @@ const BotDetail = () => {
   const menuRef = useRef<HTMLDivElement>(null);
 
   const screenshotScroll = useDraggableScroll();
+  const similarScroll = useDraggableScroll();
 
   const fetchBotData = useCallback(async () => {
     if (!slug) return;
@@ -1126,7 +1127,7 @@ const BotDetail = () => {
           const matching = filtered.filter((b) => b.category === currentCategory);
           const nonMatching = filtered.filter((b) => b.category !== currentCategory);
           
-          const combined = [...matching, ...nonMatching].slice(0, 8);
+          const combined = [...matching, ...nonMatching].slice(0, 6);
           setSimilarBots(combined);
         } catch (err) {
           console.error("Similar bots fetch error:", err);
@@ -2049,16 +2050,28 @@ const BotDetail = () => {
                     </h2>
                   </div>
                   
-                  <div className="grid grid-rows-2 grid-flow-col gap-3 sm:gap-4 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory pb-3 -mx-6 px-6">
+                  <div 
+                    ref={similarScroll.ref}
+                    onMouseDown={similarScroll.onMouseDown}
+                    onMouseUp={similarScroll.onMouseUp}
+                    onMouseMove={similarScroll.onMouseMove}
+                    onMouseLeave={similarScroll.onMouseLeave}
+                    onContextMenu={similarScroll.onContextMenu}
+                    className={`flex gap-3 sm:gap-4 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory pb-3 -mx-6 px-6 select-none ${similarScroll.isDragging ? "cursor-grabbing" : "cursor-grab"}`}
+                  >
                     {similarBots.map((item) => (
                       <div
                         key={item.id}
-                        onClick={() => {
+                        onClick={(e) => {
+                          if (similarScroll.isDragging) {
+                            e.preventDefault();
+                            return;
+                          }
                           if (haptic) haptic("light");
                           navigate(`/bot/${item.slug}`);
                           window.scrollTo({ top: 0, behavior: "smooth" });
                         }}
-                        className="similar-bot-card flex items-center p-2 sm:p-2.5 md:p-3 bg-slate-50 hover:bg-slate-100/60 dark:bg-slate-900/40 dark:hover:bg-slate-800/40 rounded-2xl cursor-pointer transition-all duration-300 group active:scale-[0.98] select-none shrink-0 snap-start border border-transparent dark:border-white/5 gap-1.5 sm:gap-2 md:gap-3 w-[165px] sm:w-[200px] md:w-[245px] lg:w-[300px] xl:w-[320px]"
+                        className="similar-bot-card flex items-center p-2 sm:p-2.5 md:p-3 bg-slate-50 hover:bg-slate-100/60 dark:bg-slate-900/40 dark:hover:bg-slate-800/40 rounded-2xl cursor-pointer transition-all duration-300 group active:scale-[0.98] select-none shrink-0 snap-start border border-transparent dark:border-white/5 gap-1.5 sm:gap-2 md:gap-3 w-[165px] sm:w-[185px] md:w-[190px] lg:w-[200px] xl:w-[200px]"
                       >
                         <img
                           src={getLiveBotIcon(item)}
