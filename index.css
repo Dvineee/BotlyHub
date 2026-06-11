@@ -1373,9 +1373,14 @@ button.bg-brand:hover, button.bg-blue-500:hover, button.bg-blue-600:hover, a.bg-
   transform: translateY(-1px) !important;
 }
 
-.light .bg-slate-50, .light .bg-slate-100, .light .bg-slate-200, .light .bg-white, .light .bg-slate-100\/50, .light .bg-white\/80, .light .fancy-glass-card, .light .stats-card-bg, .light .official-links-box, .light .popular-content-card, .light .similar-post-card, .light .bot-card {
+.light .bg-slate-50, .light .bg-slate-100, .light .bg-slate-200, .light .bg-white, .light .bg-slate-100\/50, .light .bg-white\/80, .light .stats-card-bg, .light .official-links-box, .light .popular-content-card, .light .similar-post-card, .light .bot-card {
   color: var(--text-primary) !important;
   box-shadow: 0 1px 2px #0f172a04, 0 4px 16px #0f172a05;
+}
+
+.fancy-glass-card {
+  color: unset;
+  box-shadow: none;
 }
 
 .light .fancy-glass-card:hover, .light .stats-card-bg:hover, .light .popular-content-card:hover, .light .similar-post-card:hover, .light .bot-card:hover {
@@ -2313,6 +2318,17 @@ div.qa-last-24h-box, .qa-last-24h-box {
 @media (min-width: 640px) {
     .sm\:text-\[13px\] {
         font-size: 14px !important;
+    }
+}
+
+.border-indigo-500\/20 {
+    line-height: 0;
+    border-color: #6366f133;
+}
+
+@media (min-width: 768px) {
+    .md\:pb-2 {
+        padding-bottom: 0.625rem !important;
     }
 }
 
