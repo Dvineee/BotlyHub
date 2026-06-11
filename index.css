@@ -586,10 +586,10 @@ p.text-\[10px\].text-slate-400.dark\:text-slate-500.font-medium.uppercase.tracki
 }
 
 .line-clamp-2 {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
 }
 
 .line-clamp-3 {
@@ -1299,12 +1299,12 @@ span, div, input {
 }
 
 .text-slate-500 {
-  color: var(--text-secondary) !important;
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: -.13px;
-  line-height: inherit;
-  -webkit-box-orient: vertical !important;
+    color: var(--text-secondary) !important;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -.013px;
+    line-height: inherit;
+    -webkit-box-orient: vertical !important;
 }
 
 span.text-xs.text-slate-400.font-medium {
@@ -1383,7 +1383,7 @@ button.bg-brand:hover, button.bg-blue-500:hover, button.bg-blue-600:hover, a.bg-
 }
 
 .mb-4 {
-  margin-bottom: 1rem;
+    margin-bottom: 0.5rem !important;
 }
 
 .light .bg-white\/5, .light .bg-black\/5, .light .bg-slate-500\/5, .light .bg-slate-900\/5 {
@@ -2253,9 +2253,69 @@ div.qa-last-24h-box, .qa-last-24h-box {
     background-color: rgb(255 255 255 / 0.05) !important;
 }
 
-.bot-detail-page h4 {
-    font-size: 15px !important;
+.bot-detail-page h4:not(aside *) {
+    font-size: 14px !important;
 }
+
+.bot-detail-page h2:not(.text-2xl):not(aside *),
+.bot-detail-page h3:not(.text-base):not(aside *),
+.bot-detail-page .bot-detail-section-title:not(aside *):not(.official-links-box h4) {
+    font-size: 14px !important;
+}
+
+.dark .bot-detail-page #similar-alternatives-section .similar-bot-card {
+    background-color: #1c1c1c !important;
+}
+
+@media (max-width: 639px) {
+    /* Başka bir belirleyici kullanarak .px-6 sarmalamalarının mobil cihazlarda kenar boşluğunu 0.5rem yapar */
+    body .px-6,
+    main .px-6,
+    .home-page .px-6,
+    .search-page .px-6,
+    .bot-detail-page .px-6,
+    .min-h-screen .px-6 {
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+    }
+
+    /* Ensure horizontal scrolling containers bleed perfectly to screen edges on mobile */
+    .overflow-x-auto.-mx-6 {
+        margin-left: -0.5rem !important;
+        margin-right: -0.5rem !important;
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+    }
+    
+    .overflow-x-auto.-mx-5 {
+        margin-left: -0.5rem !important;
+        margin-right: -0.5rem !important;
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+    }
+    
+    .overflow-x-auto.-mx-4 {
+        margin-left: -0.5rem !important;
+        margin-right: -0.5rem !important;
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+    }
+
+    .home-hero-container {
+        margin-bottom: 0;
+        margin-top: 0px;
+        padding: 0.5rem 0 !important;
+        mask-image: linear-gradient(to bottom, #000 0, #000 75%, #0000 100%, #0000) !important;
+        -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 75%, #00000000 100% 100%) !important;
+    }
+}
+
+@media (min-width: 640px) {
+    .sm\:text-\[13px\] {
+        font-size: 14px !important;
+    }
+}
+
 
 
 

@@ -268,9 +268,15 @@ export default function QAForum() {
   };
 
   useEffect(() => {
-    fetchTopics();
+    const params = new URLSearchParams(location.search);
+    const tagParam = params.get("tag");
+    if (tagParam) {
+      fetchTopics(selectedFilter, tagParam);
+    } else {
+      fetchTopics();
+    }
     fetchAvailableBots();
-  }, []);
+  }, [location.search]);
 
   useEffect(() => {
     if (currentUser?.id) {
@@ -796,16 +802,7 @@ export default function QAForum() {
               </button>
             </div>
 
-            {/* My Bots / Botlarım */}
-            <button
-              onClick={() => {
-                haptic("light");
-                navigate("/my-bots");
-              }}
-              className="nav-menu-item text-slate-600 dark:text-slate-400 hover:bg-blue-500/5"
-            >
-              {t("my_bots")}
-            </button>
+
           </div>
 
           {/* Section 2 & 3 Mobile-Row Container */}
@@ -933,22 +930,25 @@ export default function QAForum() {
                         </span>
                       </button>
 
-                      <button
-                        onClick={() => {
-                          haptic("light");
-                          navigate("/my-bots");
-                          setIsMenuOpen(false);
-                        }}
-                        className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group text-left"
-                      >
-                        <BotIcon
-                          size={18}
-                          className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors"
-                        />
-                        <span className="text-xs font-bold uppercase tracking-tight">
-                          {t("my_bots")}
-                        </span>
-                      </button>
+                      {/* Botlarım */}
+                      {(user && user.id && user.id !== "guest_user") && (
+                        <button
+                          onClick={() => {
+                            haptic("light");
+                            navigate("/my-bots");
+                            setIsMenuOpen(false);
+                          }}
+                          className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group text-left"
+                        >
+                          <BotIcon
+                            size={18}
+                            className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors"
+                          />
+                          <span className="text-xs font-bold uppercase tracking-tight">
+                            {t("my_bots")}
+                          </span>
+                        </button>
+                      )}
 
                       <button
                         onClick={() => {

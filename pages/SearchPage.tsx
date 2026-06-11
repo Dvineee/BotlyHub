@@ -567,17 +567,7 @@ const NavMenu = ({
               </button>
             </div>
 
-            {/* My Bots / Botlarım */}
-            <button
-              onClick={() => {
-                haptic("light");
-                navigate("/my-bots");
-              }}
-              className="nav-menu-item text-slate-600 dark:text-slate-400 hover:bg-blue-500/5"
-              id="nav-my-bots-btn"
-            >
-              {t("my_bots")}
-            </button>
+
           </div>
 
           {/* Section 2 & 3 Mobile-Row Container */}
@@ -741,22 +731,24 @@ const NavMenu = ({
                             </button>
 
                             {/* Botlarım */}
-                            <button
-                              onClick={() => {
-                                haptic("light");
-                                navigate(user && user.id && user.id !== "guest_user" ? "/my-bots" : "/");
-                                setIsMenuOpen(false);
-                              }}
-                              className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 transition-all group text-left"
-                            >
-                              <BotIcon
-                                size={18}
-                                className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors"
-                              />
-                              <span className="text-xs font-bold uppercase tracking-tight font-sans">
-                                {t("my_bots") || "Botlarım"}
-                              </span>
-                            </button>
+                            {(user && user.id && user.id !== "guest_user") && (
+                              <button
+                                onClick={() => {
+                                  haptic("light");
+                                  navigate(user && user.id && user.id !== "guest_user" ? "/my-bots" : "/");
+                                  setIsMenuOpen(false);
+                                }}
+                                className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 transition-all group text-left"
+                              >
+                                <BotIcon
+                                  size={18}
+                                  className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors"
+                                />
+                                <span className="text-xs font-bold uppercase tracking-tight font-sans">
+                                  {t("my_bots") || "Botlarım"}
+                                </span>
+                              </button>
+                            )}
 
                             {/* Gece Modu */}
                             <button

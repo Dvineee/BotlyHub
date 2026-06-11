@@ -478,17 +478,7 @@ const NavMenu = ({
               </button>
             </div>
 
-            {/* My Bots / Botlarım */}
-            <button
-              onClick={() => {
-                haptic("light");
-                navigate("/my-bots");
-              }}
-              className="nav-menu-item text-slate-600 dark:text-slate-400 hover:bg-blue-500/5"
-              id="nav-my-bots-btn"
-            >
-              {t("my_bots")}
-            </button>
+
           </div>
 
           {/* Section 2 & 3 Mobile-Row Container */}
@@ -652,22 +642,24 @@ const NavMenu = ({
                             </button>
 
                             {/* Botlarım */}
-                            <button
-                              onClick={() => {
-                                haptic("light");
-                                navigate(user && user.id && user.id !== "guest_user" ? "/my-bots" : "/");
-                                setIsMenuOpen(false);
-                              }}
-                              className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 transition-all group text-left"
-                            >
-                              <BotIcon
-                                size={18}
-                                className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors"
-                              />
-                              <span className="text-xs font-bold uppercase tracking-tight font-sans">
-                                {t("my_bots") || "Botlarım"}
-                              </span>
-                            </button>
+                            {(user && user.id && user.id !== "guest_user") && (
+                              <button
+                                onClick={() => {
+                                  haptic("light");
+                                  navigate(user && user.id && user.id !== "guest_user" ? "/my-bots" : "/");
+                                  setIsMenuOpen(false);
+                                }}
+                                className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 transition-all group text-left"
+                              >
+                                <BotIcon
+                                  size={18}
+                                  className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors"
+                                />
+                                <span className="text-xs font-bold uppercase tracking-tight font-sans">
+                                  {t("my_bots") || "Botlarım"}
+                                </span>
+                              </button>
+                            )}
 
                             {/* Gece Modu */}
                             <button
@@ -1078,11 +1070,12 @@ const BotDetail = () => {
   const { slug } = useParams();
   const { haptic, user, notification, tg, isTelegram, setWebAuthUser } =
     useTelegram();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const { toggleTheme, theme } = useTheme();
 
   const [bot, setBot] = useState<Bot | null>(null);
   const [similarBots, setSimilarBots] = useState<Bot[]>([]);
+  const [matchedQATopics, setMatchedQATopics] = useState<any[]>([]);
   const [isOwned, setIsOwned] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -1104,6 +1097,51 @@ const BotDetail = () => {
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const qaParticipantsInfo = useMemo(() => {
+    if (!matchedQATopics || matchedQATopics.length === 0) return null;
+    
+    const participantsMap = new Map<string, { name: string; avatar: string }>();
+    
+    matchedQATopics.forEach((topic) => {
+      const authId = String(topic.author_id);
+      if (authId) {
+        participantsMap.set(authId, {
+          name: topic.author_name || "Anonim",
+          avatar: topic.author_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(topic.author_name || 'Anon')}`,
+        });
+      }
+      
+      if (topic.comments && Array.isArray(topic.comments)) {
+        topic.comments.forEach((comment: any) => {
+          const comAuthId = String(comment.author_id);
+          if (comAuthId) {
+            participantsMap.set(comAuthId, {
+              name: comment.author_name || "Anonim",
+              avatar: comment.author_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.author_name || 'Anon')}`,
+            });
+          }
+        });
+      }
+    });
+    
+    const participantsList = Array.from(participantsMap.entries()).map(([id, data]) => ({
+      id,
+      ...data,
+    }));
+    
+    if (participantsList.length === 0) return null;
+    
+    const firstAuthor = participantsList[0];
+    const totalRemaining = participantsList.length - 1;
+    
+    return {
+      participants: participantsList,
+      firstAuthor: firstAuthor,
+      totalRemaining,
+      totalCount: participantsList.length
+    };
+  }, [matchedQATopics]);
 
   const screenshotScroll = useDraggableScroll();
   const similarScroll = useDraggableScroll();
@@ -1131,6 +1169,27 @@ const BotDetail = () => {
           setSimilarBots(combined);
         } catch (err) {
           console.error("Similar bots fetch error:", err);
+        }
+
+        // Fetch Q&A topics matching this bot
+        try {
+          const allQATopics = await DatabaseService.getQADiscussions('all');
+          const botNameLower = data.name.toLowerCase();
+          const botSlugLower = data.slug?.toLowerCase() || '';
+          const botIdLower = data.id.toLowerCase();
+          
+          const matches = allQATopics.filter((topic: any) => {
+            return topic.tags?.some((t: any) => {
+              const tagNameLower = t.name?.toLowerCase() || '';
+              const tagIdLower = t.id?.toLowerCase() || '';
+              return tagNameLower === botNameLower || 
+                     tagIdLower === botSlugLower || 
+                     tagIdLower === botIdLower;
+            }) || topic.title?.toLowerCase().includes(botNameLower);
+          });
+          setMatchedQATopics(matches);
+        } catch (err) {
+          console.error("Q&A topics fetch error:", err);
         }
       }
       const userId = user?.id?.toString();
@@ -2040,6 +2099,115 @@ const BotDetail = () => {
                   )}
                 </div>
               </div>
+
+              {/* Soru-Cevap ve Yorumlar Bölümü */}
+              {qaParticipantsInfo && (
+                <div className="px-6 mb-12">
+                  <div
+                    onClick={() => {
+                      if (haptic) haptic("light");
+                      navigate(`/qa?tag=${bot.name}`);
+                    }}
+                    className="py-3 bg-transparent flex items-center justify-between gap-4 cursor-pointer transition-all duration-300 hover:opacity-85"
+                  >
+                    <div className="flex items-center gap-3">
+                      {/* Overlapping avatars, maximum 3 */}
+                      <div className="flex items-center -space-x-2">
+                        {qaParticipantsInfo.participants.slice(0, 3).map((p, idx) => (
+                          <img
+                            key={p.id}
+                            src={p.avatar}
+                            alt={p.name}
+                            className="w-8 h-8 rounded-full border-2 border-white dark:border-slate-950 object-cover shadow-sm bg-slate-200"
+                            referrerPolicy="no-referrer"
+                          />
+                        ))}
+                      </div>
+                      
+                      {/* Interactive dynamic text based on user language */}
+                      <span className="text-[13px] font-semibold text-slate-600 dark:text-slate-400">
+                        {language === "tr" ? (
+                          qaParticipantsInfo.totalRemaining > 0 ? (
+                            <>
+                              <span className="font-extrabold text-slate-800 dark:text-slate-200">
+                                {qaParticipantsInfo.firstAuthor.name.startsWith("@") 
+                                  ? qaParticipantsInfo.firstAuthor.name 
+                                  : `@${qaParticipantsInfo.firstAuthor.name}`}
+                              </span>
+                              {" ve "}
+                              <span className="font-extrabold text-slate-800 dark:text-slate-200">
+                                {qaParticipantsInfo.totalRemaining} kişi
+                              </span>
+                              {" yorum yaptı."}
+                            </>
+                          ) : (
+                            <>
+                              <span className="font-extrabold text-slate-800 dark:text-slate-200">
+                                {qaParticipantsInfo.firstAuthor.name.startsWith("@") 
+                                  ? qaParticipantsInfo.firstAuthor.name 
+                                  : `@${qaParticipantsInfo.firstAuthor.name}`}
+                              </span>
+                              {" bu bot hakkında tartışma başlattı."}
+                            </>
+                          )
+                        ) : (
+                          qaParticipantsInfo.totalRemaining > 0 ? (
+                            <>
+                              <span className="font-semibold text-slate-800 dark:text-slate-200">
+                                {qaParticipantsInfo.firstAuthor.name.startsWith("@") 
+                                  ? qaParticipantsInfo.firstAuthor.name 
+                                  : `@${qaParticipantsInfo.firstAuthor.name}`}
+                              </span>
+                              {" and "}
+                              <span className="font-semibold text-slate-800 dark:text-slate-200">
+                                {qaParticipantsInfo.totalRemaining} {qaParticipantsInfo.totalRemaining === 1 ? "other" : "others"}
+                              </span>
+                              {" commented."}
+                            </>
+                          ) : (
+                            <>
+                              <span className="font-semibold text-slate-800 dark:text-slate-200">
+                                {qaParticipantsInfo.firstAuthor.name.startsWith("@") 
+                                  ? qaParticipantsInfo.firstAuthor.name 
+                                  : `@${qaParticipantsInfo.firstAuthor.name}`}
+                              </span>
+                              {" started a discussion."}
+                            </>
+                          )
+                        )}
+                      </span>
+                    </div>
+                    
+                    {/* Floating go option - Simple blue link with custom right arrow SVG icon */}
+                    <div className="flex items-center gap-1 text-[#3b82f6] dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 font-bold text-xs select-none transition-all">
+                      <span className="hidden sm:inline-block">
+                        {language === "tr" ? "İncele" : "Review"}
+                      </span>
+                      <svg
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        id="sign-out-double-arrow-2"
+                        data-name="Line Color"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="w-5 h-5 shrink-0 icon line-color"
+                      >
+                        <polyline
+                          id="secondary-2"
+                          data-name="secondary"
+                          points="13 9 16 12 13 15"
+                          style={{
+                            fill: "none",
+                            stroke: "#3b82f6",
+                            strokeLinecap: "round",
+                            strokeLinejoin: "round",
+                            strokeWidth: 2,
+                          }}
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Benzer Alternatifler */}
               {similarBots.length > 0 && (
