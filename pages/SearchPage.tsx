@@ -1469,7 +1469,7 @@ const SearchPage = () => {
                       );
                     }
                   }}
-                  className={`flex items-center gap-3 px-4 py-2.5 md:px-6 md:pb-2 rounded-xl border transition-all active:scale-95  whitespace-nowrap snap-center ${
+                  className={`search-category-item flex items-center gap-3 px-4 py-2.5 md:px-6 md:pb-2 rounded-xl border transition-all active:scale-95  whitespace-nowrap snap-center ${
                     activeCategory === cat.id
                       ? "bg-brand/10 dark:bg-brand-light/10 border-brand/40 dark:border-brand-light/40 text-brand dark:text-brand-light ring-1 ring-brand/20 dark:ring-brand-light/20"
                       : "bg-white dark:bg-slate-900/60 border-black/5 dark:border-white/5 text-slate-500 dark:text-slate-400"
