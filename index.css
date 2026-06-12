@@ -1709,8 +1709,8 @@ img.rounded-xl, img.rounded-3xl, img.rounded-2xl, img.rounded-\[11px\], img.roun
 }
 
 .dark\:bg-\[\#0F1623\]:is(.dark *) {
-  background-color: var(--bg-secondary) !important;
-  border: 1px solid var(--border-color) !important;
+    background-color: #ffffff03 !important;
+    border: 1px solid var(--border-color) !important;
 }
 
 .hover\:shadow-none:hover {
@@ -2397,6 +2397,18 @@ div.qa-last-24h-box, .qa-last-24h-box {
     border: none !important;
     background: #ffffff0d !important;
     color: #8c8c8c !important;
+}
+
+.dark\:text-blue-400:is(.dark *),
+.dark\:text-blue-400 {
+    background: rgba(255, 255, 255, .03) !important;
+    --tw-text-opacity: 1 !important;
+}
+
+@media (min-width: 1024px) {
+    .sm\:grid-cols-2 {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
 }
 
 
