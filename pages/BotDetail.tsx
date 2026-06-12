@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   Share2,
+  MoreVertical,
   Send,
   Loader2,
   ShieldCheck,
@@ -14,6 +15,7 @@ import {
   ChevronLeft,
   ChevronDown,
   Eye,
+  Users,
   Lock,
   Unlock,
   AlertTriangle,
@@ -1085,6 +1087,7 @@ const BotDetail = () => {
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isMobileActionMenuOpen, setIsMobileActionMenuOpen] = useState(false);
   const [isCategoriesExpanded, setIsCategoriesExpanded] = useState(false);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [isSidebarDropdownOpen, setIsSidebarDropdownOpen] = useState(false);
@@ -1656,37 +1659,61 @@ const BotDetail = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="lg:hidden flex flex-col gap-2 shrink-0">
+                  <div className="lg:hidden relative shrink-0">
                     <button
                       onClick={() => {
-                        haptic("medium");
-                        notification("warning"); /* Future Report logic */
+                        haptic("light");
+                        setIsMobileActionMenuOpen(!isMobileActionMenuOpen);
                       }}
-                      className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl text-slate-400 hover:text-red-500 active:scale-90 transition-all shrink-0"
+                      className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:border-slate-300 dark:hover:border-white/20 active:scale-90 transition-all shrink-0 cursor-pointer"
                     >
-                      <Flag size={20} />
+                      <MoreVertical size={20} />
                     </button>
-                    <button
-                      onClick={handleShare}
-                      className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl text-slate-400 active:scale-90 transition-all shrink-0 relative"
-                    >
-                      <Share2
-                        size={18}
-                        className={isCopied ? "text-emerald-500" : ""}
-                      />
-                      <AnimatePresence>
-                        {isCopied && (
-                          <motion.span
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="absolute -top-8 left-1/2 -translate-x-1/2 text-[8px] font-black text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-md uppercase whitespace-nowrap"
+
+                    <AnimatePresence>
+                      {isMobileActionMenuOpen && (
+                        <>
+                          <div
+                            className="fixed inset-0 z-[60]"
+                            onClick={() => setIsMobileActionMenuOpen(false)}
+                          />
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                            className="absolute right-0 top-full mt-2 w-44 z-[70] bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl shadow-2xl overflow-hidden"
                           >
-                            Kopyalandı!
-                          </motion.span>
-                        )}
-                      </AnimatePresence>
-                    </button>
+                            <div className="p-1.5 space-y-1">
+                              <button
+                                onClick={() => {
+                                  haptic("medium");
+                                  handleShare();
+                                  setIsMobileActionMenuOpen(false);
+                                }}
+                                className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-slate-50 dark:hover:bg-white/5 rounded-lg transition-colors text-left text-slate-700 dark:text-slate-300 font-bold text-[11px] uppercase tracking-wider"
+                              >
+                                <Share2
+                                  size={14}
+                                  className={isCopied ? "text-emerald-500" : "text-slate-400 dark:text-slate-500"}
+                                />
+                                <span>{t("detail_share_btn")}</span>
+                              </button>
+                              <button
+                                onClick={() => {
+                                  haptic("medium");
+                                  notification("warning"); /* Future Report logic */
+                                  setIsMobileActionMenuOpen(false);
+                                }}
+                                className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-slate-50 dark:hover:bg-white/5 rounded-lg transition-colors text-left text-red-500 font-bold text-[11px] uppercase tracking-wider"
+                              >
+                                <Flag size={14} className="text-red-400 dark:text-red-500" />
+                                <span>{t("detail_report_btn") || "Şikayet Et"}</span>
+                              </button>
+                            </div>
+                          </motion.div>
+                        </>
+                      )}
+                    </AnimatePresence>
                   </div>
                 </div>
 
@@ -1707,10 +1734,14 @@ const BotDetail = () => {
                       </div>
                       <div className="w-px h-8 bg-black/5 dark:bg-white/5 mx-2"></div>
                       <div className="flex flex-col items-center flex-1">
-                        <span className="text-slate-900 dark:text-white font-bold text-base">
+                        <span className="text-slate-900 dark:text-white font-bold text-base flex items-center gap-1">
                           {bot.user_count && bot.user_count > 1000
                             ? `${(bot.user_count / 1000).toFixed(1)}K`
                             : bot.user_count || 0}
+                          <Users
+                            size={12}
+                            className="text-slate-500 dark:text-slate-400 fill-slate-500/10"
+                          />
                         </span>
                         <span className="text-[9px] text-slate-500 font-bold uppercase mt-0.5 tracking-wider">
                           Kullanıcı
@@ -1718,10 +1749,14 @@ const BotDetail = () => {
                       </div>
                       <div className="w-px h-8 bg-black/5 dark:bg-white/5 mx-2"></div>
                       <div className="flex flex-col items-center flex-1">
-                        <span className="text-slate-900 dark:text-white font-bold text-base">
+                        <span className="text-slate-900 dark:text-white font-bold text-base flex items-center gap-1">
                           {bot.views && bot.views > 1000
                             ? `${(bot.views / 1000).toFixed(1)}K`
                             : bot.views || 0}
+                          <Eye
+                            size={12}
+                            className="text-slate-500 dark:text-slate-400"
+                          />
                         </span>
                         <span className="text-[9px] text-slate-500 font-bold uppercase mt-0.5 tracking-wider">
                           Görüntüleme
@@ -1729,158 +1764,6 @@ const BotDetail = () => {
                       </div>
                     </div>
                   </div>
-
-                  {/* Bağlantılar Dropdown Menu */}
-                  {(bot.telegram_group ||
-                    bot.website_url ||
-                    bot.app_url ||
-                    bot.social_url) && (
-                    <div className="relative mb-6">
-                      <button
-                        onClick={() => {
-                          haptic("light");
-                          setIsDropdownOpen(!isDropdownOpen);
-                        }}
-                        className="w-full h-14 bg-white dark:bg-slate-900 rounded-xl border border-black/5 dark:border-white/10 flex items-center justify-between px-5 text-[11px] font-black tracking-[0.2em] transition-all active:scale-[0.98] stats-card-bg"
-                      >
-                        <div className="flex items-center gap-3">
-                          <span>
-                            {t("detail_official_links") || "Resmi Linkler"}
-                          </span>
-                        </div>
-                        <ChevronDown
-                          size={18}
-                          className={`transition-transform duration-300 ${isDropdownOpen ? "rotate-180" : ""}`}
-                        />
-                      </button>
-
-                      <AnimatePresence>
-                        {isDropdownOpen && (
-                          <>
-                            <div
-                              className="fixed inset-0 z-[60]"
-                              onClick={() => setIsDropdownOpen(false)}
-                            ></div>
-                            <motion.div
-                              initial={{ opacity: 0, scale: 0.95, y: -10 }}
-                              animate={{ opacity: 1, scale: 1, y: 0 }}
-                              exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                              className="absolute left-0 right-0 top-full mt-2 z-[70] bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl shadow-2xl overflow-hidden"
-                            >
-                              <div className="p-2 space-y-1">
-                                {bot.telegram_group && (
-                                  <button
-                                    onClick={() => {
-                                      const url =
-                                        bot.telegram_group!.startsWith("@")
-                                          ? `https://t.me/${bot.telegram_group!.substring(1)}`
-                                          : bot.telegram_group;
-                                      window.open(url, "_blank");
-                                      setIsDropdownOpen(false);
-                                    }}
-                                    className="w-full flex items-center justify-between px-4 py-4 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-colors text-left group"
-                                  >
-                                    <div className="flex items-center gap-3">
-                                      <Send
-                                        size={14}
-                                        className="text-blue-500"
-                                      />
-                                      <span className="text-[10px] font-black tracking-widest text-slate-700 dark:text-slate-300">
-                                        Telegram Grup
-                                      </span>
-                                    </div>
-                                    <ChevronRight
-                                      size={14}
-                                      className="text-slate-300 dark:text-slate-700"
-                                    />
-                                  </button>
-                                )}
-                                {bot.website_url && (
-                                  <button
-                                    onClick={() => {
-                                      window.open(bot.website_url, "_blank");
-                                      setIsDropdownOpen(false);
-                                    }}
-                                    className="w-full flex items-center justify-between px-4 py-4 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-colors text-left group border-t border-black/[0.03] dark:border-white/[0.03]"
-                                  >
-                                    <div className="flex items-center gap-3">
-                                      <Globe
-                                        size={14}
-                                        className="text-emerald-500"
-                                      />
-                                      <span className="text-[10px] font-black tracking-widest text-slate-700 dark:text-slate-300">
-                                        Web Site
-                                      </span>
-                                    </div>
-                                    <ChevronRight
-                                      size={14}
-                                      className="text-slate-300 dark:text-slate-700"
-                                    />
-                                  </button>
-                                )}
-                                {bot.app_url && (
-                                  <button
-                                    onClick={() => {
-                                      window.open(bot.app_url, "_blank");
-                                      setIsDropdownOpen(false);
-                                    }}
-                                    className="w-full flex items-center justify-between px-4 py-4 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-colors text-left group border-t border-black/[0.03] dark:border-white/[0.03]"
-                                  >
-                                    <div className="flex items-center gap-3">
-                                      <Cpu
-                                        size={14}
-                                        className="text-purple-500"
-                                      />
-                                      <span className="text-[10px] font-black tracking-widest text-slate-700 dark:text-slate-300">
-                                        App / Bot
-                                      </span>
-                                    </div>
-                                    <ChevronRight
-                                      size={14}
-                                      className="text-slate-300 dark:text-slate-700"
-                                    />
-                                  </button>
-                                )}
-                                {bot.social_url && (
-                                  <button
-                                    onClick={() => {
-                                      window.open(bot.social_url, "_blank");
-                                      setIsDropdownOpen(false);
-                                    }}
-                                    className="w-full flex items-center justify-between px-4 py-4 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-colors text-left group border-t border-black/[0.03] dark:border-white/[0.03]"
-                                  >
-                                    <div className="flex items-center gap-3">
-                                      <Share2
-                                        size={14}
-                                        className="text-orange-500"
-                                      />
-                                      <span className="text-[10px] font-black tracking-widest text-slate-700 dark:text-slate-300">
-                                        Sosyal Medya
-                                      </span>
-                                    </div>
-                                    <ChevronRight
-                                      size={14}
-                                      className="text-slate-300 dark:text-slate-700"
-                                    />
-                                  </button>
-                                )}
-                              </div>
-                            </motion.div>
-                          </>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  )}
-                  {bot.languages && bot.languages.length > 0 && (
-                    <div className="flex flex-col bg-white dark:bg-slate-900 border border-black/5 dark:border-white/5 p-4 rounded-xl stats-card-bg mb-6">
-                      <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                        {t("detail_languages") || "Diller"}
-                      </span>
-                      <span className="text-[13px] font-medium text-slate-800 dark:text-slate-200 mt-1">
-                        {formatLanguages(bot.languages)}
-                      </span>
-                    </div>
-                  )}
                 </div>
               </div>
 
@@ -2209,6 +2092,161 @@ const BotDetail = () => {
                 </div>
               )}
 
+              {/* Mobil için Resmi Linkler ve Diller - Tartışma Alanının Altında */}
+              <div className="w-full lg:hidden px-6 mb-4">
+                {/* Bağlantılar Dropdown Menu */}
+                {(bot.telegram_group ||
+                  bot.website_url ||
+                  bot.app_url ||
+                  bot.social_url) && (
+                  <div className="relative mb-6">
+                    <button
+                      onClick={() => {
+                        haptic("light");
+                        setIsDropdownOpen(!isDropdownOpen);
+                      }}
+                      className="w-full h-14 bg-white dark:bg-slate-900 rounded-xl border border-black/5 dark:border-white/10 flex items-center justify-between px-5 text-[11px] font-black tracking-[0.2em] transition-all active:scale-[0.98] stats-card-bg"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span>
+                          {t("detail_official_links") || "Resmi Linkler"}
+                        </span>
+                      </div>
+                      <ChevronDown
+                        size={18}
+                        className={`transition-transform duration-300 ${isDropdownOpen ? "rotate-180" : ""}`}
+                      />
+                    </button>
+
+                    <AnimatePresence>
+                      {isDropdownOpen && (
+                        <>
+                          <div
+                            className="fixed inset-0 z-[60]"
+                            onClick={() => setIsDropdownOpen(false)}
+                          ></div>
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                            className="absolute left-0 right-0 top-full mt-2 z-[70] bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl shadow-2xl overflow-hidden"
+                          >
+                            <div className="p-2 space-y-1">
+                              {bot.telegram_group && (
+                                <button
+                                  onClick={() => {
+                                    const url =
+                                      bot.telegram_group!.startsWith("@")
+                                        ? `https://t.me/${bot.telegram_group!.substring(1)}`
+                                        : bot.telegram_group;
+                                    window.open(url, "_blank");
+                                    setIsDropdownOpen(false);
+                                  }}
+                                  className="w-full flex items-center justify-between px-4 py-4 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-colors text-left group"
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <Send
+                                      size={14}
+                                      className="text-blue-500"
+                                    />
+                                    <span className="text-[10px] font-black tracking-widest text-slate-700 dark:text-slate-300">
+                                      Telegram Grup
+                                    </span>
+                                  </div>
+                                  <ChevronRight
+                                    size={14}
+                                    className="text-slate-300 dark:text-slate-700"
+                                  />
+                                </button>
+                              )}
+                              {bot.website_url && (
+                                <button
+                                  onClick={() => {
+                                    window.open(bot.website_url, "_blank");
+                                    setIsDropdownOpen(false);
+                                  }}
+                                  className="w-full flex items-center justify-between px-4 py-4 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-colors text-left group border-t border-black/[0.03] dark:border-white/[0.03]"
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <Globe
+                                      size={14}
+                                      className="text-emerald-500"
+                                    />
+                                    <span className="text-[10px] font-black tracking-widest text-slate-700 dark:text-slate-300">
+                                      Web Site
+                                    </span>
+                                  </div>
+                                  <ChevronRight
+                                    size={14}
+                                    className="text-slate-300 dark:text-slate-700"
+                                  />
+                                </button>
+                              )}
+                              {bot.app_url && (
+                                <button
+                                  onClick={() => {
+                                    window.open(bot.app_url, "_blank");
+                                    setIsDropdownOpen(false);
+                                  }}
+                                  className="w-full flex items-center justify-between px-4 py-4 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-colors text-left group border-t border-black/[0.03] dark:border-white/[0.03]"
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <Cpu
+                                      size={14}
+                                      className="text-purple-500"
+                                    />
+                                    <span className="text-[10px] font-black tracking-widest text-slate-700 dark:text-slate-300">
+                                      App / Bot
+                                    </span>
+                                  </div>
+                                  <ChevronRight
+                                    size={14}
+                                    className="text-slate-300 dark:text-slate-700"
+                                  />
+                                </button>
+                              )}
+                              {bot.social_url && (
+                                <button
+                                  onClick={() => {
+                                    window.open(bot.social_url, "_blank");
+                                    setIsDropdownOpen(false);
+                                  }}
+                                  className="w-full flex items-center justify-between px-4 py-4 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-colors text-left group border-t border-black/[0.03] dark:border-white/[0.03]"
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <Share2
+                                      size={14}
+                                      className="text-orange-500"
+                                    />
+                                    <span className="text-[10px] font-black tracking-widest text-slate-700 dark:text-slate-300">
+                                      Sosyal Medya
+                                    </span>
+                                  </div>
+                                  <ChevronRight
+                                    size={14}
+                                    className="text-slate-300 dark:text-slate-700"
+                                  />
+                                </button>
+                              )}
+                            </div>
+                          </motion.div>
+                        </>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                )}
+                {bot.languages && bot.languages.length > 0 && (
+                  <div className="flex flex-col bg-white dark:bg-slate-900 border border-black/5 dark:border-white/5 p-4 rounded-xl stats-card-bg mb-6">
+                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                      {t("detail_languages") || "Diller"}
+                    </span>
+                    <span className="text-[13px] font-medium text-slate-800 dark:text-slate-200 mt-1">
+                      {formatLanguages(bot.languages)}
+                    </span>
+                  </div>
+                )}
+              </div>
+
               {/* Benzer Alternatifler */}
               {similarBots.length > 0 && (
                 <div className="px-6 mb-12" id="similar-alternatives-section">
@@ -2385,20 +2423,28 @@ const BotDetail = () => {
                       </span>
                     </div>
                     <div className="flex flex-col items-center flex-1 border-r border-slate-200/50 dark:border-white/5">
-                      <span className="text-slate-900 dark:text-white font-bold text-base">
+                      <span className="text-slate-900 dark:text-white font-bold text-base flex items-center gap-1 justify-center">
                         {bot.user_count && bot.user_count > 1000
                           ? `${(bot.user_count / 1000).toFixed(1)}K`
                           : bot.user_count || 0}
+                        <Users
+                          size={12}
+                          className="text-slate-500 dark:text-slate-400 fill-slate-500/10"
+                        />
                       </span>
                       <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">
                         {t("detail_users_count")}
                       </span>
                     </div>
                     <div className="flex flex-col items-center flex-1">
-                      <span className="text-slate-900 dark:text-white font-bold text-base">
+                      <span className="text-slate-900 dark:text-white font-bold text-base flex items-center gap-1 justify-center">
                         {bot.views && bot.views > 1000
                           ? `${(bot.views / 1000).toFixed(1)}K`
                           : bot.views || 0}
+                        <Eye
+                          size={12}
+                          className="text-slate-500 dark:text-slate-400"
+                        />
                       </span>
                       <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">
                         {t("detail_views")}
