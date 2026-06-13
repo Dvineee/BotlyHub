@@ -1376,8 +1376,7 @@ button.bg-brand:hover, button.bg-blue-500:hover, button.bg-blue-600:hover, a.bg-
 }
 
 .light .bg-slate-50, .light .bg-slate-100, .light .bg-slate-200, .light .bg-white, .light .bg-slate-100\/50, .light .bg-white\/80, .light .stats-card-bg, .light .official-links-box, .light .popular-content-card, .light .similar-post-card, .light .bot-card {
-  color: var(--text-primary) !important;
-  box-shadow: 0 1px 2px #0f172a04, 0 4px 16px #0f172a05;
+    color: var(--text-primary) !important;
 }
 
 .fancy-glass-card {
@@ -2440,7 +2439,7 @@ div.qa-last-24h-box, .qa-last-24h-box {
 }
 
 .dark .bot-detail-show-more-btn {
-    background: linear-gradient(to left, #020617 65%, rgba(2, 6, 23, 0)) !important;
+    background: linear-gradient(to left, #151618 65%, #02061700) !important;
     color: #60a5fa !important;
 }
 
