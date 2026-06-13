@@ -3577,7 +3577,7 @@ const Home = () => {
         </AnimatePresence>
       </div>
       {/* Mobile-only Sticky Search Bar */}
-      <div className="sticky top-0 z-[110] block md:hidden bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl border-b border-black/[0.03] dark:border-white/5 p-3 shadow-xs">
+      <div className="sticky top-0 z-[110] block md:hidden bg-slate-50 dark:bg-slate-950 border-b border-black/[0.03] dark:border-white/5 p-3 shadow-xs">
         <div className="relative flex items-center bg-[#eeefef] dark:bg-slate-800 rounded-xl group transition-all h-[42px] px-3">
           <div
             onClick={() => {

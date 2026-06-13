@@ -2473,13 +2473,15 @@ div.qa-last-24h-box, .qa-last-24h-box {
     background-color: #ffffff !important;
     border: 1.5px solid #e2e8f0 !important;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    border-radius: 9999px !important;
+    border-radius: 16px !important;
     box-shadow: none !important;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
 }
 
 .premium-search-container:focus-within {
     background-color: #ffffff !important;
-    border-color: #3b82f6 !important;
+    border: 1.8px solid #3b82f6 !important;
     box-shadow: none !important;
 }
 
@@ -2487,11 +2489,37 @@ div.qa-last-24h-box, .qa-last-24h-box {
     background-color: #0b0c10 !important;
     border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
     box-shadow: none !important;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
 }
 
 .dark .premium-search-container:focus-within {
     background-color: #0b0c10 !important;
-    border-color: #3b82f6 !important;
+    border: 1.8px solid #3b82f6 !important;
+    box-shadow: none !important;
+}
+
+/* Ensure inputs inside premium search containers are fully transparent and have no borders/shadows */
+.premium-search-container input,
+.premium-search-container input[type="text"] {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-color: transparent !important;
+    outline: none !important;
+    outline-width: 0 !important;
+    box-shadow: none !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    height: 100% !important;
+}
+
+.premium-search-container input:focus,
+.premium-search-container input[type="text"]:focus {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    outline: none !important;
     box-shadow: none !important;
 }
 
