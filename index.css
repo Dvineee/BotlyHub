@@ -581,8 +581,8 @@ p.text-\[10px\].text-slate-400.dark\:text-slate-500.font-medium.uppercase.tracki
 }
 
 .dark\:bg-slate-950:is(.dark *) {
-  background: linear-gradient(180deg, #ffffff05, #fff0), var(--bg-secondary) !important;
-  --tw-bg-opacity: 1;
+    background: #151618 !important;
+    --tw-bg-opacity: 1;
 }
 
 .line-clamp-2 {
@@ -2532,6 +2532,16 @@ div.qa-last-24h-box, .qa-last-24h-box {
 
 .mb-10 {
     margin-bottom: 0.5rem !important;
+}
+
+.py-3 {
+    padding-top: .5rem !important;
+    padding-bottom: .5rem !important;
+}
+
+.py-1 {
+    padding-top: 0rem !important;
+    padding-bottom: 0rem !important;
 }
 
 
