@@ -120,6 +120,14 @@ const BlogPostDetail: React.FC = () => {
   const [currentRankIndex, setCurrentRankIndex] = useState(0);
 
   useEffect(() => {
+    if (post) {
+      document.title = `${post.title} | Trend Blog | BotlyHub`;
+    } else {
+      document.title = "Trend Blog | BotlyHub";
+    }
+  }, [post]);
+
+  useEffect(() => {
     const fetchPost = async () => {
       if (!slug) return;
       setIsLoading(true);

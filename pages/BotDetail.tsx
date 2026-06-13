@@ -1230,6 +1230,14 @@ const BotDetail = () => {
   }, [slug, user?.id]);
 
   useEffect(() => {
+    if (bot) {
+      document.title = `${bot.name} | Telegram Bot & AI | BotlyHub`;
+    } else {
+      document.title = t("detail_seo_title") || "Bot Detayı | BotlyHub";
+    }
+  }, [bot, t]);
+
+  useEffect(() => {
     fetchBotData();
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node))
@@ -1959,7 +1967,7 @@ const BotDetail = () => {
                           if (haptic) haptic("light");
                           setIsDescriptionExpanded(true);
                         }}
-                        className="absolute bottom-0 right-0 inline-flex items-center text-xs font-bold text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 active:scale-95 transition-all select-none cursor-pointer bg-gradient-to-l from-[#f1f3f7] via-[#f1f3f7] to-transparent dark:from-[#0f0f12] dark:via-[#0f0f12] to-transparent pl-8 pt-0.5"
+                        className="bot-detail-show-more-btn absolute bottom-0 right-0 inline-flex items-center text-xs font-bold text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 active:scale-95 transition-all select-none cursor-pointer pl-8 pt-0.5"
                       >
                         {t("show_more") || "Daha fazla göster"}
                       </button>
@@ -1973,7 +1981,7 @@ const BotDetail = () => {
                             if (haptic) haptic("light");
                             setIsDescriptionExpanded(false);
                           }}
-                          className="inline text-xs font-bold text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 active:scale-95 transition-all select-none cursor-pointer align-baseline ml-2"
+                          className="bot-detail-show-less-btn inline text-xs font-bold text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 active:scale-95 transition-all select-none cursor-pointer align-baseline ml-2"
                         >
                           {t("show_less") || "Daha az göster"}
                         </button>

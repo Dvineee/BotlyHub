@@ -76,6 +76,10 @@ const BlogPage: React.FC = () => {
   const [trendHashtags, setTrendHashtags] = useState<string[]>([]);
 
   useEffect(() => {
+    document.title = "Trend Blog - En Yeni Botlar ve Kripto Dünyası | BotlyHub";
+  }, []);
+
+  useEffect(() => {
     if (location.state && (location.state as any).categoryId) {
       setActiveCategory((location.state as any).categoryId);
     }

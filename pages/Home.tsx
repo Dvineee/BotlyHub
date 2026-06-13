@@ -2263,6 +2263,7 @@ const Home = () => {
   }, [user?.id]);
 
   useEffect(() => {
+    document.title = t("home_seo_title") || "BotlyHub | Modern Telegram Bot & AI Ecosystem";
     loadData();
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node))
@@ -3765,7 +3766,7 @@ const Home = () => {
                                   <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                                     Mini Apps
                                   </h2>
-                                  <span className="text-xs font-semibold bg-blue-500/10 dark:bg-blue-500/15 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full ml-1">
+                                  <span className="hero-cta-circle ml-1.5 shrink-0">
                                     {data.total}
                                   </span>
                                   <ChevronRight
@@ -3910,7 +3911,7 @@ const Home = () => {
                                   <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                                     Botlar
                                   </h2>
-                                  <span className="text-xs font-semibold bg-emerald-500/10 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full ml-1">
+                                  <span className="hero-cta-circle ml-1.5 shrink-0">
                                     {data.total}
                                   </span>
                                   <ChevronRight

@@ -268,6 +268,7 @@ export default function QAForum() {
   };
 
   useEffect(() => {
+    document.title = "Soru Cevap Forumu | Telegram & TON Geliştirici Topluluğu - BotlyHub";
     const params = new URLSearchParams(location.search);
     const tagParam = params.get("tag");
     if (tagParam) {

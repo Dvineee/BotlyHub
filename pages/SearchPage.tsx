@@ -1199,6 +1199,14 @@ const SearchPage = () => {
   }, [searchParams]);
 
   useEffect(() => {
+    if (query) {
+      document.title = `"${query}" Arama Sonuçları | BotlyHub`;
+    } else {
+      document.title = t("search_seo_title") || "Bot ve Uygulama Arayın | BotlyHub";
+    }
+  }, [query, t]);
+
+  useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       const startTime = Date.now();

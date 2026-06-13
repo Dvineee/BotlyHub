@@ -2426,6 +2426,48 @@ div.qa-last-24h-box, .qa-last-24h-box {
     filter: brightness(1.25) !important;
 }
 
+.bot-detail-show-more-btn {
+    background: linear-gradient(to left, #ffffff 65%, rgba(255, 255, 255, 0)) !important;
+    color: #3b82f6 !important;
+    padding-left: 2.5rem !important;
+    font-weight: 700 !important;
+}
+
+.bot-detail-show-more-btn:hover {
+    color: #2563eb !important;
+}
+
+.dark .bot-detail-show-more-btn {
+    background: linear-gradient(to left, #020617 65%, rgba(2, 6, 23, 0)) !important;
+    color: #60a5fa !important;
+}
+
+.dark .bot-detail-show-more-btn:hover {
+    color: #3b82f6 !important;
+}
+
+.bot-detail-show-less-btn {
+    color: #3b82f6 !important;
+    font-weight: 700 !important;
+    margin-left: 0.5rem !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+}
+
+.bot-detail-show-less-btn:hover {
+    color: #2563eb !important;
+    text-decoration: underline !important;
+}
+
+.dark .bot-detail-show-less-btn {
+    color: #60a5fa !important;
+}
+
+.dark .bot-detail-show-less-btn:hover {
+    color: #3b82f6 !important;
+}
+
 
 
 
