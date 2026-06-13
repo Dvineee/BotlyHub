@@ -168,7 +168,7 @@ const TelegramWrapper = ({ children }: { children?: React.ReactNode }) => {
   const hideBottomNav = isPanelPath || location.pathname.includes('/bot/') || location.pathname.includes('/payment/') || location.pathname.includes('/bot-panel/') || location.pathname.startsWith('/qa') || location.pathname.startsWith('/blog');
 
   return (
-    <div className={`${isPanelPath ? 'dark bg-slate-950' : 'bg-slate-50 dark:bg-slate-950'} flex flex-col min-h-screen transition-colors duration-300`}>
+    <div className={`${isPanelPath ? 'dark bg-slate-950' : 'bg-slate-50 dark:bg-slate-950'} flex flex-col min-h-screen max-w-full overflow-x-clip transition-colors duration-300`}>
       {isMaintenance && !isAdminPath ? (
         <Maintenance />
       ) : isRestricted && !isAdminPath ? (

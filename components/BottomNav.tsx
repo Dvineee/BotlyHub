@@ -33,12 +33,12 @@ const BottomNav: React.FC = () => {
                         <button
                             key={item.id}
                             onClick={() => { haptic('light'); navigate(item.path); }}
-                            className="relative flex flex-col items-center justify-center flex-1 h-full py-0.5 outline-none transition-transform active:scale-95"
+                            className="relative flex flex-col items-center justify-center flex-1 h-full pb-1 pt-2 outline-none transition-transform active:scale-95"
                         >
-                            <div className={`flex items-center justify-center p-1 rounded-xl transition-all duration-200 ${active ? 'text-blue-500' : 'text-slate-400 dark:text-slate-500'}`}>
-                                <item.icon size={20} className="transition-all" strokeWidth={active ? 2.25 : 1.8} />
+                            <div className={`flex items-center justify-center p-1.5 rounded-xl transition-all duration-200 ${active ? 'text-blue-500 bg-blue-50/50 dark:bg-blue-500/10' : 'text-slate-400 dark:text-slate-500'}`}>
+                                <item.icon size={21} className="transition-all" strokeWidth={active ? 2.25 : 1.8} />
                             </div>
-                            <span className={`text-[8.5px] font-black tracking-wider uppercase transition-colors duration-150 block truncate max-w-full px-1 ${active ? 'text-blue-500' : 'text-slate-400 dark:text-slate-500'}`}>
+                            <span className={`text-[9.5px] font-bold tracking-wider uppercase transition-colors duration-150 whitespace-nowrap overflow-hidden text-ellipsis max-w-full px-1 mt-0.5 ${active ? 'text-blue-500' : 'text-slate-400 dark:text-slate-500'}`}>
                                 {item.label}
                             </span>
                             {active && (

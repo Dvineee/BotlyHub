@@ -1411,16 +1411,16 @@ const SearchPage = () => {
         />
         <div className="max-w-7xl mx-auto px-5 sm:px-8 pt-10 pb-32">
           {/* Results */}
-          <div className="sticky top-0 z-30 bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl py-3 -mx-5 px-5 md:relative md:top-auto md:z-auto md:py-0 md:px-0 md:mx-0 flex items-center gap-3 mb-10 transition-colors">
+          <div className="sticky top-0 md:top-[62px] z-30 bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl py-3 -mx-5 px-5 md:mx-0 md:px-0 flex items-center gap-3 mb-10 transition-colors">
             <div className="flex-1 relative">
-              <div className="relative flex items-center pl-2.5 pr-3.5 transition-all group premium-search-container h-[50px]">
+              <div className="relative flex items-center pl-3 pr-3.5 transition-all group premium-search-container h-[50px]">
                 <button
                   type="button"
                   onClick={() => {
                     haptic("light");
                     navigate(-1);
                   }}
-                  className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-black/5 dark:hover:bg-white/5 transition-all cursor-pointer active:scale-95 shrink-0"
+                  className="w-8 h-8 flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-blue-500 dark:hover:text-blue-400 transition-all cursor-pointer active:scale-95 shrink-0"
                   title="Geri Git"
                 >
                   <ArrowLeft size={20} />

@@ -212,7 +212,7 @@ span.text-xs.text-slate-400.font-medium {
     padding: 0;
     min-height: 100vh;
     width: 100%;
-    overflow-x: hidden;
+    overflow-x: clip;
     position: relative;
     -webkit-overflow-scrolling: touch;
     padding-top: env(safe-area-inset-top);
@@ -781,7 +781,7 @@ h2.text-lg.sm\:text-xl.font-extrabold.text-slate-900.dark\:text-white.tracking-t
 }
 
 .bot-detail-page {
-  overflow-x: hidden;
+  overflow-x: clip;
   position: relative;
 }
 
@@ -1432,7 +1432,7 @@ article.cursor-pointer.group.fancy-glass-card.transition-all.relative.flex.items
   background-color: #11121400 !important;
 }
 
-.bg-slate-50, .bg-slate-200, .bg-white, .bg-slate-900, .bg-slate-800, .bg-slate-100\/50, .bg-white\/80, .bg-slate-900\/50, .bg-slate-900\/40, .bg-slate-900\/60 {
+.bg-slate-200, .bg-white, .bg-slate-900, .bg-slate-800, .bg-slate-100\/50, .bg-white\/80, .bg-slate-900\/50, .bg-slate-900\/40, .bg-slate-900\/60 {
   border: 1px solid var(--item-border-color) !important;
 }
 
@@ -2470,29 +2470,29 @@ div.qa-last-24h-box, .qa-last-24h-box {
 
 /* Premium Search Bar Styling Rules */
 .premium-search-container {
-    background-color: #f8fafc !important;
+    background-color: #ffffff !important;
     border: 1.5px solid #e2e8f0 !important;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    border-radius: 16px !important;
+    border-radius: 9999px !important;
     box-shadow: none !important;
 }
 
 .premium-search-container:focus-within {
     background-color: #ffffff !important;
     border-color: #3b82f6 !important;
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15) !important;
+    box-shadow: none !important;
 }
 
 .dark .premium-search-container {
     background-color: #0b0c10 !important;
-    border: 1.5px solid rgba(255, 255, 255, 0.08) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
     box-shadow: none !important;
 }
 
 .dark .premium-search-container:focus-within {
     background-color: #0b0c10 !important;
     border-color: #3b82f6 !important;
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.25) !important;
+    box-shadow: none !important;
 }
 
 .pb-2 {
