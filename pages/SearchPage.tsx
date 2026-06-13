@@ -522,7 +522,7 @@ const NavMenu = ({
     <>
       <header
         ref={internalMenuRef}
-        className="relative md:sticky md:top-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl border-b border-[#f7f7f7] dark:border-white/5 w-full py-2.5 transition-colors"
+        className="hidden md:block relative md:sticky md:top-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl border-b border-[#f7f7f7] dark:border-white/5 w-full py-2.5 transition-colors"
       >
         <div className="max-w-7xl mx-auto px-5 sm:px-8 flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-0">
           {/* Section 1: Center Navigation links */}
@@ -1411,12 +1411,20 @@ const SearchPage = () => {
         />
         <div className="max-w-7xl mx-auto px-5 sm:px-8 pt-10 pb-32">
           {/* Results */}
-          <div className="sticky top-0 z-30 bg-white dark:bg-slate-950 py-3 -mx-5 px-5 md:relative md:top-auto md:z-auto md:py-0 md:px-0 md:mx-0 flex items-center gap-3 mb-10 border-b border-black/[0.03] dark:border-white/5 md:border-b-0 transition-colors">
+          <div className="sticky top-0 z-30 bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl py-3 -mx-5 px-5 md:relative md:top-auto md:z-auto md:py-0 md:px-0 md:mx-0 flex items-center gap-3 mb-10 transition-colors">
             <div className="flex-1 relative">
-              <div className="relative flex items-center bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 rounded-xl p-1 transition-all group custom-search-outline">
-                <div className="ml-2 w-8 h-8 flex items-center justify-center text-slate-400 group-focus-within:text-blue-500 shrink-0">
-                  <SearchIcon size={18} />
-                </div>
+              <div className="relative flex items-center pl-2.5 pr-3.5 transition-all group premium-search-container h-[50px]">
+                <button
+                  type="button"
+                  onClick={() => {
+                    haptic("light");
+                    navigate(-1);
+                  }}
+                  className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-black/5 dark:hover:bg-white/5 transition-all cursor-pointer active:scale-95 shrink-0"
+                  title="Geri Git"
+                >
+                  <ArrowLeft size={20} />
+                </button>
                 <input
                   type="text"
                   value={query}
@@ -1427,18 +1435,17 @@ const SearchPage = () => {
                       ? t("search_placeholder_bots")
                       : t("search_placeholder_apps")
                   }
-                  className="w-full bg-transparent py-2 px-2 text-[13px] text-slate-900 dark:text-white outline-none placeholder:text-slate-400 font-bold uppercase tracking-widest min-w-0"
+                  className="w-full bg-transparent py-2.5 px-2 text-[14.5px] text-slate-900 dark:text-white outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500 font-medium min-w-0"
                 />
-                <div className="flex items-center gap-0.5 pr-1 shrink-0">
+                <div className="flex items-center gap-2 pr-1 shrink-0">
                   {query && (
                     <button
                       onClick={() => setQuery("")}
-                      className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                      className="w-8 h-8 flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors bg-transparent hover:bg-transparent"
                     >
                       <X size={16} />
                     </button>
                   )}
-                  <div className="w-px h-5 bg-black/[0.05] dark:bg-white/[0.05] mx-1" />
                   <FilterMenu />
                 </div>
               </div>

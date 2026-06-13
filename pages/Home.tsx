@@ -2676,7 +2676,7 @@ const Home = () => {
                   ref={homeSearchRef}
                   className="hidden md:block md:flex-1 md:max-w-[280px] lg:max-w-[320px] relative z-[130]"
                 >
-                  <div className="relative flex items-center bg-[#eeefef] dark:bg-slate-800 rounded-xl group transition-all h-[42px] px-3 focus-within:ring-2 focus-within:ring-blue-500/20">
+                  <div className="relative flex items-center group transition-all h-[42px] px-3 premium-search-container">
                     {isSearchLoading ? (
                       <Loader2
                         size={16}
@@ -2684,8 +2684,8 @@ const Home = () => {
                       />
                     ) : (
                       <Search
-                        size={16}
-                        className="text-[#8e8e93] dark:text-slate-400 group-hover:text-blue-500 transition-colors shrink-0 mr-2"
+                        size={15}
+                        className="text-slate-400 dark:text-slate-500 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors shrink-0 mr-2"
                       />
                     )}
                     <input
@@ -2697,7 +2697,7 @@ const Home = () => {
                       }}
                       onFocus={() => setShowHomeSearchDropdown(true)}
                       placeholder="Herşeyi ara"
-                      className="w-full h-full bg-transparent border-none outline-none text-[13px] text-[#2c2c2e] dark:text-slate-300 font-bold tracking-wide placeholder-[#8e8e93] dark:placeholder-slate-400 shrink min-w-0 py-0"
+                      className="w-full h-full bg-transparent border-none outline-none text-[13.5px] text-[#2c2c2e] dark:text-slate-200 font-semibold tracking-wide placeholder-slate-400 dark:placeholder-slate-500 shrink min-w-0 py-0"
                     />
 
                     {homeSearchQuery && (

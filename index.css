@@ -2468,6 +2468,43 @@ div.qa-last-24h-box, .qa-last-24h-box {
     color: #3b82f6 !important;
 }
 
+/* Premium Search Bar Styling Rules */
+.premium-search-container {
+    background-color: #f8fafc !important;
+    border: 1.5px solid #e2e8f0 !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    border-radius: 16px !important;
+    box-shadow: none !important;
+}
+
+.premium-search-container:focus-within {
+    background-color: #ffffff !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15) !important;
+}
+
+.dark .premium-search-container {
+    background-color: #0b0c10 !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: none !important;
+}
+
+.dark .premium-search-container:focus-within {
+    background-color: #0b0c10 !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.25) !important;
+}
+
+.pb-2 {
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+}
+
+.mb-10 {
+    margin-bottom: 0.5rem !important;
+}
+
+
 
 
 
