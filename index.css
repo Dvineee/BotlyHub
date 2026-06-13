@@ -749,8 +749,10 @@ h2.text-lg.sm\:text-xl.font-extrabold.text-slate-900.dark\:text-white.tracking-t
 }
 
 .search-page .px-5 {
+    box-shadow: none !important;
+    border: none !important;
     padding-left: 0rem;
-    border-radius: 12px;
+    border-radius: 0px;
     padding-right: 0rem;
 }
 

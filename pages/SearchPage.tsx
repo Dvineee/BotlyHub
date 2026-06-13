@@ -1409,7 +1409,7 @@ const SearchPage = () => {
           setSearchMode={setSearchMode}
           setActiveCategory={setActiveCategory}
         />
-        <div className="max-w-7xl mx-auto px-5 sm:px-8 pt-0 md:pt-6 pb-32">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 pt-0 md:pt-0 pb-32">
           {/* Results */}
           <div className="sticky top-0 md:top-[62px] z-30 bg-white dark:bg-slate-950 py-3 -mx-5 px-5 sm:-mx-8 sm:px-8 md:mx-0 md:px-0 flex items-center gap-3 mb-6 md:mb-10 transition-colors">
             <div className="flex-1 relative px-[8.5px]">
