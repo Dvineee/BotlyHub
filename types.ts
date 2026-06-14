@@ -81,10 +81,10 @@ export interface Bot {
   is_official?: boolean;
   promoted_type?: 'latest' | 'official' | 'featured' | 'none';
   languages?: string[];
-  telegram_group?: string;
-  website_url?: string;
-  app_url?: string;
-  social_url?: string;
+  telegram_group?: string | null;
+  website_url?: string | null;
+  app_url?: string | null;
+  social_url?: string | null;
   rating?: number;
   rating_count?: number;
   user_count?: number;

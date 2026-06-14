@@ -36,6 +36,8 @@ import {
   Coins,
   BarChart3,
   Globe,
+  Edit2,
+  Trash2,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useTelegram } from "../hooks/useTelegram";
@@ -150,6 +152,7 @@ export default function QAForum() {
 
   // Modals & Panels
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingTopicId, setEditingTopicId] = useState<string | null>(null);
   const [isDetailView, setIsDetailView] = useState(false);
 
   // New Question Form State
@@ -419,13 +422,13 @@ export default function QAForum() {
     }
   };
 
-  // Create New Topic Submit
+  // Create or Edit Topic Submit
   const handleCreateTopic = async () => {
     if (!newTitle.trim() || !newContent.trim()) return;
 
     if (!user || !user.id || user.id === "guest_user") {
       haptic("heavy");
-      alert("Soru sormak veya tartışma başlatmak için lütfen giriş yapın.");
+      alert("Soru sormak, düzenlemek veya tartışma başlatmak için lütfen giriş yapın.");
       setIsLoginModalOpen(true);
       return;
     }
@@ -433,15 +436,43 @@ export default function QAForum() {
     haptic("medium");
 
     try {
-      await DatabaseService.createQADiscussion({
-        title: newTitle,
-        content: newContent,
-        author_id: currentUser.id,
-        author_name: currentUser.name,
-        author_avatar: currentUser.avatar,
-        author_bio: currentUser.bio,
-        tags: selectedTags,
-      });
+      if (editingTopicId) {
+        await DatabaseService.updateQADiscussion(editingTopicId, {
+          title: newTitle,
+          content: newContent,
+        });
+
+        // Also update local states
+        setActiveTopic((prev) => {
+          if (!prev || prev.id !== editingTopicId) return prev;
+          return {
+            ...prev,
+            title: newTitle,
+            content: newContent,
+          };
+        });
+
+        // Update topics list locally
+        setTopics((prevTopics) =>
+          prevTopics.map((t) =>
+            t.id === editingTopicId
+              ? { ...t, title: newTitle, content: newContent }
+              : t
+          )
+        );
+
+        setEditingTopicId(null);
+      } else {
+        await DatabaseService.createQADiscussion({
+          title: newTitle,
+          content: newContent,
+          author_id: currentUser.id,
+          author_name: currentUser.name,
+          author_avatar: currentUser.avatar,
+          author_bio: currentUser.bio,
+          tags: selectedTags,
+        });
+      }
 
       setShowCreateModal(false);
       setNewTitle("");
@@ -449,7 +480,22 @@ export default function QAForum() {
       setSelectedTags([]);
       fetchTopics("son"); // Switch sorting to Show latest first
     } catch (err) {
-      console.error("Creating topic failed:", err);
+      console.error("Saving topic failed:", err);
+    }
+  };
+
+  // Delete Q&A Topic
+  const handleDeleteTopic = async (topicId: string) => {
+    if (!confirm("Bu soruyu silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.")) return;
+
+    haptic("heavy");
+    try {
+      await DatabaseService.deleteQADiscussion(topicId);
+      setIsDetailView(false);
+      setActiveTopic(null);
+      fetchTopics(selectedFilter);
+    } catch (err) {
+      console.error("Failed to delete topic:", err);
     }
   };
 
@@ -1470,9 +1516,38 @@ export default function QAForum() {
                             </div>
                           </div>
                         </UserHoverCard>
-                        <span className="text-xs text-slate-400 font-medium shrink-0">
-                          {formatTimeRelative(activeTopic.created_at)}
-                        </span>
+                        <div className="flex flex-col items-end gap-1.5 shrink-0 select-none">
+                          <span className="text-xs text-slate-400 font-medium">
+                            {formatTimeRelative(activeTopic.created_at)}
+                          </span>
+                          {activeTopic.author_id?.toString() === currentUser.id?.toString() && (
+                            <div className="flex items-center gap-2 mt-0.5 pointer-events-auto">
+                              <button
+                                onClick={() => {
+                                  haptic("light");
+                                  setNewTitle(activeTopic.title);
+                                  setNewContent(activeTopic.content);
+                                  setEditingTopicId(activeTopic.id);
+                                  setShowCreateModal(true);
+                                }}
+                                className="flex items-center gap-1 px-2 py-1 text-[10px] font-bold text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 border border-slate-200/60 dark:border-slate-800/80 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                              >
+                                <Edit2 size={10} />
+                                <span>Düzenle</span>
+                              </button>
+                              <button
+                                onClick={() => {
+                                  haptic("heavy");
+                                  handleDeleteTopic(activeTopic.id);
+                                }}
+                                className="flex items-center gap-1 px-2 py-1 text-[10px] font-bold text-slate-500 hover:text-red-600 dark:text-slate-400 dark:hover:text-red-400 border border-slate-200/60 dark:border-slate-800/80 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                              >
+                                <Trash2 size={10} />
+                                <span>Sil</span>
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
 
                       {/* Question Title */}
@@ -1599,7 +1674,7 @@ export default function QAForum() {
                     {activeTopic &&
                     activeTopic.comments &&
                     activeTopic.comments.length > 0 ? (
-                      <div className="space-y-4 pt-2">
+                      <div className="space-y-4 pt-2 qa-answers-container">
                         {(() => {
                           const rootComments = activeTopic.comments.filter(
                             (c) => !c.parent_id,
@@ -1947,7 +2022,7 @@ export default function QAForum() {
 
               <div className="flex items-center justify-between mb-4 border-b border-slate-100 dark:border-slate-800/60 pb-3">
                 <h3 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest font-mono">
-                  Yeni Konu
+                  {editingTopicId ? "Soruyu Düzenle" : "Yeni Konu"}
                 </h3>
                 <span className="text-[10px] text-slate-400 flex items-center gap-1 font-bold font-mono">
                   Markdown{" "}
@@ -2046,6 +2121,9 @@ export default function QAForum() {
                   onClick={() => {
                     haptic("light");
                     setShowCreateModal(false);
+                    setEditingTopicId(null);
+                    setNewTitle("");
+                    setNewContent("");
                   }}
                   className="text-xs font-bold text-slate-400 hover:text-slate-600 dark:text-slate-500 transition-colors shrink-0 px-3 py-2"
                 >
@@ -2056,7 +2134,7 @@ export default function QAForum() {
                   disabled={!newTitle.trim() || !newContent.trim()}
                   className="px-6 py-2.5 rounded-xl bg-indigo-500 hover:bg-indigo-600 disabled:opacity-50 text-white font-black text-xs uppercase tracking-wider transition-all shadow-md shadow-indigo-500/15"
                 >
-                  Soru Başlat
+                  {editingTopicId ? "Kaydet" : "Soru Başlat"}
                 </button>
               </div>
             </motion.div>

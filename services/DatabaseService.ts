@@ -1792,6 +1792,72 @@ export class DatabaseService {
     };
   }
 
+  static async updateQADiscussion(topicId: string, updates: { title: string; content: string }) {
+    try {
+      const { error } = await supabase
+        .from('qa_discussions')
+        .update({
+          title: updates.title,
+          content: updates.content,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', topicId);
+
+      if (error) {
+        if (error.message.includes('relation "public.qa_discussions" does not exist') || error.message.includes('not found')) {
+          const { error: blogErr } = await supabase
+            .from('blogs')
+            .update({
+              title: updates.title,
+              content: updates.content,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', topicId);
+          if (blogErr) throw blogErr;
+        } else {
+          throw error;
+        }
+      }
+      return true;
+    } catch (e) {
+      console.error("updateQADiscussion error:", e);
+      throw e;
+    }
+  }
+
+  static async deleteQADiscussion(topicId: string) {
+    try {
+      const { error } = await supabase
+        .from('qa_discussions')
+        .delete()
+        .eq('id', topicId);
+
+      if (error) {
+        if (error.message.includes('relation "public.qa_discussions" does not exist') || error.message.includes('not found')) {
+          const { error: blogErr } = await supabase
+            .from('blogs')
+            .delete()
+            .eq('id', topicId);
+          if (blogErr) throw blogErr;
+        } else {
+          throw error;
+        }
+      }
+
+      try {
+        await supabase.from('qa_comments').delete().eq('topic_id', topicId);
+      } catch (comErr) {}
+      try {
+        await supabase.from('blog_comments').delete().eq('blog_id', topicId);
+      } catch (comErr) {}
+
+      return true;
+    } catch (e) {
+      console.error("deleteQADiscussion error:", e);
+      throw e;
+    }
+  }
+
   static async submitQAComment(topicId: string, comment: {
     author_id: any;
     author_name: string;

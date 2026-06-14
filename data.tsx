@@ -1,5 +1,6 @@
 
 import { ExtendedBot, SubscriptionPlan, Notification } from './types';
+import { realBotsData } from './bots_data';
 import { 
   Star, Crown, Gem, Zap,
   LayoutGrid, Gamepad2, Landmark, ShieldCheck, Wrench, BrainCircuit,
@@ -175,13 +176,16 @@ export const categories = [
   { id: 'security', label: 'cat_security', desc: 'desc_cat_security', icon: SecurityIcon },
   { id: 'education', label: 'cat_education', desc: 'desc_cat_education', icon: EducationIcon },
   { id: 'content', label: 'cat_content', desc: 'desc_cat_content', icon: ContentIcon },
+  { id: 'a_kategori', label: 'a_kategori', desc: 'desc_a_kategori', icon: AllIcon },
 ];
 
-export const mockBots: ExtendedBot[] = [
-  { id: '1', slug: 'task-master', name: 'Task Master', description: 'bot_task_master_desc', price: 29.99, icon: 'https://picsum.photos/seed/task/200', category: ['productivity'], isNew: true, bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
-  { id: '2', slug: 'gamebot-pro', name: 'GameBot Pro', description: 'bot_gamebot_pro_desc', price: 0, icon: 'https://picsum.photos/seed/game/200', category: ['games'], bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
-  { id: '10', slug: 'stockbot', name: 'StockBot', description: 'bot_stockbot_desc', price: 120.00, icon: 'https://picsum.photos/seed/stock/200', category: ['finance'], bot_link: 'https://t.me/botlyhub_bot', screenshots: [] },
-];
+export const mockBots: ExtendedBot[] = realBotsData.map(bot => ({
+  ...bot,
+  category: bot.category,
+  screenshots: bot.screenshots || [],
+  languages: bot.languages || [],
+  isNew: bot.isNew || false
+}));
 
 export const subscriptionPlans: SubscriptionPlan[] = [
   {

@@ -436,7 +436,7 @@ svg.lucide.lucide-chevron-right:focus {
 }
 
 .w-20 {
-  border-radius: 18px !important;
+  border-radius: 0px !important;
   width: 5.2rem;
 }
 
@@ -1392,8 +1392,13 @@ button.bg-brand:hover, button.bg-blue-500:hover, button.bg-blue-600:hover, a.bg-
     margin-bottom: 0.5rem !important;
 }
 
-.light .bg-white\/5, .light .bg-black\/5, .light .bg-slate-500\/5, .light .bg-slate-900\/5 {
+.light .bg-black\/5, .light .bg-slate-500\/5, .light .bg-slate-900\/5 {
   background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+.light .bg-white\/5 {
+  padding: 0;
+  background-color: rgb(0 0 0 / 0%) !important;
 }
 
 .dark .fancy-glass-card:hover, .dark .stats-card-bg:hover, .dark .popular-content-card:hover, .dark .similar-post-card:hover, .dark .bot-card:hover {
@@ -2428,7 +2433,7 @@ div.qa-last-24h-box, .qa-last-24h-box {
 }
 
 .bot-detail-show-more-btn {
-    background: linear-gradient(to left, #ffffff 65%, rgba(255, 255, 255, 0)) !important;
+    background: linear-gradient(to left, #fff 65%, rgba(255, 255, 255, 0)) !important;
     color: #3b82f6 !important;
     padding-left: 2.5rem !important;
     font-weight: 700 !important;
@@ -2439,7 +2444,7 @@ div.qa-last-24h-box, .qa-last-24h-box {
 }
 
 .dark .bot-detail-show-more-btn {
-    background: linear-gradient(to left, #151618 65%, #02061700) !important;
+    background: linear-gradient(to left, #151618 65%, rgba(21, 22, 24, 0)) !important;
     color: #60a5fa !important;
 }
 
@@ -2541,6 +2546,46 @@ div.qa-last-24h-box, .qa-last-24h-box {
 .py-1 {
     padding-top: 0rem !important;
     padding-bottom: 0rem !important;
+}
+
+.dark\:text-blue-400:is(.dark *), .dark\:text-blue-400 {
+    background: #ffffff00 !important;
+    --tw-text-opacity: 1 !important;
+}
+
+.-mx-4 {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    margin-left: 0rem !important;
+    margin-right: 0rem !important;
+}
+
+.flex.justify-end.items-center.mb-6.px-2 {
+    margin-bottom: 16px !important;
+    margin-top: 16px !important;
+}
+
+.dark span.text-\[11px\].font-bold.uppercase.tracking-wider {
+    color: #8c8c8c !important;
+}
+
+span.text-\[11px\].font-bold.uppercase.tracking-wider {
+    color: var(--text-primary) !important;
+}
+
+.qa-answers-container .p-4 {
+    padding: 0rem !important;
+}
+
+.space-y-4 > :not([hidden]) ~ :not([hidden]) {
+    padding: 0;
+    --tw-space-y-reverse: 0;
+    margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
+    margin-bottom: calc(1rem * var(--tw-space-y-reverse));
+}
+
+.top-10 {
+    top: 4.5rem;
 }
 
 

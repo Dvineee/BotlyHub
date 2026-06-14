@@ -265,6 +265,8 @@ const BotManagement = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [saveSuccess, setSaveSuccess] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
+    const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
+    const [selectedBotIds, setSelectedBotIds] = useState<string[]>([]);
 
     const load = useCallback(async () => {
         setIsLoading(true);
@@ -345,6 +347,54 @@ const BotManagement = () => {
         return matchesSearch && typeMatches;
     });
 
+    const toggleSelectBot = (botId: string) => {
+        setSelectedBotIds(prev => 
+            prev.includes(botId) 
+            ? prev.filter(id => id !== botId) 
+            : [...prev, botId]
+        );
+    };
+
+    const toggleSelectAll = () => {
+        const allFilteredIds = filteredBotsList.map(b => b.id);
+        const isAllSelected = allFilteredIds.every(id => selectedBotIds.includes(id));
+        if (isAllSelected) {
+            setSelectedBotIds(prev => prev.filter(id => !allFilteredIds.includes(id)));
+        } else {
+            const uniqueSet = new Set([...selectedBotIds, ...allFilteredIds]);
+            setSelectedBotIds(Array.from(uniqueSet));
+        }
+    };
+
+    const handleBulkDelete = async () => {
+        if (selectedBotIds.length === 0) return;
+        if (confirm(`Seçtiğiniz ${selectedBotIds.length} botu sistemden silmek istediğinize emin misiniz?`)) {
+            setIsLoading(true);
+            try {
+                for (const id of selectedBotIds) {
+                    const b = bots.find(bot => bot.id === id);
+                    const botName = b ? b.name : id;
+                    await DatabaseService.deleteBot(id);
+                    await DatabaseService.logActivity(
+                        'admin', 
+                        'bot_manage', 
+                        'bot_deleted', 
+                        'Bot Silindi (Toplu)', 
+                        `${botName} isimli bot toplu silme işlemiyle silindi.`
+                    );
+                }
+                setSelectedBotIds([]);
+                setIsMultiSelectMode(false);
+                await load();
+            } catch (err) {
+                console.error("Bulk delete error:", err);
+                alert("Silme işlemi sırasında hata oluştu!");
+            } finally {
+                setIsLoading(false);
+            }
+        }
+    };
+
     return (
         <div className="space-y-6 animate-in fade-in duration-200">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -364,6 +414,20 @@ const BotManagement = () => {
                         />
                     </div>
                     <button 
+                        onClick={() => {
+                            setIsMultiSelectMode(!isMultiSelectMode);
+                            setSelectedBotIds([]);
+                        }}
+                        className={`px-4 h-11 border rounded-xl text-xs font-semibold transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm ${
+                            isMultiSelectMode 
+                            ? 'bg-rose-600 hover:bg-rose-500 text-white border-rose-500' 
+                            : 'bg-slate-900/60 hover:bg-slate-850 text-slate-400 border-slate-800 hover:text-rose-400'
+                        }`}
+                        title="Toplu Silme özelliğini aç/kapat"
+                    >
+                        <Trash2 size={15} /> {isMultiSelectMode ? 'Seçimi Kapat' : 'Toplu Silme'}
+                    </button>
+                    <button 
                         onClick={openCreateModal}
                         className="bg-blue-600 hover:bg-blue-500 hover:scale-[1.01] px-5 py-2.5 rounded-xl text-xs font-semibold text-white transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm"
                     >
@@ -378,6 +442,53 @@ const BotManagement = () => {
                     </button>
                 </div>
             </div>
+
+            {isMultiSelectMode && (
+                <div className="bg-rose-500/10 border border-rose-500/20 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 animate-in slide-in-from-top-4 duration-300">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400">
+                            <Trash2 size={18} />
+                        </div>
+                        <div>
+                            <p className="text-sm font-bold text-white leading-none mb-1">Toplu Silme Paneli</p>
+                            <p className="text-xs text-rose-300/80">
+                                {selectedBotIds.length > 0 
+                                    ? `Seçilen ${selectedBotIds.length} ürünü silmek için 'Tamamla' butonuna tıklayın.` 
+                                    : "Silmek istediğiniz ürünleri kartların üzerindeki kutulardan seçin."
+                                }
+                            </p>
+                        </div>
+                    </div>
+                    <div className="flex flex-wrap gap-2 w-full sm:w-auto justify-end">
+                        <button
+                            onClick={toggleSelectAll}
+                            className="px-4 py-2 rounded-xl bg-slate-900 border border-slate-850 hover:border-slate-800 text-xs font-semibold text-slate-300 hover:text-white transition-all active:scale-95 cursor-pointer"
+                        >
+                            {filteredBotsList.every(b => selectedBotIds.includes(b.id)) ? 'Seçimi Kaldır' : 'Hepsini Seç'}
+                        </button>
+                        <button
+                            onClick={() => {
+                                setIsMultiSelectMode(false);
+                                setSelectedBotIds([]);
+                            }}
+                            className="px-4 py-2 rounded-xl bg-slate-900 border border-slate-850 hover:border-slate-800 text-xs font-semibold text-slate-300 hover:text-white transition-all active:scale-95 cursor-pointer"
+                        >
+                            Vazgeç
+                        </button>
+                        <button
+                            onClick={handleBulkDelete}
+                            disabled={selectedBotIds.length === 0}
+                            className={`px-5 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 ${
+                                selectedBotIds.length > 0
+                                ? 'bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-950/25 cursor-pointer'
+                                : 'bg-[#181e30] border border-slate-800/50 text-slate-500 cursor-not-allowed'
+                            }`}
+                        >
+                            Tamamla (Sil)
+                        </button>
+                    </div>
+                </div>
+            )}
 
             <div className="flex gap-1.5 p-1 bg-[#101626]/40 border border-slate-800/60 rounded-xl w-full md:w-fit">
                 <button 
@@ -405,6 +516,10 @@ const BotManagement = () => {
                         <div 
                             key={b.id} 
                             onClick={() => {
+                                if (isMultiSelectMode) {
+                                    toggleSelectBot(b.id);
+                                    return;
+                                }
                                 const cats = Array.isArray(b.category) ? b.category : (b.category ? (typeof b.category === 'string' && b.category.startsWith('[') ? JSON.parse(b.category) : [b.category]) : ['utilities']);
                                 setEditingBot({
                                     ...b,
@@ -415,7 +530,13 @@ const BotManagement = () => {
                                 });
                                 setIsModalOpen(true);
                             }}
-                            className="bg-[#101626]/40 border border-slate-800/60 rounded-2xl p-6 flex flex-col justify-between group hover:border-blue-500/30 hover:translate-y-[-2px] transition-all duration-300 relative overflow-hidden backdrop-blur-sm cursor-pointer shadow-sm"
+                            className={`border rounded-2xl p-6 flex flex-col justify-between group hover:translate-y-[-2px] transition-all duration-300 relative overflow-hidden backdrop-blur-sm cursor-pointer shadow-sm ${
+                                isMultiSelectMode 
+                                ? selectedBotIds.includes(b.id)
+                                    ? 'bg-rose-500/10 border-rose-500/40 shadow-[0_0_15px_rgba(239,68,68,0.08)]'
+                                    : 'bg-[#101626]/20 border-slate-900/40 opacity-70 hover:opacity-100 hover:border-slate-800'
+                                : 'bg-[#101626]/40 border-slate-800/60 hover:border-blue-500/30'
+                            }`}
                         >
                             <div className="space-y-4">
                                 <div className="flex justify-between items-start relative z-10">
@@ -428,55 +549,70 @@ const BotManagement = () => {
                                         />
                                         {b.price > 0 && <div className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-blue-500 rounded-lg flex items-center justify-center border-2 border-slate-950 font-semibold text-white"><Zap size={10} fill="currentColor" /></div>}
                                     </div>
-                                    <div className="flex gap-1.5" onClick={(e) => e.stopPropagation()}>
-                                        {b.is_official && (
-                                            <div className="px-2 py-1 bg-blue-500/10 border border-blue-500/20 rounded-lg flex items-center gap-1">
-                                                <ShieldCheck size={11} className="text-blue-400" />
-                                                <span className="text-[9px] font-bold text-blue-400 uppercase tracking-widest">Resmi</span>
-                                            </div>
+                                    <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                                        {isMultiSelectMode ? (
+                                            <button 
+                                                onClick={() => toggleSelectBot(b.id)}
+                                                className={`w-7 h-7 rounded-xl flex items-center justify-center transition-all ${
+                                                    selectedBotIds.includes(b.id)
+                                                    ? 'bg-rose-500 text-white border border-rose-400 scale-105 shadow-md shadow-rose-950/20'
+                                                    : 'bg-[#181e30] border border-slate-800/80 text-slate-500 hover:border-slate-600 hover:text-slate-350'
+                                                }`}
+                                            >
+                                                <Check size={14} className={selectedBotIds.includes(b.id) ? "stroke-[3px]" : "stroke-[2.5px] opacity-40"} />
+                                            </button>
+                                        ) : (
+                                            <>
+                                                {b.is_official && (
+                                                    <div className="px-2 py-1 bg-blue-500/10 border border-blue-500/20 rounded-lg flex items-center gap-1">
+                                                        <ShieldCheck size={11} className="text-blue-400" />
+                                                        <span className="text-[9px] font-bold text-blue-400 uppercase tracking-widest">Resmi</span>
+                                                    </div>
+                                                )}
+                                                <button 
+                                                    onClick={async (e) => {
+                                                        e.stopPropagation();
+                                                        const nextType = b.promoted_type === 'featured' ? 'none' : 'featured';
+                                                        await DatabaseService.saveBot({ ...b, promoted_type: nextType });
+                                                        load();
+                                                    }}
+                                                    className={`p-2 rounded-xl transition-all ${b.promoted_type === 'featured' ? 'bg-amber-500 text-white' : 'bg-[#181e30] text-slate-400 hover:text-amber-400 border border-slate-800/50'}`}
+                                                    title="Öne Çıkar"
+                                                >
+                                                    <Star size={13} fill={b.promoted_type === 'featured' ? "currentColor" : "none"} />
+                                                </button>
+                                                <button 
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        const cats = Array.isArray(b.category) ? b.category : (b.category ? (typeof b.category === 'string' && b.category.startsWith('[') ? JSON.parse(b.category) : [b.category]) : ['utilities']);
+                                                        setEditingBot({
+                                                            ...b,
+                                                            product_type: cats.includes('apps') ? 'app' : 'bot',
+                                                            promoted_type: b.promoted_type || 'none',
+                                                            languages: b.languages || [],
+                                                            category: cats
+                                                        });
+                                                        setIsModalOpen(true);
+                                                    }} 
+                                                    className="p-2 bg-[#181e30] text-slate-400 hover:text-white rounded-xl border border-slate-800/50 hover:bg-blue-600 transition-all shadow-md"
+                                                >
+                                                    <Edit3 size={13}/>
+                                                </button>
+                                                <button 
+                                                    onClick={async (e) => { 
+                                                        e.stopPropagation();
+                                                        if(confirm(`'${b.name}' Silsin mi?`)) { 
+                                                            await DatabaseService.deleteBot(b.id); 
+                                                            await DatabaseService.logActivity('admin', 'bot_manage', 'bot_deleted', 'Bot Silindi', `${b.name} isimli bot sistemden silindi.`); 
+                                                            load(); 
+                                                        } 
+                                                    }} 
+                                                    className="p-2 bg-[#181e30] border border-slate-800/50 text-red-400 hover:bg-red-500 hover:text-white rounded-xl transition-all"
+                                                >
+                                                    <Trash2 size={13}/>
+                                                </button>
+                                            </>
                                         )}
-                                        <button 
-                                            onClick={async (e) => {
-                                                e.stopPropagation();
-                                                const nextType = b.promoted_type === 'featured' ? 'none' : 'featured';
-                                                await DatabaseService.saveBot({ ...b, promoted_type: nextType });
-                                                load();
-                                            }}
-                                            className={`p-2 rounded-xl transition-all ${b.promoted_type === 'featured' ? 'bg-amber-500 text-white' : 'bg-[#181e30] text-slate-400 hover:text-amber-400 border border-slate-800/50'}`}
-                                            title="Öne Çıkar"
-                                        >
-                                            <Star size={13} fill={b.promoted_type === 'featured' ? "currentColor" : "none"} />
-                                        </button>
-                                        <button 
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                const cats = Array.isArray(b.category) ? b.category : (b.category ? (typeof b.category === 'string' && b.category.startsWith('[') ? JSON.parse(b.category) : [b.category]) : ['utilities']);
-                                                setEditingBot({
-                                                    ...b,
-                                                    product_type: cats.includes('apps') ? 'app' : 'bot',
-                                                    promoted_type: b.promoted_type || 'none',
-                                                    languages: b.languages || [],
-                                                    category: cats
-                                                });
-                                                setIsModalOpen(true);
-                                            }} 
-                                            className="p-2 bg-[#181e30] text-slate-400 hover:text-white rounded-xl border border-slate-800/50 hover:bg-blue-600 transition-all shadow-md"
-                                        >
-                                            <Edit3 size={13}/>
-                                        </button>
-                                        <button 
-                                            onClick={async (e) => { 
-                                                e.stopPropagation();
-                                                if(confirm(`'${b.name}' Silsin mi?`)) { 
-                                                    await DatabaseService.deleteBot(b.id); 
-                                                    await DatabaseService.logActivity('admin', 'bot_manage', 'bot_deleted', 'Bot Silindi', `${b.name} isimli bot sistemden silindi.`); 
-                                                    load(); 
-                                                } 
-                                            }} 
-                                            className="p-2 bg-[#181e30] border border-slate-800/50 text-red-400 hover:bg-red-500 hover:text-white rounded-xl transition-all"
-                                        >
-                                            <Trash2 size={13}/>
-                                        </button>
                                     </div>
                                 </div>
 

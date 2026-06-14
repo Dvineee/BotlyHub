@@ -1185,6 +1185,52 @@ const SearchPage = () => {
   const menuRef = React.useRef<HTMLDivElement>(null);
   const modeMenuRef = React.useRef<HTMLDivElement>(null);
   const catScroll = useDraggableScroll();
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(false);
+
+  const checkScroll = React.useCallback(() => {
+    const el = catScroll.ref.current;
+    if (el) {
+      const canScrollLeft = el.scrollLeft > 5;
+      const canScrollRight = el.scrollLeft < el.scrollWidth - el.clientWidth - 5;
+      setShowLeftArrow(canScrollLeft);
+      setShowRightArrow(canScrollRight);
+    }
+  }, [catScroll.ref]);
+
+  useEffect(() => {
+    const el = catScroll.ref.current;
+    if (!el) return;
+
+    checkScroll();
+
+    el.addEventListener("scroll", checkScroll);
+    window.addEventListener("resize", checkScroll);
+
+    const observer = new ResizeObserver(() => {
+      checkScroll();
+    });
+    observer.observe(el);
+
+    const timer = setTimeout(checkScroll, 150);
+
+    return () => {
+      el.removeEventListener("scroll", checkScroll);
+      window.removeEventListener("resize", checkScroll);
+      observer.disconnect();
+      clearTimeout(timer);
+    };
+  }, [searchMode, bots, checkScroll]);
+
+  const scrollCategories = (direction: "left" | "right") => {
+    const el = catScroll.ref.current;
+    if (el) {
+      if (haptic) haptic("light");
+      const scrollAmount = direction === "left" ? -250 : 250;
+      el.scrollBy({ left: scrollAmount, behavior: "smooth" });
+    }
+  };
+
   const { activeFilter } = useFilter();
   const [aiQuery, setAiQuery] = useState("");
   const [aiResponse, setAiResponse] = useState<string | null>(null);
@@ -1453,7 +1499,35 @@ const SearchPage = () => {
           </div>
 
           {/* Categories Horizontal Scroll */}
-          <div className="mb-10">
+          <div className="mb-10 relative group/cat">
+            {/* Left Scroll Button & Fade Overlay */}
+            {showLeftArrow && (
+              <div className="hidden md:flex absolute left-0 top-0 bottom-0 w-20 items-center justify-start bg-gradient-to-r from-white via-white/80 to-transparent dark:from-[#151618] dark:via-[#151618]/80 dark:to-transparent z-10 pointer-events-none">
+                <button
+                  type="button"
+                  onClick={() => scrollCategories("left")}
+                  className="pointer-events-auto flex w-7 h-7 items-center justify-center rounded-full bg-white dark:bg-[#1f2023] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-[#2a2b2f] transition-all duration-150 active:scale-95 shadow-md"
+                  aria-label="Sola Kaydır"
+                >
+                  <ChevronLeft size={14} />
+                </button>
+              </div>
+            )}
+
+            {/* Right Scroll Button & Fade Overlay */}
+            {showRightArrow && (
+              <div className="hidden md:flex absolute right-0 top-0 bottom-0 w-20 items-center justify-end bg-gradient-to-l from-white via-white/80 to-transparent dark:from-[#151618] dark:via-[#151618]/80 dark:to-transparent z-10 pointer-events-none">
+                <button
+                  type="button"
+                  onClick={() => scrollCategories("right")}
+                  className="pointer-events-auto flex w-7 h-7 items-center justify-center rounded-full bg-white dark:bg-[#1f2023] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-[#a5b4fc] hover:bg-slate-50 dark:hover:bg-[#2a2b2f] transition-all duration-150 active:scale-95 shadow-md"
+                  aria-label="Sağa Kaydır"
+                >
+                  <ChevronRight size={14} />
+                </button>
+              </div>
+            )}
+
             <div
               ref={catScroll.ref}
               onMouseDown={catScroll.onMouseDown}
@@ -1508,8 +1582,8 @@ const SearchPage = () => {
 
           {/* Results */}
           <div className="space-y-1">
-            <div className="flex justify-between items-center mb-6 px-2">
-              <h2 className="text-[10px] font-black text-slate-400 dark:text-slate-700 uppercase tracking-[0.4em]">
+            <div className="flex justify-end items-center mb-6 px-2">
+              <h2 className="text-[10px] font-black text-slate-400 dark:text-slate-700 uppercase tracking-[0.4em] text-right">
                 {t("search_results_label")} ({filteredBots.length})
               </h2>
             </div>

@@ -1090,6 +1090,34 @@ const BotDetail = () => {
   const [isMobileActionMenuOpen, setIsMobileActionMenuOpen] = useState(false);
   const [isCategoriesExpanded, setIsCategoriesExpanded] = useState(false);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  const [isDescriptionLong, setIsDescriptionLong] = useState(false);
+  const descriptionRef = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    const el = descriptionRef.current;
+    if (!el || !bot?.description) return;
+
+    const checkIsLong = () => {
+      if (!isDescriptionExpanded) {
+        setIsDescriptionLong(el.scrollHeight > el.clientHeight);
+      }
+    };
+
+    checkIsLong();
+
+    const observer = new ResizeObserver(() => {
+      checkIsLong();
+    });
+    observer.observe(el);
+
+    const timer = setTimeout(checkIsLong, 150);
+
+    return () => {
+      observer.disconnect();
+      clearTimeout(timer);
+    };
+  }, [bot?.description, isDescriptionExpanded, isLoading]);
+
   const [isSidebarDropdownOpen, setIsSidebarDropdownOpen] = useState(false);
   const [userRating, setUserRating] = useState<number | null>(null);
   const [hoverRating, setHoverRating] = useState<number | null>(null);
@@ -1957,11 +1985,17 @@ const BotDetail = () => {
                   </h2>
                 </div>
                 <div className="p-6 bg-slate-100/40 dark:bg-slate-900/40 rounded-2xl border border-slate-200/50 dark:border-white/5 text-sm text-slate-700 dark:text-slate-400 leading-relaxed transition-colors duration-300 bot-detail-about-box">
-                  {!isDescriptionExpanded && bot.description.length > 180 ? (
-                    <div className="relative">
-                      <p className="text-sm text-slate-700 dark:text-slate-400 leading-relaxed line-clamp-3 pr-24">
-                        {bot.description}
-                      </p>
+                  <div className="relative">
+                    <p
+                      ref={descriptionRef}
+                      className={`text-sm text-slate-700 dark:text-slate-400 leading-relaxed ${
+                        !isDescriptionExpanded ? "line-clamp-3 pr-24" : "whitespace-pre-wrap"
+                      }`}
+                    >
+                      {bot.description}
+                    </p>
+
+                    {!isDescriptionExpanded && isDescriptionLong && (
                       <button
                         onClick={() => {
                           if (haptic) haptic("light");
@@ -1971,23 +2005,20 @@ const BotDetail = () => {
                       >
                         {t("show_more") || "Daha fazla göster"}
                       </button>
-                    </div>
-                  ) : (
-                    <p className="text-sm text-slate-700 dark:text-slate-400 leading-relaxed whitespace-pre-wrap">
-                      {bot.description}
-                      {bot.description.length > 180 && isDescriptionExpanded && (
-                        <button
-                          onClick={() => {
-                            if (haptic) haptic("light");
-                            setIsDescriptionExpanded(false);
-                          }}
-                          className="bot-detail-show-less-btn inline text-xs font-bold text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 active:scale-95 transition-all select-none cursor-pointer align-baseline ml-2"
-                        >
-                          {t("show_less") || "Daha az göster"}
-                        </button>
-                      )}
-                    </p>
-                  )}
+                    )}
+
+                    {isDescriptionExpanded && isDescriptionLong && (
+                      <button
+                        onClick={() => {
+                          if (haptic) haptic("light");
+                          setIsDescriptionExpanded(false);
+                        }}
+                        className="bot-detail-show-less-btn inline text-xs font-bold text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 active:scale-95 transition-all select-none cursor-pointer align-baseline ml-2"
+                      >
+                        {t("show_less") || "Daha az göster"}
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -2147,7 +2178,7 @@ const BotDetail = () => {
                                       bot.telegram_group!.startsWith("@")
                                         ? `https://t.me/${bot.telegram_group!.substring(1)}`
                                         : bot.telegram_group;
-                                    window.open(url, "_blank");
+                                    window.open(url || undefined, "_blank");
                                     setIsDropdownOpen(false);
                                   }}
                                   className="w-full flex items-center justify-between px-4 py-4 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-colors text-left group"
@@ -2170,7 +2201,7 @@ const BotDetail = () => {
                               {bot.website_url && (
                                 <button
                                   onClick={() => {
-                                    window.open(bot.website_url, "_blank");
+                                    window.open(bot.website_url || undefined, "_blank");
                                     setIsDropdownOpen(false);
                                   }}
                                   className="w-full flex items-center justify-between px-4 py-4 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-colors text-left group border-t border-black/[0.03] dark:border-white/[0.03]"
@@ -2193,7 +2224,7 @@ const BotDetail = () => {
                               {bot.app_url && (
                                 <button
                                   onClick={() => {
-                                    window.open(bot.app_url, "_blank");
+                                    window.open(bot.app_url || undefined, "_blank");
                                     setIsDropdownOpen(false);
                                   }}
                                   className="w-full flex items-center justify-between px-4 py-4 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-colors text-left group border-t border-black/[0.03] dark:border-white/[0.03]"
@@ -2216,7 +2247,7 @@ const BotDetail = () => {
                               {bot.social_url && (
                                 <button
                                   onClick={() => {
-                                    window.open(bot.social_url, "_blank");
+                                    window.open(bot.social_url || undefined, "_blank");
                                     setIsDropdownOpen(false);
                                   }}
                                   className="w-full flex items-center justify-between px-4 py-4 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-colors text-left group border-t border-black/[0.03] dark:border-white/[0.03]"
@@ -2488,7 +2519,7 @@ const BotDetail = () => {
                   <div className="flex flex-wrap gap-2.5">
                     {bot.app_url && (
                       <button
-                        onClick={() => window.open(bot.app_url, "_blank")}
+                        onClick={() => window.open(bot.app_url || undefined, "_blank")}
                         className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200/50 dark:border-white/10 text-xs font-bold text-slate-700 dark:text-white bg-white/5 dark:bg-[#111214]/40 hover:bg-slate-205/50 dark:hover:bg-white/5 cursor-pointer backdrop-blur-md transition-all active:scale-95 duration-200"
                       >
                         <Terminal size={14} className="text-slate-400 dark:text-slate-500" />
@@ -2497,7 +2528,7 @@ const BotDetail = () => {
                     )}
                     {bot.website_url && (
                       <button
-                        onClick={() => window.open(bot.website_url, "_blank")}
+                        onClick={() => window.open(bot.website_url || undefined, "_blank")}
                         className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200/50 dark:border-white/10 text-xs font-bold text-slate-700 dark:text-white bg-white/5 dark:bg-[#111214]/40 hover:bg-slate-205/50 dark:hover:bg-white/5 cursor-pointer backdrop-blur-md transition-all active:scale-95 duration-200"
                       >
                         <Link2 size={14} className="text-slate-400 dark:text-slate-500" />
@@ -2510,17 +2541,17 @@ const BotDetail = () => {
                           const url = bot.telegram_group!.startsWith("@")
                             ? `https://t.me/${bot.telegram_group!.substring(1)}`
                             : bot.telegram_group;
-                          window.open(url, "_blank");
+                          window.open(url || undefined, "_blank");
                         }}
                         className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200/50 dark:border-white/10 text-xs font-bold text-slate-700 dark:text-white bg-white/5 dark:bg-[#111214]/40 hover:bg-slate-205/50 dark:hover:bg-white/5 cursor-pointer backdrop-blur-md transition-all active:scale-95 duration-200"
                       >
-                        <Send size={14} className="text-slate-400 dark:text-slate-500" />
+                        <Send size={14} className="text-slate-400 dark:text-slate-400" />
                         <span>{t("detail_tg_group") || "Telegram Grubu"}</span>
                       </button>
                     )}
                     {bot.social_url && (
                       <button
-                        onClick={() => window.open(bot.social_url, "_blank")}
+                        onClick={() => window.open(bot.social_url || undefined, "_blank")}
                         className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200/50 dark:border-white/10 text-xs font-bold text-slate-700 dark:text-white bg-white/5 dark:bg-[#111214]/40 hover:bg-slate-205/50 dark:hover:bg-white/5 cursor-pointer backdrop-blur-md transition-all active:scale-95 duration-200"
                       >
                         <Share2 size={14} className="text-slate-400 dark:text-slate-500" />
