@@ -130,8 +130,8 @@ const BotCard: React.FC<{ bot: Bot; tonRate: number }> = ({ bot, tonRate }) => {
           <LazyImage
             src={getLiveBotIcon(bot)}
             alt={bot.name}
-            className="w-10 h-10 rounded-xl object-cover border border-black/[0.04] dark:border-white/[0.06] shrink-0"
-            containerClass="w-10 h-10 rounded-xl shrink-0"
+            className="w-[3.5rem] h-[3.5rem] rounded-xl object-cover border border-black/[0.04] dark:border-white/[0.06] shrink-0"
+            containerClass="w-[3.5rem] h-[3.5rem] rounded-xl shrink-0"
             skeletonClass="rounded-xl"
             onError={(e) => {
               (e.target as any).src =

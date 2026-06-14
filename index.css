@@ -436,7 +436,7 @@ svg.lucide.lucide-chevron-right:focus {
 }
 
 .w-20 {
-  border-radius: 0px !important;
+  border-radius: 12px !important;
   width: 5.2rem;
 }
 
@@ -2587,6 +2587,21 @@ span.text-\[11px\].font-bold.uppercase.tracking-wider {
 .top-10 {
     top: 4.5rem;
 }
+
+.md\:w-auto {
+    align-items: center;
+    width: auto;
+}
+
+.flex.items-center.justify-center.gap-2 {
+    margin-bottom: 0rem;
+}
+
+.dark\:bg-\[\#0F1623\]:is(.dark *) {
+    background-color: #ffffff0d !important;
+    border: 1px solid rgb(255 255 255 / 0%) !important;
+}
+
 
 
 
