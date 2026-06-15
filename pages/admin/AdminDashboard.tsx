@@ -754,10 +754,28 @@ const BotManagement = () => {
                                                                 ...appsSubCategories
                                                               ]
                                                             : categories.filter(c => c.id !== 'all' && c.id !== 'apps')
-                                                        ).map((cat: any) => {
+                                                                                                                ).map((cat: any) => {
                                                             const isSelected = (editingBot.category || []).includes(cat.id);
                                                             const labelMap: Record<string, string> = {
+                                                                'all': 'Hepsi',
+                                                                'cat_all': 'Hepsi',
+                                                                'apps': 'Uygulamalar',
                                                                 'cat_apps': 'Uygulamalar',
+                                                                'apps_cat_trending': 'Trendler',
+                                                                'apps_cat_editors_choice': 'Editörün Seçimi',
+                                                                'apps_cat_new': 'Yeni',
+                                                                'apps_cat_games': 'Oyunlar',
+                                                                'apps_cat_tma_bots': 'TMA & Botlar',
+                                                                'apps_cat_ton_sites': 'TON Siteleri',
+                                                                'apps_cat_ai': 'Yapay Zeka',
+                                                                'apps_cat_web3': 'Web3 Genel',
+                                                                'apps_cat_earn': 'Kazan',
+                                                                'apps_cat_trade': 'Ticaret',
+                                                                'apps_cat_art': 'Sanat',
+                                                                'apps_cat_social': 'Sosyal',
+                                                                'apps_cat_dev': 'Geliştirici',
+                                                                'apps_cat_saas': 'SaaS',
+                                                                'apps_cat_security': 'Güvenlik & Gizlilik',
                                                                 'cat_games': 'Oyunlar',
                                                                 'cat_finance': 'Finans',
                                                                 'cat_moderation': 'Moderasyon',
@@ -772,7 +790,37 @@ const BotManagement = () => {
                                                                 'cat_shopping': 'Alışveriş',
                                                                 'cat_security': 'Güvenlik',
                                                                 'cat_education': 'Eğitim',
-                                                                'cat_content': 'İçerik'
+                                                                'cat_content': 'İçerik',
+                                                                'games': 'Oyunlar',
+                                                                'finance': 'Finans',
+                                                                'moderation': 'Moderasyon',
+                                                                'utilities': 'Araçlar',
+                                                                'ai_services': 'AI Hizmetleri',
+                                                                'communication': 'İletişim',
+                                                                'productivity': 'Üretkenlik',
+                                                                'music': 'Müzik',
+                                                                'crypto': 'Kripto',
+                                                                'telegram_platform': 'Telegram Platformu',
+                                                                'bloggers': 'Bloggerlar',
+                                                                'shopping': 'Alışveriş',
+                                                                'security': 'Güvenlik',
+                                                                'education': 'Eğitim',
+                                                                'content': 'İçerik',
+                                                                'trending': 'Trendler',
+                                                                'editors_choice': 'Editörün Seçimi',
+                                                                'new': 'Yeni',
+                                                                'games_sub': 'Oyunlar',
+                                                                'tma_bots': 'TMA & Botlar',
+                                                                'ton_sites': 'TON Siteleri',
+                                                                'ai_sub': 'Yapay Zeka',
+                                                                'web3_general': 'Web3 Genel',
+                                                                'earn': 'Kazan',
+                                                                'trade': 'Ticaret',
+                                                                'art': 'Sanat',
+                                                                'social': 'Sosyal',
+                                                                'dev': 'Geliştirici',
+                                                                'saas': 'SaaS',
+                                                                'security_privacy': 'Güvenlik & Gizlilik'
                                                             };
                                                             return (
                                                                 <button
@@ -788,7 +836,7 @@ const BotManagement = () => {
                                                                     className={`flex items-center gap-3 px-5 py-4 rounded-2xl text-[9px] font-black tracking-widest transition-all border ${isSelected ? 'bg-brand border-brand text-white ' : 'bg-white/5 border-white/5 text-slate-500 hover:bg-white/10'}`}
                                                                 >
                                                                     <cat.icon size={16} className={isSelected ? 'text-white' : 'text-slate-600'} />
-                                                                    <span className="uppercase italic truncate">{cat.label?.startsWith('cat_') ? labelMap[cat.label] || cat.label?.replace('cat_', '') : cat.label}</span>
+                                                                    <span className="uppercase italic truncate">{labelMap[cat.label] || labelMap[cat.id] || cat.label?.replace('cat_', '')?.replace('apps_cat_', '') || cat.label}</span>
                                                                 </button>
                                                             );
                                                         })}

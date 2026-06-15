@@ -436,8 +436,17 @@ svg.lucide.lucide-chevron-right:focus {
 }
 
 .w-20 {
-  border-radius: 12px !important;
   width: 5.2rem;
+}
+
+.bg-gradient-to-l {
+    border-radius: 0px !important;
+    background-image: linear-gradient(to left, var(--tw-gradient-stops));
+}
+
+.dark\:text-slate-200:is(.dark *) {
+    --tw-text-opacity: 1;
+    color: #8c8c8c !important;
 }
 
 @media (max-width: 640px) {
