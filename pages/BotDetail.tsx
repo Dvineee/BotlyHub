@@ -2670,79 +2670,6 @@ const BotDetail = () => {
           )}
         </AnimatePresence>
 
-        {/* Screenshot Lightbox */}
-        <AnimatePresence>
-          {isLightboxOpen && bot?.screenshots && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[500] flex items-center justify-center bg-black/95 backdrop-blur-3xl px-4 md:px-0"
-              onClick={closeLightbox}
-            >
-              <div className="absolute top-8 right-8 flex items-center gap-4">
-                <span className="text-white/40 text-[10px] font-black uppercase tracking-[0.2em] hidden md:block">
-                  {t("detail_screenshot")} {currentImageIndex + 1} /{" "}
-                  {bot.screenshots.length}
-                </span>
-                <button
-                  onClick={closeLightbox}
-                  className="w-12 h-12 bg-white/10 hover:bg-white/20 text-white rounded-full flex items-center justify-center transition-colors"
-                  aria-label={t("close")}
-                >
-                  <X size={24} />
-                </button>
-              </div>
-
-              <button
-                onClick={prevImage}
-                className="absolute left-4 md:left-8 w-12 h-12 md:w-16 md:h-16 bg-white/10 hover:bg-white/20 text-white rounded-full flex items-center justify-center transition-all z-10 active:scale-90"
-                aria-label={t("prev")}
-              >
-                <ChevronLeft size={32} />
-              </button>
-
-              <motion.div
-                key={currentImageIndex}
-                initial={{ opacity: 0, scale: 0.9, x: 20 }}
-                animate={{ opacity: 1, scale: 1, x: 0 }}
-                exit={{ opacity: 0, scale: 0.9, x: -20 }}
-                className="relative w-full max-w-4xl h-[70vh] md:h-[80vh] flex items-center justify-center"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <img
-                  src={bot.screenshots[currentImageIndex]}
-                  alt={`${t("detail_screenshot")} ${currentImageIndex + 1}`}
-                  className="max-w-full max-h-full object-contain rounded-xl md:rounded-xl shadow-2xl"
-                />
-              </motion.div>
-
-              <button
-                onClick={nextImage}
-                className="absolute right-4 md:right-8 w-12 h-12 md:w-16 md:h-16 bg-white/10 hover:bg-white/20 text-white rounded-full flex items-center justify-center transition-all z-10 active:scale-90"
-                aria-label={t("next")}
-              >
-                <ChevronRight size={32} />
-              </button>
-
-              {/* Thumbnails preview for large screens */}
-              <div className="absolute bottom-10 left-10 right-10 flex justify-center gap-3 overflow-x-auto no-scrollbar py-4 hidden md:flex">
-                {bot.screenshots.map((s, idx) => (
-                  <button
-                    key={idx}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setCurrentImageIndex(idx);
-                    }}
-                    className={`w-12 h-20 rounded-xl overflow-hidden border-2 transition-all shrink-0 ${currentImageIndex === idx ? "border-brand scale-110" : "border-white/10 opacity-40 hover:opacity-100"}`}
-                  >
-                    <img src={s} className="w-full h-full object-cover" />
-                  </button>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
 
       {/* Sticky Action Bar (Moved Outside to be truly fixed at the very bottom on mobile without layout or overflow issues) */}
@@ -2814,6 +2741,80 @@ const BotDetail = () => {
           </button>
         </div>
       </div>
+
+      {/* Screenshot Lightbox (Placed at root level behind root fragment to remain perfectly centered without parent relative constraints) */}
+      <AnimatePresence>
+        {isLightboxOpen && bot?.screenshots && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/95 backdrop-blur-3xl px-4 md:px-8"
+            onClick={closeLightbox}
+          >
+            <div className="absolute top-8 right-8 flex items-center gap-4 z-50">
+              <span className="text-white/40 text-[10px] font-black uppercase tracking-[0.2em] hidden md:block">
+                {t("detail_screenshot")} {currentImageIndex + 1} /{" "}
+                {bot.screenshots.length}
+              </span>
+              <button
+                onClick={closeLightbox}
+                className="w-12 h-12 bg-white/10 hover:bg-white/20 text-white rounded-full flex items-center justify-center transition-colors"
+                aria-label={t("close")}
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <button
+              onClick={prevImage}
+              className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 w-12 h-12 md:w-16 md:h-16 bg-white/10 hover:bg-white/20 text-white rounded-full flex items-center justify-center transition-all z-50 active:scale-90"
+              aria-label={t("prev")}
+            >
+              <ChevronLeft size={32} />
+            </button>
+
+            <motion.div
+              key={currentImageIndex}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="relative w-full max-w-4xl h-[70vh] md:h-[80vh] flex items-center justify-center z-10"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <img
+                src={bot.screenshots[currentImageIndex]}
+                alt={`${t("detail_screenshot")} ${currentImageIndex + 1}`}
+                className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl mx-auto my-auto select-none"
+              />
+            </motion.div>
+
+            <button
+              onClick={nextImage}
+              className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 w-12 h-12 md:w-16 md:h-16 bg-white/10 hover:bg-white/20 text-white rounded-full flex items-center justify-center transition-all z-50 active:scale-90"
+              aria-label={t("next")}
+            >
+              <ChevronRight size={32} />
+            </button>
+
+            {/* Thumbnails preview for large screens */}
+            <div className="absolute bottom-10 left-10 right-10 flex justify-center gap-3 overflow-x-auto no-scrollbar py-4 hidden md:flex z-50">
+              {bot.screenshots.map((s, idx) => (
+                <button
+                  key={idx}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentImageIndex(idx);
+                  }}
+                  className={`w-12 h-20 rounded-xl overflow-hidden border-2 transition-all shrink-0 ${currentImageIndex === idx ? "border-brand scale-110" : "border-white/10 opacity-40 hover:opacity-100"}`}
+                >
+                  <img src={s} className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <LoginModal
         isOpen={isLoginModalOpen}

@@ -2655,4 +2655,10 @@ span.text-\[11px\].font-bold.uppercase.tracking-wider {
     }
 }
 
+.fixed.inset-0.bg-slate-950\/80, .fixed.inset-0.bg-slate-950\/40, .fixed.inset-0.bg-black\/80, .fixed.inset-0.bg-black\/95 {
+    backdrop-filter: blur(12px) !important;
+    background: #0d0e1270;
+    -webkit-backdrop-filter: blur(12px)!important;
+}
+
 
