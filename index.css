@@ -2566,8 +2566,8 @@ div.qa-last-24h-box, .qa-last-24h-box {
 }
 
 .-mx-4 {
-    padding-left: 8px !important;
-    padding-right: 8px !important;
+    padding-left: 0px !important;
+    padding-right: 0px !important;
     margin-left: 0rem !important;
     margin-right: 0rem !important;
 }
@@ -2614,13 +2614,45 @@ span.text-\[11px\].font-bold.uppercase.tracking-wider {
     border: 1px solid rgb(255 255 255 / 0%) !important;
 }
 
+.hidden.sm\:grid.sm\:grid-cols-2.lg\:grid-cols-3.gap-x-8.gap-y-7.px-1.py-2 {
+    position: relative;
+    right: 13px;
+}
 
+.sm\:hidden.relative.-mx-4.px-4.overflow-hidden {
+    position: relative;
+    right: 13px;
+}
 
+@media (min-width: 640px) {
+    .sm\:px-8 {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}
 
+@media (max-width: 767px) {
+    .w-12 {
+        width: 3.5rem !important;
+    }
+}
 
+@media (max-width: 767px) {
+    .h-12 {
+        height: 3.5rem !important;
+    }
+}
 
+@media (max-width: 767px) {
+    .p-3 {
+        padding: 0.5rem !important;
+    }
+}
 
-
-
+@media (max-width: 767px) {
+    .pb-3 {
+        padding-bottom: 0rem !important;
+    }
+}
 
 
