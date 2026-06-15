@@ -1367,6 +1367,13 @@ const SearchPage = () => {
               Array.isArray(b.category)
                 ? b.category.includes("crypto")
                 : b.category === "crypto",
+            tap_to_earn: (b) => {
+              const nameLower = b.name.toLowerCase();
+              const descLower = (b.description || '').toLowerCase();
+              const isGame = Array.isArray(b.category) ? b.category.includes("games") : b.category === "games";
+              const hasTapKeywords = nameLower.includes("tap") || nameLower.includes("click") || nameLower.includes("coin") || nameLower.includes("hamster") || nameLower.includes("catizen") || nameLower.includes("blum") || nameLower.includes("yescoin") || nameLower.includes("empire") || nameLower.includes("notcoin") || descLower.includes("tap") || descLower.includes("tıkla") || descLower.includes("click") || descLower.includes("mining") || descLower.includes("kazan");
+              return isGame || hasTapKeywords;
+            },
             web3_general: (b) =>
               Array.isArray(b.category)
                 ? b.category.includes("crypto") ||

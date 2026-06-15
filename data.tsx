@@ -6,7 +6,8 @@ import {
   LayoutGrid, Gamepad2, Landmark, ShieldCheck, Wrench, BrainCircuit,
   MessageSquare, Briefcase, Music, Coins, Send, PenTool,
   ShoppingBag, Shield, GraduationCap, Play, Flame, Award,
-  Sparkles, Bot, Globe, Link2, RefreshCw, Palette, Users, Code, Cloud, EyeOff
+  Sparkles, Bot, Globe, Link2, RefreshCw, Palette, Users, Code, Cloud, EyeOff,
+  MousePointerClick
 } from 'lucide-react';
 
 const AppsIcon = ({ size = 20, className = "" }: { size?: number, className?: string }) => (
@@ -133,6 +134,10 @@ const PrivacyIcon = ({ size = 24, className = "" }: { size?: number, className?:
     <EyeOff size={size} className={`stroke-[2.2] text-[#0a263d] dark:text-slate-200 ${className}`} />
 );
 
+const TapToEarnIcon = ({ size = 24, className = "" }: { size?: number, className?: string }) => (
+    <MousePointerClick size={size} className={`stroke-[2.2] text-[#0a263d] dark:text-slate-200 ${className}`} />
+);
+
 export const appsSubCategories = [
     { id: 'trending', label: 'apps_cat_trending', icon: TrendIcon },
     { id: 'editors_choice', label: 'apps_cat_editors_choice', icon: EditorIcon },
@@ -143,6 +148,7 @@ export const appsSubCategories = [
     { id: 'ai_sub', label: 'apps_cat_ai', icon: AIIconForApps },
     { id: 'web3_general', label: 'apps_cat_web3', icon: Web3Icon },
     { id: 'earn', label: 'apps_cat_earn', icon: EarnIcon },
+    { id: 'tap_to_earn', label: 'apps_cat_tap_to_earn', icon: TapToEarnIcon },
     { id: 'trade', label: 'apps_cat_trade', icon: TradeIcon },
     { id: 'art', label: 'apps_cat_art', icon: ArtIcon },
     { id: 'social', label: 'apps_cat_social', icon: SocialIcon },
