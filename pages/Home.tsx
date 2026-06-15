@@ -2295,15 +2295,11 @@ const Home = () => {
         : b.category === "apps",
     );
 
-    // Top 3 (First 3 bots will be the dashboards selected featured bot or app, with fallbacks)
+    // Top 3 (First 3 bots will be the dashboards selected featured bot or app)
     const dashboardAppsFeatured = allApps.filter(
       (b) => b.promoted_type === "featured",
     );
-    const remainingApps = allApps.filter((b) => b.promoted_type !== "featured");
-    const appsFeatured = [...dashboardAppsFeatured, ...remainingApps].slice(
-      0,
-      3,
-    );
+    const appsFeatured = dashboardAppsFeatured.slice(0, 3);
 
     // Slider/List (Popular apps in selected category)
     let appsForList = allApps;
@@ -2382,15 +2378,11 @@ const Home = () => {
         : b.category !== "apps",
     );
 
-    // Top 3 (First 3 bots will be the dashboards selected featured bot or app, with fallbacks)
+    // Top 3 (First 3 bots will be the dashboards selected featured bot or app)
     const dashboardBotsFeatured = allBots.filter(
       (b) => b.promoted_type === "featured",
     );
-    const remainingBots = allBots.filter((b) => b.promoted_type !== "featured");
-    const botsFeatured = [...dashboardBotsFeatured, ...remainingBots].slice(
-      0,
-      3,
-    );
+    const botsFeatured = dashboardBotsFeatured.slice(0, 3);
 
     // Slider/List (Popular bots in selected category)
     let botsForList = allBots;
@@ -3780,20 +3772,22 @@ const Home = () => {
                               </div>
 
                               {/* Top 3 Featured Cards for this section */}
-                              <div className="flex md:grid md:grid-cols-3 gap-5 mb-4 overflow-x-auto no-scrollbar pb-3 md:pb-0 snap-x snap-mandatory animate-in fade-in slide-in-from-bottom-2 duration-700">
-                                {featuredBots.map((bot, index) => (
-                                  <div
-                                    key={bot.id}
-                                    className="min-w-[280px] w-[85%] sm:min-w-[320px] md:w-full snap-center shrink-0"
-                                  >
-                                    <BotCard
-                                      bot={bot}
-                                      tonRate={tonRate}
-                                      featuredRank={index + 1}
-                                    />
-                                  </div>
-                                ))}
-                              </div>
+                              {featuredBots.length > 0 && (
+                                <div className="flex md:grid md:grid-cols-3 gap-5 mb-4 overflow-x-auto no-scrollbar pb-3 md:pb-0 snap-x snap-mandatory animate-in fade-in slide-in-from-bottom-2 duration-700">
+                                  {featuredBots.map((bot, index) => (
+                                    <div
+                                      key={bot.id}
+                                      className="min-w-[280px] w-[85%] sm:min-w-[320px] md:w-full snap-center shrink-0"
+                                    >
+                                      <BotCard
+                                        bot={bot}
+                                        tonRate={tonRate}
+                                        featuredRank={index + 1}
+                                      />
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
 
                               <div
                                 ref={catScroll.ref}
@@ -3925,20 +3919,22 @@ const Home = () => {
                               </div>
 
                               {/* Top 3 Featured Cards for this section */}
-                              <div className="flex md:grid md:grid-cols-3 gap-5 mb-4 overflow-x-auto no-scrollbar pb-3 md:pb-0 snap-x snap-mandatory animate-in fade-in slide-in-from-bottom-2 duration-700">
-                                {featuredBots.map((bot, index) => (
-                                  <div
-                                    key={bot.id}
-                                    className="min-w-[280px] w-[85%] sm:min-w-[320px] md:w-full snap-center shrink-0"
-                                  >
-                                    <BotCard
-                                      bot={bot}
-                                      tonRate={tonRate}
-                                      featuredRank={index + 1}
-                                    />
-                                  </div>
-                                ))}
-                              </div>
+                              {featuredBots.length > 0 && (
+                                <div className="flex md:grid md:grid-cols-3 gap-5 mb-4 overflow-x-auto no-scrollbar pb-3 md:pb-0 snap-x snap-mandatory animate-in fade-in slide-in-from-bottom-2 duration-700">
+                                  {featuredBots.map((bot, index) => (
+                                    <div
+                                      key={bot.id}
+                                      className="min-w-[280px] w-[85%] sm:min-w-[320px] md:w-full snap-center shrink-0"
+                                    >
+                                      <BotCard
+                                        bot={bot}
+                                        tonRate={tonRate}
+                                        featuredRank={index + 1}
+                                      />
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
 
                               <div
                                 ref={botsCatScroll.ref}
