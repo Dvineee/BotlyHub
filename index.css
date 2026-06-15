@@ -2441,8 +2441,10 @@ div.qa-last-24h-box, .qa-last-24h-box {
     filter: brightness(1.25) !important;
 }
 
+/* Bot Detay Sayfası - "Daha Fazla Göster" Butonu Gece ve Gündüz Modu Arkaplan Tanımlamaları */
+/* Gündüz (Light) Modu Arkaplanı: Sayfa ana mekan rengi olan #F7F8FA ile bütünleşik geçiş sağlandı */
 .bot-detail-show-more-btn {
-    background: linear-gradient(to left, #fff 65%, rgba(255, 255, 255, 0)) !important;
+    background: linear-gradient(to left, #F7F8FA 65%, rgba(247, 248, 250, 0)) !important;
     color: #3b82f6 !important;
     padding-left: 2.5rem !important;
     font-weight: 700 !important;
@@ -2452,8 +2454,9 @@ div.qa-last-24h-box, .qa-last-24h-box {
     color: #2563eb !important;
 }
 
+/* Gece (Dark) Modu Arkaplanı: Sayfa ana mekan rengi olan #0A0A0B ile bütünleşik geçiş sağlandı */
 .dark .bot-detail-show-more-btn {
-    background: linear-gradient(to left, #151618 65%, rgba(21, 22, 24, 0)) !important;
+    background: linear-gradient(to left, #0A0A0B 65%, rgba(10, 10, 11, 0)) !important;
     color: #60a5fa !important;
 }
 
