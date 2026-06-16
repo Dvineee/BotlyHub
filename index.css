@@ -53,8 +53,19 @@
 }
 
 .qa-sidebar-widget {
-  box-shadow: none !important;
-  padding: 12px !important;
+    outline: 1px solid #e2e8f0 !important;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: none !important;
+    padding: 12px !important;
+}
+
+.dark .qa-sidebar-widget {
+    border-radius: 12px !important;
+    background: #191919 !important;
+    outline: 1px solid var(--border-color) !important;
+    box-shadow: none !important;
+    padding: 12px !important;
 }
 
 .text-xs {
