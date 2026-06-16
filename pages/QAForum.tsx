@@ -38,6 +38,8 @@ import {
   Globe,
   Edit2,
   Trash2,
+  Settings,
+  Link2,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useTelegram } from "../hooks/useTelegram";
@@ -151,6 +153,9 @@ export default function QAForum() {
   const menuRef = React.useRef<HTMLDivElement>(null);
 
   // Modals & Panels
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+  const [searchModalQuery, setSearchModalQuery] = useState("");
+  const [searchModalType, setSearchModalType] = useState<"all" | "tags" | "users">("all");
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingTopicId, setEditingTopicId] = useState<string | null>(null);
   const [isDetailView, setIsDetailView] = useState(false);
@@ -281,6 +286,18 @@ export default function QAForum() {
     }
     fetchAvailableBots();
   }, [location.search]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        haptic("light");
+        setIsSearchModalOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   useEffect(() => {
     if (currentUser?.id) {
@@ -884,9 +901,20 @@ export default function QAForum() {
               <button
                 onClick={() => {
                   haptic("light");
+                  setIsSearchModalOpen(true);
+                }}
+                className="md:hidden order-1 md:order-3 w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 border border-black/5 dark:border-white/5 rounded-xl text-slate-900 dark:text-white active:scale-95 transition-all outline-none shrink-0"
+                title="Soru ve Tartışma Ara (Ctrl+K)"
+              >
+                <Search size={18} />
+              </button>
+
+              <button
+                onClick={() => {
+                  haptic("light");
                   toggleTheme();
                 }}
-                className="w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 border border-black/5 dark:border-white/5 rounded-xl text-slate-900 dark:text-white active:scale-95 transition-all outline-none shrink-0"
+                className="order-2 md:order-1 w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 border border-black/5 dark:border-white/5 rounded-xl text-slate-900 dark:text-white active:scale-95 transition-all outline-none shrink-0"
               >
                 {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
               </button>
@@ -897,12 +925,12 @@ export default function QAForum() {
                     haptic("light");
                     setIsLoginModalOpen(true);
                   }}
-                  className="h-10 px-4 flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white border-none text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-blue-500/20 active:scale-95 transition-all whitespace-nowrap"
+                  className="order-3 md:order-2 h-10 px-4 flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white border-none text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-blue-500/20 active:scale-95 transition-all whitespace-nowrap"
                 >
                   {t("home_login")}
                 </button>
               ) : (
-                <div className="relative" ref={menuRef}>
+                <div className="relative order-3 md:order-2" ref={menuRef}>
                   <button
                     onClick={() => {
                       haptic("light");
@@ -1107,9 +1135,9 @@ export default function QAForum() {
 
       {/* Main Content Layout Container */}
       <main className="max-w-3xl lg:max-w-[1100px] mx-auto px-4 sm:px-6 py-6 transition-all">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
           {/* Left Column: Topics List or Topic Detail */}
-          <div className="lg:col-span-8">
+          <div className="md:col-span-8 lg:col-span-8">
             <AnimatePresence mode="wait">
               {!isDetailView ? (
                 <motion.div
@@ -1934,7 +1962,26 @@ export default function QAForum() {
           </div>
 
           {/* Right Column: Sidebar featuring Popüler Etiketler & En Çok Tartışılanlar */}
-          <div className="lg:col-span-4 space-y-6 hidden lg:block select-none sticky top-24 h-fit">
+          <div className="md:col-span-4 lg:col-span-4 space-y-6 hidden md:block select-none sticky top-24 h-fit">
+            {/* 🔍 Arama Widget */}
+            <div
+              onClick={() => {
+                haptic("light");
+                setIsSearchModalOpen(true);
+              }}
+              className="qa-sidebar-widget fancy-glass-card cursor-pointer group hover:bg-slate-50 dark:hover:bg-slate-800/40 hover:border-indigo-500/30 transition-all duration-300"
+            >
+              <div className="flex items-center gap-3">
+                <Search size={16} className="text-slate-400 dark:text-slate-500 group-hover:text-indigo-500 transition-colors" />
+                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 group-hover:text-indigo-500 transition-colors">
+                  Forumda ara...
+                </span>
+                <span className="ml-auto text-[10px] text-slate-400 dark:text-slate-500 font-mono bg-slate-100 dark:bg-slate-800/60 px-1.5 py-0.5 rounded">
+                  Ctrl+K
+                </span>
+              </div>
+            </div>
+
             {/* 🏷️ Popüler Etiketler Widget */}
             <div className="qa-sidebar-widget fancy-glass-card">
               <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100 dark:border-slate-800/30">
@@ -2193,7 +2240,7 @@ export default function QAForum() {
                 <button
                   onClick={() => {
                     haptic("light");
-                    navigate("/search");
+                    setIsSearchModalOpen(true);
                     setMobileModal(null);
                   }}
                   className="w-10 h-10 rounded-full flex items-center justify-center text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 active:scale-95 transition-all shrink-0"
@@ -2388,6 +2435,270 @@ export default function QAForum() {
         onClose={() => setIsLoginModalOpen(false)}
         onAuth={(webUser) => setWebAuthUser(webUser)}
       />
+
+      {/* 🔍 SEARCH MODAL - Based EXACTLY on the user's provided screenshot */}
+      <AnimatePresence>
+        {isSearchModalOpen && (
+          <div 
+            id="qa-search-backdrop"
+            className="fixed inset-0 z-[100] flex items-start justify-center p-4 pt-16 sm:pt-28 bg-black/40 dark:bg-black/60 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.98, y: -8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.98, y: -8 }}
+              transition={{ duration: 0.15, ease: "easeOut" }}
+              className="bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800 rounded-2xl max-w-[620px] w-full min-h-[460px] shadow-xl overflow-hidden flex flex-col qa-search-modal-container"
+            >
+              {/* Top search bar wrapper */}
+              <div className="flex items-center gap-3 px-[8px] py-[4px] border-b border-slate-100/80 dark:border-slate-800/80 qa-custom-search-wrapper">
+                <Search strokeWidth={1.8} size={20} className="text-slate-400 dark:text-slate-500 shrink-0" />
+                <input
+                  type="text"
+                  autoFocus
+                  value={searchModalQuery}
+                  onChange={(e) => setSearchModalQuery(e.target.value)}
+                  placeholder="Forumda ara..."
+                  className="flex-1 bg-transparent text-[16px] font-normal text-slate-800 dark:text-slate-100 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500 border-none py-[7px] px-[2px] shadow-none focus:ring-0 focus:outline-none qa-custom-search-input"
+                />
+                <button
+                  onClick={() => setIsSearchModalOpen(false)}
+                  className="text-slate-400/80 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-200 transition-colors shrink-0 p-1.5 rounded-lg hover:bg-slate-50 dark:hover:bg-white/5"
+                >
+                  <X strokeWidth={1.8} size={16} />
+                </button>
+              </div>
+
+              {/* Main inner body container */}
+              <div className="p-4 flex flex-col gap-4 flex-1">
+                
+                {/* Hash / At Filter Tag Buttons */}
+                <div className="flex items-center gap-2 select-none px-1">
+                  <button
+                    onClick={() => {
+                      haptic("light");
+                      setSearchModalType(searchModalType === "tags" ? "all" : "tags");
+                    }}
+                    className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-[13px] font-medium transition-all border qa-search-tag-btn ${
+                      searchModalType === "tags" ? "active" : ""
+                    }`}
+                  >
+                    <span className="opacity-90">#</span> etiketler
+                  </button>
+                  <button
+                    onClick={() => {
+                      haptic("light");
+                      setSearchModalType(searchModalType === "users" ? "all" : "users");
+                    }}
+                    className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-[13px] font-medium transition-all border qa-search-tag-btn ${
+                      searchModalType === "users" ? "active" : ""
+                    }`}
+                  >
+                    <span className="opacity-90">@</span> kullanıcılar
+                  </button>
+                </div>
+
+                {/* Conditional Display Area */}
+                {searchModalQuery.trim() === "" ? (
+                  // Default View shown when search query is empty (as seen in screenshot)
+                  <div className="flex flex-col flex-1 animate-in fade-in duration-200">
+                    <span className="text-[13px] font-semibold text-slate-400 dark:text-slate-500 mb-2.5 block px-1.5 pt-1">
+                      Sayfalar
+                    </span>
+                    
+                    {/* Item 1: Tartışma Başlat */}
+                    <button
+                      onClick={() => {
+                        haptic("medium");
+                        setIsSearchModalOpen(false);
+                        setShowCreateModal(true);
+                       }}
+                      className="w-full flex items-center gap-3.5 px-3 py-3 rounded-xl text-left transition-all active:scale-99 qa-search-modal-item"
+                    >
+                      <Link2 size={16} className="transform rotate-45 shrink-0 qa-icon" />
+                      <span className="text-[14px] font-medium">Tartışma başlat</span>
+                    </button>
+
+                    {/* Item 2: Yer İşaretleri */}
+                    <button
+                      onClick={() => {
+                        haptic("light");
+                        setIsSearchModalOpen(false);
+                        fetchTopics("son");
+                        setIsDetailView(false);
+                        setActiveTopic(null);
+                      }}
+                      className="w-full flex items-center gap-3.5 px-3 py-3 rounded-xl text-left transition-all active:scale-99 qa-search-modal-item"
+                    >
+                      <Bookmark size={16} className="shrink-0 qa-icon" />
+                      <span className="text-[14px] font-medium">Yer işaretleri</span>
+                    </button>
+
+                    {/* Item 3: Profil */}
+                    <button
+                      onClick={() => {
+                        haptic("light");
+                        setIsSearchModalOpen(false);
+                        if (currentUser?.id) {
+                          navigate(`/user/${currentUser.id}`);
+                        } else {
+                          setIsLoginModalOpen(true);
+                        }
+                      }}
+                      className="w-full flex items-center gap-3.5 px-3 py-3 rounded-xl text-left transition-all active:scale-99 qa-search-modal-item"
+                    >
+                      <User size={16} className="shrink-0 qa-icon" />
+                      <span className="text-[14px] font-medium">Profil</span>
+                    </button>
+
+                    {/* Item 4: Ayarlar */}
+                    <button
+                      onClick={() => {
+                        haptic("light");
+                        setIsSearchModalOpen(false);
+                        navigate("/settings");
+                      }}
+                      className="w-full flex items-center gap-3.5 px-3 py-3 rounded-xl text-left transition-all active:scale-99 mb-4 qa-search-modal-item"
+                    >
+                      <Settings size={16} className="shrink-0 qa-icon" />
+                      <span className="text-[14px] font-medium">Ayarlar</span>
+                    </button>
+                    
+                    {/* Horizontal Divider Line matching the screenshot precisely */}
+                    <div className="border-b border-slate-150 dark:border-slate-800/85 -mx-4 my-2" />
+                    
+                    {/* Beautiful blank bottom area as seen in the screenshot */}
+                    <div className="flex-1" />
+                  </div>
+                ) : (
+                  // Search Results View
+                  <div className="flex flex-col gap-3.5 animate-in fade-in duration-200 h-full">
+                    {/* Tags Search results */}
+                    {searchModalType !== "users" && (
+                      <div className="flex flex-col gap-1.5">
+                        {/* Filtered Tags */}
+                        {popularTags.filter(tag => tag.name.toLowerCase().includes(searchModalQuery.toLowerCase())).length > 0 && (
+                          <>
+                            <span className="text-[12px] font-semibold text-slate-400 dark:text-slate-500 px-1 mb-1 block">
+                              Etiketler
+                            </span>
+                            <div className="flex flex-wrap gap-1.5 mb-2 px-1">
+                              {popularTags
+                                .filter(tag => tag.name.toLowerCase().includes(searchModalQuery.toLowerCase()))
+                                .slice(0, 8)
+                                .map(tag => (
+                                  <button
+                                    key={tag.id}
+                                    onClick={() => {
+                                      haptic("light");
+                                      setIsSearchModalOpen(false);
+                                      if (isDetailView) {
+                                        setIsDetailView(false);
+                                        setActiveTopic(null);
+                                      }
+                                      fetchTopics(selectedFilter, tag.name);
+                                    }}
+                                    className="px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors border qa-search-result-pill"
+                                  >
+                                    #{tag.name}
+                                  </button>
+                                ))}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Users Search results */}
+                    {searchModalType !== "tags" && (
+                      <div className="flex flex-col gap-1.5">
+                        {/* Dynamically extract unique authors from topics */}
+                        {Array.from(new Set(topics.map(t => JSON.stringify({ id: t.author_id, name: t.author_name, avatar: t.author_avatar }))))
+                          .map(str => {
+                            try {
+                              return JSON.parse(str);
+                            } catch (e) {
+                              return null;
+                            }
+                          })
+                          .filter(u => u && u.name && u.name.toLowerCase().includes(searchModalQuery.toLowerCase()))
+                          .length > 0 && (
+                          <>
+                            <span className="text-[12px] font-semibold text-slate-400 dark:text-slate-500 px-1 mb-1 block">
+                              Kullanıcılar
+                            </span>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2 px-1">
+                              {Array.from(new Set(topics.map(t => JSON.stringify({ id: t.author_id, name: t.author_name, avatar: t.author_avatar }))))
+                                .map(str => {
+                                  try {
+                                    return JSON.parse(str);
+                                  } catch (e) {
+                                    return null;
+                                  }
+                                })
+                                .filter(u => u && u.name && u.name.toLowerCase().includes(searchModalQuery.toLowerCase()))
+                                .slice(0, 4)
+                                .map(u => (
+                                  <button
+                                    key={u.id}
+                                    onClick={() => {
+                                      haptic("light");
+                                      setIsSearchModalOpen(false);
+                                      navigate(`/user/${u.id}`);
+                                    }}
+                                    className="flex items-center gap-2.5 p-2 rounded-xl text-left transition-colors qa-search-modal-item"
+                                  >
+                                    <img src={u.avatar} className="w-6 h-6 rounded-full object-cover border border-slate-200 dark:border-slate-800" alt="" />
+                                    <span className="text-[13px] font-bold truncate">{u.name}</span>
+                                  </button>
+                                ))}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Topics/Discussions Search results */}
+                    {searchModalType === "all" && (
+                      <div className="flex flex-col gap-1.5 flex-1">
+                        <span className="text-[12px] font-semibold text-slate-400 dark:text-slate-500 px-1 mb-1 block">
+                          Tartışmalar
+                        </span>
+                        {topics.filter(t => t.title.toLowerCase().includes(searchModalQuery.toLowerCase()) || t.content.toLowerCase().includes(searchModalQuery.toLowerCase())).length > 0 ? (
+                          <div className="space-y-1.5 px-1 max-h-[260px] overflow-y-auto no-scrollbar">
+                            {topics
+                              .filter(t => t.title.toLowerCase().includes(searchModalQuery.toLowerCase()) || t.content.toLowerCase().includes(searchModalQuery.toLowerCase()))
+                              .slice(0, 5)
+                              .map(t => (
+                                <button
+                                  key={t.id}
+                                  onClick={() => {
+                                    haptic("light");
+                                    setIsSearchModalOpen(false);
+                                    setActiveTopic(t);
+                                    setIsDetailView(true);
+                                  }}
+                                  className="w-full p-3 rounded-xl text-left flex flex-col gap-1 qa-search-discussion-card"
+                                >
+                                  <span className="text-[13px] font-bold text-slate-800 dark:text-slate-200 line-clamp-1">{t.title}</span>
+                                  <span className="text-[11px] text-slate-400 dark:text-slate-500 line-clamp-1">{t.content}</span>
+                                </button>
+                              ))}
+                          </div>
+                        ) : (
+                          <div className="py-8 text-center text-slate-400 dark:text-slate-500 text-xs">
+                            Sonuç bulunamadı
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

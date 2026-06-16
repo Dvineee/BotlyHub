@@ -54,10 +54,14 @@
 
 .qa-sidebar-widget {
     outline: 1px solid #e2e8f0 !important;
-    border-radius: 16px;
+    border-radius: 12px;
     background: #ffffff;
     box-shadow: none !important;
     padding: 12px !important;
+}
+
+.top-24 {
+    top: 4rem;
 }
 
 .dark .qa-sidebar-widget {
@@ -2014,7 +2018,6 @@ div.qa-last-24h-box, .qa-last-24h-box {
 
 .bg-slate-100 {
   --tw-bg-opacity: 1;
-  background-color: rgb(241 245 249 / 0%);
 }
 
 .shadow-lg {
@@ -2766,7 +2769,6 @@ span.text-\[11px\].font-bold.uppercase.tracking-wider {
 }
 
 .tracking-wider {
-    display: flex;
     align-items: center;
     font-weight: 600;
     gap: 5px;
@@ -2803,6 +2805,174 @@ span.text-\[11px\].font-bold.uppercase.tracking-wider {
 .dark\:text-\[\#a5b4fc\]:is(.dark *) {
     --tw-text-opacity: 1;
     color: #8c8c8c !important;
+}
+
+/* Custom search modal styles requested by the user */
+.qa-custom-search-input,
+.qa-custom-search-input:focus,
+.qa-custom-search-input:active,
+.qa-custom-search-input:focus-visible,
+input[type="text"].qa-custom-search-input,
+input[type="text"].qa-custom-search-input:focus,
+input[type="text"].qa-custom-search-input:active,
+.dark .fixed input.qa-custom-search-input,
+.dark .fixed input.qa-custom-search-input:focus,
+html:not(.dark) .fixed input.qa-custom-search-input,
+html:not(.dark) .fixed input.qa-custom-search-input:focus {
+    padding: 7px 2px !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+    outline-style: none !important;
+    font-size: 1rem !important;
+    outline: none !important;
+    outline-width: 0px !important;
+    border: none !important;
+    border-width: 0px !important;
+    --tw-ring-color: transparent !important;
+    --tw-ring-shadow: none !important;
+    --tw-shadow: none !important;
+}
+
+.qa-custom-search-wrapper {
+    padding: 4px 8px !important;
+}
+
+/* Custom search modal container classes */
+.qa-search-modal-container {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
+    color: #0f172a !important;
+    box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.15) !important;
+}
+
+.dark .qa-search-modal-container {
+    background-color: #0c0e14 !important; /* matches the dark theme main colors */
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    color: #f8fafc !important;
+    box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.5) !important;
+}
+
+/* Base top search wrapper */
+.qa-custom-search-wrapper {
+    background-color: #ffffff !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+}
+
+.dark .qa-custom-search-wrapper {
+    background-color: #0c0e14 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Custom search input text color */
+.qa-custom-search-input {
+    color: #1e293b !important;
+}
+.dark .qa-custom-search-input {
+    color: #f1f5f9 !important;
+}
+
+/* Filter Tag Buttons (.qa-search-tag-btn) */
+.qa-search-tag-btn {
+    background-color: #f1f5f9 !important;
+    border-color: #e2e8f0 !important;
+    color: #475569 !important;
+}
+.qa-search-tag-btn:hover {
+    background-color: #e2e8f0 !important;
+}
+.qa-search-tag-btn.active {
+    background-color: #3b82f6 !important;
+    border-color: #2563eb !important;
+    color: #ffffff !important;
+}
+
+.dark .qa-search-tag-btn {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: #cbd5e1 !important;
+}
+.dark .qa-search-tag-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+.dark .qa-search-tag-btn.active {
+    background-color: #3b82f6 !important;
+    border-color: #3b82f6 !important;
+    color: #ffffff !important;
+}
+
+/* Modal list items (.qa-search-modal-item) */
+.qa-search-modal-item {
+    background-color: transparent !important;
+    color: #334155 !important;
+    transition: all 0.2s ease !important;
+}
+.qa-search-modal-item:hover {
+    background-color: #f1f5f9 !important; /* Light mode item hover background */
+    color: #0f172a !important;
+}
+.qa-search-modal-item .qa-icon {
+    color: #64748b !important;
+}
+.qa-search-modal-item:hover .qa-icon {
+    color: #3b82f6 !important;
+}
+
+.dark .qa-search-modal-item {
+    background-color: transparent !important;
+    color: #cbd5e1 !important;
+}
+.dark .qa-search-modal-item:hover {
+    background-color: rgba(255, 255, 255, 0.05) !important; /* Dark mode item hover background */
+    color: #ffffff !important;
+}
+.dark .qa-search-modal-item .qa-icon {
+    color: #94a3b8 !important;
+}
+.dark .qa-search-modal-item:hover .qa-icon {
+    color: #3b82f6 !important;
+}
+
+/* Discussion results (.qa-search-discussion-card) */
+.qa-search-discussion-card {
+    background-color: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+}
+.qa-search-discussion-card:hover {
+    background-color: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
+}
+
+.dark .qa-search-discussion-card {
+    background-color: rgba(255, 255, 255, 0.02) !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+.dark .qa-search-discussion-card:hover {
+    background-color: rgba(255, 255, 255, 0.06) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Tag result pills (.qa-search-result-pill) */
+.qa-search-result-pill {
+    background-color: #f8fafc !important;
+    border-color: #e2e8f0 !important;
+    color: #475569 !important;
+}
+.qa-search-result-pill:hover {
+    background-color: #f1f5f9 !important;
+    color: #1e293b !important;
+}
+
+.dark .qa-search-result-pill {
+    background-color: rgba(255, 255, 255, 0.03) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    color: #cbd5e1 !important;
+}
+.dark .qa-search-result-pill:hover {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    color: #ffffff !important;
 }
 
 
