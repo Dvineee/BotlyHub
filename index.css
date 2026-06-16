@@ -35,6 +35,23 @@
   padding: 6px !important;
 }
 
+.qa-start-discussion-box:hover {
+  background-color: #0000000d !important;
+}
+
+.dark .qa-start-discussion-box:hover {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
+.hover\:bg-indigo-50:hover {
+    --tw-bg-opacity: 1;
+    background-color: #0000000d !important;
+}
+
+.dark .hover\:bg-indigo-50:hover {
+    background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
 .qa-sidebar-widget {
   box-shadow: none !important;
   padding: 12px !important;
@@ -2727,6 +2744,54 @@ span.text-\[11px\].font-bold.uppercase.tracking-wider {
 
 .top-7 {
     top: 1.3rem;
+}
+
+@media (min-width: 640px) {
+    .sm\:text-3xl {
+        letter-spacing: -0.4px !important;
+        font-size: 26px !important;
+        line-height: 2.25rem;
+    }
+}
+
+.tracking-wider {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    gap: 5px;
+    font-size: 12px;
+    letter-spacing: 0em;
+}
+
+.px-4:not(.home-page *) {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding: 0.5rem 0.5rem;
+}
+
+.text-\[11px\] {
+    font-size: 14px !important;
+}
+
+.-mx-4 {
+    padding-left: 7.5px !important;
+    padding-right: 0px !important;
+    margin-left: 0rem !important;
+    margin-right: 0rem !important;
+}
+
+.h-16 {
+    height: 3.3rem;
+}
+
+.text-2xl {
+    font-size: 1.3rem;
+    line-height: 2rem;
+}
+
+.dark\:text-\[\#a5b4fc\]:is(.dark *) {
+    --tw-text-opacity: 1;
+    color: #8c8c8c !important;
 }
 
 

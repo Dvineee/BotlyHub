@@ -1000,18 +1000,18 @@ const NavMenu = ({
       path: "/channels",
     },
     {
-      id: "ads",
-      label: "Reklam",
-      desc: "Projenizi Öne Çıkarın",
-      icon: Share2,
-      path: "/settings",
+      id: "qa",
+      label: "QA Forum",
+      desc: "Soru & Cevap Hub'ı",
+      icon: MessageSquare,
+      path: "/qa",
     },
   ];
 
   const simpleLinks = [
-    { label: "Hızlı Link 1", path: "#" },
-    { label: "Hızlı Link 2", path: "#" },
-    { label: "Hızlı Link 3", path: "#" },
+    { label: "Reklam", path: "/premium" },
+    { label: "Blog", path: "/blog" },
+    { label: "Gelişmiş Arama", path: "/search" },
   ];
 
   const renderMegaMenuContent = () => {
@@ -1160,8 +1160,11 @@ const NavMenu = ({
               <a
                 key={i}
                 href={link.path}
-                target="_blank"
-                rel="noreferrer"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate(link.path);
+                  setOpenMenu(null);
+                }}
                 className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-blue-500 transition-all font-bold text-xs uppercase group"
               >
                 {link.label}
@@ -1493,8 +1496,12 @@ const NavMenu = ({
                                   <a
                                     key={i}
                                     href={link.path}
-                                    target="_blank"
-                                    rel="noreferrer"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      navigate(link.path);
+                                      setOpenMenu(null);
+                                      if (typeof setMobileModal === "function") setMobileModal(null);
+                                    }}
                                     className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-blue-500 transition-all font-bold text-xs uppercase group"
                                   >
                                     {link.label}
@@ -2492,18 +2499,18 @@ const Home = () => {
       path: "/channels",
     },
     {
-      id: "ads",
-      label: "Reklam",
-      desc: "Projenizi Öne Çıkarın",
-      icon: Share2,
-      path: "/settings",
+      id: "qa",
+      label: "QA Forum",
+      desc: "Soru & Cevap Hub'ı",
+      icon: MessageSquare,
+      path: "/qa",
     },
   ];
 
   const simpleLinks = [
-    { label: "Hızlı Link 1", path: "#" },
-    { label: "Hızlı Link 2", path: "#" },
-    { label: "Hızlı Link 3", path: "#" },
+    { label: "Reklam", path: "/premium" },
+    { label: "Blog", path: "/blog" },
+    { label: "Gelişmiş Arama", path: "/search" },
   ];
 
   const appsCategories = appsSubCategories;
@@ -2662,8 +2669,11 @@ const Home = () => {
               <a
                 key={i}
                 href={link.path}
-                target="_blank"
-                rel="noreferrer"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate(link.path);
+                  setOpenMenu(null);
+                }}
                 className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-blue-500 transition-all font-bold text-xs uppercase group"
               >
                 {link.label}
@@ -3160,8 +3170,12 @@ const Home = () => {
                                 <a
                                   key={i}
                                   href={link.path}
-                                  target="_blank"
-                                  rel="noreferrer"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    navigate(link.path);
+                                    setOpenMenu(null);
+                                    if (typeof setMobileModal === "function") setMobileModal(null);
+                                  }}
                                   className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-blue-500 transition-all font-bold text-xs uppercase group"
                                 >
                                   {link.label}
