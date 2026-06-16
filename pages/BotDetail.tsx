@@ -2186,7 +2186,7 @@ const BotDetail = () => {
                                   <div className="flex items-center gap-3">
                                     <Send
                                       size={14}
-                                      className="text-blue-500"
+                                      className="text-slate-400 dark:text-slate-500"
                                     />
                                     <span className="text-[10px] font-black tracking-widest text-slate-700 dark:text-slate-300">
                                       Telegram Grup
@@ -2209,7 +2209,7 @@ const BotDetail = () => {
                                   <div className="flex items-center gap-3">
                                     <Globe
                                       size={14}
-                                      className="text-emerald-500"
+                                      className="text-slate-400 dark:text-slate-500"
                                     />
                                     <span className="text-[10px] font-black tracking-widest text-slate-700 dark:text-slate-300">
                                       Web Site
@@ -2232,7 +2232,7 @@ const BotDetail = () => {
                                   <div className="flex items-center gap-3">
                                     <Cpu
                                       size={14}
-                                      className="text-purple-500"
+                                      className="text-slate-400 dark:text-slate-500"
                                     />
                                     <span className="text-[10px] font-black tracking-widest text-slate-700 dark:text-slate-300">
                                       App / Bot
@@ -2255,7 +2255,7 @@ const BotDetail = () => {
                                   <div className="flex items-center gap-3">
                                     <Share2
                                       size={14}
-                                      className="text-orange-500"
+                                      className="text-slate-400 dark:text-slate-500"
                                     />
                                     <span className="text-[10px] font-black tracking-widest text-slate-700 dark:text-slate-300">
                                       Sosyal Medya

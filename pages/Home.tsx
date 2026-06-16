@@ -596,6 +596,29 @@ const BotCard: React.FC<{ bot: Bot; tonRate: number; featuredRank?: number }> =
   React.memo(({ bot, tonRate, featuredRank }) => {
     const navigate = useNavigate();
     const { t } = useTranslation();
+    const [showTooltip, setShowTooltip] = useState(false);
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    const handleMouseEnter = () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      setShowTooltip(true);
+    };
+
+    const handleMouseLeave = () => {
+      timeoutRef.current = setTimeout(() => {
+        setShowTooltip(false);
+      }, 250); // 250ms delay for smooth transition
+    };
+
+    useEffect(() => {
+      return () => {
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
+      };
+    }, []);
     const prices = useMemo(
       () => PriceService.convert(bot.price, tonRate),
       [bot.price, tonRate],
@@ -636,6 +659,50 @@ const BotCard: React.FC<{ bot: Bot; tonRate: number; featuredRank?: number }> =
         onClick={() => navigate(`/bot/${bot.slug}`)}
         className="flex flex-col p-5 bg-white dark:bg-[#0F1623] rounded-[16px] transition-all duration-[180ms] ease-out shadow-none hover:shadow-none active:scale-[0.98] transform-gpu cursor-pointer select-none group w-full relative min-h-[175px]"
       >
+        {featuredRank && (
+          <div 
+            className="absolute top-3.5 right-3.5 z-30 flex items-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="relative">
+              <button
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowTooltip(!showTooltip);
+                }}
+                className="w-5 h-5 flex items-center justify-center rounded-full text-slate-400 hover:text-blue-500 dark:text-slate-500 dark:hover:text-blue-400 bg-slate-100/55 hover:bg-slate-200/55 dark:bg-white/[0.04] dark:hover:bg-white/[0.1] transition-all duration-150 cursor-pointer"
+                aria-label="Sponsorship Info"
+              >
+                <Info size={13} strokeWidth={2.5} />
+              </button>
+
+              {showTooltip && (
+                <div 
+                  className="absolute right-0 top-7 w-[230px] sm:w-[260px] p-3 bg-white dark:bg-[#121824] border border-black/[0.08] dark:border-white/[0.08] rounded-xl shadow-xl z-50 text-[13px] leading-relaxed text-slate-600 dark:text-slate-300 pointer-events-auto cursor-default animate-in fade-in zoom-in-95 duration-100"
+                  onMouseEnter={handleMouseEnter}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <p>
+                    <span className="font-bold text-slate-800 dark:text-slate-100 underline decoration-blue-500/30 decoration-2">{bot.name}</span>{" "}
+                    botlyhub reklam ve sponsorluk anlaşması kapsamında bu alanda listelenmektedir.{" "}
+                    <span 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate('/premium');
+                      }}
+                      className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 font-extrabold underline cursor-pointer mt-1 block"
+                    >
+                      Daha fazla bilgi için Tıklayın.
+                    </span>
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Top: bot identity (avatar + name) + category badge inline */}
         <div className="flex items-start justify-between gap-3 w-full mb-3.5 min-w-0">
           <div className="flex items-center gap-3 min-w-0">
@@ -676,7 +743,7 @@ const BotCard: React.FC<{ bot: Bot; tonRate: number; featuredRank?: number }> =
           </div>
           <div className="relative flex items-center min-w-0">
             {catLabel && (
-              <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-white/[0.04] px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0 select-none">
+              <span className={`text-[10px] sm:text-[11px] font-bold text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-white/[0.04] px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0 select-none ${featuredRank ? "mr-6" : ""}`}>
                 {catLabel}
               </span>
             )}
@@ -693,7 +760,7 @@ const BotCard: React.FC<{ bot: Bot; tonRate: number; featuredRank?: number }> =
         </div>
 
         {/* Bottom: usage signal (not stats noise) & primary CTA */}
-        <div className="mt-auto pt-3 border-t border-black/[0.03] dark:border-white/[0.03] flex items-center justify-between gap-3">
+        <div className={`mt-auto pt-3 ${featuredRank ? "" : "border-t border-black/[0.03] dark:border-white/[0.03]"} flex items-center justify-between gap-3`}>
           {/* Usage signal */}
           <div className="flex items-center gap-1.5 text-[12px] text-slate-400 dark:text-slate-500 font-bold">
             <span className="text-slate-700 dark:text-slate-400">
@@ -719,20 +786,7 @@ const BotCard: React.FC<{ bot: Bot; tonRate: number; featuredRank?: number }> =
               }
             }}
           >
-            {featuredRank ? (
-              <>
-                <svg
-                  aria-hidden="true"
-                  className="w-[14px] h-[14px] fill-current"
-                  viewBox="0 0 24 24"
-                >
-                  <use href="#solar.fire"></use>
-                </svg>
-                <span>öne çıkan #{featuredRank}</span>
-              </>
-            ) : (
-              t("run") || "Run"
-            )}
+            {t("run") || "Run"}
           </button>
         </div>
       </div>
