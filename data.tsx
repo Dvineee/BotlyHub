@@ -7,7 +7,7 @@ import {
   MessageSquare, Briefcase, Music, Coins, Send, PenTool,
   ShoppingBag, Shield, GraduationCap, Play, Flame, Award,
   Sparkles, Bot, Globe, Link2, RefreshCw, Palette, Users, Code, Cloud, EyeOff,
-  MousePointerClick
+  MousePointerClick, Megaphone
 } from 'lucide-react';
 
 const AppsIcon = ({ size = 20, className = "" }: { size?: number, className?: string }) => (
@@ -165,6 +165,10 @@ const ContentIcon = ({ size = 20, className = "" }: { size?: number, className?:
   <Play size={size} className={`stroke-[2.2] text-[#0a263d] dark:text-slate-200 ${className}`} />
 );
 
+const MarketingAdsIcon = ({ size = 20, className = "" }: { size?: number, className?: string }) => (
+  <Megaphone size={size} className={`stroke-[2.2] text-[#0a263d] dark:text-slate-200 ${className}`} />
+);
+
 export const categories = [
   { id: 'all', label: 'cat_all', icon: AllIcon },
   { id: 'games', label: 'cat_games', desc: 'desc_cat_games', icon: GamesIcon },
@@ -182,15 +186,17 @@ export const categories = [
   { id: 'security', label: 'cat_security', desc: 'desc_cat_security', icon: SecurityIcon },
   { id: 'education', label: 'cat_education', desc: 'desc_cat_education', icon: EducationIcon },
   { id: 'content', label: 'cat_content', desc: 'desc_cat_content', icon: ContentIcon },
+  { id: 'marketing_ads', label: 'cat_marketing_ads', desc: 'desc_cat_marketing_ads', icon: MarketingAdsIcon },
   { id: 'a_kategori', label: 'a_kategori', desc: 'desc_a_kategori', icon: AllIcon },
 ];
 
-export const mockBots: ExtendedBot[] = realBotsData.map(bot => ({
+export const mockBots: ExtendedBot[] = (realBotsData as any[]).map(bot => ({
   ...bot,
   category: bot.category,
   screenshots: bot.screenshots || [],
   languages: bot.languages || [],
-  isNew: bot.isNew || false
+  isNew: bot.isNew || false,
+  promoted_type: bot.promoted_type
 }));
 
 export const subscriptionPlans: SubscriptionPlan[] = [

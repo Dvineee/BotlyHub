@@ -675,6 +675,22 @@ const BotManagement = () => {
                                     e.preventDefault(); 
                                     setIsSaving(true);
                                     try {
+                                        // Check for duplicate username
+                                        const cleanLink = (editingBot.bot_link || '').trim().toLowerCase().replace(/^@/, '');
+                                        if (cleanLink && cleanLink !== '') {
+                                            const duplicate = bots.find(b => 
+                                                b.id !== editingBot.id && 
+                                                b.bot_link?.trim().toLowerCase().replace(/^@/, '') === cleanLink
+                                            );
+                                            if (duplicate) {
+                                                const confirmSave = window.confirm(`⚠️ UYARI: '@${cleanLink}' kullanıcı adı zaten '${duplicate.name}' isimli bot tarafından kullanılıyor.\n\nYine de bu kullanıcı adıyla kaydetmek istiyor musunuz?`);
+                                                if (!confirmSave) {
+                                                    setIsSaving(false);
+                                                    return;
+                                                }
+                                            }
+                                        }
+
                                         await DatabaseService.saveBot(editingBot); 
                                         setSaveSuccess(true);
                                         setTimeout(() => setSaveSuccess(false), 3000);
@@ -742,7 +758,29 @@ const BotManagement = () => {
                                                 </div>
                                                 <AdminInput label="BOT İSMİ" value={editingBot.name} onChange={(v:any)=>setEditingBot({...editingBot, name:v})} />
                                                 
-                                                <AdminInput label="@KULLANICIADI" value={editingBot.bot_link} onChange={(v:any)=>setEditingBot({...editingBot, bot_link:v})} />
+                                                <div className="space-y-2">
+                                                    <AdminInput label="@KULLANICIADI" value={editingBot.bot_link} onChange={(v:any)=>setEditingBot({...editingBot, bot_link:v})} />
+                                                    {(() => {
+                                                        const cleanLink = (editingBot.bot_link || '').trim().toLowerCase().replace(/^@/, '');
+                                                        if (cleanLink && cleanLink !== '') {
+                                                            const duplicate = bots.find(b => 
+                                                                b.id !== editingBot.id && 
+                                                                b.bot_link?.toLowerCase().replace(/^@/, '') === cleanLink
+                                                            );
+                                                            if (duplicate) {
+                                                                return (
+                                                                    <div className="mx-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-center gap-2 text-amber-500">
+                                                                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                                                        <p className="text-[10px] font-semibold leading-snug uppercase tracking-tight">
+                                                                            ⚠️ UYARI: BU @KULLANICIADI ZATEN '${duplicate.name}' TARAFINDAN KULLANILIYOR!
+                                                                        </p>
+                                                                    </div>
+                                                                );
+                                                            }
+                                                        }
+                                                        return null;
+                                                    })()}
+                                                </div>
                                                 <div className="space-y-4 md:col-span-2">
                                                     <label className="text-[9px] font-black text-slate-700 uppercase tracking-widest ml-4 px-4 py-2 bg-slate-900 rounded-full inline-block">
                                                         2. ADIM: {(editingBot.product_type === 'app' || (editingBot.category || []).includes('apps')) ? 'APP KATEGORİSİ' : 'BOT KATEGORİSİ'} SEÇİMİ

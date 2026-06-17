@@ -1238,6 +1238,7 @@ const BotDetail = () => {
   const [isCopied, setIsCopied] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileActionMenuOpen, setIsMobileActionMenuOpen] = useState(false);
+  const [copiedCommand, setCopiedCommand] = useState<string | null>(null);
   const [isCategoriesExpanded, setIsCategoriesExpanded] = useState(false);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [isDescriptionLong, setIsDescriptionLong] = useState(false);
@@ -2171,6 +2172,61 @@ const BotDetail = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Bot Commands */}
+              {bot.commands && bot.commands.length > 0 && (
+                <div className="px-6 mb-12 animate-in fade-in duration-300">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-sm font-black text-slate-900 dark:text-white uppercase bot-detail-section-title flex items-center gap-2">
+                      <Terminal size={16} className="text-brand dark:text-brand-light" />
+                      {language === "tr" ? "Bot Komutları" : "Bot Commands"}
+                    </h2>
+                  </div>
+                  <div className="p-5 bg-slate-100/40 dark:bg-slate-900/40 rounded-2xl border border-slate-200/50 dark:border-white/5 flex flex-col gap-3">
+                    <p className="text-xs text-slate-400 dark:text-slate-500 mb-1">
+                      {language === "tr" 
+                        ? "Bu bot tarafından desteklenen komutlar listelenmiştir. Kopyalamak için tıklayabilirsiniz." 
+                        : "List of commands supported by this bot. Click to copy."}
+                    </p>
+                    <div className="flex flex-wrap gap-2.5">
+                      {bot.commands.map((cmd, index) => {
+                        const isThisCopied = copiedCommand === cmd;
+                        return (
+                          <motion.button
+                            key={index}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => {
+                              navigator.clipboard.writeText(cmd);
+                              if (haptic) haptic("light");
+                              setCopiedCommand(cmd);
+                              setTimeout(() => setCopiedCommand(null), 2000);
+                            }}
+                            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl border text-xs font-mono font-bold transition-all shadow-sm cursor-pointer group ${
+                              isThisCopied 
+                                ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400" 
+                                : "bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 hover:border-brand/40 dark:hover:border-brand-light/30"
+                            }`}
+                          >
+                            <span className={isThisCopied ? "text-emerald-500" : "text-brand dark:text-brand-light font-black group-hover:scale-110 transition-transform"}>
+                              {cmd}
+                            </span>
+                            <span className={`text-[10px] uppercase font-sans font-medium tracking-wider pl-2 border-l ${
+                              isThisCopied 
+                                ? "border-emerald-500/20 text-emerald-500" 
+                                : "border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300"
+                            }`}>
+                              {isThisCopied 
+                                ? (language === "tr" ? "Kopyalandı!" : "Copied!") 
+                                : (language === "tr" ? "Kopyala" : "Copy")}
+                            </span>
+                          </motion.button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Soru-Cevap ve Yorumlar Bölümü */}
               {qaParticipantsInfo && (

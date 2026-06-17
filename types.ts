@@ -88,6 +88,7 @@ export interface Bot {
   rating?: number;
   rating_count?: number;
   user_count?: number;
+  commands?: string[];
 }
 
 export interface Promotion {

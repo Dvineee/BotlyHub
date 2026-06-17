@@ -1,6 +1,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { Bot, User, Channel, Announcement, Notification, UserBot, ActivityLog, Promotion, Referral, ReferralSettings, BlogPost, BlogComment } from '../types';
+import { realBotsData } from '../bots_data';
 import { API_BASE_URL } from '../constants';
 
 const SUPABASE_URL = (typeof process !== 'undefined' && process.env?.SUPABASE_URL) || 
@@ -543,6 +544,14 @@ export class DatabaseService {
 
         const slug = bot.slug || this.generateSlug(bot.name);
 
+        const localBot = realBotsData.find(b => 
+            b.id === bot.id || 
+            b.name?.toLowerCase() === bot.name?.toLowerCase() || 
+            b.bot_link?.toLowerCase() === bot.bot_link?.toLowerCase()
+        );
+        const commands = localBot?.commands || bot.commands || ["/start"];
+        const features = localBot?.features || bot.features || [];
+
         return {
             ...bot,
             slug,
@@ -550,7 +559,9 @@ export class DatabaseService {
             languages: (bot.languages || (bot.name.toLowerCase().includes('botlyhub') ? ['🇬🇧', '🇹🇷'] : [])).map((l: string) => l === 'İng' ? '🇬🇧' : l),
             rating: Number(avgRating.toFixed(1)),
             rating_count: botRatings.length,
-            user_count: userCount
+            user_count: userCount,
+            commands,
+            features
         };
     });
   }
@@ -641,6 +652,14 @@ export class DatabaseService {
         console.warn("Stats fetch error (maybe table missing):", e);
     }
 
+    const localBot = realBotsData.find(b => 
+        b.id === data.id || 
+        b.name?.toLowerCase() === data.name?.toLowerCase() || 
+        b.bot_link?.toLowerCase() === data.bot_link?.toLowerCase()
+    );
+    const commands = localBot?.commands || ["/start"];
+    const features = localBot?.features || data.features || [];
+
     return {
         ...data,
         slug: data.slug || this.generateSlug(data.name),
@@ -648,7 +667,9 @@ export class DatabaseService {
         languages: (data.languages || (data.name.toLowerCase().includes('botlyhub') ? ['🇬🇧', '🇹🇷'] : [])).map((l: string) => l === 'İng' ? '🇬🇧' : l),
         user_count,
         rating: Number(rating.toFixed(1)) || 0,
-        rating_count
+        rating_count,
+        commands,
+        features
     };
   }
 
