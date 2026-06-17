@@ -2,5 +2,8 @@ User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /a/
+Disallow: /u/
+Disallow: /bot-panel/
 
 Sitemap: https://botlyhub.com/sitemap.xml

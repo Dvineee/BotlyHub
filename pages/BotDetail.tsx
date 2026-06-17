@@ -51,6 +51,7 @@ import {
   LogOut,
   Plus,
   ArrowLeft,
+  ArrowRight,
   Terminal,
   Link2,
 } from "lucide-react";
@@ -271,8 +272,110 @@ const NavMenu = ({
   const renderMegaMenuContent = () => {
     if (openMenu === "kesfet") {
       return (
-        <div className="max-w-5xl mx-auto px-6 grid grid-cols-12 gap-8">
-          <div className="col-span-8">
+        <div className="max-w-6xl mx-auto px-6 grid grid-cols-12 gap-8 py-8">
+          {/* Left Column (Promotion Panel) */}
+          <div className="col-span-4 bg-gradient-to-br from-indigo-50/70 to-blue-50/40 dark:from-slate-900/40 dark:to-slate-900/10 border border-blue-100/50 dark:border-slate-800/40 rounded-2xl p-5 flex flex-col justify-between select-none">
+            {/* Top section */}
+            <div className="flex flex-col gap-3">
+              <h4 className="text-[13px] font-bold text-slate-800 dark:text-slate-200 leading-snug">
+                Telegram kanalınızın amacına göre en uygun botları bir arada inceleyin.
+              </h4>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-normal">
+                50'den fazla kategoride, telegram kanalınız için kanalınıza uygun en iyi botları bir arada görün.
+              </p>
+
+              {/* Dynamic Styled Icon Badges */}
+              <div className="flex flex-wrap gap-2 my-1">
+                {/* Red Target Icon */}
+                <span className="w-7 h-7 rounded-full bg-[#ff4d4f] flex items-center justify-center shadow-xs select-none shrink-0">
+                  <span className="w-3 h-3 rounded-full bg-white flex items-center justify-center">
+                    <span className="w-1 h-1 rounded-full bg-[#ff4d4f]"></span>
+                  </span>
+                </span>
+                
+                {/* White/Blue border circle with blue square inside */}
+                <span className="w-7 h-7 rounded-full bg-white dark:bg-slate-900 border border-blue-500/80 flex items-center justify-center shadow-xs shrink-0">
+                  <span className="w-2.5 h-2.5 bg-blue-600 rounded-sm"></span>
+                </span>
+
+                {/* Yellow/Black hexagonal pattern */}
+                <span className="w-7 h-7 rounded-full bg-amber-500 flex items-center justify-center shadow-xs shrink-0">
+                  <span className="text-[9px] font-extrabold text-slate-950">✦</span>
+                </span>
+
+                {/* Mint/Dark green */}
+                <span className="w-7 h-7 rounded-full bg-[#181d20] flex items-center justify-center shadow-xs shrink-0">
+                  <span className="w-3.5 h-2.5 rounded-full border-2 border-emerald-400 flex items-center justify-center">
+                    <span className="w-1 h-1 rounded-full bg-emerald-400"></span>
+                  </span>
+                </span>
+
+                {/* Dark Black with italic T */}
+                <span className="w-7 h-7 rounded-full bg-black flex items-center justify-center shadow-xs shrink-0">
+                  <span className="text-[11px] font-[900] italic text-white font-serif font-black">T</span>
+                </span>
+
+                {/* Light blue/grey with circle-A */}
+                <span className="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 border border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-center shadow-xs shrink-0">
+                  <span className="text-[9px] font-black text-slate-500 dark:text-slate-400">A</span>
+                </span>
+
+                {/* Black with white slash/stripes */}
+                <span className="w-7 h-7 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center shadow-xs shrink-0">
+                  <span className="text-[10px] font-bold text-white leading-none">☰</span>
+                </span>
+
+                {/* Feather with dotted boundary */}
+                <span className="w-7 h-7 rounded-full bg-white dark:bg-slate-900 border border-dotted border-slate-400 dark:border-slate-700 flex items-center justify-center shadow-xs shrink-0">
+                  <span className="text-[10px]">🪶</span>
+                </span>
+              </div>
+
+              {/* Try now button */}
+              <button
+                onClick={() => {
+                  haptic("light");
+                  navigate("/search");
+                  setOpenMenu(null);
+                }}
+                className="group/btn text-[12px] font-extrabold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1.5 mt-1 cursor-pointer transition-colors self-start"
+              >
+                Şimdi dene <ArrowRight size={13} className="shrink-0 transition-transform group-hover/btn:translate-x-1" />
+              </button>
+            </div>
+
+            <div className="border-t border-slate-200/60 dark:border-slate-800/60 my-3 w-full" />
+
+            {/* Bottom section (Botlyhub brand and CTA) */}
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <span className="w-5 h-5 rounded bg-blue-600 flex items-center justify-center shadow-sm shrink-0">
+                  <span className="text-[10px] font-black text-white">▲</span>
+                </span>
+                <span className="text-[12px] font-extrabold text-slate-800 dark:text-slate-200">
+                  Botlyhub
+                </span>
+              </div>
+              
+              <p className="text-[10.5px] text-slate-500 dark:text-slate-400 leading-normal font-normal">
+                Tek bir yerden incele, yönet ve pasif gelir elde et.
+              </p>
+
+              <button
+                onClick={() => {
+                  haptic("light");
+                  navigate("/premium");
+                  setOpenMenu(null);
+                }}
+                className="group/btn text-[12px] font-extrabold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1.5 mt-1 cursor-pointer transition-colors self-start"
+              >
+                Daha fazla bilgi edin <ArrowRight size={13} className="shrink-0 transition-transform group-hover/btn:translate-x-1" />
+              </button>
+            </div>
+          </div>
+
+          {/* Middle Column (Categories etc.) */}
+          <div className="col-span-12 md:col-span-5 border-l border-black/5 dark:border-white/5 pl-8">
             <AnimatePresence mode="wait">
               {navState === "main" ? (
                 <motion.div
@@ -292,14 +395,13 @@ const NavMenu = ({
                         } else if (item.id === "apps") {
                           haptic("light");
                           setNavState("apps");
-                        } else if (item.action) {
-                          item.action();
                         } else if (item.path) {
+                          haptic("light");
                           navigate(item.path);
                           setOpenMenu(null);
                         }
                       }}
-                      className="flex items-center gap-4 p-4 hover:bg-black/[0.02] dark:hover:bg-white/5 rounded-2xl transition-all group border border-transparent hover:border-black/5 dark:hover:border-white/10 text-left w-full"
+                      className="flex items-center gap-4 p-4 hover:bg-slate-500/[0.04] dark:hover:bg-white/5 rounded-2xl transition-all group border border-transparent hover:border-black/5 dark:hover:border-white/10 text-left w-full cursor-pointer"
                     >
                       <div className="menu-icon-container shrink-0 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
                         <item.icon size={20} />
@@ -347,12 +449,12 @@ const NavMenu = ({
                       <button
                         key={cat.id}
                         onClick={() => handleCategoryClick(cat.id, "bots")}
-                        className="flex items-center gap-3 p-3 hover:bg-black/[0.02] dark:hover:bg-white/5 rounded-xl transition-all group text-left border border-transparent hover:border-black/5 dark:hover:border-white/10 w-full"
+                        className="flex items-center gap-2.5 p-2 rounded-xl transition-all duration-200 text-left bg-slate-50/50 dark:bg-slate-800/10 border border-slate-100/50 dark:border-slate-800/20 hover:bg-blue-500/[0.04] dark:hover:bg-blue-500/[0.04] hover:border-blue-500/15 group w-full cursor-pointer"
                       >
-                        <div className="menu-icon-container !w-8 !h-8 px-0 shrink-0 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
-                          <cat.icon size={16} />
+                        <div className="w-7 h-7 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/55 dark:border-slate-800 flex items-center justify-center text-slate-450 dark:text-slate-450 group-hover:bg-blue-500 group-hover:text-white dark:group-hover:bg-blue-650 dark:group-hover:text-white/95 transition-all duration-200 shrink-0 shadow-xs">
+                          <cat.icon size={14} />
                         </div>
-                        <span className="text-[11px] font-bold uppercase tracking-tight menu-item-text">
+                        <span className="text-[12px] font-semibold text-slate-700 dark:text-slate-350 group-hover:text-blue-600 dark:group-hover:text-blue-400 font-sans tracking-tight leading-tight whitespace-nowrap overflow-hidden text-ellipsis">
                           {t(cat.label)}
                         </span>
                       </button>
@@ -381,7 +483,7 @@ const NavMenu = ({
                     </div>
                     <button
                       onClick={() => handleCategoryClick("all", "apps")}
-                      className="text-xs font-black uppercase tracking-widest text-blue-500 hover:text-blue-600 dark:text-blue-400 cursor-pointer px-3 py-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-all duration-150"
+                      className="text-xs font-black uppercase tracking-widest text-blue-550 hover:text-blue-600 dark:text-blue-400 cursor-pointer px-3 py-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-all duration-150"
                     >
                       Tümünü Gör
                     </button>
@@ -391,12 +493,12 @@ const NavMenu = ({
                       <button
                         key={cat.id}
                         onClick={() => handleCategoryClick(cat.id, "apps")}
-                        className="flex items-center gap-3 p-3 hover:bg-black/[0.02] dark:hover:bg-white/5 rounded-xl transition-all group text-left border border-transparent hover:border-black/5 dark:hover:border-white/10 w-full"
+                        className="flex items-center gap-2.5 p-2 rounded-xl transition-all duration-200 text-left bg-slate-50/50 dark:bg-slate-800/10 border border-slate-100/50 dark:border-slate-800/20 hover:bg-blue-500/[0.04] dark:hover:bg-blue-500/[0.04] hover:border-blue-500/15 group w-full cursor-pointer"
                       >
-                        <div className="menu-icon-container !w-8 !h-8 px-0 shrink-0 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
-                          <cat.icon size={16} />
+                        <div className="w-7 h-7 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/55 dark:border-slate-800 flex items-center justify-center text-slate-450 dark:text-slate-450 group-hover:bg-blue-500 group-hover:text-white dark:group-hover:bg-blue-650 dark:group-hover:text-white/95 transition-all duration-200 shrink-0 shadow-xs">
+                          <cat.icon size={14} />
                         </div>
-                        <span className="text-[11px] font-bold uppercase tracking-tight menu-item-text">
+                        <span className="text-[12px] font-semibold text-slate-700 dark:text-slate-350 group-hover:text-blue-600 dark:group-hover:text-blue-400 font-sans tracking-tight leading-tight whitespace-nowrap overflow-hidden text-ellipsis">
                           {t(cat.label)}
                         </span>
                       </button>
@@ -406,28 +508,78 @@ const NavMenu = ({
               )}
             </AnimatePresence>
           </div>
-          <div className="col-span-4 border-l border-black/5 dark:border-white/5 pl-8 flex flex-col justify-center gap-3">
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-600 mb-2">
+
+          {/* Right Column (Featured Hub) */}
+          <div className="col-span-3 border-l border-black/5 dark:border-white/5 pl-8 flex flex-col justify-center gap-3 mega-menu-right-links">
+            <h4 className="text-[12px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1 px-1">
               Hızlı Bağlantılar
-            </span>
-            {simpleLinks.map((link, i) => (
-              <a
-                key={i}
-                href={link.path}
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigate(link.path);
-                  setOpenMenu(null);
-                }}
-                className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-blue-500 transition-all font-bold text-xs uppercase group"
-              >
-                {link.label}
-                <ExternalLink
-                  size={14}
-                  className="opacity-0 group-hover:opacity-100 transition-all"
-                />
-              </a>
-            ))}
+            </h4>
+            
+            {/* Reklam Link */}
+            <button
+              onClick={() => {
+                haptic("light");
+                navigate("/premium");
+                setOpenMenu(null);
+              }}
+              className="flex items-center gap-3 p-2.5 rounded-xl text-left hover:bg-amber-500/[0.04] dark:hover:bg-amber-500/[0.03] border border-transparent hover:border-amber-500/10 transition-all duration-200 group/link w-full cursor-pointer"
+            >
+              <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center text-amber-500 shrink-0 group-hover/link:scale-110 transition-transform duration-200">
+                <Sparkles size={16} />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[13px] font-bold text-slate-750 dark:text-slate-200 group-hover/link:text-amber-600 dark:group-hover/link:text-amber-400 transition-colors">
+                  Reklam
+                </span>
+                <span className="text-[10.5px] text-slate-450 dark:text-slate-400">
+                  Botlyhub ile öne çıkın
+                </span>
+              </div>
+            </button>
+
+            {/* Blog Link */}
+            <button
+              onClick={() => {
+                haptic("light");
+                navigate("/blog");
+                setOpenMenu(null);
+              }}
+              className="flex items-center gap-3 p-2.5 rounded-xl text-left hover:bg-blue-500/[0.04] dark:hover:bg-blue-500/[0.03] border border-transparent hover:border-blue-500/10 transition-all duration-200 group/link w-full cursor-pointer"
+            >
+              <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center text-blue-500 shrink-0 group-hover/link:scale-110 transition-transform duration-200">
+                <Compass size={16} />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[13px] font-bold text-slate-750 dark:text-slate-200 group-hover/link:text-blue-600 dark:group-hover/link:text-blue-400 transition-colors">
+                  Blog & Rehberler
+                </span>
+                <span className="text-[10.5px] text-slate-450 dark:text-slate-400">
+                  En son ipuçları & rehberler
+                </span>
+              </div>
+            </button>
+
+            {/* Advanced Search Link */}
+            <button
+              onClick={() => {
+                haptic("light");
+                navigate("/search");
+                setOpenMenu(null);
+              }}
+              className="flex items-center gap-3 p-2.5 rounded-xl text-left hover:bg-emerald-500/[0.04] dark:hover:bg-emerald-500/[0.03] border border-transparent hover:border-emerald-500/10 transition-all duration-200 group/link w-full cursor-pointer"
+            >
+              <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-550 dark:text-emerald-400 shrink-0 group-hover/link:scale-110 transition-transform duration-200">
+                <Search size={16} />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[13px] font-bold text-slate-750 dark:text-slate-200 group-hover/link:text-emerald-600 dark:group-hover/link:text-emerald-400 transition-colors">
+                  Gelişmiş Arama
+                </span>
+                <span className="text-[10.5px] text-slate-450 dark:text-slate-400">
+                  Filtrelerle nokta atışı arama
+                </span>
+              </div>
+            </button>
           </div>
         </div>
       );
@@ -738,11 +890,7 @@ const NavMenu = ({
                                   key={item.id}
                                   onClick={() => {
                                     haptic("light");
-                                    if (item.id === "bots") {
-                                      setMobileMenuPanel("bots");
-                                    } else if (item.id === "apps") {
-                                      setMobileMenuPanel("apps");
-                                    } else if (item.path) {
+                                    if (item.path) {
                                       navigate(item.path);
                                       setIsMenuOpen(false);
                                     }
@@ -760,18 +908,13 @@ const NavMenu = ({
                                       {item.desc}
                                     </span>
                                   </div>
-                                  {(item.id === "bots" || item.id === "apps") && (
-                                    <ChevronRight size={14} className="text-slate-400 shrink-0" />
-                                  )}
                                 </button>
                               ))}
                             </div>
 
                             {/* Hızlı Bağlantılar / Quick Links */}
                             <div className="pt-3 border-t border-slate-100 dark:border-white/5 flex flex-col gap-1.5">
-                              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-600 pl-2">
-                                Hızlı Bağlantılar
-                              </span>
+
                               {simpleLinks.map((link, i) => (
                                 <a
                                   key={i}

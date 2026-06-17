@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { Loader2, Megaphone } from 'lucide-react';
 import { DatabaseService } from './services/DatabaseService';
@@ -8,30 +8,34 @@ import { User } from './types';
 import { checkAccountQuality, getDeviceFingerprint } from './security';
 import './types';
 
-import Home from './pages/Home';
+// Static/Essential routes
 import Maintenance from './pages/Maintenance';
 import Restricted from './pages/Restricted';
-import SearchPage from './pages/SearchPage';
-import BotDetail from './pages/BotDetail';
-import Payment from './pages/Payment';
-import ProfileSettings from './pages/ProfileSettings';
-import MyBots from './pages/MyBots';
-import MyChannels from './pages/MyChannels';
-import Premium from './pages/Premium';
-import Notifications from './pages/Notifications';
-import AccountSettings from './pages/AccountSettings';
-import Earnings from './pages/Earnings';
-import AdminLogin from './pages/admin/AdminLogin';
-import AdminDashboard from './pages/admin/AdminDashboard';
-import UserPanelLogin from './pages/UserPanelLogin';
-import UserPanel from './pages/UserPanel';
-import ReferralPage from './pages/ReferralPage';
-import BlogPage from './pages/BlogPage';
-import BlogPostDetail from './pages/BlogPostDetail';
-import Statistics from './pages/Statistics';
-import UserProfile from './pages/UserProfile';
-import BotManagementPanel from './pages/BotManagementPanel';
-import QAForum from './pages/QAForum';
+
+// Lazy loaded routes for optimized bundle size and speed
+const Home = lazy(() => import('./pages/Home'));
+const SearchPage = lazy(() => import('./pages/SearchPage'));
+const BotDetail = lazy(() => import('./pages/BotDetail'));
+const Payment = lazy(() => import('./pages/Payment'));
+const ProfileSettings = lazy(() => import('./pages/ProfileSettings'));
+const MyBots = lazy(() => import('./pages/MyBots'));
+const MyChannels = lazy(() => import('./pages/MyChannels'));
+const Premium = lazy(() => import('./pages/Premium'));
+const Notifications = lazy(() => import('./pages/Notifications'));
+const AccountSettings = lazy(() => import('./pages/AccountSettings'));
+const Earnings = lazy(() => import('./pages/Earnings'));
+const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'));
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+const UserPanelLogin = lazy(() => import('./pages/UserPanelLogin'));
+const UserPanel = lazy(() => import('./pages/UserPanel'));
+const ReferralPage = lazy(() => import('./pages/ReferralPage'));
+const BlogPage = lazy(() => import('./pages/BlogPage'));
+const BlogPostDetail = lazy(() => import('./pages/BlogPostDetail'));
+const Statistics = lazy(() => import('./pages/Statistics'));
+const UserProfile = lazy(() => import('./pages/UserProfile'));
+const BotManagementPanel = lazy(() => import('./pages/BotManagementPanel'));
+const QAForum = lazy(() => import('./pages/QAForum'));
+
 import ScrollToTop from './components/ScrollToTop';
 import Footer from './components/Footer';
 import BottomNav from './components/BottomNav';
@@ -193,31 +197,33 @@ export default function App() {
     <>
       <ScrollToTop />
       <TelegramWrapper>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/search" element={<SearchPage />} />
-          <Route path="/bot/:slug" element={<BotDetail />} />
-          <Route path="/payment/:slug" element={<Payment />} />
-          <Route path="/profile" element={<UserProfile />} />
-          <Route path="/user/:id" element={<UserProfile />} />
-          <Route path="/settings" element={<ProfileSettings />} />
-          <Route path="/account-settings" element={<AccountSettings />} />
-          <Route path="/my-bots" element={<MyBots />} />
-          <Route path="/channels" element={<MyChannels />} />
-          <Route path="/premium" element={<Premium />} />
-          <Route path="/notifications" element={<Notifications />} />
-          <Route path="/earnings" element={<Earnings />} />
-          <Route path="/a/admin" element={<AdminLogin />} />
-          <Route path="/a/dashboard/*" element={<AdminDashboard />} />
-          <Route path="/u/login" element={<UserPanelLogin />} />
-          <Route path="/u/panel/*" element={<UserPanel />} />
-          <Route path="/referral" element={<ReferralPage />} />
-          <Route path="/blog" element={<BlogPage />} />
-          <Route path="/blog/:slug" element={<BlogPostDetail />} />
-          <Route path="/stats" element={<Statistics />} />
-          <Route path="/qa" element={<QAForum />} />
-          <Route path="/bot-panel/:botId/*" element={<BotManagementPanel />} />
-        </Routes>
+        <Suspense fallback={<div className="min-h-screen bg-[#020617] flex items-center justify-center text-slate-500" />}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/bot/:slug" element={<BotDetail />} />
+            <Route path="/payment/:slug" element={<Payment />} />
+            <Route path="/profile" element={<UserProfile />} />
+            <Route path="/user/:id" element={<UserProfile />} />
+            <Route path="/settings" element={<ProfileSettings />} />
+            <Route path="/account-settings" element={<AccountSettings />} />
+            <Route path="/my-bots" element={<MyBots />} />
+            <Route path="/channels" element={<MyChannels />} />
+            <Route path="/premium" element={<Premium />} />
+            <Route path="/notifications" element={<Notifications />} />
+            <Route path="/earnings" element={<Earnings />} />
+            <Route path="/a/admin" element={<AdminLogin />} />
+            <Route path="/a/dashboard/*" element={<AdminDashboard />} />
+            <Route path="/u/login" element={<UserPanelLogin />} />
+            <Route path="/u/panel/*" element={<UserPanel />} />
+            <Route path="/referral" element={<ReferralPage />} />
+            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/blog/:slug" element={<BlogPostDetail />} />
+            <Route path="/stats" element={<Statistics />} />
+            <Route path="/qa" element={<QAForum />} />
+            <Route path="/bot-panel/:botId/*" element={<BotManagementPanel />} />
+          </Routes>
+        </Suspense>
       </TelegramWrapper>
     </>
   );

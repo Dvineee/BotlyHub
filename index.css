@@ -2974,8 +2974,13 @@ html:not(.dark) .fixed input.qa-custom-search-input:focus {
     color: #ffffff !important;
 }
 
+@media (min-width: 768px) {
+    .md\:my-16 {
+        margin-top: 3rem !important;
+        margin-bottom: 4rem !important;
+    }
+}
 
-
-
-
-
+.mega-menu-right-links {
+  justify-content: normal !important;
+}
