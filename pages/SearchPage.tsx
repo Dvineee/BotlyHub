@@ -9,6 +9,7 @@ import {
   Loader2,
   Sparkles,
   Send,
+  Shield,
   Bot as BotIcon,
   Star,
   Sun,
@@ -598,8 +599,8 @@ const NavMenu = ({
 
           {/* Right Column (Featured Hub) */}
           <div className="col-span-3 border-l border-black/5 dark:border-white/5 pl-8 flex flex-col justify-center gap-3 mega-menu-right-links">
-            <h4 className="text-[12px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1 px-1">
-              Hızlı Bağlantılar
+            <h4 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 px-3">
+              {t("mega_quick_links") || "Hızlı Bağlantılar"}
             </h4>
             
             {/* Reklam Link */}
@@ -609,19 +610,20 @@ const NavMenu = ({
                 navigate("/premium");
                 setOpenMenu(null);
               }}
-              className="flex items-center gap-3 p-2.5 rounded-xl text-left hover:bg-amber-500/[0.04] dark:hover:bg-amber-500/[0.03] border border-transparent hover:border-amber-500/10 transition-all duration-200 group/link w-full cursor-pointer"
+              className="group/link flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 border border-transparent hover:border-black/5 dark:hover:border-white/10 transition-all text-left w-full cursor-pointer"
             >
-              <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center text-amber-500 shrink-0 group-hover/link:scale-110 transition-transform duration-200">
-                <Sparkles size={16} />
+              <div className="flex items-center gap-3">
+                <Sparkles size={15} className="text-slate-500 dark:text-slate-400 transition-colors group-hover/link:text-slate-850 dark:group-hover/link:text-white" />
+                <div className="flex flex-col">
+                  <span className="text-[13px] font-bold text-slate-700 dark:text-slate-200 transition-colors group-hover/link:text-slate-950 dark:group-hover/link:text-white">
+                    {t("mega_ad") || "Reklam"}
+                  </span>
+                  <span className="text-[10.5px] text-slate-450 dark:text-slate-450">
+                    {t("mega_ad_desc") || "Botlyhub ile öne çıkın"}
+                  </span>
+                </div>
               </div>
-              <div className="flex flex-col">
-                <span className="text-[13px] font-bold text-slate-750 dark:text-slate-200 group-hover/link:text-amber-600 dark:group-hover/link:text-amber-400 transition-colors">
-                  Reklam
-                </span>
-                <span className="text-[10.5px] text-slate-450 dark:text-slate-400">
-                  Botlyhub ile öne çıkın
-                </span>
-              </div>
+              <ArrowRight size={14} className="opacity-0 -translate-x-1 group-hover/link:opacity-100 group-hover/link:translate-x-0 transition-all text-slate-400 dark:text-slate-500" />
             </button>
 
             {/* Blog Link */}
@@ -631,19 +633,20 @@ const NavMenu = ({
                 navigate("/blog");
                 setOpenMenu(null);
               }}
-              className="flex items-center gap-3 p-2.5 rounded-xl text-left hover:bg-blue-500/[0.04] dark:hover:bg-blue-500/[0.03] border border-transparent hover:border-blue-500/10 transition-all duration-200 group/link w-full cursor-pointer"
+              className="group/link flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 border border-transparent hover:border-black/5 dark:hover:border-white/10 transition-all text-left w-full cursor-pointer"
             >
-              <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center text-blue-500 shrink-0 group-hover/link:scale-110 transition-transform duration-200">
-                <Compass size={16} />
+              <div className="flex items-center gap-3">
+                <Compass size={15} className="text-slate-500 dark:text-slate-400 transition-colors group-hover/link:text-slate-850 dark:group-hover/link:text-white" />
+                <div className="flex flex-col">
+                  <span className="text-[13px] font-bold text-slate-700 dark:text-slate-200 transition-colors group-hover/link:text-slate-950 dark:group-hover/link:text-white">
+                    {t("mega_blog") || "Blog & Rehberler"}
+                  </span>
+                  <span className="text-[10.5px] text-slate-450 dark:text-slate-450">
+                    {t("mega_blog_desc") || "En son ipuçları & rehberler"}
+                  </span>
+                </div>
               </div>
-              <div className="flex flex-col">
-                <span className="text-[13px] font-bold text-slate-750 dark:text-slate-200 group-hover/link:text-blue-600 dark:group-hover/link:text-blue-400 transition-colors">
-                  Blog & Rehberler
-                </span>
-                <span className="text-[10.5px] text-slate-450 dark:text-slate-400">
-                  En son ipuçları & rehberler
-                </span>
-              </div>
+              <ArrowRight size={14} className="opacity-0 -translate-x-1 group-hover/link:opacity-100 group-hover/link:translate-x-0 transition-all text-slate-400 dark:text-slate-500" />
             </button>
 
             {/* Advanced Search Link */}
@@ -653,19 +656,20 @@ const NavMenu = ({
                 navigate("/search");
                 setOpenMenu(null);
               }}
-              className="flex items-center gap-3 p-2.5 rounded-xl text-left hover:bg-emerald-500/[0.04] dark:hover:bg-emerald-500/[0.03] border border-transparent hover:border-emerald-500/10 transition-all duration-200 group/link w-full cursor-pointer"
+              className="group/link flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 border border-transparent hover:border-black/5 dark:hover:border-white/10 transition-all text-left w-full cursor-pointer"
             >
-              <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-550 dark:text-emerald-400 shrink-0 group-hover/link:scale-110 transition-transform duration-200">
-                <SearchIcon size={16} />
+              <div className="flex items-center gap-3">
+                <SearchIcon size={15} className="text-slate-500 dark:text-slate-400 transition-colors group-hover/link:text-slate-850 dark:group-hover/link:text-white" />
+                <div className="flex flex-col">
+                  <span className="text-[13px] font-bold text-slate-700 dark:text-slate-200 transition-colors group-hover/link:text-slate-950 dark:group-hover/link:text-white">
+                    {t("mega_advanced_search") || "Gelişmiş Arama"}
+                  </span>
+                  <span className="text-[10.5px] text-slate-450 dark:text-slate-450">
+                    {t("mega_advanced_search_desc") || "Filtrelerle nokta atışı arama"}
+                  </span>
+                </div>
               </div>
-              <div className="flex flex-col">
-                <span className="text-[13px] font-bold text-slate-755 dark:text-slate-200 group-hover/link:text-emerald-600 dark:group-hover/link:text-emerald-400 transition-colors">
-                  Gelişmiş Arama
-                </span>
-                <span className="text-[10.5px] text-slate-450 dark:text-slate-400">
-                  Filtrelerle nokta atışı arama
-                </span>
-              </div>
+              <ArrowRight size={14} className="opacity-0 -translate-x-1 group-hover/link:opacity-100 group-hover/link:translate-x-0 transition-all text-slate-400 dark:text-slate-500" />
             </button>
           </div>
         </div>
@@ -1019,7 +1023,7 @@ const NavMenu = ({
                                     setOpenMenu(null);
                                     if (typeof setMobileModal === "function") setMobileModal(null);
                                   }}
-                                  className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-blue-500 transition-all font-bold text-xs uppercase group"
+                                  className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all font-bold text-xs uppercase group"
                                 >
                                   {link.label}
                                   <ExternalLink

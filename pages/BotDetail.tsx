@@ -276,60 +276,34 @@ const NavMenu = ({
       return (
         <div className="max-w-6xl mx-auto px-6 grid grid-cols-12 gap-8 py-8">
           {/* Left Column (Promotion Panel) */}
-          <div className="col-span-4 bg-gradient-to-br from-indigo-50/70 to-blue-50/40 dark:from-slate-900/40 dark:to-slate-900/10 border border-blue-100/50 dark:border-slate-800/40 rounded-2xl p-5 flex flex-col justify-between select-none">
+          <div className="col-span-4 bg-slate-50/50 dark:bg-white/[0.02] border border-slate-200/50 dark:border-white/[0.04] rounded-2xl p-5 flex flex-col justify-between select-none">
             {/* Top section */}
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3.5">
               <h4 className="text-[13px] font-bold text-slate-800 dark:text-slate-200 leading-snug">
-                Telegram kanalınızın amacına göre en uygun botları bir arada inceleyin.
+                {t("mega_promo_title") || "Kanalınız İçin En Uygun Araçlar"}
               </h4>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-normal">
-                50'den fazla kategoride, telegram kanalınız için kanalınıza uygun en iyi botları bir arada görün.
+                {t("mega_promo_desc") || "Onlarca kategoride, topluluğunuzun veya kanalınızın büyümesine yardımcı olacak en popüler araçları bir arada inceleyin."}
               </p>
 
-              {/* Dynamic Styled Icon Badges */}
-              <div className="flex flex-wrap gap-2 my-1">
-                {/* Red Target Icon */}
-                <span className="w-7 h-7 rounded-full bg-[#ff4d4f] flex items-center justify-center shadow-xs select-none shrink-0">
-                  <span className="w-3 h-3 rounded-full bg-white flex items-center justify-center">
-                    <span className="w-1 h-1 rounded-full bg-[#ff4d4f]"></span>
-                  </span>
-                </span>
-                
-                {/* White/Blue border circle with blue square inside */}
-                <span className="w-7 h-7 rounded-full bg-white dark:bg-slate-900 border border-blue-500/80 flex items-center justify-center shadow-xs shrink-0">
-                  <span className="w-2.5 h-2.5 bg-blue-600 rounded-sm"></span>
-                </span>
-
-                {/* Yellow/Black hexagonal pattern */}
-                <span className="w-7 h-7 rounded-full bg-amber-500 flex items-center justify-center shadow-xs shrink-0">
-                  <span className="text-[9px] font-extrabold text-slate-950">✦</span>
-                </span>
-
-                {/* Mint/Dark green */}
-                <span className="w-7 h-7 rounded-full bg-[#181d20] flex items-center justify-center shadow-xs shrink-0">
-                  <span className="w-3.5 h-2.5 rounded-full border-2 border-emerald-400 flex items-center justify-center">
-                    <span className="w-1 h-1 rounded-full bg-emerald-400"></span>
-                  </span>
-                </span>
-
-                {/* Dark Black with italic T */}
-                <span className="w-7 h-7 rounded-full bg-black flex items-center justify-center shadow-xs shrink-0">
-                  <span className="text-[11px] font-[900] italic text-white font-serif font-black">T</span>
-                </span>
-
-                {/* Light blue/grey with circle-A */}
-                <span className="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 border border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-center shadow-xs shrink-0">
-                  <span className="text-[9px] font-black text-slate-500 dark:text-slate-400">A</span>
-                </span>
-
-                {/* Black with white slash/stripes */}
-                <span className="w-7 h-7 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center shadow-xs shrink-0">
-                  <span className="text-[10px] font-bold text-white leading-none">☰</span>
-                </span>
-
-                {/* Feather with dotted boundary */}
-                <span className="w-7 h-7 rounded-full bg-white dark:bg-slate-900 border border-dotted border-slate-400 dark:border-slate-700 flex items-center justify-center shadow-xs shrink-0">
-                  <span className="text-[10px]">🪶</span>
+              {/* Dynamic Styled Icon Badges - Professional & Non-colorful Mono version */}
+              <div className="flex items-center gap-1.5 py-1">
+                <div className="flex -space-x-2.5 overflow-hidden">
+                  <div className="inline-block w-8 h-8 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-slate-900 flex items-center justify-center shrink-0">
+                    <Shield size={13} className="text-slate-600 dark:text-slate-400" />
+                  </div>
+                  <div className="inline-block w-8 h-8 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-slate-900 flex items-center justify-center shrink-0">
+                    <BotIcon size={13} className="text-slate-600 dark:text-slate-400" />
+                  </div>
+                  <div className="inline-block w-8 h-8 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-slate-900 flex items-center justify-center shrink-0">
+                    <LayoutGrid size={13} className="text-slate-600 dark:text-slate-400" />
+                  </div>
+                  <div className="inline-block w-8 h-8 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-slate-900 flex items-center justify-center shrink-0">
+                    <Compass size={13} className="text-slate-600 dark:text-slate-400" />
+                  </div>
+                </div>
+                <span className="text-[10px] text-slate-450 dark:text-slate-500 font-semibold uppercase tracking-wider ml-1">
+                  +50 Kategori
                 </span>
               </div>
 
@@ -340,19 +314,20 @@ const NavMenu = ({
                   navigate("/search");
                   setOpenMenu(null);
                 }}
-                className="group/btn text-[12px] font-extrabold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1.5 mt-1 cursor-pointer transition-colors self-start"
+                className="group/btn text-[12px] font-extrabold text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white flex items-center gap-1.5 mt-0.5 cursor-pointer transition-colors self-start"
               >
-                Şimdi dene <ArrowRight size={13} className="shrink-0 transition-transform group-hover/btn:translate-x-1" />
+                {t("mega_try_now") || "Şimdi dene"}{" "}
+                <ArrowRight size={13} className="shrink-0 transition-transform group-hover/btn:translate-x-0.5" />
               </button>
             </div>
 
-            <div className="border-t border-slate-200/60 dark:border-slate-800/60 my-3 w-full" />
+            <div className="border-t border-slate-200/50 dark:border-white/[0.04] my-3.5 w-full" />
 
             {/* Bottom section (Botlyhub brand and CTA) */}
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded bg-blue-600 flex items-center justify-center shadow-sm shrink-0">
-                  <span className="text-[10px] font-black text-white">▲</span>
+                <span className="w-5 h-5 rounded bg-slate-900 dark:bg-white flex items-center justify-center shadow-xs shrink-0">
+                  <span className="text-[10px] font-black text-white dark:text-slate-950">▲</span>
                 </span>
                 <span className="text-[12px] font-extrabold text-slate-800 dark:text-slate-200">
                   Botlyhub
@@ -360,7 +335,7 @@ const NavMenu = ({
               </div>
               
               <p className="text-[10.5px] text-slate-500 dark:text-slate-400 leading-normal font-normal">
-                Tek bir yerden incele, yönet ve pasif gelir elde et.
+                {t("mega_brand_desc") || "Tek bir yerden inceleyin, yönetin ve entegre edin."}
               </p>
 
               <button
@@ -369,9 +344,10 @@ const NavMenu = ({
                   navigate("/premium");
                   setOpenMenu(null);
                 }}
-                className="group/btn text-[12px] font-extrabold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1.5 mt-1 cursor-pointer transition-colors self-start"
+                className="group/btn text-[12px] font-extrabold text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white flex items-center gap-1.5 mt-0.5 cursor-pointer transition-colors self-start"
               >
-                Daha fazla bilgi edin <ArrowRight size={13} className="shrink-0 transition-transform group-hover/btn:translate-x-1" />
+                {t("mega_learn_more") || "Daha fazla bilgi edin"}{" "}
+                <ArrowRight size={13} className="shrink-0 transition-transform group-hover/btn:translate-x-0.5" />
               </button>
             </div>
           </div>
@@ -513,8 +489,8 @@ const NavMenu = ({
 
           {/* Right Column (Featured Hub) */}
           <div className="col-span-3 border-l border-black/5 dark:border-white/5 pl-8 flex flex-col justify-center gap-3 mega-menu-right-links">
-            <h4 className="text-[12px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1 px-1">
-              Hızlı Bağlantılar
+            <h4 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 px-3">
+              {t("mega_quick_links") || "Hızlı Bağlantılar"}
             </h4>
             
             {/* Reklam Link */}
@@ -524,19 +500,20 @@ const NavMenu = ({
                 navigate("/premium");
                 setOpenMenu(null);
               }}
-              className="flex items-center gap-3 p-2.5 rounded-xl text-left hover:bg-amber-500/[0.04] dark:hover:bg-amber-500/[0.03] border border-transparent hover:border-amber-500/10 transition-all duration-200 group/link w-full cursor-pointer"
+              className="group/link flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 border border-transparent hover:border-black/5 dark:hover:border-white/10 transition-all text-left w-full cursor-pointer"
             >
-              <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center text-amber-500 shrink-0 group-hover/link:scale-110 transition-transform duration-200">
-                <Sparkles size={16} />
+              <div className="flex items-center gap-3">
+                <Sparkles size={15} className="text-slate-500 dark:text-slate-400 transition-colors group-hover/link:text-slate-850 dark:group-hover/link:text-white" />
+                <div className="flex flex-col">
+                  <span className="text-[13px] font-bold text-slate-700 dark:text-slate-200 transition-colors group-hover/link:text-slate-950 dark:group-hover/link:text-white">
+                    {t("mega_ad") || "Reklam"}
+                  </span>
+                  <span className="text-[10.5px] text-slate-450 dark:text-slate-450">
+                    {t("mega_ad_desc") || "Botlyhub ile öne çıkın"}
+                  </span>
+                </div>
               </div>
-              <div className="flex flex-col">
-                <span className="text-[13px] font-bold text-slate-750 dark:text-slate-200 group-hover/link:text-amber-600 dark:group-hover/link:text-amber-400 transition-colors">
-                  Reklam
-                </span>
-                <span className="text-[10.5px] text-slate-450 dark:text-slate-400">
-                  Botlyhub ile öne çıkın
-                </span>
-              </div>
+              <ArrowRight size={14} className="opacity-0 -translate-x-1 group-hover/link:opacity-100 group-hover/link:translate-x-0 transition-all text-slate-400 dark:text-slate-500" />
             </button>
 
             {/* Blog Link */}
@@ -546,19 +523,20 @@ const NavMenu = ({
                 navigate("/blog");
                 setOpenMenu(null);
               }}
-              className="flex items-center gap-3 p-2.5 rounded-xl text-left hover:bg-blue-500/[0.04] dark:hover:bg-blue-500/[0.03] border border-transparent hover:border-blue-500/10 transition-all duration-200 group/link w-full cursor-pointer"
+              className="group/link flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 border border-transparent hover:border-black/5 dark:hover:border-white/10 transition-all text-left w-full cursor-pointer"
             >
-              <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center text-blue-500 shrink-0 group-hover/link:scale-110 transition-transform duration-200">
-                <Compass size={16} />
+              <div className="flex items-center gap-3">
+                <Compass size={15} className="text-slate-500 dark:text-slate-400 transition-colors group-hover/link:text-slate-850 dark:group-hover/link:text-white" />
+                <div className="flex flex-col">
+                  <span className="text-[13px] font-bold text-slate-700 dark:text-slate-200 transition-colors group-hover/link:text-slate-950 dark:group-hover/link:text-white">
+                    {t("mega_blog") || "Blog & Rehberler"}
+                  </span>
+                  <span className="text-[10.5px] text-slate-450 dark:text-slate-450">
+                    {t("mega_blog_desc") || "En son ipuçları & rehberler"}
+                  </span>
+                </div>
               </div>
-              <div className="flex flex-col">
-                <span className="text-[13px] font-bold text-slate-750 dark:text-slate-200 group-hover/link:text-blue-600 dark:group-hover/link:text-blue-400 transition-colors">
-                  Blog & Rehberler
-                </span>
-                <span className="text-[10.5px] text-slate-450 dark:text-slate-400">
-                  En son ipuçları & rehberler
-                </span>
-              </div>
+              <ArrowRight size={14} className="opacity-0 -translate-x-1 group-hover/link:opacity-100 group-hover/link:translate-x-0 transition-all text-slate-400 dark:text-slate-500" />
             </button>
 
             {/* Advanced Search Link */}
@@ -568,19 +546,20 @@ const NavMenu = ({
                 navigate("/search");
                 setOpenMenu(null);
               }}
-              className="flex items-center gap-3 p-2.5 rounded-xl text-left hover:bg-emerald-500/[0.04] dark:hover:bg-emerald-500/[0.03] border border-transparent hover:border-emerald-500/10 transition-all duration-200 group/link w-full cursor-pointer"
+              className="group/link flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 border border-transparent hover:border-black/5 dark:hover:border-white/10 transition-all text-left w-full cursor-pointer"
             >
-              <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-550 dark:text-emerald-400 shrink-0 group-hover/link:scale-110 transition-transform duration-200">
-                <Search size={16} />
+              <div className="flex items-center gap-3">
+                <Search size={15} className="text-slate-500 dark:text-slate-400 transition-colors group-hover/link:text-slate-850 dark:group-hover/link:text-white" />
+                <div className="flex flex-col">
+                  <span className="text-[13px] font-bold text-slate-700 dark:text-slate-200 transition-colors group-hover/link:text-slate-950 dark:group-hover/link:text-white">
+                    {t("mega_advanced_search") || "Gelişmiş Arama"}
+                  </span>
+                  <span className="text-[10.5px] text-slate-450 dark:text-slate-450">
+                    {t("mega_advanced_search_desc") || "Filtrelerle nokta atışı arama"}
+                  </span>
+                </div>
               </div>
-              <div className="flex flex-col">
-                <span className="text-[13px] font-bold text-slate-750 dark:text-slate-200 group-hover/link:text-emerald-600 dark:group-hover/link:text-emerald-400 transition-colors">
-                  Gelişmiş Arama
-                </span>
-                <span className="text-[10.5px] text-slate-450 dark:text-slate-400">
-                  Filtrelerle nokta atışı arama
-                </span>
-              </div>
+              <ArrowRight size={14} className="opacity-0 -translate-x-1 group-hover/link:opacity-100 group-hover/link:translate-x-0 transition-all text-slate-400 dark:text-slate-500" />
             </button>
           </div>
         </div>
@@ -927,7 +906,7 @@ const NavMenu = ({
                                     setOpenMenu(null);
                                     if (typeof setMobileModal === "function") setMobileModal(null);
                                   }}
-                                  className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-blue-500 transition-all font-bold text-xs uppercase group"
+                                  className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all font-bold text-xs uppercase group"
                                 >
                                   {link.label}
                                   <ExternalLink
@@ -3219,52 +3198,55 @@ const BotDetail = () => {
 
             {/* Modal Content */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 w-full max-w-sm rounded-[32px] overflow-hidden p-6 relative z-10 shadow-2xl transition-colors duration-300"
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-white/5 w-full max-w-sm rounded-[28px] overflow-hidden p-6 relative z-10 shadow-2xl transition-colors duration-300"
             >
               {/* Close Button */}
               <button
                 onClick={() => setShowPlatformChoiceModal(false)}
-                className="absolute top-6 right-6 w-8 h-8 rounded-full bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 flex items-center justify-center transition-colors"
-                aria-label="Cihaz Seçimini Kapat"
+                className="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 flex items-center justify-center transition-all cursor-pointer"
+                aria-label={t("close") || "Kapat"}
               >
-                <X size={16} />
+                <X size={15} />
               </button>
 
-              <div className="text-center mb-6 mt-2">
-                <div className="w-12 h-12 bg-brand/10 text-brand rounded-2xl flex items-center justify-center mx-auto mb-3">
-                  <Smartphone size={24} />
+              {/* Title Section */}
+              <div className="text-center mb-6 mt-3">
+                <div className="w-14 h-14 bg-slate-100 dark:bg-white/5 text-slate-850 dark:text-slate-150 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-200/40 dark:border-white/[0.05] shadow-sm">
+                  <Smartphone size={22} className="text-slate-700 dark:text-slate-300" />
                 </div>
-                <h3 className="text-md font-black text-slate-900 dark:text-white tracking-tight uppercase italic">
-                  PLATFORM SEÇİN
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">
+                  {t("platform_selector_title") || "Seçenekleri Başlat"}
                 </h3>
-                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-extrabold uppercase tracking-wide mt-2">
-                  {bot.name} UYGULAMASINI AÇMAK İSTEDİĞİNİZ CİHAZ PLATFORMUNU SEÇİN.
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 px-2 leading-relaxed">
+                  {t("platform_selector_desc") || `${bot.name} uygulamasını başlatmak istediğiniz cihaz platformunu seçin.`}
                 </p>
               </div>
 
-              <div className="flex flex-col gap-3">
+              {/* Platform Options */}
+              <div className="flex flex-col gap-2.5">
                 {bot.android_url && (
                   <button
                     onClick={() => {
                       setShowPlatformChoiceModal(false);
                       openPlatformLink('android');
                     }}
-                    className="w-full p-4 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-white/5 dark:hover:bg-white/10 border border-slate-100 dark:border-white/5 flex items-center gap-4 text-left transition-all active:scale-[0.98]"
+                    className="group w-full p-3.5 rounded-2xl bg-slate-50/50 hover:bg-slate-100/70 dark:bg-white/[0.02] dark:hover:bg-white/[0.06] border border-slate-200/50 dark:border-white/[0.04] hover:border-slate-300 dark:hover:border-white/[0.08] flex items-center gap-3.5 text-left transition-all duration-200 active:scale-[0.98] cursor-pointer"
                   >
-                    <div className="w-9 h-9 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200/40 dark:border-white/[0.05] text-slate-705 dark:text-slate-295 flex items-center justify-center shrink-0 transition-colors">
                       <Smartphone size={18} />
                     </div>
-                    <div>
-                      <div className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                        ANDROID İLE BAŞLAT
+                    <div className="flex-1">
+                      <div className="text-xs font-bold text-slate-800 dark:text-slate-100 tracking-tight">
+                        Android
                       </div>
-                      <div className="text-[9px] text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-0.5">
-                        GOOGLE PLAY STORE ÜZERİNDEN AÇIN
+                      <div className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">
+                        Google Play Store üzerinden aç
                       </div>
                     </div>
+                    <ChevronRight size={14} className="text-slate-300 dark:text-slate-600 group-hover:text-slate-500 dark:group-hover:text-slate-400 group-hover:translate-x-0.5 transition-all duration-200" />
                   </button>
                 )}
 
@@ -3274,19 +3256,20 @@ const BotDetail = () => {
                       setShowPlatformChoiceModal(false);
                       openPlatformLink('ios');
                     }}
-                    className="w-full p-4 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-white/5 dark:hover:bg-white/10 border border-slate-100 dark:border-white/5 flex items-center gap-4 text-left transition-all active:scale-[0.98]"
+                    className="group w-full p-3.5 rounded-2xl bg-slate-50/50 hover:bg-slate-100/70 dark:bg-white/[0.02] dark:hover:bg-white/[0.06] border border-slate-200/50 dark:border-white/[0.04] hover:border-slate-300 dark:hover:border-white/[0.08] flex items-center gap-3.5 text-left transition-all duration-200 active:scale-[0.98] cursor-pointer"
                   >
-                    <div className="w-9 h-9 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200/40 dark:border-white/[0.05] text-slate-705 dark:text-slate-295 flex items-center justify-center shrink-0 transition-colors">
                       <Apple size={18} />
                     </div>
-                    <div>
-                      <div className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                        IOS / APPLE İLE BAŞLAT
+                    <div className="flex-1">
+                      <div className="text-xs font-bold text-slate-800 dark:text-slate-100 tracking-tight">
+                        iOS / Apple
                       </div>
-                      <div className="text-[9px] text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-0.5">
-                        APP STORE ÜZERİNDEN AÇIN
+                      <div className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">
+                        App Store üzerinden aç
                       </div>
                     </div>
+                    <ChevronRight size={14} className="text-slate-300 dark:text-slate-600 group-hover:text-slate-500 dark:group-hover:text-slate-400 group-hover:translate-x-0.5 transition-all duration-200" />
                   </button>
                 )}
 
@@ -3296,19 +3279,20 @@ const BotDetail = () => {
                       setShowPlatformChoiceModal(false);
                       openPlatformLink('tgapp');
                     }}
-                    className="w-full p-4 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-white/5 dark:hover:bg-white/10 border border-slate-100 dark:border-white/5 flex items-center gap-4 text-left transition-all active:scale-[0.98]"
+                    className="group w-full p-3.5 rounded-2xl bg-slate-50/50 hover:bg-slate-100/70 dark:bg-white/[0.02] dark:hover:bg-white/[0.06] border border-slate-200/50 dark:border-white/[0.04] hover:border-slate-300 dark:hover:border-white/[0.08] flex items-center gap-3.5 text-left transition-all duration-200 active:scale-[0.98] cursor-pointer"
                   >
-                    <div className="w-9 h-9 rounded-lg bg-sky-500/10 text-sky-500 flex items-center justify-center shrink-0">
-                      <Send size={18} />
+                    <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200/40 dark:border-white/[0.05] text-slate-705 dark:text-slate-295 flex items-center justify-center shrink-0 transition-colors">
+                      <Send size={16} className="relative left-[-0.5px]" />
                     </div>
-                    <div>
-                      <div className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                        TELEGRAM APP İLE BAŞLAT
+                    <div className="flex-1">
+                      <div className="text-xs font-bold text-slate-800 dark:text-slate-100 tracking-tight">
+                        Telegram App
                       </div>
-                      <div className="text-[9px] text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-0.5">
-                        TELEGRAM MINI APP / WEB APP ÜZERİNDEN AÇIN
+                      <div className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">
+                        Telegram Mini App / Web App olarak aç
                       </div>
                     </div>
+                    <ChevronRight size={14} className="text-slate-300 dark:text-slate-600 group-hover:text-slate-500 dark:group-hover:text-slate-400 group-hover:translate-x-0.5 transition-all duration-200" />
                   </button>
                 )}
               </div>
