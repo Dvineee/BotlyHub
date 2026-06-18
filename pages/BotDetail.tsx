@@ -1228,6 +1228,13 @@ const BotDetail = () => {
   const { toggleTheme, theme } = useTheme();
 
   const [bot, setBot] = useState<Bot | null>(null);
+  const isApp = useMemo(() => {
+    if (!bot) return false;
+    const categoryVal = bot.category as any;
+    return Array.isArray(categoryVal)
+      ? categoryVal.includes('apps')
+      : (typeof categoryVal === 'string' && (categoryVal as string).includes('apps'));
+  }, [bot]);
   const [similarBots, setSimilarBots] = useState<Bot[]>([]);
   const [matchedQATopics, setMatchedQATopics] = useState<any[]>([]);
   const [isOwned, setIsOwned] = useState(false);
@@ -2859,7 +2866,7 @@ const BotDetail = () => {
                         className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200/50 dark:border-white/10 text-xs font-bold text-slate-700 dark:text-white bg-white/5 dark:bg-[#111214]/40 hover:bg-slate-205/50 dark:hover:bg-white/5 cursor-pointer backdrop-blur-md transition-all active:scale-95 duration-200"
                       >
                         <Terminal size={14} className="text-slate-400 dark:text-slate-500" />
-                        <span>{t("detail_app_bot") || "Uygulama Bot"}</span>
+                        <span>{isApp ? (t("detail_app_only") || "Uygulama") : (t("detail_bot_only") || "Bot")}</span>
                       </button>
                     )}
                     {bot.website_url && (
