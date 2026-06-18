@@ -530,6 +530,82 @@ export class DatabaseService {
       .replace(/^-+|-+$/g, '');
   }
 
+  static parseSocialLinks(socialUrl: string | null | undefined): {
+    github_url: string | null;
+    youtube_url: string | null;
+    x_url: string | null;
+    social_url_clean: string | null;
+    android_url: string | null;
+    ios_url: string | null;
+  } {
+    if (!socialUrl) {
+      return { github_url: null, youtube_url: null, x_url: null, social_url_clean: null, android_url: null, ios_url: null };
+    }
+
+    try {
+      const trimmed = socialUrl.trim();
+      if (trimmed.startsWith('{')) {
+        const parsed = JSON.parse(trimmed);
+        return {
+          github_url: parsed.github_url || parsed.github || null,
+          youtube_url: parsed.youtube_url || parsed.youtube || null,
+          x_url: parsed.x_url || parsed.x || null,
+          social_url_clean: parsed.social_url || parsed.other || null,
+          android_url: parsed.android_url || null,
+          ios_url: parsed.ios_url || null,
+        };
+      }
+    } catch (e) {
+      // ignore JSON parse fail, fall back to legacy strings
+    }
+
+    const urlLower = socialUrl.toLowerCase();
+    if (urlLower.includes('github.com')) {
+      return { github_url: socialUrl, youtube_url: null, x_url: null, social_url_clean: null, android_url: null, ios_url: null };
+    } else if (urlLower.includes('youtube.com') || urlLower.includes('youtu.be')) {
+      return { github_url: null, youtube_url: socialUrl, x_url: null, social_url_clean: null, android_url: null, ios_url: null };
+    } else if (urlLower.includes('twitter.com') || urlLower.includes('x.com')) {
+      return { github_url: null, youtube_url: null, x_url: socialUrl, social_url_clean: null, android_url: null, ios_url: null };
+    } else if (urlLower.includes('play.google.com')) {
+      return { github_url: null, youtube_url: null, x_url: null, social_url_clean: null, android_url: socialUrl, ios_url: null };
+    } else if (urlLower.includes('apps.apple.com')) {
+      return { github_url: null, youtube_url: null, x_url: null, social_url_clean: null, android_url: null, ios_url: socialUrl };
+    } else {
+      return { github_url: null, youtube_url: null, x_url: null, social_url_clean: socialUrl, android_url: null, ios_url: null };
+    }
+  }
+
+  static serializeSocialLinks(links: {
+    github_url?: string | null;
+    youtube_url?: string | null;
+    x_url?: string | null;
+    social_url_clean?: string | null;
+    android_url?: string | null;
+    ios_url?: string | null;
+  }): string | null {
+    const { github_url, youtube_url, x_url, social_url_clean, android_url, ios_url } = links;
+    
+    const cleanGithub = github_url?.trim() || null;
+    const cleanYoutube = youtube_url?.trim() || null;
+    const cleanX = x_url?.trim() || null;
+    const cleanSocial = social_url_clean?.trim() || null;
+    const cleanAndroid = android_url?.trim() || null;
+    const cleanIos = ios_url?.trim() || null;
+
+    if (!cleanGithub && !cleanYoutube && !cleanX && !cleanSocial && !cleanAndroid && !cleanIos) {
+      return null;
+    }
+    
+    return JSON.stringify({
+      github_url: cleanGithub,
+      youtube_url: cleanYoutube,
+      x_url: cleanX,
+      social_url: cleanSocial,
+      android_url: cleanAndroid,
+      ios_url: cleanIos
+    });
+  }
+
   static async getBots(): Promise<Bot[]> {
     const { data: bots } = await supabase.from('bots').select('*').order('id', { ascending: false });
     const { data: ratings } = await supabase.from('bot_ratings').select('bot_id, rating');
@@ -552,6 +628,8 @@ export class DatabaseService {
         const commands = localBot?.commands || bot.commands || ["/start"];
         const features = localBot?.features || bot.features || [];
 
+        const parsedSocial = this.parseSocialLinks(bot.social_url);
+
         return {
             ...bot,
             slug,
@@ -561,7 +639,13 @@ export class DatabaseService {
             rating_count: botRatings.length,
             user_count: userCount,
             commands,
-            features
+            features,
+            github_url: parsedSocial.github_url,
+            youtube_url: parsedSocial.youtube_url,
+            x_url: parsedSocial.x_url,
+            android_url: parsedSocial.android_url,
+            ios_url: parsedSocial.ios_url,
+            social_url: parsedSocial.social_url_clean
         };
     });
   }
@@ -660,6 +744,8 @@ export class DatabaseService {
     const commands = localBot?.commands || ["/start"];
     const features = localBot?.features || data.features || [];
 
+    const parsedSocial = this.parseSocialLinks(data.social_url);
+
     return {
         ...data,
         slug: data.slug || this.generateSlug(data.name),
@@ -669,7 +755,13 @@ export class DatabaseService {
         rating: Number(rating.toFixed(1)) || 0,
         rating_count,
         commands,
-        features
+        features,
+        github_url: parsedSocial.github_url,
+        youtube_url: parsedSocial.youtube_url,
+        x_url: parsedSocial.x_url,
+        android_url: parsedSocial.android_url,
+        ios_url: parsedSocial.ios_url,
+        social_url: parsedSocial.social_url_clean
     };
   }
 
@@ -721,6 +813,15 @@ export class DatabaseService {
     if (!bot.name) throw new Error("Bot ismi boş bırakılamaz.");
     if (!bot.bot_link) throw new Error("Kullanıcı adı (@) boş bırakılamaz.");
 
+    const serializedSocial = this.serializeSocialLinks({
+        github_url: bot.github_url,
+        youtube_url: bot.youtube_url,
+        x_url: bot.x_url,
+        android_url: bot.android_url,
+        ios_url: bot.ios_url,
+        social_url_clean: bot.social_url
+    });
+
     const payload = { 
         id: bot.id, 
         name: bot.name, 
@@ -737,7 +838,7 @@ export class DatabaseService {
         telegram_group: bot.telegram_group || null,
         website_url: bot.website_url || null,
         app_url: bot.app_url || null,
-        social_url: bot.social_url || null
+        social_url: serializedSocial
     };
 
     const { error } = await supabase.from('bots').upsert(payload, { onConflict: 'id' });
@@ -770,12 +871,20 @@ export class DatabaseService {
             ? botRatings.reduce((acc, curr) => acc + curr.rating, 0) / botRatings.length 
             : 0;
 
+        const parsedSocial = this.parseSocialLinks(bot.social_url);
+
         return { 
             ...bot, 
             category: this.parseCategory(bot.category),
             ownerCount: (userBots || []).filter((ub: any) => ub.bot_id === bot.id).length,
             rating: Number(avgRating.toFixed(1)),
-            ratingCount: botRatings.length
+            ratingCount: botRatings.length,
+            github_url: parsedSocial.github_url,
+            youtube_url: parsedSocial.youtube_url,
+            x_url: parsedSocial.x_url,
+            android_url: parsedSocial.android_url,
+            ios_url: parsedSocial.ios_url,
+            social_url: parsedSocial.social_url_clean
         };
     });
   }
@@ -813,6 +922,8 @@ export class DatabaseService {
           const botData = bots.find(b => b.id === ub.bot_id);
           if (!botData) return null;
 
+          const parsedSocial = this.parseSocialLinks(botData.social_url);
+
           return { 
               ...botData, 
               category: this.parseCategory(botData.category),
@@ -820,7 +931,13 @@ export class DatabaseService {
               ownership_id: ub.id, 
               is_premium: ub.is_premium, 
               isActive: ub.is_active, 
-              revenueEnabled: ub.revenue_enabled 
+              revenueEnabled: ub.revenue_enabled,
+              github_url: parsedSocial.github_url,
+              youtube_url: parsedSocial.youtube_url,
+              x_url: parsedSocial.x_url,
+              android_url: parsedSocial.android_url,
+              ios_url: parsedSocial.ios_url,
+              social_url: parsedSocial.social_url_clean
           } as UserBot;
       }).filter((b): b is UserBot => b !== null);
     } catch (e) {

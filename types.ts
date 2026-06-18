@@ -85,6 +85,11 @@ export interface Bot {
   website_url?: string | null;
   app_url?: string | null;
   social_url?: string | null;
+  github_url?: string | null;
+  youtube_url?: string | null;
+  x_url?: string | null;
+  android_url?: string | null;
+  ios_url?: string | null;
   rating?: number;
   rating_count?: number;
   user_count?: number;

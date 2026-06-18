@@ -54,6 +54,8 @@ import {
   ArrowRight,
   Terminal,
   Link2,
+  Smartphone,
+  Apple,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useNavigate, useParams, Link as RouterLink } from "react-router-dom";
@@ -1233,6 +1235,7 @@ const BotDetail = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [tonRate, setTonRate] = useState(250);
   const [showGuide, setShowGuide] = useState(false);
+  const [showPlatformChoiceModal, setShowPlatformChoiceModal] = useState(false);
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
@@ -1474,20 +1477,64 @@ const BotDetail = () => {
     PriceService.getTonPrice().then((p) => setTonRate(p.tonTry));
   }, []);
 
+  const openPlatformLink = useCallback((platform: 'android' | 'ios' | 'default', customDefaultUrl?: string) => {
+    if (!bot) return;
+    let url = '';
+    if (platform === 'android') {
+      url = bot.android_url || '';
+    } else if (platform === 'ios') {
+      url = bot.ios_url || '';
+    } else {
+      url = customDefaultUrl || bot.app_url || '';
+      if (!url) {
+        const username = bot.bot_link
+          .replace("@", "")
+          .replace("https://t.me/", "")
+          .split("/")
+          .pop()
+          ?.trim();
+        url = `https://t.me/${username}`;
+      }
+    }
+
+    if (url) {
+      if (tg?.openTelegramLink && url.startsWith('https://t.me/')) {
+        tg.openTelegramLink(url);
+      } else {
+        window.open(url, "_blank");
+      }
+    }
+  }, [bot, tg]);
+
+  const handleLaunchAppOrBot = useCallback((customDefaultUrl?: string) => {
+    if (!bot) return;
+    const categoryVal = bot.category as any;
+    const isApp = Array.isArray(categoryVal)
+      ? categoryVal.includes('apps')
+      : (typeof categoryVal === 'string' && (categoryVal as string).includes('apps'));
+
+    const hasAndroid = !!bot.android_url?.trim();
+    const hasIos = !!bot.ios_url?.trim();
+
+    if (isApp && (hasAndroid || hasIos)) {
+      if (hasAndroid && hasIos) {
+        setShowPlatformChoiceModal(true);
+      } else if (hasAndroid) {
+        openPlatformLink('android');
+      } else if (hasIos) {
+        openPlatformLink('ios');
+      }
+    } else {
+      openPlatformLink('default', customDefaultUrl);
+    }
+  }, [bot, openPlatformLink]);
+
   const handleAction = useCallback(async () => {
     if (isProcessing || !bot) return;
     haptic("medium");
 
     if (isOwned) {
-      const username = bot.bot_link
-        .replace("@", "")
-        .replace("https://t.me/", "")
-        .split("/")
-        .pop()
-        ?.trim();
-      const finalUrl = `https://t.me/${username}`;
-      if (tg?.openTelegramLink) tg.openTelegramLink(finalUrl);
-      else window.open(finalUrl, "_blank");
+      handleLaunchAppOrBot();
       return;
     }
 
@@ -1540,7 +1587,16 @@ const BotDetail = () => {
 
         setIsOwned(true);
         notification("success");
-        setTimeout(() => setShowGuide(true), 500);
+        
+        const categoryVal = bot.category as any;
+        const isApp = Array.isArray(categoryVal)
+          ? categoryVal.includes('apps')
+          : (typeof categoryVal === 'string' && (categoryVal as string).includes('apps'));
+        if (!isApp) {
+          setTimeout(() => setShowGuide(true), 500);
+        } else {
+          setTimeout(() => handleLaunchAppOrBot(), 600);
+        }
       } catch (e: any) {
         console.error("Action failed:", e);
         alert("İşlem başarısız: " + (e.message || "Lütfen tekrar deneyin."));
@@ -1561,6 +1617,8 @@ const BotDetail = () => {
     setShowGuide,
     navigate,
     setIsLoginModalOpen,
+    handleLaunchAppOrBot,
+    t,
   ]);
 
   const handleAiAnalysis = async () => {
@@ -2450,6 +2508,75 @@ const BotDetail = () => {
                                   />
                                 </button>
                               )}
+                              {bot.github_url && (
+                                <button
+                                  onClick={() => {
+                                    window.open(bot.github_url || undefined, "_blank");
+                                    setIsDropdownOpen(false);
+                                  }}
+                                  className="w-full flex items-center justify-between px-4 py-4 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-colors text-left group border-t border-black/[0.03] dark:border-white/[0.03]"
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <Terminal
+                                      size={14}
+                                      className="text-slate-400 dark:text-slate-500"
+                                    />
+                                    <span className="text-[10px] font-black tracking-widest text-slate-700 dark:text-slate-300">
+                                      Github
+                                    </span>
+                                  </div>
+                                  <ChevronRight
+                                    size={14}
+                                    className="text-slate-300 dark:text-slate-700"
+                                  />
+                                </button>
+                              )}
+                              {bot.youtube_url && (
+                                <button
+                                  onClick={() => {
+                                    window.open(bot.youtube_url || undefined, "_blank");
+                                    setIsDropdownOpen(false);
+                                  }}
+                                  className="w-full flex items-center justify-between px-4 py-4 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-colors text-left group border-t border-black/[0.03] dark:border-white/[0.03]"
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <Play
+                                      size={14}
+                                      className="text-slate-400 dark:text-slate-500"
+                                    />
+                                    <span className="text-[10px] font-black tracking-widest text-slate-700 dark:text-slate-300">
+                                      Youtube
+                                    </span>
+                                  </div>
+                                  <ChevronRight
+                                    size={14}
+                                    className="text-slate-300 dark:text-slate-700"
+                                  />
+                                </button>
+                              )}
+                              {bot.x_url && (
+                                <button
+                                  onClick={() => {
+                                    window.open(bot.x_url || undefined, "_blank");
+                                    setIsDropdownOpen(false);
+                                  }}
+                                  className="w-full flex items-center justify-between px-4 py-4 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-colors text-left group border-t border-black/[0.03] dark:border-white/[0.03]"
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <Globe
+                                      size={14}
+                                      className="text-slate-400 dark:text-slate-500"
+                                    />
+                                    <span className="text-[10px] font-black tracking-widest text-slate-700 dark:text-slate-300">
+                                      X (Twitter)
+                                    </span>
+                                  </div>
+                                  <ChevronRight
+                                    size={14}
+                                    className="text-slate-300 dark:text-slate-700"
+                                  />
+                                </button>
+                              )}
                               {bot.social_url && (
                                 <button
                                   onClick={() => {
@@ -2715,6 +2842,9 @@ const BotDetail = () => {
               {(bot.telegram_group ||
                 bot.website_url ||
                 bot.app_url ||
+                bot.github_url ||
+                bot.youtube_url ||
+                bot.x_url ||
                 bot.social_url) && (
                 <div className="flex flex-col bg-slate-100/40 dark:bg-slate-900/40 rounded-2xl border border-slate-200/50 dark:border-white/5 p-6 transition-colors duration-300 official-links-box">
                   <div className="mb-3">
@@ -2723,9 +2853,9 @@ const BotDetail = () => {
                     </h4>
                   </div>
                   <div className="flex flex-wrap gap-2.5">
-                    {bot.app_url && (
+                    {(bot.app_url || bot.android_url || bot.ios_url) && (
                       <button
-                        onClick={() => window.open(bot.app_url || undefined, "_blank")}
+                        onClick={() => handleLaunchAppOrBot(bot.app_url || undefined)}
                         className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200/50 dark:border-white/10 text-xs font-bold text-slate-700 dark:text-white bg-white/5 dark:bg-[#111214]/40 hover:bg-slate-205/50 dark:hover:bg-white/5 cursor-pointer backdrop-blur-md transition-all active:scale-95 duration-200"
                       >
                         <Terminal size={14} className="text-slate-400 dark:text-slate-500" />
@@ -2753,6 +2883,33 @@ const BotDetail = () => {
                       >
                         <Send size={14} className="text-slate-400 dark:text-slate-400" />
                         <span>{t("detail_tg_group") || "Telegram Grubu"}</span>
+                      </button>
+                    )}
+                    {bot.github_url && (
+                      <button
+                        onClick={() => window.open(bot.github_url || undefined, "_blank")}
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200/50 dark:border-white/10 text-xs font-bold text-slate-700 dark:text-white bg-white/5 dark:bg-[#111214]/40 hover:bg-slate-205/50 dark:hover:bg-white/5 cursor-pointer backdrop-blur-md transition-all active:scale-95 duration-200"
+                      >
+                        <Terminal size={14} className="text-slate-400 dark:text-slate-500" />
+                        <span>Github</span>
+                      </button>
+                    )}
+                    {bot.youtube_url && (
+                      <button
+                        onClick={() => window.open(bot.youtube_url || undefined, "_blank")}
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200/50 dark:border-white/10 text-xs font-bold text-slate-700 dark:text-white bg-white/5 dark:bg-[#111214]/40 hover:bg-slate-205/50 dark:hover:bg-white/5 cursor-pointer backdrop-blur-md transition-all active:scale-95 duration-200"
+                      >
+                        <Play size={14} className="text-slate-400 dark:text-slate-500" />
+                        <span>Youtube</span>
+                      </button>
+                    )}
+                    {bot.x_url && (
+                      <button
+                        onClick={() => window.open(bot.x_url || undefined, "_blank")}
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200/50 dark:border-white/10 text-xs font-bold text-slate-700 dark:text-white bg-white/5 dark:bg-[#111214]/40 hover:bg-slate-205/50 dark:hover:bg-white/5 cursor-pointer backdrop-blur-md transition-all active:scale-95 duration-200"
+                      >
+                        <Globe size={14} className="text-slate-400 dark:text-slate-500" />
+                        <span>X (Twitter)</span>
                       </button>
                     )}
                     {bot.social_url && (
@@ -3019,6 +3176,97 @@ const BotDetail = () => {
               ))}
             </div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Platform Choice Modal */}
+      <AnimatePresence>
+        {showPlatformChoiceModal && bot && (
+          <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowPlatformChoiceModal(false)}
+              className="absolute inset-0 bg-slate-950/80 backdrop-blur-md"
+            />
+
+            {/* Modal Content */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 w-full max-w-sm rounded-[32px] overflow-hidden p-6 relative z-10 shadow-2xl transition-colors duration-300"
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => setShowPlatformChoiceModal(false)}
+                className="absolute top-6 right-6 w-8 h-8 rounded-full bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 flex items-center justify-center transition-colors"
+                aria-label="Cihaz Seçimini Kapat"
+              >
+                <X size={16} />
+              </button>
+
+              <div className="text-center mb-6 mt-2">
+                <div className="w-12 h-12 bg-brand/10 text-brand rounded-2xl flex items-center justify-center mx-auto mb-3">
+                  <Smartphone size={24} />
+                </div>
+                <h3 className="text-md font-black text-slate-900 dark:text-white tracking-tight uppercase italic">
+                  PLATFORM SEÇİN
+                </h3>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-extrabold uppercase tracking-wide mt-2">
+                  {bot.name} UYGULAMASINI AÇMAK İSTEDİĞİNİZ CİHAZ PLATFORMUNU SEÇİN.
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                {bot.android_url && (
+                  <button
+                    onClick={() => {
+                      setShowPlatformChoiceModal(false);
+                      openPlatformLink('android');
+                    }}
+                    className="w-full p-4 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-white/5 dark:hover:bg-white/10 border border-slate-100 dark:border-white/5 flex items-center gap-4 text-left transition-all active:scale-[0.98]"
+                  >
+                    <div className="w-9 h-9 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0">
+                      <Smartphone size={18} />
+                    </div>
+                    <div>
+                      <div className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                        ANDROID İLE BAŞLAT
+                      </div>
+                      <div className="text-[9px] text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-0.5">
+                        GOOGLE PLAY STORE ÜZERİNDEN AÇIN
+                      </div>
+                    </div>
+                  </button>
+                )}
+
+                {bot.ios_url && (
+                  <button
+                    onClick={() => {
+                      setShowPlatformChoiceModal(false);
+                      openPlatformLink('ios');
+                    }}
+                    className="w-full p-4 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-white/5 dark:hover:bg-white/10 border border-slate-100 dark:border-white/5 flex items-center gap-4 text-left transition-all active:scale-[0.98]"
+                  >
+                    <div className="w-9 h-9 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0">
+                      <Apple size={18} />
+                    </div>
+                    <div>
+                      <div className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                        IOS / APPLE İLE BAŞLAT
+                      </div>
+                      <div className="text-[9px] text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-0.5">
+                        APP STORE ÜZERİNDEN AÇIN
+                      </div>
+                    </div>
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
 

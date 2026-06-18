@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { ShoppingBag, TrendingUp, Bot, Send, Activity, Trash2, AlertTriangle, X, Loader2, Lock, Clock, Info, Settings, LayoutDashboard, ChevronLeft } from 'lucide-react';
+import { ShoppingBag, TrendingUp, Bot, Send, Activity, Trash2, AlertTriangle, X, Loader2, Lock, Clock, Info, Settings, LayoutDashboard, ChevronLeft, Smartphone, Apple } from 'lucide-react';
 import { UserBot, Bot as BotType } from '../types';
 import { DatabaseService } from '../services/DatabaseService';
 import { useTelegram } from '../hooks/useTelegram';
@@ -29,6 +29,8 @@ const MyBots = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [botToDelete, setBotToDelete] = useState<UserBot | null>(null);
   const [expiredBotNotice, setExpiredBotNotice] = useState<string | null>(null);
+  const [showPlatformChoiceModal, setShowPlatformChoiceModal] = useState(false);
+  const [activePlatformBot, setActivePlatformBot] = useState<UserBot | null>(null);
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -158,15 +160,52 @@ const MyBots = () => {
       }
   };
 
+  const openPlatformLink = (bot: UserBot, platform: 'android' | 'ios' | 'default') => {
+      let url = '';
+      if (platform === 'android') {
+          url = bot.android_url || '';
+      } else if (platform === 'ios') {
+          url = bot.ios_url || '';
+      } else {
+          let botLink = bot.bot_link || '';
+          url = botLink.startsWith('http') ? botLink : `https://t.me/${botLink.replace('@', '').trim()}`;
+      }
+
+      if (url) {
+          if (tg?.openTelegramLink && url.startsWith('https://t.me/')) {
+              tg.openTelegramLink(url);
+          } else {
+              window.open(url, '_blank');
+          }
+      }
+  };
+
   const handleStartBot = async (bot: UserBot) => {
       haptic('medium');
       if (user?.id) {
           await DatabaseService.logActivity(user.id.toString(), 'bot_manage', 'Bot Başlatıldı', 'Bot Tetiklendi', `'${bot.name}' botu Telegram üzerinden tetiklendi.`);
       }
-      let botLink = bot.bot_link || '';
-      let finalUrl = botLink.startsWith('http') ? botLink : `https://t.me/${botLink.replace('@', '').trim()}`;
-      if (tg?.openTelegramLink) tg.openTelegramLink(finalUrl);
-      else window.open(finalUrl, '_blank');
+
+      const categoryVal = bot.category as any;
+      const isApp = Array.isArray(categoryVal)
+          ? categoryVal.includes('apps')
+          : (typeof categoryVal === 'string' && (categoryVal as string).includes('apps'));
+
+      const hasAndroid = !!bot.android_url?.trim();
+      const hasIos = !!bot.ios_url?.trim();
+
+      if (isApp && (hasAndroid || hasIos)) {
+          if (hasAndroid && hasIos) {
+              setActivePlatformBot(bot);
+              setShowPlatformChoiceModal(true);
+          } else if (hasAndroid) {
+              openPlatformLink(bot, 'android');
+          } else if (hasIos) {
+              openPlatformLink(bot, 'ios');
+          }
+      } else {
+          openPlatformLink(bot, 'default');
+      }
   };
 
   const getExpiryText = (dateStr?: string) => {
@@ -566,6 +605,97 @@ const MyBots = () => {
                   </div>
               </div>
           </div>
+      )}
+
+      {/* Platform Choice Modal */}
+      {showPlatformChoiceModal && activePlatformBot && (
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 select-none">
+          {/* Backdrop */}
+          <div
+            onClick={() => {
+                setShowPlatformChoiceModal(false);
+                setActivePlatformBot(null);
+            }}
+            className="absolute inset-0 bg-slate-950/80 backdrop-blur-md transition-opacity duration-300"
+          />
+
+          {/* Modal Content */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-205 dark:border-white/5 w-full max-w-sm rounded-[32px] overflow-hidden p-6 relative z-10 shadow-2xl transition-all duration-300 transform scale-100">
+            {/* Close Button */}
+            <button
+              onClick={() => {
+                  setShowPlatformChoiceModal(false);
+                  setActivePlatformBot(null);
+              }}
+              className="absolute top-6 right-6 w-8 h-8 rounded-full bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 flex items-center justify-center transition-colors border-none cursor-pointer"
+              aria-label="Cihaz Seçimini Kapat"
+            >
+              <X size={16} />
+            </button>
+
+            <div className="text-center mb-6 mt-2">
+              <div className="w-12 h-12 bg-blue-500/10 text-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                <Smartphone size={24} />
+              </div>
+              <h3 className="text-md font-black text-slate-900 dark:text-white tracking-tight uppercase italic">
+                PLATFORM SEÇİN
+              </h3>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 font-extrabold uppercase tracking-wide mt-2">
+                {activePlatformBot.name} UYGULAMASINI AÇMAK İSTEDİĞİNİZ CİHAZ PLATFORMUNU SEÇİN.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              {activePlatformBot.android_url && (
+                <button
+                  onClick={() => {
+                    const bot = activePlatformBot;
+                    setShowPlatformChoiceModal(false);
+                    setActivePlatformBot(null);
+                    openPlatformLink(bot, 'android');
+                  }}
+                  className="w-full p-4 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-white/5 dark:hover:bg-white/10 border border-slate-100 dark:border-white/5 flex items-center gap-4 text-left transition-all active:scale-[0.98] cursor-pointer"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0">
+                    <Smartphone size={18} />
+                  </div>
+                  <div>
+                    <div className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                      ANDROID İLE BAŞLAT
+                    </div>
+                    <div className="text-[9px] text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-0.5">
+                      GOOGLE PLAY STORE ÜZERİNDEN AÇIN
+                    </div>
+                  </div>
+                </button>
+              )}
+
+              {activePlatformBot.ios_url && (
+                <button
+                  onClick={() => {
+                    const bot = activePlatformBot;
+                    setShowPlatformChoiceModal(false);
+                    setActivePlatformBot(null);
+                    openPlatformLink(bot, 'ios');
+                  }}
+                  className="w-full p-4 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-white/5 dark:hover:bg-white/10 border border-slate-100 dark:border-white/5 flex items-center gap-4 text-left transition-all active:scale-[0.98] cursor-pointer"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0">
+                    <Apple size={18} />
+                  </div>
+                  <div>
+                    <div className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                      IOS / APPLE İLE BAŞLAT
+                    </div>
+                    <div className="text-[9px] text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-0.5">
+                      APP STORE ÜZERİNDEN AÇIN
+                    </div>
+                  </div>
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
       )}
       </div>
     </div>

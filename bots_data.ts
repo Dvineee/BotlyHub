@@ -9902,5 +9902,200 @@ export const realBotsData = [
     "commands": [
       "/start"
     ]
+  },
+  {
+    "id": "bot-304",
+    "name": "Tonkeeper",
+    "slug": "tonkeeper",
+    "description": "Tonkeeper, The Open Network (TON) ekosistemi üzerinde geliştirilmiş, kullanıcıların dijital varlıklarını en güvenli ve hızlı şekilde yönetmelerini sağlayan önde gelen bir saklama cüzdanıdır. Kullanıcı dostu arayüzü sayesinde, yeni başlayanlar dahi TON ağındaki token'larını kolayca gönderebilir, alabilir ve yönetebilir. Ayrıca NFT koleksiyonlarını görüntüleme ve merkeziyetsiz uygulamalarla (dApp) doğrudan etkileşime girme imkanı sunar. Donanım cüzdan desteği ve gelişmiş güvenlik protokolleri ile varlıklarınızın güvenliğini maksimum seviyeye taşırken, yerleşik swap özelliği sayesinde varlıklar arası hızlı dönüşümler gerçekleştirebilirsiniz. TON ağının yüksek performansından tam verim almanız için tasarlanan bu uygulama, hem mobil hem de masaüstü platformlarda kesintisiz bir deneyim vaat ederek Web3 dünyasına açılan kapınız olmayı hedefliyor.",
+    "icon": "https://picsum.photos/seed/tonkeeper_app/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "finance",
+      "crypto"
+    ],
+    "bot_link": "@tonkeeper",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "featured",
+    "languages": [
+      "🇬🇧"
+    ],
+    "telegram_group": "https://t.me/tonkeeper",
+    "website_url": "https://tonkeeper.com/",
+    "app_url": "https://t.me/tonkeeper_bot",
+    "social_url": "https://x.com/tonkeeper",
+    "github_url": "https://github.com/tonkeeper",
+    "views": 4500,
+    "rating": 4.9,
+    "rating_count": 890,
+    "user_count": 420000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "bot-305",
+    "name": "STON.fi",
+    "slug": "ston-fi",
+    "description": "STON.fi, The Open Network blokzinciri üzerine inşa edilmiş, tamamen merkeziyetsiz bir likidite protokolü ve otomatik piyasa yapıcı (AMM) platformudur. Platform, kullanıcıların herhangi bir aracıya veya merkezi otoriteye ihtiyaç duymadan, varlıklarını güvenli ve düşük işlem ücretleriyle takas etmelerine olanak tanır. Kullanıcılar likidite sağlayarak, platform üzerindeki işlem hacminden pay alabilir ve böylece pasif gelir elde edebilirler. Gelişmiş çapraz zincir (cross-chain) teknolojisi ile donatılan STON.fi, farklı blokzincirleri arasında varlık transferlerini sorunsuz hale getirerek, parçalı finans dünyasını birleştirme vizyonunu taşır. Şeffaflık ve güvenlik ilkelerini temel alan protokol, akıllı sözleşmeler aracılığıyla denetlenebilir ve manipülasyona kapalı bir ticaret deneyimi sunar. TON ağının ölçeklenebilirliği sayesinde yüksek işlem kapasitesine sahip olan platform, profesyonel yatırımcılardan bireysel kullanıcılara kadar herkes için sürdürülebilir bir DeFi altyapısı sağlar.",
+    "icon": "https://picsum.photos/seed/stonfi_app/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "finance",
+      "crypto"
+    ],
+    "bot_link": "@stonfi",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "featured",
+    "languages": [
+      "🇬🇧"
+    ],
+    "telegram_group": "https://t.me/stonfidex",
+    "website_url": "https://ston.fi",
+    "app_url": null,
+    "social_url": "https://x.com/ston_fi",
+    "github_url": "https://github.com/ston-fi",
+    "views": 5200,
+    "rating": 4.8,
+    "rating_count": 640,
+    "user_count": 280000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "bot-306",
+    "name": "MyTonWallet",
+    "slug": "mytonwallet",
+    "description": "MyTonWallet, The Open Network üzerinde çalışan, hem masaüstü hem de mobil cihazlar için optimize edilmiş, gelişmiş bir gözetimsiz (non-custodial) cüzdan çözümüdür. Kullanıcıların özel anahtarları üzerinde tam kontrol sahibi olmalarını sağlayan bu cüzdan, güvenlik ve gizlilik odaklı bir deneyim sunar. Uygulama, TON üzerindeki jetonların (jettons) transferi, NFT'lerin yönetimi ve staking işlemleri gibi karmaşık süreçleri basitleştirerek kullanıcı deneyimini iyileştirir. Ayrıca, donanım cüzdanlar (Ledger gibi) ile doğrudan entegrasyon sağlayarak en yüksek güvenlik standartlarını hedefleyen kullanıcılar için ideal bir seçimdir. MyTonWallet, açık kaynaklı kod yapısı ve topluluk odaklı gelişimi ile şeffaflığı ön planda tutar. TON ağının sunduğu tüm avantajları (hız, ölçeklenebilirlik, düşük maliyet) tek bir platformda birleştiren uygulama, kullanıcıların merkeziyetsiz finans araçlarına erişimini her geçen gün daha kolay ve güvenli bir hale getirmeye devam etmektedir.",
+    "icon": "https://picsum.photos/seed/mytonwallet_app/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "finance",
+      "crypto"
+    ],
+    "bot_link": "@mytonwallet",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "featured",
+    "languages": [
+      "🇬🇧"
+    ],
+    "telegram_group": "https://t.me/mytonwallet",
+    "website_url": "https://mytonwallet.io/",
+    "app_url": null,
+    "social_url": "https://x.com/mytonwallet",
+    "github_url": "https://github.com/mytonwallet",
+    "views": 3800,
+    "rating": 4.7,
+    "rating_count": 450,
+    "user_count": 185000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "bot-307",
+    "name": "iMe App",
+    "slug": "ime-app",
+    "description": "iMe App, Telegram API'si üzerine inşa edilmiş ve entegre bir cüzdan özelliği ile genişletilmiş çok işlevli bir mesajlaşma platformudur. Kullanıcıların sadece arkadaşlarıyla sohbet etmesini sağlamakla kalmaz, aynı zamanda yerleşik cüzdanı sayesinde kripto varlıklarını yönetmelerine, transfer etmelerine ve ağ üzerindeki finansal işlemleri mesajlaşma deneyiminin bir parçası haline getirmelerine olanak tanır. Uygulama, kullanıcılara bulut tabanlı bir hizmet sunarken, verimliliği artıran gelişmiş mesaj yönetimi, çeviri araçları ve özelleştirilebilir arayüz seçenekleriyle dikkat çeker. TON ağının hızını ve güvenliğini birleştirerek, sosyal etkileşimi finansal özgürlükle buluşturan hibrit bir model sunar. Özellikle kripto para birimlerine yeni başlayanlar için karmaşık cüzdan kurulumlarından ziyade, halihazırda kullandıkları bir uygulama üzerinden varlıklarını takip etme kolaylığı sağlar. Güncel piyasa takibi ve güvenli saklama özellikleri sayesinde, dijital ekonomi ile sosyal ağlar arasındaki sınırı ortadan kaldırmayı hedefler.",
+    "icon": "https://picsum.photos/seed/ime_app/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "finance",
+      "crypto",
+      "communication"
+    ],
+    "bot_link": "@ime_en",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "featured",
+    "languages": [
+      "🇬🇧",
+      "🇷🇺"
+    ],
+    "telegram_group": "https://t.me/ime_en",
+    "website_url": "https://ime.ae/",
+    "app_url": null,
+    "social_url": "https://x.com/ime_platform",
+    "github_url": null,
+    "views": 2900,
+    "rating": 4.6,
+    "rating_count": 320,
+    "user_count": 140000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "bot-308",
+    "name": "Grindery",
+    "slug": "grindery",
+    "description": "Grindery, Web3 dünyasında kullanıcıların farklı blokzincirleri üzerinde işlem yapmasını kolaylaştıran ve özellikle akıllı hesaplar (Smart Accounts) üzerinden çalışan yenilikçi bir cüzdan ve otomasyon çözümüdür. Kullanıcıların karmaşık özel anahtarlar veya teknik detaylarla uğraşmadan, sanki geleneksel bir web uygulaması kullanıyormuş gibi merkeziyetsiz finans araçlarına erişmesini sağlar. Platform, kullanıcıların günlük rutinlerini otomatize etmelerine, farklı token'lar arasında kolayca geçiş yapmalarına ve dApp'lerle güvenli bir şekilde etkileşime girmelerine yardımcı olur. Grindery'nin sunduğu en büyük avantajlardan biri, 'gas-less' yani işlem ücreti ödemeden işlem yapma imkanı tanıyan altyapısıdır; bu da yeni kullanıcıların ekosisteme giriş engelini ciddi oranda düşürür. Hem bireysel kullanıcılar hem de geliştiriciler için esnek araçlar barındıran sistem, TON ağı entegrasyonu ile hız ve performans beklentilerini karşılar. Geleceğin dijital cüzdan standartlarını belirleme yolunda ilerleyen bu proje, Web3'ün karmaşıklığını gizleyen, temiz ve anlaşılır bir kullanıcı arayüzü sunmaya odaklanır.",
+    "icon": "https://picsum.photos/seed/grindery_app/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "finance",
+      "crypto",
+      "utilities"
+    ],
+    "bot_link": "@grindery",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "featured",
+    "languages": [
+      "🇬🇧"
+    ],
+    "telegram_group": "https://t.me/grindery_io",
+    "website_url": "https://grindery.io/",
+    "app_url": null,
+    "social_url": "https://x.com/grindery_io",
+    "github_url": "https://github.com/grindery",
+    "views": 3100,
+    "rating": 4.5,
+    "rating_count": 210,
+    "user_count": 95000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "bot-309",
+    "name": "Gem Wallet",
+    "slug": "gemwallet",
+    "description": "Gem Wallet, birden fazla blokzinciri destekleyen ve özellikle kullanıcıların varlıkları üzerinde tam mülkiyet sahibi olmalarını sağlayan, güvenli ve gözetimsiz bir mobil cüzdan uygulamasıdır. Uygulama, TON ağı dahil olmak üzere popüler ağlardaki varlıklarınızı tek bir merkezden kolaylıkla takip etmenize, göndermenize ve almanıza imkan tanır. Gem Wallet'ın tasarım felsefesi, sadelik ve güvenlik üzerine kurulmuştur; bu sayede kullanıcılar, özel anahtarlarını cihazlarının güvenli bölgesinde saklayarak varlıklarını koruma altına alırlar. Kullanıcı deneyimini ön planda tutan arayüzü, varlık bakiyelerini gerçek zamanlı takip etmeyi sağlar ve anlık bildirimlerle piyasa hareketlerinden haberdar olmanıza yardımcı olur. Özellikle DeFi protokollerine ve merkeziyetsiz borsalara hızlı erişim sunması, aktif kripto kullanıcıları için büyük bir kolaylıktır. Uygulama içerisinde bulunan gelişmiş portföy analiz araçları, yatırımcıların varlıklarının performansını detaylı bir şekilde görmelerini sağlar. Güvenliğe verdiği önem ve kolay kullanım arayüzü sayesinde, hem acemi hem de deneyimli kripto yatırımcıları için günlük hayatta ihtiyaç duyulan güvenilir bir dijital varlık yönetim aracı olarak öne çıkar.",
+    "icon": "https://picsum.photos/seed/gemwallet_app/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "finance",
+      "crypto"
+    ],
+    "bot_link": "@gemwallet",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "featured",
+    "languages": [
+      "🇬🇧"
+    ],
+    "telegram_group": "https://t.me/gemwallet",
+    "website_url": "https://gemwallet.com/",
+    "app_url": null,
+    "social_url": "https://x.com/gemwallet",
+    "github_url": null,
+    "views": 2500,
+    "rating": 4.4,
+    "rating_count": 180,
+    "user_count": 720000,
+    "commands": [
+      "/start"
+    ]
   }
 ];
