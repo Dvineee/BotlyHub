@@ -2460,8 +2460,8 @@ div.qa-last-24h-box, .qa-last-24h-box {
 .text-orange-600 {
     --tw-text-opacity: 1;
     color: rgb(234 88 12 / var(--tw-text-opacity, 1));
-    padding-left: 0.25rem !important;
-    padding-right: 0.5rem !important;
+    padding-left: .5rem !important;
+    padding-right: .5rem !important;
 }
 
 .search-category-item:hover {

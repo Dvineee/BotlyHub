@@ -155,6 +155,7 @@ export const appsSubCategories = [
     { id: 'dev', label: 'apps_cat_dev', icon: DevIcon },
     { id: 'saas', label: 'apps_cat_saas', icon: SaaSIcon },
     { id: 'security_privacy', label: 'apps_cat_security', icon: PrivacyIcon },
+    { id: 'defi_sub', label: 'apps_cat_defi', icon: TradeIcon },
 ];
 
 const EducationIcon = ({ size = 20, className = "" }: { size?: number, className?: string }) => (
@@ -187,7 +188,7 @@ export const categories = [
   { id: 'education', label: 'cat_education', desc: 'desc_cat_education', icon: EducationIcon },
   { id: 'content', label: 'cat_content', desc: 'desc_cat_content', icon: ContentIcon },
   { id: 'marketing_ads', label: 'cat_marketing_ads', desc: 'desc_cat_marketing_ads', icon: MarketingAdsIcon },
-  { id: 'a_kategori', label: 'a_kategori', desc: 'desc_a_kategori', icon: AllIcon },
+  { id: 'defi', label: 'cat_defi', desc: 'desc_cat_defi', icon: FinanceIcon },
 ];
 
 export const mockBots: ExtendedBot[] = (realBotsData as any[]).map(bot => ({

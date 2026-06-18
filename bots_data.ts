@@ -1,12 +1,13 @@
 export const realBotsData = [
   {
-    "id": "bot-1",
+    "id": "BOT-REAL-1000",
     "name": "Notcoin",
     "slug": "notcoin",
-    "description": "Notcoin, oyna-kazan (tap-to-earn) mekaniğiyle milyonlarca kullanıcıyı Web3 dünyasıyla tanıştıran ve TON ekosistemini canlandıran öncü Telegram mini uygulamasıdır.",
+    "description": "Notcoin, Telegram üzerinde tıklama (tap-to-earn) çılgınlığını başlatan ve TON (The Open Network) ekosisteminin kitlesel olarak benimsenmesinde öncülük eden efsanevi bir Web3 mini oyunudur. İlk olarak basit bir sosyal deney olarak başlayan ve muhtemelen hiçbir şey sloganıyla yola çıkan proje, kısa sürede 35 milyondan fazla oyuncuya ulaşmıştır. Oyuncular ekrana dokunarak sanal altın paralar madenlemiş, ardından bu puanları TON ağında gerçek değere sahip $NOT tokenlarına dönüştürerek borsalarda listelenen ilk büyük Telegram airdrop başarısına imza atmışlardır. Notcoin, lansmanından sonra da diğer oyun stüdyolarına ve projelere altyapı sağlayarak Web3 ekosisteminde kalıcı bir topluluk platformu haline gelmiştir.",
     "icon": "https://picsum.photos/seed/notcoin/200",
     "price": 0,
     "category": [
+      "apps",
       "games",
       "crypto"
     ],
@@ -16,13 +17,12 @@ export const realBotsData = [
     "promoted_type": "featured",
     "languages": [
       "🇬🇧",
-      "🇹🇷",
       "🇷🇺"
     ],
     "telegram_group": "https://t.me/notcoin",
     "website_url": "https://notco.in",
     "app_url": "https://t.me/notcoin_bot",
-    "social_url": "https://twitter.com/thenotcoin",
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/thenotcoin\",\"youtube_url\":\"https://www.youtube.com/@notcoin\",\"android_url\":null,\"ios_url\":null}",
     "views": 4500,
     "rating": 4.9,
     "rating_count": 850,
@@ -33,13 +33,14 @@ export const realBotsData = [
     ]
   },
   {
-    "id": "bot-2",
+    "id": "BOT-REAL-1001",
     "name": "Hamster Kombat",
     "slug": "hamster-kombat",
-    "description": "Kendi kripto para borsanı yönettiğin, günlük görevleri ve kart kombinasyonlarını tamamlayarak pasif gelirini ve seviyeni artırdığın son derece popüler bir oyna-kazan strateji oyunu.",
+    "description": "Hamster Kombat, Telegram ve TON blockchain altyapısı üzerinde çalışan, oyuncuların sanal bir kripto para borsasının CEO hamsterı olarak rol aldığı son derece popüler bir Web3 Mini App tıklama (tap-to-earn) oyunudur. Oyuncular, ekran üzerindeki devasa hamster simgesine dokunarak ve çeşitli borsa yükseltme kartları satın alarak saatlik pasif kazançlarını artırırlar. Günlük şifreler, kombolar ve mini bulmaca görevleri sayesinde topluluk etkileşimini zirvede tutan proje, kendi yerel tokenı olan $HMSTR için gerçekleştirdiği devasa airdrop ile Web3 ekosisteminde geniş kitlelerin ilgisini çekmiştir. Oyun, basit mekanikleri ve eğlenceli sosyal dinamikleriyle milyonlarca aktif kullanıcıya ulaşmıştır.",
     "icon": "https://picsum.photos/seed/hamster/200",
     "price": 0,
     "category": [
+      "apps",
       "games",
       "crypto"
     ],
@@ -49,13 +50,13 @@ export const realBotsData = [
     "promoted_type": "featured",
     "languages": [
       "🇬🇧",
-      "🇹🇷",
-      "🇮🇩"
+      "🇷🇺",
+      "🇹🇷"
     ],
     "telegram_group": "https://t.me/hamster_kombat",
     "website_url": "https://hamsterkombat.io",
     "app_url": "https://t.me/hamster_kombat_bot",
-    "social_url": "https://twitter.com/hamster_kombat",
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/hamster_kombat\",\"youtube_url\":\"https://www.youtube.com/@HamsterKombatOfficial\",\"android_url\":null,\"ios_url\":null}",
     "views": 9800,
     "rating": 4.8,
     "rating_count": 1200,
@@ -66,15 +67,17 @@ export const realBotsData = [
     ]
   },
   {
-    "id": "bot-3",
+    "id": "BOT-REAL-1002",
     "name": "Blum",
     "slug": "blum",
-    "description": "Telegram içinde doğrudan çalışan, merkeziyetsiz (DEX) ve merkezi (CEX) borsaların özelliklerini birleştiren, kullanıcı dostu hibrit kripto ticaret ve puan toplama botu.",
+    "description": "Blum, eski Binance yöneticileri tarafından kurulan ve Telegram içerisinden doğrudan erişilebilen, merkeziyetsiz ve merkezi borsa özelliklerini bir arada sunan hibrit bir kripto para ticaret platformudur. Kullanıcılar, Blum Mini App aracılığıyla zincirler arası geçiş yapmaya gerek duymadan 30'dan fazla farklı blokzincir ağındaki klasik tokenları ve popüler memecoinleri kolayca takas edebilirler. Uygulama içinde yer alan oyunlaştırılmış puan toplama mekanizması (Drop Game), kullanıcıların her sekiz saatte bir pasif olarak Blum Puanı (BP) farm etmelerine ve ekrandan düşen yeşil yaprakları yakalayarak ekstra puan kazanmalarına olanak tanır. Binance Labs MVB programı tarafından desteklenen Blum, modern ve kullanıcı dostu arayüzüyle Web3 dünyasına geçişi son derece kolaylaştırmaktadır.",
     "icon": "https://picsum.photos/seed/blum/200",
     "price": 0,
     "category": [
+      "apps",
       "finance",
-      "crypto"
+      "crypto",
+      "defi"
     ],
     "bot_link": "@BlumCryptoBot",
     "screenshots": [],
@@ -82,12 +85,14 @@ export const realBotsData = [
     "promoted_type": "featured",
     "languages": [
       "🇬🇧",
-      "🇹🇷"
+      "🇷🇺",
+      "🇹🇷",
+      "🇮🇷"
     ],
     "telegram_group": "https://t.me/blumcrypto",
     "website_url": "https://blum.io",
     "app_url": "https://t.me/BlumCryptoBot",
-    "social_url": "https://twitter.com/blumcrypto",
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/blumcrypto\",\"youtube_url\":\"https://www.youtube.com/@BlumCrypto\",\"android_url\":null,\"ios_url\":null}",
     "views": 8200,
     "rating": 4.7,
     "rating_count": 940,
@@ -97,26 +102,30 @@ export const realBotsData = [
     ]
   },
   {
-    "id": "bot-4",
+    "id": "BOT-REAL-1003",
     "name": "TapSwap",
     "slug": "tapswap",
-    "description": "Ekrana dokunarak sanal altın madenciliği yaptığınız, her seviyede farklı ödüller elde ederek kazancınızı katladığınız TON tabanlı popüler tıklama oyunu.",
+    "description": "TapSwap, TON blockchain altyapısını kullanan ve dünya genelinde 60 milyondan fazla oyuncuya ulaşarak büyük bir başarı yakalayan en popüler tıklama (tap-to-earn) oyunlarından biridir. Oyuncular, Telegram botu üzerinden ekrana dokunarak altın paralar toplar ve bu paraları kullanarak enerji limitlerini, dolum hızlarını ve dokunuş başına kazançlarını yükseltirler. Ayrıca çevrimdışiyken bile puan toplamaya devam eden TapBot özelliği sayesinde pasif kazanç elde edebilirler. Sosyal medya görevleri, günlük kodlar ve arkadaş davet sistemleriyle sürekli güncel tutulan TapSwap, kullanıcılarına gelecekte dağıtılacak olan $TAPS token airdrop'u için adil bir kazanç kapısı sunmaktadır.",
     "icon": "https://picsum.photos/seed/tapswap/200",
     "price": 0,
     "category": [
-      "games"
+      "apps",
+      "games",
+      "crypto"
     ],
     "bot_link": "@tapswap_bot",
     "screenshots": [],
     "is_official": false,
     "promoted_type": "latest",
     "languages": [
-      "🇬🇧"
+      "🇬🇧",
+      "🇷🇺",
+      "🇹🇷"
     ],
-    "telegram_group": "https://t.me/tapswapai",
+    "telegram_group": "https://t.me/tapsp",
     "website_url": "https://tapswap.ai",
     "app_url": "https://t.me/tapswap_bot",
-    "social_url": null,
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/tapswap\",\"youtube_url\":\"https://www.youtube.com/@tapswap_official\",\"android_url\":null,\"ios_url\":null}",
     "views": 3100,
     "rating": 4.5,
     "rating_count": 310,
@@ -126,13 +135,14 @@ export const realBotsData = [
     ]
   },
   {
-    "id": "bot-5",
+    "id": "BOT-REAL-1004",
     "name": "Catizen",
     "slug": "catizen",
-    "description": "Kedi kafesi işlettiğiniz, kedileri aynı seviyedekilerle birleştirerek daha yüksek seviye ve değerli kediler yarattığınız ve ödüller kazandığınız eğlenceli TON blockchain oyunu.",
+    "description": "Catizen, TON ve Mantle blockchain ağları üzerinde çalışan, kedi kafe temalı ve birleştirme (merge-to-earn) mekaniklerine dayalı yenilikçi bir Telegram Mini App oyunudur. Oyuncular, kafelerine gelen sevimli kedileri aynı seviyedeki diğer kedilerle birleştirerek daha üst seviye kediler üretir ve böylece saniye başına kazanılan oyun içi para birimi olan vKITTY üretim hızını artırırlar. Geleneksel tıklama oyunlarından farklı olarak stratejik yönetim gerektiren Catizen, topladığı uygulama içi satın alım gelirlerinin bir kısmını sokak kedilerini kurtarmaya bağışlayarak sosyal sorumluluk alanında da öne çıkar. TON ekosisteminin en çok gelir üreten ve en yüksek kullanıcı bağlılığına sahip oyunlarından biridir.",
     "icon": "https://picsum.photos/seed/catizen/200",
     "price": 0,
     "category": [
+      "apps",
       "games",
       "crypto"
     ],
@@ -142,13 +152,14 @@ export const realBotsData = [
     "promoted_type": "official",
     "languages": [
       "🇬🇧",
-      "🇹🇷",
-      "🇯🇵"
+      "🇨🇳",
+      "🇷🇺",
+      "🇹🇷"
     ],
-    "telegram_group": "https://t.me/catizengames",
+    "telegram_group": "https://t.me/CatizenAnn",
     "website_url": "https://catizen.ai",
     "app_url": "https://t.me/catizenbot",
-    "social_url": "https://twitter.com/CatizenAI",
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/CatizenAI\",\"youtube_url\":\"https://www.youtube.com/@CatizenAI\",\"android_url\":null,\"ios_url\":null}",
     "views": 6400,
     "rating": 4.7,
     "rating_count": 520,
@@ -161,10 +172,11 @@ export const realBotsData = [
     "id": "bot-6",
     "name": "Crypto Bot",
     "slug": "crypto-bot",
-    "description": "Crypto Bot, doğrudan Telegram uygulaması içerisinde yerleşik olarak çalışan, kullanıcıların kripto paraları saniyeler içinde alıp satmasını, göndermesini ve saklamasını sağlayan bir finansal asistandır. Harici bir uygulama indirme gereksinimi duymadan, mevcut Telegram arayüzünüzde bir banka uygulaması kolaylığında hizmet sunar. Özellikle TON ekosistemiyle derin entegrasyonu sayesinde, jeton transferleri ve cüzdan yönetimi sadece bir mesaj göndermek kadar kolay hale gelir. Crypto Bot, P2P (kişiden kişiye) ticaret piyasasını destekleyerek, kullanıcıların farklı ödeme yöntemleriyle kripto almasına ve satmasına olanak tanır. Güvenlik, Telegram'ın kendi altyapısı ve platformun sunduğu ek şifreleme yöntemleriyle sağlanır. Uygulama, sosyal etkileşimi finansal işlemlerle birleştirerek, kripto dünyasına girişi demokratikleştiren ve her yaştan kullanıcı için ulaşılabilir kılan benzersiz bir yapıya sahiptir. Günlük işlemler için hız ve pratiklik arayanlar için en ideal çözüm olma özelliğini sürdürmektedir.",
+    "description": "CryptoBot, Telegram içinde çalışan ve The Open Network (TON) ekosisteminin en çok kullanılan merkeziyetsiz finans araçlarından biri olan kapsamlı bir kripto cüzdanı ve borsasıdır. Kullanıcıların doğrudan sohbet arayüzü üzerinden TON, Bitcoin, USDT ve diğer popüler kripto paraları alıp satmasına, saklamasına ve transfer etmesine olanak tanır. Yerleşik P2P pazarı sayesinde, kullanıcılar yerel para birimleriyle sıfır komisyonla kripto ticareti yapabilirler. Ayrıca, Telegram kanalları için abonelik sistemleri, fatura oluşturma ve kripto para ile çekiliş düzenleme gibi gelişmiş araçlar sunar. Kullanıcı dostu yapısıyla CryptoBot, Telegram'ı tam teşekküllü bir Web3 finans merkezine dönüştürür.",
     "icon": "https://picsum.photos/seed/cryptobot/200",
     "price": 0,
     "category": [
+      "apps",
       "finance",
       "crypto",
       "wallets"
@@ -177,10 +189,10 @@ export const realBotsData = [
       "🇬🇧",
       "🇷🇺"
     ],
-    "telegram_group": "https://t.me/CryptoBot",
-    "website_url": "https://crypto.bot/",
+    "telegram_group": "https://t.me/cryptobot_news",
+    "website_url": null,
     "app_url": "https://t.me/CryptoBot",
-    "social_url": "{\"x_url\":\"https://x.com/CryptoBot\"}",
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/CryptoBot\",\"android_url\":null,\"ios_url\":null}",
     "views": 7300,
     "rating": 4.9,
     "rating_count": 1400,
@@ -196,14 +208,16 @@ export const realBotsData = [
     ]
   },
   {
-    "id": "bot-7",
+    "id": "BOT-REAL-1006",
     "name": "Major",
     "slug": "major",
-    "description": "Telegram Yıldızları kazanmak ve liderlik tablosunun zirvesine çıkarak unvanlar kazanmak üzere kurgulanmış topluluk puanı toplama mini oyunu.",
+    "description": "Major, Telegram'ın kendi ekosistemine entegre edilmiş, kullanıcıların Stars kazanarak sıralamalarda yükseldiği popüler bir Web3 Mini App oyunudur. TON blockchain altyapısı üzerinde kurulan bu sosyal rekabet oyunu, kullanıcıların günlük görevleri yapması, arkadaşlarını davet etmesi ve diğer oyuncularla etkileşime girmesi üzerine tasarlanmıştır. Toplanan yıldızlar, projenin yerel tokenı olan $MAJOR airdrop ödüllerine dönüştürülmektedir. Temiz, modern ve Telegram'ın yerel arayüzüne tam uyumlu tasarımıyla dikkat çeken Major, kısa sürede milyonlarca kullanıcıya ulaşarak TON ekosisteminin en başarılı sosyal finans ve oyunlaştırma projelerinden biri olmayı başarmıştır.",
     "icon": "https://picsum.photos/seed/major/200",
     "price": 0,
     "category": [
-      "games"
+      "apps",
+      "games",
+      "crypto"
     ],
     "bot_link": "@major",
     "screenshots": [],
@@ -211,12 +225,12 @@ export const realBotsData = [
     "promoted_type": "latest",
     "languages": [
       "🇬🇧",
-      "🇹🇷"
+      "🇷🇺"
     ],
     "telegram_group": "https://t.me/major_official",
-    "website_url": null,
+    "website_url": "https://major.bot",
     "app_url": "https://t.me/major",
-    "social_url": null,
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/major_otc\",\"youtube_url\":null,\"android_url\":null,\"ios_url\":null}",
     "views": 4100,
     "rating": 4.6,
     "rating_count": 420,
@@ -226,13 +240,14 @@ export const realBotsData = [
     ]
   },
   {
-    "id": "bot-8",
+    "id": "BOT-REAL-1007",
     "name": "Yescoin",
     "slug": "yescoin",
-    "description": "Sadece ekrana dokunmak yerine, kaydırma (swipe) hareketleriyle altınları toplayabildiğiniz, TON blockchain tabanlı son derece dinamik bir oyna-kazan uygulaması.",
+    "description": "Yescoin, TON blockchain ağı üzerinde çalışan ve geleneksel dokunma mekaniklerini ekranı kaydırma (swipe-to-earn) hareketine dönüştüren oldukça popüler ve eğlenceli bir Telegram Mini App oyunudur. Oyuncular, ekranda beliren paraların üzerinden parmaklarını kaydırarak hızlıca Yescoin toplarlar. Oyunda yer alan YesPack robotu sayesinde kullanıcılar çevrimdışiyken bile otomatik olarak madencilik yapmaya devam edebilirler. Günlük sandıklar, hızlandırıcılar, özel görevler ve takım (squad) kurma özellikleri sayesinde sosyal etkileşimi en üst düzeyde tutan Yescoin, yenilikçi oyun yapısıyla kısa sürede milyonlarca oyuncuyu bünyesine katarak TON ekosisteminin en sevilen ve en hızlı büyüyen Web3 projelerinden biri haline gelmiştir.",
     "icon": "https://picsum.photos/seed/yescoin/200",
     "price": 0,
     "category": [
+      "apps",
       "games",
       "crypto"
     ],
@@ -242,12 +257,14 @@ export const realBotsData = [
     "promoted_type": "official",
     "languages": [
       "🇬🇧",
-      "🇹🇷"
+      "🇷🇺",
+      "🇹🇷",
+      "🇮🇷"
     ],
-    "telegram_group": "https://t.me/theyescoin",
-    "website_url": "https://yescoin.gold",
+    "telegram_group": "https://t.me/therealyescoin",
+    "website_url": "https://yescoin.foundation",
     "app_url": "https://t.me/theYescoin_bot",
-    "social_url": "https://twitter.com/yescoingold",
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/the_yescoin\",\"youtube_url\":\"https://www.youtube.com/@the_yescoin\",\"android_url\":null,\"ios_url\":null}",
     "views": 3900,
     "rating": 4.5,
     "rating_count": 290,
@@ -258,27 +275,30 @@ export const realBotsData = [
     ]
   },
   {
-    "id": "bot-9",
+    "id": "BOT-REAL-1008",
     "name": "X Empire",
     "slug": "x-empire",
-    "description": "Elon Musk karakterinden esinlenerek imparatorluğunuzu kurduğunuz, şirket yatırımları yaptığınız, yeteneklerinizi geliştirip diğerleriyle dövüştüğünüz borsa/tıklama simülatörü.",
+    "description": "X Empire (eski adıyla Musk Empire), Elon Musk temalı karikatürize edilmiş bir karakteri sıfırdan zirveye taşımayı amaçlayan, TON blockchain altyapısı üzerinde kurulmuş son derece popüler bir Telegram Mini App oyunudur. Oyuncular, ekrana tıklayarak kazandıkları paralarla karakterlerinin kişisel gelişimini, ofislerini ve iş becerilerini yükseltirler. Ayrıca oyun içinde yer alan sanal borsa simülasyonunda farklı fonlara yatırım yaparak veya günlük bilmeceleri çözerek devasa karlar elde edebilirler. Kendi yerel tokenı olan $X ile airdrop gerçekleştiren proje, zengin stratejik ögeleri, günlük komboları ve arkadaş davet sistemleriyle topluluk katılımını her zaman en üst düzeyde tutmayı başarmıştır.",
     "icon": "https://picsum.photos/seed/xempire/200",
     "price": 0,
     "category": [
-      "games"
+      "apps",
+      "games",
+      "crypto"
     ],
-    "bot_link": "@muskempire_bot",
+    "bot_link": "@xempire_bot",
     "screenshots": [],
     "is_official": false,
     "promoted_type": "none",
     "languages": [
       "🇬🇧",
-      "🇷🇺"
+      "🇷🇺",
+      "🇹🇷"
     ],
-    "telegram_group": null,
+    "telegram_group": "https://t.me/xempire_official",
     "website_url": "https://xempire.io",
-    "app_url": "https://t.me/muskempire_bot",
-    "social_url": null,
+    "app_url": "https://t.me/xempire_bot",
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/xempiregame\",\"youtube_url\":\"https://www.youtube.com/@xempiregame\",\"android_url\":null,\"ios_url\":null}",
     "views": 5200,
     "rating": 4.6,
     "rating_count": 512,
@@ -288,13 +308,14 @@ export const realBotsData = [
     ]
   },
   {
-    "id": "bot-10",
-    "name": "DOGS",
+    "id": "BOT-REAL-1009",
+    "name": "Dogs",
     "slug": "dogs",
-    "description": "Kullanıcıların Telegram hesap yaşına göre tamamen ücretsiz DOGS token talep edebildiği, rekor kıran bir hızda büyüyen topluluk bazlı airdrop mini uygulaması.",
+    "description": "Dogs, Telegram kurucusu Pavel Durov'un çizdiği ikonik köpek maskotu Spotty'den ilham alan ve doğrudan Telegram kullanıcılarının hesap yaşlarına göre ödül dağıtan benzersiz bir Web3 memecoin projesidir. Dogs House botunu başlatan kullanıcılar, hesaplarının ne kadar eski olduğuna ve Telegram Premium üyeliği gibi kriterlere bağlı olarak anında $DOGS tokenı kazanmışlardır. Karmaşık oyun mekanikleri veya sürekli tıklama zorunluluğu olmadan, tamamen topluluk sadakatini ödüllendiren bu basit yaklaşım, projenin viral bir şekilde yayılmasını sağlamıştır. TON blockchain ağı üzerinde dağıtılan $DOGS tokenları, adil dağıtım modeli ve devasa topluluk desteği sayesinde TON ekosisteminin en popüler memecoinlerinden biri haline gelmiştir.",
     "icon": "https://picsum.photos/seed/dogs/200",
     "price": 0,
     "category": [
+      "apps",
       "games",
       "crypto"
     ],
@@ -306,9 +327,9 @@ export const realBotsData = [
       "🇬🇧"
     ],
     "telegram_group": "https://t.me/dogs_community",
-    "website_url": null,
+    "website_url": "https://dogs.dev",
     "app_url": "https://t.me/dogshouse_bot",
-    "social_url": null,
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/realDogsHouse\",\"youtube_url\":null,\"android_url\":null,\"ios_url\":null}",
     "views": 8900,
     "rating": 4.9,
     "rating_count": 1850,
@@ -318,14 +339,16 @@ export const realBotsData = [
     ]
   },
   {
-    "id": "bot-11",
+    "id": "BOT-REAL-1010",
     "name": "Rocky Rabbit",
     "slug": "rocky-rabbit",
-    "description": "Boksör bir tavşanı eğittiğiniz, onu şampiyona ligine hazırlarken günlük bulmacalar ve kombinasyonlarla TON ödülleri biriktirdiğiniz popüler oyna-kazan mini oyunu.",
+    "description": "Rocky Rabbit, TON blockchain ağı üzerinde çalışan ve oyuncuların kendi dijital boksör tavşanlarını eğitmelerini sağlayan son derece popüler bir oyna-kazan (play-to-earn) Telegram Mini App oyunudur. Oyuncular, tavşanlarının dövüş becerilerini geliştirmek, kondisyonlarını artırmak ve turnuvalara hazırlamak için çeşitli antrenman kartlarını yükseltirler. Günlük kombo kartları (SuperSet) ve gizli kelime bulmacaları (Enigma) gibi oyun içi etkinlikler sayesinde kullanıcılar ekstra ödüller kazanırlar. Kendi yerel tokenı RabBitcoin ($RBTC) ile airdrop dağıtan proje, rekabetçi yapısı ve sevimli karakter tasarımıyla kısa sürede milyonlarca aktif kullanıcıya ulaşarak TON ekosisteminin en popüler spor ve simülasyon oyunlarından biri olmuştur.",
     "icon": "https://picsum.photos/seed/rockyrabbit/200",
     "price": 0,
     "category": [
-      "games"
+      "apps",
+      "games",
+      "crypto"
     ],
     "bot_link": "@rocky_rabbit_bot",
     "screenshots": [],
@@ -333,12 +356,12 @@ export const realBotsData = [
     "promoted_type": "none",
     "languages": [
       "🇬🇧",
-      "🇹🇷"
+      "🇷🇺"
     ],
-    "telegram_group": "https://t.me/rockyrabbit",
+    "telegram_group": "https://t.me/rockyrabbitann",
     "website_url": "https://rockyrabbit.io",
     "app_url": "https://t.me/rocky_rabbit_bot",
-    "social_url": null,
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/rockyrabbitio\",\"youtube_url\":\"https://www.youtube.com/@rockyrabbitio\",\"android_url\":null,\"ios_url\":null}",
     "views": 2900,
     "rating": 4.4,
     "rating_count": 180,
@@ -349,26 +372,30 @@ export const realBotsData = [
     ]
   },
   {
-    "id": "bot-12",
-    "name": "MemeFi Club",
+    "id": "BOT-REAL-1011",
+    "name": "MemeFi",
     "slug": "memefi",
-    "description": "Meme kültüründeki popüler canavarlar ve düşmanlar ile rekabet ettiğiniz, klanlara katılıp bossları alt ederek kripto ödülleri biriktirdiğiniz tıklama/boss savaşı oyunu.",
+    "description": "MemeFi, popüler internet memelerini ve kripto kültürünü eğlenceli bir fantezi dünyasıyla birleştiren, Sui ve Linea blokzincirleri üzerinde çalışan yenilikçi bir Telegram Mini App oyunudur. Oyuncular, ekran üzerindeki devasa boss karakterlerine dokunarak onlara hasar verir, canlarını tüketir ve her alt ettikleri düşmandan altın kazanırlar. Kazandıkları paralarla hasar güçlerini, maksimum enerjilerini ve yenilenme hızlarını yükseltebilirler. YouTube videolarına gizlenmiş günlük video kodları ve özel kombolar gibi yenilikçi mekaniklerle kullanıcı bağlılığını artıran MemeFi, geleneksel tıklama oyunlarına kıyasla çok daha zengin bir görsel dünya ve RPG öğeleri sunarak milyonlarca aktif kullanıcıya ulaşmıştır.",
     "icon": "https://picsum.photos/seed/memefi/200",
     "price": 0,
     "category": [
-      "games"
+      "apps",
+      "games",
+      "crypto"
     ],
-    "bot_link": "@memefi_club_bot",
+    "bot_link": "@memefi_coin_bot",
     "screenshots": [],
     "is_official": false,
     "promoted_type": "none",
     "languages": [
-      "🇬🇧"
+      "🇬🇧",
+      "🇷🇺",
+      "🇪🇸"
     ],
     "telegram_group": "https://t.me/memeficlub",
-    "website_url": "https://memefi.club",
-    "app_url": "https://t.me/memefi_club_bot",
-    "social_url": "https://twitter.com/memeficlub",
+    "website_url": "https://www.memefi.club",
+    "app_url": "https://t.me/memefi_coin_bot",
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/memeficlub\",\"youtube_url\":\"https://www.youtube.com/@MemeFiClub\",\"android_url\":null,\"ios_url\":null}",
     "views": 4600,
     "rating": 4.4,
     "rating_count": 380,
@@ -378,15 +405,17 @@ export const realBotsData = [
     ]
   },
   {
-    "id": "bot-13",
+    "id": "BOT-REAL-1012",
     "name": "PocketFi",
     "slug": "pocketfi",
-    "description": "Çoklu zincirler (EVM ve TON) üzerinde anında DeFi token takasları yapabileceğiniz, pasif madencilik ve çapraz zincir köprüleme entegrasyonuna sahip yenilikçi cüzdan.",
+    "description": "PocketFi, Telegram Mini App arayüzü sayesinde doğrudan mesajlaşma uygulaması üzerinden çalışan, zincirler arası (cross-chain) token transferleri ve merkeziyetsiz ticaret için geliştirilmiş nihai bir Web3 finans arayüzüdür. Kullanıcılar, Solana, Ethereum, Arbitrum ve TON gibi farklı blokzincir ağları arasında saniyeler içinde ve son derece düşük komisyonlarla varlık takası yapabilirler. Gelişmiş cüzdan yönetimi, otomatik alım (autopilot) ve copy trading gibi profesyonel ticaret araçlarını tek bir çatı altında birleştiren platform, kullanıcı dostu tasarımıyla öne çıkar. Platformun yerel tokenı olan $SWITCH, uygulama içi sosyal madencilik mekanizmalarıyla dağıtılarak topluluk katılımını ve DeFi erişilebilirliğini en üst düzeye çıkarmıştır.",
     "icon": "https://picsum.photos/seed/pocketfi/200",
     "price": 0,
     "category": [
+      "apps",
       "finance",
-      "crypto"
+      "crypto",
+      "defi"
     ],
     "bot_link": "@pocketfi_bot",
     "screenshots": [],
@@ -394,12 +423,12 @@ export const realBotsData = [
     "promoted_type": "featured",
     "languages": [
       "🇬🇧",
-      "🇹🇷"
+      "🇷🇺"
     ],
     "telegram_group": "https://t.me/pocketfi",
     "website_url": "https://pocketfi.org",
     "app_url": "https://t.me/pocketfi_bot",
-    "social_url": null,
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/pocket_fi\",\"youtube_url\":null,\"android_url\":null,\"ios_url\":null}",
     "views": 6100,
     "rating": 4.8,
     "rating_count": 430,
@@ -409,14 +438,15 @@ export const realBotsData = [
     ]
   },
   {
-    "id": "bot-14",
+    "id": "BOT-REAL-1013",
     "name": "Time Farm",
     "slug": "time-farm",
-    "description": "Zaman madenciliği yapabileceğiniz, her 4 saatte bir puan talep ederek sadakat puanları kazandığınız ve bunları TON ödüllerine dönüştürmek için sakladığınız basit madencilik botu.",
+    "description": "Time Farm, ünlü Web3 İK ve blokzincir şirketi Chrono.tech tarafından geliştirilen ve TON blockchain ağı üzerinde çalışan popüler bir Telegram Mini App sosyal madencilik oyunudur. Kullanıcılar, her birkaç saatte bir uygulamaya girerek pasif bir şekilde $SECOND tokenı biriktirirler. Basit arayüzü ve düşük katılım bariyeri sayesinde kısa sürede 17 milyondan fazla aktif kullanıcıya ulaşan platformda, kazanılan tokenlar staking mekanizmalarıyla çoğaltılabilir veya platform içi reklam kampanyaları oluşturmak için kullanılabilir. Günlük video kodları, özel kombolar ve geleceğe yönelik piyasa tahmin oyunları gibi zengin interaktif özelliklerle donatılan Time Farm, kullanıcılarına hem eğlenceli hem de fayda odaklı bir Web3 ekosistemi sunmaktadır.",
     "icon": "https://picsum.photos/seed/timefarm/200",
     "price": 0,
     "category": [
-      "utilities",
+      "apps",
+      "games",
       "crypto"
     ],
     "bot_link": "@TimeFarmCryptoBot",
@@ -424,12 +454,13 @@ export const realBotsData = [
     "is_official": false,
     "promoted_type": "none",
     "languages": [
-      "🇬🇧"
+      "🇬🇧",
+      "🇷🇺"
     ],
-    "telegram_group": "https://t.me/timefarm_official",
+    "telegram_group": "https://t.me/timefarmcommunitychat",
     "website_url": null,
     "app_url": "https://t.me/TimeFarmCryptoBot",
-    "social_url": null,
+    "social_url": "{\"github_url\":null,\"x_url\":null,\"youtube_url\":null,\"android_url\":null,\"ios_url\":null}",
     "views": 3500,
     "rating": 4.3,
     "rating_count": 198,
@@ -439,26 +470,29 @@ export const realBotsData = [
     ]
   },
   {
-    "id": "bot-15",
+    "id": "BOT-REAL-1014",
     "name": "W-Coin",
     "slug": "w-coin",
-    "description": "Kullanıcıların oylamalarıyla TON, Solana veya Ethereum ağlarından hangisinde listeleneceğinin belirlendiği, topluluk odaklı oyna-kazan tıklama mini oyunu.",
+    "description": "W-Coin, Telegram üzerinde çalışan ve topluluk oylaması sonucunda token lansmanı için TON blockchain ağını seçen son derece popüler bir oyna-kazan (play-to-earn) tıklama oyunudur. Oyuncular, ekrandaki büyük butona dokunarak oyun içi puanlar toplar, günlük görevleri tamamlar ve arkadaş davet sistemleriyle kazançlarını katlarlar. Geleneksel tıklama oyunlarından farklı olarak oyuna entegre edilen yapay zeka destekli W-AI robotu sayesinde kullanıcılar çevrimdışiyken bile otomatik pasif kazanç elde edebilirler. 20 milyondan fazla aktif oyuncuya ulaşan W-Coin, adil dağıtım modeli ve güçlü topluluk desteğiyle TON ekosisteminin en hızlı büyüyen ve en çok ilgi gören sosyal madencilik projelerinden biridir.",
     "icon": "https://picsum.photos/seed/wcoin/200",
     "price": 0,
     "category": [
-      "games"
+      "apps",
+      "games",
+      "crypto"
     ],
-    "bot_link": "@wcoin_tap_bot",
+    "bot_link": "@wcoin_tapbot",
     "screenshots": [],
     "is_official": false,
     "promoted_type": "none",
     "languages": [
-      "🇬🇧"
+      "🇬🇧",
+      "🇷🇺"
     ],
-    "telegram_group": null,
-    "website_url": "https://wcoin.app",
-    "app_url": "https://t.me/wcoin_tap_bot",
-    "social_url": null,
+    "telegram_group": "https://t.me/wcoin_io",
+    "website_url": null,
+    "app_url": "https://t.me/wcoin_tapbot",
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/wcoin_io\",\"youtube_url\":null,\"android_url\":null,\"ios_url\":null}",
     "views": 2400,
     "rating": 4.2,
     "rating_count": 140,
@@ -469,14 +503,16 @@ export const realBotsData = [
     ]
   },
   {
-    "id": "bot-16",
-    "name": "PixelTap",
+    "id": "BOT-REAL-1015",
+    "name": "Pixelverse",
     "slug": "pixel-tap",
-    "description": "Siberpunk evreninde geçen piksel grafikli evcil hayvanlarınızı besleyip geliştirdiğiniz, gerçek zamanlı PvP arenasında dövüştürerek kazanç sağladığınız oyun.",
+    "description": "Pixelverse, siberpunk temalı pikselli bir evrende geçen ve gerçek zamanlı PvP (oyuncu oyuncuya karşı) savaşları içeren son derece dinamik bir Telegram Mini App ve web tabanlı oyun ekosistemidir. Oyuncular, PixelTap botu aracılığıyla kendi robot evcil hayvanlarını (botlarını) satın alır, onları kazandıkları puanlarla yükseltir ve diğer oyuncularla hızlı tıklama savaşlarına girerek ödüller kazanırlar. Günlük kombo kartları ve siberpunk dünyasının derin hikayeleriyle zenginleştirilen oyun, TON blockchain ağı üzerinde çalışan yerel tokenı $PIXFI ile güçlü bir ekonomik altyapıya sahiptir. Hem mobil hem de masaüstü tarayıcılarda oynanabilen çoklu platform desteği sayesinde milyonlarca oyuncuya hitap eden benzersiz bir Web3 projesidir.",
     "icon": "https://picsum.photos/seed/pixelverse/200",
     "price": 0,
     "category": [
-      "games"
+      "apps",
+      "games",
+      "crypto"
     ],
     "bot_link": "@pixelversexyzbot",
     "screenshots": [],
@@ -484,12 +520,14 @@ export const realBotsData = [
     "promoted_type": "none",
     "languages": [
       "🇬🇧",
-      "🇹🇷"
+      "🇷🇺",
+      "🇹🇷",
+      "🇨🇳"
     ],
-    "telegram_group": "https://t.me/pixelversexyz",
+    "telegram_group": "https://t.me/pixelverse_xyz",
     "website_url": "https://pixelverse.xyz",
     "app_url": "https://t.me/pixelversexyzbot",
-    "social_url": null,
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/pixelverse_xyz\",\"youtube_url\":\"https://www.youtube.com/@Pixelverse_xyz\",\"android_url\":null,\"ios_url\":null}",
     "views": 4800,
     "rating": 4.5,
     "rating_count": 270,
@@ -499,29 +537,32 @@ export const realBotsData = [
     ]
   },
   {
-    "id": "bot-17",
-    "name": "STON.fi Bot",
+    "id": "BOT-REAL-1016",
+    "name": "STON.fi",
     "slug": "ston-fi",
-    "description": "TON blockchain'in en yüksek likiditesine sahip merkeziyetsiz borsası STON.fi'ye anında erişerek kripto paralarınızı takas edebileceğiniz güvenli ticaret botu.",
+    "description": "STON.fi, TON blockchain altyapısı üzerine inşa edilmiş en popüler merkeziyetsiz borsalardan (DEX) biridir. Kullanıcıların tamamen güvenli, hızlı ve son derece düşük işlem ücretleriyle TON tabanlı kripto varlıkları ve jetonları birbirleriyle takas etmelerine olanak tanır. Gelişmiş otomatik piyasa yapıcı (AMM) algoritması sayesinde kayma oranlarını en aza indiren platform, aynı zamanda kullanıcılara likidite havuzlarına katılarak pasif gelir elde etme fırsatı sunar. Telegram Mini App entegrasyonu sayesinde doğrudan mesajlaşma arayüzü üzerinden cüzdan bağlantısı kurularak kolayca kullanılabilen STON.fi, TON ekosisteminin finansal omurgasını oluşturan en güvenilir DeFi protokolleri arasında yer alır.",
     "icon": "https://picsum.photos/seed/ston/200",
     "price": 0,
     "category": [
+      "apps",
       "finance",
-      "crypto"
+      "crypto",
+      "defi"
     ],
-    "bot_link": "@stonfibot",
+    "bot_link": "@stonfiersbot",
     "screenshots": [],
     "is_official": true,
     "promoted_type": "official",
     "languages": [
       "🇬🇧",
-      "🇹🇷",
-      "🇷🇺"
+      "🇷🇺",
+      "🇪🇸",
+      "🇨🇳"
     ],
-    "telegram_group": "https://t.me/stonfidex",
+    "telegram_group": "https://t.me/ston_fi",
     "website_url": "https://ston.fi",
-    "app_url": "https://t.me/stonfibot",
-    "social_url": "https://twitter.com/ston_fi",
+    "app_url": "https://t.me/stonfiersbot",
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/ston_fi\",\"youtube_url\":\"https://www.youtube.com/@ston_fi\",\"android_url\":null,\"ios_url\":null}",
     "views": 5900,
     "rating": 4.8,
     "rating_count": 380,
@@ -566,13 +607,14 @@ export const realBotsData = [
   },
   {
     "id": "bot-19",
-    "name": "Fragment Bot",
+    "name": "Fragment",
     "slug": "fragment-bot",
-    "description": "Telegram kullanıcı adları, anonim sanal numaralar ve hediye edilebilir Telegram Premium aboneliklerinin satıldığı açık artırma platformu botu.",
+    "description": "Fragment, doğrudan Telegram ekibiyle bağlantılı olarak geliştirilen ve The Open Network (TON) blockchain altyapısını kullanan devrim niteliğinde merkeziyetsiz bir açık artırma ve pazar yeridir. Başlangıçta özel Telegram kullanıcı adlarının (usernames) ve anonim telefon numaralarının NFT olarak alınıp satılması için kurulan platform, daha sonra Telegram Premium üyeliklerinin ve kanal reklamlarının kripto parayla satın alınabildiği bir merkeze dönüşmüştür. Kullanıcılar, Toncoin (TON) kullanarak benzersiz dijital varlıklara sahip olabilir ve bunları cüzdanlarında güvenle saklayabilirler. Fragment, blockchain teknolojisinin günlük iletişim araçlarına nasıl sorunsuz bir şekilde entegre edilebileceğinin en başarılı örneklerinden biridir ve şeffaf, güvenli ve sansüre dirençli yapısıyla dijital mülkiyet kavramını yeniden tanımlamaktadır.",
     "icon": "https://picsum.photos/seed/fragment/200",
     "price": 0,
     "category": [
-      "finance"
+      "apps",
+      "utilities"
     ],
     "bot_link": "@fragment",
     "screenshots": [],
@@ -581,9 +623,9 @@ export const realBotsData = [
     "languages": [
       "🇬🇧"
     ],
-    "telegram_group": null,
+    "telegram_group": "https://t.me/fragment",
     "website_url": "https://fragment.com",
-    "app_url": "https://t.me/fragment",
+    "app_url": null,
     "social_url": null,
     "views": 11200,
     "rating": 4.9,
@@ -743,27 +785,32 @@ export const realBotsData = [
     ]
   },
   {
-    "id": "bot-24",
-    "name": "DeDust DEX",
+    "id": "BOT-REAL-1023",
+    "name": "DeDust",
     "slug": "dedust",
-    "description": "DeDust.io merkezsiz borsasının (DEX) resmi Telegram botudur. TON üzerindeki tüm varlıkları doğrudan güvenle takas edin ve portföy durumunu kontrol edin.",
+    "description": "DeDust, TON blockchain ağı üzerinde çalışan ve modern AMM (Otomatik Piyasa Yapıcı) mimarisine sahip son derece güçlü bir merkeziyetsiz borsadır (DEX). Kullanıcı dostu arayüzü ile dikkat çeken platform, en geniş token listelerinden birine ev sahipliği yaparak kullanıcıların diledikleri jetonlar arasında saniyeler içinde takas yapmasına imkan tanır. Gelişmiş likidite havuzları ve yüksek yıllık getiri oranları (APY) sunan farming programları sayesinde yatırımcılar için cazip kazanç fırsatları sunar. DeDust, Ethereum ve BSC gibi diğer büyük ağlarla entegre köprü (bridge) çözümleri barındırarak zincirler arası varlık transferini de son derece zahmetsiz ve düşük maliyetli hale getirmektedir.",
     "icon": "https://picsum.photos/seed/dedust/200",
     "price": 0,
     "category": [
+      "apps",
       "finance",
-      "crypto"
+      "crypto",
+      "defi"
     ],
-    "bot_link": "@dedust_bot",
+    "bot_link": "@DeDustBot",
     "screenshots": [],
     "is_official": true,
     "promoted_type": "official",
     "languages": [
-      "🇬🇧"
+      "🇬🇧",
+      "🇷🇺",
+      "🇪🇸",
+      "🇨🇳"
     ],
     "telegram_group": "https://t.me/dedust_en",
     "website_url": "https://dedust.io",
-    "app_url": "https://t.me/dedust_bot",
-    "social_url": null,
+    "app_url": "https://t.me/DeDustBot",
+    "social_url": "{\"github_url\":\"https://github.com/dedust-io\",\"x_url\":\"https://x.com/dedust_io\",\"youtube_url\":null,\"android_url\":null,\"ios_url\":null}",
     "views": 6800,
     "rating": 4.8,
     "rating_count": 420,
@@ -773,15 +820,17 @@ export const realBotsData = [
     ]
   },
   {
-    "id": "bot-25",
+    "id": "BOT-REAL-1024",
     "name": "Storm Trade",
     "slug": "storm-trade",
-    "description": "TON ağında yer alan ilk merkeziyetsiz kaldıraçlı swap borsası botudur. Kripto, emtia ve döviz çiftlerinde 100x'e kadar kaldıraçlı işlem sunar.",
+    "description": "Storm Trade, TON blockchain ağı üzerinde çalışan ve Telegram Mini App arayüzü sayesinde doğrudan mesajlaşma uygulaması içinden erişilebilen ilk ve en büyük merkeziyetsiz kaldıraçlı işlem (DEX Perpetuals) platformudur. Kullanıcılar, cüzdanlarını bağlayarak kripto paralar, forex, emtialar ve hisse senetleri gibi geniş bir varlık yelpazesinde 50x'e kadar kaldıraçla güvenli bir şekilde işlem yapabilirler. Sosyal finans (SocialFi) unsurlarını bünyesinde barındıran platform, kullanıcı dostu arayüzü, işlem yarışmaları ve likidite sağlayıcılarına sunduğu yüksek getiri oranları ile öne çıkar. TON ekosisteminin finansal derinliğini artıran en kritik ve yenilikçi DeFi protokollerinden biridir.",
     "icon": "https://picsum.photos/seed/storm/200",
     "price": 0,
     "category": [
+      "apps",
       "finance",
-      "crypto"
+      "crypto",
+      "defi"
     ],
     "bot_link": "@StormTradeBot",
     "screenshots": [],
@@ -789,12 +838,13 @@ export const realBotsData = [
     "promoted_type": "featured",
     "languages": [
       "🇬🇧",
+      "🇷🇺",
       "🇹🇷"
     ],
-    "telegram_group": "https://t.me/stormtrade_chat",
+    "telegram_group": "https://t.me/storm_trade_news",
     "website_url": "https://storm.tg",
     "app_url": "https://t.me/StormTradeBot",
-    "social_url": "https://twitter.com/storm_trade_ton",
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/storm_trade_ton\",\"youtube_url\":\"https://www.youtube.com/@storm_trade\",\"android_url\":null,\"ios_url\":null}",
     "views": 5400,
     "rating": 4.7,
     "rating_count": 310,
@@ -1446,16 +1496,18 @@ export const realBotsData = [
     ]
   },
   {
-    "id": "bot-46",
-    "name": "Lost Dogs",
+    "id": "BOT-REAL-1045",
+    "name": "Lost Dogs: The Way",
     "slug": "lost-dogs",
-    "description": "Bir çizgi roman dünyasında kaybolan köpekleri yönlendirdiğiniz, günlük oylarla klanınızın kaderini ve kazanç miktarını belirlediğiniz popüler TON tabanında kurgulanmış Mini Oyun.",
+    "description": "Lost Dogs: The Way, Notcoin ekibi ve TON tabanlı popüler NFT projesi Lost Dogs Co iş birliğiyle geliştirilen, hikaye anlatımı ve topluluk kararlarına dayalı yenilikçi bir Telegram Mini App oyunudur. Geleneksel tıklama oyunlarından farklı olarak oyuncular, her gün sunulan üç farklı seçenek arasından seçim yaparak sihirli bir köpek dünyasındaki hikayenin gidişatını ve karakterlerin kaderini belirlerler. Doğru tahminde bulunan veya çoğunluğun seçimine katılan oyuncular, oyun içi $WOOF tokenları ve gerçek $NOT token airdrop ödülleri kazanırlar. Eşsiz görsel tasarımı, takım (squad) stratejileri ve NFT entegrasyonuyla Lost Dogs, Web3 dünyasında sürdürülebilir topluluk katılımına dayalı yepyeni bir oyun modeli öncülüğünü üstlenmiştir.",
     "icon": "https://picsum.photos/seed/lostdogs/200",
     "price": 0,
     "category": [
-      "games"
+      "apps",
+      "games",
+      "crypto"
     ],
-    "bot_link": "@lost_dog_bot",
+    "bot_link": "@lost_dogs_bot",
     "screenshots": [],
     "is_official": true,
     "promoted_type": "latest",
@@ -1463,10 +1515,10 @@ export const realBotsData = [
       "🇬🇧",
       "🇷🇺"
     ],
-    "telegram_group": "https://t.me/lostdogs_community",
+    "telegram_group": "https://t.me/lostdogscoeng",
     "website_url": null,
-    "app_url": "https://t.me/lost_dog_bot",
-    "social_url": null,
+    "app_url": "https://t.me/lost_dogs_bot",
+    "social_url": "{\"github_url\":null,\"x_url\":null,\"youtube_url\":null,\"android_url\":null,\"ios_url\":null}",
     "views": 4600,
     "rating": 4.6,
     "rating_count": 240,
@@ -1506,26 +1558,29 @@ export const realBotsData = [
     ]
   },
   {
-    "id": "bot-48",
+    "id": "BOT-REAL-1047",
     "name": "Agent 301",
     "slug": "agent-301",
-    "description": "Hesabınızdaki mesaj yoğunluğuna ve Telegram aktivitelerinize göre AP (Agent Points) toplayıp listeleme ödülleri kazandığınız pratik tıklama görevi.",
+    "description": "Agent 301, Telegram kullanıcılarının platformu ne kadar aktif kullandıklarını ve bugüne kadar kaç mesaj gönderdiklerini analiz ederek onları ödüllendiren son derece yenilikçi bir Web3 Telegram Mini App uygulamasıdır. Kullanıcılar botu başlattıklarında, hesap geçmişlerine ve toplam mesaj sayılarına bağlı olarak anında Agent Points (AP) kazanırlar. Kazanılan bu puanlar, TON blockchain ağı üzerinde çalışacak olan projenin yerel tokenı $AGNT airdrop'una katılım hakkı sağlar. Günlük yapboz bulmacaları (Daily Puzzle), sosyal görevler ve arkadaş davet sistemleriyle kazançların artırılabildiği Agent 301, sansür karşıtlığını simgeleyen Resistance Dog (Spotty) maskotuyla güçlü bir topluluk bağlığı ve eğlenceli bir sosyal deneyim sunmaktadır.",
     "icon": "https://picsum.photos/seed/agent/200",
     "price": 0,
     "category": [
-      "utilities"
+      "apps",
+      "games",
+      "crypto"
     ],
     "bot_link": "@Agent301Bot",
     "screenshots": [],
     "is_official": false,
     "promoted_type": "none",
     "languages": [
-      "🇬🇧"
+      "🇬🇧",
+      "🇷🇺"
     ],
-    "telegram_group": null,
+    "telegram_group": "https://t.me/agen301",
     "website_url": null,
     "app_url": "https://t.me/Agent301Bot",
-    "social_url": null,
+    "social_url": "{\"github_url\":null,\"x_url\":null,\"youtube_url\":null,\"android_url\":null,\"ios_url\":null}",
     "views": 3500,
     "rating": 4.4,
     "rating_count": 185,
@@ -1535,27 +1590,30 @@ export const realBotsData = [
     ]
   },
   {
-    "id": "bot-49",
-    "name": "bemo Liquid Staking",
+    "id": "BOT-REAL-1048",
+    "name": "Bemo",
     "slug": "bemo-stake",
-    "description": "TON ağındaki varlıklarınızı kilitlemeden akıllı sözleşmelerde stake etmenizi ve getiri elde ederken stTON tokenlarıyla likiditeye erişmenizi sağlayan en popüler staking platformu botu.",
+    "description": "bemo, TON blockchain ağı üzerinde geliştirilmiş ve kullanıcıların varlıklarını kilitlemeden stake ödülleri kazanmasını sağlayan ilk gözetimsiz likit stake (liquid staking) protokolüdür. Kullanıcılar TON yatırarak karşılığında bmTON tokenı alırlar; bu tokenın değeri, her doğrulama (validation) turunun ardından stake ödüllerinin birikmesiyle TON karşısında sürekli olarak artar. Elde edilen bmTON tokenları, stake geliri üretmeye devam ederken DeFi ekosisteminde takas edilebilir veya teminat olarak kullanılabilir. Gelişmiş gaz optimizasyonu sunan v2 güncellemesiyle işlem maliyetlerini minimize eden bemo, yüksek güvenlik standartları ve esnek yapısıyla TON ekosisteminin en yenilikçi finansal araçlarındandır.",
     "icon": "https://picsum.photos/seed/bemo/200",
     "price": 0,
     "category": [
+      "apps",
       "finance",
-      "crypto"
+      "crypto",
+      "defi"
     ],
-    "bot_link": "@bemo_stake_bot",
+    "bot_link": "@bemo_finance_bot",
     "screenshots": [],
     "is_official": true,
     "promoted_type": "official",
     "languages": [
-      "🇬🇧"
+      "🇬🇧",
+      "🇷🇺"
     ],
     "telegram_group": "https://t.me/bemofinance",
-    "website_url": "https://bemo.finance",
-    "app_url": "https://t.me/bemo_stake_bot",
-    "social_url": null,
+    "website_url": "https://bemo.fi",
+    "app_url": "https://t.me/bemo_finance_bot/app",
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/bemo_fi\",\"youtube_url\":null,\"android_url\":null,\"ios_url\":null}",
     "views": 4900,
     "rating": 4.8,
     "rating_count": 210,
@@ -9900,81 +9958,16 @@ export const realBotsData = [
     ]
   },
   {
-    "id": "bot-304",
-    "name": "Tonkeeper",
-    "slug": "tonkeeper",
-    "description": "Tonkeeper, The Open Network (TON) ekosistemi için tasarlanmış en popüler ve kullanıcı dostu gözetimsiz (non-custodial) cüzdanlardan biridir. Kullanıcıların özel anahtarları üzerinde tam kontrol sahibi olmasını sağlayan uygulama, hızlı işlem yapma kabiliyeti, NFT desteği ve entegre merkeziyetsiz uygulama (dApp) tarayıcısı ile dikkat çeker. Hem yeni başlayanlar hem de deneyimli kripto kullanıcıları için optimize edilmiş arayüzü sayesinde, dijital varlıkların yönetimi oldukça pratik bir hale getirilmiştir. Tonkeeper, yüksek güvenlik standartları, donanım cüzdan entegrasyonu ve düzenli güncellemeleri ile TON ağındaki en güvenilir varlık yönetim araçlarından biri olarak öne çıkmaktadır. Uygulama, TON üzerindeki gelişmiş özellikleri sade ve akıcı bir deneyimle birleştirerek, merkeziyetsiz finans dünyasına giriş yapmayı herkes için kolaylaştırmayı hedefler.",
-    "icon": "https://picsum.photos/seed/tonkeeper_app/200",
-    "price": 0,
-    "category": [
-      "apps",
-      "finance",
-      "crypto",
-      "wallets"
-    ],
-    "bot_link": "@tonkeeper_bot",
-    "screenshots": [],
-    "is_official": true,
-    "promoted_type": "featured",
-    "languages": [
-      "🇬🇧"
-    ],
-    "telegram_group": "https://t.me/tonkeeper",
-    "website_url": "https://tonkeeper.com/",
-    "app_url": null,
-    "social_url": "{\"github_url\":\"https://github.com/tonkeeper\",\"x_url\":\"https://x.com/tonkeeper\",\"android_url\":\"https://play.google.com/store/apps/details?id=com.tonkeeper\",\"ios_url\":\"https://apps.apple.com/app/tonkeeper/id1587760636\"}",
-    "views": 4500,
-    "rating": 4.9,
-    "rating_count": 890,
-    "user_count": 420000,
-    "commands": [
-      "/start"
-    ]
-  },
-  {
-    "id": "bot-305",
-    "name": "STON.fi",
-    "slug": "ston-fi",
-    "description": "STON.fi, The Open Network blokzinciri üzerine inşa edilmiş, tamamen merkeziyetsiz bir likidite protokolü ve otomatik piyasa yapıcı (AMM) platformudur. Platform, kullanıcıların herhangi bir aracıya veya merkezi otoriteye ihtiyaç duymadan, varlıklarını güvenli ve düşük işlem ücretleriyle takas etmelerine olanak tanır. Kullanıcılar likidite sağlayarak, platform üzerindeki işlem hacminden pay alabilir ve böylece pasif gelir elde edebilirler. Gelişmiş çapraz zincir (cross-chain) teknolojisi ile donatılan STON.fi, farklı blokzincirleri arasında varlık transferlerini sorunsuz hale getirerek, parçalı finans dünyasını birleştirme vizyonunu taşır. Şeffaflık ve güvenlik ilkelerini temel alan protokol, akıllı sözleşmeler aracılığıyla denetlenebilir ve manipülasyona kapalı bir ticaret deneyimi sunar. TON ağının ölçeklenebilirliği sayesinde yüksek işlem kapasitesine sahip olan platform, profesyonel yatırımcılardan bireysel kullanıcılara kadar herkes için sürdürülebilir bir DeFi altyapısı sağlar.",
-    "icon": "https://picsum.photos/seed/stonfi_app/200",
-    "price": 0,
-    "category": [
-      "apps",
-      "finance",
-      "crypto"
-    ],
-    "bot_link": "@stonfi",
-    "screenshots": [],
-    "is_official": true,
-    "promoted_type": "featured",
-    "languages": [
-      "🇬🇧"
-    ],
-    "telegram_group": "https://t.me/stonfidex",
-    "website_url": "https://ston.fi",
-    "app_url": null,
-    "social_url": "https://x.com/ston_fi",
-    "github_url": "https://github.com/ston-fi",
-    "views": 5200,
-    "rating": 4.8,
-    "rating_count": 640,
-    "user_count": 280000,
-    "commands": [
-      "/start"
-    ]
-  },
-  {
-    "id": "bot-306",
+    "id": "BOT-REAL-1305",
     "name": "MyTonWallet",
     "slug": "mytonwallet",
-    "description": "MyTonWallet, TON blokzinciri için özel olarak geliştirilmiş, hem masaüstü hem de mobil platformlarda çalışan tam özellikli ve yüksek güvenlikli bir gözetimsiz cüzdandır. Kullanıcılarına jeton yönetimi, NFT depolama ve staking gibi karmaşık işlemleri oldukça kolay bir arayüzle sunar. Uygulama, geliştiriciler için sağladığı kapsamlı araçlar ve kullanıcılar için sunduğu gelişmiş gizlilik özellikleri ile ekosistemin teknik anlamda en yetkin cüzdanlarından biridir. Donanım cüzdan desteği sayesinde varlıklarınızı en üst seviyede koruma imkanı tanır. Açık kaynak kodlu olması, projenin şeffaflığına olan güveni artırır. TON ağındaki tüm avantajları, kullanıcı odaklı bir arayüzde birleştiren MyTonWallet, hem bireysel yatırımcılar hem de teknoloji meraklıları için esnek ve profesyonel bir varlık yönetim deneyimi sunar.",
+    "description": "MyTonWallet, TON (The Open Network) blockchain ağı için geliştirilmiş, hem yeni başlayanlar hem de profesyonel kullanıcılar için gelişmiş özellikler sunan son derece şık ve güvenli bir gözetimsiz (non-custodial) kripto para cüzdanıdır. Kullanıcıların birden fazla TON hesabını tek bir arayüzden kolayca yönetmesine olanak tanır. Dahili staking arayüzü sayesinde kullanıcılar, varlıklarını doğrudan cüzdan içerisinden stake ederek pasif gelir elde edebilirler. Ayrıca TON Connect entegrasyonu ile merkeziyetsiz uygulamalara (dApps) sorunsuz bir şekilde bağlanma, NFT koleksiyonlarını görüntüleme ve cüzdan içi hızlı takas (swap) yapma imkanı sunar. Temiz arayüzü ve yüksek hızıyla TON ekosisteminin en popüler cüzdan alternatiflerinden biridir.",
     "icon": "https://picsum.photos/seed/mytonwallet_app/200",
     "price": 0,
     "category": [
       "apps",
       "finance",
-      "crypto",
-      "wallets"
+      "crypto"
     ],
     "bot_link": "@mytonwallet",
     "screenshots": [],
@@ -9982,12 +9975,15 @@ export const realBotsData = [
     "promoted_type": "featured",
     "languages": [
       "🇬🇧",
-      "🇷🇺"
+      "🇷🇺",
+      "🇹🇷",
+      "🇪🇸",
+      "🇨🇳"
     ],
     "telegram_group": "https://t.me/mytonwallet",
-    "website_url": "https://mytonwallet.io/",
+    "website_url": "https://mytonwallet.io",
     "app_url": null,
-    "social_url": "{\"github_url\":\"https://github.com/mytonwallet\",\"x_url\":\"https://x.com/mytonwallet\",\"android_url\":\"https://play.google.com/store/apps/details?id=com.mytonwallet.app\",\"ios_url\":\"https://apps.apple.com/app/mytonwallet/id1639017163\"}",
+    "social_url": "{\"github_url\":\"https://github.com/mytonwallet\",\"x_url\":\"https://x.com/mytonwallet\",\"youtube_url\":null,\"android_url\":\"https://play.google.com/store/apps/details?id=io.mytonwallet.app\",\"ios_url\":\"https://apps.apple.com/app/tonkeeper-wallet-for-ton/id1641344415\"}",
     "views": 3800,
     "rating": 4.7,
     "rating_count": 450,
@@ -10137,7 +10133,7 @@ export const realBotsData = [
     "id": "bot-311",
     "name": "Tonhub",
     "slug": "tonhub",
-    "description": "Tonhub, The Open Network ekosistemi için özel olarak geliştirilmiş, sadeleştirilmiş arayüzü ve üstün performansıyla tanınan mobil tabanlı bir gözetimsiz (non-custodial) cüzdandır. Kullanıcıların dijital varlıklarını yönetirken yaşadıkları teknik zorlukları ortadan kaldırmak için tasarlanan uygulama, 'tek dokunuşla işlem' mantığıyla akıcı bir deneyim sunar. Tonhub'ın en dikkat çeken özelliklerinden biri, yerleşik staking desteği sayesinde kullanıcıların sahip oldukları TON token'larını kolaylıkla stake ederek pasif gelir elde etmelerine olanak tanımasıdır. Uygulama, yüksek güvenlik protokolleri gereği cihazın güvenli donanımını kullanarak özel anahtarların cihaz dışına çıkmamasını sağlar. Ayrıca, TON tabanlı merkeziyetsiz uygulamalar için güvenli bir giriş kapısı (dApp browser) işlevi görerek ekosistemle etkileşimi kolaylaştırır.",
+    "description": "Tonhub, The Open Network (TON) blockchain'i üzerinde çalışan, özellikle hız ve güvenlik odaklı geliştirilmiş mobil tabanlı gözetimsiz bir kripto cüzdanıdır. Kullanıcıların Toncoin ve diğer ağ varlıklarını güvenle yönetmelerini sağlayan Tonhub, biyometrik güvenlik önlemleri (Face ID, Touch ID) ve şifreli özel anahtar saklama teknolojisiyle üst düzey koruma sunar. Doğrudan cüzdan içerisinden yapılabilen staking işlemleri, kullanıcıların ağ doğrulayıcılarına (validators) kolayca katılarak faiz kazanmalarını mümkün kılar. Sade ve sezgisel kullanıcı arayüzü, kripto dünyasına yeni adım atanlar için bile karmaşık süreçleri basitleştirir. Açık kaynak kodlu yapısı ve TON ekosistemindeki dApp'ler ile sorunsuz bağlantı sağlayan TON Connect desteği ile Tonhub, mobil cihazlarda güvenilir bir Web3 kapısıdır.",
     "icon": "https://picsum.photos/seed/tonhub/200",
     "price": 0,
     "category": [
@@ -10146,7 +10142,7 @@ export const realBotsData = [
       "crypto",
       "wallets"
     ],
-    "bot_link": "@tonhub",
+    "bot_link": "@tonhubbot",
     "screenshots": [],
     "is_official": true,
     "promoted_type": "featured",
@@ -10154,9 +10150,9 @@ export const realBotsData = [
       "🇬🇧"
     ],
     "telegram_group": "https://t.me/tonhub",
-    "website_url": "https://tonhub.com/",
-    "app_url": null,
-    "social_url": "{\"x_url\":\"https://x.com/tonhub_wallet\",\"android_url\":\"https://play.google.com/store/apps/details?id=com.tonhub.app\",\"ios_url\":\"https://apps.apple.com/app/tonhub/id1573215286\"}",
+    "website_url": "https://tonhub.com",
+    "app_url": "https://t.me/tonhubbot",
+    "social_url": "{\"x_url\":\"https://x.com/tonhub\",\"github_url\":\"https://github.com/tonhub\"}",
     "views": 3100,
     "rating": 4.7,
     "rating_count": 140,
@@ -10166,28 +10162,29 @@ export const realBotsData = [
     ]
   },
   {
-    "id": "bot-312",
+    "id": "BOT-REAL-1293",
     "name": "Vertus",
     "slug": "vertus",
-    "description": "Vertus, Telegram ekosistemi içerisinde entegre bir şekilde çalışan, kullanıcıların dijital varlıklarını yönetmeleri ve ağ üzerinde aktif birer katılımcı olmaları için tasarlanmış yenilikçi bir cüzdan platformudur. Uygulama, sadece bir cüzdan değil, aynı zamanda kullanıcıların TON ağı üzerinde 'kazan ve yönet' mantığıyla çalışan aktiviteler gerçekleştirmelerine olanak tanıyan bir Web3 aracıdır. Vertus'un sunduğu en önemli avantaj, kullanıcıların ağ üzerindeki işlemlerini Telegram arayüzünden hiç çıkmadan, yüksek hızda gerçekleştirebilmeleridir. Güvenli saklama özelliklerinin yanı sıra, uygulama içi ödül sistemleri ile ekosisteme katkı sağlayan kullanıcıları teşvik eder. Kullanıcı deneyimi açısından oldukça basit bir yapı sunan Vertus, kripto para dünyasına yeni adım atanlar için düşük giriş bariyerleri oluşturur. Uygulamanın arkasındaki şeffaf çalışma prensipleri ve topluluk odaklı gelişimi, onu Telegram tabanlı projeler arasında öne çıkaran temel unsurlardır. Hızlı, güvenilir ve sosyal bir cüzdan deneyimi arayanlar için Vertus, TON ağındaki finansal aktiviteleri kolaylaştıran pratik bir çözümdür.",
+    "description": "Vertus, TON blockchain altyapısı üzerinde çalışan ve doğrudan Telegram botu üzerinden erişilebilen yeni nesil bir gözetimsiz (non-custodial) kripto cüzdanı ve sosyal madencilik dApp platformudur. Kullanıcılar, son derece basit bir kurulumla kendi cüzdanlarını oluşturup özel anahtarlarını güvenceye aldıktan sonra, her iki saatte bir pasif olarak $VERT token madenciliği yapmaya başlayabilirler. Madencilik hızını artırmak ve gaz ücretlerini optimize etmek için çeşitli geliştirmeler sunan Vertus, arkadaş davet sistemleri ve sosyal görevlerle topluluk etkileşimini dinamik tutar. Kullanıcı dostu arayüzü sayesinde kripto dünyasına yeni adım atanlar için güvenli, masrafsız ve pratik bir Web3 cüzdan deneyimi sunmaktadır.",
     "icon": "https://picsum.photos/seed/vertus/200",
     "price": 0,
     "category": [
+      "apps",
       "finance",
-      "crypto",
-      "wallets"
+      "crypto"
     ],
-    "bot_link": "@vertus_app",
+    "bot_link": "@Vertus_App_bot",
     "screenshots": [],
     "is_official": true,
     "promoted_type": "latest",
     "languages": [
-      "🇬🇧"
+      "🇬🇧",
+      "🇷🇺"
     ],
-    "telegram_group": "https://t.me/vertus_app",
-    "website_url": "https://vertus.app/",
-    "app_url": "https://t.me/vertus_app",
-    "social_url": "{\"x_url\":\"https://x.com/vertus_app\"}",
+    "telegram_group": "https://t.me/thevertus_chat",
+    "website_url": null,
+    "app_url": "https://t.me/Vertus_App_bot",
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/the_vertus\",\"youtube_url\":null,\"android_url\":null,\"ios_url\":null}",
     "views": 3800,
     "rating": 4.6,
     "rating_count": 190,
@@ -10231,12 +10228,13 @@ export const realBotsData = [
   },
   {
     "id": "bot-314",
-    "name": "Wallet (in Telegram)",
+    "name": "Wallet",
     "slug": "wallet-in-telegram",
     "description": "Wallet (Telegram), doğrudan Telegram mesajlaşma uygulamasının içine yerleşik olarak gelen, milyonlarca kullanıcıya kripto para dünyasını ulaştırmayı hedefleyen resmi bir cüzdan çözümüdür. Kullanıcıların herhangi bir harici uygulama indirmeden veya karmaşık cüzdan kurulumları yapmadan, sadece Telegram hesapları aracılığıyla kripto varlık alıp satmalarına, göndermelerine ve saklamalarına olanak tanır. TON ağı üzerine inşa edilen bu cüzdan, özellikle P2P pazar yeri ile yerel para birimleriyle kripto alımını demokratikleştirir. İşlem hızları oldukça yüksek olup, kripto dünyasına yeni başlayanlar için en basit ve erişilebilir giriş noktasıdır. Güvenlik, Telegram'ın altyapısı ve platformun sunduğu ek şifreleme özellikleri ile desteklenmektedir. Sosyal mesajlaşma ile finansal işlemleri tek bir ekranda birleştirerek dijital ekonominin gündelik hayata entegrasyonunu sağlar.",
     "icon": "https://picsum.photos/seed/telegram_wallet/200",
     "price": 0,
     "category": [
+      "apps",
       "finance",
       "crypto",
       "wallets"
@@ -10466,7 +10464,7 @@ export const realBotsData = [
       "crypto",
       "wallets"
     ],
-    "bot_link": "@senderwallet",
+    "bot_link": "@senderwallet_bot",
     "screenshots": [],
     "is_official": true,
     "promoted_type": "none",
@@ -10475,7 +10473,7 @@ export const realBotsData = [
     ],
     "telegram_group": "https://t.me/senderwallet",
     "website_url": "https://sender.org/",
-    "app_url": "https://t.me/senderwallet",
+    "app_url": "https://t.me/senderwallet_bot",
     "social_url": "{\"x_url\":\"https://x.com/senderwallet\",\"github_url\":\"https://github.com/sender-wallet\",\"android_url\":\"https://play.google.com/store/apps/details?id=io.sender.wallet\",\"ios_url\":\"https://apps.apple.com/app/sender-wallet/id1588829631\"}",
     "views": 4550,
     "rating": 4.7,
@@ -10498,7 +10496,7 @@ export const realBotsData = [
       "crypto",
       "wallets"
     ],
-    "bot_link": "@coin98_en",
+    "bot_link": "@coin98_bot",
     "screenshots": [],
     "is_official": true,
     "promoted_type": "none",
@@ -10507,12 +10505,1050 @@ export const realBotsData = [
     ],
     "telegram_group": "https://t.me/coin98_en",
     "website_url": "https://coin98.com/",
-    "app_url": "https://t.me/coin98_en",
+    "app_url": "https://t.me/coin98_bot",
     "social_url": "{\"x_url\":\"https://x.com/coin98_wallet\",\"github_url\":\"https://github.com/coin98\",\"android_url\":\"https://play.google.com/store/apps/details?id=coin98.crypto.finance.wallet\",\"ios_url\":\"https://apps.apple.com/app/coin98-super-wallet/id1561969966\"}",
     "views": 9200,
     "rating": 4.8,
     "rating_count": 310,
     "user_count": 512000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "BOT-REAL-1304",
+    "name": "Getgems",
+    "slug": "getgems",
+    "description": "Getgems, TON blockchain ağı üzerindeki en büyük ve en aktif NFT pazar yeridir. Dijital sanat eserlerinden oyun içi varlıklara, Telegram kullanıcı adlarından anonim telefon numaralarına kadar geniş bir yelpazedeki benzersiz dijital varlıkların (NFT) alım satımına ev sahipliği yapar. Kullanıcılar, cüzdanlarını bağlayarak saniyeler içinde kendi NFT koleksiyonlarını oluşturabilir, listeleyebilir veya açık artırmalara katılabilirler. Sıkıştırılmış NFT (cNFT) teknolojisini desteklemesi sayesinde devasa koleksiyonların son derece düşük ücretlerle basılmasına olanak tanır. Getgems, Telegram entegrasyonu ve topluluk odaklı yapısıyla TON ekosisteminde dijital sahipliğin ve Web3 sanat dünyasının merkezi haline gelmiştir.",
+    "icon": "https://picsum.photos/seed/getgems/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "utility",
+      "crypto"
+    ],
+    "bot_link": "@getgems_io_bot",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "none",
+    "languages": [
+      "🇬🇧",
+      "🇷🇺"
+    ],
+    "telegram_group": "https://t.me/getgems",
+    "website_url": "https://getgems.io",
+    "app_url": "https://t.me/getgems_io_bot",
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/getgems_io\",\"youtube_url\":null,\"android_url\":null,\"ios_url\":null}",
+    "views": 3200,
+    "rating": 4.8,
+    "rating_count": 250,
+    "user_count": 120000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "REAL-TON-APP-015",
+    "name": "Tonstakers",
+    "slug": "tonstakers",
+    "description": "Tonstakers, TON blockchain ağı üzerindeki en büyük ve en popüler merkeziyetsiz likit stake (liquid staking) protokolüdür. Kullanıcılar, Toncoin (TON) varlıklarını platforma kilitleyerek güvenli bir şekilde yıllık faiz geliri elde ederken, karşılığında likit tsTON tokenı alırlar. tsTON tokenları, kullanıcıların stake ödüllerini biriktirmeye devam ederken aynı zamanda TON DeFi ekosistemindeki diğer borç verme, likidite havuzları ve ticaret platformlarında serbestçe kullanılabilmesini sağlar. Herhangi bir kilitleme süresi olmaksızın anında likiditeye erişim sunan Tonstakers, yüksek güvenlik standartları ve bağımsız denetim raporlarıyla TON ağının en güvenilir finansal altyapılarından biridir.",
+    "icon": "https://picsum.photos/seed/tonstakers/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "finance",
+      "crypto",
+      "defi"
+    ],
+    "bot_link": "@tonstakers_bot",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "none",
+    "languages": [
+      "🇬🇧",
+      "🇷🇺"
+    ],
+    "telegram_group": "https://t.me/thetonstakers",
+    "website_url": "https://tonstakers.com",
+    "app_url": "https://t.me/tonstakers_bot",
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/tonstakers\",\"youtube_url\":null,\"android_url\":null,\"ios_url\":null}",
+    "views": 4100,
+    "rating": 4.9,
+    "rating_count": 180,
+    "user_count": 92000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "BOT-REAL-1306",
+    "name": "EVAA Protocol",
+    "slug": "evaa-protocol",
+    "description": "EVAA Protocol, TON blockchain ağı üzerinde geliştirilen ve doğrudan Telegram Mini App arayüzü üzerinden erişilebilen ilk ve en büyük merkeziyetsiz borç alma ve borç verme (lending) platformudur. Kullanıcılar, sahip oldukları kripto varlıkları protokole yatırarak pasif faiz geliri elde edebilir veya bu varlıklarını teminat olarak göstererek aşırı teminatlandırılmış (overcollateralized) krediler çekebilirler. Tamamen açık kaynak kodlu akıllı sözleşmeler ve bağımsız denetim şirketleri tarafından onaylanmış güvenlik altyapısıyla çalışan EVAA, TON ekosisteminde sermaye verimliliğini artıran en önemli DeFi araçlarından biridir. Kullanıcı dostu tasarımıyla kripto finansını herkes için erişilebilir kılmaktadır.",
+    "icon": "https://picsum.photos/seed/evaa/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "finance",
+      "crypto",
+      "defi"
+    ],
+    "bot_link": "@EvaaAppBot",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "none",
+    "languages": [
+      "🇬🇧",
+      "🇷🇺"
+    ],
+    "telegram_group": "https://t.me/evaatg",
+    "website_url": "https://evaa.finance",
+    "app_url": "https://t.me/EvaaAppBot",
+    "social_url": "{\"github_url\":\"https://github.com/evaaprotocol\",\"x_url\":\"https://x.com/evaaprotocol\",\"youtube_url\":\"https://www.youtube.com/@evaaprotocol\",\"android_url\":null,\"ios_url\":null}",
+    "views": 2700,
+    "rating": 4.6,
+    "rating_count": 92,
+    "user_count": 48000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "BOT-REAL-3005",
+    "name": "OpenMask",
+    "slug": "openmask",
+    "description": "OpenMask, tarayıcı uzantısı (extension) olarak çalışan ve TON blockchain ekosistemi için özel olarak geliştirilmiş, Ethereum dünyasındaki MetaMask tarzında son derece popüler bir gözetimsiz (non-custodial) kripto para cüzdanıdır. Kullanıcıların kendi özel anahtarları (private key) ve kurtarma kelimeleri üzerinde tam kontrol sahibi olmasını sağlayan cüzdan; Toncoin, Jetton tokenları ve NFT'lerin güvenle saklanması, gönderilmesi ve alınması için mükemmel bir altyapı sunar. TON Connect teknolojisini desteklemesi sayesinde merkeziyetsiz borsalar (DEX), NFT pazar yerleri ve Web3 oyunları gibi dApp'lere saniyeler içinde sorunsuz bir şekilde bağlanabilir. Güçlü güvenlik şifrelemeleri, çoklu hesap yönetimi ve geliştirici dostu araçları ile OpenMask, masaüstü tarayıcılarda TON ağını deneyimlemek isteyen kullanıcılar için en ideal çözümdür.",
+    "icon": "https://picsum.photos/seed/openmask/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "utilities",
+      "wallets"
+    ],
+    "bot_link": "@openmask",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "none",
+    "languages": [
+      "🇬🇧",
+      "🇷🇺"
+    ],
+    "telegram_group": "https://t.me/openmask",
+    "website_url": "https://openmask.app",
+    "app_url": null,
+    "social_url": "{\"github_url\":\"https://github.com/OpenMask\",\"x_url\":\"https://x.com/openmask_wallet\",\"youtube_url\":null,\"android_url\":null,\"ios_url\":null}",
+    "views": 2767,
+    "rating": 4.8,
+    "rating_count": 50,
+    "user_count": 40000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "REAL-TON-APP-019",
+    "name": "Fanton",
+    "slug": "fanton",
+    "description": "Fanton, TON blockchain ağı üzerinde çalışan ve doğrudan Telegram içerisinden oynanabilen ilk ve en popüler Web3 fantezi futbol (Fantasy Football) oyunudur. Oyuncular, Avrupa liglerindeki ve Şampiyonlar Ligi'ndeki gerçek futbolculardan oluşan sanal takımlarını kurarlar. Seçilen futbolcuların gerçek maçlardaki performanslarına, attıkları gollere veya yaptıkları asistlere göre puan toplayan kullanıcılar, liderlik tablolarında yükselerek TON tokenları ve özel NFT kartları gibi değerli ödüller kazanırlar. Hem ücretsiz (Free2Play) hem de NFT kart sahiplerine özel profesyonel turnuvalar sunan Fanton, spor tutkusunu blockchain teknolojisiyle birleştirerek milyonlarca futbolseveri eğlenceli ve kazançlı bir ekosistemde buluşturur.",
+    "icon": "https://picsum.photos/seed/fanton/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "games",
+      "crypto"
+    ],
+    "bot_link": "@FanTonGameBot",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "none",
+    "languages": [
+      "🇬🇧",
+      "🇷🇺",
+      "🇪🇸"
+    ],
+    "telegram_group": "https://t.me/fanton_nft_en",
+    "website_url": "https://fan-ton.com",
+    "app_url": "https://t.me/FanTonGameBot",
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/FantasyFanton\",\"youtube_url\":null,\"android_url\":null,\"ios_url\":null}",
+    "views": 11514,
+    "rating": 4.8,
+    "rating_count": 70,
+    "user_count": 50000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "bot-p4-2559",
+    "name": "SquidTG",
+    "slug": "squidtg",
+    "description": "SquidTG, The Open Network (TON) üzerinde inşa edilmiş ve popüler Squid Game konseptinden ilham alan rekabetçi bir Telegram Mini App oyunudur. Oyuncular, hayatta kalma temalı çeşitli mini oyunlarda birbirleriyle yarışarak oyun içi token olan SQD kazanmaya çalışırlar. Tıklama hızı, zamanlama ve strateji gerektiren bu oyunlar, yüksek risk ve yüksek ödül dinamiği üzerine kuruludur. Kullanıcılar ayrıca NFT yumurtaları satın alarak karakterlerini geliştirebilir ve kazanç potansiyellerini artırabilirler. Topluluk turnuvaları ve liderlik tablolarıyla rekabeti sürekli canlı tutan SquidTG, TON ağındaki oyunculara adrenalin dolu ve kazançlı bir Web3 oyun deneyimi sunmaktadır.",
+    "icon": "https://picsum.photos/seed/squidtg/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "games",
+      "crypto"
+    ],
+    "bot_link": "@squidtg_bot",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "none",
+    "languages": [
+      "🇬🇧",
+      "🇹🇷"
+    ],
+    "telegram_group": "https://t.me/squidtg",
+    "website_url": "https://squidtg.com",
+    "app_url": "https://t.me/squidtg_bot",
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/Squid_TG\",\"android_url\":null,\"ios_url\":null}",
+    "views": 7343,
+    "rating": 4.8,
+    "rating_count": 70,
+    "user_count": 50000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "BOT-REAL-2351",
+    "name": "Gatto",
+    "slug": "gatto",
+    "description": "Gatto, TON blockchain altyapısı üzerinde çalışan, klasik sanal bebek (Tamagotchi) mekaniklerini oyna-kazan (play-to-earn) modeliyle birleştiren son derece popüler ve eğlenceli bir Telegram Mini App oyunudur. Oyuncular, Gattomon adı verilen sevimli dijital evcil hayvanlarını yumurtadan çıkarır, besler, eğitir ve diğer oyuncuların hayvanlarıyla yarışmalara sokarlar. Evcil hayvanlar büyüdükçe ve geliştikçe oyunculara gerçek TON tokenları madenleme ve özel NFT'ler kazanma fırsatı sunarlar. Strateji, macera ve evcil hayvan yönetimini bir araya getiren Gatto, derinlikli oyun yapısı ve yüksek kullanıcı bağlılığı sayesinde TON ekosisteminin en uzun soluklu ve en başarılı Web3 oyun projelerinden biri olarak öne çıkmaktadır.",
+    "icon": "https://picsum.photos/seed/gatto/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "games",
+      "crypto"
+    ],
+    "bot_link": "@gatto_gamebot",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "none",
+    "languages": [
+      "🇬🇧",
+      "🇷🇺"
+    ],
+    "telegram_group": "https://t.me/gatto_game",
+    "website_url": null,
+    "app_url": "https://t.me/gatto_gamebot",
+    "social_url": "{\"github_url\":null,\"x_url\":null,\"youtube_url\":null,\"android_url\":null,\"ios_url\":null}",
+    "views": 6558,
+    "rating": 4.8,
+    "rating_count": 70,
+    "user_count": 50000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "BOT-REAL-1967",
+    "name": "Cat Gold Miner",
+    "slug": "catgoldminer",
+    "description": "Cat Gold Miner, TON blockchain ağı üzerinde çalışan, kedi yöneticilerin altın madenlerini işlettiği son derece popüler ve eğlenceli bir boşta kalma (idle) ve oyna-kazan (play-to-earn) Telegram Mini App oyunudur. Oyuncular, maden ocaklarını kazar, asansörleri yükseltir, taşıma kapasitelerini artırır ve işleri otomatikleştirmek için özel yeteneklere sahip kedi yöneticileri işe alırlar. Günlük şifreler (Morse Code) ve gizli hazine avları gibi interaktif etkinliklerle zenginleştirilen oyun, TON App dizininde en üst sıralarda yer almaktadır. Kendi yerel tokenı olan $CATGM ile ekonomik döngüsünü sağlayan proje, hem stratejik derinliği hem de sevimli kedi temasıyla milyonlarca oyuncunun ilgisini çekmeyi başarmıştır.",
+    "icon": "https://picsum.photos/seed/catgoldminer/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "games",
+      "crypto"
+    ],
+    "bot_link": "@catgoldminerbot",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "none",
+    "languages": [
+      "🇬🇧",
+      "🇷🇺",
+      "🇨🇳"
+    ],
+    "telegram_group": "https://t.me/catgoldminerann",
+    "website_url": "https://catgoldminer.ai",
+    "app_url": "https://t.me/catgoldminerbot",
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/catgoldminer\",\"youtube_url\":\"https://www.youtube.com/@catgoldminer_official\",\"android_url\":null,\"ios_url\":null}",
+    "views": 11006,
+    "rating": 4.8,
+    "rating_count": 70,
+    "user_count": 50000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "BOT-REAL-2108",
+    "name": "AVACOIN",
+    "slug": "avacoin",
+    "description": "AVACOIN, Telegram üzerinde çalışan ve sanal altın madenciliği temasıyla milyonlarca oyuncuyu bir araya getiren son derece popüler bir oyna-kazan (play-to-earn) Web3 Mini App oyunudur. Oyuncular, ilk başlarda basit bir tıklama (clicker) oyunu olarak başlayan bu platformda ekrana dokunarak sanal altın tozları biriktirir ve bunları oyun içi AVACN tokenlarına dönüştürürler. Zamanla gelişen oyun mekanikleri sayesinde platform; emlak yatırımları, staking havuzları, lonca (guild) savaşları ve pasif gelir getiren sanal altın fabrikaları gibi zengin stratejik ögeler barındıran kapsamlı bir GameFi ekosistemine dönüşmüştür. Kullanıcı dostu arayüzü, günlük görevleri ve adil dağıtım modeliyle AVACOIN, TON blockchain ağının en uzun soluklu ve topluluk bağlılığı en yüksek oyun projelerinden biridir.",
+    "icon": "https://picsum.photos/seed/avacoin/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "games",
+      "crypto"
+    ],
+    "bot_link": "@avagoldcoin_bot",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "none",
+    "languages": [
+      "🇬🇧",
+      "🇷🇺"
+    ],
+    "telegram_group": "https://t.me/avagoldcoin",
+    "website_url": "https://avacoin.io",
+    "app_url": "https://t.me/avagoldcoin_bot",
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/avagoldcoin\",\"youtube_url\":null,\"android_url\":null,\"ios_url\":null}",
+    "views": 11612,
+    "rating": 4.8,
+    "rating_count": 70,
+    "user_count": 50000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "bot-p4-2437",
+    "name": "TonRocket (xRocket)",
+    "slug": "xrocket",
+    "description": "TonRocket (xRocket), Telegram kullanıcıları için özel olarak tasarlanmış, The Open Network (TON) tabanlı gelişmiş bir kripto para cüzdanı ve P2P borsa botudur. Kullanıcıların Telegram sohbetlerinden ayrılmadan kripto para transferleri yapmasını, fatura kesmesini ve ödeme almasını sağlayan son derece hızlı bir altyapıya sahiptir. Özellikle içerik üreticileri ve topluluk yöneticileri için geliştirilen Rocket Pay özellikleri, kripto paralarla bahşiş vermeyi ve anında ödeme almayı çocuk oyuncağı haline getirir. Gelişmiş API desteği sayesinde diğer Telegram botları ve web projeleriyle kolayca entegre edilebilir. Güvenilir yapısı ve düşük işlem ücretleriyle TON ekosisteminin vazgeçilmezlerindendir.",
+    "icon": "https://picsum.photos/seed/xrocket/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "finance",
+      "crypto",
+      "wallets"
+    ],
+    "bot_link": "@tonRocketBot",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "none",
+    "languages": [
+      "🇬🇧",
+      "🇹🇷"
+    ],
+    "telegram_group": "https://t.me/xrocket_news",
+    "website_url": "https://tonrocket.tg",
+    "app_url": "https://t.me/tonRocketBot",
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/tonRocket\",\"android_url\":null,\"ios_url\":null}",
+    "views": 4013,
+    "rating": 4.8,
+    "rating_count": 70,
+    "user_count": 50000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "BOT-REAL-2253",
+    "name": "Dotcoin",
+    "slug": "dotcoin",
+    "description": "Dotcoin, TON (The Open Network) blockchain ağı üzerinde çalışan ve dünya genelinde 15 milyondan fazla aktif oyuncuya ulaşarak viral bir başarı yakalayan son derece popüler bir tıklama (tap-to-earn) Telegram Mini App oyunudur. Oyuncular, ekranın ortasında yer alan ve dokundukça büyüyen merkezi bir noktaya (dot) tıklayarak Dotcoin toplarlar. Oyundaki benzersiz genişleyen nokta mekaniği ve etrafındaki çarpan halkaları, tıklama hızına bağlı olarak kazanılan ödülleri katlayan stratejik bir derinlik sunar. Yescoin ve Venom Foundation gibi büyük Web3 girişimleriyle stratejik ortaklıklar kuran Dotcoin, günlük görevler, sosyal davetler ve cüzdan bağlantı ödülleriyle topluluğuna adil ve eğlenceli bir airdrop kazanç kapısı sunmaktadır.",
+    "icon": "https://picsum.photos/seed/dotcoin/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "games",
+      "crypto"
+    ],
+    "bot_link": "@dotcoin_bot",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "none",
+    "languages": [
+      "🇬🇧",
+      "🇷🇺",
+      "🇹🇷"
+    ],
+    "telegram_group": "https://t.me/dotcoin_news",
+    "website_url": null,
+    "app_url": "https://t.me/dotcoin_bot",
+    "social_url": "{\"github_url\":null,\"x_url\":null,\"youtube_url\":null,\"android_url\":null,\"ios_url\":null}",
+    "views": 11723,
+    "rating": 4.8,
+    "rating_count": 70,
+    "user_count": 50000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "bot-p4-2368",
+    "name": "CyberFinance",
+    "slug": "cyberfinance",
+    "description": "CyberFinance, The Open Network (TON) üzerinde geliştirilmiş, merkeziyetsiz finans (DeFi) ve oyunlaştırma (gamification) unsurlarını bir araya getiren bir Telegram Mini App projesidir. Kullanıcılar, siberpunk temalı bir arayüzde sanal bir çekiç ile yumurta kırarak veya madencilik havuzlarına katılarak CFI token kazanırlar. Platform, geleneksel likidite sağlama ve staking işlemlerini sıkıcı finansal arayüzlerden kurtararak eğlenceli bir oyuna dönüştürür. Kullanıcılar, Telegram üzerinden kolayca cüzdanlarını bağlayabilir, varlıklarını kilitleyerek pasif getiri elde edebilirler ve aynı zamanda oyun içi görevleri tamamlayarak ekstra ödüller kazanabilirler. TON ağındaki DeFi adaptasyonunu artırmayı hedefleyen yenilikçi bir protokoldür.",
+    "icon": "https://picsum.photos/seed/cyberfinance/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "finance",
+      "crypto",
+      "defi"
+    ],
+    "bot_link": "@CyberFinanceBot",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "none",
+    "languages": [
+      "🇬🇧",
+      "🇹🇷"
+    ],
+    "telegram_group": "https://t.me/CyberFinance_Chat",
+    "website_url": "https://cyberfi.tg",
+    "app_url": "https://t.me/CyberFinanceBot",
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/CyberFinance_\",\"android_url\":null,\"ios_url\":null}",
+    "views": 4930,
+    "rating": 4.8,
+    "rating_count": 70,
+    "user_count": 50000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "BOT-REAL-2645",
+    "name": "TonUP",
+    "slug": "tonup",
+    "description": "TonUP, The Open Network (TON) blockchain ekosistemi üzerinde faaliyet gösteren, yüksek potansiyelli Web3 projelerini desteklemek ve fonlamak amacıyla kurulmuş lider bir merkeziyetsiz launchpad platformudur. TON Foundation ve TONCoin.Fund gibi güçlü kurumsal yapılar tarafından desteklenen TonUP, ekosistemdeki yenilikçi girişimlerin güvenli ve şeffaf bir şekilde sermaye toplamasına yardımcı olurken, yatırımcılara da erken aşamadaki projelere güvenle katılma fırsatı sunar. Platform, katı güvenlik denetimleri ve detaylı proje inceleme süreçleri uygulayarak topluluğu dolandırıcılık risklerinden korur. Yerel tokenı $UP aracılığıyla platform yönetişimine ve özel satışlara katılım imkanı sunan TonUP, TON ağının büyümesini ve yeni teknolojilerin adaptasyonunu hızlandıran kritik bir finansal köprüdür.",
+    "icon": "https://picsum.photos/seed/tonup/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "finance",
+      "crypto",
+      "launchpads"
+    ],
+    "bot_link": "@TonUP_io",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "none",
+    "languages": [
+      "🇬🇧",
+      "🇷🇺",
+      "🇨🇳"
+    ],
+    "telegram_group": "https://t.me/TonUP_io",
+    "website_url": "https://tonup.io",
+    "app_url": null,
+    "social_url": "{\"github_url\":\"https://github.com/TonUP-io\",\"x_url\":\"https://x.com/TonUP_io\",\"youtube_url\":\"https://www.youtube.com/@TonUP_io\",\"android_url\":null,\"ios_url\":null}",
+    "views": 6600,
+    "rating": 4.8,
+    "rating_count": 70,
+    "user_count": 50000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "BOT-REAL-2642",
+    "name": "Cats",
+    "slug": "cats",
+    "description": "Cats (Catsgang), Dogs projesinin yakaladığı devasa başarının ardından The Open Network (TON) üzerinde geliştirilen, kedi temalı son derece popüler bir Telegram Mini App and meme coin projesidir. Platform, kullanıcıların Telegram hesaplarının yaşına, aktifliğine ve Telegram Premium durumuna göre puan dağıtan adil bir airdrop mekanizmasına dayanır. Kullanıcılar ayrıca kendi kedi fotoğraflarını yapay zeka tarayıcısına yükleyerek, günlük sosyal görevleri tamamlayarak ve arkadaşlarını davet ederek ek $CATS tokenları kazanabilirler. Eğlenceli internet kedi kültürünü Web3 ekonomisiyle harmanlayan Catsgang, kısa sürede milyonlarca aktif kullanıcıya ulaşmıştır. Adil token dağıtımı ve eğlenceli topluluk aktiviteleriyle TON ağındaki memecoin ekosisteminin en dikkat çekici projelerinden biri olmayı başarmıştır.",
+    "icon": "https://picsum.photos/seed/cats/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "games",
+      "crypto"
+    ],
+    "bot_link": "@catsgang_bot",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "none",
+    "languages": [
+      "🇬🇧",
+      "🇷🇺"
+    ],
+    "telegram_group": "https://t.me/cats_community",
+    "website_url": "https://catsgang.com",
+    "app_url": "https://t.me/catsgang_bot",
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/Cats_House_TMA\",\"youtube_url\":null,\"android_url\":null,\"ios_url\":null}",
+    "views": 7906,
+    "rating": 4.8,
+    "rating_count": 70,
+    "user_count": 50000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "BOT-REAL-2665",
+    "name": "Banana",
+    "slug": "banana",
+    "description": "Banana, yapay zeka ve Web3 oyun veri altyapısı devi CARV tarafından desteklenen, TON blockchain ağı üzerinde çalışan son derece eğlenceli ve popüler bir boşta kalma (idle) ve tıklama oyunudur. Oyuncular, ekranın ortasındaki muz görseline tıklayarak PEEL puanları toplar ve her gün tamamen rastgele seviyede nadirliğe sahip dijital muz NFT'leri kazanırlar. Kazanılan muzların nadirlik derecesi arttıkça toplanan puan miktarı da katlanarak artar. Geleneksel tıklama oyunlarından farklı olarak Banana, oyuncuların topladıkları dijital muzları satarak doğrudan USDT şeklinde gerçek nakit ödüller kazanmalarına olanak tanır. CARV ID entegrasyonu sayesinde oyuncu verilerini güvenle saklayan proje, benzersiz ve kazançlı bir Web3 deneyimi sunar.",
+    "icon": "https://picsum.photos/seed/banana/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "games",
+      "crypto"
+    ],
+    "bot_link": "@OfficialBananaBot",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "none",
+    "languages": [
+      "🇬🇧"
+    ],
+    "telegram_group": "https://t.me/banana_update",
+    "website_url": null,
+    "app_url": "https://t.me/OfficialBananaBot",
+    "social_url": "{\"github_url\":null,\"x_url\":null,\"youtube_url\":null,\"android_url\":null,\"ios_url\":null}",
+    "views": 8646,
+    "rating": 4.8,
+    "rating_count": 70,
+    "user_count": 50000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "BOT-REAL-2685",
+    "name": "Nomis",
+    "slug": "nomis",
+    "description": "Nomis Protocol, Web3 dünyası için geliştirilmiş, blockchain cüzdanlarının zincir üstü aktivitelerini analiz ederek güvenilirlik ve itibar puanı belirleyen öncü bir merkeziyetsiz kimlik ve kredi skorlama protokolüdür. Yapay zeka ve makine öğrenimi modellerini kullanarak 30'dan fazla parametreyi ve 50'den fazla veri kaynağını tarayan Nomis, cüzdanlara 0 ile 100 arasında bir itibar skoru atar. Kullanıcılar bu skorları Soulbound Token (SBT) olarak mint ederek DeFi protokollerinde, airdrop campaigns ve merkeziyetsiz yönetişimde ayrıcalıklar elde etmek için kullanabilirler. Telegram Mini App entegrasyonu sayesinde kullanıcıların TON ağındaki puanlarını kolayca takip etmelerine ve artırmalarına olanak tanıyan Nomis, Web3 ekosisteminde güven ve kişiselleştirilmiş finansal hizmetlerin temel yapı taşlarından biridir.",
+    "icon": "https://picsum.photos/seed/nomis/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "finance",
+      "crypto",
+      "defi",
+      "utilities"
+    ],
+    "bot_link": "@NomisAppBot",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "none",
+    "languages": [
+      "🇬🇧",
+      "🇷🇺",
+      "🇵🇹"
+    ],
+    "telegram_group": "https://t.me/nomis_protocol",
+    "website_url": "https://nomis.cc",
+    "app_url": "https://t.me/NomisAppBot",
+    "social_url": "{\"github_url\":\"https://github.com/Nomis-Protocol\",\"x_url\":\"https://x.com/0xNomis\",\"youtube_url\":null,\"android_url\":null,\"ios_url\":null}",
+    "views": 11165,
+    "rating": 4.8,
+    "rating_count": 70,
+    "user_count": 50000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "BOT-REAL-2869",
+    "name": "Ton.Vote",
+    "slug": "ton-vote",
+    "description": "TON.Vote, The Open Network (TON) ekosisteminin tamamen merkeziyetsiz, şeffaf ve manipülasyona karşı dirençli resmi topluluk oylama ve yönetişim platformudur. Orbs Network iş birliğiyle geliştirilen ve akıllı sözleşmeler aracılığıyla çalışan bu platform, Toncoin ve diğer ekosistem token sahiplerinin ağın geleceğini şekillendirecek kritik kararlarda oy kullanmalarına olanak tanır. Platformda yapılan oylamalar, ağ doğrulayıcıları, geliştirme bütçeleri ve protokol güncellemeleri üzerinde doğrudan etkiye sahiptir. TON.Vote, topluluk odaklı merkeziyetsiz otonom organizasyonların kurulmasını ve yönetilmesini son derece basitleştirir. Güvenli kriptografik altyapısı ve kullanıcı dostu arayüzü sayesinde, TON ağında katılımcı demokrasinin ve karar alma mekanizmalarının en önemli güvencesidir.",
+    "icon": "https://picsum.photos/seed/ton-vote/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "utilities",
+      "governance"
+    ],
+    "bot_link": "@tonvote_news",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "none",
+    "languages": [
+      "🇬🇧",
+      "🇷🇺"
+    ],
+    "telegram_group": "https://t.me/tonvote_news",
+    "website_url": "https://ton.vote",
+    "app_url": null,
+    "social_url": "{\"github_url\":\"https://github.com/orbs-network/ton-vote\",\"x_url\":\"https://x.com/ton_vote\",\"youtube_url\":null,\"android_url\":null,\"ios_url\":null}",
+    "views": 8502,
+    "rating": 4.8,
+    "rating_count": 70,
+    "user_count": 50000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "BOT-REAL-2795",
+    "name": "Hipo",
+    "slug": "hipo",
+    "description": "Hipo Finance, The Open Network (TON) üzerinde geliştirilmiş, açık kaynak kodlu ve bağımsız güvenlik denetimlerinden başarıyla geçmiş yenilikçi bir likit staking protokolüdür. Kullanıcılar, Toncoin varlıklarını Hipo üzerinde stake ederek yüksek APY oranlarında pasif gelir elde ederken, karşılığında hTON likit türev tokenları alırlar. Bu sayede, stake edilen varlıklar kilitli kalmaz ve diğer DeFi platformlarında teminat veya alım satım aracı olarak kullanılmaya devam edilebilir. Hipo Club aracılığıyla topluluğu oyunlaştırılmış bir deneyimle ödüllendiren platform, kullanıcıların XP kazanarak gelecekteki $HPO yönetişim tokenı airdroplarından pay almalarını sağlar. Şeffaf, merkeziyetsiz ve topluluk odaklı yapısıyla TON DeFi ekosisteminin en güvenilir staking çözümlerinden biridir.",
+    "icon": "https://picsum.photos/seed/hipo/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "finance",
+      "crypto",
+      "defi",
+      "staking"
+    ],
+    "bot_link": "@HipoFinance",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "none",
+    "languages": [
+      "🇬🇧"
+    ],
+    "telegram_group": "https://t.me/HipoFinance",
+    "website_url": "https://hipo.finance",
+    "app_url": null,
+    "social_url": "{\"github_url\":\"https://github.com/hipofinance\",\"x_url\":\"https://x.com/hipofinance\",\"youtube_url\":\"https://www.youtube.com/@HipoFinance\",\"android_url\":null,\"ios_url\":null}",
+    "views": 5741,
+    "rating": 4.8,
+    "rating_count": 70,
+    "user_count": 50000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "BOT-REAL-2670",
+    "name": "Ton Diamonds",
+    "slug": "ton-diamonds",
+    "description": "TON Diamonds, The Open Network (TON) ekosisteminde dijital sanat eserlerine ve premium NFT koleksiyonlarına odaklanmış, yüksek kürasyon standartlarına sahip prestijli bir merkeziyetsiz NFT pazar yeri ve dijital sanat galerisidir. Sıradan NFT platformlarından farklı olarak TON Diamonds, yalnızca DAO oylamasıyla seçilen seçkin sanatçıların ve özel koleksiyonların sergilenmesine izin verir. Platformun yerel tokenı olan $ART, pazar yerindeki işlem ücretlerinin ödenmesinde, sanatçı destekleme programlarında bir sonraki adımlarda ve platform yönetişiminde aktif olarak kullanılır. Ayrıca Telegram Premium entegrasyonu ve sim kart gerektirmeyen anonim telefon numaralarının ticareti gibi benzersiz Web3 özelliklerini destekler. Estetik tasarımı, güvenli akıllı sözleşmeleri ve sanat odaklı vizyonuyla TON ağındaki dijital mülkiyetin en seçkin temsilcisidir.",
+    "icon": "https://picsum.photos/seed/ton-diamonds/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "nft",
+      "utilities"
+    ],
+    "bot_link": "@tondiamonds",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "none",
+    "languages": [
+      "🇬🇧",
+      "🇷🇺"
+    ],
+    "telegram_group": "https://t.me/tondiamonds",
+    "website_url": "https://ton.diamonds",
+    "app_url": null,
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/tondiamonds\",\"youtube_url\":null,\"android_url\":null,\"ios_url\":null}",
+    "views": 6595,
+    "rating": 4.8,
+    "rating_count": 70,
+    "user_count": 50000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "BOT-REAL-2648",
+    "name": "Coub",
+    "slug": "coub",
+    "description": "Coub, internet kültürünün popüler 10 saniyelik döngüsel video paylaşım platformudur ve Web3 dünyasına adım atarak The Open Network (TON) ekosistemine kusursuz bir şekilde entegre olmuştur. Doğrudan Telegram Mini App üzerinden erişilebilen yeni yapısıyla kullanıcılar, popüler filmlerden, memelerden ve müzik videolarından kesitler alarak yaratıcı içerikler üretir ve bunları paylaşırlar. Platform, İzle-Kazan ve Üret-Kazan mekanikleri sayesinde hem izleyicileri hem de içerik üreticilerini platformun yerel kripto para ödülleriyle ödüllendirir. Geleneksel sosyal medya platformlarını blockchain ekonomisiyle birleştirerek SocialFi alanında devrim yaratmayı hedefleyen Coub, Telegram'ın devasa kullanıcı tabanını yaratıcı ve kazançlı bir ekosistemde bir araya getirmektedir.",
+    "icon": "https://picsum.photos/seed/coub/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "social"
+    ],
+    "bot_link": "@coub",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "none",
+    "languages": [
+      "🇬🇧",
+      "🇷🇺"
+    ],
+    "telegram_group": "https://t.me/coubcommunityru",
+    "website_url": "https://coub.com",
+    "app_url": "https://t.me/coub",
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/coub\",\"youtube_url\":null,\"android_url\":null,\"ios_url\":null}",
+    "views": 4155,
+    "rating": 4.8,
+    "rating_count": 70,
+    "user_count": 50000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "BOT-REAL-2504",
+    "name": "DuckChain",
+    "slug": "duckchain",
+    "description": "DuckChain, Telegram kullanıcılarının Web3 ve merkeziyetsiz uygulamalar dünyasına en kolay ve güvenli şekilde adım atmasını sağlamak amacıyla tasarlanmış, TON tabanlı ve EVM uyumlu yenilikçi bir Layer 2 blockchain projesidir. Yapay zeka ve EVM teknolojilerini bir araya getiren DuckChain, geliştiricilerin Ethereum tabanlı uygulamalarını kolayca Telegram ekosistemine taşımasına imkan tanır. Kullanıcılar, Telegram botu üzerinden DuckChain test ağlarına ve ana ağlarına katılarak, cüzdan bağlama ve gas ücretlerini TON üzerinden ödeme gibi işlemleri saniyeler içinde gerçekleştirebilirler. Quack mekanikleriyle oyunlaştırılmış görevler sunarak kullanıcıların puan ve airdrop kazanmasını sağlayan DuckChain, Telegram'ı tam teşekküllü bir Web3 işletim sistemine dönüştürmeyi hedeflemektedir.",
+    "icon": "https://picsum.photos/seed/duckchain/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "crypto",
+      "utilities"
+    ],
+    "bot_link": "@DuckChain_bot",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "none",
+    "languages": [
+      "🇬🇧",
+      "🇨🇳"
+    ],
+    "telegram_group": "https://t.me/DuckChain_Announcement",
+    "website_url": "https://duckchain.io",
+    "app_url": "https://t.me/DuckChain_bot",
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/DuckChain_io\",\"youtube_url\":null,\"android_url\":null,\"ios_url\":null}",
+    "views": 8092,
+    "rating": 4.8,
+    "rating_count": 70,
+    "user_count": 50000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "BOT-REAL-2970",
+    "name": "Gemz",
+    "slug": "gemz",
+    "description": "Gemz, The Open Network (TON) altyapısıyla Telegram üzerinde çalışan, sevimli ve stratejik bir madencilik simülasyonu ve Tıkla-Kazan oyunudur. Oyuncular, ekrana dokunarak oyun içi altınları toplar ve bu altınları kullanarak madencilik ekipmanlarını, PR departmanını ve yasal lisansları yükselterek saatlik pasif gelirlerini maksimize etmeye çalışırlar. Hamster Kombat benzeri günlük kombo kartları, şifreli kod çözme görevleri ve sosyal medya etkileşimleriyle oyunculara sürekli olarak ekstra ödüller sunulur. Gelişmiş arkadaş davet sistemleri ve topluluk etkinlikleriyle sosyal dinamikleri ön planda tutan Gemz, kullanıcı dostu arayüzü ve gelecekteki token airdrop beklentisiyle milyonlarca aktif kripto meraklısını bünyesinde barındıran son derece başarılı bir GameFi projesidir.",
+    "icon": "https://picsum.photos/seed/gemz/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "games",
+      "crypto"
+    ],
+    "bot_link": "@gemzcoin_bot",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "none",
+    "languages": [
+      "🇬🇧",
+      "🇷🇺",
+      "🇹🇷"
+    ],
+    "telegram_group": "https://t.me/gemz_announcements",
+    "website_url": "https://gemz.co",
+    "app_url": "https://t.me/gemzcoin_bot",
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/gemzcoin\",\"youtube_url\":\"https://www.youtube.com/@gemzcoin\",\"android_url\":null,\"ios_url\":null}",
+    "views": 9792,
+    "rating": 4.8,
+    "rating_count": 70,
+    "user_count": 50000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "REAL-TON-APP-026",
+    "name": "Fragment",
+    "slug": "fragment",
+    "description": "Fragment, Telegram kurucusu Pavel Durov tarafından hayata geçirilen, benzersiz Telegram kullanıcı adları (usernames), anonim sanal telefon numaraları ve Telegram reklam hakları gibi dijital varlıkların TON blockchain ağı üzerinde NFT olarak alınıp satılmasını sağlayan resmi ve merkeziyetsiz bir açık artırma platformudur. Tamamen on-chain (zincir üstü) çalışan bu yenilikçi pazar yeri, dijital kimliklerin ve nadir varlıkların şeffaf, güvenli ve kalıcı bir şekilde sahiplenilmesine olanak tanır. Satışların tamamı Toncoin (TON) ile gerçekleştirilir ve milyonlarca dolarlık işlem hacmiyle TON ağının ekonomik olarak en aktif ve en prestijli platformlarından biri olma özelliğini taşır.",
+    "icon": "https://picsum.photos/seed/fragment/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "utility",
+      "crypto"
+    ],
+    "bot_link": "@fragment",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "none",
+    "languages": [
+      "🇬🇧"
+    ],
+    "telegram_group": "https://t.me/fragment",
+    "website_url": "https://fragment.com",
+    "app_url": null,
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/fragment\",\"youtube_url\":null,\"android_url\":null,\"ios_url\":null}",
+    "views": 8279,
+    "rating": 4.8,
+    "rating_count": 70,
+    "user_count": 50000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "BOT-REAL-2999",
+    "name": "SEED",
+    "slug": "seed",
+    "description": "SEED, Sui Vakfı (Sui Foundation) tarafından desteklenen ve Playable Studio tarafından geliştirilen, Telegram üzerinde çalışan son derece popüler bir Web3 sosyal simülasyon ve oyna-kazan (play-to-earn) oyunudur. Oyuncular, sanal bir ekosistemde tohumlar eker, bitkiler yetiştirir, nadir böcekler toplar ve sevimli kuş NFT'lerini (SEED Birds) besleyerek ekosistemlerini büyütürler. Geleneksel basit tıklama oyunlarının ötesine geçerek derinlikli bir tarım ve ticaret simülasyonu sunan proje, oyunculara oyun içi varlıkları üzerinde gerçek mülkiyet hakkı tanır. Kendi yerel tokenı olan $SEED ile ekonomik döngüsünü kuran platform, yenilikçi oyun yapısı ve milyonlarca aktif kullanıcısıyla Telegram ekosisteminin en başarılı GameFi projelerinden biridir.",
+    "icon": "https://picsum.photos/seed/seed/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "games",
+      "crypto"
+    ],
+    "bot_link": "@seed_coin_bot",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "none",
+    "languages": [
+      "🇬🇧"
+    ],
+    "telegram_group": "https://t.me/seed_coin_channel",
+    "website_url": null,
+    "app_url": "https://t.me/seed_coin_bot",
+    "social_url": "{\"github_url\":null,\"x_url\":null,\"youtube_url\":null,\"android_url\":null,\"ios_url\":null}",
+    "views": 11408,
+    "rating": 4.8,
+    "rating_count": 70,
+    "user_count": 50000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "BOT-REAL-3001",
+    "name": "TADA mini",
+    "slug": "tada-mini",
+    "description": "TADA mini, Güneydoğu Asya'nın popüler araç çağırma platformu TADA tarafından TON Foundation ortaklığıyla geliştirilen ve doğrudan Telegram üzerinden çalışan devrim niteliğinde bir Web3 Mini App uygulamasıdır. Kullanıcılar, ek bir uygulama indirmeden veya kayıt olmadan doğrudan Telegram mesajlaşma arayüzü üzerinden taksi veya araç rezervasyonu yapabilir ve ödemelerini Toncoin (TON) veya USDT (TON) ile saniyeler içinde tamamlayabilirler. Singapur, Tayland, Vietnam ve Kamboçya gibi ülkelerde 300 binden fazla sürücüyü bünyesinde barındıran TADA, sıfır komisyon politikasıyla hem sürücüler hem de yolcular için en adil fiyatları sunar. Günlük görevler ve davet sistemleriyle kripto ödülleri de kazandıran bu yenilikçi proje, Web2 geleneksel hizmetlerinin Web3 dünyasına kitlesel entegrasyonunun en başarılı ve somut örneklerinden biridir.",
+    "icon": "https://picsum.photos/seed/tada-mini/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "utilities"
+    ],
+    "bot_link": "@TADA_Ride_Bot",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "none",
+    "languages": [
+      "🇬🇧",
+      "🇨🇳",
+      "🇻🇳",
+      "🇰🇭"
+    ],
+    "telegram_group": null,
+    "website_url": "https://tada.global",
+    "app_url": "https://t.me/TADA_Ride_Bot",
+    "social_url": "{\"github_url\":null,\"x_url\":null,\"youtube_url\":null,\"android_url\":\"https://play.google.com/store/apps/details?id=com.mvlchain.tada\",\"ios_url\":\"https://apps.apple.com/app/tada-ride-hailing/id1438853874\"}",
+    "views": 8788,
+    "rating": 4.8,
+    "rating_count": 70,
+    "user_count": 50000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "BOT-REAL-3002",
+    "name": "TonMobile eSIM",
+    "slug": "tonmobile-esim",
+    "description": "TonMobile eSIM, seyahat edenlerin fahiş dolaşım (roaming) ücretlerinden kurtulmasını sağlayan ve doğrudan TON ekosistemiyle entegre çalışan yeni nesil bir dijital SIM kart (eSIM) sağlayıcısıdır. Kullanıcılar, fiziksel bir SIM karta ihtiyaç duymadan, dünya genelinde 180'den fazla ülkede geçerli olan uygun fiyatlı mobil internet paketlerini saniyeler içinde satın alıp aktif hale getirebilirler. Platformun en büyük avantajlarından biri, ödemelerin kredi kartlarının yanı sıra Toncoin (TON) veya diğer popüler kripto para birimleriyle de yapılabilmesidir. Hem bağımsız mobil uygulamaları hem de pratik Telegram botu üzerinden çalışan bu yenilikçi seyahat aracı, fiziksel evrak işlerini ortadan kaldırarak küresel internet erişimini son derece hızlı, güvenli, ekonomik ve Web3 dostu bir deneyime dönüştürür.",
+    "icon": "https://picsum.photos/seed/tonmobile-esim/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "utilities"
+    ],
+    "bot_link": "@tonmobile_esim",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "none",
+    "languages": [
+      "🇬🇧",
+      "🇷🇺"
+    ],
+    "telegram_group": "https://t.me/tonmobile_esim",
+    "website_url": "https://tonmobile.travel",
+    "app_url": null,
+    "social_url": "{\"github_url\":null,\"x_url\":null,\"youtube_url\":null,\"android_url\":\"https://play.google.com/store/apps/details?id=com.tonmobile.travel\",\"ios_url\":\"https://apps.apple.com/app/tonmobile-esim-travel-data/id1614742661\"}",
+    "views": 11011,
+    "rating": 4.8,
+    "rating_count": 70,
+    "user_count": 50000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "BOT-REAL-3003",
+    "name": "Tonnel Network",
+    "slug": "tonnel-network",
+    "description": "Tonnel Network, TON (The Open Network) blockchain ağı üzerinde geliştirilmiş ilk ve en popüler sıfır bilgi kanıtı (Zero-Knowledge) tabanlı gizlilik protokolüdür. Ethereum ağındaki Tornado Cash protokolüne benzer bir coin karıştırma (coin mixing) mantığıyla çalışan Tonnel, kullanıcıların işlem geçmişlerini ve cüzdan bakiyelerini tamamen anonim hale getirmelerine olanak tanır. Kullanıcılar, TON, Jetton tokenları veya NFT'lerini ortak bir akıllı sözleşme havuzuna yatırıp, daha sonra bu fonları tamamen farklı ve izi sürülemez yeni adreslere güvenle çekebilirler. Açık kaynak kodlu yapısı ve merkeziyetsiz yönetim modeliyle öne çıkan Tonnel Network, TON blockchain ağının şeffaf yapısı içinde kişisel finansal gizliliğini korumak isteyen Web3 kullanıcıları için vazgeçilmez ve son derece güvenli bir altyapı aracıdır.",
+    "icon": "https://picsum.photos/seed/tonnel-network/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "utilities",
+      "security_privacy"
+    ],
+    "bot_link": "@tonnel_network_bot",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "none",
+    "languages": [
+      "🇬🇧",
+      "🇷🇺"
+    ],
+    "telegram_group": "https://t.me/tonnel_network",
+    "website_url": "https://tonnel.network",
+    "app_url": "https://t.me/tonnel_network_bot",
+    "social_url": "{\"github_url\":\"https://github.com/tonnel-network\",\"x_url\":\"https://x.com/tonnel_network\",\"youtube_url\":null,\"android_url\":null,\"ios_url\":null}",
+    "views": 9652,
+    "rating": 4.8,
+    "rating_count": 70,
+    "user_count": 50000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "BOT-REAL-3004",
+    "name": "Tonstarter",
+    "slug": "tonstarter",
+    "description": "Tonstarter, TON (The Open Network) blockchain ağı üzerinde geliştirilen ilk, en büyük ve en güvenilir merkeziyetsiz proje fonlama ve ön satış (launchpad) platformudur. Platform, Web3 girişimcilerinin ve yeni projelerin erken aşamada topluluktan fon toplamasına olanak tanırırken, yatırımcılara da gelecek vadeden projelere güvenli ve adil bir şekilde erken yatırım yapma fırsatı sunar. Akıllı sözleşmelerle güvence altına alınan adil dağıtım (fair launch) modelleri ve sıkı güvenlik denetimlerinden geçen projeleri listelemesiyle tanınan Tonstarter, TON ekosisteminin büyümesinde kritik bir katalizör görevi üstlenmektedir. Kullanıcı dostu arayüzü sayesinde cüzdanlarını bağlayan yatırımcılar, Toncoin (TON) kullanarak ön satışlara ve airdrop kampanyalarına kolayca katılabilir, ekosistemin en yeni fırsatlarını güvenle keşfedebilirler.",
+    "icon": "https://picsum.photos/seed/tonstarter/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "finance",
+      "crypto"
+    ],
+    "bot_link": "@tonstarter",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "none",
+    "languages": [
+      "🇬🇧",
+      "🇷🇺"
+    ],
+    "telegram_group": "https://t.me/tonstarter",
+    "website_url": "https://tonstarter.com",
+    "app_url": null,
+    "social_url": "{\"github_url\":\"https://github.com/tonstarter\",\"x_url\":\"https://x.com/tonstarter\",\"youtube_url\":null,\"android_url\":null,\"ios_url\":null}",
+    "views": 6031,
+    "rating": 4.8,
+    "rating_count": 70,
+    "user_count": 50000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "BOT-REAL-3006",
+    "name": "SafePal",
+    "slug": "safepal",
+    "description": "SafePal, dünya genelinde milyonlarca kullanıcıya hizmet veren ve TON (The Open Network) blockchain altyapısını hem yazılımsal hem de donanımsal cüzdanlarında tam olarak destekleyen küresel ölçekte lider bir kripto para cüzdan ekosistemidir. Binance Labs tarafından desteklenen platform; mobil uygulama, tarayıcı uzantısı ve askeri düzeyde güvenliğe sahip SafePal S1 donanım cüzdanı olmak üzere üçlü bir güvenlik katmanı sunar. Kullanıcılar, Toncoin ve TON tabanlı tüm varlıklarını tamamen güvenli bir ortamda saklayabilir, dahili dApp tarayıcısı sayesinde TON DeFi protokollerine doğrudan bağlanabilir ve cüzdan içi hızlı takas (swap) özelliklerini kullanabilirler. Çoklu zincir desteği ve yüksek güvenlik standartları ile SafePal, TON ekosistemindeki varlıklarını profesyonel düzeyde korumak isteyen yatırımcıların bir numaralı tercihidir.",
+    "icon": "https://picsum.photos/seed/safepal/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "utilities",
+      "wallets"
+    ],
+    "bot_link": "@SafePal_official",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "none",
+    "languages": [
+      "🇬🇧",
+      "🇨🇳",
+      "🇹🇷",
+      "🇷🇺",
+      "🇪🇸"
+    ],
+    "telegram_group": "https://t.me/SafePal_official",
+    "website_url": "https://safepal.com",
+    "app_url": null,
+    "social_url": "{\"github_url\":\"https://github.com/SafePalWallet\",\"x_url\":\"https://x.com/iSafePal\",\"youtube_url\":null,\"android_url\":\"https://play.google.com/store/apps/details?id=io.safepal.wallet\",\"ios_url\":\"https://apps.apple.com/app/safepal-crypto-wallet/id1548297139\"}",
+    "views": 8762,
+    "rating": 4.8,
+    "rating_count": 70,
+    "user_count": 50000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "BOT-REAL-3007",
+    "name": "TON Station",
+    "slug": "ton-station",
+    "description": "TON Station, oyun sektörünün devleri SIDUS HEROES ve SuperVerse tarafından ortaklaşa geliştirilen, TON blockchain ağı üzerinde çalışan lider bir Web3 oyun dağıtım (launcher) ve sosyal madencilik platformudur. Geleneksel basit tıklama oyunlarının ötesine geçerek kaliteli Web3 oyunlarını tek bir çatı altında toplayan platform, kullanıcılarına zengin bir oyun kütüphanesi sunar. Kullanıcılar, her sekiz saatte bir uygulamaya girerek platformun yerel tokenı olan $SOON madenciliğini yapabilir, günlük görevleri (Daily Combo) tamamlayabilir ve özel turnuvalara katılarak ödüller kazanabilirler. Güçlü ortaklıkları, sürdürülebilir ekonomik modeli ve 10 milyondan fazla kayıtlı kullanıcısıyla TON Station, Telegram ekosistemindeki en prestijli oyun mağazası ve airdrop dağıtım merkezlerinden biri konumundadır.",
+    "icon": "https://picsum.photos/seed/ton-station/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "games",
+      "crypto"
+    ],
+    "bot_link": "@tonstationgames_bot",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "none",
+    "languages": [
+      "🇬🇧"
+    ],
+    "telegram_group": "https://t.me/tonstationgames",
+    "website_url": "https://tonstation.app",
+    "app_url": "https://t.me/tonstationgames_bot",
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/tonstationgames\",\"youtube_url\":null,\"android_url\":null,\"ios_url\":null}",
+    "views": 9570,
+    "rating": 4.8,
+    "rating_count": 70,
+    "user_count": 50000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "BOT-REAL-3008",
+    "name": "GOATS",
+    "slug": "goats",
+    "description": "GOATS, TON blockchain ağı üzerinde çalışan ve internet mem kültürünü eğlenceli mini oyunlarla birleştiren son derece popüler bir Web3 oyunlaştırma (GameFi) platformudur. Telegram botu üzerinden çalışan bu yenilikçi Mini App; yazı-tura, zar atma ve şans çarkı gibi eğlenceli ve heyecanlı mini oyunlar sunarak kullanıcıların $GOATS tokenları kazanmalarına olanak tanır. Dogs ve Cats projelerine benzer bir şekilde topluluk odaklı büyüyen platform, kullanıcıların kazandıkları puanları doğrudan TON uyumlu cüzdanlarına çekebilmelerini sağlayarak adil bir ödül mekanizması sunar. Kısa sürede 20 milyondan fazla aktif oyuncuya ulaşan GOATS, hem eğlenceli oyun dinamikleri hem de büyük borsalarda listelenen güçlü token ekonomisiyle TON ekosisteminin en başarılı memecoin projelerinden biridir.",
+    "icon": "https://picsum.photos/seed/goats/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "games",
+      "crypto"
+    ],
+    "bot_link": "@realgoats_bot",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "none",
+    "languages": [
+      "🇬🇧"
+    ],
+    "telegram_group": "https://t.me/realgoats_channel",
+    "website_url": "https://ton.goatsbot.xyz",
+    "app_url": "https://t.me/realgoats_bot",
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/GOATS_immortal\",\"youtube_url\":null,\"android_url\":null,\"ios_url\":null}",
+    "views": 6420,
+    "rating": 4.8,
+    "rating_count": 70,
+    "user_count": 50000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "BOT-REAL-3009",
+    "name": "Tradoor",
+    "slug": "tradoor",
+    "description": "Tradoor, TON blockchain ağı üzerinde çalışan ve Telegram Mini App entegrasyonu sayesinde doğrudan mesajlaşma uygulaması üzerinden 100x'e kadar kaldıraçla işlem yapma imkanı sunan ilk ve en hızlı merkeziyetsiz vadeli işlemler (DEX Perpetuals) ve opsiyon platformudur. Gelişmiş NDMM (Normal Dağılım Tabanlı Piyasa Yapıcı) algoritmasını kullanan platform, sıfır slipaj ve 50 milisaniye gibi rekor bir sürede işlem onayı sunarak merkezi borsaların (CEX) hızını DeFi dünyasına taşır. Kullanıcıların cüzdanlarını bağlayarak tamamen anonim ve güvenli bir şekilde Bitcoin, Ethereum ve TON vadeli işlemleri yapmalarun sağlayan Tradoor, yapay zeka destekli Quant AI asistanı sayesinde kullanıcıların ticaret stratejilerini otomatikleştirmelerine de olanak tanıyarak benzersiz bir DeFi deneyimi sunmaktadır.",
+    "icon": "https://picsum.photos/seed/tradoor/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "finance",
+      "crypto",
+      "defi"
+    ],
+    "bot_link": "@tradoor_io_bot",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "none",
+    "languages": [
+      "🇬🇧",
+      "🇹🇷",
+      "🇷🇺",
+      "🇨🇳"
+    ],
+    "telegram_group": "https://t.me/tradoor_io",
+    "website_url": "https://tradoor.io",
+    "app_url": "https://t.me/tradoor_io_bot",
+    "social_url": "{\"github_url\":null,\"x_url\":\"https://x.com/tradoor_io\",\"youtube_url\":null,\"android_url\":null,\"ios_url\":null}",
+    "views": 10619,
+    "rating": 4.8,
+    "rating_count": 70,
+    "user_count": 50000,
     "commands": [
       "/start"
     ]
