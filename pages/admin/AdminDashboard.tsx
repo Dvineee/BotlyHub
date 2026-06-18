@@ -913,15 +913,23 @@ const BotManagement = () => {
                                                     </div>
                                                 </div>
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 md:col-span-2">
+                                                    <div className="md:col-span-2 p-6 bg-brand/5 border border-brand/20 rounded-[28px] space-y-6">
+                                                        <h4 className="text-[10px] font-black uppercase tracking-widest text-[#38bdf8] italic flex items-center gap-2">
+                                                            <Smartphone size={14} /> UYGULAMA ERİŞİM LİNKLERİ (ANDROID / IOS / TGAPP)
+                                                        </h4>
+                                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                                            <AdminInput label="ANDROID CİHAZ LİNKİ (PLAY STORE)" value={editingBot.android_url || ''} onChange={(v:any)=>setEditingBot({...editingBot, android_url:v})} placeholder="https://play.google.com/..." />
+                                                            <AdminInput label="IOS CİHAZ LİNKİ (APP STORE)" value={editingBot.ios_url || ''} onChange={(v:any)=>setEditingBot({...editingBot, ios_url:v})} placeholder="https://apps.apple.com/..." />
+                                                            <AdminInput label="TELEGRAM APP (TGAPP)" value={editingBot.app_url || ''} onChange={(v:any)=>setEditingBot({...editingBot, app_url:v})} placeholder="https://t.me/your_bot_or_app" />
+                                                        </div>
+                                                    </div>
+
                                                     <AdminInput label="TELEGRAM GRUP (@)" value={editingBot.telegram_group || ''} onChange={(v:any)=>setEditingBot({...editingBot, telegram_group:v})} placeholder="@groupname" />
                                                     <AdminInput label="WEB SİTE URL" value={editingBot.website_url || ''} onChange={(v:any)=>setEditingBot({...editingBot, website_url:v})} placeholder="https://..." />
-                                                    <AdminInput label="APP URL" value={editingBot.app_url || ''} onChange={(v:any)=>setEditingBot({...editingBot, app_url:v})} placeholder="https://..." />
                                                     <AdminInput label="GITHUB URL" value={editingBot.github_url || ''} onChange={(v:any)=>setEditingBot({...editingBot, github_url:v})} placeholder="https://github.com/..." />
                                                     <AdminInput label="YOUTUBE URL" value={editingBot.youtube_url || ''} onChange={(v:any)=>setEditingBot({...editingBot, youtube_url:v})} placeholder="https://youtube.com/..." />
                                                     <AdminInput label="X / TWITTER URL" value={editingBot.x_url || ''} onChange={(v:any)=>setEditingBot({...editingBot, x_url:v})} placeholder="https://x.com/..." />
                                                     <AdminInput label="SOSYAL MEDYA URL" value={editingBot.social_url || ''} onChange={(v:any)=>setEditingBot({...editingBot, social_url:v})} placeholder="https://..." />
-                                                    <AdminInput label="ANDROID CİHAZ LİNKİ (PLAY STORE)" value={editingBot.android_url || ''} onChange={(v:any)=>setEditingBot({...editingBot, android_url:v})} placeholder="https://play.google.com/..." />
-                                                    <AdminInput label="IOS CİHAZ LİNKİ (APP STORE)" value={editingBot.ios_url || ''} onChange={(v:any)=>setEditingBot({...editingBot, ios_url:v})} placeholder="https://apps.apple.com/..." />
                                                 </div>
                                             </div>
                                             <div className="space-y-2">

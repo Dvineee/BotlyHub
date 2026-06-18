@@ -161,12 +161,13 @@ export const realBotsData = [
     "id": "bot-6",
     "name": "Crypto Bot",
     "slug": "crypto-bot",
-    "description": "Kripto varlıkları güvenli bir şekilde saklamanızı, P2P (kişiden kişiye) ticaret yapmanızı, fatura oluşturmanızı ve anında para transfer etmenizi sağlayan Telegram'ın en köklü kripto para cüzdan botu.",
+    "description": "Crypto Bot, doğrudan Telegram uygulaması içerisinde yerleşik olarak çalışan, kullanıcıların kripto paraları saniyeler içinde alıp satmasını, göndermesini ve saklamasını sağlayan bir finansal asistandır. Harici bir uygulama indirme gereksinimi duymadan, mevcut Telegram arayüzünüzde bir banka uygulaması kolaylığında hizmet sunar. Özellikle TON ekosistemiyle derin entegrasyonu sayesinde, jeton transferleri ve cüzdan yönetimi sadece bir mesaj göndermek kadar kolay hale gelir. Crypto Bot, P2P (kişiden kişiye) ticaret piyasasını destekleyerek, kullanıcıların farklı ödeme yöntemleriyle kripto almasına ve satmasına olanak tanır. Güvenlik, Telegram'ın kendi altyapısı ve platformun sunduğu ek şifreleme yöntemleriyle sağlanır. Uygulama, sosyal etkileşimi finansal işlemlerle birleştirerek, kripto dünyasına girişi demokratikleştiren ve her yaştan kullanıcı için ulaşılabilir kılan benzersiz bir yapıya sahiptir. Günlük işlemler için hız ve pratiklik arayanlar için en ideal çözüm olma özelliğini sürdürmektedir.",
     "icon": "https://picsum.photos/seed/cryptobot/200",
     "price": 0,
     "category": [
       "finance",
-      "crypto"
+      "crypto",
+      "wallets"
     ],
     "bot_link": "@CryptoBot",
     "screenshots": [],
@@ -174,13 +175,12 @@ export const realBotsData = [
     "promoted_type": "official",
     "languages": [
       "🇬🇧",
-      "🇹🇷",
       "🇷🇺"
     ],
-    "telegram_group": null,
-    "website_url": "https://c-p2p.com",
+    "telegram_group": "https://t.me/CryptoBot",
+    "website_url": "https://crypto.bot/",
     "app_url": "https://t.me/CryptoBot",
-    "social_url": null,
+    "social_url": "{\"x_url\":\"https://x.com/CryptoBot\"}",
     "views": 7300,
     "rating": 4.9,
     "rating_count": 1400,
@@ -10094,6 +10094,137 @@ export const realBotsData = [
     "rating": 4.4,
     "rating_count": 180,
     "user_count": 720000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "bot-310",
+    "name": "Bitget Wallet",
+    "slug": "bitget-wallet",
+    "description": "Bitget Wallet, çok zincirli (multi-chain) yapısıyla dünya genelinde milyonlarca kullanıcıya hizmet veren, Web3 dünyasının en kapsamlı cüzdanlarından biridir. TON ağı ile tam entegre çalışarak jeton takasları, NFT yönetimi ve merkeziyetsiz uygulama erişimi konularında kusursuz bir deneyim sunar. Uygulamanın en güçlü yanı, Bitget borsasıyla olan entegrasyonu sayesinde merkezi ve merkeziyetsiz finans arasındaki köprüyü kolayca kurabilmesidir. Gelişmiş güvenlik önlemleri, çoklu imza desteği ve akıllı sözleşme analiz araçları ile kullanıcıların varlıklarını her türlü siber tehdide karşı korur. Kullanıcı dostu arayüzü sayesinde, yeni nesil kripto yatırımcılarının karmaşık DeFi işlemlerini dahi saniyeler içinde gerçekleştirmesine imkan tanır. Hem mobil uygulamaları hem de tarayıcı eklentisi ile her platformda erişilebilir olan Bitget Wallet, Web3 ekosistemindeki en güçlü ve güvenilir yönetim araçlarından biri olma konumunu korumaktadır.",
+    "icon": "https://picsum.photos/seed/bitgetwallet/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "finance",
+      "crypto",
+      "wallets"
+    ],
+    "bot_link": "@BitgetWallet",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "featured",
+    "languages": [
+      "🇬🇧",
+      "🇹🇷",
+      "🇨🇳",
+      "🇷🇺"
+    ],
+    "telegram_group": "https://t.me/Bitget_Wallet_Official",
+    "website_url": "https://web3.bitget.com/",
+    "app_url": null,
+    "social_url": "{\"github_url\":\"https://github.com/BitgetWallet\",\"x_url\":\"https://x.com/BitgetWallet\",\"android_url\":\"https://play.google.com/store/apps/details?id=com.bitget.wallet\",\"ios_url\":\"https://apps.apple.com/app/bitget-wallet/id1534015694\"}",
+    "views": 4500,
+    "rating": 4.8,
+    "rating_count": 120,
+    "user_count": 50000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "bot-311",
+    "name": "Tonhub",
+    "slug": "tonhub",
+    "description": "Tonhub, The Open Network ekosistemi için özel olarak geliştirilmiş, sadeleştirilmiş arayüzü ve üstün hızıyla tanınan mobil tabanlı bir gözetimsiz (non-custodial) cüzdandır. Kullanıcıların dijital varlıklarını yönetirken yaşadıkları karmaşayı ortadan kaldırmak için tasarlanan uygulama, 'tek dokunuşla işlem' mantığıyla çalışır. Tonhub'ın en dikkat çeken yönü, yerleşik staking desteği sayesinde kullanıcıların sahip oldukları TON'ları kolaylıkla stake ederek pasif gelir elde etmelerine olanak tanımasıdır. Uygulama, güvenlik protokolleri gereği cihazın güvenli donanımını kullanarak özel anahtarların asla dış dünyaya sızmamasını sağlar. Ayrıca, TON tabanlı uygulama ve hizmetler için güvenli bir giriş kapısı (dApp browser) işlevi görür. Tasarımıyla hem şık hem de işlevsel bir deneyim sunan Tonhub, TON ağının sağladığı teknik avantajları, herkesin anlayabileceği akıcı bir kullanıcı deneyimine dönüştürmeyi başaran öncü cüzdanlardan biridir.",
+    "icon": "https://picsum.photos/seed/tonhub/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "finance",
+      "crypto",
+      "wallets"
+    ],
+    "bot_link": "@tonhub",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "featured",
+    "languages": [
+      "🇬🇧"
+    ],
+    "telegram_group": "https://t.me/tonhub",
+    "website_url": "https://tonhub.com/",
+    "app_url": null,
+    "social_url": "{\"x_url\":\"https://x.com/tonhub_wallet\",\"android_url\":\"https://play.google.com/store/apps/details?id=com.tonhub.app\",\"ios_url\":\"https://apps.apple.com/app/tonhub/id1573215286\"}",
+    "views": 3100,
+    "rating": 4.7,
+    "rating_count": 140,
+    "user_count": 65000,
+    "commands": [
+      "/start"
+    ]
+  },
+  {
+    "id": "bot-312",
+    "name": "Vertus",
+    "slug": "vertus",
+    "description": "Vertus, Telegram ekosistemi içerisinde entegre bir şekilde çalışan, kullanıcıların dijital varlıklarını yönetmeleri ve ağ üzerinde aktif birer katılımcı olmaları için tasarlanmış yenilikçi bir cüzdan platformudur. Uygulama, sadece bir cüzdan değil, aynı zamanda kullanıcıların TON ağı üzerinde 'kazan ve yönet' mantığıyla çalışan aktiviteler gerçekleştirmelerine olanak tanıyan bir Web3 aracıdır. Vertus'un sunduğu en önemli avantaj, kullanıcıların ağ üzerindeki işlemlerini Telegram arayüzünden hiç çıkmadan, yüksek hızda gerçekleştirebilmeleridir. Güvenli saklama özelliklerinin yanı sıra, uygulama içi ödül sistemleri ile ekosisteme katkı sağlayan kullanıcıları teşvik eder. Kullanıcı deneyimi açısından oldukça basit bir yapı sunan Vertus, kripto para dünyasına yeni adım atanlar için düşük giriş bariyerleri oluşturur. Uygulamanın arkasındaki şeffaf çalışma prensipleri ve topluluk odaklı gelişimi, onu Telegram tabanlı projeler arasında öne çıkaran temel unsurlardır. Hızlı, güvenilir ve sosyal bir cüzdan deneyimi arayanlar için Vertus, TON ağındaki finansal aktiviteleri kolaylaştıran pratik bir çözümdür.",
+    "icon": "https://picsum.photos/seed/vertus/200",
+    "price": 0,
+    "category": [
+      "finance",
+      "crypto",
+      "wallets"
+    ],
+    "bot_link": "@vertus_app",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "latest",
+    "languages": [
+      "🇬🇧"
+    ],
+    "telegram_group": "https://t.me/vertus_app",
+    "website_url": "https://vertus.app/",
+    "app_url": "https://t.me/vertus_app",
+    "social_url": "{\"x_url\":\"https://x.com/vertus_app\"}",
+    "views": 3800,
+    "rating": 4.6,
+    "rating_count": 190,
+    "user_count": 85000,
+    "commands": [
+      "/start",
+      "/play"
+    ]
+  },
+  {
+    "id": "bot-313",
+    "name": "Paybis Wallet",
+    "slug": "paybis-wallet",
+    "description": "Paybis Wallet, geniş bir kripto varlık yelpazesini destekleyen, kullanıcıların hem kripto alıp satabildiği hem de güvenle saklayabildiği profesyonel bir dijital varlık yönetim platformudur. Paybis'in köklü borsa altyapısıyla entegre olan cüzdan, kullanıcıların kredi kartı veya banka transferi gibi geleneksel yöntemlerle kripto para alımlarını doğrudan cüzdan içerisinden gerçekleştirmelerine olanak tanır. TON ağı ile uyumlu çalışması, kullanıcıların TON tabanlı varlıklarını diğer büyük kripto paralarla (BTC, ETH vb.) hızlıca yönetmelerini sağlar. Uygulama, güvenlik standartları konusunda yüksek hassasiyet göstererek, iki aşamalı doğrulama ve biyometrik giriş gibi özelliklerle varlıklarınızı korur. Profesyonel yatırımcılar için sunduğu detaylı işlem geçmişi ve portföy izleme araçları, Paybis'i çok yönlü bir çözüm haline getirir. Hem mobil hem de web platformlarında tutarlı ve güçlü bir altyapı sunan Paybis Wallet, dijital varlıklarını merkezi bir borsa güvencesiyle ve merkeziyetsiz bir cüzdan rahatlığıyla yönetmek isteyenler için ideal bir seçenektir.",
+    "icon": "https://picsum.photos/seed/paybis/200",
+    "price": 0,
+    "category": [
+      "apps",
+      "finance",
+      "crypto",
+      "wallets"
+    ],
+    "bot_link": "@paybis",
+    "screenshots": [],
+    "is_official": true,
+    "promoted_type": "featured",
+    "languages": [
+      "🇬🇧"
+    ],
+    "telegram_group": "https://t.me/paybis",
+    "website_url": "https://paybis.com/",
+    "app_url": null,
+    "social_url": "{\"x_url\":\"https://x.com/paybis\",\"android_url\":\"https://play.google.com/store/apps/details?id=com.paybis.wallet\",\"ios_url\":\"https://apps.apple.com/app/paybis/id1588829631\"}",
+    "views": 2905,
+    "rating": 4.5,
+    "rating_count": 95,
+    "user_count": 42000,
     "commands": [
       "/start"
     ]

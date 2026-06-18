@@ -1484,13 +1484,24 @@ const BotDetail = () => {
     PriceService.getTonPrice().then((p) => setTonRate(p.tonTry));
   }, []);
 
-  const openPlatformLink = useCallback((platform: 'android' | 'ios' | 'default', customDefaultUrl?: string) => {
+  const openPlatformLink = useCallback((platform: 'android' | 'ios' | 'tgapp' | 'default', customDefaultUrl?: string) => {
     if (!bot) return;
     let url = '';
     if (platform === 'android') {
       url = bot.android_url || '';
     } else if (platform === 'ios') {
       url = bot.ios_url || '';
+    } else if (platform === 'tgapp') {
+      url = bot.app_url || '';
+      if (!url) {
+        const username = bot.bot_link
+          .replace("@", "")
+          .replace("https://t.me/", "")
+          .split("/")
+          .pop()
+          ?.trim();
+        url = `https://t.me/${username}`;
+      }
     } else {
       url = customDefaultUrl || bot.app_url || '';
       if (!url) {
@@ -1522,14 +1533,21 @@ const BotDetail = () => {
 
     const hasAndroid = !!bot.android_url?.trim();
     const hasIos = !!bot.ios_url?.trim();
+    const hasTgApp = !!bot.app_url?.trim();
 
-    if (isApp && (hasAndroid || hasIos)) {
-      if (hasAndroid && hasIos) {
+    if (isApp) {
+      const availablePlatforms: ('android' | 'ios' | 'tgapp')[] = [];
+      if (hasAndroid) availablePlatforms.push('android');
+      if (hasIos) availablePlatforms.push('ios');
+      if (hasTgApp) availablePlatforms.push('tgapp');
+
+      if (availablePlatforms.length > 1) {
         setShowPlatformChoiceModal(true);
-      } else if (hasAndroid) {
-        openPlatformLink('android');
-      } else if (hasIos) {
-        openPlatformLink('ios');
+      } else if (availablePlatforms.length === 1) {
+        const singlePlatform = availablePlatforms[0];
+        openPlatformLink(singlePlatform);
+      } else {
+        openPlatformLink('default', customDefaultUrl);
       }
     } else {
       openPlatformLink('default', customDefaultUrl);
@@ -3267,6 +3285,28 @@ const BotDetail = () => {
                       </div>
                       <div className="text-[9px] text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-0.5">
                         APP STORE ÜZERİNDEN AÇIN
+                      </div>
+                    </div>
+                  </button>
+                )}
+
+                {bot.app_url && (
+                  <button
+                    onClick={() => {
+                      setShowPlatformChoiceModal(false);
+                      openPlatformLink('tgapp');
+                    }}
+                    className="w-full p-4 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-white/5 dark:hover:bg-white/10 border border-slate-100 dark:border-white/5 flex items-center gap-4 text-left transition-all active:scale-[0.98]"
+                  >
+                    <div className="w-9 h-9 rounded-lg bg-sky-500/10 text-sky-500 flex items-center justify-center shrink-0">
+                      <Send size={18} />
+                    </div>
+                    <div>
+                      <div className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                        TELEGRAM APP İLE BAŞLAT
+                      </div>
+                      <div className="text-[9px] text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-0.5">
+                        TELEGRAM MINI APP / WEB APP ÜZERİNDEN AÇIN
                       </div>
                     </div>
                   </button>

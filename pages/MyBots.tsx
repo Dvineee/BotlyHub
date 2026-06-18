@@ -160,15 +160,23 @@ const MyBots = () => {
       }
   };
 
-  const openPlatformLink = (bot: UserBot, platform: 'android' | 'ios' | 'default') => {
+  const openPlatformLink = (bot: UserBot, platform: 'android' | 'ios' | 'tgapp' | 'default') => {
       let url = '';
       if (platform === 'android') {
           url = bot.android_url || '';
       } else if (platform === 'ios') {
           url = bot.ios_url || '';
+      } else if (platform === 'tgapp') {
+          url = bot.app_url || '';
+          if (!url) {
+              let botLink = bot.bot_link || '';
+              url = botLink.startsWith('http') ? botLink : `https://t.me/${botLink.replace('@', '').trim()}`;
+          }
       } else {
-          let botLink = bot.bot_link || '';
-          url = botLink.startsWith('http') ? botLink : `https://t.me/${botLink.replace('@', '').trim()}`;
+          url = bot.app_url || bot.bot_link || '';
+          if (url && !url.startsWith('http')) {
+              url = `https://t.me/${url.replace('@', '').trim()}`;
+          }
       }
 
       if (url) {
@@ -193,15 +201,22 @@ const MyBots = () => {
 
       const hasAndroid = !!bot.android_url?.trim();
       const hasIos = !!bot.ios_url?.trim();
+      const hasTgApp = !!bot.app_url?.trim();
 
-      if (isApp && (hasAndroid || hasIos)) {
-          if (hasAndroid && hasIos) {
+      if (isApp) {
+          const availablePlatforms: ('android' | 'ios' | 'tgapp')[] = [];
+          if (hasAndroid) availablePlatforms.push('android');
+          if (hasIos) availablePlatforms.push('ios');
+          if (hasTgApp) availablePlatforms.push('tgapp');
+
+          if (availablePlatforms.length > 1) {
               setActivePlatformBot(bot);
               setShowPlatformChoiceModal(true);
-          } else if (hasAndroid) {
-              openPlatformLink(bot, 'android');
-          } else if (hasIos) {
-              openPlatformLink(bot, 'ios');
+          } else if (availablePlatforms.length === 1) {
+              const singlePlatform = availablePlatforms[0];
+              openPlatformLink(bot, singlePlatform);
+          } else {
+              openPlatformLink(bot, 'default');
           }
       } else {
           openPlatformLink(bot, 'default');
@@ -689,6 +704,30 @@ const MyBots = () => {
                     </div>
                     <div className="text-[9px] text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-0.5">
                       APP STORE ÜZERİNDEN AÇIN
+                    </div>
+                  </div>
+                </button>
+              )}
+
+              {activePlatformBot.app_url && (
+                <button
+                  onClick={() => {
+                    const bot = activePlatformBot;
+                    setShowPlatformChoiceModal(false);
+                    setActivePlatformBot(null);
+                    openPlatformLink(bot, 'tgapp');
+                  }}
+                  className="w-full p-4 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-white/5 dark:hover:bg-white/10 border border-slate-100 dark:border-white/5 flex items-center gap-4 text-left transition-all active:scale-[0.98] cursor-pointer"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-sky-500/10 text-sky-500 flex items-center justify-center shrink-0">
+                    <Send size={18} />
+                  </div>
+                  <div>
+                    <div className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                      TELEGRAM APP İLE BAŞLAT
+                    </div>
+                    <div className="text-[9px] text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-0.5">
+                      TELEGRAM MINI APP ÜZERİNDEN AÇIN
                     </div>
                   </div>
                 </button>
