@@ -3017,3 +3017,27 @@ span.text-\[12px\].text-slate-500.dark\:text-slate-400.font-normal {
     line-height: 1.53;
     text-wrap: balance;
 }
+
+.bg-slate-50\/50 {
+    background-color: #f1f5f9;
+}
+
+.py-8 {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.font-mono {
+    font-family: inherit;
+}
+
+@media (min-width: 640px) {
+    .sm\:text-3xl {
+        font-family: revert;
+        letter-spacing: -1.3px !important;
+        font-size: 28px !important;
+        line-height: 2rem !important;
+    }
+}
+
+
