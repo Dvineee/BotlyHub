@@ -3048,4 +3048,23 @@ span.text-\[12px\].text-slate-500.dark\:text-slate-400.font-normal {
     letter-spacing: .005em !important;
 }
 
+.bg-white.dark\:bg-\[\#111214\].rounded-2xl.p-5.shadow-xs.space-y-4.my-6.qa-last-24h-box {
+    outline: solid 1px #4f46e51a;
+}
+
+main.max-w-3xl.lg\:max-w-\[1100px\].mx-auto.px-4.sm\:px-6.py-6.transition-all {
+    margin-top: 12px;
+}
+
+.shadow-sm {
+    --tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.flex.items-start.justify-between.gap-4.border-b.border-slate-200\/40.dark\:border-slate-800\/20.pb-4\.5.mb-5.select-none {
+    padding: 8px 0;
+}
+
+
+
 
