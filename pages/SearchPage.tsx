@@ -369,7 +369,7 @@ const NavMenu = ({
                 Telegram kanalınızın amacına göre en uygun botları bir arada inceleyin.
               </h4>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-normal">
-                50'den fazla kategoride, telegram kanalınız için kanalınıza uygun en iyi botları bir arada görün.
+                Onlarca kategoride, topluluğunuz için bot ve uygulama listeleri.
               </p>
 
               {/* Dynamic Styled Icon Badges */}
@@ -429,35 +429,6 @@ const NavMenu = ({
                 className="group/btn text-[12px] font-extrabold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1.5 mt-1 cursor-pointer transition-colors self-start"
               >
                 Şimdi dene <ArrowRight size={13} className="shrink-0 transition-transform group-hover/btn:translate-x-1" />
-              </button>
-            </div>
-
-            <div className="border-t border-slate-200/60 dark:border-slate-800/60 my-3 w-full" />
-
-            {/* Bottom section (Botlyhub brand and CTA) */}
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded bg-blue-600 flex items-center justify-center shadow-sm shrink-0">
-                  <span className="text-[10px] font-black text-white">▲</span>
-                </span>
-                <span className="text-[12px] font-extrabold text-slate-800 dark:text-slate-200">
-                  Botlyhub
-                </span>
-              </div>
-              
-              <p className="text-[10.5px] text-slate-500 dark:text-slate-400 leading-normal font-normal">
-                Tek bir yerden incele, yönet ve pasif gelir elde et.
-              </p>
-
-              <button
-                onClick={() => {
-                  haptic("light");
-                  navigate("/premium");
-                  setOpenMenu(null);
-                }}
-                className="group/btn text-[12px] font-extrabold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1.5 mt-1 cursor-pointer transition-colors self-start"
-              >
-                Daha fazla bilgi edin <ArrowRight size={13} className="shrink-0 transition-transform group-hover/btn:translate-x-1" />
               </button>
             </div>
           </div>
@@ -599,9 +570,6 @@ const NavMenu = ({
 
           {/* Right Column (Featured Hub) */}
           <div className="col-span-3 border-l border-black/5 dark:border-white/5 pl-8 flex flex-col justify-center gap-3 mega-menu-right-links">
-            <h4 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 px-3">
-              {t("mega_quick_links") || "Hızlı Bağlantılar"}
-            </h4>
             
             {/* Reklam Link */}
             <button

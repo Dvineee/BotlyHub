@@ -1161,9 +1161,9 @@ span, div, input {
 }
 
 .mega-menu-container {
-  padding-top: 2rem !important;
-  padding-bottom: 2rem !important;
-  background-color: rgba(255, 255, 255, 0.98) !important;
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+    background-color: rgba(255, 255, 255, 0.98) !important;
 }
 
 .bg-emerald-500\/5, .bg-blue-500\/5 {
@@ -1342,9 +1342,10 @@ span, div, input {
 }
 
 .text-slate-500 {
+    text-wrap: balance;
     color: var(--text-secondary) !important;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
     letter-spacing: -.013px;
     line-height: inherit;
     -webkit-box-orient: vertical !important;
@@ -1753,10 +1754,16 @@ img.rounded-xl, img.rounded-3xl, img.rounded-2xl, img.rounded-\[11px\], img.roun
   transition: background 180ms ease, border-color 180ms ease, transform 180ms ease, opacity 180ms ease, box-shadow 180ms ease !important;
 }
 
-.bot-card .text-xs, .fancy-glass-card .text-xs, .similar-post-card .text-xs, .bot-card .text-slate-500, .bot-card .text-slate-400, .fancy-glass-card .text-slate-400, .fancy-glass-card .text-slate-500 {
+.bot-card .text-xs, .fancy-glass-card .text-xs, .similar-post-card .text-xs, .bot-card .text-slate-500, .bot-card .text-slate-400, .fancy-glass-card .text-slate-400 {
   opacity: .98 !important;
   font-size: 14px !important;
   letter-spacing: .005em !important;
+}
+
+.fancy-glass-card .text-slate-500 {
+    opacity: .98 !important;
+    font-size: 13px !important;
+    letter-spacing: .005em !important;
 }
 
 .dark\:bg-\[\#0F1623\]:is(.dark *) {
@@ -2133,17 +2140,13 @@ div.qa-last-24h-box, .qa-last-24h-box {
 }
 
 .hero-cta-circle {
-  width: 28px !important;
-  height: 28px !important;
-  border-radius: 50% !important;
-  border: 1px solid rgba(138, 143, 152, 0.4) !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  font-size: 13px !important;
-  font-weight: 400 !important;
-  color: #8a8f98 !important;
-  flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 14px !important;
+    font-weight: 400 !important;
+    color: #8a8f98 !important;
+    flex-shrink: 0 !important;
 }
 
 .hero-cta-label {
@@ -2994,4 +2997,8 @@ html:not(.dark) .fixed input.qa-custom-search-input:focus {
 
 .mega-menu-right-links {
   justify-content: normal !important;
+}
+
+.pl-8 {
+    padding-left: 1rem;
 }
