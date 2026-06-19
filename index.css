@@ -1442,6 +1442,10 @@ button.bg-brand:hover, button.bg-blue-500:hover, button.bg-blue-600:hover, a.bg-
   background-color: rgb(0 0 0 / 0%) !important;
 }
 
+.dark .bg-white\/5 {
+  padding: 0;
+}
+
 .dark .fancy-glass-card:hover, .dark .stats-card-bg:hover, .dark .popular-content-card:hover, .dark .similar-post-card:hover, .dark .bot-card:hover {
   border-color: rgba(255, 255, 255, 0.14) !important;
 }
@@ -2761,10 +2765,9 @@ span.text-\[11px\].font-bold.uppercase.tracking-wider {
 
 @media (min-width: 640px) {
     .sm\:text-3xl {
-        color: #d0d6e0 !important;
-        font-family: "Inter Variable", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Open Sans", "Helvetica Neue", sans-serif;
+        font-family: Inter Variable, SF Pro Display, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif;
         letter-spacing: -1.3px !important;
-        font-size: 26px !important;
+        font-size: 28px !important;
         line-height: 2rem !important;
     }
 }

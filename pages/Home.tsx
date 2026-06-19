@@ -3051,10 +3051,10 @@ const Home = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
                         transition={{ duration: 0.15 }}
-                        className="absolute left-0 right-0 mt-2 bg-white dark:bg-[#111214] border border-slate-100 dark:border-slate-800/80 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.12)] p-2.5 z-[200] max-h-[380px] overflow-y-auto"
+                        className="absolute left-0 right-0 mt-2 bg-white dark:bg-[#111214] border border-slate-100 dark:border-slate-800/80 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.12)] p-2.5 z-[200] max-h-[385px] flex flex-col overflow-hidden"
                       >
                         {/* Results List */}
-                        <div className="space-y-1">
+                        <div className="space-y-1 overflow-y-auto max-h-[290px] pr-1 scrollbar-thin">
                           {filteredDropdownBots.length === 0 ? (
                             <div className="py-6 text-center text-[12px] text-slate-400 dark:text-slate-500 font-medium">
                               Herhangi bir sonuç bulunamadı
