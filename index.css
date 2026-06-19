@@ -2601,7 +2601,7 @@ div.qa-last-24h-box, .qa-last-24h-box {
     padding-bottom: .5rem !important;
 }
 
-.py-1 {
+.py-1:not(.announcement-badge):not(.sponsored-badge):not([class*="badge"]):not([class*="rozet"]) {
     padding-top: 0rem !important;
     padding-bottom: 0rem !important;
 }
@@ -3038,6 +3038,14 @@ span.text-\[12px\].text-slate-500.dark\:text-slate-400.font-normal {
         font-size: 28px !important;
         line-height: 2rem !important;
     }
+}
+
+.fancy-glass-card .text-slate-500 {
+    padding-bottom: 3px !important;
+    padding-top: 3px !important;
+    opacity: .98 !important;
+    font-size: 13px !important;
+    letter-spacing: .005em !important;
 }
 
 
