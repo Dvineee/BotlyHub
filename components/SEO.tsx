@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
+import { SITE_URL } from '../constants';
 
 interface SEOProps {
   title?: string;
@@ -34,16 +35,17 @@ export const SEO: React.FC<SEOProps> = ({
 }) => {
   const siteName = 'BotlyHub';
   const fullTitle = title ? `${title} | ${siteName}` : `${siteName} | Modern Telegram Bot & AI Ecosystem`;
-  const defaultDescription = 'BotlyHub - Telegram botları, otomasyon sistemleri ve AI destekli servisler için yeni nesil keşif ve yönetim platformu.';
+  const defaultDescription = 'BotlyHub - Telegram botları, otomasyon sistemleri og AI destekli servisler için yeni nesil keşif ve yönetim platformu.';
   const currentDescription = description || defaultDescription;
-  const url = typeof window !== 'undefined' ? window.location.origin + window.location.pathname : 'https://botlyhub.com';
+  const url = typeof window !== 'undefined' ? window.location.origin + window.location.pathname : SITE_URL;
+  const googleVerification = typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_GOOGLE_SITE_VERIFICATION;
 
   const schemaOrg = {
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": "BotlyHub",
-    "url": "https://botlyhub.com",
-    "logo": "https://botlyhub.com/logo.png",
+    "url": SITE_URL,
+    "logo": `${SITE_URL}/logo.png`,
     "description": defaultDescription,
     "sameAs": [
       "https://twitter.com/botlyhub",
@@ -55,10 +57,10 @@ export const SEO: React.FC<SEOProps> = ({
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "BotlyHub",
-    "url": "https://botlyhub.com",
+    "url": SITE_URL,
     "potentialAction": {
       "@type": "SearchAction",
-      "target": "https://botlyhub.com/search?q={search_term_string}",
+      "target": `${SITE_URL}/search?q={search_term_string}`,
       "query-input": "required name=search_term_string"
     }
   };
@@ -81,7 +83,7 @@ export const SEO: React.FC<SEOProps> = ({
       "name": siteName,
       "logo": {
         "@type": "ImageObject",
-        "url": "https://botlyhub.com/logo.png"
+        "url": `${SITE_URL}/logo.png`
       }
     },
     "datePublished": articleData.publishedTime,
@@ -138,7 +140,7 @@ export const SEO: React.FC<SEOProps> = ({
       <meta name="keywords" content="botlyhub, telegram bot platformu, telegram botları, ton ecosystem, telegram automation, bot store, ai services, telegram mini apps, telegram kanalları, bot keşif" />
       <meta name="author" content="BotlyHub Team" />
       <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-      <meta name="google-site-verification" content="GOOGLE_SITE_VERIFICATION_CODE_HERE" />
+      {googleVerification && <meta name="google-site-verification" content={googleVerification} />}
 
       {/* JSON-LD Schemas */}
       <script type="application/ld+json">

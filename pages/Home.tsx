@@ -2328,7 +2328,24 @@ const Home = () => {
       )
       .slice(0, 25);
   }, [bots, homeSearchQuery]);
-  const { activeFilter } = useFilter();
+  const { activeFilter, searchMode, setSearchMode } = useFilter();
+
+  useEffect(() => {
+    if (searchMode === "bots" && navState !== "bots") {
+      setNavState("bots");
+    } else if (searchMode === "apps" && navState !== "apps") {
+      setNavState("apps");
+    }
+  }, [searchMode]);
+
+  useEffect(() => {
+    if (navState === "bots" && searchMode !== "bots") {
+      setSearchMode("bots");
+    } else if (navState === "apps" && searchMode !== "apps") {
+      setSearchMode("apps");
+    }
+  }, [navState]);
+
   const [selectedAppsCategory, setSelectedAppsCategory] = useState("all");
   const [selectedBotsCategory, setSelectedBotsCategory] = useState("all");
   const [homeBlogs, setHomeBlogs] = useState<BlogPost[]>([]);
@@ -2909,7 +2926,7 @@ const Home = () => {
       </svg>
       {/* Top Background Wrapper (Sticky Header on Desktop and Mobile) */}
       <div
-        className="relative md:sticky md:top-0 z-[120] min-h-[56px] md:min-h-[64px] md:h-[72px] py-2 md:py-0 flex items-center bg-white dark:bg-slate-950 border-b border-black/[0.03] dark:border-white/5 transition-all shadow-sm"
+        className="relative md:sticky md:top-0 z-[120] min-h-[56px] md:min-h-[64px] md:h-[72px] py-2 md:py-0 flex items-center bg-white dark:bg-slate-950 transition-all"
         onMouseLeave={() => {
           setOpenMenu(null);
           setNavState("main");
@@ -3835,7 +3852,7 @@ const Home = () => {
         </AnimatePresence>
       </div>
       {/* Mobile-only Sticky Search Bar */}
-      <div className="sticky top-0 z-[110] block md:hidden bg-slate-50 dark:bg-slate-950 border-b border-black/[0.03] dark:border-white/5 p-3 shadow-xs">
+      <div className="sticky top-0 z-[110] block md:hidden bg-white dark:bg-slate-950 p-3">
         <div className="relative flex items-center bg-[#eeefef] dark:bg-slate-800 rounded-xl group transition-all h-[42px] px-3">
           <div
             onClick={() => {
@@ -3883,17 +3900,19 @@ const Home = () => {
             className="w-full"
           >
             {announcements.length > 0 && (
-              <div className="pb-8 pt-4 max-w-7xl mx-auto w-full px-5 sm:px-8 overflow-hidden select-none">
-                <AnnouncementsCarousel
-                  announcements={announcements}
-                  scroll={annScroll}
-                  onShowPopup={(a) => setSelectedAnn(a)}
-                />
+              <div className="bg-white dark:bg-slate-950 w-full transition-colors duration-300">
+                <div className="pb-8 pt-4 max-w-7xl mx-auto w-full px-5 sm:px-8 overflow-hidden select-none">
+                  <AnnouncementsCarousel
+                    announcements={announcements}
+                    scroll={annScroll}
+                    onShowPopup={(a) => setSelectedAnn(a)}
+                  />
+                </div>
               </div>
             )}
 
             {/* Bottom Section */}
-            <div className="bg-white dark:bg-slate-950 w-full pt-4 pb-20 shadow-[0_-1px_0_0_rgba(0,0,0,0.015)]">
+            <div className="bg-white dark:bg-slate-950 w-full pt-4 pb-20">
               <div className="max-w-6xl mx-auto px-6 sm:px-8 relative">
 
                 {/* 🧠 Hero Section - High Conversion, Clear Segment Positioning */}

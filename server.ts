@@ -7,10 +7,12 @@ import crypto from "crypto";
 import { rateLimit } from "express-rate-limit";
 import { z } from "zod";
 import fs from "fs";
+import { GoogleGenAI } from "@google/genai";
 import { DatabaseService, supabase } from "./services/DatabaseService";
 import { createClient } from "@supabase/supabase-js";
 import { TonService } from "./services/TonService";
 import { SecurityUtils } from "./services/SecurityUtils";
+import { SITE_URL } from "./constants";
 
 dotenv.config();
 
@@ -43,6 +45,69 @@ const authLimiter = rateLimit({
 
 // --- AUTH STORE ---
 const authCodes = new Map<string, { code: string, expires: number }>();
+
+// --- GEMINI AI CLIENT ---
+let _aiInstance: GoogleGenAI | null = null;
+function getAIInstance() {
+  if (!_aiInstance) {
+    const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error("Gemini API key is not configured.");
+    }
+    _aiInstance = new GoogleGenAI({ apiKey });
+  }
+  return _aiInstance;
+}
+
+// --- ADMIN SESSION STORE ---
+export const adminSessions = new Map<string, { expires: number }>();
+
+export function generateAdminToken(): string {
+  const expires = Date.now() + 24 * 60 * 60 * 1000;
+  const secret = process.env.SUPABASE_SERVICE_ROLE_KEY || "defaultSecret";
+  const signature = crypto.createHmac("sha256", secret).update(expires.toString()).digest("hex");
+  const token = `admin_session_${expires}_${signature}`;
+  adminSessions.set(token, { expires });
+  return token;
+}
+
+export function verifyAdminToken(token: string | undefined): boolean {
+  if (!token) return false;
+  const session = adminSessions.get(token);
+  if (session && session.expires > Date.now()) {
+    return true;
+  }
+  if (token.startsWith("admin_session_")) {
+    try {
+      const parts = token.split("_");
+      const expires = parseInt(parts[2], 10);
+      const signature = parts[3];
+      if (expires > Date.now()) {
+        const secret = process.env.SUPABASE_SERVICE_ROLE_KEY || "defaultSecret";
+        const expectedSignature = crypto.createHmac("sha256", secret).update(expires.toString()).digest("hex");
+        if (signature === expectedSignature) {
+          adminSessions.set(token, { expires });
+          return true;
+        }
+      }
+    } catch {
+      return false;
+    }
+  }
+  return false;
+}
+
+export function requireAdminAuth(req: express.Request, res: express.Response, next: express.NextFunction) {
+  const authHeader = req.headers.authorization || req.get('Authorization');
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "Yetkisiz erişim. Lütfen tekrar giriş yapın." });
+  }
+  const token = authHeader.split(" ")[1];
+  if (!verifyAdminToken(token)) {
+    return res.status(401).json({ error: "Oturum süreniz dolmuş veya geçersiz. Lütfen tekrar giriş yapın." });
+  }
+  next();
+}
 
 // Stricter rate limit for payment verification
 const paymentLimiter = rateLimit({
@@ -80,6 +145,7 @@ async function startServer() {
   const allowedOrigins = [
     'https://botlyhub.vercel.app',
     'https://botlyhub.com',
+    SITE_URL,
     /\.run\.app$/ // Matches AI Studio dev urls
   ];
 
@@ -127,15 +193,26 @@ async function startServer() {
     const requestOrigin = req.get('Origin') || '';
     let origin = `${protocol}://${host}`;
     
-    if (requestOrigin.includes('botlyhub.vercel.app')) {
-        origin = 'https://botlyhub.vercel.app';
-    } else if (requestOrigin.includes('botlyhub.com')) {
-        origin = 'https://botlyhub.com';
-    } else if (host?.includes('botlyhub')) {
-        origin = `https://${host}`;
-    } else if (origin.includes('.run.app')) {
-        // If we are on AI Studio runner, use the full current origin
-        origin = `${protocol}://${host}`;
+    try {
+      if (SITE_URL) {
+        const siteUrlUrl = new URL(SITE_URL);
+        if (requestOrigin.includes(siteUrlUrl.hostname) || host?.includes(siteUrlUrl.hostname)) {
+            origin = SITE_URL;
+        }
+      }
+    } catch (e) {}
+    
+    if (origin !== SITE_URL) {
+      if (requestOrigin.includes('botlyhub.vercel.app')) {
+          origin = 'https://botlyhub.vercel.app';
+      } else if (requestOrigin.includes('botlyhub.com')) {
+          origin = 'https://botlyhub.com';
+      } else if (host?.includes('botlyhub')) {
+          origin = `https://${host}`;
+      } else if (origin.includes('.run.app')) {
+          // If we are on AI Studio runner, use the full current origin
+          origin = `${protocol}://${host}`;
+      }
     }
 
     // Ensure origin does not have trailing slash
@@ -154,6 +231,409 @@ async function startServer() {
   app.get("/api/health", (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.json({ status: "ok", time: new Date().toISOString() });
+  });
+
+  // --- ADMIN LOGIN ENDPOINT ---
+  app.post("/api/admin/login", authLimiter, (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    const { username, password } = req.body;
+    const adminUsername = process.env.ADMIN_USERNAME || 'admin';
+    const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+
+    if (username === adminUsername && password === adminPassword) {
+      const token = generateAdminToken();
+      return res.json({ success: true, token });
+    } else {
+      return res.status(401).json({ error: "Geçersiz kullanıcı adı veya şifre." });
+    }
+  });
+
+  // --- ADMIN DB ACTION ENDPOINT ---
+  app.post("/api/admin/db-action", requireAdminAuth, async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    const { action, args } = req.body;
+
+    try {
+      let result: any = null;
+      switch (action) {
+        case "updateUserStatus":
+          result = await DatabaseService.updateUserStatus(args[0], args[1]);
+          break;
+        case "updateUserRestriction":
+          result = await DatabaseService.updateUserRestriction(args[0], args[1]);
+          break;
+        case "updateUserPublishStatus":
+          result = await DatabaseService.updateUserPublishStatus(args[0], args[1]);
+          break;
+        case "deleteUser":
+          result = await DatabaseService.deleteUser(args[0]);
+          break;
+        case "deleteBot":
+          result = await DatabaseService.deleteBot(args[0]);
+          break;
+        case "updateSettings":
+          result = await DatabaseService.updateSettings(args[0]);
+          break;
+        case "deleteAnnouncement":
+          result = await DatabaseService.deleteAnnouncement(args[0]);
+          break;
+        case "deleteBlog":
+          result = await DatabaseService.deleteBlog(args[0]);
+          break;
+        case "updateReferralSettings":
+          result = await DatabaseService.updateReferralSettings(args[0]);
+          break;
+        case "saveAnnouncement":
+          result = await DatabaseService.saveAnnouncement(args[0]);
+          break;
+        case "saveBlog":
+          result = await DatabaseService.saveBlog(args[0]);
+          break;
+        case "savePromotion":
+          result = await DatabaseService.savePromotion(args[0]);
+          break;
+        case "deletePromotion":
+          result = await DatabaseService.deletePromotion(args[0]);
+          break;
+        case "updatePromotionStatus":
+          result = await DatabaseService.updatePromotionStatus(args[0], args[1]);
+          break;
+        case "confirmReferral":
+          result = await DatabaseService.confirmReferral(args[0]);
+          break;
+        case "deleteNotification":
+          result = await DatabaseService.deleteNotification(args[0]);
+          break;
+        case "sendGlobalNotification":
+          result = await DatabaseService.sendGlobalNotification(args[0], args[1], args[2]);
+          break;
+        case "sendUserNotification":
+          result = await DatabaseService.sendUserNotification(args[0], args[1], args[2], args[3]);
+          break;
+        case "grantPanelAccess":
+          result = await DatabaseService.grantPanelAccess(args[0], args[1]);
+          break;
+        case "updateUserWallet":
+          result = await DatabaseService.updateUserWallet(args[0], args[1]);
+          break;
+        case "updateUserBot":
+          result = await DatabaseService.updateUserBot(args[0], args[1]);
+          break;
+        case "removeUserBotById":
+          result = await DatabaseService.removeUserBotById(args[0]);
+          break;
+        case "logActivity":
+          result = await DatabaseService.logActivity(args[0], args[1], args[2], args[3], args[4]);
+          break;
+        default:
+          return res.status(400).json({ error: `Geçersiz admin işlemi: ${action}` });
+      }
+
+      return res.json({ success: true, data: result });
+    } catch (err: any) {
+      console.error(`[DB-ACTION ERROR] Action ${action} failed:`, err);
+      return res.status(500).json({ error: err.message || "İşlem yapılırken bir hata oluştu." });
+    }
+  });
+
+  // --- AI / GEMINI ENDPOINTS ---
+
+  app.post("/api/ai/recommend", async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    try {
+      const { query, availableBots } = req.body;
+      if (!query || !availableBots) {
+        return res.status(400).json({ error: "query and availableBots parameters are required." });
+      }
+
+      const ai = getAIInstance();
+      const botContext = availableBots.map((bot: any) => 
+        `Name: ${bot.name}, Category: ${Array.isArray(bot.category) ? bot.category.join(", ") : bot.category}, Description: ${bot.description}, Price: ${bot.price} TRY`
+      ).join("\n");
+
+      const prompt = `
+        You are an AI assistant for BotlyHub, a Telegram bot marketplace.
+        A user is looking for a bot. Based on their query and the list of available bots below, recommend the most suitable bots.
+        Explain why you are recommending them. Be helpful and professional.
+        
+        User Query: "${query}"
+        
+        Available Bots:
+        ${botContext}
+        
+        Response format:
+        - Start with a friendly greeting.
+        - List 1-3 recommended bots with a brief explanation for each.
+        - If no bots match perfectly, suggest the closest alternatives or ask for more details.
+        - Keep it concise and formatted for a mobile app (use bullet points).
+        - Language: Turkish.
+      `;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: [{ parts: [{ text: prompt }] }],
+      });
+
+      return res.json({ text: response.text || "Üzgünüm, şu anda size yardımcı olamıyorum." });
+    } catch (err: any) {
+      console.error("[AI Recommend Error]:", err);
+      return res.status(500).json({ error: err.message || "AI service error" });
+    }
+  });
+
+  app.post("/api/ai/analyze", async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    try {
+      const { bot } = req.body;
+      if (!bot) {
+        return res.status(400).json({ error: "bot parameter is required." });
+      }
+
+      const ai = getAIInstance();
+      const prompt = `
+        Sen BotlyHub platformunun AI asistanısın. 
+        Aşağıdaki botu analiz et ve kullanıcının neden bu botu seçmesi gerektiğini etkileyici bir dille anlat.
+        Bot Adı: ${bot.name}
+        Kategori: ${Array.isArray(bot.category) ? bot.category.join(", ") : bot.category}
+        Açıklama: ${bot.description}
+        
+        Yanıtın:
+        - Botun en güçlü yanlarını vurgula.
+        - Kullanıcıya sağlayacağı faydaları belirt.
+        - Profesyonel, ikna edici ve samimi bir ton kullan.
+        - Maksimum 3-4 kısa paragraf olsun.
+        - Emoji kullan.
+        - Dil: Türkçe.
+      `;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: [{ parts: [{ text: prompt }] }],
+      });
+
+      return res.json({ text: response.text || "Analiz şu anda yapılamıyor." });
+    } catch (err: any) {
+      console.error("[AI Analyze Error]:", err);
+      return res.status(500).json({ error: err.message || "AI service error" });
+    }
+  });
+
+  app.post("/api/ai/generate-ad", async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    try {
+      const { prompt, generateImage = true } = req.body;
+      if (!prompt) {
+        return res.status(400).json({ error: "prompt parameter is required." });
+      }
+
+      const ai = getAIInstance();
+      
+      const textResponse = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: `Create a compelling advertisement for: ${prompt}. 
+        Return a JSON object with:
+        - title: A catchy short title (max 40 chars)
+        - content: Engaging ad copy (max 200 chars)
+        - button_text: Short call to action (max 15 chars)
+        All text should be in Turkish.`,
+        config: {
+          responseMimeType: "application/json",
+        }
+      });
+
+      if (!textResponse.text) {
+        throw new Error("Yapay zeka metin içeriği üretemedi.");
+      }
+
+      const adData = JSON.parse(textResponse.text);
+
+      let imageUrl = '';
+      if (generateImage) {
+        try {
+          const imageResponse = await ai.models.generateContent({
+            model: "gemini-2.5-flash-image",
+            contents: {
+              parts: [{ text: `A high-quality, professional advertisement visual for: ${prompt}. Modern, vibrant, and eye-catching.` }]
+            },
+            config: {
+              imageConfig: {
+                aspectRatio: "16:9"
+              }
+            }
+          });
+
+          const parts = imageResponse.candidates?.[0]?.content?.parts;
+          if (parts) {
+            for (const part of parts) {
+              if (part.inlineData) {
+                imageUrl = `data:image/png;base64,${part.inlineData.data}`;
+                break;
+              }
+            }
+          }
+        } catch (imgError) {
+          console.warn("Gemini Image Generation failed (likely quota), using fallback:", imgError);
+        }
+      }
+
+      if (!imageUrl) {
+        imageUrl = `https://picsum.photos/seed/${encodeURIComponent(prompt)}/1280/720`;
+      }
+
+      return res.json({
+        title: adData.title || '',
+        content: adData.content || '',
+        button_text: adData.button_text || 'İNCELE',
+        image_url: imageUrl
+      });
+    } catch (err: any) {
+      console.error("[AI Generate Ad Error]:", err);
+      return res.status(500).json({ error: err.message || "AI service error" });
+    }
+  });
+
+  app.post("/api/ai/generate-description", async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    try {
+      const { botName, category } = req.body;
+      if (!botName || !category) {
+        return res.status(400).json({ error: "botName and category are required parameters" });
+      }
+
+      const ai = getAIInstance();
+      const prompt = `
+        Create a professional and catchy description for a Telegram bot named "${botName}" in the "${category}" category.
+        The description should highlight potential features and benefits for users.
+        Keep it under 200 characters.
+        Language: Turkish.
+      `;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: [{ parts: [{ text: prompt }] }],
+      });
+
+      return res.json({ text: response.text || "" });
+    } catch (err: any) {
+      console.error("[AI Generate Description Error]:", err);
+      return res.status(200).json({ text: "" }); // return empty gracefully to not crash UI flow
+    }
+  });
+
+  app.post("/api/ai/generate-slug", async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    try {
+      const { title } = req.body;
+      if (!title) {
+        return res.status(400).json({ error: "title parameter is required." });
+      }
+
+      const ai = getAIInstance();
+      const prompt = `
+        Create a highly SEO-friendly, clean URL slug for this blog post title: "${title}".
+        Requirements:
+        - Language: Turkish (but convert Turkish characters to English equivalents, e.g., ö -> o, ş -> s).
+        - Use only lowercase letters, numbers, and hyphens.
+        - Remove all special characters, punctuation, and extra spaces.
+        - Keep it descriptive but concise.
+        - Do NOT add any suffixes or numbers unless necessary for the title's meaning.
+        - Return ONLY the slug string, nothing else.
+      `;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: [{ parts: [{ text: prompt }] }],
+      });
+
+      return res.json({ slug: response.text?.trim().toLowerCase() || title.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '') });
+    } catch (err: any) {
+      console.error("[AI Generate Slug Error]:", err);
+      return res.json({ slug: title.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '') }); // fallback
+    }
+  });
+
+  // --- DYNAMIC SITEMAP ENDPOINT ---
+  app.get("/sitemap.xml", async (req, res) => {
+    res.setHeader('Content-Type', 'application/xml');
+    try {
+      const { data: bots } = await supabase.from('bots').select('id, slug, updated_at');
+      const { data: blogs } = await supabase.from('blogs').select('slug, updated_at, created_at');
+
+      const cleanSiteUrl = SITE_URL.replace(/\/$/, "");
+
+      const staticUrls = [
+        "",
+        "/search",
+        "/blog",
+        "/profile",
+        "/my-bots",
+        "/channels",
+        "/premium",
+        "/referral",
+        "/stats",
+        "/qa"
+      ];
+
+      let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+      xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+
+      // Static pages
+      for (const sUrl of staticUrls) {
+        xml += `  <url>\n`;
+        xml += `    <loc>${cleanSiteUrl}${sUrl}</loc>\n`;
+        xml += `    <changefreq>daily</changefreq>\n`;
+        xml += `    <priority>${sUrl === "" ? "1.0" : "0.8"}</priority>\n`;
+        xml += `  </url>\n`;
+      }
+
+      // Dynamic Bots
+      if (bots) {
+        for (const bot of bots) {
+          const botSlug = bot.slug || bot.id;
+          if (!botSlug) continue;
+          xml += `  <url>\n`;
+          xml += `    <loc>${cleanSiteUrl}/bot/${botSlug}</loc>\n`;
+          xml += `    <changefreq>weekly</changefreq>\n`;
+          xml += `    <priority>0.7</priority>\n`;
+          if (bot.updated_at) {
+            xml += `    <lastmod>${new Date(bot.updated_at).toISOString().split('T')[0]}</lastmod>\n`;
+          }
+          xml += `  </url>\n`;
+        }
+      }
+
+      // Dynamic Blog posts
+      if (blogs) {
+        for (const blog of blogs) {
+          if (!blog.slug) continue;
+          xml += `  <url>\n`;
+          xml += `    <loc>${cleanSiteUrl}/blog/${blog.slug}</loc>\n`;
+          xml += `    <changefreq>monthly</changefreq>\n`;
+          xml += `    <priority>0.6</priority>\n`;
+          const blogDate = blog.updated_at || blog.created_at;
+          if (blogDate) {
+            xml += `    <lastmod>${new Date(blogDate).toISOString().split('T')[0]}</lastmod>\n`;
+          }
+          xml += `  </url>\n`;
+        }
+      }
+
+      xml += `</urlset>\n`;
+      return res.status(200).send(xml);
+    } catch (err) {
+      console.error("[SITEMAP GENERATION ERROR]:", err);
+      // Fallback Sitemap if DB query errors
+      const cleanSiteUrl = SITE_URL.replace(/\/$/, "");
+      let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+      xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+      xml += `  <url>\n`;
+      xml += `    <loc>${cleanSiteUrl}</loc>\n`;
+      xml += `    <changefreq>daily</changefreq>\n`;
+      xml += `    <priority>1.0</priority>\n`;
+      xml += `  </url>\n`;
+      xml += `</urlset>\n`;
+      return res.status(200).send(xml);
+    }
   });
 
   // --- CHAT PHOTO PROXY CACHE ---
@@ -515,7 +995,7 @@ async function startServer() {
     }
   });
 
-  app.post("/api/admin/add-admin", async (req, res) => {
+  app.post("/api/admin/add-admin", requireAdminAuth, async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');

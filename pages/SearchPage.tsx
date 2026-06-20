@@ -1307,9 +1307,7 @@ const SearchPage = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [searchMode, setSearchMode] = useState<"bots" | "apps">(
-    (searchParams.get("mode") as "bots" | "apps") || "bots",
-  );
+  const { activeFilter, searchMode, setSearchMode } = useFilter();
   const [isModeMenuOpen, setIsModeMenuOpen] = useState(false);
   const menuRef = React.useRef<HTMLDivElement>(null);
   const modeMenuRef = React.useRef<HTMLDivElement>(null);
@@ -1360,7 +1358,7 @@ const SearchPage = () => {
     }
   };
 
-  const { activeFilter } = useFilter();
+
   const [aiQuery, setAiQuery] = useState("");
   const [aiResponse, setAiResponse] = useState<string | null>(null);
   const [isAiLoading, setIsAiLoading] = useState(false);

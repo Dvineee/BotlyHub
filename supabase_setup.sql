@@ -19,16 +19,15 @@ CREATE INDEX IF NOT EXISTS idx_pending_admin_actions_lookup ON public.pending_ad
 ALTER TABLE public.pending_admin_actions ENABLE ROW LEVEL SECURITY;
 
 -- 4. Create Security Policies
--- Allow Service Role Key or Authenticated Users (Admins on the web panel) to insert actions
-CREATE POLICY "Allow service role or admin inserts" ON public.pending_admin_actions
+-- Disable all direct public access (the backend uses service_role which bypasses RLS securely)
+CREATE POLICY "Allow service role only inserts" ON public.pending_admin_actions
     FOR INSERT
-    WITH CHECK (true);
+    WITH CHECK (false);
 
--- Allow admins or service role to select/update actions
-CREATE POLICY "Allow service role or admin selects" ON public.pending_admin_actions
+CREATE POLICY "Allow service role only selects" ON public.pending_admin_actions
     FOR SELECT
-    USING (true);
+    USING (false);
 
-CREATE POLICY "Allow service role or admin updates" ON public.pending_admin_actions
+CREATE POLICY "Allow service role only updates" ON public.pending_admin_actions
     FOR UPDATE
-    USING (true);
+    USING (false);

@@ -4,6 +4,7 @@ import { Check, Zap, Gift, Sparkles, TrendingUp, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useFilter, FilterType } from '../FilterContext';
 import { useTelegram } from '../hooks/useTelegram';
+import { useTranslation } from '../TranslationContext';
 
 const FilterIcon = ({ size = 18, className = "" }: { size?: number, className?: string }) => (
   <svg 
@@ -24,8 +25,9 @@ const FilterIcon = ({ size = 18, className = "" }: { size?: number, className?: 
 
 export const FilterMenu: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { activeFilter, setActiveFilter } = useFilter();
+  const { activeFilter, setActiveFilter, searchMode, setSearchMode } = useFilter();
   const { haptic } = useTelegram();
+  const { t } = useTranslation();
   const menuRef = useRef<HTMLDivElement>(null);
 
   const options: { id: FilterType; label: string; icon: any; color: string }[] = [
@@ -83,6 +85,43 @@ export const FilterMenu: React.FC = () => {
                 <X size={14} />
               </button>
             </div>
+
+            {/* Bots / Apps Toggle Segment */}
+            <div className="px-1 pb-2 mb-2 border-b border-slate-100 dark:border-white/5">
+              <div className="flex bg-slate-100/80 dark:bg-slate-800/80 p-0.5 rounded-xl border border-slate-200/20">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    haptic('light');
+                    setSearchMode('bots');
+                  }}
+                  className={`flex-1 py-1.5 text-center text-[11px] font-extrabold uppercase tracking-wider rounded-lg transition-all ${
+                    searchMode === 'bots'
+                      ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
+                      : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'
+                  }`}
+                >
+                  {t("cat_bots") || "Botlar"}
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    haptic('light');
+                    setSearchMode('apps');
+                  }}
+                  className={`flex-1 py-1.5 text-center text-[11px] font-extrabold uppercase tracking-wider rounded-lg transition-all ${
+                    searchMode === 'apps'
+                      ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-xs'
+                      : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'
+                  }`}
+                >
+                  {t("cat_apps_nav") || t("apps") || "Uygulamalar"}
+                </button>
+              </div>
+            </div>
+
             {options.map((opt) => (
               <button
                 key={opt.id}

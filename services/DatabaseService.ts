@@ -17,6 +17,29 @@ export class DatabaseService {
   private static blogsCache: BlogPost[] | null = null;
   private static blogsCacheTime: number = 0;
   private static BLOGS_CACHE_TTL = 1000 * 60 * 5; // 5 minutes
+
+  private static async executeAdminDbAction(action: string, args: any[]): Promise<any> {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('admin_v3_session');
+      if (!token) {
+        throw new Error("Yönetici oturumu bulunamadı. Lütfen tekrar giriş yapın.");
+      }
+      const response = await fetch(`${API_BASE_URL || ''}/api/admin/db-action`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ action, args })
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || `Yönetici işlemi başarısız: ${action}`);
+      }
+      return data.data;
+    }
+    return null;
+  }
   
   // --- PROMOTIONS ---
   static async getPromotions(): Promise<Promotion[]> {
@@ -50,6 +73,9 @@ export class DatabaseService {
   }
 
   static async savePromotion(promo: Partial<Promotion>) {
+    if (typeof window !== 'undefined') {
+      return this.executeAdminDbAction("savePromotion", [promo]);
+    }
     const payload: any = {
         title: promo.title,
         content: promo.content,
@@ -83,6 +109,9 @@ export class DatabaseService {
   }
 
   static async updatePromotionStatus(id: string, status: Promotion['status']) {
+      if (typeof window !== 'undefined') {
+        return this.executeAdminDbAction("updatePromotionStatus", [id, status]);
+      }
       const { error } = await supabase
         .from('promotions')
         .update({ status: status })
@@ -107,6 +136,9 @@ export class DatabaseService {
   }
 
   static async deletePromotion(id: string) {
+    if (typeof window !== 'undefined') {
+      return this.executeAdminDbAction("deletePromotion", [id]);
+    }
     const { error } = await supabase.from('promotions').delete().eq('id', id);
     if (error) throw error;
   }
@@ -225,21 +257,33 @@ export class DatabaseService {
   }
 
   static async updateUserStatus(userId: string, status: 'Active' | 'Passive') {
+      if (typeof window !== 'undefined') {
+        return this.executeAdminDbAction("updateUserStatus", [userId, status]);
+      }
       const { error } = await supabase.from('users').update({ status }).eq('id', userId);
       if (error) throw error;
   }
 
   static async updateUserRestriction(userId: string, isRestricted: boolean) {
+      if (typeof window !== 'undefined') {
+        return this.executeAdminDbAction("updateUserRestriction", [userId, isRestricted]);
+      }
       const { error } = await supabase.from('users').update({ is_restricted: isRestricted }).eq('id', userId);
       if (error) throw error;
   }
 
   static async updateUserPublishStatus(userId: string, canPublish: boolean) {
+      if (typeof window !== 'undefined') {
+        return this.executeAdminDbAction("updateUserPublishStatus", [userId, canPublish]);
+      }
       const { error } = await supabase.from('users').update({ can_publish_promos: canPublish }).eq('id', userId);
       if (error) throw error;
   }
 
   static async deleteUser(userId: string) {
+      if (typeof window !== 'undefined') {
+        return this.executeAdminDbAction("deleteUser", [userId]);
+      }
       const userIdStr = userId.toString();
       console.log(`[DatabaseService] Deleting user ${userIdStr}...`);
       
@@ -349,6 +393,9 @@ export class DatabaseService {
   }
 
   static async updateUserWallet(userId: string, updates: { balance?: number, total_earned?: number }) {
+      if (typeof window !== 'undefined' && localStorage.getItem('admin_v3_session')) {
+        return this.executeAdminDbAction("updateUserWallet", [userId, updates]);
+      }
       const { error } = await supabase
           .from('user_wallets')
           .update({ 
@@ -377,11 +424,17 @@ export class DatabaseService {
   }
 
   static async updateUserBot(ownershipId: string, updates: any) {
+    if (typeof window !== 'undefined' && localStorage.getItem('admin_v3_session')) {
+      return this.executeAdminDbAction("updateUserBot", [ownershipId, updates]);
+    }
     const { error } = await supabase.from('user_bots').update(updates).eq('id', ownershipId);
     if (error) throw error;
   }
 
   static async removeUserBotById(ownershipId: string) {
+    if (typeof window !== 'undefined' && localStorage.getItem('admin_v3_session')) {
+      return this.executeAdminDbAction("removeUserBotById", [ownershipId]);
+    }
     const { error } = await supabase.from('user_bots').delete().eq('id', ownershipId);
     if (error) throw error;
   }
@@ -849,6 +902,9 @@ export class DatabaseService {
   }
 
   static async deleteBot(id: string) {
+    if (typeof window !== 'undefined') {
+      return this.executeAdminDbAction("deleteBot", [id]);
+    }
     const { error } = await supabase.from('bots').delete().eq('id', id);
     if (error) throw error;
   }
@@ -1017,6 +1073,9 @@ export class DatabaseService {
   }
 
   static async sendUserNotification(userId: string, title: string, message: string, type: Notification['type'] = 'system') {
+      if (typeof window !== 'undefined') {
+        return this.executeAdminDbAction("sendUserNotification", [userId, title, message, type]);
+      }
       const { error } = await supabase.from('notifications').insert([{ 
           id: Math.floor(Math.random() * 999999999).toString(), 
           user_id: userId.toString(),
@@ -1029,6 +1088,9 @@ export class DatabaseService {
   }
 
   static async sendGlobalNotification(title: string, message: string, type: Notification['type'] = 'system') {
+      if (typeof window !== 'undefined') {
+        return this.executeAdminDbAction("sendGlobalNotification", [title, message, type]);
+      }
       const { error } = await supabase.from('notifications').insert([{ 
           id: Math.floor(Math.random() * 999999999).toString(), 
           title, message, type, 
@@ -1040,6 +1102,9 @@ export class DatabaseService {
   }
 
   static async deleteNotification(id: string) {
+      if (typeof window !== 'undefined') {
+        return this.executeAdminDbAction("deleteNotification", [id]);
+      }
       const { error } = await supabase.from('notifications').delete().eq('id', id);
       if (error) throw error;
   }
@@ -1092,11 +1157,17 @@ export class DatabaseService {
   }
 
   static async updateSettings(updates: any) {
+    if (typeof window !== 'undefined') {
+      return this.executeAdminDbAction("updateSettings", [updates]);
+    }
     const { error } = await supabase.from('settings').update(updates).eq('id', 1);
     if (error) throw error;
   }
 
   static async grantPanelAccess(userId: string, password: string) {
+    if (typeof window !== 'undefined') {
+      return this.executeAdminDbAction("grantPanelAccess", [userId, password]);
+    }
     const { error } = await supabase
       .from('users')
       .update({ 
@@ -1121,6 +1192,9 @@ export class DatabaseService {
   }
 
   static async logActivity(userId: string, type: ActivityLog['type'], actionKey: string, title: string, description: string) {
+      if (typeof window !== 'undefined' && localStorage.getItem('admin_v3_session')) {
+        return this.executeAdminDbAction("logActivity", [userId, type, actionKey, title, description]);
+      }
       await supabase.from('bot_logs').insert({ 
           user_id: String(userId), 
           type, 
@@ -1178,11 +1252,17 @@ export class DatabaseService {
   }
 
   static async saveAnnouncement(ann: any) {
+    if (typeof window !== 'undefined') {
+      return this.executeAdminDbAction("saveAnnouncement", [ann]);
+    }
     const { error } = await supabase.from('announcements').upsert({ ...ann, id: ann.id || Math.floor(Math.random() * 999999).toString() });
     if (error) throw error;
   }
 
   static async deleteAnnouncement(id: string) {
+    if (typeof window !== 'undefined') {
+      return this.executeAdminDbAction("deleteAnnouncement", [id]);
+    }
     const { error } = await supabase.from('announcements').delete().eq('id', id);
     if (error) throw error;
   }
@@ -1457,6 +1537,9 @@ export class DatabaseService {
   }
 
   static async saveBlog(blog: Partial<BlogPost>) {
+    if (typeof window !== 'undefined') {
+      return this.executeAdminDbAction("saveBlog", [blog]);
+    }
     const payload: any = {
         title: blog.title,
         content: blog.content,
@@ -1491,6 +1574,9 @@ export class DatabaseService {
   }
 
   static async deleteBlog(id: string) {
+    if (typeof window !== 'undefined') {
+      return this.executeAdminDbAction("deleteBlog", [id]);
+    }
     const { error } = await supabase.from('blogs').delete().eq('id', id);
     if (error) throw error;
   }
@@ -1602,6 +1688,9 @@ export class DatabaseService {
   }
 
   static async updateReferralSettings(settings: Partial<ReferralSettings>) {
+    if (typeof window !== 'undefined') {
+      return this.executeAdminDbAction("updateReferralSettings", [settings]);
+    }
     const { error } = await supabase
         .from('referral_settings')
         .update(settings)
@@ -1620,6 +1709,9 @@ export class DatabaseService {
   }
 
   static async confirmReferral(referralId: string) {
+    if (typeof window !== 'undefined') {
+      return this.executeAdminDbAction("confirmReferral", [referralId]);
+    }
     const { data: referral } = await supabase.from('referrals').select('*').eq('id', referralId).maybeSingle();
     if (!referral || referral.status !== 'pending') return;
 

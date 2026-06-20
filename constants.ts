@@ -9,4 +9,9 @@ export const API_BASE_URL = (envApiUrl && envApiUrl !== 'undefined')
   ? envApiUrl 
   : (isBrowser ? window.location.origin : '');
 
+const envSiteUrl = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_SITE_URL) || (typeof process !== 'undefined' && process.env && (process.env.VITE_SITE_URL || process.env.SITE_URL));
+export const SITE_URL = (envSiteUrl && envSiteUrl !== 'undefined')
+  ? envSiteUrl
+  : 'https://botlyhub.vercel.app';
+
 

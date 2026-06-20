@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import * as Router from 'react-router-dom';
 import { Shield, Lock, User, AlertCircle, ChevronRight, Sparkles } from 'lucide-react';
 import { DatabaseService } from '../../services/DatabaseService';
+import { API_BASE_URL } from '../../constants';
 import { motion, AnimatePresence } from 'motion/react';
 
 const { useNavigate } = Router as any;
@@ -19,15 +20,30 @@ const AdminLogin = () => {
     setIsLoading(true);
     setError('');
 
-    // Simulate network delay for better UX
-    await new Promise(resolve => setTimeout(resolve, 800));
+    // Simulate small delay for UX
+    await new Promise(resolve => setTimeout(resolve, 300));
 
-    if (username === 'admin' && password === 'admin123') {
-      DatabaseService.setAdminSession('v3_token_' + Math.random());
-      await DatabaseService.logActivity('admin', 'auth', 'admin_login', 'Admin Girişi', 'Yönetici paneline başarıyla giriş yapıldı.');
-      navigate('/a/dashboard');
-    } else {
-      setError('Geçersiz kullanıcı adı veya şifre.');
+    try {
+      const response = await fetch(`${API_BASE_URL || ''}/api/admin/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+      
+      const data = await response.json();
+      if (response.ok && data.success && data.token) {
+        DatabaseService.setAdminSession(data.token);
+        // Log activity (note: we will also route logActivity safely or keep it)
+        await DatabaseService.logActivity('admin', 'auth', 'admin_login', 'Admin Girişi', 'Yönetici paneline başarıyla giriş yapıldı.');
+        navigate('/a/dashboard');
+      } else {
+        setError(data.error || 'Geçersiz kullanıcı adı veya şifre.');
+        setIsLoading(false);
+      }
+    } catch (err: any) {
+      setError('Sistem bağlantı hatası oluştu.');
       setIsLoading(false);
     }
   };
