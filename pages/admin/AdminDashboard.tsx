@@ -340,22 +340,33 @@ const BotManagement = () => {
             android_url: '',
             ios_url: '',
             promoted_type: 'none',
-            languages: ['🇹🇷']
+            languages: ['🇹🇷'],
+            platform: ''
         };
 
         headers.forEach((header, index) => {
-            const cleanHeader = (header || '').toLowerCase().trim().replace(/['"_-]/g, '');
+            const cleanHeader = (header || '').toLowerCase().trim().replace(/['"_\s-]/g, '');
             const val = (row[index] || '').trim();
 
-            if (!val) return;
+            if (!val || val.toLowerCase() === 'yok') return;
 
             // Name
-            if (cleanHeader === 'name' || cleanHeader === 'baslik' || cleanHeader === 'isim' || cleanHeader === 'title') {
+            if (cleanHeader === 'name' || cleanHeader === 'baslik' || cleanHeader === 'isim' || cleanHeader === 'title' || cleanHeader === 'uygulamaadi' || cleanHeader === 'uygulamaadı') {
                 bot.name = val;
             }
             // Link
-            else if (cleanHeader === 'botlink' || cleanHeader === 'link' || cleanHeader === 'username' || cleanHeader === 'kullaniciadi') {
-                bot.bot_link = val.startsWith('@') || val.startsWith('https://') ? val : '@' + val;
+            else if (cleanHeader === 'botlink' || cleanHeader === 'link' || cleanHeader === 'username' || cleanHeader === 'kullaniciadi' || cleanHeader === 'telegramappadresi') {
+                let cleanVal = val;
+                if (val.startsWith('https://t.me/')) {
+                    const parts = val.replace('https://t.me/', '').split('/');
+                    if (parts[0]) {
+                        cleanVal = '@' + parts[0];
+                    }
+                }
+                bot.bot_link = cleanVal.startsWith('@') || cleanVal.startsWith('https://') ? cleanVal : '@' + cleanVal;
+                if (val.startsWith('https://')) {
+                    bot.app_url = val;
+                }
             }
             // Description
             else if (cleanHeader === 'description' || cleanHeader === 'desc' || cleanHeader === 'aciklama' || cleanHeader === 'details') {
@@ -387,14 +398,31 @@ const BotManagement = () => {
             }
             // Languages
             else if (cleanHeader === 'languages' || cleanHeader === 'language' || cleanHeader === 'diller' || cleanHeader === 'dil') {
-                bot.languages = val.split(',').map((l: string) => l.trim()).filter(Boolean);
+                const langMap: Record<string, string> = {
+                    'english': '🇺🇸',
+                    'russian': '🇷🇺',
+                    'turkish': '🇹🇷',
+                    'spanish': '🇪🇸',
+                    'french': '🇫🇷',
+                    'german': '🇩🇪',
+                    'italian': '🇮🇹',
+                    'chinese': '🇨🇳'
+                };
+                bot.languages = val.split(',').map((l: string) => {
+                    const cleanL = l.trim().toLowerCase();
+                    return langMap[cleanL] || l.trim();
+                }).filter(Boolean);
+            }
+            // Platform
+            else if (cleanHeader === 'platform') {
+                bot.platform = val;
             }
             // Telegram Group
             else if (cleanHeader === 'telegramgroup' || cleanHeader === 'group' || cleanHeader === 'grup') {
                 bot.telegram_group = val;
             }
             // Website Url
-            else if (cleanHeader === 'websiteurl' || cleanHeader === 'website' || cleanHeader === 'web') {
+            else if (cleanHeader === 'websiteurl' || cleanHeader === 'website' || cleanHeader === 'web' || cleanHeader === 'websitesi') {
                 bot.website_url = val;
             }
             // App Url
@@ -410,15 +438,15 @@ const BotManagement = () => {
                 bot.youtube_url = val;
             }
             // X.com Url
-            else if (cleanHeader === 'xurl' || cleanHeader === 'twitter' || cleanHeader === 'twitterurl' || cleanHeader === 'xcom') {
+            else if (cleanHeader === 'xurl' || cleanHeader === 'twitter' || cleanHeader === 'twitterurl' || cleanHeader === 'xcom' || cleanHeader === 'x') {
                 bot.x_url = val;
             }
             // Android play store
-            else if (cleanHeader === 'androidurl' || cleanHeader === 'playstore' || cleanHeader === 'android') {
+            else if (cleanHeader === 'androidurl' || cleanHeader === 'playstore' || cleanHeader === 'android' || cleanHeader === 'androidappadresi') {
                 bot.android_url = val;
             }
             // iOS app store
-            else if (cleanHeader === 'iosurl' || cleanHeader === 'appstore' || cleanHeader === 'ios') {
+            else if (cleanHeader === 'iosurl' || cleanHeader === 'appstore' || cleanHeader === 'ios' || cleanHeader === 'iosappadresi') {
                 bot.ios_url = val;
             }
         });

@@ -7,7 +7,7 @@ import {
   MessageSquare, Briefcase, Music, Coins, Send, PenTool,
   ShoppingBag, Shield, GraduationCap, Play, Flame, Award,
   Sparkles, Bot, Globe, Link2, RefreshCw, Palette, Users, Code, Cloud, EyeOff,
-  MousePointerClick, Megaphone
+  MousePointerClick, Megaphone, Wallet, Image as ImageIcon, Gift
 } from 'lucide-react';
 
 const AppsIcon = ({ size = 20, className = "" }: { size?: number, className?: string }) => (
@@ -170,6 +170,26 @@ const MarketingAdsIcon = ({ size = 20, className = "" }: { size?: number, classN
   <Megaphone size={size} className={`stroke-[2.2] text-[#0a263d] dark:text-slate-200 ${className}`} />
 );
 
+const WalletsIcon = ({ size = 20, className = "" }: { size?: number, className?: string }) => (
+  <Wallet size={size} className={`stroke-[2.2] text-[#0a263d] dark:text-slate-200 ${className}`} />
+);
+
+const NftIcon = ({ size = 20, className = "" }: { size?: number, className?: string }) => (
+  <ImageIcon size={size} className={`stroke-[2.2] text-[#0a263d] dark:text-slate-200 ${className}`} />
+);
+
+const SocialCatIcon = ({ size = 20, className = "" }: { size?: number, className?: string }) => (
+  <Users size={size} className={`stroke-[2.2] text-[#0a263d] dark:text-slate-200 ${className}`} />
+);
+
+const AirdropsIcon = ({ size = 20, className = "" }: { size?: number, className?: string }) => (
+  <Gift size={size} className={`stroke-[2.2] text-[#0a263d] dark:text-slate-200 ${className}`} />
+);
+
+const BuildersIcon = ({ size = 20, className = "" }: { size?: number, className?: string }) => (
+  <Code size={size} className={`stroke-[2.2] text-[#0a263d] dark:text-slate-200 ${className}`} />
+);
+
 export const categories = [
   { id: 'all', label: 'cat_all', icon: AllIcon },
   { id: 'games', label: 'cat_games', desc: 'desc_cat_games', icon: GamesIcon },
@@ -189,6 +209,11 @@ export const categories = [
   { id: 'content', label: 'cat_content', desc: 'desc_cat_content', icon: ContentIcon },
   { id: 'marketing_ads', label: 'cat_marketing_ads', desc: 'desc_cat_marketing_ads', icon: MarketingAdsIcon },
   { id: 'defi', label: 'cat_defi', desc: 'desc_cat_defi', icon: FinanceIcon },
+  { id: 'wallets', label: 'cat_wallets', desc: 'desc_cat_wallets', icon: WalletsIcon },
+  { id: 'nft', label: 'cat_nft', desc: 'desc_cat_nft', icon: NftIcon },
+  { id: 'social', label: 'cat_social', desc: 'desc_cat_social', icon: SocialCatIcon },
+  { id: 'airdrops', label: 'cat_airdrops', desc: 'desc_cat_airdrops', icon: AirdropsIcon },
+  { id: 'builders', label: 'cat_builders', desc: 'desc_cat_builders', icon: BuildersIcon },
 ];
 
 export const mockBots: ExtendedBot[] = (realBotsData as any[]).map(bot => ({
