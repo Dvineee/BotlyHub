@@ -856,7 +856,7 @@ const CategoryBotCard: React.FC<{ bot: Bot; rank: number }> = React.memo(
 );
 
 const getMobileColumns = (bots: Bot[]) => {
-  const list = bots.slice(0, 9);
+  const list = bots.slice(0, 12);
   const cols = [];
 
   if (list.length <= 3) {
@@ -873,7 +873,7 @@ const getMobileColumns = (bots: Bot[]) => {
       if (row2[i]) colItems.push({ bot: row2[i], rank: i + 4 });
       cols.push(colItems);
     }
-  } else {
+  } else if (list.length <= 9) {
     const row1 = list.slice(0, 3);
     const row2 = list.slice(3, 6);
     const row3 = list.slice(6, 9);
@@ -883,6 +883,19 @@ const getMobileColumns = (bots: Bot[]) => {
       if (row1[i]) colItems.push({ bot: row1[i], rank: i + 1 });
       if (row2[i]) colItems.push({ bot: row2[i], rank: i + 4 });
       if (row3[i]) colItems.push({ bot: row3[i], rank: i + 7 });
+      cols.push(colItems);
+    }
+  } else {
+    // Up to 12 bots logic, with 4 columns
+    const row1 = list.slice(0, 4);
+    const row2 = list.slice(4, 8);
+    const row3 = list.slice(8, 12);
+
+    for (let i = 0; i < 4; i++) {
+      const colItems = [];
+      if (row1[i]) colItems.push({ bot: row1[i], rank: i + 1 });
+      if (row2[i]) colItems.push({ bot: row2[i], rank: i + 5 });
+      if (row3[i]) colItems.push({ bot: row3[i], rank: i + 9 });
       cols.push(colItems);
     }
   }
@@ -2548,7 +2561,7 @@ const Home = () => {
         );
       }
     }
-    const appsSlider = appsForList.slice(0, 9); // Limit to 9 as requested
+    const appsSlider = appsForList.slice(0, 12); // Limit to 12 as requested
 
     if (allApps.length > 0) {
       result["apps"] = {
@@ -2580,7 +2593,7 @@ const Home = () => {
           : b.category === selectedBotsCategory,
       );
     }
-    const botsSlider = botsForList.slice(0, 9); // Limit to 9 as requested
+    const botsSlider = botsForList.slice(0, 12); // Limit to 12 as requested
 
     if (allBots.length > 0) {
       result["bots"] = {
@@ -4009,7 +4022,7 @@ const Home = () => {
                             </div>
 
                             {(() => {
-                              const displayedBots = sliderBots.slice(0, 9);
+                              const displayedBots = sliderBots.slice(0, 12);
                               return (
                                 <>
                                   {/* Desktop Grid Layout (sm and up) */}
@@ -4156,7 +4169,7 @@ const Home = () => {
                             </div>
 
                             {(() => {
-                              const displayedBots = sliderBots.slice(0, 9);
+                              const displayedBots = sliderBots.slice(0, 12);
                               return (
                                 <>
                                   {/* Desktop Grid Layout (sm and up) */}
