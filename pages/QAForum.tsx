@@ -42,6 +42,8 @@ import {
   Trash2,
   Settings,
   Link2,
+  HelpCircle,
+  Info,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useTelegram } from "../hooks/useTelegram";
@@ -2562,8 +2564,7 @@ export default function QAForum() {
       <AnimatePresence>
         {isSearchModalOpen && (
           <div 
-            id="qa-search-backdrop"
-            className="fixed inset-0 z-[100] flex items-start justify-center p-4 pt-16 sm:pt-28 bg-black/40 dark:bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-[100] flex items-start justify-center p-4 pt-16 sm:pt-28 bg-black/40 dark:bg-black/60 backdrop-blur-sm select-none"
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.98, y: -8 }}
@@ -2586,8 +2587,9 @@ export default function QAForum() {
                 <button
                   onClick={() => setIsSearchModalOpen(false)}
                   className="text-slate-400/80 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-200 transition-colors shrink-0 p-1.5 rounded-lg hover:bg-slate-50 dark:hover:bg-white/5"
+                  title="Kapat"
                 >
-                  <X strokeWidth={1.8} size={16} />
+                  <X strokeWidth={1.8} size={18} />
                 </button>
               </div>
 
@@ -2619,7 +2621,7 @@ export default function QAForum() {
                     <span className="opacity-90">@</span> kullanıcılar
                   </button>
                 </div>
-
+                
                 {/* Conditional Display Area */}
                 {searchModalQuery.trim() === "" ? (
                   // Default View shown when search query is empty (as seen in screenshot)
@@ -2631,60 +2633,62 @@ export default function QAForum() {
                     {/* Item 1: Tartışma Başlat */}
                     <button
                       onClick={() => {
-                        haptic("medium");
+                        haptic("light");
                         setIsSearchModalOpen(false);
                         setShowCreateModal(true);
-                       }}
-                      className="w-full flex items-center gap-3.5 px-3 py-3 rounded-xl text-left transition-all active:scale-99 qa-search-modal-item"
-                    >
-                      <Link2 size={16} className="transform rotate-45 shrink-0 qa-icon" />
-                      <span className="text-[14px] font-medium">Tartışma başlat</span>
-                    </button>
-
-                    {/* Item 2: Yer İşaretleri */}
-                    <button
-                      onClick={() => {
-                        haptic("light");
-                        setIsSearchModalOpen(false);
-                        fetchTopics("son");
-                        setIsDetailView(false);
-                        setActiveTopic(null);
                       }}
-                      className="w-full flex items-center gap-3.5 px-3 py-3 rounded-xl text-left transition-all active:scale-99 qa-search-modal-item"
+                      className="w-full text-left flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 transition-all group qa-search-modal-item"
                     >
-                      <Bookmark size={16} className="shrink-0 qa-icon" />
-                      <span className="text-[14px] font-medium">Yer işaretleri</span>
+                      <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-indigo-50 dark:bg-indigo-950/40 text-indigo-500 border border-indigo-100/10 dark:border-indigo-500/15 group-hover:scale-105 transition-all qa-icon">
+                        <Plus strokeWidth={2} size={18} />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[13.5px] font-bold text-slate-800 dark:text-slate-250 select-none">
+                          Yeni Tartışma Başlat
+                        </span>
+                        <span className="text-[11px] text-slate-450 dark:text-slate-500 select-none">
+                          Foruma yeni bir konu ekle
+                        </span>
+                      </div>
                     </button>
-
-                    {/* Item 3: Profil */}
-                    <button
-                      onClick={() => {
-                        haptic("light");
-                        setIsSearchModalOpen(false);
-                        if (currentUser?.id) {
-                          navigate(`/user/${currentUser.id}`);
-                        } else {
-                          setIsLoginModalOpen(true);
-                        }
-                      }}
-                      className="w-full flex items-center gap-3.5 px-3 py-3 rounded-xl text-left transition-all active:scale-99 qa-search-modal-item"
+                    
+                    {/* Item 2: Kurallar & Rehber */}
+                    <a
+                      href="#/blog/forum-rules"
+                      onClick={() => setIsSearchModalOpen(false)}
+                      className="w-full text-left flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 transition-all group qa-search-modal-item"
                     >
-                      <User size={16} className="shrink-0 qa-icon" />
-                      <span className="text-[14px] font-medium">Profil</span>
-                    </button>
-
-                    {/* Item 4: Ayarlar */}
-                    <button
-                      onClick={() => {
-                        haptic("light");
-                        setIsSearchModalOpen(false);
-                        navigate("/settings");
-                      }}
-                      className="w-full flex items-center gap-3.5 px-3 py-3 rounded-xl text-left transition-all active:scale-99 mb-4 qa-search-modal-item"
+                      <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-blue-50 dark:bg-blue-950/40 text-blue-500 border border-blue-100/10 dark:border-blue-500/15 group-hover:scale-105 transition-all qa-icon">
+                        <HelpCircle strokeWidth={2} size={18} />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[13.5px] font-bold text-slate-800 dark:text-slate-250 select-none">
+                          Topluluk Kuralları & Rehber
+                        </span>
+                        <span className="text-[11px] text-slate-450 dark:text-slate-500 select-none">
+                          Lütfen paylaşımdan önce okuyun
+                        </span>
+                      </div>
+                    </a>
+                    
+                    {/* Item 3: Hakkımızda & İletişim */}
+                    <a
+                      href="#/blog/about"
+                      onClick={() => setIsSearchModalOpen(false)}
+                      className="w-full text-left flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 transition-all group qa-search-modal-item"
                     >
-                      <Settings size={16} className="shrink-0 qa-icon" />
-                      <span className="text-[14px] font-medium">Ayarlar</span>
-                    </button>
+                      <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-emerald-50 dark:bg-emerald-950/40 text-emerald-500 border border-emerald-100/10 dark:border-emerald-500/15 group-hover:scale-105 transition-all qa-icon">
+                        <Info strokeWidth={2} size={18} />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[13.5px] font-bold text-slate-800 dark:text-slate-250 select-none">
+                          BotlyHub Hakkında
+                        </span>
+                        <span className="text-[11px] text-slate-450 dark:text-slate-500 select-none">
+                          Sürüm, geliştiriciler ve vizyonumuz
+                        </span>
+                      </div>
+                    </a>
                     
                     {/* Horizontal Divider Line matching the screenshot precisely */}
                     <div className="border-b border-slate-150 dark:border-slate-800/85 -mx-4 my-2" />
@@ -2699,7 +2703,7 @@ export default function QAForum() {
                     {searchModalType !== "users" && (
                       <div className="flex flex-col gap-1.5">
                         {/* Filtered Tags */}
-                        {popularTags.filter(tag => tag.name.toLowerCase().includes(searchModalQuery.toLowerCase())).length > 0 && (
+                        {popularTags.filter(tag => tag.name.toLowerCase().includes(searchModalQuery.toLowerCase())).length > 0 ? (
                           <>
                             <span className="text-[12px] font-semibold text-slate-400 dark:text-slate-500 px-1 mb-1 block">
                               Etiketler
@@ -2727,7 +2731,11 @@ export default function QAForum() {
                                 ))}
                             </div>
                           </>
-                        )}
+                        ) : searchModalType === "tags" ? (
+                          <div className="py-6 text-center text-xs text-slate-400 dark:text-slate-500 font-medium select-none">
+                            Kriterlere uygun etiket bulunamadı
+                          </div>
+                        ) : null}
                       </div>
                     )}
 
@@ -2744,7 +2752,7 @@ export default function QAForum() {
                             }
                           })
                           .filter(u => u && u.name && u.name.toLowerCase().includes(searchModalQuery.toLowerCase()))
-                          .length > 0 && (
+                          .length > 0 ? (
                           <>
                             <span className="text-[12px] font-semibold text-slate-400 dark:text-slate-500 px-1 mb-1 block">
                               Kullanıcılar
@@ -2776,7 +2784,11 @@ export default function QAForum() {
                                 ))}
                             </div>
                           </>
-                        )}
+                        ) : searchModalType === "users" ? (
+                          <div className="py-6 text-center text-xs text-slate-400 dark:text-slate-500 font-medium select-none">
+                            Kriterlere uygun kullanıcı bulunamadı
+                          </div>
+                        ) : null}
                       </div>
                     )}
 
@@ -2787,7 +2799,7 @@ export default function QAForum() {
                           Tartışmalar
                         </span>
                         {topics.filter(t => t.title.toLowerCase().includes(searchModalQuery.toLowerCase()) || t.content.toLowerCase().includes(searchModalQuery.toLowerCase())).length > 0 ? (
-                          <div className="space-y-1.5 px-1 max-h-[260px] overflow-y-auto no-scrollbar">
+                          <div className="space-y-1.5 px-1">
                             {topics
                               .filter(t => t.title.toLowerCase().includes(searchModalQuery.toLowerCase()) || t.content.toLowerCase().includes(searchModalQuery.toLowerCase()))
                               .slice(0, 5)
@@ -2802,7 +2814,7 @@ export default function QAForum() {
                                   }}
                                   className="w-full p-3 rounded-xl text-left flex flex-col gap-1 qa-search-discussion-card"
                                 >
-                                  <span className="text-[13px] font-bold text-slate-800 dark:text-slate-200 line-clamp-1">{t.title}</span>
+                                  <span className="text-[13.5px] font-bold text-slate-800 dark:text-slate-200 line-clamp-1">{t.title}</span>
                                   <span className="text-[11px] text-slate-400 dark:text-slate-500 line-clamp-1">{t.content}</span>
                                 </button>
                               ))}

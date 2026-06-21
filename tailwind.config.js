@@ -58,7 +58,6 @@ export default {
         black: '600',
       },
       letterSpacing: {
-        tight: '-0.13px',
         wider: '0em',
         widest: '-0.013em',
       },

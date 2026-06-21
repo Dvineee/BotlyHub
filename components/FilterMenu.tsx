@@ -113,7 +113,7 @@ export const FilterMenu: React.FC = () => {
                   }}
                   className={`flex-1 py-1.5 text-center text-[11px] font-extrabold uppercase tracking-wider rounded-lg transition-all ${
                     searchMode === 'apps'
-                      ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-xs'
+                      ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
                       : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'
                   }`}
                 >

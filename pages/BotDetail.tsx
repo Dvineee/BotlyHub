@@ -2669,7 +2669,7 @@ const BotDetail = () => {
             </div>
 
             {/* Right Column (PC only) - Action bar moved here for large screens */}
-            <aside className="hidden lg:flex flex-col gap-4 sticky top-10 h-fit pr-6 lg:pr-0 mt-10">
+            <aside className="hidden lg:flex flex-col gap-4 sticky top-10 h-fit pr-6 lg:pr-0 mt-10 bot-detail-aside">
               {/* Action Buttons for Sidebar */}
               <div className="flex flex-col gap-4">
                 <button

@@ -109,7 +109,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onAuth }) => {
             initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            className="bg-white dark:bg-[#14181f] w-full max-w-lg rounded-3xl overflow-y-auto max-h-[90vh] md:max-h-none md:overflow-visible relative shadow-2xl border border-black/5 dark:border-white/5"
+            className="bg-white dark:bg-[#111214] w-full max-w-lg rounded-3xl overflow-y-auto max-h-[90vh] md:max-h-none md:overflow-visible relative shadow-2xl border border-black/5 dark:border-white/5"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-6 sm:p-8">

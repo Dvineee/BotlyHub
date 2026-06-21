@@ -53,6 +53,7 @@ import {
   Sliders,
   Settings,
   Globe,
+  Check,
 } from "lucide-react";
 import { useNavigate, Link as RouterLink } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
@@ -2291,6 +2292,10 @@ const Home = () => {
   const [showHomeSearchDropdown, setShowHomeSearchDropdown] = useState(false);
   const [isSearchLoading, setIsSearchLoading] = useState(false);
   const homeSearchRef = useRef<HTMLDivElement>(null);
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+  const [searchModalType, setSearchModalType] = useState<"all" | "bots" | "apps">("all");
+  const [homeActiveFilter, setHomeActiveFilter] = useState<'all' | 'paid' | 'free' | 'popular' | 'bhub'>('all');
+  const [isHomeFilterOpen, setIsHomeFilterOpen] = useState(false);
 
   useEffect(() => {
     if (homeSearchQuery.trim()) {
@@ -2321,13 +2326,27 @@ const Home = () => {
   const filteredDropdownBots = useMemo(() => {
     if (!homeSearchQuery.trim()) return [];
     return bots
-      .filter(
-        (bot) =>
+      .filter((bot) => {
+        const matchesQuery =
           bot.name.toLowerCase().includes(homeSearchQuery.toLowerCase()) ||
-          bot.description.toLowerCase().includes(homeSearchQuery.toLowerCase()),
-      )
+          bot.description.toLowerCase().includes(homeSearchQuery.toLowerCase());
+
+        if (!matchesQuery) return false;
+
+        const isApp = Array.isArray(bot.category)
+          ? bot.category.includes("apps")
+          : bot.category === "apps";
+
+        if (searchModalType === "bots") {
+          return !isApp;
+        }
+        if (searchModalType === "apps") {
+          return isApp;
+        }
+        return true;
+      })
       .slice(0, 25);
-  }, [bots, homeSearchQuery]);
+  }, [bots, homeSearchQuery, searchModalType]);
   const { activeFilter, searchMode, setSearchMode } = useFilter();
 
   useEffect(() => {
@@ -2944,151 +2963,33 @@ const Home = () => {
               </div>
 
               <div className="hidden md:flex md:flex-1 md:max-w-4xl order-3 md:order-2 items-center gap-4 lg:gap-8 font-sans justify-center">
-                {/* Tablet/PC View - Instant Search Dropdown */}
+                {/* Tablet/PC View - Search Launch Trigger */}
                 <div
-                  ref={homeSearchRef}
                   className="hidden md:block md:flex-1 md:max-w-[280px] lg:max-w-[320px] relative z-[130]"
                 >
-                  <div className="relative flex items-center group transition-all h-[42px] px-3 premium-search-container">
-                    {isSearchLoading ? (
-                      <Loader2
-                        size={16}
-                        className="text-blue-500 animate-spin shrink-0 mr-2"
-                      />
-                    ) : (
-                      <Search
-                        size={15}
-                        className="text-slate-400 dark:text-slate-500 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors shrink-0 mr-2"
-                      />
-                    )}
-                    <input
-                      type="text"
-                      value={homeSearchQuery}
-                      onChange={(e) => {
-                        setHomeSearchQuery(e.target.value);
-                        setShowHomeSearchDropdown(true);
-                      }}
-                      onFocus={() => setShowHomeSearchDropdown(true)}
-                      placeholder="Herşeyi ara"
-                      className="w-full h-full bg-transparent border-none outline-none text-[13.5px] text-[#2c2c2e] dark:text-slate-200 font-semibold tracking-wide placeholder-slate-400 dark:placeholder-slate-500 shrink min-w-0 py-0"
+                  <div
+                    onClick={() => {
+                      haptic("light");
+                      setIsSearchModalOpen(true);
+                    }}
+                    className="relative flex items-center group transition-all h-[42px] px-3 premium-search-container cursor-pointer select-none active:scale-[0.99]"
+                  >
+                    <Search
+                      size={15}
+                      className="text-slate-400 dark:text-slate-500 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors shrink-0 mr-2"
                     />
-
-                    {homeSearchQuery && (
-                      <button
-                        onClick={() => {
-                          setHomeSearchQuery("");
-                          setShowHomeSearchDropdown(false);
-                        }}
-                        className="p-1 hover:text-slate-700 dark:hover:text-slate-200 text-slate-400 rounded-full transition-all shrink-0 mr-1"
-                      >
-                        <X size={14} />
-                      </button>
-                    )}
+                    <div className="flex-1 text-[13.5px] text-slate-400 dark:text-slate-500 font-semibold tracking-wide truncate">
+                      Herşeyi ara...
+                    </div>
 
                     {/* Vertical Divider */}
                     <div className="w-px h-5 bg-black/[0.08] dark:bg-white/[0.08] mx-1 shrink-0" />
 
-                    {/* Filter Menu */}
-                    <div className="shrink-0 relative z-[140]">
+                    {/* Filter Menu (Decorative/Trigger in Modal) */}
+                    <div className="shrink-0 relative z-[140] pointer-events-none opacity-80">
                       <FilterMenu />
                     </div>
                   </div>
-
-                  {/* Dropdown Container */}
-                  <AnimatePresence>
-                    {showHomeSearchDropdown && homeSearchQuery && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        transition={{ duration: 0.15 }}
-                        className="absolute left-0 right-0 mt-2 bg-white dark:bg-[#111214] border border-slate-100 dark:border-slate-800/80 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.12)] p-2.5 z-[200] max-h-[385px] flex flex-col overflow-hidden"
-                      >
-                        {/* Results List */}
-                        <div className="space-y-1 overflow-y-auto max-h-[290px] pr-1 custom-scrollbar">
-                          {filteredDropdownBots.length === 0 ? (
-                            <div className="py-6 text-center text-[12px] text-slate-400 dark:text-slate-500 font-medium">
-                              Herhangi bir sonuç bulunamadı
-                            </div>
-                          ) : (
-                            filteredDropdownBots.map((bot, index) => (
-                              <motion.div
-                                key={bot.id}
-                                initial={{ opacity: 0, y: 6 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{
-                                  duration: 0.18,
-                                  delay: index * 0.03,
-                                  ease: "easeOut",
-                                }}
-                                onClick={() => {
-                                  haptic("light");
-                                  navigate(`/bot/${bot.slug}`);
-                                  setShowHomeSearchDropdown(false);
-                                }}
-                                className="flex items-center gap-3 p-2 hover:bg-slate-50 dark:hover:bg-slate-800/40 rounded-xl cursor-pointer transition-colors group"
-                              >
-                                <img
-                                  src={getLiveBotIcon(bot)}
-                                  alt={bot.name}
-                                  className="w-8 h-8 rounded-lg object-cover bg-slate-50 dark:bg-slate-850 border border-slate-100 dark:border-white/5 shrink-0"
-                                  onError={(e) => {
-                                    (e.target as any).src =
-                                      `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`;
-                                  }}
-                                />
-                                <div className="min-w-0 flex-1">
-                                  <div className="flex items-center gap-1.5">
-                                    <h4 className="text-[13px] font-bold text-slate-800 dark:text-slate-200 group-hover:text-blue-500 transition-colors truncate">
-                                      {bot.name}
-                                    </h4>
-                                    {bot.is_official && (
-                                      <svg
-                                        width="11"
-                                        height="11"
-                                        viewBox="0 0 16 16"
-                                        fill="none"
-                                        className="text-[#139fec] shrink-0"
-                                      >
-                                        <path
-                                          fillRule="evenodd"
-                                          clipRule="evenodd"
-                                          d="M7.408 1.2375C7.57933 1.11017 7.78667 1.0415 8 1.0415C8.21333 1.0415 8.42067 1.11017 8.592 1.23749L9.81067 2.14417C9.83467 2.16217 9.86133 2.1755 9.88933 2.18484C9.91733 2.19417 9.94733 2.19884 9.97733 2.19817L11.496 2.18084C11.7093 2.17817 11.918 2.24484 12.09 2.37017C12.2627 2.4955 12.39 2.6735 12.454 2.87684L12.9073 4.32617C12.916 4.35484 12.93 4.3815 12.9473 4.4055C12.9647 4.4295 12.986 4.45084 13.0107 4.46817L14.2493 5.34684C14.4233 5.47017 14.5527 5.64617 14.6187 5.8495C14.6847 6.05217 14.6833 6.27084 14.6153 6.4735L14.13 7.91284C14.1207 7.94084 14.1153 7.97084 14.1153 8.00017C14.1153 8.0295 14.12 8.0595 14.13 8.0875L14.6153 9.52684C14.6833 9.72884 14.6847 9.9475 14.6187 10.1508C14.5527 10.3535 14.4233 10.5302 14.2493 10.6535L13.0107 11.5322C12.9867 11.5495 12.9653 11.5702 12.9473 11.5948C12.93 11.6188 12.9167 11.6455 12.9073 11.6742L12.454 13.1235C12.3907 13.3268 12.2627 13.5048 12.09 13.6302C11.9173 13.7555 11.7093 13.8222 11.496 13.8195L9.97733 13.8022C9.94733 13.8015 9.918 13.8062 9.88933 13.8155C9.86133 13.8248 9.83467 13.8382 9.81067 13.8562L8.592 14.7628C8.42067 14.8902 8.21333 14.9588 8 14.9588C7.78667 14.9588 7.57933 14.8902 7.408 14.7628L6.18933 13.8562C6.16533 13.8382 6.13867 13.8248 6.11067 13.8155C6.08267 13.8062 6.05267 13.8015 6.02267 13.8022L4.504 13.8195C4.29067 13.8222 4.082 13.7550 3.91 13.6302C3.73733 13.5048 3.61 13.3268 3.546 13.1235L3.09267 11.6742C3.084 11.6455 3.07 11.6188 3.05267 11.5948C3.03533 11.5708 3.014 11.5495 2.98933 11.5322L1.75067 10.6535C1.57667 10.5302 1.44733 10.3542 1.38133 10.1508C1.31533 9.94817 1.31667 9.7295 1.38467 9.52684L1.87 8.00017C1.88067 8.0595 1.88533 8.03017 1.88533 8.00017C1.88533 7.97017 1.88067 7.94084 1.87067 7.91284L1.38533 6.4735C1.31733 6.2715 1.316 6.05284 1.382 5.8495C1.448 5.64684 1.57733 5.47084 1.75133 5.3475L1.75133 5.3475L2.99 4.46884C3.014 4.45084 3.03533 4.43017 3.05333 4.40617C3.07067 4.38217 3.084 4.3555 3.09333 4.32684L3.54667 2.8775C3.61 2.67417 3.738 2.49617 3.91067 2.37084C4.08333 2.2455 4.29133 2.17884 4.50467 2.1815L6.02333 2.19884C6.05333 2.1995 6.08266 2.19484 6.11133 2.1855C6.13933 2.17617 6.166 2.16284 6.19 2.14484L7.408 1.2375Z"
-                                          fill="currentColor"
-                                        ></path>
-                                      </svg>
-                                    )}
-                                  </div>
-                                  <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate leading-normal">
-                                    {bot.description.startsWith("bot_")
-                                      ? t(bot.description)
-                                      : bot.description}
-                                  </p>
-                                </div>
-                              </motion.div>
-                            ))
-                          )}
-                        </div>
-
-                        {/* Clean Explore Link */}
-                        <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-center select-none text-center">
-                          <span
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              haptic("medium");
-                              navigate(
-                                `/search?q=${encodeURIComponent(homeSearchQuery)}`,
-                              );
-                              setShowHomeSearchDropdown(false);
-                            }}
-                            className="text-[12px] font-bold text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 transition-colors cursor-pointer inline-flex items-center gap-1.5 py-1"
-                          >
-                            Tümünü Keşfet →
-                          </span>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
                 </div>
 
                 {/* Header Navigation Links (Discover, Categories, My Bots) */}
@@ -3857,7 +3758,7 @@ const Home = () => {
           <div
             onClick={() => {
               haptic("light");
-              navigate("/search");
+              setIsSearchModalOpen(true);
             }}
             className="flex items-center flex-1 min-w-0 cursor-pointer active:scale-[0.98] transition-transform"
           >
@@ -4893,6 +4794,466 @@ const Home = () => {
               </button>
             </div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isSearchModalOpen && (
+          <div
+            id="home-search-backdrop"
+            onClick={(e) => {
+              if ((e.target as HTMLElement).id === "home-search-backdrop") {
+                setIsSearchModalOpen(false);
+              }
+            }}
+            className="fixed inset-0 z-[3000] flex items-start justify-center p-0 sm:p-4 pt-0 sm:pt-28 bg-black/40 dark:bg-black/60 backdrop-blur-sm select-none"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.98, y: -8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.98, y: -8 }}
+              transition={{ duration: 0.15, ease: "easeOut" }}
+              className="bg-white dark:bg-slate-900 border-0 sm:border border-slate-200/50 dark:border-slate-800 rounded-none sm:rounded-2xl max-w-full sm:max-w-[620px] w-full h-full sm:h-auto max-h-screen sm:max-h-[85vh] min-h-screen sm:min-h-[460px] shadow-xl overflow-hidden flex flex-col qa-search-modal-container"
+            >
+              {/* Top search bar wrapper */}
+              <div className="flex items-center gap-3 px-[8px] py-[4px] border-b border-slate-100/80 dark:border-slate-800/80 qa-custom-search-wrapper">
+                {isSearchLoading ? (
+                  <Loader2 strokeWidth={1.8} size={20} className="text-indigo-500 dark:text-indigo-400 shrink-0 animate-spin" />
+                ) : (
+                  <Search strokeWidth={1.8} size={20} className="text-slate-400 dark:text-slate-500 shrink-0" />
+                )}
+                <input
+                  type="text"
+                  value={homeSearchQuery}
+                  onChange={(e) => setHomeSearchQuery(e.target.value)}
+                  placeholder={t("search_placeholder") || "Herşeyi ara..."}
+                  className="flex-1 bg-transparent text-[16px] font-normal text-slate-800 dark:text-slate-100 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500 border-none py-[7px] px-[2px] shadow-none focus:ring-0 focus:outline-none qa-custom-search-input"
+                  autoFocus
+                />
+                <div className="relative shrink-0">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      haptic("light");
+                      setIsHomeFilterOpen(!isHomeFilterOpen);
+                    }}
+                    className={`text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-200 transition-all shrink-0 p-1.5 rounded-lg hover:bg-slate-50 dark:hover:bg-white/5 active:scale-95 ${
+                      homeActiveFilter !== "all" ? "text-indigo-500 dark:text-indigo-400 bg-indigo-50/50 dark:bg-indigo-500/10" : ""
+                    }`}
+                    title={t("filter") || "Filtrele"}
+                  >
+                    <SlidersHorizontal strokeWidth={1.8} size={18} />
+                  </button>
+
+                  <AnimatePresence>
+                    {isHomeFilterOpen && (
+                      <>
+                        <div 
+                          className="fixed inset-0 z-[140]" 
+                          onClick={() => setIsHomeFilterOpen(false)}
+                        />
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.95, y: 8 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.95, y: 8 }}
+                          className="absolute right-0 mt-2 w-52 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl shadow-2xl p-1.5 z-[150] select-none"
+                        >
+                          <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800 mb-1 flex items-center justify-between">
+                            <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+                              {t("filter") || "Filtrele"}
+                            </span>
+                          </div>
+
+                          {[
+                            { id: 'all', label: t('all') || 'Tümü', icon: SlidersHorizontal, color: 'text-indigo-500' },
+                            { id: 'paid', label: t('paid') || 'Ücretli', icon: Zap, color: 'text-amber-500' },
+                            { id: 'free', label: t('free') || 'Ücretsiz', icon: Gift, color: 'text-emerald-500' },
+                            { id: 'popular', label: t('popular') || 'En Popüler', icon: TrendingUp, color: 'text-rose-500' },
+                            { id: 'bhub', label: t('bhub_original') || 'BHub Orijinal', icon: Sparkles, color: 'text-blue-500' },
+                          ].map((opt) => {
+                            const IconComponent = opt.icon;
+                            return (
+                              <button
+                                key={opt.id}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  haptic("light");
+                                  setHomeActiveFilter(opt.id as any);
+                                  setIsHomeFilterOpen(false);
+                                }}
+                                className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-white/5 text-left transition-all group"
+                              >
+                                <div className="flex items-center gap-2.5">
+                                  <IconComponent size={16} className={`${opt.color} ${homeActiveFilter === opt.id ? 'opacity-100' : 'opacity-60 group-hover:opacity-100'}`} />
+                                  <span className={`text-[12px] font-bold ${
+                                    homeActiveFilter === opt.id ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white'
+                                  }`}>
+                                    {opt.label}
+                                  </span>
+                                </div>
+                                {homeActiveFilter === opt.id && <Check size={14} className="text-indigo-600 dark:text-indigo-400 shrink-0" />}
+                              </button>
+                            );
+                          })}
+                        </motion.div>
+                      </>
+                    )}
+                  </AnimatePresence>
+                </div>
+                <button
+                  onClick={() => setIsSearchModalOpen(false)}
+                  className="text-slate-400/80 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-200 transition-colors shrink-0 p-1.5 rounded-lg hover:bg-slate-50 dark:hover:bg-white/5"
+                  title="Kapat"
+                >
+                  <X strokeWidth={1.8} size={18} />
+                </button>
+              </div>
+
+              {/* Filter Tabs / Type Selector - Styled exactly like Q&A forum page's search tabs but adapted for bots & apps */}
+              <div className="px-4 py-2 border-b border-slate-100/50 dark:border-slate-800/50 flex items-center gap-2 select-none overflow-x-auto no-scrollbar shrink-0">
+                <button
+                  onClick={() => setSearchModalType("all")}
+                  className={`flex items-center gap-1 px-3.5 py-1.5 rounded-full text-[13px] font-medium transition-all border shrink-0 qa-search-tag-btn ${
+                    searchModalType === "all" ? "active" : ""
+                  }`}
+                >
+                  {t("search_all") || "Tümü"}
+                </button>
+                <button
+                  onClick={() => setSearchModalType("bots")}
+                  className={`flex items-center gap-1 px-3.5 py-1.5 rounded-full text-[13px] font-medium transition-all border shrink-0 qa-search-tag-btn ${
+                    searchModalType === "bots" ? "active" : ""
+                  }`}
+                >
+                  {t("search_bots") || "Botlar"}
+                </button>
+                <button
+                  onClick={() => setSearchModalType("apps")}
+                  className={`flex items-center gap-1 px-3.5 py-1.5 rounded-full text-[13px] font-medium transition-all border shrink-0 qa-search-tag-btn ${
+                    searchModalType === "apps" ? "active" : ""
+                  }`}
+                >
+                  {t("search_apps") || "Uygulamalar"}
+                </button>
+              </div>
+
+              {/* Main inner body container */}
+              <div className="p-4 flex flex-col gap-4 flex-1 overflow-y-auto custom-scrollbar">
+                <AnimatePresence mode="wait">
+                  {homeSearchQuery.trim() === "" ? (
+                    // Empty search query state: Show beautiful recommendations / categories / trending items
+                    <motion.div
+                      key="empty-state"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                      className="flex flex-col flex-1"
+                    >
+                    <span className="text-[13px] font-semibold text-slate-400 dark:text-slate-500 mb-2.5 block px-1.5 pt-1 select-none">
+                      {t("popular_categories") || "Popüler Kategoriler"}
+                    </span>
+                    <div className="flex flex-wrap gap-2 mb-4 px-1.5">
+                      {/* Popular search terms / pills */}
+                      {categories.slice(0, 4).map((cat) => (
+                        <button
+                          key={cat.id}
+                          onClick={() => {
+                            setHomeSearchQuery(t(cat.label));
+                          }}
+                          className="px-3.5 py-1.5 border rounded-xl text-xs font-semibold transition-colors qa-search-result-pill"
+                        >
+                          {t(cat.label)}
+                        </button>
+                      ))}
+                      {appsSubCategories.slice(0, 4).map((cat) => (
+                        <button
+                          key={cat.id}
+                          onClick={() => {
+                            setHomeSearchQuery(t(cat.label));
+                          }}
+                          className="px-3.5 py-1.5 border rounded-xl text-xs font-semibold transition-colors qa-search-result-pill"
+                        >
+                          {t(cat.label)}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Showcase some promoted official/featured items to provide a stunning interface */}
+                    <span className="text-[13px] font-semibold text-slate-400 dark:text-slate-500 mb-2.5 block px-1.5 pt-1 select-none">
+                      {t("recommended_bots") || "Önerilen" + " " + "Bot ve Uygulamalar"}
+                    </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 px-1.5">
+                      {bots.slice(0, 4).map((bot) => (
+                        <div
+                          key={bot.id}
+                          onClick={() => {
+                            haptic("light");
+                            setIsSearchModalOpen(false);
+                            navigate(`/bot/${bot.slug}`);
+                          }}
+                          className="flex items-center gap-3 p-3 rounded-2xl cursor-pointer transition-all group qa-search-discussion-card"
+                        >
+                          <img
+                            src={getLiveBotIcon(bot)}
+                            alt={bot.name}
+                            className="w-10 h-10 rounded-xl object-cover bg-slate-50 dark:bg-slate-850 border border-slate-100 dark:border-white/5 shrink-0"
+                            onError={(e) => {
+                              (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`;
+                            }}
+                          />
+                          <div className="min-w-0 flex-1">
+                            <h4 className="text-[13px] font-bold text-slate-800 dark:text-slate-200 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors truncate">
+                              {bot.name}
+                            </h4>
+                            <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate leading-normal">
+                              {bot.description.startsWith("bot_") ? t(bot.description) : bot.description}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Horizontal Divider Line matching the screenshot precisely */}
+                    <div className="border-b border-slate-100 dark:border-slate-800/80 -mx-4 my-2.5" />
+
+                    {/* Beautiful blank bottom area as seen in the screenshot */}
+                    <div className="flex-1" />
+                  </motion.div>
+                ) : (
+                  // Search query is not empty: render RESULTS in separate lists
+                  <motion.div
+                    key="results-state"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="flex flex-col gap-3.5 h-full"
+                  >
+                    {/* Bots list section */}
+                    {(searchModalType === "all" || searchModalType === "bots") && (
+                      <div className="flex flex-col gap-1.55">
+                        {bots.filter((b) => {
+                          const isApp = Array.isArray(b.category) ? b.category.includes("apps") : b.category === "apps";
+                          if (isApp) return false;
+                          const matchesQuery = b.name.toLowerCase().includes(homeSearchQuery.toLowerCase()) || 
+                                               b.description.toLowerCase().includes(homeSearchQuery.toLowerCase());
+                          if (!matchesQuery) return false;
+
+                          let matchesFilter = true;
+                          if (homeActiveFilter === "paid") matchesFilter = (b.price || 0) > 0;
+                          else if (homeActiveFilter === "free") matchesFilter = (b.price || 0) === 0;
+                          else if (homeActiveFilter === "bhub") matchesFilter = !!b.is_official;
+
+                          return matchesFilter;
+                        }).length > 0 ? (
+                          <>
+                            <span className="text-[12px] font-semibold text-slate-400 dark:text-slate-500 px-1 mb-1 block select-none">
+                              {t("bots") || "Botlar"}
+                            </span>
+                            <div className="space-y-1">
+                              {bots
+                                .filter((b) => {
+                                  const isApp = Array.isArray(b.category) ? b.category.includes("apps") : b.category === "apps";
+                                  if (isApp) return false;
+                                  const matchesQuery = b.name.toLowerCase().includes(homeSearchQuery.toLowerCase()) || 
+                                                       b.description.toLowerCase().includes(homeSearchQuery.toLowerCase());
+                                  if (!matchesQuery) return false;
+
+                                  let matchesFilter = true;
+                                  if (homeActiveFilter === "paid") matchesFilter = (b.price || 0) > 0;
+                                  else if (homeActiveFilter === "free") matchesFilter = (b.price || 0) === 0;
+                                  else if (homeActiveFilter === "bhub") matchesFilter = !!b.is_official;
+
+                                  return matchesFilter;
+                                })
+                                .sort((a, b) => {
+                                  if (homeActiveFilter === "popular") return (b.views || 0) - (a.views || 0);
+                                  return 0;
+                                })
+                                .slice(0, 10)
+                                .map((bot) => (
+                                  <div
+                                    key={bot.id}
+                                    onClick={() => {
+                                      haptic("light");
+                                      setIsSearchModalOpen(false);
+                                      navigate(`/bot/${bot.slug}`);
+                                    }}
+                                    className="flex items-center gap-3.5 p-2 px-2.5 rounded-xl cursor-pointer transition-colors group qa-search-modal-item"
+                                  >
+                                    <img
+                                      src={getLiveBotIcon(bot)}
+                                      alt={bot.name}
+                                      className="w-10 h-10 rounded-xl object-cover bg-slate-50 dark:bg-slate-850 border border-slate-100 dark:border-white/5 shrink-0"
+                                      onError={(e) => {
+                                        (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`;
+                                      }}
+                                    />
+                                    <div className="min-w-0 flex-1">
+                                      <div className="flex items-center gap-1.5">
+                                        <h4 className="text-[13.5px] font-bold text-slate-800 dark:text-slate-200 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors truncate">
+                                          {bot.name}
+                                        </h4>
+                                        {bot.is_official && (
+                                          <svg
+                                            width="11"
+                                            height="11"
+                                            viewBox="0 0 16 16"
+                                            fill="none"
+                                            className="text-[#139fec] shrink-0"
+                                          >
+                                            <path
+                                              fillRule="evenodd"
+                                              clipRule="evenodd"
+                                              d="M7.408 1.2375C7.57933 1.11017 7.78667 1.0415 8 1.0415C8.21333 1.0415 8.42067 1.11017 8.592 1.23749L9.81067 2.14417C9.83467 2.16217 9.86133 2.1755 9.88933 2.18484C9.91733 2.19417 9.94733 2.19884 9.97733 2.19817L11.496 2.18084C11.7093 2.17817 11.918 2.24484 12.09 2.37017C12.2627 2.4955 12.39 2.6735 12.454 2.87684L12.9073 4.32617C12.916 4.35484 12.93 4.3815 12.9473 4.4055C12.9647 4.4295 12.986 4.45084 13.0107 4.46817L14.2493 5.34684C14.4233 5.47017 14.5527 5.64617 14.6187 5.8495C14.6847 6.05217 14.6833 6.27084 14.6153 6.4735L14.13 7.91284C14.1207 7.94084 14.1153 7.97084 14.1153 8.00017C14.1153 8.0295 14.12 8.0595 14.13 8.0875L14.6153 9.52684C14.6833 9.72884 14.6847 9.9475 14.6187 10.1508C14.5527 10.3535 14.4233 10.5302 14.2493 10.6535L13.0107 11.5322C12.9867 11.5495 12.9653 11.5702 12.9473 11.5948C12.93 11.6188 12.9167 11.6455 12.9073 11.6742L12.454 13.1235C12.3907 13.3268 12.2627 13.5048 12.09 13.6302C11.9173 13.7555 11.7093 13.8222 11.496 13.8195L9.97733 13.8022C9.94733 13.8015 9.918 13.8062 9.88933 13.8155C9.86133 13.8248 9.83467 13.8382 9.81067 13.8562L8.592 14.7628C8.42067 14.8902 8.21333 14.9588 8 14.9588C7.78667 14.9588 7.57933 14.8902 7.408 14.7628L6.18933 13.8562C6.16533 13.8382 6.13867 13.8248 6.11067 13.8155C6.08267 13.8062 6.05267 13.8015 6.02267 13.8022L4.504 13.8195C4.29067 13.8222 4.082 13.7550 3.91 13.6302C3.73733 13.5048 3.61 13.3268 3.546 13.1235L3.09267 11.6742C3.084 11.6455 3.07 11.6188 3.05267 11.5948C3.03533 11.5708 3.014 11.5495 2.98933 11.5322L1.75067 10.6535C1.57667 10.5302 1.44733 10.3542 1.38133 10.1508C1.31533 9.94817 1.31667 9.7295 1.38467 9.52684L1.87 8.00017C1.88067 8.0595 1.88533 8.03017 1.88533 8.00017C1.88533 7.97017 1.88067 7.94084 1.87067 7.91284L1.38533 6.4735C1.31733 6.2715 1.316 6.05284 1.382 5.8495C1.448 5.64684 1.57733 5.47084 1.75133 5.3475L1.75133 5.3475L2.99 4.46884C3.014 4.45084 3.03533 4.43017 3.05333 4.40617C3.07067 4.38217 3.084 4.3555 3.09333 4.32684L3.54667 2.8775C3.61 2.67417 3.738 2.49617 3.91067 2.37084C4.08333 2.2455 4.29133 2.17884 4.50467 2.1815L6.02333 2.19884C6.05333 2.1995 6.08266 2.19484 6.11133 2.1855C6.13933 2.17617 6.166 2.16284 6.19 2.14484L7.408 1.2375Z"
+                                              fill="currentColor"
+                                            ></path>
+                                          </svg>
+                                        )}
+                                      </div>
+                                      <p className="text-[12px] text-slate-400 dark:text-slate-500 truncate leading-normal">
+                                        {bot.description.startsWith("bot_") ? t(bot.description) : bot.description}
+                                      </p>
+                                    </div>
+                                  </div>
+                                ))}
+                            </div>
+                          </>
+                        ) : searchModalType === "bots" ? (
+                          <div className="py-6 text-center text-[12px] text-slate-400 dark:text-slate-500 font-medium select-none">
+                            Kriterlere uygun bot bulunamadı
+                          </div>
+                        ) : null}
+                      </div>
+                    )}
+
+                    {/* Apps list section */}
+                    {(searchModalType === "all" || searchModalType === "apps") && (
+                      <div className="flex flex-col gap-1.5">
+                        {bots.filter((b) => {
+                          const isApp = Array.isArray(b.category) ? b.category.includes("apps") : b.category === "apps";
+                          if (!isApp) return false;
+                          const matchesQuery = b.name.toLowerCase().includes(homeSearchQuery.toLowerCase()) || 
+                                               b.description.toLowerCase().includes(homeSearchQuery.toLowerCase());
+                          if (!matchesQuery) return false;
+
+                          let matchesFilter = true;
+                          if (homeActiveFilter === "paid") matchesFilter = (b.price || 0) > 0;
+                          else if (homeActiveFilter === "free") matchesFilter = (b.price || 0) === 0;
+                          else if (homeActiveFilter === "bhub") matchesFilter = !!b.is_official;
+
+                          return matchesFilter;
+                        }).length > 0 ? (
+                          <>
+                            <span className="text-[12px] font-semibold text-slate-400 dark:text-slate-500 px-1 mb-1 block select-none">
+                              {t("apps") || "Uygulamalar"}
+                            </span>
+                            <div className="space-y-1">
+                              {bots
+                                .filter((b) => {
+                                  const isApp = Array.isArray(b.category) ? b.category.includes("apps") : b.category === "apps";
+                                  if (!isApp) return false;
+                                  const matchesQuery = b.name.toLowerCase().includes(homeSearchQuery.toLowerCase()) || 
+                                                       b.description.toLowerCase().includes(homeSearchQuery.toLowerCase());
+                                  if (!matchesQuery) return false;
+
+                                  let matchesFilter = true;
+                                  if (homeActiveFilter === "paid") matchesFilter = (b.price || 0) > 0;
+                                  else if (homeActiveFilter === "free") matchesFilter = (b.price || 0) === 0;
+                                  else if (homeActiveFilter === "bhub") matchesFilter = !!b.is_official;
+
+                                  return matchesFilter;
+                                })
+                                .sort((a, b) => {
+                                  if (homeActiveFilter === "popular") return (b.views || 0) - (a.views || 0);
+                                  return 0;
+                                })
+                                .slice(0, 10)
+                                .map((bot) => (
+                                  <div
+                                    key={bot.id}
+                                    onClick={() => {
+                                      haptic("light");
+                                      setIsSearchModalOpen(false);
+                                      navigate(`/bot/${bot.slug}`);
+                                    }}
+                                    className="flex items-center gap-3.5 p-2 px-2.5 rounded-xl cursor-pointer transition-colors group qa-search-modal-item"
+                                  >
+                                    <img
+                                      src={getLiveBotIcon(bot)}
+                                      alt={bot.name}
+                                      className="w-10 h-10 rounded-xl object-cover bg-slate-50 dark:bg-slate-850 border border-slate-100 dark:border-white/5 shrink-0"
+                                      onError={(e) => {
+                                        (e.target as any).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=334155&color=fff&bold=true`;
+                                      }}
+                                    />
+                                    <div className="min-w-0 flex-1">
+                                      <div className="flex items-center gap-1.5">
+                                        <h4 className="text-[13.5px] font-bold text-slate-800 dark:text-slate-200 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors truncate">
+                                          {bot.name}
+                                        </h4>
+                                        {bot.is_official && (
+                                          <svg
+                                            width="11"
+                                            height="11"
+                                            viewBox="0 0 16 16"
+                                            fill="none"
+                                            className="text-[#139fec] shrink-0"
+                                          >
+                                            <path
+                                              fillRule="evenodd"
+                                              clipRule="evenodd"
+                                              d="M7.408 1.2375C7.57933 1.11017 7.78667 1.0415 8 1.0415C8.21333 1.0415 8.42067 1.11017 8.592 1.23749L9.81067 2.14417C9.83467 2.16217 9.86133 2.1755 9.88933 2.18484C9.91733 2.19417 9.94733 2.19884 9.97733 2.19817L11.496 2.18084C11.7093 2.17817 11.918 2.24484 12.09 2.37017C12.2627 2.4955 12.39 2.6735 12.454 2.87684L12.9073 4.32617C12.916 4.35484 12.93 4.3815 12.9473 4.4055C12.9647 4.4295 12.986 4.45084 13.0107 4.46817L14.2493 5.34684C14.4233 5.47017 14.5527 5.64617 14.6187 5.8495C14.6847 6.05217 14.6833 6.27084 14.6153 6.4735L14.13 7.91284C14.1207 7.94084 14.1153 7.97084 14.1153 8.00017C14.1153 8.0295 14.12 8.0595 14.13 8.0875L14.6153 9.52684C14.6833 9.72884 14.6847 9.9475 14.6187 10.1508C14.5527 10.3535 14.4233 10.5302 14.2493 10.6535L13.0107 11.5322C12.9867 11.5495 12.9653 11.5702 12.9473 11.5948C12.93 11.6188 12.9167 11.6455 12.9073 11.6742L12.454 13.1235C12.3907 13.3268 12.2627 13.5048 12.09 13.6302C11.9173 13.7555 11.7093 13.8222 11.496 13.8195L9.97733 13.8022C9.94733 13.8015 9.918 13.8062 9.88933 13.8155C9.86133 13.8248 9.83467 13.8382 9.81067 13.8562L8.592 14.7628C8.42067 14.8902 8.21333 14.9588 8 14.9588C7.78667 14.9588 7.57933 14.8902 7.408 14.7628L6.18933 13.8562C6.16533 13.8382 6.13867 13.8248 6.11067 13.8155C6.08267 13.8062 6.05267 13.8015 6.02267 13.8022L4.504 13.8195C4.29067 13.8222 4.082 13.7550 3.91 13.6302C3.73733 13.5048 3.61 13.3268 3.546 13.1235L3.09267 11.6742C3.084 11.6455 3.07 11.6188 3.05267 11.5948C3.03533 11.5708 3.014 11.5495 2.98933 11.5322L1.75067 10.6535C1.57667 10.5302 1.44733 10.3542 1.38133 10.1508C1.31533 9.94817 1.31667 9.7295 1.38467 9.52684L1.87 8.00017C1.88067 8.0595 1.88533 8.03017 1.88533 8.00017C1.88533 7.97017 1.88067 7.94084 1.87067 7.91284L1.38533 6.4735C1.31733 6.2715 1.316 6.05284 1.382 5.8495C1.448 5.64684 1.57733 5.47084 1.75133 5.3475L1.75133 5.3475L2.99 4.46884C3.014 4.45084 3.03533 4.43017 3.05333 4.40617C3.07067 4.38217 3.084 4.3555 3.09333 4.32684L3.54667 2.8775C3.61 2.67417 3.738 2.49617 3.91067 2.37084C4.08333 2.2455 4.29133 2.17884 4.50467 2.1815L6.02333 2.19884C6.05333 2.1995 6.08266 2.19484 6.11133 2.1855C6.13933 2.17617 6.166 2.16284 6.19 2.14484L7.408 1.2375Z"
+                                              fill="currentColor"
+                                            ></path>
+                                          </svg>
+                                        )}
+                                      </div>
+                                      <p className="text-[12px] text-slate-400 dark:text-slate-500 truncate leading-normal">
+                                        {bot.description.startsWith("bot_") ? t(bot.description) : bot.description}
+                                      </p>
+                                    </div>
+                                  </div>
+                                ))}
+                            </div>
+                          </>
+                        ) : searchModalType === "apps" ? (
+                          <div className="py-6 text-center text-[12px] text-slate-400 dark:text-slate-500 font-medium select-none">
+                            Kriterlere uygun uygulama bulunamadı
+                          </div>
+                        ) : null}
+                      </div>
+                    )}
+
+                    {/* Empty state: No bot and no app match query at all */}
+                    {bots.filter((b) => {
+                      const isBotAndVisible = (searchModalType === "all" || searchModalType === "bots") && !(Array.isArray(b.category) ? b.category.includes("apps") : b.category === "apps");
+                      const isAppAndVisible = (searchModalType === "all" || searchModalType === "apps") && (Array.isArray(b.category) ? b.category.includes("apps") : b.category === "apps");
+                      
+                      if (!isBotAndVisible && !isAppAndVisible) return false;
+
+                      const matchesQuery = b.name.toLowerCase().includes(homeSearchQuery.toLowerCase()) || 
+                                           b.description.toLowerCase().includes(homeSearchQuery.toLowerCase());
+                      if (!matchesQuery) return false;
+
+                      let matchesFilter = true;
+                      if (homeActiveFilter === "paid") matchesFilter = (b.price || 0) > 0;
+                      else if (homeActiveFilter === "free") matchesFilter = (b.price || 0) === 0;
+                      else if (homeActiveFilter === "bhub") matchesFilter = !!b.is_official;
+
+                      return matchesFilter;
+                    }).length === 0 && (
+                      <div className="py-12 text-center text-[12px] text-slate-400 dark:text-slate-500 font-medium select-none">
+                        Aramanızla eşleşen sonuç bulunamadı
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+                </AnimatePresence>
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>
