@@ -2580,9 +2580,16 @@ const BotDetail = () => {
                 )}
                 {bot.languages && bot.languages.length > 0 && (
                   <div className="flex flex-col bg-white dark:bg-slate-900 border border-black/5 dark:border-white/5 p-4 rounded-xl stats-card-bg mb-6">
-                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                      {t("detail_languages") || "Diller"}
-                    </span>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                        {t("detail_languages") || "Diller"}
+                      </span>
+                      {bot.platform && (
+                        <span className="font-semibold" style={{ fontSize: '13px', color: '#8c8c8c' }}>
+                          {bot.platform}
+                        </span>
+                      )}
+                    </div>
                     <span className="text-[13px] font-medium text-slate-800 dark:text-slate-200 mt-1">
                       {formatLanguages(bot.languages)}
                     </span>
@@ -2799,10 +2806,17 @@ const BotDetail = () => {
 
               {/* Languages Section for Desktop */}
               {bot.languages && bot.languages.length > 0 && (
-                <div className="flex flex-col bg-slate-100/40 dark:bg-slate-900/40 rounded-2xl border border-slate-200/50 dark:border-white/5 p-6 stats-card-bg transition-colors duration-300 font-medium">
-                  <span className="text-xs font-black text-slate-900 dark:text-white uppercase bot-detail-section-title mb-2">
-                    {t("detail_languages") || "Diller"}
-                  </span>
+                <div className="flex flex-col bg-slate-100/40 dark:bg-slate-900/40 rounded-2xl border border-slate-200/50 dark:border-white/5 p-6 stats-card-bg transition-colors duration-300 font-medium font-sans">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-black text-slate-900 dark:text-white uppercase bot-detail-section-title">
+                      {t("detail_languages") || "Diller"}
+                    </span>
+                    {bot.platform && (
+                      <span className="font-semibold" style={{ fontSize: '13px', color: '#8c8c8c' }}>
+                        {bot.platform}
+                      </span>
+                    )}
+                  </div>
                   <span className="text-sm font-medium text-slate-700 dark:text-slate-400 leading-relaxed">
                     {formatLanguages(bot.languages)}
                   </span>

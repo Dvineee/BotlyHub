@@ -268,6 +268,295 @@ const BotManagement = () => {
     const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
     const [selectedBotIds, setSelectedBotIds] = useState<string[]>([]);
 
+    const [isCsvModalOpen, setIsCsvModalOpen] = useState(false);
+    const [csvType, setCsvType] = useState<'apps' | 'bots'>('apps');
+    const [csvPreview, setCsvPreview] = useState<any[]>([]);
+    const [csvError, setCsvError] = useState<string | null>(null);
+    const [skippedCount, setSkippedCount] = useState<number>(0);
+    const [isImporting, setIsImporting] = useState(false);
+    const [importLog, setImportLog] = useState<string[]>([]);
+    const [showSample, setShowSample] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const parseCSV = (text: string) => {
+        const lines: string[] = [];
+        let row = [""];
+        let insideQuote = false;
+        
+        for (let i = 0; i < text.length; i++) {
+            const char = text[i];
+            const nextChar = text[i + 1];
+            
+            if (char === '"') {
+                if (insideQuote && nextChar === '"') {
+                    row[row.length - 1] += '"';
+                    i++; // Skip next quote
+                } else {
+                    insideQuote = !insideQuote;
+                }
+            } else if ((char === ',' || char === ';') && !insideQuote) {
+                row.push("");
+            } else if ((char === '\r' || char === '\n') && !insideQuote) {
+                if (char === '\r' && nextChar === '\n') {
+                    i++;
+                }
+                lines.push(JSON.stringify(row));
+                row = [""];
+            } else {
+                row[row.length - 1] += char;
+            }
+        }
+        if (row.length > 1 || row[0] !== "") {
+            lines.push(JSON.stringify(row));
+        }
+        
+        return lines.map(line => {
+            try {
+                return JSON.parse(line);
+            } catch (err) {
+                return [];
+            }
+        });
+    };
+
+    const mapCsvRowToBot = (row: string[], headers: string[], type: 'apps' | 'bots') => {
+        const bot: any = {
+            id: generateUniqueId(),
+            name: '',
+            description: '',
+            price: 0,
+            category: type === 'apps' ? ['apps'] : ['utilities'],
+            bot_link: '@',
+            icon: '',
+            screenshots: [],
+            is_official: false,
+            telegram_group: '',
+            website_url: '',
+            app_url: '',
+            social_url: '',
+            github_url: '',
+            youtube_url: '',
+            x_url: '',
+            android_url: '',
+            ios_url: '',
+            promoted_type: 'none',
+            languages: ['🇹🇷']
+        };
+
+        headers.forEach((header, index) => {
+            const cleanHeader = (header || '').toLowerCase().trim().replace(/['"_-]/g, '');
+            const val = (row[index] || '').trim();
+
+            if (!val) return;
+
+            // Name
+            if (cleanHeader === 'name' || cleanHeader === 'baslik' || cleanHeader === 'isim' || cleanHeader === 'title') {
+                bot.name = val;
+            }
+            // Link
+            else if (cleanHeader === 'botlink' || cleanHeader === 'link' || cleanHeader === 'username' || cleanHeader === 'kullaniciadi') {
+                bot.bot_link = val.startsWith('@') || val.startsWith('https://') ? val : '@' + val;
+            }
+            // Description
+            else if (cleanHeader === 'description' || cleanHeader === 'desc' || cleanHeader === 'aciklama' || cleanHeader === 'details') {
+                bot.description = val;
+            }
+            // Price
+            else if (cleanHeader === 'price' || cleanHeader === 'ucret' || cleanHeader === 'fiyat') {
+                const num = parseFloat(val.replace(/[^0-9.]/g, ''));
+                bot.price = isNaN(num) ? 0 : num;
+            }
+            // Category
+            else if (cleanHeader === 'category' || cleanHeader === 'categories' || cleanHeader === 'kategori') {
+                const parsedCats = val.split(',').map((c: string) => c.trim().toLowerCase()).filter(Boolean);
+                if (type === 'apps') {
+                    if (!parsedCats.includes('apps')) parsedCats.push('apps');
+                    bot.category = parsedCats;
+                } else {
+                    bot.category = parsedCats.filter((c: string) => c !== 'apps');
+                    if (bot.category.length === 0) bot.category = ['utilities'];
+                }
+            }
+            // Icon
+            else if (cleanHeader === 'icon' || cleanHeader === 'avatar' || cleanHeader === 'resim') {
+                bot.icon = val;
+            }
+            // Is Official
+            else if (cleanHeader === 'isofficial' || cleanHeader === 'official' || cleanHeader === 'resmi') {
+                bot.is_official = val.toLowerCase() === 'true' || val === '1' || val.toLowerCase() === 'evet' || val.toLowerCase() === 'yes';
+            }
+            // Languages
+            else if (cleanHeader === 'languages' || cleanHeader === 'language' || cleanHeader === 'diller' || cleanHeader === 'dil') {
+                bot.languages = val.split(',').map((l: string) => l.trim()).filter(Boolean);
+            }
+            // Telegram Group
+            else if (cleanHeader === 'telegramgroup' || cleanHeader === 'group' || cleanHeader === 'grup') {
+                bot.telegram_group = val;
+            }
+            // Website Url
+            else if (cleanHeader === 'websiteurl' || cleanHeader === 'website' || cleanHeader === 'web') {
+                bot.website_url = val;
+            }
+            // App Url
+            else if (cleanHeader === 'appurl' || cleanHeader === 'app' || cleanHeader === 'uygulamaurl') {
+                bot.app_url = val;
+            }
+            // GitHub Url
+            else if (cleanHeader === 'githuburl' || cleanHeader === 'github') {
+                bot.github_url = val;
+            }
+            // YouTube Url
+            else if (cleanHeader === 'youtubeurl' || cleanHeader === 'youtube') {
+                bot.youtube_url = val;
+            }
+            // X.com Url
+            else if (cleanHeader === 'xurl' || cleanHeader === 'twitter' || cleanHeader === 'twitterurl' || cleanHeader === 'xcom') {
+                bot.x_url = val;
+            }
+            // Android play store
+            else if (cleanHeader === 'androidurl' || cleanHeader === 'playstore' || cleanHeader === 'android') {
+                bot.android_url = val;
+            }
+            // iOS app store
+            else if (cleanHeader === 'iosurl' || cleanHeader === 'appstore' || cleanHeader === 'ios') {
+                bot.ios_url = val;
+            }
+        });
+
+        return bot;
+    };
+
+    const handleCsvUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setCsvError(null);
+        setCsvPreview([]);
+        setSkippedCount(0);
+        setImportLog([]);
+        
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                const text = event.target?.result as string;
+                if (!text) {
+                    setCsvError("Dosya içeriği boş veya okunamadı.");
+                    return;
+                }
+
+                const rows = parseCSV(text);
+                if (rows.length < 2) {
+                    setCsvError("Geçersiz CSV formatı. En azından bir başlık satırı ve bir veri satırı bulunmalıdır.");
+                    return;
+                }
+
+                const headers = rows[0];
+                const cleanHeaders = headers.map((h: string) => (h || '').toLowerCase().trim().replace(/['"_-]/g, ''));
+                const hasName = cleanHeaders.some((h: string) => h === 'name' || h === 'baslik' || h === 'isim' || h === 'title');
+                const hasLink = cleanHeaders.some((h: string) => h === 'botlink' || h === 'link' || h === 'username' || h === 'kullaniciadi');
+
+                if (!hasName || !hasLink) {
+                    setCsvError("CSV dosyasında 'name' ('isim'/'başlık') ve 'bot_link' ('kullanıcı adı'/'link') kolonları zorunludur.");
+                    return;
+                }
+
+                const previewData = rows.slice(1)
+                    .filter((row: string[]) => row.length > 0 && row.some(cell => (cell || '').trim() !== ''))
+                    .map((row: string[]) => mapCsvRowToBot(row, headers, csvType));
+
+                const existingLinks = new Set(bots.map(b => b.bot_link?.trim().toLowerCase().replace(/^@/, '')));
+                
+                const filteredPreview = previewData.filter(bot => {
+                    if (!bot.bot_link) return true;
+                    const cleanLink = bot.bot_link.trim().toLowerCase().replace(/^@/, '');
+                    return !existingLinks.has(cleanLink);
+                });
+
+                const countSkipped = previewData.length - filteredPreview.length;
+                setSkippedCount(countSkipped);
+
+                if (filteredPreview.length === 0) {
+                    if (countSkipped > 0) {
+                        setCsvError(`Seçilen tüm uygulamalar (${countSkipped} adet) zaten sistemde kayıtlı olduğu için içe aktarılacak yeni bir ürün bulunamaz.`);
+                    } else {
+                        setCsvError("İçe aktarılacak geçerli satır bulunamadı.");
+                    }
+                } else {
+                    setCsvPreview(filteredPreview);
+                }
+            } catch (err: any) {
+                console.error("CSV parse error:", err);
+                setCsvError("CSV dosyası ayrıştırılamadı: " + (err.message || "Bilinmeyen hata"));
+            }
+        };
+        reader.onerror = () => {
+            setCsvError("Dosya okunurken hata oluştu.");
+        };
+        reader.readAsText(file, 'UTF-8');
+    };
+
+    const runImport = async () => {
+        if (csvPreview.length === 0) return;
+        setIsImporting(true);
+        setImportLog([]);
+        const logs: string[] = [];
+
+        try {
+            let successCount = 0;
+            let duplicateCount = 0;
+            let failCount = 0;
+
+            for (const bot of csvPreview) {
+                if (!bot.name || !bot.bot_link || bot.bot_link === '@') {
+                    logs.push(`⚠️ Atlandı: Geçersiz isim veya kullanıcı adı (Satır eksik).`);
+                    failCount++;
+                    continue;
+                }
+
+                const cleanLink = bot.bot_link.trim().toLowerCase().replace(/^@/, '');
+                
+                const isDuplicate = bots.some(b => b.bot_link?.trim().toLowerCase().replace(/^@/, '') === cleanLink);
+                if (isDuplicate) {
+                    logs.push(`⚠️ Atlandı: '${bot.name}' (@${cleanLink}) zaten kayıtlı.`);
+                    duplicateCount++;
+                    continue;
+                }
+
+                try {
+                    await DatabaseService.saveBot(bot);
+                    logs.push(`✅ Eklendi: ${bot.name} (@${cleanLink})`);
+                    successCount++;
+                } catch (err: any) {
+                    logs.push(`❌ Hata: '${bot.name}' eklenirken hata: ${err.message || "Bilinmeyen hata"}`);
+                    failCount++;
+                }
+            }
+
+            logs.push(`---`);
+            logs.push(`🎉 İŞLEM TAMAMLANDI!`);
+            logs.push(`• Kaydedilen Yeni Ürün: ${successCount}`);
+            logs.push(`• Çift Kayıt Nedeniyle Atlanan: ${duplicateCount}`);
+            logs.push(`• Başarısız/Hatalı: ${failCount}`);
+
+            DatabaseService.logActivity(
+                'admin', 
+                'bot_manage', 
+                'bulk_import', 
+                'Toplu İçe Aktarma (CSV)', 
+                `Toplu CSV içe aktarma işlemi çalıştırıldı. ${successCount} ürün eklendi.`
+            ).catch(console.error);
+
+            setImportLog(logs);
+            setCsvPreview([]);
+            if (fileInputRef.current) fileInputRef.current.value = '';
+            await load();
+        } catch (err: any) {
+            console.error("Bulk import process error:", err);
+            alert("İçe aktarma sırasında beklenmedik hata oluştu!");
+        } finally {
+            setIsImporting(false);
+        }
+    };
+
     const load = useCallback(async () => {
         setIsLoading(true);
         setBots(await DatabaseService.getBotsWithStats());
@@ -317,7 +606,8 @@ const BotManagement = () => {
             android_url: '',
             ios_url: '',
             promoted_type: 'none',
-            languages: ['🇹🇷']
+            languages: ['🇹🇷'],
+            platform: ''
         });
         setIsModalOpen(true);
         setActiveTab('info');
@@ -437,6 +727,19 @@ const BotManagement = () => {
                         className="bg-blue-600 hover:bg-blue-500 hover:scale-[1.01] px-5 py-2.5 rounded-xl text-xs font-semibold text-white transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm"
                     >
                         <Plus size={16} /> Yeni Ürün Tanımla
+                    </button>
+                    <button 
+                        onClick={() => {
+                            setCsvType(listFilter === 'apps' ? 'apps' : 'bots');
+                            setCsvPreview([]);
+                            setCsvError(null);
+                            setImportLog([]);
+                            setIsCsvModalOpen(true);
+                        }}
+                        className="px-5 h-11 bg-slate-900/60 hover:bg-slate-850 border border-slate-800 rounded-xl text-slate-300 hover:text-white transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm"
+                        title="CSV ile toplu ürün yükle"
+                    >
+                        <Database size={15} className="text-blue-400" /> Toplu CSV Yükle
                     </button>
                     <button 
                         onClick={load}
@@ -924,6 +1227,7 @@ const BotManagement = () => {
                                                         </div>
                                                     </div>
 
+                                                    <AdminInput label="PLATFORM" value={editingBot.platform || ''} onChange={(v:any)=>setEditingBot({...editingBot, platform:v})} placeholder="Örn: Telegram, Web, Android" />
                                                     <AdminInput label="TELEGRAM GRUP (@)" value={editingBot.telegram_group || ''} onChange={(v:any)=>setEditingBot({...editingBot, telegram_group:v})} placeholder="@groupname" />
                                                     <AdminInput label="WEB SİTE URL" value={editingBot.website_url || ''} onChange={(v:any)=>setEditingBot({...editingBot, website_url:v})} placeholder="https://..." />
                                                     <AdminInput label="GITHUB URL" value={editingBot.github_url || ''} onChange={(v:any)=>setEditingBot({...editingBot, github_url:v})} placeholder="https://github.com/..." />
@@ -1014,6 +1318,259 @@ const BotManagement = () => {
                                 </form>
                             </div>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {isCsvModalOpen && (
+                <div className="fixed inset-0 z-[120] bg-black/95 flex items-center justify-center p-4 backdrop-blur-3xl animate-in fade-in duration-300">
+                    <div className="bg-[#020617] border border-white/10 rounded-[32px] w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden relative shadow-2xl">
+                        
+                        {/* Close button */}
+                        <button 
+                            type="button"
+                            onClick={() => {
+                                setIsCsvModalOpen(false);
+                                setCsvPreview([]);
+                                setCsvError(null);
+                                setSkippedCount(0);
+                                setImportLog([]);
+                            }} 
+                            className="absolute top-6 right-6 p-2.5 bg-white/5 rounded-xl hover:bg-red-600 hover:text-white transition-all active:scale-90 text-slate-400 cursor-pointer"
+                        >
+                            <X size={18} />
+                        </button>
+
+                        <div className="p-8 pb-4 border-b border-white/5 flex items-center gap-4">
+                            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                                <Database size={18} className="text-white" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg lg:text-xl font-bold text-white uppercase tracking-wider">Toplu Veri Aktarımı (CSV)</h3>
+                                <p className="text-xs text-slate-400 mt-0.5">Sisteme CSV biçiminde toplu şekilde bot ve uygulama yükleyin.</p>
+                            </div>
+                        </div>
+
+                        <div className="flex-1 overflow-y-auto p-8 space-y-6 scrollbar-thin">
+                            {/* Type selector inside the modal */}
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-extrabold uppercase text-slate-400 tracking-widest block font-sans">Yüklenecek Ürün Türü</label>
+                                <div className="flex gap-2 p-1 bg-[#090d16]/80 border border-white/5 rounded-xl w-fit">
+                                    <button 
+                                        type="button"
+                                        onClick={() => {
+                                            setCsvType('apps');
+                                            setCsvPreview([]);
+                                            setCsvError(null);
+                                            setSkippedCount(0);
+                                            setImportLog([]);
+                                        }}
+                                        className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${csvType === 'apps' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}`}
+                                    >
+                                        Uygulamalar (Apps)
+                                    </button>
+                                    <button 
+                                        type="button"
+                                        onClick={() => {
+                                            setCsvType('bots');
+                                            setCsvPreview([]);
+                                            setCsvError(null);
+                                            setSkippedCount(0);
+                                            setImportLog([]);
+                                        }}
+                                        className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${csvType === 'bots' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}`}
+                                    >
+                                        Botlar (Bots)
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* CSV Guidelines & copyable sample */}
+                            <div className="bg-slate-900/20 border border-white/5 rounded-2xl p-5 space-y-3">
+                                <div className="flex justify-between items-center">
+                                    <h4 className="text-xs font-black text-slate-300 uppercase tracking-widest flex items-center gap-1.5 font-sans">
+                                        <Info size={14} className="text-blue-400" /> CSV Şablon Kuralları
+                                    </h4>
+                                    <button 
+                                        type="button"
+                                        onClick={() => setShowSample(!showSample)}
+                                        className="text-[10px] font-bold uppercase text-blue-400 hover:text-blue-300 tracking-wider transition-all cursor-pointer bg-transparent border-none"
+                                    >
+                                        {showSample ? 'Şablonu Gizle' : 'Örnek Şablon Göster'}
+                                    </button>
+                                </div>
+                                <ul className="text-xs text-slate-400 space-y-1 ml-4 list-disc font-sans">
+                                    <li>Format: İlk satır başlıklar (kolon isimleri) olmalıdır. Ayırıcı olarak virgül (<code className="text-blue-400">,</code>) veya noktalı virgül (<code className="text-blue-400">;</code>) kullanılabilir.</li>
+                                    <li>Zorunlu Kolonlar: <code className="text-blue-400 font-mono">name</code> (isim) ve <code className="text-blue-400 font-mono">bot_link</code> (Telegram kullanıcı adı / slug).</li>
+                                    <li>İsteğe Bağlı Kolonlar: <code className="text-slate-400 font-mono">description, price, category, icon, is_official, languages, website_url, app_url, telegram_group, github_url</code></li>
+                                </ul>
+
+                                {showSample && (
+                                    <div className="bg-black/80 border border-white/5 rounded-xl p-4 font-mono text-[11px] text-emerald-400 relative overflow-x-auto space-y-2 select-all">
+                                        <div className="absolute top-2 right-2 flex gap-1">
+                                            <button 
+                                                type="button"
+                                                onClick={() => {
+                                                    const text = csvType === 'apps' 
+                                                        ? 'name,bot_link,description,price,category,icon,is_official,languages,website_url,app_url,github_url\nTelegram Wallet,wallet,"Send TON crypto.",0,"apps,finance,wallet",https://example.com/wallet.jpg,true,"🇺🇸,🇹🇷",https://wallet.tg,https://t.me/wallet,https://github.com/ton'
+                                                        : 'name,bot_link,description,price,category,icon,is_official,languages,telegram_group,website_url\nBotlyHub Cleaner,cleaner_bot,"Keep groups clean.",5,"utilities,moderation",https://example.com/cleaner.jpg,true,"🇺🇸,🇹🇷",https://t.me/my_group,https://botlyhub.org';
+                                                    navigator.clipboard.writeText(text);
+                                                    alert("Örnek panoya kopyalandı!");
+                                                }}
+                                                className="px-2.5 py-1 bg-white/5 hover:bg-white/10 rounded-lg text-[9px] uppercase font-bold text-slate-400 hover:text-white transition-all cursor-pointer border border-white/5"
+                                            >
+                                                Kopyala
+                                            </button>
+                                        </div>
+                                        <div className="text-slate-500 uppercase font-black text-[9px] tracking-widest pb-1 mb-1 border-b border-white/5">
+                                            {csvType === 'apps' ? 'Uygulamalar için Örnek İçerik:' : 'Botlar için Örnek İçerik:'}
+                                        </div>
+                                        {csvType === 'apps' ? (
+                                            <>
+                                                <div>name,bot_link,description,price,category,icon,is_official,languages,website_url,app_url,github_url</div>
+                                                <div className="text-slate-300">Telegram Wallet,wallet,"Send TON crypto.",0,"apps,finance,wallet",https://example.com/wallet.jpg,true,"🇺🇸,🇹🇷",https://wallet.tg,https://t.me/wallet,https://github.com/ton</div>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <div>name,bot_link,description,price,category,icon,is_official,languages,telegram_group,website_url</div>
+                                                <div className="text-slate-300 font-mono">BotlyHub Cleaner,cleaner_bot,"Keep groups clean.",5,"utilities,moderation",https://example.com/cleaner.jpg,true,"🇺🇸,🇹🇷",https://t.me/my_group,https://botlyhub.org</div>
+                                            </>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Drop & Select file */}
+                            <div className="flex flex-col items-center justify-center border-2 border-dashed border-white/10 rounded-2xl p-8 bg-slate-900/10 text-center hover:border-blue-500/50 hover:bg-slate-900/30 transition-all cursor-pointer relative group">
+                                <input 
+                                    ref={fileInputRef}
+                                    type="file" 
+                                    accept=".csv"
+                                    onChange={handleCsvUpload}
+                                    className="absolute inset-0 opacity-0 cursor-pointer"
+                                    disabled={isImporting}
+                                />
+                                <div className="w-12 h-12 rounded-xl bg-blue-500/5 border border-blue-500/10 flex items-center justify-center text-blue-400 mb-3 group-hover:scale-110 transition-all">
+                                    <FileText size={22} />
+                                </div>
+                                <span className="text-xs font-bold text-white font-sans">CSV Dosyası Seçin</span>
+                                <span className="text-[10px] text-slate-500 mt-1 font-sans">Sürükleyip bırakabilir veya tıklayarak bilgisayarınızdan seçebilirsiniz (.csv)</span>
+                            </div>
+
+                            {/* Error display */}
+                            {csvError && (
+                                <div className="bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs p-4 rounded-xl flex items-center gap-3 animate-in fade-in font-sans">
+                                    <AlertTriangle size={16} className="text-rose-400 shrink-0" />
+                                    <span>{csvError}</span>
+                                </div>
+                            )}
+
+                            {/* Duplicate skipping info */}
+                            {skippedCount > 0 && (
+                                <div className="bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs p-4 rounded-xl flex items-center gap-3 animate-in fade-in font-sans">
+                                    <Info size={16} className="text-amber-400 shrink-0" />
+                                    <span><strong>{skippedCount} adet</strong> zaten ekli olan uygulama/bot listeden otomatik olarak ayıklandı ve atlandı.</span>
+                                </div>
+                            )}
+
+                            {/* Log console logs */}
+                            {importLog.length > 0 && (
+                                <div className="space-y-2 animate-in fade-in">
+                                    <h4 className="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider font-sans">İçe Aktarma Konsol Çıktısı</h4>
+                                    <div className="bg-[#090d16] border border-white/5 rounded-xl p-4 font-mono text-[11px] text-slate-300 h-44 overflow-y-auto space-y-1 scrollbar-thin">
+                                        {importLog.map((log, i) => (
+                                            <div key={i} className="leading-relaxed">
+                                                {log}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Preview section */}
+                            {csvPreview.length > 0 && (
+                                <div className="space-y-3 animate-in fade-in">
+                                    <div className="flex justify-between items-center">
+                                        <h4 className="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider font-sans">
+                                            İçe Aktarılacak Ürünler ({csvPreview.length} adet)
+                                        </h4>
+                                        <span className="text-[10px] text-blue-450 font-semibold uppercase tracking-wider font-sans">Önizleme modu</span>
+                                    </div>
+                                    <div className="border border-white/5 rounded-xl overflow-hidden bg-[#090d16] max-h-56 overflow-y-auto scrollbar-thin">
+                                        <table className="w-full text-left text-xs border-collapse">
+                                            <thead>
+                                                <tr className="bg-slate-900 border-b border-white/5 text-slate-400 font-bold font-sans">
+                                                    <th className="p-3">Adı</th>
+                                                    <th className="p-3">Kullanıcı Adı</th>
+                                                    <th className="p-3">Kategori</th>
+                                                    <th className="p-3">Ücret</th>
+                                                    <th className="p-3">Diller</th>
+                                                    <th className="p-3">Resmi</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-white/5 text-slate-300 font-sans">
+                                                {csvPreview.map((bot, i) => (
+                                                    <tr key={i} className="hover:bg-white/5">
+                                                        <td className="p-3 font-semibold text-white">{bot.name}</td>
+                                                        <td className="p-3 text-blue-400 font-mono">{bot.bot_link}</td>
+                                                        <td className="p-3 font-mono">
+                                                            <span className="bg-slate-950/80 px-2 py-0.5 rounded text-[10px] border border-slate-800/10 text-slate-400 font-sans">
+                                                                {bot.category?.join(', ')}
+                                                            </span>
+                                                        </td>
+                                                        <td className="p-3 font-mono">{bot.price > 0 ? `$${bot.price}` : 'Ücretsiz'}</td>
+                                                        <td className="p-3">{bot.languages?.join(', ')}</td>
+                                                        <td className="p-3 font-mono">
+                                                            {bot.is_official ? (
+                                                                <span className="text-emerald-450 font-bold">Evet</span>
+                                                            ) : (
+                                                                <span className="text-slate-500">Hayır</span>
+                                                            )}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            )}
+
+                        </div>
+
+                        {/* Modal Footer actions */}
+                        <div className="p-6 border-t border-white/5 bg-slate-950/50 flex justify-end gap-3 rounded-b-[32px]">
+                            <button 
+                                type="button"
+                                onClick={() => {
+                                    setIsCsvModalOpen(false);
+                                    setCsvPreview([]);
+                                    setCsvError(null);
+                                    setSkippedCount(0);
+                                    setImportLog([]);
+                                }}
+                                className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-850 border border-slate-800 text-xs font-semibold text-slate-400 hover:text-white transition-all active:scale-95 cursor-pointer font-sans"
+                                disabled={isImporting}
+                            >
+                                Kapat
+                            </button>
+                            <button 
+                                type="button"
+                                onClick={runImport}
+                                disabled={csvPreview.length === 0 || isImporting}
+                                className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95 flex items-center gap-2 font-sans ${
+                                    csvPreview.length > 0 && !isImporting
+                                    ? 'bg-blue-600 hover:bg-blue-500 text-white cursor-pointer shadow-lg shadow-blue-950/20'
+                                    : 'bg-[#121724] text-slate-500 cursor-not-allowed border border-white/5'
+                                }`}
+                            >
+                                {isImporting ? (
+                                    <><Loader2 size={13} className="animate-spin" /> İçe Aktarılıyor...</>
+                                ) : (
+                                    <><CheckCircle2 size={13} /> {csvPreview.length} Ürünü İçe Aktar</>
+                                )}
+                            </button>
+                        </div>
+
                     </div>
                 </div>
             )}

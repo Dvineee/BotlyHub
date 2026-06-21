@@ -590,9 +590,10 @@ export class DatabaseService {
     social_url_clean: string | null;
     android_url: string | null;
     ios_url: string | null;
+    platform: string | null;
   } {
     if (!socialUrl) {
-      return { github_url: null, youtube_url: null, x_url: null, social_url_clean: null, android_url: null, ios_url: null };
+      return { github_url: null, youtube_url: null, x_url: null, social_url_clean: null, android_url: null, ios_url: null, platform: null };
     }
 
     try {
@@ -606,6 +607,7 @@ export class DatabaseService {
           social_url_clean: parsed.social_url || parsed.other || null,
           android_url: parsed.android_url || null,
           ios_url: parsed.ios_url || null,
+          platform: parsed.platform || null,
         };
       }
     } catch (e) {
@@ -614,17 +616,17 @@ export class DatabaseService {
 
     const urlLower = socialUrl.toLowerCase();
     if (urlLower.includes('github.com')) {
-      return { github_url: socialUrl, youtube_url: null, x_url: null, social_url_clean: null, android_url: null, ios_url: null };
+      return { github_url: socialUrl, youtube_url: null, x_url: null, social_url_clean: null, android_url: null, ios_url: null, platform: null };
     } else if (urlLower.includes('youtube.com') || urlLower.includes('youtu.be')) {
-      return { github_url: null, youtube_url: socialUrl, x_url: null, social_url_clean: null, android_url: null, ios_url: null };
+      return { github_url: null, youtube_url: socialUrl, x_url: null, social_url_clean: null, android_url: null, ios_url: null, platform: null };
     } else if (urlLower.includes('twitter.com') || urlLower.includes('x.com')) {
-      return { github_url: null, youtube_url: null, x_url: socialUrl, social_url_clean: null, android_url: null, ios_url: null };
+      return { github_url: null, youtube_url: null, x_url: socialUrl, social_url_clean: null, android_url: null, ios_url: null, platform: null };
     } else if (urlLower.includes('play.google.com')) {
-      return { github_url: null, youtube_url: null, x_url: null, social_url_clean: null, android_url: socialUrl, ios_url: null };
+      return { github_url: null, youtube_url: null, x_url: null, social_url_clean: null, android_url: socialUrl, ios_url: null, platform: null };
     } else if (urlLower.includes('apps.apple.com')) {
-      return { github_url: null, youtube_url: null, x_url: null, social_url_clean: null, android_url: null, ios_url: socialUrl };
+      return { github_url: null, youtube_url: null, x_url: null, social_url_clean: null, android_url: null, ios_url: socialUrl, platform: null };
     } else {
-      return { github_url: null, youtube_url: null, x_url: null, social_url_clean: socialUrl, android_url: null, ios_url: null };
+      return { github_url: null, youtube_url: null, x_url: null, social_url_clean: socialUrl, android_url: null, ios_url: null, platform: null };
     }
   }
 
@@ -635,8 +637,9 @@ export class DatabaseService {
     social_url_clean?: string | null;
     android_url?: string | null;
     ios_url?: string | null;
+    platform?: string | null;
   }): string | null {
-    const { github_url, youtube_url, x_url, social_url_clean, android_url, ios_url } = links;
+    const { github_url, youtube_url, x_url, social_url_clean, android_url, ios_url, platform } = links;
     
     const cleanGithub = github_url?.trim() || null;
     const cleanYoutube = youtube_url?.trim() || null;
@@ -644,8 +647,9 @@ export class DatabaseService {
     const cleanSocial = social_url_clean?.trim() || null;
     const cleanAndroid = android_url?.trim() || null;
     const cleanIos = ios_url?.trim() || null;
+    const cleanPlatform = platform?.trim() || null;
 
-    if (!cleanGithub && !cleanYoutube && !cleanX && !cleanSocial && !cleanAndroid && !cleanIos) {
+    if (!cleanGithub && !cleanYoutube && !cleanX && !cleanSocial && !cleanAndroid && !cleanIos && !cleanPlatform) {
       return null;
     }
     
@@ -655,7 +659,8 @@ export class DatabaseService {
       x_url: cleanX,
       social_url: cleanSocial,
       android_url: cleanAndroid,
-      ios_url: cleanIos
+      ios_url: cleanIos,
+      platform: cleanPlatform
     });
   }
 
@@ -698,6 +703,7 @@ export class DatabaseService {
             x_url: parsedSocial.x_url,
             android_url: parsedSocial.android_url,
             ios_url: parsedSocial.ios_url,
+            platform: parsedSocial.platform || bot.platform || null,
             social_url: parsedSocial.social_url_clean
         };
     });
@@ -814,6 +820,7 @@ export class DatabaseService {
         x_url: parsedSocial.x_url,
         android_url: parsedSocial.android_url,
         ios_url: parsedSocial.ios_url,
+        platform: parsedSocial.platform || data.platform || null,
         social_url: parsedSocial.social_url_clean
     };
   }
@@ -872,6 +879,7 @@ export class DatabaseService {
         x_url: bot.x_url,
         android_url: bot.android_url,
         ios_url: bot.ios_url,
+        platform: bot.platform,
         social_url_clean: bot.social_url
     });
 
@@ -940,6 +948,7 @@ export class DatabaseService {
             x_url: parsedSocial.x_url,
             android_url: parsedSocial.android_url,
             ios_url: parsedSocial.ios_url,
+            platform: parsedSocial.platform || bot.platform || null,
             social_url: parsedSocial.social_url_clean
         };
     });
@@ -993,6 +1002,7 @@ export class DatabaseService {
               x_url: parsedSocial.x_url,
               android_url: parsedSocial.android_url,
               ios_url: parsedSocial.ios_url,
+              platform: parsedSocial.platform || botData.platform || null,
               social_url: parsedSocial.social_url_clean
           } as UserBot;
       }).filter((b): b is UserBot => b !== null);

@@ -3085,6 +3085,10 @@ svg path {
   row-gap: 5px !important;
 }
 
+.text-slate-800, .text-slate-850 {
+  --tw-text-opacity: 1;
+}
+
 
 
 

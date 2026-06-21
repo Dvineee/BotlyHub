@@ -81,6 +81,7 @@ export interface Bot {
   is_official?: boolean;
   promoted_type?: 'latest' | 'official' | 'featured' | 'none';
   languages?: string[];
+  platform?: string;
   telegram_group?: string | null;
   website_url?: string | null;
   app_url?: string | null;
