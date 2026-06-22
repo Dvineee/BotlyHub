@@ -2286,18 +2286,24 @@ const Home = () => {
   }, [homeSearchQuery]);
 
   useEffect(() => {
-    if (mobileModal) {
+    if (mobileModal || isSearchModalOpen) {
       document.body.style.overflow = "hidden";
       document.body.style.height = "100vh";
+      document.body.style.position = "fixed";
+      document.body.style.width = "100%";
     } else {
       document.body.style.overflow = "";
       document.body.style.height = "";
+      document.body.style.position = "";
+      document.body.style.width = "";
     }
     return () => {
       document.body.style.overflow = "";
       document.body.style.height = "";
+      document.body.style.position = "";
+      document.body.style.width = "";
     };
-  }, [mobileModal]);
+  }, [mobileModal, isSearchModalOpen]);
 
   const filteredDropdownBots = useMemo(() => {
     if (!homeSearchQuery.trim()) return [];
@@ -4782,14 +4788,19 @@ const Home = () => {
                 setIsSearchModalOpen(false);
               }
             }}
-            className="fixed inset-0 z-[3000] flex items-start justify-center p-0 sm:p-4 pt-0 sm:pt-28 bg-black/40 dark:bg-black/60 backdrop-blur-sm select-none"
+            onTouchMove={(e) => {
+              if ((e.target as HTMLElement).id === "home-search-backdrop") {
+                e.stopPropagation();
+              }
+            }}
+            className="fixed inset-0 z-[3000] flex items-start justify-center p-0 sm:p-4 pt-0 sm:pt-28 bg-black/40 dark:bg-black/60 backdrop-blur-sm select-none overscroll-none"
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.98, y: -8 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.98, y: -8 }}
               transition={{ duration: 0.15, ease: "easeOut" }}
-              className="bg-white dark:bg-slate-900 border-0 sm:border border-slate-200/50 dark:border-slate-800 rounded-none sm:rounded-2xl max-w-full sm:max-w-[620px] w-full h-full sm:h-auto max-h-screen sm:max-h-[85vh] min-h-screen sm:min-h-[460px] shadow-xl overflow-hidden flex flex-col qa-search-modal-container"
+              className="bg-white dark:bg-slate-900 border-0 sm:border border-slate-200/50 dark:border-slate-800 rounded-none sm:rounded-2xl max-w-full sm:max-w-[620px] w-full h-full sm:h-auto max-h-screen sm:max-h-[85vh] min-h-screen sm:min-h-[460px] shadow-xl overflow-hidden flex flex-col qa-search-modal-container overscroll-contain"
             >
               {/* Top search bar wrapper */}
               <div className="flex items-center gap-3 px-[8px] py-[4px] border-b border-slate-100/80 dark:border-slate-800/80 qa-custom-search-wrapper">
@@ -4914,7 +4925,7 @@ const Home = () => {
               </div>
 
               {/* Main inner body container */}
-              <div className="p-4 flex flex-col gap-4 flex-1 overflow-y-auto custom-scrollbar">
+              <div className="p-4 flex flex-col gap-4 flex-1 overflow-y-auto custom-scrollbar overscroll-contain">
                 <AnimatePresence mode="wait">
                   {homeSearchQuery.trim() === "" ? (
                     // Empty search query state: Show beautiful recommendations / categories / trending items

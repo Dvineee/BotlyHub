@@ -3157,6 +3157,21 @@ svg path {
     padding-bottom: 0.5rem !important;
 }
 
+.fancy-glass-card, .stats-card-bg, .popular-content-card, .similar-post-card, .bot-card {
+    box-shadow: none !important;
+    border: none !important;
+    border-width: 0px !important;
+}
+
+.bg-white\/5 {
+    border: none !important;
+    padding: 0 !important;
+}
+
+.border-t {
+    border-top-width: 0px !important;
+}
+
 
 
 
