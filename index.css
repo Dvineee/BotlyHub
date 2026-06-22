@@ -1349,6 +1349,12 @@ button.bg-brand:hover, button.bg-blue-500:hover, button.bg-blue-600:hover, a.bg-
   box-shadow: none;
 }
 
+.fancy-glass-card .text-slate-500 {
+    opacity: .95 !important;
+    font-size: 13px !important;
+    letter-spacing: .005em !important;
+}
+
 .light .fancy-glass-card:hover, .light .stats-card-bg:hover, .light .popular-content-card:hover, .light .similar-post-card:hover, .light .bot-card:hover {
   border-color: rgba(15, 23, 42, 0.12) !important;
 }
@@ -1675,8 +1681,8 @@ img.rounded-xl, img.rounded-3xl, img.rounded-2xl, img.rounded-\[11px\], img.roun
 }
 
 .dark\:bg-\[\#0F1623\]:is(.dark *) {
-    background-color: #ffffff03 !important;
-    border: 1px solid var(--border-color) !important;
+    background-color: #1c1c1c !important;
+    border: 1px solid rgb(255 255 255 / 0%) !important;
 }
 
 .hover\:shadow-none:hover {
@@ -2070,7 +2076,19 @@ div.qa-last-24h-box, .qa-last-24h-box {
 
 /* Duyuru kartları için kenarlık stili */
 .announcement-card {
-  border: 1px solid var(--border-color) !important;
+  mask-image: linear-gradient(to bottom, #000 0%, #000 80%, #00000000 100%);
+  border: 1px solid var(--border-color);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.dark .announcement-card {
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5) !important;
+}
+
+.dark .announcement-badge {
+  background-color: rgba(30, 41, 59, 0.7) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #e2e8f0 !important;
 }
 
 .bot-detail-page .tracking-\[0\.2em\] {
@@ -2510,7 +2528,6 @@ span.text-\[11px\].font-bold.uppercase.tracking-wider {
 }
 
 .space-y-4>:not([hidden])~:not([hidden]) {
-    border: none;
     --tw-space-y-reverse: 0;
     margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
     margin-bottom: calc(1rem * var(--tw-space-y-reverse));
@@ -2530,7 +2547,7 @@ span.text-\[11px\].font-bold.uppercase.tracking-wider {
 }
 
 .dark\:bg-\[\#0F1623\]:is(.dark *) {
-    background-color: #ffffff0d !important;
+    background-color: #1c1c1c !important;
     border: 1px solid rgb(255 255 255 / 0%) !important;
 }
 
@@ -2910,13 +2927,10 @@ html, body {
   border-radius: 12px;
 }
 
-.dark .absolute[class*="bg-white"],
-.dark [class*="dropdown-menu"],
-.dark [role="menu"],
-.dark .mega-menu-container {
-  background-color: #191919 !important;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 10px 30px -8px rgba(0, 0, 0, 0.4) !important;
+.dark .absolute[class*=bg-white], .dark [class*=dropdown-menu], .dark [role=menu], .dark .mega-menu-container {
+    background-color: #1c1c1c !important;
+    border: 1px solid #26262699;
+    box-shadow: 0 10px 30px -8px #0006 !important;
 }
 
 .light .absolute[class*="bg-[#"],
@@ -3067,10 +3081,8 @@ svg path {
 .dark .bot-detail-aside .stats-card-bg,
 .dark .bot-detail-aside .official-links-box,
 .dark .bot-detail-aside .fancy-glass-card {
-  background-color: #111214 !important;
-  background-image: none !important;
-  backdrop-filter: none !important;
-  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    background-color: #2626264d !important;
+    border: 1px solid #26262666 !important;
 }
 
 .flex.flex-wrap.items-center.gap-2.mt-6 button {
@@ -3088,6 +3100,63 @@ svg path {
 .text-slate-800, .text-slate-850 {
   --tw-text-opacity: 1;
 }
+
+.text-slate-400 {
+    --tw-text-opacity: 1;
+    color: #a6a6a6;
+}
+
+.dark\:bg-\[\#111214\]:is(.dark *) {
+    border-color: #26262666 !important;
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(28 28 28) !important;
+}
+
+.gap-6 {
+    gap: 0.75rem !important;
+}
+
+.pt-10 {
+    padding-top: 0.5rem !important;
+}
+
+:not(.dark) .text-slate-400 {
+    --tw-text-opacity: 1 !important;
+    color: #6f6e77 !important;
+}
+
+.dark\:border-slate-800\/80:is(.dark *) {
+    border-color: #26262666 !important;
+}
+
+.dark\:border-slate-800:is(.dark *) {
+    --tw-border-opacity: 1 !important;
+    border-color: #26262666 !important;
+}
+
+.flex.flex-wrap.items-center.gap-2.mt-6 button {
+    box-shadow: none !important;
+    background-color: rgb(255 255 255 / 0%) !important;
+}
+
+.-mx-4 {
+    padding-right: 0px !important;
+    margin-left: 0rem !important;
+    margin-right: -2rem !important;
+}
+
+.px-4 {
+    padding-left: 0rem !important;
+    padding-right: 1rem !important;
+}
+
+.py-2 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+}
+
 
 
 

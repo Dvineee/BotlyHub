@@ -317,21 +317,12 @@ const PromoCard: React.FC<{
     ann.description.toLowerCase().includes("gift") ||
     ann.description.toLowerCase().includes("lucky buy");
 
-  let cardBgClass =
-    "bg-[#f4f7f5] dark:bg-[#1a231d] border-[#e5ece8]/50 dark:border-white/5";
-  let btnClass =
-    "text-[#34c759] hover:text-[#2eb850]";
-
-  if (isStars) {
-    cardBgClass =
-      "bg-[#fbf7ee] dark:bg-[#201d16] border-[#f3eccf]/50 dark:border-white/5";
-    btnClass =
-      "text-[#ff9f0a] hover:text-[#e08a00]";
-  } else if (isTon) {
-    cardBgClass =
-      "bg-[#f1f6fb] dark:bg-[#151c24] border-[#e3ebf4]/50 dark:border-white/5";
-    btnClass = "text-[#2f80ed] hover:text-[#1b6cd5]";
-  }
+  const cardBgClass =
+    "bg-white dark:bg-[#111214] border-black/5 dark:border-white/5 shadow-xs";
+  const btnClass =
+    "text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300";
+  const descColorClass =
+    "text-slate-500 dark:text-slate-400";
 
   return (
     <motion.div
@@ -350,7 +341,7 @@ const PromoCard: React.FC<{
           <h3 className="text-[#0f172a] dark:text-white font-[900] text-[15px] sm:text-[17px] tracking-tight leading-snug font-sans group-hover:text-black dark:group-hover:text-slate-100 transition-colors">
             {ann.title}
           </h3>
-          <p className="text-[#64748b] dark:text-slate-400 text-[11px] sm:text-[12px] leading-snug sm:leading-[1.4] font-medium line-clamp-3">
+          <p className={`${descColorClass} text-[11px] sm:text-[12px] leading-snug sm:leading-[1.4] font-medium line-clamp-3`}>
             {ann.description}
           </p>
         </div>
@@ -859,43 +850,15 @@ const getMobileColumns = (bots: Bot[]) => {
   const list = bots.slice(0, 12);
   const cols = [];
 
-  if (list.length <= 3) {
-    for (let i = 0; i < list.length; i++) {
-      cols.push([{ bot: list[i], rank: i + 1 }]);
+  for (let c = 0; c < 3; c++) {
+    const colItems = [];
+    for (let r = 0; r < 4; r++) {
+      const idx = c + r * 3;
+      if (list[idx]) {
+        colItems.push({ bot: list[idx], rank: idx + 1 });
+      }
     }
-  } else if (list.length <= 6) {
-    const row1 = list.slice(0, 3);
-    const row2 = list.slice(3, 6);
-
-    for (let i = 0; i < Math.max(row1.length, row2.length); i++) {
-      const colItems = [];
-      if (row1[i]) colItems.push({ bot: row1[i], rank: i + 1 });
-      if (row2[i]) colItems.push({ bot: row2[i], rank: i + 4 });
-      cols.push(colItems);
-    }
-  } else if (list.length <= 9) {
-    const row1 = list.slice(0, 3);
-    const row2 = list.slice(3, 6);
-    const row3 = list.slice(6, 9);
-
-    for (let i = 0; i < 3; i++) {
-      const colItems = [];
-      if (row1[i]) colItems.push({ bot: row1[i], rank: i + 1 });
-      if (row2[i]) colItems.push({ bot: row2[i], rank: i + 4 });
-      if (row3[i]) colItems.push({ bot: row3[i], rank: i + 7 });
-      cols.push(colItems);
-    }
-  } else {
-    // Up to 12 bots logic, with 4 columns
-    const row1 = list.slice(0, 4);
-    const row2 = list.slice(4, 8);
-    const row3 = list.slice(8, 12);
-
-    for (let i = 0; i < 4; i++) {
-      const colItems = [];
-      if (row1[i]) colItems.push({ bot: row1[i], rank: i + 1 });
-      if (row2[i]) colItems.push({ bot: row2[i], rank: i + 5 });
-      if (row3[i]) colItems.push({ bot: row3[i], rank: i + 9 });
+    if (colItems.length > 0) {
       cols.push(colItems);
     }
   }
@@ -2202,7 +2165,7 @@ const NavMenu = ({
                       {navState === "bots" ? "Bot Kategorileri" : "Uygulama Kategorileri"}
                     </h3>
 
-                    <div className="grid grid-cols-2 gap-3.5 pr-1 max-h-[58vh] overflow-y-auto">
+                    <div className="grid grid-cols-4 gap-2 pr-1 max-h-[58vh] overflow-y-auto">
                       {(navState === "bots"
                         ? botsCategories
                         : appsCategories
@@ -2210,14 +2173,14 @@ const NavMenu = ({
                         <button
                           key={cat.id}
                           onClick={() => handleCategoryClick(cat.id, navState)}
-                          className="flex flex-col items-start gap-4 p-5 bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 active:scale-[0.97] transition-all rounded-[24px] border border-black/5 dark:border-white/5 text-left group"
+                          className="flex flex-col items-center justify-center gap-2 p-2 px-1 bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 active:scale-[0.97] transition-all rounded-xl border border-black/5 dark:border-white/5 text-center group"
                         >
                           <div
-                            className={`w-9 h-9 rounded-xl flex items-center justify-center ${navState === "bots" ? "text-blue-500 bg-blue-500/10" : "text-emerald-500 bg-emerald-500/10"}`}
+                            className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${navState === "bots" ? "text-blue-500 bg-blue-500/10" : "text-emerald-500 bg-emerald-500/10"}`}
                           >
-                            <cat.icon size={18} />
+                            <cat.icon size={15} />
                           </div>
-                          <span className="text-xs font-[900] uppercase tracking-tight text-slate-800 dark:text-slate-200 leading-snug">
+                          <span className="text-[10px] font-[900] uppercase tracking-tight text-slate-800 dark:text-slate-200 leading-tight block text-center truncate-1 w-full whitespace-normal">
                             {t(cat.label)}
                           </span>
                         </button>
@@ -4748,7 +4711,7 @@ const Home = () => {
                       {navState === "bots" ? "Bot Kategorileri" : "Uygulama Kategorileri"}
                     </h3>
 
-                    <div className="grid grid-cols-2 gap-3.5 pr-1 max-h-[58vh] overflow-y-auto">
+                    <div className="grid grid-cols-4 gap-2 pr-1 max-h-[58vh] overflow-y-auto">
                       {(navState === "bots"
                         ? botsCategories
                         : appsCategories
@@ -4756,14 +4719,14 @@ const Home = () => {
                         <button
                           key={cat.id}
                           onClick={() => handleCategoryClick(cat.id, navState)}
-                          className="flex flex-col items-start gap-4 p-5 bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 active:scale-[0.97] transition-all rounded-[24px] border border-black/5 dark:border-white/5 text-left group"
+                          className="flex flex-col items-center justify-center gap-2 p-2 px-1 bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 active:scale-[0.97] transition-all rounded-xl border border-black/5 dark:border-white/5 text-center group"
                         >
                           <div
-                            className={`w-9 h-9 rounded-xl flex items-center justify-center ${navState === "bots" ? "text-blue-500 bg-blue-500/10" : "text-emerald-500 bg-emerald-500/10"}`}
+                            className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${navState === "bots" ? "text-blue-500 bg-blue-500/10" : "text-emerald-500 bg-emerald-500/10"}`}
                           >
-                            <cat.icon size={18} />
+                            <cat.icon size={15} />
                           </div>
-                          <span className="text-xs font-[900] uppercase tracking-tight text-slate-800 dark:text-slate-200 leading-snug">
+                          <span className="text-[10px] font-[900] uppercase tracking-tight text-slate-800 dark:text-slate-200 leading-tight block text-center truncate-1 w-full whitespace-normal">
                             {t(cat.label)}
                           </span>
                         </button>
@@ -4923,7 +4886,7 @@ const Home = () => {
               </div>
 
               {/* Filter Tabs / Type Selector - Styled exactly like Q&A forum page's search tabs but adapted for bots & apps */}
-              <div className="px-4 py-2 border-b border-slate-100/50 dark:border-slate-800/50 flex items-center gap-2 select-none overflow-x-auto no-scrollbar shrink-0">
+              <div className="py-2 border-b border-slate-100/50 dark:border-slate-800/50 flex items-center gap-2 select-none overflow-x-auto no-scrollbar shrink-0">
                 <button
                   onClick={() => setSearchModalType("all")}
                   className={`flex items-center gap-1 px-3.5 py-1.5 rounded-full text-[13px] font-medium transition-all border shrink-0 qa-search-tag-btn ${
