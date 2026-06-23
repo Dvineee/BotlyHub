@@ -2575,6 +2575,97 @@ const Home = () => {
     return result;
   }, [filteredBots, selectedAppsCategory, selectedBotsCategory]);
 
+  const [showAppsLeftArrow, setShowAppsLeftArrow] = useState(false);
+  const [showAppsRightArrow, setShowAppsRightArrow] = useState(false);
+  const [showBotsLeftArrow, setShowBotsLeftArrow] = useState(false);
+  const [showBotsRightArrow, setShowBotsRightArrow] = useState(false);
+
+  const checkAppsScroll = useCallback(() => {
+    const el = catScroll.ref.current;
+    if (el) {
+      const canScrollLeft = el.scrollLeft > 5;
+      const canScrollRight = el.scrollLeft < el.scrollWidth - el.clientWidth - 5;
+      setShowAppsLeftArrow(canScrollLeft);
+      setShowAppsRightArrow(canScrollRight);
+    }
+  }, [catScroll.ref]);
+
+  const checkBotsScroll = useCallback(() => {
+    const el = botsCatScroll.ref.current;
+    if (el) {
+      const canScrollLeft = el.scrollLeft > 5;
+      const canScrollRight = el.scrollLeft < el.scrollWidth - el.clientWidth - 5;
+      setShowBotsLeftArrow(canScrollLeft);
+      setShowBotsRightArrow(canScrollRight);
+    }
+  }, [botsCatScroll.ref]);
+
+  useEffect(() => {
+    const el = catScroll.ref.current;
+    if (!el) return;
+
+    checkAppsScroll();
+
+    el.addEventListener("scroll", checkAppsScroll);
+    window.addEventListener("resize", checkAppsScroll);
+
+    const observer = new ResizeObserver(() => {
+      checkAppsScroll();
+    });
+    observer.observe(el);
+
+    const timer = setTimeout(checkAppsScroll, 150);
+
+    return () => {
+      el.removeEventListener("scroll", checkAppsScroll);
+      window.removeEventListener("resize", checkAppsScroll);
+      observer.disconnect();
+      clearTimeout(timer);
+    };
+  }, [checkAppsScroll, catScroll.ref, isLoading, activeFilter, categorizedBots]);
+
+  useEffect(() => {
+    const el = botsCatScroll.ref.current;
+    if (!el) return;
+
+    checkBotsScroll();
+
+    el.addEventListener("scroll", checkBotsScroll);
+    window.addEventListener("resize", checkBotsScroll);
+
+    const observer = new ResizeObserver(() => {
+      checkBotsScroll();
+    });
+    observer.observe(el);
+
+    const timer = setTimeout(checkBotsScroll, 150);
+
+    return () => {
+      el.removeEventListener("scroll", checkBotsScroll);
+      window.removeEventListener("resize", checkBotsScroll);
+      observer.disconnect();
+      clearTimeout(timer);
+    };
+  }, [checkBotsScroll, botsCatScroll.ref, isLoading, activeFilter, categorizedBots]);
+
+  const scrollAppsCategories = (direction: "left" | "right") => {
+    const el = catScroll.ref.current;
+    if (el) {
+      if (haptic) haptic("light");
+      const scrollAmount = direction === "left" ? -250 : 250;
+      el.scrollBy({ left: scrollAmount, behavior: "smooth" });
+    }
+  };
+
+  const scrollBotsCategories = (direction: "left" | "right") => {
+    const el = botsCatScroll.ref.current;
+    if (el) {
+      if (haptic) haptic("light");
+      const scrollAmount = direction === "left" ? -250 : 250;
+      el.scrollBy({ left: scrollAmount, behavior: "smooth" });
+    }
+  };
+
   const totalBotsCount = useMemo(() => {
     return bots.filter((b) =>
       Array.isArray(b.category)
@@ -3735,7 +3826,7 @@ const Home = () => {
         </AnimatePresence>
       </div>
       {/* Mobile-only Sticky Search Bar */}
-      <div className="sticky top-0 z-[110] block md:hidden bg-white dark:bg-slate-950 p-3">
+      <div className="relative z-[110] block md:hidden bg-white dark:bg-slate-950 p-3">
         <div className="relative flex items-center bg-[#eeefef] dark:bg-slate-800 rounded-xl group transition-all h-[42px] px-3">
           <div
             onClick={() => {
@@ -3915,7 +4006,7 @@ const Home = () => {
 
                         return (
                           <div ref={appsSectionRef} className="my-12 md:my-16 space-y-6 md:space-y-8 scroll-mt-20">
-                            <div className="flex flex-col gap-6 overflow-hidden">
+                            <div className="flex flex-col gap-6">
                               <div
                                 className="flex flex-col gap-2 cursor-pointer group shrink-0"
                                 onClick={() =>
@@ -3956,6 +4047,22 @@ const Home = () => {
                                   ))}
                                 </div>
                               )}
+                            </div>
+
+                            <div className="relative sticky top-0 md:top-[72px] z-30 bg-white dark:bg-slate-950 -mx-4 px-4 sm:-mx-8 sm:px-8 md:mx-0 md:px-0 border-b border-black/[0.03] dark:border-white/[0.03] group">
+                              {/* Left Scroll Button & Fade Overlay */}
+                              {showAppsLeftArrow && (
+                                <div className="hidden md:flex absolute left-0 top-0 bottom-0 w-20 items-center justify-start bg-gradient-to-r from-white via-white/80 to-transparent dark:from-slate-950 dark:via-slate-950/80 dark:to-transparent z-[31] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                  <button
+                                    type="button"
+                                    onClick={() => scrollAppsCategories("left")}
+                                    className="pointer-events-auto flex w-7 h-7 items-center justify-center rounded-full bg-white dark:bg-[#1f2023] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-[#2a2b2f] transition-all duration-150 active:scale-95 shadow-md"
+                                    aria-label="Sola Kaydır"
+                                  >
+                                    <ChevronLeft size={14} />
+                                  </button>
+                                </div>
+                              )}
 
                               <div
                                 ref={catScroll.ref}
@@ -3964,7 +4071,7 @@ const Home = () => {
                                 onMouseMove={catScroll.onMouseMove}
                                 onMouseLeave={catScroll.onMouseLeave}
                                 onContextMenu={catScroll.onContextMenu}
-                                className="category-filter-container no-scrollbar relative z-0"
+                                className="category-filter-container no-scrollbar py-3.5"
                               >
                                 <button
                                   className={`category-filter-item ${selectedAppsCategory === "all" ? "active" : ""}`}
@@ -3988,6 +4095,20 @@ const Home = () => {
                                   </button>
                                 ))}
                               </div>
+
+                              {/* Right Scroll Button & Fade Overlay */}
+                              {showAppsRightArrow && (
+                                <div className="hidden md:flex absolute right-0 top-0 bottom-0 w-20 items-center justify-end bg-gradient-to-l from-white via-white/80 to-transparent dark:from-slate-950 dark:via-slate-950/80 dark:to-transparent z-[31] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                  <button
+                                    type="button"
+                                    onClick={() => scrollAppsCategories("right")}
+                                    className="pointer-events-auto flex w-7 h-7 items-center justify-center rounded-full bg-white dark:bg-[#1f2023] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-[#a5b4fc] hover:bg-slate-50 dark:hover:bg-[#2a2b2f] transition-all duration-150 active:scale-95 shadow-md"
+                                    aria-label="Sağa Kaydır"
+                                  >
+                                    <ChevronRight size={14} />
+                                  </button>
+                                </div>
+                              )}
                             </div>
 
                             {(() => {
@@ -4062,7 +4183,7 @@ const Home = () => {
 
                         return (
                           <div ref={botsSectionRef} className="my-12 md:my-16 space-y-6 md:space-y-8 scroll-mt-20">
-                            <div className="flex flex-col gap-6 overflow-hidden">
+                            <div className="flex flex-col gap-6">
                               <div
                                 className="flex flex-col gap-2 cursor-pointer group shrink-0"
                                 onClick={() =>
@@ -4103,6 +4224,22 @@ const Home = () => {
                                   ))}
                                 </div>
                               )}
+                            </div>
+
+                            <div className="relative sticky top-0 md:top-[72px] z-30 bg-white dark:bg-slate-950 -mx-4 px-4 sm:-mx-8 sm:px-8 md:mx-0 md:px-0 border-b border-black/[0.03] dark:border-white/[0.03] group">
+                              {/* Left Scroll Button & Fade Overlay */}
+                              {showBotsLeftArrow && (
+                                <div className="hidden md:flex absolute left-0 top-0 bottom-0 w-20 items-center justify-start bg-gradient-to-r from-white via-white/80 to-transparent dark:from-slate-950 dark:via-slate-950/80 dark:to-transparent z-[31] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                  <button
+                                    type="button"
+                                    onClick={() => scrollBotsCategories("left")}
+                                    className="pointer-events-auto flex w-7 h-7 items-center justify-center rounded-full bg-white dark:bg-[#1f2023] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-[#2a2b2f] transition-all duration-150 active:scale-95 shadow-md"
+                                    aria-label="Sola Kaydır"
+                                  >
+                                    <ChevronLeft size={14} />
+                                  </button>
+                                </div>
+                              )}
 
                               <div
                                 ref={botsCatScroll.ref}
@@ -4111,7 +4248,7 @@ const Home = () => {
                                 onMouseMove={botsCatScroll.onMouseMove}
                                 onMouseLeave={botsCatScroll.onMouseLeave}
                                 onContextMenu={botsCatScroll.onContextMenu}
-                                className="category-filter-container no-scrollbar relative z-0"
+                                className="category-filter-container no-scrollbar py-3.5"
                               >
                                 <button
                                   className={`category-filter-item ${selectedBotsCategory === "all" ? "active" : ""}`}
@@ -4135,6 +4272,20 @@ const Home = () => {
                                   </button>
                                 ))}
                               </div>
+
+                              {/* Right Scroll Button & Fade Overlay */}
+                              {showBotsRightArrow && (
+                                <div className="hidden md:flex absolute right-0 top-0 bottom-0 w-20 items-center justify-end bg-gradient-to-l from-white via-white/80 to-transparent dark:from-slate-950 dark:via-slate-950/80 dark:to-transparent z-[31] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                  <button
+                                    type="button"
+                                    onClick={() => scrollBotsCategories("right")}
+                                    className="pointer-events-auto flex w-7 h-7 items-center justify-center rounded-full bg-white dark:bg-[#1f2023] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-[#a5b4fc] hover:bg-slate-50 dark:hover:bg-[#2a2b2f] transition-all duration-150 active:scale-95 shadow-md"
+                                    aria-label="Sağa Kaydır"
+                                  >
+                                    <ChevronRight size={14} />
+                                  </button>
+                                </div>
+                              )}
                             </div>
 
                             {(() => {

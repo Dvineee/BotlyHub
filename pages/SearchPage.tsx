@@ -1591,7 +1591,7 @@ const SearchPage = () => {
         />
         <div className="max-w-7xl mx-auto px-5 sm:px-8 pt-0 md:pt-0 pb-32">
           {/* Results */}
-          <div className="sticky top-0 md:top-[62px] z-30 bg-white dark:bg-slate-950 py-3 -mx-5 px-5 sm:-mx-8 sm:px-8 md:mx-0 md:px-0 flex items-center gap-3 mb-0 md:mb-2 transition-colors">
+          <div className="relative z-20 bg-white dark:bg-slate-950 py-3 -mx-5 px-5 sm:-mx-8 sm:px-8 md:mx-0 md:px-0 flex items-center gap-3 mb-0 md:mb-2 transition-colors">
             <div className="flex-1 relative px-[8.5px]">
               <div className="relative flex items-center pl-3 pr-3.5 transition-all group premium-search-container h-[50px]">
                 <button
@@ -1633,7 +1633,7 @@ const SearchPage = () => {
           </div>
 
           {/* Categories Horizontal Scroll */}
-          <div className="mb-10 relative group/cat">
+          <div className="sticky top-0 md:top-[60px] z-30 bg-white dark:bg-slate-950 py-3 -mx-5 px-5 sm:-mx-8 sm:px-8 md:mx-0 md:px-0 border-b border-black/[0.03] dark:border-white/[0.03] mb-10 relative group/cat">
             {/* Left Scroll Button & Fade Overlay */}
             {showLeftArrow && (
               <div className="hidden md:flex absolute left-0 top-0 bottom-0 w-20 items-center justify-start bg-gradient-to-r from-white via-white/80 to-transparent dark:from-[#151618] dark:via-[#151618]/80 dark:to-transparent z-10 pointer-events-none">

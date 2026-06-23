@@ -18,6 +18,10 @@ export class DatabaseService {
   private static blogsCacheTime: number = 0;
   private static BLOGS_CACHE_TTL = 1000 * 60 * 5; // 5 minutes
 
+  private static botsCache: Bot[] | null = null;
+  private static botsCacheTime: number = 0;
+  private static BOTS_CACHE_TTL = 1000 * 30; // 30 seconds cache for top performance
+
   private static async executeAdminDbAction(action: string, args: any[]): Promise<any> {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('admin_v3_session');
@@ -433,10 +437,13 @@ export class DatabaseService {
 
   static async removeUserBotById(ownershipId: string) {
     if (typeof window !== 'undefined' && localStorage.getItem('admin_v3_session')) {
-      return this.executeAdminDbAction("removeUserBotById", [ownershipId]);
+      const res = await this.executeAdminDbAction("removeUserBotById", [ownershipId]);
+      DatabaseService.botsCache = null;
+      return res;
     }
     const { error } = await supabase.from('user_bots').delete().eq('id', ownershipId);
     if (error) throw error;
+    DatabaseService.botsCache = null;
   }
 
   static async syncChannelsFromBotActivity(userId: string): Promise<number> {
@@ -665,11 +672,16 @@ export class DatabaseService {
   }
 
   static async getBots(): Promise<Bot[]> {
+    const now = Date.now();
+    if (this.botsCache && (now - this.botsCacheTime < this.BOTS_CACHE_TTL)) {
+      return this.botsCache;
+    }
+
     const { data: bots } = await supabase.from('bots').select('*').order('id', { ascending: false });
     const { data: ratings } = await supabase.from('bot_ratings').select('bot_id, rating');
     const { data: userBots } = await supabase.from('user_bots').select('bot_id');
 
-    return (bots || []).map(bot => {
+    const result = (bots || []).map(bot => {
         const botRatings = (ratings || []).filter(r => r.bot_id === bot.id);
         const avgRating = botRatings.length > 0 
             ? botRatings.reduce((acc, curr) => acc + curr.rating, 0) / botRatings.length 
@@ -707,6 +719,10 @@ export class DatabaseService {
             social_url: parsedSocial.social_url_clean
         };
     });
+
+    this.botsCache = result;
+    this.botsCacheTime = now;
+    return result;
   }
 
   static async getBotById(id: string): Promise<Bot | null> {
@@ -852,6 +868,7 @@ export class DatabaseService {
             console.error("Supabase Upsert Error:", error);
             throw new Error(error.message);
         }
+        DatabaseService.botsCache = null;
     } catch (e: any) {
         console.error("rateBot Exception:", e);
         throw e;
@@ -907,51 +924,27 @@ export class DatabaseService {
         console.error("Supabase upsert error:", error);
         throw error;
     }
+    DatabaseService.botsCache = null;
   }
 
   static async deleteBot(id: string) {
     if (typeof window !== 'undefined') {
-      return this.executeAdminDbAction("deleteBot", [id]);
+      const res = await this.executeAdminDbAction("deleteBot", [id]);
+      DatabaseService.botsCache = null;
+      return res;
     }
     const { error } = await supabase.from('bots').delete().eq('id', id);
     if (error) throw error;
+    DatabaseService.botsCache = null;
   }
 
   static async getBotsWithStats(): Promise<any[]> {
-    const { data: bots } = await supabase.from('bots').select('*').order('id', { ascending: false });
-    const { data: userBots } = await supabase.from('user_bots').select('bot_id');
-    
-    let ratings: any[] = [];
-    try {
-        const { data: ratingsData } = await supabase.from('bot_ratings').select('bot_id, rating');
-        ratings = ratingsData || [];
-    } catch (e) {
-        console.warn("Could not fetch ratings, table might be missing:", e);
-    }
-
-    return (bots || []).map(bot => {
-        const botRatings = ratings.filter(r => r.bot_id === bot.id);
-        const avgRating = botRatings.length > 0 
-            ? botRatings.reduce((acc, curr) => acc + curr.rating, 0) / botRatings.length 
-            : 0;
-
-        const parsedSocial = this.parseSocialLinks(bot.social_url);
-
-        return { 
-            ...bot, 
-            category: this.parseCategory(bot.category),
-            ownerCount: (userBots || []).filter((ub: any) => ub.bot_id === bot.id).length,
-            rating: Number(avgRating.toFixed(1)),
-            ratingCount: botRatings.length,
-            github_url: parsedSocial.github_url,
-            youtube_url: parsedSocial.youtube_url,
-            x_url: parsedSocial.x_url,
-            android_url: parsedSocial.android_url,
-            ios_url: parsedSocial.ios_url,
-            platform: parsedSocial.platform || bot.platform || null,
-            social_url: parsedSocial.social_url_clean
-        };
-    });
+    const bots = await this.getBots();
+    return bots.map(bot => ({
+        ...bot,
+        ownerCount: bot.user_count,
+        ratingCount: bot.rating_count
+    }));
   }
 
   // --- USER BOTS ---
@@ -1054,6 +1047,7 @@ export class DatabaseService {
         throw error;
     }
     
+    DatabaseService.botsCache = null;
     await this.logActivity(userId, 'bot_manage', 'bot_acquired', 'Bot Kütüphaneye Eklendi', `${botData.name} botu kütüphaneye eklendi.`);
     
     return true;
@@ -1067,6 +1061,7 @@ export class DatabaseService {
   static async removeUserBot(userId: string, botId: string) {
     const { error } = await supabase.from('user_bots').delete().eq('user_id', userId.toString()).eq('bot_id', botId.toString());
     if (error) throw error;
+    DatabaseService.botsCache = null;
   }
 
   // --- NOTIFICATIONS ---
