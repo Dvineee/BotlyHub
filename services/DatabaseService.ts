@@ -20,7 +20,7 @@ export class DatabaseService {
 
   private static botsCache: Bot[] | null = null;
   private static botsCacheTime: number = 0;
-  private static BOTS_CACHE_TTL = 1000 * 30; // 30 seconds cache for top performance
+  private static BOTS_CACHE_TTL = 1000 * 60 * 5; // 5 minutes cache for top performance
 
   private static async executeAdminDbAction(action: string, args: any[]): Promise<any> {
     if (typeof window !== 'undefined') {

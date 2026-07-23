@@ -21,6 +21,7 @@ interface SEOProps {
     name: string;
     item: string;
   }[];
+  schemas?: any[];
 }
 
 export const SEO: React.FC<SEOProps> = ({
@@ -32,6 +33,7 @@ export const SEO: React.FC<SEOProps> = ({
   twitterHandle = '@botlyhub',
   articleData,
   breadcrumbs,
+  schemas,
 }) => {
   const siteName = 'BotlyHub';
   const fullTitle = title ? `${title} | ${siteName}` : `${siteName} | Modern Telegram Bot & AI Ecosystem`;
@@ -159,6 +161,11 @@ export const SEO: React.FC<SEOProps> = ({
           {JSON.stringify(schemaBreadcrumb)}
         </script>
       )}
+      {schemas && schemas.map((schema, index) => (
+        <script key={`custom-schema-${index}`} type="application/ld+json">
+          {JSON.stringify(schema)}
+        </script>
+      ))}
     </Helmet>
   );
 };

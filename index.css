@@ -732,9 +732,6 @@ h2.text-lg.sm\:text-xl.font-extrabold.text-slate-900.dark\:text-white.tracking-t
 .search-page .px-5 {
     box-shadow: none !important;
     border: none !important;
-    padding-left: 0rem;
-    border-radius: 0px;
-    padding-right: 0rem;
 }
 
 .bot-detail-page > div.px-5 {
@@ -1777,10 +1774,10 @@ html:not(.dark) .absolute[class*="dropdown-menu"] button:hover, html:not(.dark) 
   }
 
   .bottom-nav-container {
-    background: rgba(255, 255, 255, 0.95) !important;
-    background-color: rgba(255, 255, 255, 0.95) !important;
-    backdrop-filter: blur(24px) !important;
-    -webkit-backdrop-filter: blur(24px) !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
     border: none !important;
     border-top: 1px solid rgba(226, 232, 240, 0.8) !important;
     box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.03) !important;
@@ -1794,10 +1791,10 @@ html:not(.dark) .absolute[class*="dropdown-menu"] button:hover, html:not(.dark) 
   }
 
   .dark .bottom-nav-container {
-    background: rgba(12, 14, 20, 0.98) !important;
-    background-color: rgba(12, 14, 20, 0.98) !important;
-    backdrop-filter: blur(24px) !important;
-    -webkit-backdrop-filter: blur(24px) !important;
+    background: #0c0e14 !important;
+    background-color: #0c0e14 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
     border: none !important;
     border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
     box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.4) !important;
@@ -2928,7 +2925,7 @@ html, body {
   border-radius: 12px;
 }
 
-.dark .absolute[class*=bg-white], .dark [class*=dropdown-menu], .dark [role=menu], .dark .mega-menu-container {
+.dark [class*=dropdown-menu], .dark [role=menu], .dark .mega-menu-container {
     background-color: #1c1c1c !important;
     border: 1px solid #26262699;
     box-shadow: 0 10px 30px -8px #0006 !important;
@@ -3181,8 +3178,49 @@ svg path {
     padding-top: 0rem !important;
 }
 
+.md\:space-y-8>:not([hidden])~:not([hidden]) {
+    --tw-space-y-reverse: 0;
+    margin-top: calc(0rem * calc(1 - var(--tw-space-y-reverse))) !important;
+    margin-bottom: calc(1rem * var(--tw-space-y-reverse)) !important;
+}
 
+.dark\:border-white\/5:is(.dark *) {
+    border-color: #26262666;
+}
 
+.dark\:from-slate-950:is(.dark *),
+.dark .dark\:from-slate-950 {
+    --tw-gradient-from: #151618 var(--tw-gradient-from-position) !important;
+    --tw-gradient-to: rgb(2 6 23 / 0) var(--tw-gradient-to-position) !important;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
 
+.dark\:via-slate-950\/80:is(.dark *),
+.dark .dark\:via-slate-950\/80 {
+    --tw-gradient-to: rgb(2 6 23 / 0) var(--tw-gradient-to-position) !important;
+    --tw-gradient-stops: var(--tw-gradient-from), rgb(21 22 24) var(--tw-gradient-via-position), var(--tw-gradient-to) !important;
+}
 
+.dark\:bg-slate-900:is(.dark *),
+.dark .dark\:bg-slate-900 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(28 28 28) !important;
+}
+
+.dark .dark\:bg-slate-900:hover,
+.dark\:bg-slate-900:hover:is(.dark *) {
+    background-color: rgb(38 38 38) !important;
+}
+
+.dark .category-filter-item.active {
+    background-color: #3b82f6 !important;
+    color: #ffffff !important;
+    border-color: #3b82f6 !important;
+}
+
+.dark .category-filter-item:hover:not(.active) {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+}
 

@@ -255,7 +255,7 @@ const MyChannels = () => {
                       </button>
 
                       <div className={`absolute inset-0 z-30 transition-transform duration-300 ease-out flex items-center justify-center p-3 ${openSettingsId === c.id ? 'translate-x-0' : 'translate-x-full'}`}>
-                           <div className="absolute inset-0 bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl"></div>
+                           <div className="absolute inset-0 bg-white dark:bg-slate-950"></div>
                            <div className="w-full h-full flex items-center justify-center gap-4 relative z-40">
                                 <div 
                                     onClick={(e) => { e.stopPropagation(); toggleAdMode(c.id); }}

@@ -73,7 +73,7 @@ export const FilterMenu: React.FC = () => {
             initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            className="absolute right-0 mt-4 w-60 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-white/5 rounded-2xl shadow-2xl p-2 z-[150] animate-in fade-in zoom-in-95 duration-200"
+            className="absolute right-0 mt-4 w-60 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-2xl shadow-2xl p-2 z-[150] animate-in fade-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="px-4 py-3 border-b border-slate-100 dark:border-white/5 mb-2 flex items-center justify-between">
@@ -98,7 +98,7 @@ export const FilterMenu: React.FC = () => {
                   }}
                   className={`flex-1 py-1.5 text-center text-[11px] font-extrabold uppercase tracking-wider rounded-lg transition-all ${
                     searchMode === 'bots'
-                      ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
+                      ? 'bg-white dark:bg-slate-950 text-blue-600 dark:text-blue-400 shadow-xs'
                       : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'
                   }`}
                 >
@@ -113,7 +113,7 @@ export const FilterMenu: React.FC = () => {
                   }}
                   className={`flex-1 py-1.5 text-center text-[11px] font-extrabold uppercase tracking-wider rounded-lg transition-all ${
                     searchMode === 'apps'
-                      ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
+                      ? 'bg-white dark:bg-slate-950 text-blue-600 dark:text-blue-400 shadow-xs'
                       : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'
                   }`}
                 >
