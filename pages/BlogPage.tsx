@@ -46,7 +46,6 @@ import { BlogPost } from '../types';
 import { AnimatePresence } from 'motion/react';
 import { Loader2 } from 'lucide-react';
 import { BlogSkeleton, LazyImage } from '../components/Preload';
-import LoginModal from '../components/LoginModal';
 
 const categories = [
   { id: 'all', translationKey: 'cat_all', icon: Layout, color: 'text-slate-600' },
@@ -71,7 +70,6 @@ const BlogPage: React.FC = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [isLangPickerOpen, setIsLangPickerOpen] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -103,7 +101,7 @@ const BlogPage: React.FC = () => {
         console.error("Fetch Blogs Error:", err);
       } finally {
         const elapsedTime = Date.now() - startTime;
-        const minDelay = 200;
+        const minDelay = 500;
         if (elapsedTime < minDelay) {
             await new Promise(resolve => setTimeout(resolve, minDelay - elapsedTime));
         }
@@ -278,10 +276,10 @@ const BlogPage: React.FC = () => {
                   <button
                     onClick={() => {
                       haptic("light");
-                      setIsLoginModalOpen(true);
+                      navigate("/login");
                       setIsMobileMenuOpen(false);
                     }}
-                    className="px-5 h-10 bg-blue-500 hover:bg-blue-600 text-white text-[13px] font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center whitespace-nowrap shadow-lg shadow-blue-500/25"
+                    className="px-3.5 py-1.5 bg-blue-500 text-white rounded-full text-xs font-bold transition-all active:scale-95 text-center flex items-center"
                   >
                     {t("login") || "Giriş Yap"}
                   </button>
@@ -429,7 +427,7 @@ const BlogPage: React.FC = () => {
             </div>
 
             {/* Menu Footer Row - Always pinned to the bottom safely */}
-            <div className="border-t border-slate-100 dark:border-white/5 px-8 py-5 flex items-center gap-3 shrink-0 bg-white dark:bg-slate-950 pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
+            <div className="border-t border-slate-100 dark:border-white/5 px-8 py-5 flex items-center gap-3 shrink-0 bg-white/95 dark:bg-slate-950/95 pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
               {/* Language Selector Pill */}
               <button
                 onClick={() => {
@@ -599,16 +597,16 @@ const BlogPage: React.FC = () => {
                !isSidebarCollapsed ? (
                 <div className="p-4 bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-500/10 dark:to-blue-500/10 rounded-2xl border border-blue-100/50 dark:border-blue-500/20">
                    <p className="text-[10px] text-blue-700/70 dark:text-blue-400/70 mb-3 leading-tight">{t('blog_login_desc')}</p>
-                   <button onClick={() => setIsLoginModalOpen(true)} className="w-full h-10 bg-blue-500 hover:bg-blue-600 text-white text-[12px] font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2 shadow-lg shadow-blue-500/25">
+                   <button onClick={() => navigate('/login')} className="w-full mobile-login-btn bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2">
                      <User size={14} />
                      {t('login')}
                    </button>
                 </div>
                ) : (
                  <button 
-                  onClick={() => setIsLoginModalOpen(true)}
+                  onClick={() => navigate('/login')}
                   title={t('login')}
-                  className="w-full h-10 rounded-xl bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center transition-all active:scale-95 shadow-lg shadow-blue-500/25"
+                  className="w-full h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center transition-all hover:bg-blue-700 shadow-lg shadow-blue-500/20"
                  >
                    <User size={20} />
                  </button>
@@ -947,11 +945,6 @@ const BlogPage: React.FC = () => {
         </aside>
 
       </div>
-      <LoginModal 
-        isOpen={isLoginModalOpen} 
-        onClose={() => setIsLoginModalOpen(false)} 
-        onAuth={(u) => setWebAuthUser(u)} 
-      />
     </div>
   );
 };

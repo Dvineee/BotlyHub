@@ -71,8 +71,6 @@ import Logo from "../components/Logo";
 import { SEO } from "../components/SEO";
 import LoginModal from "../components/LoginModal";
 import { HomeSkeleton, LazyImage } from "../components/Preload";
-import { NavMenu } from "../components/NavMenu";
-import { AnnouncementsCarousel } from "../components/AnnouncementsCarousel";
 
 const iconMap: Record<string, any> = {
   Sparkles,
@@ -867,6 +865,1371 @@ const getMobileColumns = (bots: Bot[]) => {
   return cols;
 };
 
+const NavMenu = ({
+  isScrolled,
+  user,
+  unreadCount,
+  theme,
+  toggleTheme,
+  haptic,
+  isMenuOpen,
+  setIsMenuOpen,
+  setIsLoginModalOpen,
+  setWebAuthUser,
+  isLoginModalOpen,
+  menuRef: parentMenuRef,
+  openMenu,
+  setOpenMenu,
+  navState,
+  setNavState,
+  mobileModal,
+  setMobileModal,
+}: {
+  isScrolled: boolean;
+  user: any;
+  unreadCount: number;
+  theme: string;
+  toggleTheme: () => void;
+  haptic: any;
+  isMenuOpen: boolean;
+  setIsMenuOpen: (v: boolean) => void;
+  setIsLoginModalOpen: (v: boolean) => void;
+  setWebAuthUser: (v: any) => void;
+  isLoginModalOpen: boolean;
+  menuRef: React.RefObject<HTMLDivElement>;
+  openMenu: "kesfet" | null;
+  setOpenMenu: (v: "kesfet" | null) => void;
+  navState: "main" | "bots" | "apps";
+  setNavState: (v: "main" | "bots" | "apps") => void;
+  mobileModal: "kesfet" | null;
+  setMobileModal: (v: "kesfet" | null) => void;
+}) => {
+  const { t, language, setLanguage } = useTranslation();
+  const [mobileMenuPanel, setMobileMenuPanel] = useState<"main" | "categories" | "bots" | "apps">("main");
+  const toggleLanguage = () => {
+    haptic("light");
+    setLanguage(language === "tr" ? "en" : "tr");
+  };
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isMenuOpen) {
+      setMobileMenuPanel("main");
+    }
+  }, [isMenuOpen]);
+
+  const internalMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        internalMenuRef.current &&
+        !internalMenuRef.current.contains(event.target as Node)
+      ) {
+        setOpenMenu(null);
+        setNavState("main");
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const botsCategories = categories.filter(
+    (c) => c.id !== "apps" && c.id !== "all",
+  );
+  const appsCategories = appsSubCategories;
+
+  const handleCategoryClick = (catId: string, mode: "bots" | "apps") => {
+    haptic("light");
+    navigate(`/search?mode=${mode}&category=${catId}`);
+    setOpenMenu(null);
+    setMobileModal(null);
+    setNavState("main");
+  };
+
+  interface MenuItem {
+    id: string;
+    label: string;
+    desc: string;
+    icon: any;
+    action?: () => void;
+    path?: string;
+  }
+
+  const discoverItems: MenuItem[] = [
+    {
+      id: "bots",
+      label: "Botlar",
+      desc: "Telegram Bot Marketi",
+      icon: BotIcon,
+      path: "/search?mode=bots",
+    },
+    {
+      id: "apps",
+      label: "Uygulamalar",
+      desc: "Web3 & TMA Uygulamaları",
+      icon: LayoutGrid,
+      path: "/search?mode=apps",
+    },
+    {
+      id: "channels",
+      label: "Kanallar",
+      desc: "Popüler Telegram Kanalları",
+      icon: Megaphone,
+      path: "/channels",
+    },
+    {
+      id: "qa",
+      label: "QA Forum",
+      desc: "Soru & Cevap Hub'ı",
+      icon: MessageSquare,
+      path: "/qa",
+    },
+  ];
+
+  const simpleLinks = [
+    { label: "Reklam", path: "/premium" },
+    { label: "Blog", path: "/blog" },
+    { label: "Gelişmiş Arama", path: "/search" },
+  ];
+
+  const renderMegaMenuContent = () => {
+    if (openMenu === "kesfet") {
+      return (
+        <div className="max-w-6xl mx-auto px-6 grid grid-cols-12 gap-8">
+          {/* Left Column (Promotion Panel) */}
+          <div className="col-span-4 bg-slate-50/50 dark:bg-white/[0.02] border border-slate-200/50 dark:border-white/[0.04] rounded-2xl p-5 flex flex-col justify-between select-none">
+            {/* Top section */}
+            <div className="flex flex-col gap-3.5">
+              <h4 className="text-[13px] font-bold text-slate-800 dark:text-slate-200 leading-snug">
+                {t("mega_promo_title") || "Kanalınız İçin En Uygun Araçlar"}
+              </h4>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-normal">
+                {t("mega_promo_desc") || "Onlarca kategoride, topluluğunuz için bot ve uygulama listeleri."}
+              </p>
+
+              {/* Dynamic Styled Icon Badges - Professional & Non-colorful Mono version */}
+              <div className="flex items-center gap-1.5 py-1">
+                <div className="flex -space-x-2.5 overflow-hidden">
+                  <div className="inline-block w-8 h-8 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-slate-900 flex items-center justify-center shrink-0">
+                    <Shield size={13} className="text-slate-600 dark:text-slate-400" />
+                  </div>
+                  <div className="inline-block w-8 h-8 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-slate-900 flex items-center justify-center shrink-0">
+                    <BotIcon size={13} className="text-slate-600 dark:text-slate-400" />
+                  </div>
+                  <div className="inline-block w-8 h-8 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-slate-900 flex items-center justify-center shrink-0">
+                    <LayoutGrid size={13} className="text-slate-600 dark:text-slate-400" />
+                  </div>
+                  <div className="inline-block w-8 h-8 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-slate-900 flex items-center justify-center shrink-0">
+                    <Compass size={13} className="text-slate-600 dark:text-slate-400" />
+                  </div>
+                </div>
+                <span className="text-[10px] text-slate-450 dark:text-slate-500 font-semibold uppercase tracking-wider ml-1">
+                  +50 Kategori
+                </span>
+              </div>
+
+              {/* Try now button */}
+              <button
+                onClick={() => {
+                  haptic("light");
+                  navigate("/search");
+                  setOpenMenu(null);
+                }}
+                className="group/btn text-[12px] font-extrabold text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white flex items-center gap-1.5 mt-0.5 cursor-pointer transition-colors self-start"
+              >
+                {t("mega_try_now") || "Şimdi dene"}{" "}
+                <ArrowRight size={13} className="shrink-0 transition-transform group-hover/btn:translate-x-0.5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Middle Column (Categories etc.) */}
+          <div className="col-span-12 md:col-span-5 border-l border-black/5 dark:border-white/5 pl-8">
+            <AnimatePresence mode="wait">
+              {navState === "main" ? (
+                <motion.div
+                  key="main"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="grid grid-cols-2 gap-4"
+                >
+                  {discoverItems.map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => {
+                        if (item.id === "bots") {
+                          haptic("light");
+                          setNavState("bots");
+                        } else if (item.id === "apps") {
+                          haptic("light");
+                          setNavState("apps");
+                        } else if (item.path) {
+                          haptic("light");
+                          navigate(item.path);
+                          setOpenMenu(null);
+                        }
+                      }}
+                      className="flex items-center gap-4 p-4 hover:bg-slate-500/[0.04] dark:hover:bg-white/5 rounded-2xl transition-all group border border-transparent hover:border-black/5 dark:hover:border-white/10 text-left w-full cursor-pointer"
+                    >
+                      <div className="menu-icon-container shrink-0 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
+                        <item.icon size={20} />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[14px] font-semibold menu-item-text">
+                          {item.label}
+                        </span>
+                        <span className="text-[12px] text-slate-500 dark:text-slate-400 font-normal">
+                          {item.desc}
+                        </span>
+                      </div>
+                    </button>
+                  ))}
+                </motion.div>
+              ) : navState === "bots" ? (
+                <motion.div
+                  key="bots"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  className="flex flex-col gap-6"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-4">
+                      <button
+                        onClick={() => setNavState("main")}
+                        className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full text-slate-500 transition-colors"
+                      >
+                        <ArrowLeft size={20} />
+                      </button>
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-tight">
+                        Bot Kategorileri
+                      </h3>
+                    </div>
+                    <button
+                      onClick={() => handleCategoryClick("all", "bots")}
+                      className="text-xs font-black uppercase tracking-widest text-blue-550 hover:text-blue-600 dark:text-blue-400 cursor-pointer px-3 py-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-all duration-150"
+                    >
+                      Tümünü Gör
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                    {botsCategories.map((cat) => (
+                      <button
+                        key={cat.id}
+                        onClick={() => handleCategoryClick(cat.id, "bots")}
+                        className="flex items-center gap-2.5 p-2 rounded-xl transition-all duration-200 text-left bg-slate-50/50 dark:bg-slate-800/10 border border-slate-100/50 dark:border-slate-800/20 hover:bg-blue-500/[0.04] dark:hover:bg-blue-500/[0.04] hover:border-blue-500/15 group w-full cursor-pointer"
+                      >
+                        <div className="w-7 h-7 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/55 dark:border-slate-800 flex items-center justify-center text-slate-450 dark:text-slate-450 group-hover:bg-blue-500 group-hover:text-white dark:group-hover:bg-blue-650 dark:group-hover:text-white/95 transition-all duration-200 shrink-0 shadow-xs">
+                          <cat.icon size={14} />
+                        </div>
+                        <span className="text-[12px] font-semibold text-slate-700 dark:text-slate-350 group-hover:text-blue-600 dark:group-hover:text-blue-400 font-sans tracking-tight leading-tight whitespace-nowrap overflow-hidden text-ellipsis">
+                          {t(cat.label)}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="apps"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  className="flex flex-col gap-6"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-4">
+                      <button
+                        onClick={() => setNavState("main")}
+                        className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full text-slate-500 transition-colors"
+                      >
+                        <ArrowLeft size={20} />
+                      </button>
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-tight">
+                        Uygulama Kategorileri
+                      </h3>
+                    </div>
+                    <button
+                      onClick={() => handleCategoryClick("all", "apps")}
+                      className="text-xs font-black uppercase tracking-widest text-blue-550 hover:text-blue-600 dark:text-blue-400 cursor-pointer px-3 py-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-all duration-150"
+                    >
+                      Tümünü Gör
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                    {appsCategories.map((cat) => (
+                      <button
+                        key={cat.id}
+                        onClick={() => handleCategoryClick(cat.id, "apps")}
+                        className="flex items-center gap-2.5 p-2 rounded-xl transition-all duration-200 text-left bg-slate-50/50 dark:bg-slate-800/10 border border-slate-100/50 dark:border-slate-800/20 hover:bg-blue-500/[0.04] dark:hover:bg-blue-500/[0.04] hover:border-blue-500/15 group w-full cursor-pointer"
+                      >
+                        <div className="w-7 h-7 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/55 dark:border-slate-800 flex items-center justify-center text-slate-450 dark:text-slate-450 group-hover:bg-blue-500 group-hover:text-white dark:group-hover:bg-blue-650 dark:group-hover:text-white/95 transition-all duration-200 shrink-0 shadow-xs">
+                          <cat.icon size={14} />
+                        </div>
+                        <span className="text-[12px] font-semibold text-slate-700 dark:text-slate-350 group-hover:text-blue-600 dark:group-hover:text-blue-400 font-sans tracking-tight leading-tight whitespace-nowrap overflow-hidden text-ellipsis">
+                          {t(cat.label)}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Right Column (Featured Hub) */}
+          <div className="col-span-3 border-l border-black/5 dark:border-white/5 pl-8 flex flex-col justify-center gap-3 mega-menu-right-links">
+            
+            {/* Reklam Link */}
+            <button
+              onClick={() => {
+                haptic("light");
+                navigate("/premium");
+                setOpenMenu(null);
+              }}
+              className="group/link flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 border border-transparent hover:border-black/5 dark:hover:border-white/10 transition-all text-left w-full cursor-pointer"
+            >
+              <div className="flex items-center gap-3">
+                <Sparkles size={15} className="text-slate-500 dark:text-slate-400 transition-colors group-hover/link:text-slate-850 dark:group-hover/link:text-white" />
+                <div className="flex flex-col">
+                  <span className="text-[13px] font-bold text-slate-700 dark:text-slate-200 transition-colors group-hover/link:text-slate-950 dark:group-hover/link:text-white">
+                    {t("mega_ad") || "Reklam"}
+                  </span>
+                  <span className="text-[10.5px] text-slate-450 dark:text-slate-450">
+                    {t("mega_ad_desc") || "Botlyhub ile öne çıkın"}
+                  </span>
+                </div>
+              </div>
+              <ArrowRight size={14} className="opacity-0 -translate-x-1 group-hover/link:opacity-100 group-hover/link:translate-x-0 transition-all text-slate-400 dark:text-slate-500" />
+            </button>
+
+            {/* Blog Link */}
+            <button
+              onClick={() => {
+                haptic("light");
+                navigate("/blog");
+                setOpenMenu(null);
+              }}
+              className="group/link flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 border border-transparent hover:border-black/5 dark:hover:border-white/10 transition-all text-left w-full cursor-pointer"
+            >
+              <div className="flex items-center gap-3">
+                <Compass size={15} className="text-slate-500 dark:text-slate-400 transition-colors group-hover/link:text-slate-850 dark:group-hover/link:text-white" />
+                <div className="flex flex-col">
+                  <span className="text-[13px] font-bold text-slate-700 dark:text-slate-200 transition-colors group-hover/link:text-slate-950 dark:group-hover/link:text-white">
+                    {t("mega_blog") || "Blog & Rehberler"}
+                  </span>
+                  <span className="text-[10.5px] text-slate-450 dark:text-slate-450">
+                    {t("mega_blog_desc") || "En son ipuçları & rehberler"}
+                  </span>
+                </div>
+              </div>
+              <ArrowRight size={14} className="opacity-0 -translate-x-1 group-hover/link:opacity-100 group-hover/link:translate-x-0 transition-all text-slate-400 dark:text-slate-500" />
+            </button>
+
+            {/* Advanced Search Link */}
+            <button
+              onClick={() => {
+                haptic("light");
+                navigate("/search");
+                setOpenMenu(null);
+              }}
+              className="group/link flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 border border-transparent hover:border-black/5 dark:hover:border-white/10 transition-all text-left w-full cursor-pointer"
+            >
+              <div className="flex items-center gap-3">
+                <Search size={15} className="text-slate-500 dark:text-slate-400 transition-colors group-hover/link:text-slate-850 dark:group-hover/link:text-white" />
+                <div className="flex flex-col">
+                  <span className="text-[13px] font-bold text-slate-700 dark:text-slate-200 transition-colors group-hover/link:text-slate-950 dark:group-hover/link:text-white">
+                    {t("mega_advanced_search") || "Gelişmiş Arama"}
+                  </span>
+                  <span className="text-[10.5px] text-slate-450 dark:text-slate-450">
+                    {t("mega_advanced_search_desc") || "Filtrelerle nokta atışı arama"}
+                  </span>
+                </div>
+              </div>
+              <ArrowRight size={14} className="opacity-0 -translate-x-1 group-hover/link:opacity-100 group-hover/link:translate-x-0 transition-all text-slate-400 dark:text-slate-500" />
+            </button>
+          </div>
+        </div>
+      );
+    }
+  };
+
+  return (
+    <>
+      <div
+        className="sticky top-0 z-[1] bg-white dark:bg-slate-900 border-b border-[#f7f7f7] dark:border-white/5 w-full py-2.5 md:pb-2 transition-colors"
+        ref={internalMenuRef}
+      >
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 flex items-center justify-between">
+          {/* Left Section (Logo) */}
+          <div className="hidden md:flex items-center w-48 shrink-0">
+            {isScrolled ? (
+              <Logo onClick={() => navigate("/")} className="cursor-pointer" />
+            ) : null}
+          </div>
+
+          {/* Center Section (Navigation) */}
+          <div className="flex items-center justify-center gap-8 md:gap-14 flex-1">
+            {/* Discover / Keşfet */}
+            <button
+              onClick={() => {
+                haptic("light");
+                navigate("/");
+              }}
+              className="nav-menu-item grow-0 text-slate-600 dark:text-slate-400 hover:bg-blue-500/5"
+            >
+              {t("nav_explore")}
+            </button>
+
+            {/* Categories / Kategoriler */}
+            <div
+              className="relative md:static"
+              onMouseEnter={() => {
+                if (window.innerWidth >= 768) setOpenMenu("kesfet");
+              }}
+            >
+              <button
+                onClick={() => {
+                  if (window.innerWidth < 768) {
+                    haptic("light");
+                    setMobileModal("kesfet");
+                  } else {
+                    setOpenMenu(openMenu === "kesfet" ? null : "kesfet");
+                  }
+                }}
+                className={`nav-menu-item grow-0 ${openMenu === "kesfet" ? "text-slate-900 dark:text-white bg-blue-500/5" : "text-slate-600 dark:text-slate-400 hover:bg-blue-500/5"}`}
+              >
+                Kategoriler{" "}
+                <ChevronDown
+                  size={14}
+                  className={`text-slate-400 transition-transform duration-300 ${openMenu === "kesfet" ? "rotate-180" : ""}`}
+                />
+              </button>
+            </div>
+
+
+          </div>
+
+          {/* Profile Section */}
+          <div className="flex items-center justify-end md:w-48 shrink-0">
+            <AnimatePresence mode="wait">
+              {isScrolled && (
+                <motion.div
+                  key="scrolled-actions"
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 10 }}
+                  transition={{ duration: 0.2 }}
+                  className="hidden md:flex items-center gap-2 md:gap-3"
+                >
+                  {user && (
+                    <button
+                      onClick={() => {
+                        haptic("medium");
+                        navigate("/earnings");
+                      }}
+                      className="w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 border border-black/5 dark:border-white/5 rounded-xl text-slate-900 dark:text-white active:scale-95 transition-all outline-none shrink-0"
+                    >
+                      <Wallet size={18} />
+                    </button>
+                  )}
+
+                  <div className="relative font-sans" ref={parentMenuRef}>
+                    <button
+                      onClick={() => {
+                        haptic("light");
+                        setIsMenuOpen(!isMenuOpen);
+                      }}
+                      className={`h-10 px-3 flex items-center gap-2 border border-black/5 dark:border-white/5 text-slate-900 dark:text-white rounded-xl active:scale-95 transition-all relative ${isMenuOpen ? "bg-slate-100 dark:bg-white/10" : "bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10"}`}
+                    >
+                      <div className="flex md:hidden items-center justify-center">
+                        <div className="w-5 h-5 relative flex items-center justify-center">
+                          <AnimatePresence mode="wait">
+                            {isMenuOpen ? (
+                              <motion.div
+                                key="close"
+                                initial={{ rotate: -90, opacity: 0, scale: 0.8 }}
+                                animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                                exit={{ rotate: 90, opacity: 0, scale: 0.8 }}
+                                transition={{ duration: 0.15, ease: "easeOut" }}
+                              >
+                                <X size={18} className="text-slate-700 dark:text-slate-300" />
+                              </motion.div>
+                            ) : (
+                              <motion.div
+                                key="menu"
+                                initial={{ rotate: 90, opacity: 0, scale: 0.8 }}
+                                animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                                exit={{ rotate: -90, opacity: 0, scale: 0.8 }}
+                                transition={{ duration: 0.15, ease: "easeOut" }}
+                              >
+                                <Menu size={18} className="text-slate-700 dark:text-slate-300" />
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      </div>
+                      <div className="hidden md:flex items-center gap-1.5">
+                        {user ? (
+                          <>
+                            <span className="text-[11px] font-black uppercase tracking-wide">
+                              {user.username ||
+                                user.first_name ||
+                                user.name ||
+                                ""}
+                            </span>
+                            <ChevronDown
+                              size={12}
+                              className={`text-slate-400 dark:text-slate-500 transition-transform duration-200 ${isMenuOpen ? "rotate-180" : ""}`}
+                            />
+                          </>
+                        ) : (
+                          <Settings
+                            size={18}
+                            className="text-slate-700 dark:text-slate-300"
+                          />
+                        )}
+                      </div>
+                      {user && unreadCount > 0 && (
+                        <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 rounded-full border-2 border-slate-50 dark:border-slate-950 text-[8px] font-black text-white flex items-center justify-center px-1">
+                          {unreadCount > 9 ? "9+" : unreadCount}
+                        </div>
+                      )}
+                    </button>
+                    {isMenuOpen && (
+                      <div className="absolute right-0 top-full mt-4 w-72 sm:w-80 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-2xl shadow-2xl p-3 z-[150] animate-in fade-in slide-in-from-right-3 duration-200">
+                        {/* Mobile View */}
+                        <div className="block md:hidden">
+                          {mobileMenuPanel === "main" && (
+                            <div className="space-y-1">
+                              {/* Keşfet */}
+                              <button
+                                onClick={() => {
+                                  haptic("light");
+                                  navigate("/");
+                                  setIsMenuOpen(false);
+                                }}
+                                className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 transition-all group text-left"
+                              >
+                                <Compass
+                                  size={18}
+                                  className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors"
+                                />
+                                <span className="text-xs font-bold uppercase tracking-tight font-sans">
+                                  Keşfet
+                                </span>
+                              </button>
+
+                              {/* Kategoriler */}
+                              <button
+                                onClick={() => {
+                                  haptic("light");
+                                  setMobileMenuPanel("categories");
+                                }}
+                                className="w-full flex items-center justify-between gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 transition-all group text-left"
+                              >
+                                <div className="flex items-center gap-3">
+                                  <LayoutGrid
+                                    size={18}
+                                    className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors"
+                                  />
+                                  <span className="text-xs font-bold uppercase tracking-tight font-sans">
+                                    Kategoriler
+                                  </span>
+                                </div>
+                                <ChevronRight size={14} className="text-slate-400" />
+                              </button>
+
+                              {/* Botlarım */}
+                              {(user && user.id && user.id !== "guest_user") && (
+                                <button
+                                  onClick={() => {
+                                    haptic("light");
+                                    navigate(user && user.id && user.id !== "guest_user" ? "/my-bots" : "/");
+                                    setIsMenuOpen(false);
+                                  }}
+                                  className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 transition-all group text-left"
+                                >
+                                  <BotIcon
+                                    size={18}
+                                    className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors"
+                                  />
+                                  <span className="text-xs font-bold uppercase tracking-tight font-sans">
+                                    {t("my_bots") || "Botlarım"}
+                                  </span>
+                                </button>
+                              )}
+
+                              {/* Gece Modu */}
+                              <button
+                                onClick={() => {
+                                  haptic("light");
+                                  toggleTheme();
+                                }}
+                                className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 transition-all group text-left"
+                              >
+                                {theme === "dark" ? (
+                                  <>
+                                    <Sun
+                                      size={18}
+                                      className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors"
+                                    />
+                                    <span className="text-xs font-bold uppercase tracking-tight font-sans">
+                                      {t("light_mode") || "Gündüz Modu"}
+                                    </span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Moon
+                                      size={18}
+                                      className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors"
+                                    />
+                                    <span className="text-xs font-bold uppercase tracking-tight font-sans">
+                                      {t("dark_mode") || "Gece Modu"}
+                                    </span>
+                                  </>
+                                )}
+                              </button>
+
+                              {/* Botunu Ekle */}
+                              <button
+                                onClick={() => {
+                                  haptic("light");
+                                  navigate("/settings");
+                                  setIsMenuOpen(false);
+                                }}
+                                className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 transition-all group text-left"
+                              >
+                                <Plus
+                                  size={18}
+                                  className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors"
+                                />
+                                <span className="text-xs font-bold uppercase tracking-tight font-sans">
+                                  Botunu Ekle
+                                </span>
+                              </button>
+                            </div>
+                          )}
+
+                          {mobileMenuPanel === "categories" && (
+                            <div className="space-y-4">
+                              {/* Back button */}
+                              <button
+                                onClick={() => {
+                                  haptic("light");
+                                  setMobileMenuPanel("main");
+                                }}
+                                className="w-full flex items-center gap-2 p-3 text-slate-500 dark:text-slate-400 hover:text-slate-700 border-b border-slate-100 dark:border-white/5 font-bold text-xs uppercase"
+                              >
+                                <ArrowLeft size={16} />
+                                <span>Geri</span>
+                              </button>
+
+                              {/* Mega Menu Options */}
+                              <div className="space-y-2">
+                                {discoverItems.map((item) => (
+                                  <button
+                                    key={item.id}
+                                    onClick={() => {
+                                      haptic("light");
+                                      if (item.path) {
+                                        navigate(item.path);
+                                        setIsMenuOpen(false);
+                                      }
+                                    }}
+                                    className="flex items-center gap-4 p-3 hover:bg-slate-50 dark:hover:bg-white/5 rounded-2xl transition-all border border-black/5 dark:border-white/5 text-left w-full group"
+                                  >
+                                    <div className="shrink-0 w-10 h-10 rounded-xl bg-black/[0.03] dark:bg-white/5 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
+                                      <item.icon size={20} />
+                                    </div>
+                                    <div className="flex flex-col min-w-0 flex-1">
+                                      <span className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-tight">
+                                        {item.label}
+                                      </span>
+                                      <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                                        {item.desc}
+                                      </span>
+                                    </div>
+                                  </button>
+                                ))}
+                              </div>
+
+                              {/* Hızlı Bağlantılar / Quick Links */}
+                              <div className="pt-3 border-t border-slate-100 dark:border-white/5 flex flex-col gap-1.5">
+                                
+                                {simpleLinks.map((link, i) => (
+                                  <a
+                                    key={i}
+                                    href={link.path}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      navigate(link.path);
+                                      setOpenMenu(null);
+                                      if (typeof setMobileModal === "function") setMobileModal(null);
+                                    }}
+                                    className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all font-bold text-xs uppercase group"
+                                  >
+                                    {link.label}
+                                    <ExternalLink
+                                      size={14}
+                                      className="opacity-0 group-hover:opacity-100 transition-all"
+                                    />
+                                  </a>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {mobileMenuPanel === "bots" && (
+                            <div className="space-y-1">
+                              {/* Back button */}
+                              <button
+                                onClick={() => {
+                                  haptic("light");
+                                  setMobileMenuPanel("categories");
+                                }}
+                                className="w-full flex items-center gap-2 p-3 text-slate-500 dark:text-slate-400 hover:text-slate-700 border-b border-slate-100 dark:border-white/5 mb-2 font-bold text-xs uppercase"
+                              >
+                                <ArrowLeft size={16} />
+                                <span>Kategoriler</span>
+                              </button>
+
+                              <div className="max-h-[300px] overflow-y-auto pr-1 space-y-1">
+                                <button
+                                  onClick={() => {
+                                    haptic("light");
+                                    navigate("/search?mode=bots");
+                                    setIsMenuOpen(false);
+                                  }}
+                                  className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 font-bold text-xs uppercase text-left"
+                                >
+                                  <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
+                                    <Compass size={16} className="text-blue-500" />
+                                  </div>
+                                  <span>Tüm Botlar</span>
+                                </button>
+
+                                {categories.filter((c) => c.id !== "apps" && c.id !== "all").map((cat) => (
+                                  <button
+                                    key={cat.id}
+                                    onClick={() => {
+                                      haptic("light");
+                                      navigate(`/search?mode=bots&category=${cat.id}`);
+                                      setIsMenuOpen(false);
+                                    }}
+                                    className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 font-bold text-xs uppercase text-left"
+                                  >
+                                    <div className="w-8 h-8 rounded-lg bg-black/[0.04] dark:bg-white/5 flex items-center justify-center shrink-0">
+                                      {cat.icon && <cat.icon size={16} className="text-slate-400" />}
+                                    </div>
+                                    <span className="truncate">{t(cat.label) || cat.label}</span>
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {mobileMenuPanel === "apps" && (
+                            <div className="space-y-1">
+                              {/* Back button */}
+                              <button
+                                onClick={() => {
+                                  haptic("light");
+                                  setMobileMenuPanel("categories");
+                                }}
+                                className="w-full flex items-center gap-2 p-3 text-slate-500 dark:text-slate-400 hover:text-slate-700 border-b border-slate-100 dark:border-white/5 mb-2 font-bold text-xs uppercase"
+                              >
+                                <ArrowLeft size={16} />
+                                <span>Kategoriler</span>
+                              </button>
+
+                              <div className="max-h-[300px] overflow-y-auto pr-1 space-y-1">
+                                <button
+                                  onClick={() => {
+                                    haptic("light");
+                                    navigate("/search?mode=apps");
+                                    setIsMenuOpen(false);
+                                  }}
+                                  className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 font-bold text-xs uppercase text-left"
+                                >
+                                  <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
+                                    <Compass size={16} className="text-blue-500" />
+                                  </div>
+                                  <span>Tüm Uygulamalar</span>
+                                </button>
+
+                                {appsSubCategories.map((cat) => (
+                                  <button
+                                    key={cat.id}
+                                    onClick={() => {
+                                      haptic("light");
+                                      navigate(`/search?mode=apps&category=${cat.id}`);
+                                      setIsMenuOpen(false);
+                                    }}
+                                    className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 font-bold text-xs uppercase text-left"
+                                  >
+                                    <div className="w-8 h-8 rounded-lg bg-black/[0.04] dark:bg-white/5 flex items-center justify-center shrink-0">
+                                      {cat.icon && <cat.icon size={16} className="text-slate-400" />}
+                                    </div>
+                                    <span className="truncate">{t(cat.label) || cat.label}</span>
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Desktop View */}
+                        <div className="hidden md:block">
+                          {user ? (
+                          <>
+                            <div className="p-4 border-b border-slate-100 dark:border-white/5 mb-2">
+                              <div className="flex items-center gap-3">
+                                {user.photo_url || user.avatar ? (
+                                  <img
+                                    src={user.photo_url || user.avatar}
+                                    alt={user.first_name || user.name}
+                                    className="w-10 h-10 rounded-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-black">
+                                    {user.first_name
+                                      ? user.first_name[0]
+                                      : user.name
+                                        ? user.name[0]
+                                        : "U"}
+                                  </div>
+                                )}
+                                <div className="flex flex-col min-w-0">
+                                  <span className="text-[13px] font-bold text-slate-900 dark:text-white truncate">
+                                    {user.first_name
+                                      ? `${user.first_name} ${user.last_name || ""}`
+                                      : user.name}
+                                  </span>
+                                  <span className="text-[10px] text-slate-500 truncate">
+                                    @{user.username || user.id}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+
+                            <button
+                              onClick={() => {
+                                haptic("light");
+                                navigate("/");
+                                setIsMenuOpen(false);
+                              }}
+                              className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group text-left"
+                            >
+                              <Store
+                                size={18}
+                                className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors"
+                              />
+                              <span className="text-xs font-bold uppercase tracking-tight">
+                                {t("market")}
+                              </span>
+                            </button>
+
+                            <button
+                              onClick={() => {
+                                haptic("light");
+                                navigate("/profile");
+                                setIsMenuOpen(false);
+                              }}
+                              className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group text-left"
+                            >
+                              <User
+                                size={18}
+                                className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors"
+                              />
+                              <span className="text-xs font-bold uppercase tracking-tight">
+                                {t("profile")}
+                              </span>
+                            </button>
+
+                            <button
+                              onClick={() => {
+                                haptic("light");
+                                navigate("/my-bots");
+                                setIsMenuOpen(false);
+                              }}
+                              className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group text-left"
+                            >
+                              <BotIcon
+                                size={18}
+                                className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors"
+                              />
+                              <span className="text-xs font-bold uppercase tracking-tight">
+                                {t("my_bots")}
+                              </span>
+                            </button>
+
+                            <button
+                              onClick={() => {
+                                haptic("light");
+                                navigate("/channels");
+                                setIsMenuOpen(false);
+                              }}
+                              className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group text-left"
+                            >
+                              <Megaphone
+                                size={18}
+                                className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors"
+                              />
+                              <span className="text-xs font-bold uppercase tracking-tight">
+                                {t("my_channels")}
+                              </span>
+                            </button>
+
+                            <button
+                              onClick={() => {
+                                haptic("light");
+                                navigate("/notifications");
+                                setIsMenuOpen(false);
+                              }}
+                              className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group text-left"
+                            >
+                              <div className="flex items-center gap-3">
+                                <Bell
+                                  size={18}
+                                  className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors"
+                                />
+                                <span className="text-xs font-bold uppercase tracking-tight">
+                                  {t("notifications")}
+                                </span>
+                              </div>
+                              {unreadCount > 0 && (
+                                <div className="w-2 h-2 bg-red-500 rounded-full" />
+                              )}
+                            </button>
+
+                            <button
+                              onClick={() => {
+                                haptic("light");
+                                navigate("/qa");
+                                setIsMenuOpen(false);
+                              }}
+                              className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group text-left"
+                            >
+                              <MessageSquare
+                                size={18}
+                                className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors"
+                              />
+                              <span className="text-xs font-bold uppercase tracking-tight">
+                                Soru Cevap & Q&A
+                              </span>
+                            </button>
+
+                            <div className="h-px bg-slate-100 dark:border-white/5 my-2" />
+
+                            {/* Gece Modu & Add Your inside dropdown */}
+                            <button
+                              onClick={() => {
+                                haptic("light");
+                                toggleTheme();
+                              }}
+                              className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group text-left"
+                            >
+                              {theme === "dark" ? (
+                                <>
+                                  <Sun
+                                    size={18}
+                                    className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors"
+                                  />
+                                  <span className="text-xs font-bold uppercase tracking-tight">
+                                    {t("light_mode") || "Gündüz Modu"}
+                                  </span>
+                                </>
+                              ) : (
+                                <>
+                                  <Moon
+                                    size={18}
+                                    className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors"
+                                  />
+                                  <span className="text-xs font-bold uppercase tracking-tight">
+                                    {t("dark_mode") || "Gece Modu"}
+                                  </span>
+                                </>
+                              )}
+                            </button>
+
+                            <button
+                              onClick={() => {
+                                haptic("light");
+                                navigate("/settings");
+                                setIsMenuOpen(false);
+                              }}
+                              className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group text-left"
+                            >
+                              <Plus
+                                size={18}
+                                className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors"
+                              />
+                              <span className="text-xs font-bold uppercase tracking-tight">
+                                {t("add_your")}
+                              </span>
+                            </button>
+
+                            <div className="h-px bg-slate-100 dark:border-white/5 my-2" />
+
+                            <button
+                              onClick={() => {
+                                const confirmed = window.confirm(
+                                  "Çıkış yapmak istediğinize emin misiniz?",
+                                );
+                                if (confirmed) {
+                                  haptic("medium");
+                                  setWebAuthUser(null);
+                                  setIsMenuOpen(false);
+                                }
+                              }}
+                              className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 text-red-500 transition-all font-bold text-xs uppercase text-left"
+                            >
+                              <LogOut size={18} />
+                              <span className="text-xs font-bold uppercase tracking-tight">
+                                {t("home_logout")}
+                              </span>
+                            </button>
+                          </>
+                        ) : (
+                          <>
+
+
+                            <button
+                              onClick={() => {
+                                haptic("light");
+                                toggleTheme();
+                              }}
+                              className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group text-left"
+                            >
+                              {theme === "dark" ? (
+                                <>
+                                  <Sun
+                                    size={18}
+                                    className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors"
+                                  />
+                                  <span className="text-xs font-bold uppercase tracking-tight">
+                                    {t("light_mode") || "Gündüz Modu"}
+                                  </span>
+                                </>
+                              ) : (
+                                <>
+                                  <Moon
+                                    size={18}
+                                    className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors"
+                                  />
+                                  <span className="text-xs font-bold uppercase tracking-tight">
+                                    {t("dark_mode") || "Gece Modu"}
+                                  </span>
+                                </>
+                              )}
+                            </button>
+
+                            <button
+                              onClick={() => {
+                                haptic("light");
+                                navigate("/settings");
+                                setIsMenuOpen(false);
+                              }}
+                              className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 transition-all group text-left"
+                            >
+                              <Plus
+                                size={18}
+                                className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors"
+                              />
+                              <span className="text-xs font-bold uppercase tracking-tight">
+                                {t("add_your")}
+                              </span>
+                            </button>
+                          </>
+                        )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {!user && (
+                    <button
+                      onClick={() => {
+                        haptic("light");
+                        setIsLoginModalOpen(true);
+                      }}
+                      className="nav-menu-item !px-5 bg-blue-500 hover:bg-blue-600 text-white text-[13px] font-bold rounded-[10px] transition-all active:scale-95 flex items-center justify-center whitespace-nowrap shadow-lg shadow-blue-500/25 border-none"
+                    >
+                      {t("home_login")}
+                    </button>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+
+        {/* Desktop Mega Menu Dropdown */}
+        <AnimatePresence>
+          {openMenu && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+              className="hidden md:block absolute left-0 right-0 top-full bg-white dark:bg-slate-900/95 backdrop-blur-xl border-b border-black/5 dark:border-white/10 shadow-2xl z-[100] mega-menu-container"
+              onMouseLeave={() => {
+                setOpenMenu(null);
+                setNavState("main");
+              }}
+            >
+              {renderMegaMenuContent()}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Mobile Modal for Categories */}
+      <AnimatePresence>
+        {mobileModal && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.22 }}
+            className="fixed inset-0 z-[250] w-full h-full bg-white dark:bg-slate-950 flex flex-col md:hidden overflow-hidden"
+          >
+            {/* Top Header of Menu Modal */}
+            <div className="flex justify-between items-center px-6 py-5 border-b border-black/[0.04] dark:border-white/[0.04] shrink-0">
+              <Logo
+                onClick={() => {
+                  setMobileModal(null);
+                  setNavState("main");
+                  navigate("/");
+                }}
+                className="cursor-pointer scale-95"
+              />
+
+              <div className="flex items-center gap-2">
+                {user ? (
+                  <button
+                    onClick={() => {
+                      haptic("light");
+                      navigate("/earnings");
+                      setMobileModal(null);
+                    }}
+                    className="px-3.5 py-1.5 bg-slate-50 dark:bg-white/5 border border-black/[0.04] dark:border-white/5 rounded-full text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1 active:scale-95 transition-all"
+                  >
+                    @{user.username || user.first_name || "Profil"}
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      haptic("light");
+                      setIsLoginModalOpen(true);
+                      setMobileModal(null);
+                    }}
+                    className="px-3.5 py-1.5 bg-blue-500 text-white rounded-full text-xs font-bold transition-all active:scale-95 text-center flex items-center"
+                  >
+                    {t("login") || "Giriş Yap"}
+                  </button>
+                )}
+
+                <button
+                  onClick={() => {
+                    haptic("light");
+                    navigate("/search");
+                    setMobileModal(null);
+                  }}
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 active:scale-95 transition-all shrink-0"
+                  title="Ara"
+                >
+                  <Search size={21} />
+                </button>
+
+                <button
+                  onClick={() => {
+                    haptic("light");
+                    setMobileModal(null);
+                    setNavState("main");
+                  }}
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 active:scale-95 transition-all shrink-0"
+                >
+                  <X size={26} strokeWidth={2.5} />
+                </button>
+              </div>
+            </div>
+
+            {/* Menu Core Content Area */}
+            <div className="flex-1 overflow-y-auto flex flex-col justify-between py-6">
+              <AnimatePresence mode="wait">
+                {navState === "main" ? (
+                  <motion.div
+                    key="mobile-main"
+                    initial={{ opacity: 0, x: -15 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -15 }}
+                    className="flex-1 flex flex-col justify-center px-8 sm:px-12 py-4 gap-6 sm:gap-8"
+                  >
+                    <button
+                      onClick={() => {
+                        haptic("light");
+                        navigate("/");
+                        setMobileModal(null);
+                      }}
+                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase leading-none"
+                    >
+                      {t("nav_explore") || "Keşfet"}
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        haptic("light");
+                        navigate("/search?mode=bots");
+                        setMobileModal(null);
+                      }}
+                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase leading-none"
+                    >
+                      {t("bots") || "Bot Market"}
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        haptic("light");
+                        navigate("/search?mode=apps");
+                        setMobileModal(null);
+                      }}
+                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-emerald-500 transition-colors uppercase leading-none"
+                    >
+                      {t("apps") || "Uygulamalar"}
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        haptic("light");
+                        navigate("/qa");
+                        setMobileModal(null);
+                      }}
+                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase leading-none"
+                    >
+                      {t("qa_forum") || "Soru & Cevap"}
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        haptic("light");
+                        navigate("/blog");
+                        setMobileModal(null);
+                      }}
+                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase flex items-center gap-3 leading-none"
+                    >
+                      <span>{t("blog") || "Günlük"}</span>
+                      <span className="text-[10px] font-black tracking-widest bg-blue-500 text-white px-2 py-0.5 rounded-md uppercase leading-none animate-pulse">
+                        NEW
+                      </span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        haptic("light");
+                        navigate("/settings");
+                        setMobileModal(null);
+                      }}
+                      className="text-left text-3xl sm:text-4xl font-[900] tracking-tight text-slate-900 dark:text-white hover:text-blue-500 transition-colors uppercase leading-none"
+                    >
+                      Uygulama Ekle
+                    </button>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="mobile-categories"
+                    initial={{ opacity: 0, x: 15 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 15 }}
+                    className="flex flex-col w-full h-full px-6"
+                  >
+                    <div className="flex items-center justify-between mb-6 px-1">
+                      <button
+                        onClick={() => setNavState("main")}
+                        className="flex items-center gap-2 text-blue-500 dark:text-blue-400 font-[900] uppercase tracking-widest text-xs"
+                      >
+                        <ArrowLeft size={16} strokeWidth={3} /> Geri
+                      </button>
+                      <button
+                        onClick={() => handleCategoryClick("all", navState === "bots" ? "bots" : "apps")}
+                        className="text-xs font-[900] uppercase tracking-widest text-blue-500 dark:text-blue-400"
+                      >
+                        Tümünü Gör
+                      </button>
+                    </div>
+
+                    <h3 className="text-base font-[900] uppercase tracking-tight text-slate-900 dark:text-white mb-4 px-1">
+                      {navState === "bots" ? "Bot Kategorileri" : "Uygulama Kategorileri"}
+                    </h3>
+
+                    <div className="grid grid-cols-4 gap-2 pr-1 max-h-[58vh] overflow-y-auto">
+                      {(navState === "bots"
+                        ? botsCategories
+                        : appsCategories
+                      ).map((cat) => (
+                        <button
+                          key={cat.id}
+                          onClick={() => handleCategoryClick(cat.id, navState)}
+                          className="flex flex-col items-center justify-center gap-2 p-2 px-1 bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 active:scale-[0.97] transition-all rounded-xl border border-black/5 dark:border-white/5 text-center group"
+                        >
+                          <div
+                            className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${navState === "bots" ? "text-blue-500 bg-blue-500/10" : "text-emerald-500 bg-emerald-500/10"}`}
+                          >
+                            <cat.icon size={15} />
+                          </div>
+                          <span className="text-[10px] font-[900] uppercase tracking-tight text-slate-800 dark:text-slate-200 leading-tight block text-center truncate-1 w-full whitespace-normal">
+                            {t(cat.label)}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Menu Footer Row */}
+              <div className="border-t border-slate-100 dark:border-white/5 px-8 pt-6 flex items-center gap-3 shrink-0">
+                {/* Language Selector Pill */}
+                <button
+                  onClick={toggleLanguage}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-50 dark:bg-white/5 border border-black/[0.04] dark:border-white/[0.04] text-xs font-bold text-slate-700 dark:text-slate-300 transition-all active:scale-95"
+                >
+                  <Globe size={15} />
+                  <span>{language.toUpperCase()}</span>
+                </button>
+
+                {/* Theme Toggle Pill */}
+                <button
+                  onClick={() => {
+                    haptic("light");
+                    toggleTheme();
+                  }}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-50 dark:bg-white/5 border border-black/[0.04] dark:border-white/[0.04] text-xs font-bold text-slate-700 dark:text-slate-300 transition-all active:scale-95"
+                >
+                  {theme === "dark" ? (
+                    <>
+                      <Moon size={15} className="text-blue-400" />
+                      <span>Gece Modu</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sun size={15} className="text-amber-500" />
+                      <span>Gündüz Modu</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+};
+
 const Home = () => {
   const navigate = useNavigate();
   const { t, language, setLanguage } = useTranslation();
@@ -1048,7 +2411,7 @@ const Home = () => {
     // Sağlıklı ve gerçekçi bir yükleme deneyimi için minimum 500ms'lik bir ön yükleme süresi uyguluyoruz.
     // Bu sayede, internet hızlı olsa bile arayüzde rahatsız edici bir anlık kırpışma (flicker) yaşanmaz.
     const elapsedTime = Date.now() - startTime;
-    const minDelay = 200;
+    const minDelay = 500;
     if (elapsedTime < minDelay) {
       await new Promise((resolve) =>
         setTimeout(resolve, minDelay - elapsedTime),
@@ -1211,100 +2574,6 @@ const Home = () => {
 
     return result;
   }, [filteredBots, selectedAppsCategory, selectedBotsCategory]);
-
-  const [appsEl, setAppsEl] = useState<HTMLDivElement | null>(null);
-  const [botsEl, setBotsEl] = useState<HTMLDivElement | null>(null);
-
-  const [showAppsLeftArrow, setShowAppsLeftArrow] = useState(false);
-  const [showAppsRightArrow, setShowAppsRightArrow] = useState(false);
-  const [showBotsLeftArrow, setShowBotsLeftArrow] = useState(false);
-  const [showBotsRightArrow, setShowBotsRightArrow] = useState(false);
-
-  const checkAppsScroll = useCallback(() => {
-    const el = appsEl;
-    if (el) {
-      const canScrollLeft = el.scrollLeft > 5;
-      const canScrollRight = el.scrollLeft < el.scrollWidth - el.clientWidth - 5;
-      setShowAppsLeftArrow(canScrollLeft);
-      setShowAppsRightArrow(canScrollRight);
-    }
-  }, [appsEl]);
-
-  const checkBotsScroll = useCallback(() => {
-    const el = botsEl;
-    if (el) {
-      const canScrollLeft = el.scrollLeft > 5;
-      const canScrollRight = el.scrollLeft < el.scrollWidth - el.clientWidth - 5;
-      setShowBotsLeftArrow(canScrollLeft);
-      setShowBotsRightArrow(canScrollRight);
-    }
-  }, [botsEl]);
-
-  useEffect(() => {
-    const el = appsEl;
-    if (!el) return;
-
-    checkAppsScroll();
-
-    el.addEventListener("scroll", checkAppsScroll);
-    window.addEventListener("resize", checkAppsScroll);
-
-    const observer = new ResizeObserver(() => {
-      checkAppsScroll();
-    });
-    observer.observe(el);
-
-    const timer = setTimeout(checkAppsScroll, 150);
-
-    return () => {
-      el.removeEventListener("scroll", checkAppsScroll);
-      window.removeEventListener("resize", checkAppsScroll);
-      observer.disconnect();
-      clearTimeout(timer);
-    };
-  }, [checkAppsScroll, appsEl, isLoading, activeFilter, categorizedBots]);
-
-  useEffect(() => {
-    const el = botsEl;
-    if (!el) return;
-
-    checkBotsScroll();
-
-    el.addEventListener("scroll", checkBotsScroll);
-    window.addEventListener("resize", checkBotsScroll);
-
-    const observer = new ResizeObserver(() => {
-      checkBotsScroll();
-    });
-    observer.observe(el);
-
-    const timer = setTimeout(checkBotsScroll, 150);
-
-    return () => {
-      el.removeEventListener("scroll", checkBotsScroll);
-      window.removeEventListener("resize", checkBotsScroll);
-      observer.disconnect();
-      clearTimeout(timer);
-    };
-  }, [checkBotsScroll, botsEl, isLoading, activeFilter, categorizedBots]);
-
-  const scrollAppsCategories = (direction: "left" | "right") => {
-    const el = appsEl;
-    if (el) {
-      if (haptic) haptic("light");
-      const scrollAmount = direction === "left" ? -250 : 250;
-      el.scrollBy({ left: scrollAmount, behavior: "smooth" });
-    }
-  };
-
-  const scrollBotsCategories = (direction: "left" | "right") => {
-    const el = botsEl;
-    if (el) {
-      if (haptic) haptic("light");
-      const scrollAmount = direction === "left" ? -250 : 250;
-      el.scrollBy({ left: scrollAmount, behavior: "smooth" });
-    }
-  };
 
   const totalBotsCount = useMemo(() => {
     return bots.filter((b) =>
@@ -1657,27 +2926,6 @@ const Home = () => {
         </symbol>
       </svg>
       {/* Top Background Wrapper (Sticky Header on Desktop and Mobile) */}
-      <NavMenu
-        user={user}
-        unreadCount={unreadCount}
-        theme={theme}
-        toggleTheme={toggleTheme}
-        haptic={haptic}
-        isMenuOpen={isMenuOpen}
-        setIsMenuOpen={setIsMenuOpen}
-        setIsLoginModalOpen={setIsLoginModalOpen}
-        setWebAuthUser={setWebAuthUser}
-        isLoginModalOpen={isLoginModalOpen}
-        menuRef={menuRef}
-        openMenu={openMenu}
-        setOpenMenu={setOpenMenu}
-        navState={navState}
-        setNavState={setNavState}
-        mobileModal={mobileModal}
-        setMobileModal={setMobileModal}
-        setIsSearchModalOpen={setIsSearchModalOpen}
-      />
-      {false && (
       <div
         className="relative md:sticky md:top-0 z-[120] min-h-[56px] md:min-h-[64px] md:h-[72px] py-2 md:py-0 flex items-center bg-white dark:bg-slate-950 transition-all"
         onMouseLeave={() => {
@@ -2475,7 +3723,7 @@ const Home = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
-              className="hidden md:block absolute left-0 right-0 top-full bg-white dark:bg-slate-900 border-b border-black/5 dark:border-white/10 shadow-2xl z-[100] mega-menu-container"
+              className="hidden md:block absolute left-0 right-0 top-full bg-white dark:bg-slate-900/95 backdrop-blur-xl border-b border-black/5 dark:border-white/10 shadow-2xl z-[100] mega-menu-container"
               onMouseLeave={() => {
                 setOpenMenu(null);
                 setNavState("main");
@@ -2486,7 +3734,6 @@ const Home = () => {
           )}
         </AnimatePresence>
       </div>
-      )}
       {/* Mobile-only Sticky Search Bar */}
       <div className="relative z-[110] block md:hidden bg-white dark:bg-slate-950 p-3">
         <div className="relative flex items-center bg-[#eeefef] dark:bg-slate-800 rounded-xl group transition-all h-[42px] px-3">
@@ -2711,75 +3958,36 @@ const Home = () => {
                               )}
                             </div>
 
-                            <div className="relative sticky top-0 md:top-[72px] z-30 bg-white dark:bg-slate-950 -mx-4 px-4 sm:-mx-8 sm:px-8 md:mx-0 md:px-0 border-b border-black/[0.03] dark:border-white/[0.03] group">
-                              {/* Left Scroll Button & Fade Overlay */}
-                              {showAppsLeftArrow && (
-                                <div className="flex absolute left-0 top-0 bottom-0 w-12 md:w-20 items-center justify-start bg-gradient-to-r from-white via-white/80 to-transparent dark:from-slate-950 dark:via-slate-950/80 dark:to-transparent z-[31] pointer-events-none opacity-100 transition-opacity duration-200">
-                                  <button
-                                    type="button"
-                                    onClick={() => scrollAppsCategories("left")}
-                                    className="pointer-events-auto flex w-7 h-7 items-center justify-center rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-150 active:scale-95 shadow-md ml-1"
-                                    aria-label="Sola Kaydır"
-                                  >
-                                    <ChevronLeft size={14} />
-                                  </button>
-                                </div>
-                              )}
-
-                              <div
-                                ref={(node) => {
-                                  // @ts-ignore
-                                  catScroll.ref.current = node;
-                                  setAppsEl(node);
+                            <div
+                              ref={catScroll.ref}
+                              onMouseDown={catScroll.onMouseDown}
+                              onMouseUp={catScroll.onMouseUp}
+                              onMouseMove={catScroll.onMouseMove}
+                              onMouseLeave={catScroll.onMouseLeave}
+                              onContextMenu={catScroll.onContextMenu}
+                              className="category-filter-container no-scrollbar sticky top-0 md:top-[72px] z-30 bg-white dark:bg-slate-950 py-3.5 -mx-4 px-4 sm:-mx-8 sm:px-8 md:mx-0 md:px-0 border-b border-black/[0.03] dark:border-white/[0.03]"
+                            >
+                              <button
+                                className={`category-filter-item ${selectedAppsCategory === "all" ? "active" : ""}`}
+                                onClick={() => {
+                                  haptic("light");
+                                  setSelectedAppsCategory("all");
                                 }}
-                                onMouseDown={catScroll.onMouseDown}
-                                onMouseUp={catScroll.onMouseUp}
-                                onMouseMove={catScroll.onMouseMove}
-                                onMouseLeave={catScroll.onMouseLeave}
-                                onContextMenu={catScroll.onContextMenu}
-                                className="category-filter-container no-scrollbar py-3.5"
                               >
+                                {t("home_all")}
+                              </button>
+                              {appsSubCategories.map((subCat) => (
                                 <button
-                                  className={`category-filter-item flex items-center gap-1.5 ${selectedAppsCategory === "all" ? "active" : ""}`}
+                                  key={subCat.id}
+                                  className={`category-filter-item ${selectedAppsCategory === subCat.id ? "active" : ""}`}
                                   onClick={() => {
                                     haptic("light");
-                                    setSelectedAppsCategory("all");
+                                    setSelectedAppsCategory(subCat.id);
                                   }}
                                 >
-                                  <Sparkles size={13} className="shrink-0" />
-                                  <span>{t("home_all")}</span>
+                                  {t(subCat.label)}
                                 </button>
-                                {appsSubCategories.map((subCat) => {
-                                  const IconComponent = subCat.icon;
-                                  return (
-                                    <button
-                                      key={subCat.id}
-                                      className={`category-filter-item flex items-center gap-1.5 ${selectedAppsCategory === subCat.id ? "active" : ""}`}
-                                      onClick={() => {
-                                        haptic("light");
-                                        setSelectedAppsCategory(subCat.id);
-                                      }}
-                                    >
-                                      {IconComponent && <IconComponent size={13} className="shrink-0" />}
-                                      <span>{t(subCat.label)}</span>
-                                    </button>
-                                  );
-                                })}
-                              </div>
-
-                              {/* Right Scroll Button & Fade Overlay */}
-                              {showAppsRightArrow && (
-                                <div className="flex absolute right-0 top-0 bottom-0 w-12 md:w-20 items-center justify-end bg-gradient-to-l from-white via-white/80 to-transparent dark:from-slate-950 dark:via-slate-950/80 dark:to-transparent z-[31] pointer-events-none opacity-100 transition-opacity duration-200">
-                                  <button
-                                    type="button"
-                                    onClick={() => scrollAppsCategories("right")}
-                                    className="pointer-events-auto flex w-7 h-7 items-center justify-center rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-150 active:scale-95 shadow-md mr-1"
-                                    aria-label="Sağa Kaydır"
-                                  >
-                                    <ChevronRight size={14} />
-                                  </button>
-                                </div>
-                              )}
+                              ))}
                             </div>
 
                             {(() => {
@@ -2897,76 +4105,36 @@ const Home = () => {
                               )}
                             </div>
 
-                            <div className="relative sticky top-0 md:top-[72px] z-30 bg-white dark:bg-slate-950 -mx-4 px-4 sm:-mx-8 sm:px-8 md:mx-0 md:px-0 border-b border-black/[0.03] dark:border-white/[0.03] group">
-                              {/* Left Scroll Button & Fade Overlay */}
-                              {showBotsLeftArrow && (
-                                <div className="flex absolute left-0 top-0 bottom-0 w-12 md:w-20 items-center justify-start bg-gradient-to-r from-white via-white/80 to-transparent dark:from-slate-950 dark:via-slate-950/80 dark:to-transparent z-[31] pointer-events-none opacity-100 transition-opacity duration-200">
-                                  <button
-                                    type="button"
-                                    onClick={() => scrollBotsCategories("left")}
-                                    className="pointer-events-auto flex w-7 h-7 items-center justify-center rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-150 active:scale-95 shadow-md ml-1"
-                                    aria-label="Sola Kaydır"
-                                  >
-                                    <ChevronLeft size={14} />
-                                  </button>
-                                </div>
-                              )}
-
-                              <div
-                                ref={(node) => {
-                                  // @ts-ignore
-                                  botsCatScroll.ref.current = node;
-                                  setBotsEl(node);
+                            <div
+                              ref={botsCatScroll.ref}
+                              onMouseDown={botsCatScroll.onMouseDown}
+                              onMouseUp={botsCatScroll.onMouseUp}
+                              onMouseMove={botsCatScroll.onMouseMove}
+                              onMouseLeave={botsCatScroll.onMouseLeave}
+                              onContextMenu={botsCatScroll.onContextMenu}
+                              className="category-filter-container no-scrollbar sticky top-0 md:top-[72px] z-30 bg-white dark:bg-slate-950 py-3.5 -mx-4 px-4 sm:-mx-8 sm:px-8 md:mx-0 md:px-0 border-b border-black/[0.03] dark:border-white/[0.03]"
+                            >
+                              <button
+                                className={`category-filter-item ${selectedBotsCategory === "all" ? "active" : ""}`}
+                                onClick={() => {
+                                  haptic("light");
+                                  setSelectedBotsCategory("all");
                                 }}
-                                onMouseDown={botsCatScroll.onMouseDown}
-                                onMouseUp={botsCatScroll.onMouseUp}
-                                onMouseMove={botsCatScroll.onMouseMove}
-                                onMouseLeave={botsCatScroll.onMouseLeave}
-                                decline-context-menu="true"
-                                onContextMenu={botsCatScroll.onContextMenu}
-                                className="category-filter-container no-scrollbar py-3.5"
                               >
+                                {t("home_all")}
+                              </button>
+                              {botsCategories.map((cat) => (
                                 <button
-                                  className={`category-filter-item flex items-center gap-1.5 ${selectedBotsCategory === "all" ? "active" : ""}`}
+                                  key={cat.id}
+                                  className={`category-filter-item ${selectedBotsCategory === cat.id ? "active" : ""}`}
                                   onClick={() => {
                                     haptic("light");
-                                    setSelectedBotsCategory("all");
+                                    setSelectedBotsCategory(cat.id);
                                   }}
                                 >
-                                  <Sparkles size={13} className="shrink-0" />
-                                  <span>{t("home_all")}</span>
+                                  {t(cat.label)}
                                 </button>
-                                {botsCategories.map((cat) => {
-                                  const IconComponent = cat.icon;
-                                  return (
-                                    <button
-                                      key={cat.id}
-                                      className={`category-filter-item flex items-center gap-1.5 ${selectedBotsCategory === cat.id ? "active" : ""}`}
-                                      onClick={() => {
-                                        haptic("light");
-                                        setSelectedBotsCategory(cat.id);
-                                      }}
-                                    >
-                                      {IconComponent && <IconComponent size={13} className="shrink-0" />}
-                                      <span>{t(cat.label)}</span>
-                                    </button>
-                                  );
-                                })}
-                              </div>
-
-                              {/* Right Scroll Button & Fade Overlay */}
-                              {showBotsRightArrow && (
-                                <div className="flex absolute right-0 top-0 bottom-0 w-12 md:w-20 items-center justify-end bg-gradient-to-l from-white via-white/80 to-transparent dark:from-slate-950 dark:via-slate-950/80 dark:to-transparent z-[31] pointer-events-none opacity-100 transition-opacity duration-200">
-                                  <button
-                                    type="button"
-                                    onClick={() => scrollBotsCategories("right")}
-                                    className="pointer-events-auto flex w-7 h-7 items-center justify-center rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-150 active:scale-95 shadow-md mr-1"
-                                    aria-label="Sağa Kaydır"
-                                  >
-                                    <ChevronRight size={14} />
-                                  </button>
-                                </div>
-                              )}
+                              ))}
                             </div>
 
                             {(() => {
@@ -3411,7 +4579,7 @@ const Home = () => {
                       setIsLoginModalOpen(true);
                       setMobileModal(null);
                     }}
-                    className="px-5 h-10 bg-blue-500 hover:bg-blue-600 text-white text-[13px] font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center whitespace-nowrap shadow-lg shadow-blue-500/25"
+                    className="px-3.5 py-1.5 bg-blue-500 text-white rounded-full text-xs font-bold transition-all active:scale-95 text-center flex items-center"
                   >
                     {t("login") || "Giriş Yap"}
                   </button>
@@ -3576,7 +4744,7 @@ const Home = () => {
             </div>
 
             {/* Menu Footer Row - Always pinned to the bottom safely */}
-            <div className="border-t border-slate-100 dark:border-white/5 px-8 py-5 flex items-center gap-3 shrink-0 bg-white dark:bg-slate-950 pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
+            <div className="border-t border-slate-100 dark:border-white/5 px-8 py-5 flex items-center gap-3 shrink-0 bg-white/95 dark:bg-slate-950/95 pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
               {/* Language Selector Pill */}
               <button
                 onClick={toggleLanguage}
@@ -4078,5 +5246,85 @@ const Home = () => {
     </div>
   );
 };
+
+const AnnouncementsCarousel: React.FC<{
+  announcements: Announcement[];
+  scroll: any;
+  onShowPopup: (ann: Announcement) => void;
+}> = React.memo(({ announcements, scroll, onShowPopup }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const { t } = useTranslation();
+
+  const handleScroll = useCallback(() => {
+    if (scroll.ref.current) {
+      const width = scroll.ref.current.offsetWidth;
+      const index = Math.round(scroll.ref.current.scrollLeft / width);
+      if (index !== currentIndex) {
+        setCurrentIndex(index);
+      }
+    }
+  }, [currentIndex, scroll.ref]);
+
+  useEffect(() => {
+    const el = scroll.ref.current;
+    if (el) {
+      el.addEventListener("scroll", handleScroll, { passive: true });
+      return () => el.removeEventListener("scroll", handleScroll);
+    }
+  }, [handleScroll, scroll.ref]);
+
+  useEffect(() => {
+    if (announcements.length <= 1) return;
+
+    const interval = setInterval(() => {
+      if (window.innerWidth < 768 && scroll.ref.current && !scroll.isDragging) {
+        const nextIndex = (currentIndex + 1) % announcements.length;
+        const width = scroll.ref.current.offsetWidth;
+        scroll.ref.current.scrollTo({
+          left: nextIndex * width,
+          behavior: "smooth",
+        });
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [currentIndex, announcements.length, scroll.isDragging, scroll.ref]);
+
+  return (
+    <div className="w-full flex flex-col gap-4">
+      <div className="relative">
+        <div
+          ref={scroll.ref}
+          onMouseDown={scroll.onMouseDown}
+          onMouseUp={scroll.onMouseUp}
+          onMouseMove={scroll.onMouseMove}
+          onMouseLeave={scroll.onMouseLeave}
+          onContextMenu={scroll.onContextMenu}
+          className={`flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 overflow-x-auto md:overflow-x-visible no-scrollbar pb-3 scroll-smooth snap-x snap-mandatory ${scroll.isDragging ? "cursor-grabbing" : "cursor-grab"}`}
+        >
+          {announcements.map((ann) => (
+            <div
+              key={ann.id}
+              className="w-[84vw] sm:w-[50vw] md:w-full shrink-0 snap-center"
+            >
+              <PromoCard ann={ann} onShowPopup={onShowPopup} />
+            </div>
+          ))}
+        </div>
+
+        {announcements.length > 1 && (
+          <div className="md:hidden flex justify-center items-center gap-1.5 mt-3 pointer-events-none">
+            {announcements.map((_, i) => (
+              <div
+                key={i}
+                className={`h-1.5 rounded-full transition-all duration-300 ${i === currentIndex ? "w-4 bg-slate-800 dark:bg-white" : "w-1.5 bg-slate-300 dark:bg-slate-700"}`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+});
 
 export default Home;

@@ -47,7 +47,6 @@ import { DatabaseService } from '../services/DatabaseService';
 import { BlogPost, BlogComment } from '../types';
 import { UserHoverCard } from '../components/UserHoverCard';
 import { Skeleton, SkeletonText, LazyImage } from '../components/Preload';
-import LoginModal from '../components/LoginModal';
 
 const UserIcon = User;
 
@@ -102,13 +101,12 @@ const categories = [
 const BlogPostDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const { haptic, user, setWebAuthUser } = useTelegram();
+  const { haptic, user } = useTelegram();
   const { language, setLanguage, t } = useTranslation();
   const { theme, toggleTheme } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [post, setPost] = useState<BlogPost | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -200,7 +198,7 @@ const BlogPostDetail: React.FC = () => {
         console.error("Fetch Blog Detail Error:", err);
       } finally {
         const elapsedTime = Date.now() - startTime;
-        const minDelay = 200;
+        const minDelay = 500;
         if (elapsedTime < minDelay) {
             await new Promise(resolve => setTimeout(resolve, minDelay - elapsedTime));
         }
@@ -484,10 +482,10 @@ const BlogPostDetail: React.FC = () => {
                   <button
                     onClick={() => {
                       haptic("light");
-                      setIsLoginModalOpen(true);
+                      navigate("/login");
                       setIsMobileMenuOpen(false);
                     }}
-                    className="px-5 h-10 bg-blue-500 hover:bg-blue-600 text-white text-[13px] font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center whitespace-nowrap shadow-lg shadow-blue-500/25"
+                    className="px-3.5 py-1.5 bg-blue-500 text-white rounded-full text-xs font-bold transition-all active:scale-95 text-center flex items-center"
                   >
                     {t("login") || "Giriş Yap"}
                   </button>
@@ -623,7 +621,7 @@ const BlogPostDetail: React.FC = () => {
             </div>
 
             {/* Menu Footer Row - Always pinned to the bottom safely */}
-            <div className="border-t border-slate-100 dark:border-white/5 px-8 py-5 flex items-center gap-3 shrink-0 bg-white dark:bg-slate-950 pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
+            <div className="border-t border-slate-100 dark:border-white/5 px-8 py-5 flex items-center gap-3 shrink-0 bg-white/95 dark:bg-slate-950/95 pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
               {/* Language Selector Pill */}
               <button
                 onClick={() => {
@@ -1100,11 +1098,6 @@ const BlogPostDetail: React.FC = () => {
         </aside>
 
       </div>
-      <LoginModal 
-        isOpen={isLoginModalOpen} 
-        onClose={() => setIsLoginModalOpen(false)} 
-        onAuth={(u) => setWebAuthUser(u)} 
-      />
     </div>
   );
 };

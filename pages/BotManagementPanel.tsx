@@ -466,7 +466,7 @@ const BotManagementPanel = () => {
              ) : (
                 <button 
                     onClick={() => { haptic('medium'); setIsLoginModalOpen(true); }}
-                    className="px-5 h-10 bg-blue-500 hover:bg-blue-600 text-white text-[13px] font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center whitespace-nowrap shadow-lg shadow-blue-500/25 mr-3"
+                    className="h-10 px-6 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all mr-3 shadow-lg shadow-blue-500/20"
                 >
                     Giriş Yap
                 </button>

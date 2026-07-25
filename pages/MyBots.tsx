@@ -352,7 +352,7 @@ const MyBots = () => {
                     {/* Settings Sidebar Overlay */}
 
                     <div className="hidden">
-                         <div className="absolute inset-0 bg-slate-50 dark:bg-slate-950"></div>
+                         <div className="absolute inset-0 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-xl"></div>
                          <div className={`w-full h-full grid gap-3 relative z-40 content-center justify-center ${bot.is_official ? 'grid-cols-2 grid-rows-2' : 'grid-cols-1'}`}>
                                 {bot.is_official && (
                                     <>

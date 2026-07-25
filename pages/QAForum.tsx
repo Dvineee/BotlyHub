@@ -52,7 +52,6 @@ import { DatabaseService } from "../services/DatabaseService";
 import { SEO } from "../components/SEO";
 import { useTheme } from "../ThemeContext";
 import Logo from "../components/Logo";
-import { NavMenu } from "../components/NavMenu";
 import { categories, appsSubCategories } from "../data";
 import { API_BASE_URL } from "../constants";
 import LoginModal from "../components/LoginModal";
@@ -260,7 +259,7 @@ export default function QAForum() {
       console.error("Failed to fetch topics:", err);
     } finally {
       const elapsedTime = Date.now() - startTime;
-      const minDelay = 200;
+      const minDelay = 500;
       if (elapsedTime < minDelay) {
         await new Promise((resolve) =>
           setTimeout(resolve, minDelay - elapsedTime),
@@ -664,7 +663,7 @@ export default function QAForum() {
   const renderMegaMenuContent = () => {
     if (openMenu === "kesfet") {
       return (
-        <div className="max-w-6xl mx-auto px-6 grid grid-cols-12 gap-8 py-8">
+        <div className="max-w-6xl mx-auto px-6 grid grid-cols-12 gap-8">
           {/* Left Column (Promotion Panel) */}
           <div className="col-span-4 bg-slate-50/50 dark:bg-white/[0.02] border border-slate-200/50 dark:border-white/[0.04] rounded-2xl p-5 flex flex-col justify-between select-none">
             {/* Top section */}
@@ -950,27 +949,6 @@ export default function QAForum() {
       />
 
       {/* Header Sticky Navigation Panel */}
-      <NavMenu
-        user={user}
-        unreadCount={unreadCount}
-        theme={theme}
-        toggleTheme={toggleTheme}
-        haptic={haptic}
-        isMenuOpen={isMenuOpen}
-        setIsMenuOpen={setIsMenuOpen}
-        setIsLoginModalOpen={setIsLoginModalOpen}
-        setWebAuthUser={setWebAuthUser}
-        isLoginModalOpen={isLoginModalOpen}
-        menuRef={menuRef}
-        openMenu={openMenu}
-        setOpenMenu={setOpenMenu}
-        navState={navState}
-        setNavState={setNavState}
-        mobileModal={mobileModal}
-        setMobileModal={setMobileModal}
-        setIsSearchModalOpen={setIsSearchModalOpen}
-      />
-      {false && (
       <header
         ref={internalMenuRef}
         className="relative md:sticky md:top-0 z-40 bg-white dark:bg-slate-950 border-b border-[#f7f7f7] dark:border-white/5 w-full py-2.5 transition-colors"
@@ -1071,7 +1049,7 @@ export default function QAForum() {
                     haptic("light");
                     setIsLoginModalOpen(true);
                   }}
-                  className="order-3 md:order-2 px-5 h-10 bg-blue-500 hover:bg-blue-600 text-white text-[13px] font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center whitespace-nowrap shadow-lg shadow-blue-500/25"
+                  className="order-3 md:order-2 h-10 px-4 flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white border-none text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-blue-500/20 active:scale-95 transition-all whitespace-nowrap"
                 >
                   {t("home_login")}
                 </button>
@@ -1267,7 +1245,7 @@ export default function QAForum() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
-              className="hidden md:block absolute left-0 right-0 top-full bg-white dark:bg-slate-900 border-b border-black/5 dark:border-white/10 shadow-2xl z-[100] mega-menu-container"
+              className="hidden md:block absolute left-0 right-0 top-full bg-white dark:bg-slate-900/95 backdrop-blur-xl border-b border-black/5 dark:border-white/10 shadow-2xl z-[100] mega-menu-container"
               onMouseLeave={() => {
                 setOpenMenu(null);
                 setNavState("main");
@@ -1278,7 +1256,6 @@ export default function QAForum() {
           )}
         </AnimatePresence>
       </header>
-      )}
 
       {/* Main Content Layout Container */}
       <main className="max-w-3xl lg:max-w-[1100px] mx-auto px-4 sm:px-6 py-6 transition-all">
@@ -1663,24 +1640,6 @@ export default function QAForum() {
                   transition={{ duration: 0.2 }}
                   className="space-y-6"
                 >
-                  {/* Back button */}
-                  <div className="flex items-center">
-                    <button
-                      onClick={() => {
-                        haptic("light");
-                        setIsDetailView(false);
-                        setActiveTopic(null);
-                        fetchTopics(selectedFilter);
-                      }}
-                      className="group flex items-center gap-2 text-[11px] font-black uppercase tracking-wider text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-                    >
-                      <span className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-900 group-hover:bg-slate-200 dark:group-hover:bg-slate-800 transition-colors border border-black/5 dark:border-white/5">
-                        <ArrowLeft size={14} />
-                      </span>
-                      <span>Geri Dön</span>
-                    </button>
-                  </div>
-
                   {/* Main discussion card detailed */}
                   {activeTopic && (
                     <div className="fancy-glass-card mb-6">
@@ -2396,7 +2355,7 @@ export default function QAForum() {
                       setIsLoginModalOpen(true);
                       setMobileModal(null);
                     }}
-                    className="px-5 h-10 bg-blue-500 hover:bg-blue-600 text-white text-[13px] font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center whitespace-nowrap shadow-lg shadow-blue-500/25"
+                    className="px-3.5 py-1.5 bg-blue-500 text-white rounded-full text-xs font-bold transition-all active:scale-95 text-center flex items-center"
                   >
                     {t("login") || "Giriş Yap"}
                   </button>
