@@ -29,6 +29,82 @@ const getLiveBotIcon = (botLink: string) => {
 
 const generateUniqueId = () => `BOT-${Math.floor(10000 + Math.random() * 90000)}-${Math.random().toString(36).substring(2, 5).toUpperCase()}`;
 
+const categoryLabelMap: Record<string, string> = {
+    'all': 'Hepsi',
+    'cat_all': 'Hepsi',
+    'apps': 'Uygulama',
+    'cat_apps': 'Uygulamalar',
+    'apps_cat_trending': 'Trendler',
+    'apps_cat_editors_choice': 'Editörün Seçimi',
+    'apps_cat_new': 'Yeni',
+    'apps_cat_games': 'Oyunlar',
+    'apps_cat_tma_bots': 'Telegram Platformu',
+    'apps_cat_ton_sites': 'TON Siteleri',
+    'apps_cat_ai': 'Yapay Zeka',
+    'apps_cat_web3': 'Web3 Genel',
+    'apps_cat_earn': 'Kazan',
+    'apps_cat_tap_to_earn': 'Tıkla Kazan',
+    'apps_cat_trade': 'Ticaret',
+    'apps_cat_art': 'Sanat',
+    'apps_cat_social': 'Sosyal',
+    'apps_cat_dev': 'Geliştirici',
+    'apps_cat_saas': 'SaaS',
+    'apps_cat_security': 'Güvenlik & Gizlilik',
+    'cat_games': 'Oyunlar',
+    'cat_finance': 'Finans',
+    'cat_moderation': 'Moderasyon',
+    'cat_utilities': 'Araçlar',
+    'cat_ai_services': 'AI Hizmetleri',
+    'cat_communication': 'İletişim',
+    'cat_productivity': 'Üretkenlik',
+    'cat_music': 'Müzik',
+    'cat_crypto': 'Kripto',
+    'cat_telegram_platform': 'Telegram Platformu',
+    'cat_bloggers': 'Bloggerlar',
+    'cat_shopping': 'Alışveriş',
+    'cat_security': 'Güvenlik',
+    'cat_education': 'Eğitim',
+    'cat_content': 'İçerik',
+    'games': 'Oyunlar',
+    'finance': 'Finans',
+    'moderation': 'Moderasyon',
+    'utilities': 'Araçlar',
+    'ai_services': 'AI Hizmetleri',
+    'communication': 'İletişim',
+    'productivity': 'Üretkenlik',
+    'music': 'Müzik',
+    'crypto': 'Kripto',
+    'telegram_platform': 'Telegram Platformu',
+    'bloggers': 'Bloggerlar',
+    'shopping': 'Alışveriş',
+    'security': 'Güvenlik',
+    'education': 'Eğitim',
+    'content': 'İçerik',
+    'marketing_ads': 'Pazarlama',
+    'defi': 'DeFi',
+    'wallets': 'Cüzdanlar',
+    'nft': 'NFT',
+    'social': 'Sosyal',
+    'airdrops': 'Airdrops',
+    'builders': 'Geliştiriciler',
+    'trending': 'Trendler',
+    'editors_choice': 'Editörün Seçimi',
+    'new': 'Yeni',
+    'games_sub': 'Oyunlar',
+    'tma_bots': 'Telegram Platformu',
+    'ton_sites': 'TON Siteleri',
+    'ai_sub': 'Yapay Zeka',
+    'web3_general': 'Web3 Genel',
+    'earn': 'Kazan',
+    'tap_to_earn': 'Tıkla Kazan',
+    'trade': 'Ticaret',
+    'art': 'Sanat',
+    'dev': 'Geliştirici',
+    'saas': 'SaaS',
+    'security_privacy': 'Güvenlik & Gizlilik',
+    'defi_sub': 'DeFi'
+};
+
 const translateType = (type: string) => {
     const translations: any = {
         all: 'HEPSİ',
@@ -335,6 +411,112 @@ const BotManagement = () => {
         });
     };
 
+    const normalizeAndMapCategories = (val: string, targetType: 'apps' | 'bots'): string[] => {
+        if (!val || !val.trim()) {
+            return targetType === 'apps' ? ['apps'] : ['utilities'];
+        }
+
+        const rawTokens = val.split(/[,;\/|+\n]/).map(t => t.trim()).filter(Boolean);
+        const matchedCategories = new Set<string>();
+
+        if (targetType === 'apps') {
+            matchedCategories.add('apps');
+        }
+
+        const appCategoryMap: Record<string, string[]> = {
+            'trending': ['trending', 'trend', 'trendler', 'popular', 'populer', 'populerler', 'coksatanlar', 'coksatan'],
+            'editors_choice': ['editors_choice', 'editorschoice', 'editorinsecimi', 'editorunsecimi', 'editorchoice', 'featured', 'onecikanlar', 'onecikan'],
+            'new': ['new', 'yeni', 'yeniler', 'latest', 'soneklenenler', 'yeniemini'],
+            'games_sub': ['games_sub', 'games', 'game', 'oyun', 'oyunlar', 'gaming', 'oyunlareglence', 'eglence', 'oyungeglence', 'gameplay'],
+            'tma_bots': ['tma_bots', 'tmabots', 'tma', 'telegramminiapp', 'telegramplatformu', 'telegramapp', 'botapp', 'app', 'miniapp', 'miniapps'],
+            'ton_sites': ['ton_sites', 'tonsites', 'tonsiteleri', 'ton', 'tonsite', 'website', 'tonsitesi'],
+            'ai_sub': ['ai_sub', 'ai_services', 'aiservices', 'ai', 'yapayzeka', 'gpt', 'aiapp', 'aipowered', 'yapayzekaurunu'],
+            'web3_general': ['web3_general', 'web3general', 'web3', 'web30', 'blockchain', 'blokzincir', 'web3genel'],
+            'earn': ['earn', 'kazan', 'kazanc', 'earning', 'parakazan', 'makemoney', 'kazansistemi'],
+            'tap_to_earn': ['tap_to_earn', 'tap2earn', 't2e', 'tiklakazan', 'taptoearn', 'clicker', 'tapper', 'tiklamagame'],
+            'trade': ['trade', 'trading', 'ticaret', 'takas', 'borsa', 'dex', 'swap', 'alimsatim'],
+            'art': ['art', 'sanat', 'tasarim', 'design', 'gorsel', 'resim', 'nftart'],
+            'social': ['social', 'sosyal', 'topluluk', 'community', 'ag', 'sosyalag', 'medya'],
+            'dev': ['dev', 'builders', 'gelistirici', 'gelistiriciler', 'developer', 'kod', 'yazilim', 'yazilimgelistirme'],
+            'saas': ['saas', 'cloud', 'yazilimservisi', 'servis', 'cloudservice'],
+            'security_privacy': ['security_privacy', 'security', 'guvenlik', 'gizlilik', 'privacy', 'guvenlikgizlilik', 'anti-spam'],
+            'defi_sub': ['defi_sub', 'defi', 'decentralizedfinance', 'merkeziyetsizfinans', 'defi_app']
+        };
+
+        const botCategoryMap: Record<string, string[]> = {
+            'games': ['games', 'game', 'oyun', 'oyunlar', 'gaming', 'oyunlareglence', 'eglence', 'oyunlarveeglence'],
+            'finance': ['finance', 'finans', 'money', 'para', 'finansal', 'banka', 'borsa', 'finansalbilgi'],
+            'moderation': ['moderation', 'moderasyon', 'mod', 'grupyonetimi', 'grup', 'guvenlikmoderasyon', 'kanaljonetim', 'yonetim'],
+            'utilities': ['utilities', 'utility', 'araclar', 'arac', 'faydali', 'tools', 'tool', 'genel', 'faydalıaraclar'],
+            'ai_services': ['ai_services', 'aiservices', 'ai', 'yapayzeka', 'gpt', 'botai', 'ai/ml', 'yapayzekahizmetleri', 'chatgpt'],
+            'communication': ['communication', 'iletisim', 'sohbet', 'chat', 'mesaj', 'mesajlasma', 'iletisimsohbet'],
+            'productivity': ['productivity', 'verimlilik', 'uretkenlik', 'is', 'isbirligi', 'isaks', 'task', 'istakibi', 'zaman'],
+            'music': ['music', 'muzik', 'ses', 'audio', 'radyo', 'sarki', 'muzildinle'],
+            'crypto': ['crypto', 'kripto', 'coin', 'token', 'cryptocurrency', 'kriptopara', 'btc', 'eth', 'ton'],
+            'telegram_platform': ['telegram_platform', 'telegramplatformu', 'telegram', 'tg', 'platform', 'kanal', 'group', 'tgplatform'],
+            'bloggers': ['bloggers', 'blogger', 'blog', 'bloggerlar', 'icerikureticisi', 'yayin', 'haber', 'makale'],
+            'shopping': ['shopping', 'alisveris', 'magaza', 'eticaret', 'store', 'shop', 'siparis'],
+            'security': ['security', 'guvenlik', 'antispam', 'koruma', 'gizlilik', 'guvenlikbotu'],
+            'education': ['education', 'egitim', 'kurs', 'ogrenme', 'okul', 'ders', 'bilgi'],
+            'content': ['content', 'icerik', 'medya', 'media', 'video', 'foto'],
+            'marketing_ads': ['marketing_ads', 'marketing', 'pazarlama', 'reklam', 'ads', 'tanitim', 'pazarlamareklam', 'duyuru'],
+            'defi': ['defi', 'decentralizedfinance', 'merkeziyetsizfinans'],
+            'wallets': ['wallets', 'wallet', 'cuzdan', 'cuzdanlar'],
+            'nft': ['nft', 'nfts', 'dijitalsanat', 'collectible', 'koleksiyon'],
+            'social': ['social', 'sosyal', 'topluluk', 'community', 'ag'],
+            'airdrops': ['airdrops', 'airdrop', 'odul', 'hediye', 'claim'],
+            'builders': ['builders', 'builder', 'gelistirici', 'gelistiriciler', 'developer', 'dev', 'kod', 'yazilimbotu']
+        };
+
+        const targetMap = targetType === 'apps' ? appCategoryMap : botCategoryMap;
+
+        rawTokens.forEach(token => {
+            const cleanToken = token.toLowerCase()
+                .replace(/i̇/g, 'i')
+                .replace(/ı/g, 'i')
+                .replace(/ğ/g, 'g')
+                .replace(/ü/g, 'u')
+                .replace(/ş/g, 's')
+                .replace(/ö/g, 'o')
+                .replace(/ç/g, 'c')
+                .replace(/[^a-z0-9]/g, '');
+
+            if (!cleanToken) return;
+
+            let matched = false;
+            for (const [catId, aliases] of Object.entries(targetMap)) {
+                if (aliases.includes(cleanToken)) {
+                    matchedCategories.add(catId);
+                    matched = true;
+                    break;
+                }
+            }
+
+            if (!matched) {
+                for (const [catId, aliases] of Object.entries(targetMap)) {
+                    if (aliases.some(alias => cleanToken.includes(alias) || alias.includes(cleanToken))) {
+                        matchedCategories.add(catId);
+                        matched = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!matched && cleanToken !== 'apps' && cleanToken.length >= 2) {
+                matchedCategories.add(cleanToken);
+            }
+        });
+
+        const result = Array.from(matchedCategories);
+        if (targetType === 'bots' && result.length === 0) {
+            return ['utilities'];
+        }
+        if (targetType === 'apps' && result.length === 0) {
+            return ['apps'];
+        }
+        return result;
+    };
+
     const detectProductTypes = (val: string, defaultType: 'apps' | 'bots'): ('apps' | 'bots')[] => {
         if (!val || !val.trim()) {
             return [defaultType];
@@ -442,15 +624,11 @@ const BotManagement = () => {
                     bot.price = isNaN(num) ? 0 : num;
                 }
                 // Category / Kategoriler
-                else if (['category', 'categories', 'kategori', 'kategoriler'].includes(cleanHeader)) {
-                    const parsedCats = val.split(/[;,]/).map((c: string) => c.trim().toLowerCase()).filter(Boolean);
-                    if (type === 'apps') {
-                        if (!parsedCats.includes('apps')) parsedCats.push('apps');
-                        bot.category = parsedCats;
-                    } else {
-                        bot.category = parsedCats.filter((c: string) => c !== 'apps');
-                        if (bot.category.length === 0) bot.category = ['utilities'];
-                    }
+                else if (['category', 'categories', 'kategori', 'kategoriler', 'cat', 'cats', 'altkategori', 'subcategories', 'subcategory'].includes(cleanHeader)) {
+                    const existing = Array.isArray(bot.category) ? bot.category : [];
+                    const newCats = normalizeAndMapCategories(val, type);
+                    const combined = Array.from(new Set([...existing, ...newCats]));
+                    bot.category = combined;
                 }
                 // Icon
                 else if (['icon', 'avatar', 'resim', 'gorsel'].includes(cleanHeader)) {
@@ -1661,7 +1839,7 @@ const BotManagement = () => {
                                                             <td className="p-3 text-blue-400 font-mono">{bot.bot_link}</td>
                                                             <td className="p-3 font-mono">
                                                                 <span className="bg-slate-950/80 px-2 py-0.5 rounded text-[10px] border border-slate-800/10 text-slate-400 font-sans">
-                                                                    {bot.category?.join(', ')}
+                                                                    {bot.category?.map((c: string) => categoryLabelMap[c] || c).join(', ')}
                                                                 </span>
                                                             </td>
                                                             <td className="p-3 font-mono">{bot.price > 0 ? `$${bot.price}` : 'Ücretsiz'}</td>
