@@ -335,162 +335,204 @@ const BotManagement = () => {
         });
     };
 
-    const mapCsvRowToBot = (row: string[], headers: string[], type: 'apps' | 'bots') => {
-        const bot: any = {
-            id: generateUniqueId(),
-            name: '',
-            description: '',
-            price: 0,
-            category: type === 'apps' ? ['apps'] : ['utilities'],
-            bot_link: '@',
-            icon: '',
-            screenshots: [],
-            is_official: false,
-            telegram_group: '',
-            website_url: '',
-            app_url: '',
-            social_url: '',
-            github_url: '',
-            youtube_url: '',
-            x_url: '',
-            android_url: '',
-            ios_url: '',
-            promoted_type: 'none',
-            languages: ['🇹🇷'],
-            platform: ''
-        };
+    const detectProductTypes = (val: string, defaultType: 'apps' | 'bots'): ('apps' | 'bots')[] => {
+        if (!val || !val.trim()) {
+            return [defaultType];
+        }
+        const norm = val.toLowerCase()
+            .replace(/i̇/g, 'i')
+            .replace(/ı/g, 'i')
+            .replace(/ğ/g, 'g')
+            .replace(/ü/g, 'u')
+            .replace(/ş/g, 's')
+            .replace(/ö/g, 'o')
+            .replace(/ç/g, 'c');
 
+        const hasBot = norm.includes('bot');
+        const hasApp = norm.includes('app') || norm.includes('uygulama') || norm.includes('mini');
+
+        if (hasBot && hasApp) {
+            return ['apps', 'bots'];
+        } else if (hasApp) {
+            return ['apps'];
+        } else if (hasBot) {
+            return ['bots'];
+        }
+
+        return [defaultType];
+    };
+
+    const mapCsvRowToBots = (row: string[], headers: string[], csvType: 'apps' | 'bots'): any[] => {
+        let urunTipiVal = '';
         headers.forEach((header, index) => {
             const cleanHeader = normalizeHeader(header);
-            const val = (row[index] || '').trim();
-
-            if (!val || val.toLowerCase() === 'yok' || val.toLowerCase() === 'n/a' || val.toLowerCase().startsWith('n/a ')) return;
-
-            // Name
-            if (['name', 'baslik', 'isim', 'title', 'uygulamaadi', 'urunadi', 'appname'].includes(cleanHeader)) {
-                bot.name = val;
-            }
-            // Link
-            else if (['botlink', 'link', 'username', 'kullaniciadi', 'telegramappadresi', 'bot'].includes(cleanHeader)) {
-                let cleanVal = val;
-                if (val.startsWith('https://t.me/')) {
-                    const parts = val.replace('https://t.me/', '').split('/');
-                    if (parts[0]) {
-                        cleanVal = '@' + parts[0];
-                    }
+            if (['uruntipi', 'uruntip', 'producttype', 'type', 'tip', 'urun', 'tur', 'uruntur'].includes(cleanHeader)) {
+                if (row[index]) {
+                    urunTipiVal = row[index].trim();
                 }
-                bot.bot_link = cleanVal.startsWith('@') || cleanVal.startsWith('https://') ? cleanVal : '@' + cleanVal;
-            }
-            // TGApp / App Url
-            else if (['tgapp', 'appurl', 'app', 'uygulamaurl', 'telegramapp'].includes(cleanHeader)) {
-                bot.app_url = val;
-                if ((!bot.bot_link || bot.bot_link === '@') && val.includes('t.me/')) {
-                    const parts = val.replace('https://t.me/', '').replace('http://t.me/', '').split('/');
-                    if (parts[0]) {
-                        bot.bot_link = '@' + parts[0];
-                    }
-                }
-            }
-            // Description / Market Açıklaması
-            else if (['description', 'desc', 'aciklama', 'details', 'marketaciklamasi', 'ozet', 'bilgi'].includes(cleanHeader)) {
-                bot.description = val;
-            }
-            // Price / Ücret
-            else if (['price', 'ucret', 'fiyat'].includes(cleanHeader)) {
-                const num = parseFloat(val.replace(/[^0-9.]/g, ''));
-                bot.price = isNaN(num) ? 0 : num;
-            }
-            // Category / Kategoriler
-            else if (['category', 'categories', 'kategori', 'kategoriler'].includes(cleanHeader)) {
-                const parsedCats = val.split(/[;,]/).map((c: string) => c.trim().toLowerCase()).filter(Boolean);
-                if (type === 'apps') {
-                    if (!parsedCats.includes('apps')) parsedCats.push('apps');
-                    bot.category = parsedCats;
-                } else {
-                    bot.category = parsedCats.filter((c: string) => c !== 'apps');
-                    if (bot.category.length === 0) bot.category = ['utilities'];
-                }
-            }
-            // Icon
-            else if (['icon', 'avatar', 'resim', 'gorsel'].includes(cleanHeader)) {
-                bot.icon = val;
-            }
-            // Is Official
-            else if (['isofficial', 'official', 'resmi'].includes(cleanHeader)) {
-                bot.is_official = val.toLowerCase() === 'true' || val === '1' || val.toLowerCase() === 'evet' || val.toLowerCase() === 'yes';
-            }
-            // Languages / Diller
-            else if (['languages', 'language', 'diller', 'dil'].includes(cleanHeader)) {
-                const langMap: Record<string, string> = {
-                    'english': '🇺🇸',
-                    'russian': '🇷🇺',
-                    'turkish': '🇹🇷',
-                    'spanish': '🇪🇸',
-                    'french': '🇫🇷',
-                    'german': '🇩🇪',
-                    'italian': '🇮🇹',
-                    'chinese': '🇨🇳',
-                    'gb': '🇬🇧',
-                    'us': '🇺🇸',
-                    'ru': '🇷🇺',
-                    'tr': '🇹🇷',
-                    'es': '🇪🇸',
-                    'fr': '🇫🇷',
-                    'de': '🇩🇪',
-                    'in': '🇮🇳',
-                    'ir': '🇮🇷'
-                };
-                bot.languages = val.split(/[;,]/).map((l: string) => {
-                    const cleanL = l.trim().toLowerCase();
-                    return langMap[cleanL] || l.trim();
-                }).filter(Boolean);
-            }
-            // Platform
-            else if (['platform', 'platforms'].includes(cleanHeader)) {
-                bot.platform = val;
-            }
-            // Telegram Group
-            else if (['telegramgroup', 'group', 'grup', 'telegramgrup', 'telegramkanal'].includes(cleanHeader)) {
-                bot.telegram_group = val;
-            }
-            // Website Url
-            else if (['websiteurl', 'website', 'web', 'websitesi', 'websiteadres'].includes(cleanHeader)) {
-                bot.website_url = val;
-            }
-            // GitHub Url
-            else if (['githuburl', 'github'].includes(cleanHeader)) {
-                bot.github_url = val;
-            }
-            // YouTube Url
-            else if (['youtubeurl', 'youtube'].includes(cleanHeader)) {
-                bot.youtube_url = val;
-            }
-            // X / Twitter Url
-            else if (['xurl', 'twitter', 'twitterurl', 'xcom', 'x', 'xtwitterurl'].includes(cleanHeader)) {
-                bot.x_url = val;
-            }
-            // Social Media Url / Sosyal Medya
-            else if (['socialurl', 'social', 'sosyal', 'sosyalmedyaurl', 'sosyalmedya'].includes(cleanHeader)) {
-                bot.social_url = val;
-            }
-            // Android Linki
-            else if (['androidurl', 'playstore', 'android', 'androidappadresi', 'androidlinki'].includes(cleanHeader)) {
-                bot.android_url = val;
-            }
-            // iOS Linki
-            else if (['iosurl', 'appstore', 'ios', 'iosappadresi', 'ioslinki'].includes(cleanHeader)) {
-                bot.ios_url = val;
             }
         });
 
-        if ((!bot.bot_link || bot.bot_link === '@') && bot.app_url && bot.app_url.includes('t.me/')) {
-            const parts = bot.app_url.replace('https://t.me/', '').replace('http://t.me/', '').split('/');
-            if (parts[0]) {
-                bot.bot_link = '@' + parts[0];
-            }
-        }
+        const targetTypes = detectProductTypes(urunTipiVal, csvType);
 
-        return bot;
+        return targetTypes.map(type => {
+            const bot: any = {
+                id: generateUniqueId(),
+                name: '',
+                description: '',
+                price: 0,
+                category: type === 'apps' ? ['apps'] : ['utilities'],
+                bot_link: '@',
+                icon: '',
+                screenshots: [],
+                is_official: false,
+                telegram_group: '',
+                website_url: '',
+                app_url: '',
+                social_url: '',
+                github_url: '',
+                youtube_url: '',
+                x_url: '',
+                android_url: '',
+                ios_url: '',
+                promoted_type: 'none',
+                languages: ['🇹🇷'],
+                platform: '',
+                product_type: type === 'apps' ? 'app' : 'bot'
+            };
+
+            headers.forEach((header, index) => {
+                const cleanHeader = normalizeHeader(header);
+                const val = (row[index] || '').trim();
+
+                if (!val || val.toLowerCase() === 'yok' || val.toLowerCase() === 'n/a' || val.toLowerCase().startsWith('n/a ')) return;
+
+                // Name
+                if (['name', 'baslik', 'isim', 'title', 'uygulamaadi', 'urunadi', 'appname'].includes(cleanHeader)) {
+                    bot.name = val;
+                }
+                // Link
+                else if (['botlink', 'link', 'username', 'kullaniciadi', 'telegramappadresi', 'bot'].includes(cleanHeader)) {
+                    let cleanVal = val;
+                    if (val.startsWith('https://t.me/')) {
+                        const parts = val.replace('https://t.me/', '').split('/');
+                        if (parts[0]) {
+                            cleanVal = '@' + parts[0];
+                        }
+                    }
+                    bot.bot_link = cleanVal.startsWith('@') || cleanVal.startsWith('https://') ? cleanVal : '@' + cleanVal;
+                }
+                // TGApp / App Url
+                else if (['tgapp', 'appurl', 'app', 'uygulamaurl', 'telegramapp'].includes(cleanHeader)) {
+                    bot.app_url = val;
+                    if ((!bot.bot_link || bot.bot_link === '@') && val.includes('t.me/')) {
+                        const parts = val.replace('https://t.me/', '').replace('http://t.me/', '').split('/');
+                        if (parts[0]) {
+                            bot.bot_link = '@' + parts[0];
+                        }
+                    }
+                }
+                // Description / Market Açıklaması
+                else if (['description', 'desc', 'aciklama', 'details', 'marketaciklamasi', 'ozet', 'bilgi'].includes(cleanHeader)) {
+                    bot.description = val;
+                }
+                // Price / Ücret
+                else if (['price', 'ucret', 'fiyat'].includes(cleanHeader)) {
+                    const num = parseFloat(val.replace(/[^0-9.]/g, ''));
+                    bot.price = isNaN(num) ? 0 : num;
+                }
+                // Category / Kategoriler
+                else if (['category', 'categories', 'kategori', 'kategoriler'].includes(cleanHeader)) {
+                    const parsedCats = val.split(/[;,]/).map((c: string) => c.trim().toLowerCase()).filter(Boolean);
+                    if (type === 'apps') {
+                        if (!parsedCats.includes('apps')) parsedCats.push('apps');
+                        bot.category = parsedCats;
+                    } else {
+                        bot.category = parsedCats.filter((c: string) => c !== 'apps');
+                        if (bot.category.length === 0) bot.category = ['utilities'];
+                    }
+                }
+                // Icon
+                else if (['icon', 'avatar', 'resim', 'gorsel'].includes(cleanHeader)) {
+                    bot.icon = val;
+                }
+                // Is Official
+                else if (['isofficial', 'official', 'resmi'].includes(cleanHeader)) {
+                    bot.is_official = val.toLowerCase() === 'true' || val === '1' || val.toLowerCase() === 'evet' || val.toLowerCase() === 'yes';
+                }
+                // Languages / Diller
+                else if (['languages', 'language', 'diller', 'dil'].includes(cleanHeader)) {
+                    const langMap: Record<string, string> = {
+                        'english': '🇺🇸',
+                        'russian': '🇷🇺',
+                        'turkish': '🇹🇷',
+                        'spanish': '🇪🇸',
+                        'french': '🇫🇷',
+                        'german': '🇩🇪',
+                        'italian': '🇮🇹',
+                        'chinese': '🇨🇳',
+                        'gb': '🇬🇧',
+                        'us': '🇺🇸',
+                        'ru': '🇷🇺',
+                        'tr': '🇹🇷',
+                        'es': '🇪🇸',
+                        'fr': '🇫🇷',
+                        'de': '🇩🇪',
+                        'in': '🇮🇳',
+                        'ir': '🇮🇷'
+                    };
+                    bot.languages = val.split(/[;,]/).map((l: string) => {
+                        const cleanL = l.trim().toLowerCase();
+                        return langMap[cleanL] || l.trim();
+                    }).filter(Boolean);
+                }
+                // Platform
+                else if (['platform', 'platforms'].includes(cleanHeader)) {
+                    bot.platform = val;
+                }
+                // Telegram Group
+                else if (['telegramgroup', 'group', 'grup', 'telegramgrup', 'telegramkanal'].includes(cleanHeader)) {
+                    bot.telegram_group = val;
+                }
+                // Website Url
+                else if (['websiteurl', 'website', 'web', 'websitesi', 'websiteadres'].includes(cleanHeader)) {
+                    bot.website_url = val;
+                }
+                // GitHub Url
+                else if (['githuburl', 'github'].includes(cleanHeader)) {
+                    bot.github_url = val;
+                }
+                // YouTube Url
+                else if (['youtubeurl', 'youtube'].includes(cleanHeader)) {
+                    bot.youtube_url = val;
+                }
+                // X / Twitter Url
+                else if (['xurl', 'twitter', 'twitterurl', 'xcom', 'x', 'xtwitterurl'].includes(cleanHeader)) {
+                    bot.x_url = val;
+                }
+                // Social Media Url / Sosyal Medya
+                else if (['socialurl', 'social', 'sosyal', 'sosyalmedyaurl', 'sosyalmedya'].includes(cleanHeader)) {
+                    bot.social_url = val;
+                }
+                // Android Linki
+                else if (['androidurl', 'playstore', 'android', 'androidappadresi', 'androidlinki'].includes(cleanHeader)) {
+                    bot.android_url = val;
+                }
+                // iOS Linki
+                else if (['iosurl', 'appstore', 'ios', 'iosappadresi', 'ioslinki'].includes(cleanHeader)) {
+                    bot.ios_url = val;
+                }
+            });
+
+            if ((!bot.bot_link || bot.bot_link === '@') && bot.app_url && bot.app_url.includes('t.me/')) {
+                const parts = bot.app_url.replace('https://t.me/', '').replace('http://t.me/', '').split('/');
+                if (parts[0]) {
+                    bot.bot_link = '@' + parts[0];
+                }
+            }
+
+            return bot;
+        });
     };
 
     const handleCsvUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -538,14 +580,26 @@ const BotManagement = () => {
 
                 const previewData = rows.slice(1)
                     .filter((row: string[]) => row.length > 0 && row.some(cell => (cell || '').trim() !== ''))
-                    .map((row: string[]) => mapCsvRowToBot(row, headers, csvType));
+                    .flatMap((row: string[]) => mapCsvRowToBots(row, headers, csvType));
 
-                const existingLinks = new Set(bots.map(b => b.bot_link?.trim().toLowerCase().replace(/^@/, '').replace(/^https?:\/\/t\.me\//, '').split('/')[0]));
-                
+                const existingKeys = new Set(bots.map(b => {
+                    const cleanLink = b.bot_link?.trim().toLowerCase().replace(/^@/, '').replace(/^https?:\/\/t\.me\//, '').split('/')[0] || '';
+                    const isApp = (b.category || []).includes('apps') || b.product_type === 'app';
+                    return `${cleanLink}_${isApp ? 'app' : 'bot'}`;
+                }));
+
+                const seenPreviewKeys = new Set<string>();
                 const filteredPreview = previewData.filter(bot => {
-                    if (!bot.bot_link) return true;
+                    if (!bot.bot_link || bot.bot_link === '@') return true;
                     const cleanLink = bot.bot_link.trim().toLowerCase().replace(/^@/, '').replace(/^https?:\/\/t\.me\//, '').split('/')[0];
-                    return !existingLinks.has(cleanLink);
+                    const isApp = (bot.category || []).includes('apps') || bot.product_type === 'app';
+                    const key = `${cleanLink}_${isApp ? 'app' : 'bot'}`;
+
+                    if (existingKeys.has(key) || seenPreviewKeys.has(key)) {
+                        return false;
+                    }
+                    seenPreviewKeys.add(key);
+                    return true;
                 });
 
                 const countSkipped = previewData.length - filteredPreview.length;
@@ -553,7 +607,7 @@ const BotManagement = () => {
 
                 if (filteredPreview.length === 0) {
                     if (countSkipped > 0) {
-                        setCsvError(`Seçilen tüm uygulamalar (${countSkipped} adet) zaten sistemde kayıtlı olduğu için içe aktarılacak yeni bir ürün bulunamaz.`);
+                        setCsvError(`Seçilen tüm ürünler (${countSkipped} adet) zaten sistemde kayıtlı olduğu için içe aktarılacak yeni bir ürün bulunamaz.`);
                     } else {
                         setCsvError("İçe aktarılacak geçerli satır bulunamadı.");
                     }
@@ -589,18 +643,24 @@ const BotManagement = () => {
                     continue;
                 }
 
-                const cleanLink = bot.bot_link.trim().toLowerCase().replace(/^@/, '');
-                
-                const isDuplicate = bots.some(b => b.bot_link?.trim().toLowerCase().replace(/^@/, '') === cleanLink);
+                const cleanLink = bot.bot_link.trim().toLowerCase().replace(/^@/, '').replace(/^https?:\/\/t\.me\//, '').split('/')[0];
+                const isApp = (bot.category || []).includes('apps') || bot.product_type === 'app';
+
+                const isDuplicate = bots.some(b => {
+                    const linkMatch = (b.bot_link?.trim().toLowerCase().replace(/^@/, '').replace(/^https?:\/\/t\.me\//, '').split('/')[0] || '') === cleanLink;
+                    const bIsApp = (b.category || []).includes('apps') || b.product_type === 'app';
+                    return linkMatch && (bIsApp === isApp);
+                });
+
                 if (isDuplicate) {
-                    logs.push(`⚠️ Atlandı: '${bot.name}' (@${cleanLink}) zaten kayıtlı.`);
+                    logs.push(`⚠️ Atlandı: '${bot.name}' (@${cleanLink} - ${isApp ? 'Uygulama' : 'Bot'}) zaten kayıtlı.`);
                     duplicateCount++;
                     continue;
                 }
 
                 try {
                     await DatabaseService.saveBot(bot);
-                    logs.push(`✅ Eklendi: ${bot.name} (@${cleanLink})`);
+                    logs.push(`✅ Eklendi: ${bot.name} (@${cleanLink} - ${isApp ? 'Uygulama' : 'Bot'})`);
                     successCount++;
                 } catch (err: any) {
                     logs.push(`❌ Hata: '${bot.name}' eklenirken hata: ${err.message || "Bilinmeyen hata"}`);
@@ -1479,7 +1539,8 @@ const BotManagement = () => {
                                 <ul className="text-xs text-slate-400 space-y-1 ml-4 list-disc font-sans">
                                     <li>Format: İlk satır başlıklar (kolon isimleri) olmalıdır. Ayırıcı olarak virgül (<code className="text-blue-400">,</code>) veya noktalı virgül (<code className="text-blue-400">;</code>) kullanılabilir.</li>
                                     <li>Zorunlu Kolonlar: <code className="text-blue-400 font-mono">name</code> (isim) ve <code className="text-blue-400 font-mono">bot_link</code> (Telegram kullanıcı adı / slug).</li>
-                                    <li>İsteğe Bağlı Kolonlar: <code className="text-slate-400 font-mono">description, price, category, icon, is_official, languages, website_url, app_url, telegram_group, github_url</code></li>
+                                    <li>Otomatik Ayrıştırma: <code className="text-blue-400 font-mono">uruntipi</code> (veya <code className="text-blue-400 font-mono">type</code>) kolonunda "TELEGRAM BOTU & APP" yazıyorsa ürün <strong>hem botlara hem uygulamalara</strong> eklenir.</li>
+                                    <li>İsteğe Bağlı Kolonlar: <code className="text-slate-400 font-mono">uruntipi, description, price, category, icon, is_official, languages, website_url, app_url, telegram_group, github_url</code></li>
                                 </ul>
 
                                 {showSample && (
@@ -1577,6 +1638,7 @@ const BotManagement = () => {
                                         <table className="w-full text-left text-xs border-collapse">
                                             <thead>
                                                 <tr className="bg-slate-900 border-b border-white/5 text-slate-400 font-bold font-sans">
+                                                    <th className="p-3">Tür</th>
                                                     <th className="p-3">Adı</th>
                                                     <th className="p-3">Kullanıcı Adı</th>
                                                     <th className="p-3">Kategori</th>
@@ -1586,26 +1648,34 @@ const BotManagement = () => {
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-white/5 text-slate-300 font-sans">
-                                                {csvPreview.map((bot, i) => (
-                                                    <tr key={i} className="hover:bg-white/5">
-                                                        <td className="p-3 font-semibold text-white">{bot.name}</td>
-                                                        <td className="p-3 text-blue-400 font-mono">{bot.bot_link}</td>
-                                                        <td className="p-3 font-mono">
-                                                            <span className="bg-slate-950/80 px-2 py-0.5 rounded text-[10px] border border-slate-800/10 text-slate-400 font-sans">
-                                                                {bot.category?.join(', ')}
-                                                            </span>
-                                                        </td>
-                                                        <td className="p-3 font-mono">{bot.price > 0 ? `$${bot.price}` : 'Ücretsiz'}</td>
-                                                        <td className="p-3">{bot.languages?.join(', ')}</td>
-                                                        <td className="p-3 font-mono">
-                                                            {bot.is_official ? (
-                                                                <span className="text-emerald-450 font-bold">Evet</span>
-                                                            ) : (
-                                                                <span className="text-slate-500">Hayır</span>
-                                                            )}
-                                                        </td>
-                                                    </tr>
-                                                ))}
+                                                {csvPreview.map((bot, i) => {
+                                                    const isApp = bot.product_type === 'app' || bot.category?.includes('apps');
+                                                    return (
+                                                        <tr key={i} className="hover:bg-white/5">
+                                                            <td className="p-3 font-mono">
+                                                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${isApp ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 'bg-purple-500/10 text-purple-400 border border-purple-500/20'}`}>
+                                                                    {isApp ? 'Mini App' : 'Bot'}
+                                                                </span>
+                                                            </td>
+                                                            <td className="p-3 font-semibold text-white">{bot.name}</td>
+                                                            <td className="p-3 text-blue-400 font-mono">{bot.bot_link}</td>
+                                                            <td className="p-3 font-mono">
+                                                                <span className="bg-slate-950/80 px-2 py-0.5 rounded text-[10px] border border-slate-800/10 text-slate-400 font-sans">
+                                                                    {bot.category?.join(', ')}
+                                                                </span>
+                                                            </td>
+                                                            <td className="p-3 font-mono">{bot.price > 0 ? `$${bot.price}` : 'Ücretsiz'}</td>
+                                                            <td className="p-3">{bot.languages?.join(', ')}</td>
+                                                            <td className="p-3 font-mono">
+                                                                {bot.is_official ? (
+                                                                    <span className="text-emerald-450 font-bold">Evet</span>
+                                                                ) : (
+                                                                    <span className="text-slate-500">Hayır</span>
+                                                                )}
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })}
                                             </tbody>
                                         </table>
                                     </div>
