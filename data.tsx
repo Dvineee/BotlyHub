@@ -11,15 +11,15 @@ import {
 } from 'lucide-react';
 
 const AppsIcon = ({ size = 20, className = "" }: { size?: number, className?: string }) => (
-  <LayoutGrid size={size} className={`stroke-[2.2] text-[#0a263d] dark:text-slate-200 ${className}`} />
+  <LayoutGrid size={size} className={`stroke-[2.2] ${className || "text-[#0a263d] dark:text-slate-200"}`} />
 );
 
 const AllIcon = ({ size = 20, className = "" }: { size?: number, className?: string }) => (
-  <LayoutGrid size={size} className={`stroke-[2.2] text-[#0a263d] dark:text-slate-200 ${className}`} />
+  <LayoutGrid size={size} className={`stroke-[2.2] ${className || "text-[#0a263d] dark:text-slate-200"}`} />
 );
 
 const GamesIcon = ({ size = 20, className = "" }: { size?: number, className?: string }) => (
-  <Gamepad2 size={size} className={`stroke-[2.2] text-[#0a263d] dark:text-slate-200 ${className}`} />
+  <Gamepad2 size={size} className={`stroke-[2.2] ${className || "text-[#0a263d] dark:text-slate-200"}`} />
 );
 
 const FinanceIcon = ({ size = 20, className = "" }: { size?: number, className?: string }) => (

@@ -3958,36 +3958,70 @@ const Home = () => {
                               )}
                             </div>
 
-                            <div
-                              ref={catScroll.ref}
-                              onMouseDown={catScroll.onMouseDown}
-                              onMouseUp={catScroll.onMouseUp}
-                              onMouseMove={catScroll.onMouseMove}
-                              onMouseLeave={catScroll.onMouseLeave}
-                              onContextMenu={catScroll.onContextMenu}
-                              className="category-filter-container no-scrollbar sticky top-0 md:top-[72px] z-30 bg-white dark:bg-slate-950 py-3.5 -mx-4 px-4 sm:-mx-8 sm:px-8 md:mx-0 md:px-0 border-b border-black/[0.03] dark:border-white/[0.03]"
-                            >
-                              <button
-                                className={`category-filter-item ${selectedAppsCategory === "all" ? "active" : ""}`}
-                                onClick={() => {
-                                  haptic("light");
-                                  setSelectedAppsCategory("all");
-                                }}
+                            <div className="sticky top-0 md:top-[72px] z-30 bg-white/90 dark:bg-transparent backdrop-blur-md sm:-mx-8 sm:px-8 md:mx-0 md:px-0">
+                              <div
+                                ref={catScroll.ref}
+                                onMouseDown={catScroll.onMouseDown}
+                                onMouseUp={catScroll.onMouseUp}
+                                onMouseMove={catScroll.onMouseMove}
+                                onMouseLeave={catScroll.onMouseLeave}
+                                onContextMenu={catScroll.onContextMenu}
+                                className="category-filter-container bg-[#f0f2f5] dark:bg-[#1c1c1c] border border-black/10 dark:border-white/10 rounded-2xl p-0 shadow-sm overflow-x-auto no-scrollbar scroll-smooth flex items-stretch select-none"
                               >
-                                {t("home_all")}
-                              </button>
-                              {appsSubCategories.map((subCat) => (
                                 <button
-                                  key={subCat.id}
-                                  className={`category-filter-item ${selectedAppsCategory === subCat.id ? "active" : ""}`}
+                                  className={`category-filter-item flex flex-col items-center justify-center gap-1.5 py-2.5 px-3.5 sm:px-4 min-w-[76px] sm:min-w-[88px] shrink-0 border-r border-black/10 dark:border-white/10 last:border-r-0 first:rounded-l-2xl last:rounded-r-2xl transition-all duration-200 cursor-pointer group ${
+                                    selectedAppsCategory === "all"
+                                      ? "active bg-slate-900 text-white dark:bg-white/15 dark:text-white font-bold shadow-sm"
+                                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 font-medium"
+                                  }`}
                                   onClick={() => {
                                     haptic("light");
-                                    setSelectedAppsCategory(subCat.id);
+                                    setSelectedAppsCategory("all");
                                   }}
                                 >
-                                  {t(subCat.label)}
+                                  <LayoutGrid
+                                    size={18}
+                                    className={
+                                      selectedAppsCategory === "all"
+                                        ? "text-white dark:text-white"
+                                        : "text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors"
+                                    }
+                                  />
+                                  <span className="text-[11px] sm:text-[12px] tracking-tight whitespace-nowrap">
+                                    {t("home_all")}
+                                  </span>
                                 </button>
-                              ))}
+                                {appsSubCategories.map((subCat) => {
+                                  const Icon = subCat.icon || Sparkles;
+                                  const isActive = selectedAppsCategory === subCat.id;
+                                  return (
+                                    <button
+                                      key={subCat.id}
+                                      className={`category-filter-item flex flex-col items-center justify-center gap-1.5 py-2.5 px-3.5 sm:px-4 min-w-[76px] sm:min-w-[88px] shrink-0 border-r border-black/10 dark:border-white/10 last:border-r-0 first:rounded-l-2xl last:rounded-r-2xl transition-all duration-200 cursor-pointer group ${
+                                        isActive
+                                          ? "active bg-slate-900 text-white dark:bg-white/15 dark:text-white font-bold shadow-sm"
+                                          : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 font-medium"
+                                      }`}
+                                      onClick={() => {
+                                        haptic("light");
+                                        setSelectedAppsCategory(subCat.id);
+                                      }}
+                                    >
+                                      <Icon
+                                        size={18}
+                                        className={
+                                          isActive
+                                            ? "text-white dark:text-white"
+                                            : "text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors"
+                                        }
+                                      />
+                                      <span className="text-[11px] sm:text-[12px] tracking-tight whitespace-nowrap">
+                                        {t(subCat.label)}
+                                      </span>
+                                    </button>
+                                  );
+                                })}
+                              </div>
                             </div>
 
                             {(() => {
@@ -4105,36 +4139,70 @@ const Home = () => {
                               )}
                             </div>
 
-                            <div
-                              ref={botsCatScroll.ref}
-                              onMouseDown={botsCatScroll.onMouseDown}
-                              onMouseUp={botsCatScroll.onMouseUp}
-                              onMouseMove={botsCatScroll.onMouseMove}
-                              onMouseLeave={botsCatScroll.onMouseLeave}
-                              onContextMenu={botsCatScroll.onContextMenu}
-                              className="category-filter-container no-scrollbar sticky top-0 md:top-[72px] z-30 bg-white dark:bg-slate-950 py-3.5 -mx-4 px-4 sm:-mx-8 sm:px-8 md:mx-0 md:px-0 border-b border-black/[0.03] dark:border-white/[0.03]"
-                            >
-                              <button
-                                className={`category-filter-item ${selectedBotsCategory === "all" ? "active" : ""}`}
-                                onClick={() => {
-                                  haptic("light");
-                                  setSelectedBotsCategory("all");
-                                }}
+                            <div className="sticky top-0 md:top-[72px] z-30 bg-white/90 dark:bg-transparent backdrop-blur-md sm:-mx-8 sm:px-8 md:mx-0 md:px-0">
+                              <div
+                                ref={botsCatScroll.ref}
+                                onMouseDown={botsCatScroll.onMouseDown}
+                                onMouseUp={botsCatScroll.onMouseUp}
+                                onMouseMove={botsCatScroll.onMouseMove}
+                                onMouseLeave={botsCatScroll.onMouseLeave}
+                                onContextMenu={botsCatScroll.onContextMenu}
+                                className="category-filter-container bg-[#f0f2f5] dark:bg-[#1c1c1c] border border-black/10 dark:border-white/10 rounded-2xl p-0 shadow-sm overflow-x-auto no-scrollbar scroll-smooth flex items-stretch select-none"
                               >
-                                {t("home_all")}
-                              </button>
-                              {botsCategories.map((cat) => (
                                 <button
-                                  key={cat.id}
-                                  className={`category-filter-item ${selectedBotsCategory === cat.id ? "active" : ""}`}
+                                  className={`category-filter-item flex flex-col items-center justify-center gap-1.5 py-2.5 px-3.5 sm:px-4 min-w-[76px] sm:min-w-[88px] shrink-0 border-r border-black/10 dark:border-white/10 last:border-r-0 first:rounded-l-2xl last:rounded-r-2xl transition-all duration-200 cursor-pointer group ${
+                                    selectedBotsCategory === "all"
+                                      ? "active bg-slate-900 text-white dark:bg-white/15 dark:text-white font-bold shadow-sm"
+                                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 font-medium"
+                                  }`}
                                   onClick={() => {
                                     haptic("light");
-                                    setSelectedBotsCategory(cat.id);
+                                    setSelectedBotsCategory("all");
                                   }}
                                 >
-                                  {t(cat.label)}
+                                  <LayoutGrid
+                                    size={18}
+                                    className={
+                                      selectedBotsCategory === "all"
+                                        ? "text-white dark:text-white"
+                                        : "text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors"
+                                    }
+                                  />
+                                  <span className="text-[11px] sm:text-[12px] tracking-tight whitespace-nowrap">
+                                    {t("home_all")}
+                                  </span>
                                 </button>
-                              ))}
+                                {botsCategories.map((cat) => {
+                                  const Icon = cat.icon || Sparkles;
+                                  const isActive = selectedBotsCategory === cat.id;
+                                  return (
+                                    <button
+                                      key={cat.id}
+                                      className={`category-filter-item flex flex-col items-center justify-center gap-1.5 py-2.5 px-3.5 sm:px-4 min-w-[76px] sm:min-w-[88px] shrink-0 border-r border-black/10 dark:border-white/10 last:border-r-0 first:rounded-l-2xl last:rounded-r-2xl transition-all duration-200 cursor-pointer group ${
+                                        isActive
+                                          ? "active bg-slate-900 text-white dark:bg-white/15 dark:text-white font-bold shadow-sm"
+                                          : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 font-medium"
+                                      }`}
+                                      onClick={() => {
+                                        haptic("light");
+                                        setSelectedBotsCategory(cat.id);
+                                      }}
+                                    >
+                                      <Icon
+                                        size={18}
+                                        className={
+                                          isActive
+                                            ? "text-white dark:text-white"
+                                            : "text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors"
+                                        }
+                                      />
+                                      <span className="text-[11px] sm:text-[12px] tracking-tight whitespace-nowrap">
+                                        {t(cat.label)}
+                                      </span>
+                                    </button>
+                                  );
+                                })}
+                              </div>
                             </div>
 
                             {(() => {

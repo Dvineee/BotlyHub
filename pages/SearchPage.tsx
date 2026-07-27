@@ -1637,55 +1637,61 @@ const SearchPage = () => {
               </div>
             )}
 
-            <div
-              ref={catScroll.ref}
-              onMouseDown={catScroll.onMouseDown}
-              onMouseUp={catScroll.onMouseUp}
-              onMouseMove={catScroll.onMouseMove}
-              onMouseLeave={catScroll.onMouseLeave}
-              onContextMenu={catScroll.onContextMenu}
-              className={`flex gap-3 overflow-x-auto no-scrollbar -mx-4 px-4 pb-2 snap-x ${catScroll.isDragging ? "cursor-grabbing" : "cursor-grab"}`}
-            >
-              {(searchMode === "bots"
-                ? categories
-                : [
-                    { id: "all", label: "cat_all", icon: Sparkles },
-                    ...appsSubCategories,
-                  ]
-              ).map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => {
-                    navigate(`/search?mode=${searchMode}&category=${cat.id}`);
-                    if (user?.id) {
-                      DatabaseService.logActivity(
-                        user.id.toString(),
-                        "system",
-                        "search_category",
-                        "Kategori Filtresi",
-                        `Arama motorunda '${t(cat.label)}' kategorisi filtrelendi.`,
-                      );
-                    }
-                  }}
-                  className={`search-category-item flex items-center gap-3 px-4 py-2.5 md:px-6 md:pb-2 rounded-xl border transition-all active:scale-95  whitespace-nowrap snap-center ${
-                    activeCategory === cat.id
-                      ? "bg-brand/10 dark:bg-brand-light/10 border-brand/40 dark:border-brand-light/40 text-brand dark:text-brand-light ring-1 ring-brand/20 dark:ring-brand-light/20"
-                      : "bg-white dark:bg-slate-900/60 border-black/5 dark:border-white/5 text-slate-500 dark:text-slate-400"
-                  }`}
-                >
-                  <cat.icon
-                    size={16}
-                    className={
-                      activeCategory === cat.id
-                        ? "text-[#0a263d] dark:text-white font-bold"
-                        : "text-[#0a263d]/60 dark:text-slate-400"
-                    }
-                  />
-                  <span className="text-[11px] font-bold uppercase tracking-wider">
-                    {t(cat.label)}
-                  </span>
-                </button>
-              ))}
+            <div className="bg-[#f0f2f5] dark:bg-[#1c1c1c] border border-black/10 dark:border-white/10 rounded-2xl p-0 shadow-sm overflow-x-auto no-scrollbar scroll-smooth">
+              <div
+                ref={catScroll.ref}
+                onMouseDown={catScroll.onMouseDown}
+                onMouseUp={catScroll.onMouseUp}
+                onMouseMove={catScroll.onMouseMove}
+                onMouseLeave={catScroll.onMouseLeave}
+                onContextMenu={catScroll.onContextMenu}
+                className={`flex items-stretch select-none ${catScroll.isDragging ? "cursor-grabbing" : "cursor-grab"}`}
+              >
+                {(searchMode === "bots"
+                  ? categories
+                  : [
+                      { id: "all", label: "cat_all", icon: LayoutGrid },
+                      ...appsSubCategories,
+                    ]
+                ).map((cat) => {
+                  const Icon = cat.icon || Sparkles;
+                  const isActive = activeCategory === cat.id;
+                  return (
+                    <button
+                      key={cat.id}
+                      onClick={() => {
+                        navigate(`/search?mode=${searchMode}&category=${cat.id}`);
+                        if (user?.id) {
+                          DatabaseService.logActivity(
+                            user.id.toString(),
+                            "system",
+                            "search_category",
+                            "Kategori Filtresi",
+                            `Arama motorunda '${t(cat.label)}' kategorisi filtrelendi.`,
+                          );
+                        }
+                      }}
+                      className={`search-category-item flex flex-col items-center justify-center gap-1.5 py-2.5 px-3.5 sm:px-4 min-w-[76px] sm:min-w-[88px] shrink-0 border-r border-black/10 dark:border-white/10 last:border-r-0 first:rounded-l-2xl last:rounded-r-2xl transition-all duration-200 cursor-pointer group ${
+                        isActive
+                          ? "bg-slate-900 text-white dark:bg-white/15 dark:text-white font-bold shadow-sm"
+                          : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 font-medium"
+                      }`}
+                    >
+                      <Icon
+                        size={18}
+                        className={
+                          isActive
+                            ? "text-white dark:text-white"
+                            : "text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors"
+                        }
+                      />
+                      <span className="text-[11px] sm:text-[12px] tracking-tight whitespace-nowrap">
+                        {t(cat.label)}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
 

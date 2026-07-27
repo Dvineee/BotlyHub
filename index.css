@@ -876,28 +876,11 @@ h2.text-lg.sm\:text-xl.font-extrabold.text-slate-900.dark\:text-white.tracking-t
   display: none;
 }
 
-.dark .category-filter-item {
-  padding: 7px 12px;
-  border: 1px solid #ffffff0d;
-  margin-right: 12px;
-  border-radius: 10px;
-  color: #ffffff8a;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 20px;
-  transition: all .2s ease;
-  -webkit-user-select: none;
-  white-space: nowrap;
-  flex-shrink: 0;
-  border-color: #ffffff0d;
-  background-color: rgb(255 255 255 / 0.05) !important;
-}
-
-.dark .category-filter-item:hover, .dark .category-filter-item.active {
-  border-color: rgba(255, 255, 255, 0.1);
-  background-color: rgba(255, 255, 255, 0.05);
-  color: #ffffff;
+.category-filter-container {
+  display: flex;
+  overflow-x: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 @media (min-width: 768px) {
@@ -1198,7 +1181,14 @@ span, div, input {
 }
 
 .dark\:border-white\/10:is(.dark *) {
-  border-color: #ffffff1a;
+    border-color: #26262666 !important;
+}
+
+.dark\:bg-\[\#141518\]:is(.dark *),
+.dark .dark\:bg-\[\#141518\],
+.dark .bg-\[\#141518\] {
+    --tw-bg-opacity: 1 !important;
+    background-color: #1c1c1c !important;
 }
 
 .border-t {
@@ -1546,49 +1536,7 @@ header, nav, .sticky-nav {
   }
 }
 
-.category-filter-item {
-  padding: 8px 16px !important;
-  border: 1px solid var(--border-color) !important;
-  margin-right: 12px;
-  border-radius: 24px !important;
-  color: #d4d4d4 !important;
-  cursor: pointer;
-  font-size: 13px !important;
-  font-weight: 500 !important;
-  line-height: 20px;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  -webkit-user-select: none;
-  white-space: nowrap;
-  flex-shrink: 0;
-  border-color: #0000000d;
-  background-color: var(--bg-elevated) !important;
-  text-align: center;
-}
-
-.light .category-filter-item {
-  color: #0f172a !important;
-}
-
-.category-filter-item:hover, .category-filter-item.active {
-  transform: translateY(-1px) !important;
-  background-color: var(--btn-bg) !important;
-  color: var(--btn-text) !important;
-  border-color: var(--btn-bg) !important;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
-}
-
-.light .category-filter-item:hover, .light .category-filter-item.active {
-  color: var(--btn-text) !important;
-}
-
-.category-filter-container {
-  display: flex;
-  overflow-x: auto;
-  padding: 2px 2px;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-  flex: 1;
-}
+/* Category filter bar styling handled via Tailwind utility classes */
 
 .gap-y-7 {
   row-gap: 10px;
@@ -2320,24 +2268,6 @@ div.qa-last-24h-box, .qa-last-24h-box {
     .w-12 {
         width: 3rem !important;
     }
-    .category-filter-item {
-        padding: 6px 14px !important;
-        border: 1px solid var(--border-color) !important;
-        margin-right: 8px !important;
-        border-radius: 24px !important;
-        color: #d4d4d4 !important;
-        cursor: pointer;
-        font-size: 13px !important;
-        font-weight: 600 !important;
-        line-height: 20px;
-        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
-        -webkit-user-select: none;
-        white-space: nowrap;
-        flex-shrink: 0;
-        border-color: #0000000d;
-        background-color: var(--bg-secondary) !important;
-        text-align: center;
-    }
 }
 
 .dark .announcement-badge {
@@ -2943,7 +2873,10 @@ html, body {
 }
 
 /* 4. Global Action Button Corner and Micro-Movement Symmetry */
-button, a.bg-brand, a[class*="bg-blue-600"], button[class*="bg-blue-600"] {
+button:not(.category-filter-item):not(.search-category-item),
+a.bg-brand:not(.category-filter-item):not(.search-category-item),
+a[class*="bg-blue-600"]:not(.category-filter-item):not(.search-category-item),
+button[class*="bg-blue-600"]:not(.category-filter-item):not(.search-category-item) {
   border-radius: 12px;
 }
 
