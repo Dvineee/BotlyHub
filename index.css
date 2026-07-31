@@ -1742,7 +1742,7 @@ html:not(.dark) .absolute[class*="dropdown-menu"] button:hover, html:not(.dark) 
 
   .dark .bottom-nav-container {
     background: rgba(12, 14, 20, 0.98) !important;
-    background-color: rgba(12, 14, 20, 0.98) !important;
+    background-color: rgb(28 28 28 / var(--tw-bg-opacity, 1)) !important;
     backdrop-filter: blur(24px) !important;
     -webkit-backdrop-filter: blur(24px) !important;
     border: none !important;
@@ -2063,6 +2063,12 @@ div.qa-last-24h-box, .qa-last-24h-box {
 
 .dark\:bg-slate-900\/40:is(.dark *) {
     background-color: rgb(15 23 42 / 0%) !important;
+}
+
+.dark\:bg-slate-900\/95:is(.dark *),
+.dark .dark\:bg-slate-900\/95,
+.dark\:bg-slate-900\/95 {
+    background-color: rgb(28 28 28 / var(--tw-bg-opacity, 1)) !important;
 }
 
 .dark\:bg-\[\#111214\]\/40:is(.dark *) {
@@ -3117,9 +3123,14 @@ html:not(.dark) .border, .light .border {
     border-top-width: 0px !important;
 }
 
-.pt-2 {
-    padding-top: 0rem !important;
+.text-\[11px\] {
+    font-size: 14px !important;
 }
+
+.font-extrabold {
+    font-weight: 500 !important;
+}
+
 
 
 

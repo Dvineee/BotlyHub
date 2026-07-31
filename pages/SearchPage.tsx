@@ -1293,8 +1293,8 @@ const SearchPage = () => {
   const checkScroll = React.useCallback(() => {
     const el = catScroll.ref.current;
     if (el) {
-      const canScrollLeft = el.scrollLeft > 5;
-      const canScrollRight = el.scrollLeft < el.scrollWidth - el.clientWidth - 5;
+      const canScrollLeft = el.scrollLeft > 3;
+      const canScrollRight = el.scrollWidth - el.clientWidth - el.scrollLeft > 3;
       setShowLeftArrow(canScrollLeft);
       setShowRightArrow(canScrollRight);
     }
@@ -1304,23 +1304,27 @@ const SearchPage = () => {
     const el = catScroll.ref.current;
     if (!el) return;
 
-    checkScroll();
+    const check = () => checkScroll();
 
-    el.addEventListener("scroll", checkScroll);
-    window.addEventListener("resize", checkScroll);
+    check();
+    const rAF = requestAnimationFrame(check);
+    const timer1 = setTimeout(check, 50);
+    const timer2 = setTimeout(check, 300);
 
-    const observer = new ResizeObserver(() => {
-      checkScroll();
-    });
+    el.addEventListener("scroll", check, { passive: true });
+    window.addEventListener("resize", check);
+
+    const observer = new ResizeObserver(check);
     observer.observe(el);
-
-    const timer = setTimeout(checkScroll, 150);
+    if (el.firstElementChild) observer.observe(el.firstElementChild);
 
     return () => {
-      el.removeEventListener("scroll", checkScroll);
-      window.removeEventListener("resize", checkScroll);
+      cancelAnimationFrame(rAF);
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      el.removeEventListener("scroll", check);
+      window.removeEventListener("resize", check);
       observer.disconnect();
-      clearTimeout(timer);
     };
   }, [searchMode, bots, checkScroll]);
 
@@ -1345,6 +1349,59 @@ const SearchPage = () => {
     if (mode && mode !== searchMode) setSearchMode(mode);
     if (category && category !== activeCategory) setActiveCategory(category);
   }, [searchParams]);
+
+  useEffect(() => {
+    const centerActiveCategory = () => {
+      const container = catScroll.ref.current;
+      if (!container) return;
+
+      let targetId = activeCategory;
+      let activeEl = container.querySelector<HTMLElement>(`[data-category-id="${targetId}"]`);
+
+      if (!activeEl) {
+        const aliases: Record<string, string> = {
+          games: "games_sub",
+          games_sub: "games",
+          ai_services: "ai_sub",
+          ai_sub: "ai_services",
+          finance: "trade",
+          trade: "finance",
+          communication: "social",
+          social: "communication",
+        };
+        if (aliases[targetId]) {
+          activeEl = container.querySelector<HTMLElement>(`[data-category-id="${aliases[targetId]}"]`);
+        }
+      }
+
+      if (activeEl) {
+        const containerRect = container.getBoundingClientRect();
+        const activeRect = activeEl.getBoundingClientRect();
+        if (containerRect.width > 0 && activeRect.width > 0) {
+          const currentScroll = container.scrollLeft;
+          const relativeLeft = activeRect.left - containerRect.left + currentScroll;
+          const targetScrollLeft = relativeLeft - (containerRect.width / 2) + (activeRect.width / 2);
+          container.scrollTo({
+            left: Math.max(0, targetScrollLeft),
+            behavior: "smooth",
+          });
+        }
+      }
+    };
+
+    centerActiveCategory();
+    const rAF = requestAnimationFrame(centerActiveCategory);
+    const t1 = setTimeout(centerActiveCategory, 50);
+    const t2 = setTimeout(centerActiveCategory, 200);
+    const t3 = setTimeout(centerActiveCategory, 500);
+
+    return () => {
+      cancelAnimationFrame(rAF);
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
+  }, [activeCategory, searchMode, catScroll.ref]);
 
   useEffect(() => {
     if (query) {
@@ -1611,11 +1668,11 @@ const SearchPage = () => {
           <div className="sticky top-0 md:top-[60px] z-30 bg-white dark:bg-slate-950 py-3 -mx-5 px-5 sm:-mx-8 sm:px-8 md:mx-0 md:px-0 border-b border-black/[0.03] dark:border-white/[0.03] mb-10 relative group/cat">
             {/* Left Scroll Button & Fade Overlay */}
             {showLeftArrow && (
-              <div className="hidden md:flex absolute left-0 top-0 bottom-0 w-20 items-center justify-start bg-gradient-to-r from-white via-white/80 to-transparent dark:from-[#151618] dark:via-[#151618]/80 dark:to-transparent z-10 pointer-events-none">
+              <div className="flex absolute left-0 top-3 bottom-3 w-12 items-center justify-start bg-gradient-to-r from-white via-white/90 to-transparent dark:from-slate-950 dark:via-slate-950/90 dark:to-transparent z-20 pointer-events-none rounded-l-2xl pl-1 transition-opacity duration-200">
                 <button
                   type="button"
                   onClick={() => scrollCategories("left")}
-                  className="pointer-events-auto flex w-7 h-7 items-center justify-center rounded-full bg-white dark:bg-[#1f2023] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-[#2a2b2f] transition-all duration-150 active:scale-95 shadow-md"
+                  className="pointer-events-auto flex w-7 h-7 items-center justify-center rounded-full bg-white dark:bg-[#2b2b2b] border border-black/10 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#383838] transition-all duration-150 active:scale-95 shadow-md cursor-pointer"
                   aria-label="Sola Kaydır"
                 >
                   <ChevronLeft size={14} />
@@ -1625,11 +1682,11 @@ const SearchPage = () => {
 
             {/* Right Scroll Button & Fade Overlay */}
             {showRightArrow && (
-              <div className="hidden md:flex absolute right-0 top-0 bottom-0 w-20 items-center justify-end bg-gradient-to-l from-white via-white/80 to-transparent dark:from-[#151618] dark:via-[#151618]/80 dark:to-transparent z-10 pointer-events-none">
+              <div className="flex absolute right-0 top-3 bottom-3 w-12 items-center justify-end bg-gradient-to-l from-white via-white/90 to-transparent dark:from-slate-950 dark:via-slate-950/90 dark:to-transparent z-20 pointer-events-none rounded-r-2xl pr-1 transition-opacity duration-200">
                 <button
                   type="button"
                   onClick={() => scrollCategories("right")}
-                  className="pointer-events-auto flex w-7 h-7 items-center justify-center rounded-full bg-white dark:bg-[#1f2023] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-[#a5b4fc] hover:bg-slate-50 dark:hover:bg-[#2a2b2f] transition-all duration-150 active:scale-95 shadow-md"
+                  className="pointer-events-auto flex w-7 h-7 items-center justify-center rounded-full bg-white dark:bg-[#2b2b2b] border border-black/10 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#383838] transition-all duration-150 active:scale-95 shadow-md cursor-pointer"
                   aria-label="Sağa Kaydır"
                 >
                   <ChevronRight size={14} />
@@ -1637,16 +1694,15 @@ const SearchPage = () => {
               </div>
             )}
 
-            <div className="bg-[#f0f2f5] dark:bg-[#1c1c1c] border border-black/10 dark:border-white/10 rounded-2xl p-0 shadow-sm overflow-x-auto no-scrollbar scroll-smooth">
-              <div
-                ref={catScroll.ref}
-                onMouseDown={catScroll.onMouseDown}
-                onMouseUp={catScroll.onMouseUp}
-                onMouseMove={catScroll.onMouseMove}
-                onMouseLeave={catScroll.onMouseLeave}
-                onContextMenu={catScroll.onContextMenu}
-                className={`flex items-stretch select-none ${catScroll.isDragging ? "cursor-grabbing" : "cursor-grab"}`}
-              >
+            <div
+              ref={catScroll.ref}
+              onMouseDown={catScroll.onMouseDown}
+              onMouseUp={catScroll.onMouseUp}
+              onMouseMove={catScroll.onMouseMove}
+              onMouseLeave={catScroll.onMouseLeave}
+              onContextMenu={catScroll.onContextMenu}
+              className={`category-filter-container bg-[#f0f2f5] dark:bg-[#1c1c1c] border border-black/10 dark:border-white/10 rounded-2xl p-0 shadow-sm overflow-x-auto no-scrollbar scroll-smooth flex items-stretch select-none ${catScroll.isDragging ? "cursor-grabbing" : "cursor-grab"}`}
+            >
                 {(searchMode === "bots"
                   ? categories
                   : [
@@ -1659,6 +1715,7 @@ const SearchPage = () => {
                   return (
                     <button
                       key={cat.id}
+                      data-category-id={cat.id}
                       onClick={() => {
                         navigate(`/search?mode=${searchMode}&category=${cat.id}`);
                         if (user?.id) {
@@ -1691,7 +1748,6 @@ const SearchPage = () => {
                     </button>
                   );
                 })}
-              </div>
             </div>
           </div>
 

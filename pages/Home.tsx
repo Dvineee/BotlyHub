@@ -2363,6 +2363,150 @@ const Home = () => {
   const catScroll = useDraggableScroll();
   const botsCatScroll = useDraggableScroll();
 
+  // Scroll arrow states for Apps category menu
+  const [showAppsLeftArrow, setShowAppsLeftArrow] = useState(false);
+  const [showAppsRightArrow, setShowAppsRightArrow] = useState(false);
+
+  const checkAppsScroll = useCallback(() => {
+    const el = catScroll.ref.current;
+    if (el) {
+      const canScrollLeft = el.scrollLeft > 3;
+      const canScrollRight = el.scrollWidth - el.clientWidth - el.scrollLeft > 3;
+      setShowAppsLeftArrow(canScrollLeft);
+      setShowAppsRightArrow(canScrollRight);
+    }
+  }, [catScroll.ref]);
+
+  useEffect(() => {
+    const el = catScroll.ref.current;
+    if (!el) return;
+
+    const check = () => checkAppsScroll();
+
+    check();
+    const rAF = requestAnimationFrame(check);
+    const timer1 = setTimeout(check, 50);
+    const timer2 = setTimeout(check, 300);
+
+    el.addEventListener("scroll", check, { passive: true });
+    window.addEventListener("resize", check);
+
+    const observer = new ResizeObserver(check);
+    observer.observe(el);
+    if (el.firstElementChild) observer.observe(el.firstElementChild);
+
+    // Center active category chip
+    const centerAppsCategory = () => {
+      const activeEl = el.querySelector<HTMLElement>(`[data-category-id="${selectedAppsCategory}"]`);
+      if (activeEl) {
+        const containerRect = el.getBoundingClientRect();
+        const activeRect = activeEl.getBoundingClientRect();
+        if (containerRect.width > 0 && activeRect.width > 0) {
+          const currentScroll = el.scrollLeft;
+          const relativeLeft = activeRect.left - containerRect.left + currentScroll;
+          const targetScrollLeft = relativeLeft - (containerRect.width / 2) + (activeRect.width / 2);
+          el.scrollTo({
+            left: Math.max(0, targetScrollLeft),
+            behavior: "smooth",
+          });
+        }
+      }
+    };
+    centerAppsCategory();
+    const centerTimer = setTimeout(centerAppsCategory, 100);
+
+    return () => {
+      cancelAnimationFrame(rAF);
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(centerTimer);
+      el.removeEventListener("scroll", check);
+      window.removeEventListener("resize", check);
+      observer.disconnect();
+    };
+  }, [checkAppsScroll, selectedAppsCategory, categories]);
+
+  const scrollAppsCategories = (direction: "left" | "right") => {
+    const el = catScroll.ref.current;
+    if (el) {
+      if (haptic) haptic("light");
+      const scrollAmount = direction === "left" ? -250 : 250;
+      el.scrollBy({ left: scrollAmount, behavior: "smooth" });
+    }
+  };
+
+  // Scroll arrow states for Bots category menu
+  const [showBotsLeftArrow, setShowBotsLeftArrow] = useState(false);
+  const [showBotsRightArrow, setShowBotsRightArrow] = useState(false);
+
+  const checkBotsScroll = useCallback(() => {
+    const el = botsCatScroll.ref.current;
+    if (el) {
+      const canScrollLeft = el.scrollLeft > 3;
+      const canScrollRight = el.scrollWidth - el.clientWidth - el.scrollLeft > 3;
+      setShowBotsLeftArrow(canScrollLeft);
+      setShowBotsRightArrow(canScrollRight);
+    }
+  }, [botsCatScroll.ref]);
+
+  useEffect(() => {
+    const el = botsCatScroll.ref.current;
+    if (!el) return;
+
+    const check = () => checkBotsScroll();
+
+    check();
+    const rAF = requestAnimationFrame(check);
+    const timer1 = setTimeout(check, 50);
+    const timer2 = setTimeout(check, 300);
+
+    el.addEventListener("scroll", check, { passive: true });
+    window.addEventListener("resize", check);
+
+    const observer = new ResizeObserver(check);
+    observer.observe(el);
+    if (el.firstElementChild) observer.observe(el.firstElementChild);
+
+    // Center active category chip
+    const centerBotsCategory = () => {
+      const activeEl = el.querySelector<HTMLElement>(`[data-category-id="${selectedBotsCategory}"]`);
+      if (activeEl) {
+        const containerRect = el.getBoundingClientRect();
+        const activeRect = activeEl.getBoundingClientRect();
+        if (containerRect.width > 0 && activeRect.width > 0) {
+          const currentScroll = el.scrollLeft;
+          const relativeLeft = activeRect.left - containerRect.left + currentScroll;
+          const targetScrollLeft = relativeLeft - (containerRect.width / 2) + (activeRect.width / 2);
+          el.scrollTo({
+            left: Math.max(0, targetScrollLeft),
+            behavior: "smooth",
+          });
+        }
+      }
+    };
+    centerBotsCategory();
+    const centerTimer = setTimeout(centerBotsCategory, 100);
+
+    return () => {
+      cancelAnimationFrame(rAF);
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(centerTimer);
+      el.removeEventListener("scroll", check);
+      window.removeEventListener("resize", check);
+      observer.disconnect();
+    };
+  }, [checkBotsScroll, selectedBotsCategory, categories]);
+
+  const scrollBotsCategories = (direction: "left" | "right") => {
+    const el = botsCatScroll.ref.current;
+    if (el) {
+      if (haptic) haptic("light");
+      const scrollAmount = direction === "left" ? -250 : 250;
+      el.scrollBy({ left: scrollAmount, behavior: "smooth" });
+    }
+  };
+
   const botsCategories = categories.filter(
     (c) => c.id !== "apps" && c.id !== "all",
   );
@@ -3958,7 +4102,35 @@ const Home = () => {
                               )}
                             </div>
 
-                            <div className="sticky top-0 md:top-[72px] z-30 bg-white/90 dark:bg-transparent backdrop-blur-md sm:-mx-8 sm:px-8 md:mx-0 md:px-0">
+                            <div className="sticky top-0 md:top-[72px] z-30 bg-white/90 dark:bg-transparent backdrop-blur-md sm:-mx-8 sm:px-8 md:mx-0 md:px-0 relative group/cat">
+                              {/* Left Scroll Button & Fade Overlay */}
+                              {showAppsLeftArrow && (
+                                <div className="flex absolute left-0 top-0 bottom-0 w-12 items-center justify-start bg-gradient-to-r from-[#f0f2f5] via-[#f0f2f5]/90 to-transparent dark:from-[#1c1c1c] dark:via-[#1c1c1c]/90 dark:to-transparent z-20 pointer-events-none rounded-l-2xl pl-1 transition-opacity duration-200">
+                                  <button
+                                    type="button"
+                                    onClick={() => scrollAppsCategories("left")}
+                                    className="pointer-events-auto flex w-7 h-7 items-center justify-center rounded-full bg-white dark:bg-[#2b2b2b] border border-black/10 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#383838] transition-all duration-150 active:scale-95 shadow-md cursor-pointer"
+                                    aria-label="Sola Kaydır"
+                                  >
+                                    <ChevronLeft size={14} />
+                                  </button>
+                                </div>
+                              )}
+
+                              {/* Right Scroll Button & Fade Overlay */}
+                              {showAppsRightArrow && (
+                                <div className="flex absolute right-0 top-0 bottom-0 w-12 items-center justify-end bg-gradient-to-l from-[#f0f2f5] via-[#f0f2f5]/90 to-transparent dark:from-[#1c1c1c] dark:via-[#1c1c1c]/90 dark:to-transparent z-20 pointer-events-none rounded-r-2xl pr-1 transition-opacity duration-200">
+                                  <button
+                                    type="button"
+                                    onClick={() => scrollAppsCategories("right")}
+                                    className="pointer-events-auto flex w-7 h-7 items-center justify-center rounded-full bg-white dark:bg-[#2b2b2b] border border-black/10 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#383838] transition-all duration-150 active:scale-95 shadow-md cursor-pointer"
+                                    aria-label="Sağa Kaydır"
+                                  >
+                                    <ChevronRight size={14} />
+                                  </button>
+                                </div>
+                              )}
+
                               <div
                                 ref={catScroll.ref}
                                 onMouseDown={catScroll.onMouseDown}
@@ -3969,6 +4141,7 @@ const Home = () => {
                                 className="category-filter-container bg-[#f0f2f5] dark:bg-[#1c1c1c] border border-black/10 dark:border-white/10 rounded-2xl p-0 shadow-sm overflow-x-auto no-scrollbar scroll-smooth flex items-stretch select-none"
                               >
                                 <button
+                                  data-category-id="all"
                                   className={`category-filter-item flex flex-col items-center justify-center gap-1.5 py-2.5 px-3.5 sm:px-4 min-w-[76px] sm:min-w-[88px] shrink-0 border-r border-black/10 dark:border-white/10 last:border-r-0 first:rounded-l-2xl last:rounded-r-2xl transition-all duration-200 cursor-pointer group ${
                                     selectedAppsCategory === "all"
                                       ? "active bg-slate-900 text-white dark:bg-white/15 dark:text-white font-bold shadow-sm"
@@ -3997,6 +4170,7 @@ const Home = () => {
                                   return (
                                     <button
                                       key={subCat.id}
+                                      data-category-id={subCat.id}
                                       className={`category-filter-item flex flex-col items-center justify-center gap-1.5 py-2.5 px-3.5 sm:px-4 min-w-[76px] sm:min-w-[88px] shrink-0 border-r border-black/10 dark:border-white/10 last:border-r-0 first:rounded-l-2xl last:rounded-r-2xl transition-all duration-200 cursor-pointer group ${
                                         isActive
                                           ? "active bg-slate-900 text-white dark:bg-white/15 dark:text-white font-bold shadow-sm"
@@ -4139,7 +4313,35 @@ const Home = () => {
                               )}
                             </div>
 
-                            <div className="sticky top-0 md:top-[72px] z-30 bg-white/90 dark:bg-transparent backdrop-blur-md sm:-mx-8 sm:px-8 md:mx-0 md:px-0">
+                            <div className="sticky top-0 md:top-[72px] z-30 bg-white/90 dark:bg-transparent backdrop-blur-md sm:-mx-8 sm:px-8 md:mx-0 md:px-0 relative group/cat">
+                              {/* Left Scroll Button & Fade Overlay */}
+                              {showBotsLeftArrow && (
+                                <div className="flex absolute left-0 top-0 bottom-0 w-12 items-center justify-start bg-gradient-to-r from-[#f0f2f5] via-[#f0f2f5]/90 to-transparent dark:from-[#1c1c1c] dark:via-[#1c1c1c]/90 dark:to-transparent z-20 pointer-events-none rounded-l-2xl pl-1 transition-opacity duration-200">
+                                  <button
+                                    type="button"
+                                    onClick={() => scrollBotsCategories("left")}
+                                    className="pointer-events-auto flex w-7 h-7 items-center justify-center rounded-full bg-white dark:bg-[#2b2b2b] border border-black/10 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#383838] transition-all duration-150 active:scale-95 shadow-md cursor-pointer"
+                                    aria-label="Sola Kaydır"
+                                  >
+                                    <ChevronLeft size={14} />
+                                  </button>
+                                </div>
+                              )}
+
+                              {/* Right Scroll Button & Fade Overlay */}
+                              {showBotsRightArrow && (
+                                <div className="flex absolute right-0 top-0 bottom-0 w-12 items-center justify-end bg-gradient-to-l from-[#f0f2f5] via-[#f0f2f5]/90 to-transparent dark:from-[#1c1c1c] dark:via-[#1c1c1c]/90 dark:to-transparent z-20 pointer-events-none rounded-r-2xl pr-1 transition-opacity duration-200">
+                                  <button
+                                    type="button"
+                                    onClick={() => scrollBotsCategories("right")}
+                                    className="pointer-events-auto flex w-7 h-7 items-center justify-center rounded-full bg-white dark:bg-[#2b2b2b] border border-black/10 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#383838] transition-all duration-150 active:scale-95 shadow-md cursor-pointer"
+                                    aria-label="Sağa Kaydır"
+                                  >
+                                    <ChevronRight size={14} />
+                                  </button>
+                                </div>
+                              )}
+
                               <div
                                 ref={botsCatScroll.ref}
                                 onMouseDown={botsCatScroll.onMouseDown}
@@ -4150,6 +4352,7 @@ const Home = () => {
                                 className="category-filter-container bg-[#f0f2f5] dark:bg-[#1c1c1c] border border-black/10 dark:border-white/10 rounded-2xl p-0 shadow-sm overflow-x-auto no-scrollbar scroll-smooth flex items-stretch select-none"
                               >
                                 <button
+                                  data-category-id="all"
                                   className={`category-filter-item flex flex-col items-center justify-center gap-1.5 py-2.5 px-3.5 sm:px-4 min-w-[76px] sm:min-w-[88px] shrink-0 border-r border-black/10 dark:border-white/10 last:border-r-0 first:rounded-l-2xl last:rounded-r-2xl transition-all duration-200 cursor-pointer group ${
                                     selectedBotsCategory === "all"
                                       ? "active bg-slate-900 text-white dark:bg-white/15 dark:text-white font-bold shadow-sm"
@@ -4178,6 +4381,7 @@ const Home = () => {
                                   return (
                                     <button
                                       key={cat.id}
+                                      data-category-id={cat.id}
                                       className={`category-filter-item flex flex-col items-center justify-center gap-1.5 py-2.5 px-3.5 sm:px-4 min-w-[76px] sm:min-w-[88px] shrink-0 border-r border-black/10 dark:border-white/10 last:border-r-0 first:rounded-l-2xl last:rounded-r-2xl transition-all duration-200 cursor-pointer group ${
                                         isActive
                                           ? "active bg-slate-900 text-white dark:bg-white/15 dark:text-white font-bold shadow-sm"

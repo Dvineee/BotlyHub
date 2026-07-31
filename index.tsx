@@ -6,7 +6,7 @@ import App from './App';
 import { TranslationProvider, useTranslation } from './TranslationContext';
 import { ThemeProvider } from './ThemeContext';
 import { FilterProvider } from './FilterContext';
-import { HashRouter } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import { TonConnectUIProvider } from '@tonconnect/ui-react';
 import './index.css';
 
@@ -91,11 +91,11 @@ if (rootElement) {
         <ThemeProvider>
           <TranslationProvider>
             <FilterProvider>
-              <HashRouter>
+              <BrowserRouter>
                 <ErrorBoundaryWrapper>
                   <App />
                 </ErrorBoundaryWrapper>
-              </HashRouter>
+              </BrowserRouter>
             </FilterProvider>
           </TranslationProvider>
         </ThemeProvider>
