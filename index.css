@@ -3131,6 +3131,37 @@ html:not(.dark) .border, .light .border {
     font-weight: 500 !important;
 }
 
+.dark .text-slate-800,
+.dark .text-slate-850,
+.dark\:text-slate-800:is(.dark *),
+.dark\:text-slate-850:is(.dark *) {
+    --tw-text-opacity: 1;
+    color: rgb(255 255 255 / var(--tw-text-opacity, 1)) !important;
+}
+
+.dark .dark\:from-slate-950,
+.dark\:from-slate-950:is(.dark *),
+.dark [class*="from-slate-950"] {
+    --tw-gradient-from: #151618 var(--tw-gradient-from-position, 0%) !important;
+    --tw-gradient-to: rgb(2 6 23 / 0) var(--tw-gradient-to-position, 100%) !important;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+
+.dark .dark\:via-slate-950\/90,
+.dark\:via-slate-950\/90:is(.dark *),
+.dark [class*="via-slate-950"] {
+    --tw-gradient-to: rgb(2 6 23 / 0) var(--tw-gradient-to-position, 100%) !important;
+    --tw-gradient-stops: var(--tw-gradient-from), rgb(21 22 24) var(--tw-gradient-via-position, 50%), var(--tw-gradient-to) !important;
+}
+
+.top-3 {
+    top: .5rem !important;
+}
+
+.bottom-3 {
+    bottom: .5rem !important;
+}
+
 
 
 
