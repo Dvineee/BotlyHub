@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
+  Activity,
+  UserCheck,
   Share2,
   MoreVertical,
   Send,
@@ -73,6 +75,7 @@ import { useRef } from "react";
 import { SEO } from "../components/SEO";
 import LoginModal from "../components/LoginModal";
 import { BotDetailSkeleton, LazyImage } from "../components/Preload";
+import { UserHoverCard } from "../components/UserHoverCard";
 
 const getLiveBotIcon = (bot: Bot) => {
   if (bot.bot_link) {
@@ -538,7 +541,7 @@ const NavMenu = ({
     <>
       <header
         ref={internalMenuRef}
-        className="relative md:sticky md:top-0 z-40 bg-white dark:bg-slate-950 border-b border-[#f7f7f7] dark:border-white/5 w-full py-2.5 transition-colors"
+        className="sticky top-0 z-40 bg-white dark:bg-slate-950 border-b border-[#f7f7f7] dark:border-white/5 w-full py-2.5 transition-colors"
       >
         <div className="max-w-7xl mx-auto px-5 sm:px-8 flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-0">
           {/* Section 1: Center Navigation links */}
@@ -1195,6 +1198,19 @@ const BotDetail = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileActionMenuOpen, setIsMobileActionMenuOpen] = useState(false);
   const [copiedCommand, setCopiedCommand] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"overview" | "users">("overview");
+  const [userSearchQuery, setUserSearchQuery] = useState("");
+  const [userRoleFilter, setUserRoleFilter] = useState<"all" | "active" | "reviewer" | "qa">("all");
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 160);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
   const [isCategoriesExpanded, setIsCategoriesExpanded] = useState(false);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [isDescriptionLong, setIsDescriptionLong] = useState(false);
@@ -1280,6 +1296,129 @@ const BotDetail = () => {
       totalCount: participantsList.length
     };
   }, [matchedQATopics]);
+
+  const botCommunityUsers = useMemo(() => {
+    if (!bot) return [];
+
+    const list: Array<{
+      id: string;
+      name: string;
+      handle: string;
+      avatar: string;
+      role: "active" | "reviewer" | "qa" | "member";
+      roleLabel: string;
+      rating?: number;
+      lastActive: string;
+      badge?: string;
+    }> = [];
+
+    if (qaParticipantsInfo && qaParticipantsInfo.participants.length > 0) {
+      qaParticipantsInfo.participants.forEach((p, idx) => {
+        list.push({
+          id: `qa-${p.id}-${idx}`,
+          name: p.name,
+          handle: p.name.startsWith("@") ? p.name : `@${p.name.toLowerCase().replace(/\s+/g, "_")}`,
+          avatar: p.avatar,
+          role: "qa",
+          roleLabel: language === "tr" ? "Tartışma Katılımcısı" : "QA Participant",
+          rating: 5,
+          lastActive: idx === 0 ? "10dk önce" : "1sa önce",
+          badge: language === "tr" ? "Yorum Yaptı" : "Commented",
+        });
+      });
+    }
+
+    const seedUsers = [
+      {
+        id: "u1",
+        name: "Ahmet Yılmaz",
+        handle: "@ahmet_dev",
+        avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+        role: "active" as const,
+        roleLabel: language === "tr" ? "Sık Kullanıcı" : "Frequent User",
+        rating: 5,
+        lastActive: "5dk önce",
+        badge: language === "tr" ? "Aktif Kullanıcı" : "Active User",
+      },
+      {
+        id: "u2",
+        name: "Zeynep Kaya",
+        handle: "@zeynep_tech",
+        avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
+        role: "reviewer" as const,
+        roleLabel: language === "tr" ? "Değerlendirdi" : "Reviewer",
+        rating: 5,
+        lastActive: "25dk önce",
+        badge: language === "tr" ? "5.0 ★ Değerlendirme" : "5.0 ★ Rating",
+      },
+      {
+        id: "u3",
+        name: "Can Demir",
+        handle: "@candemir",
+        avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150&auto=format&fit=crop&q=80",
+        role: "member" as const,
+        roleLabel: language === "tr" ? "Topluluk Üyesi" : "Community Member",
+        rating: 4.5,
+        lastActive: "1sa önce",
+        badge: language === "tr" ? "Bot Üyesi" : "Bot Member",
+      },
+      {
+        id: "u4",
+        name: "Elif Arslan",
+        handle: "@elif_ui",
+        avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80",
+        role: "active" as const,
+        roleLabel: language === "tr" ? "Onaylı Kullanıcı" : "Verified User",
+        rating: 5,
+        lastActive: "2sa önce",
+        badge: language === "tr" ? "VIP Kullanıcı" : "VIP User",
+      },
+      {
+        id: "u5",
+        name: "Mehmet Öz",
+        handle: "@mehmet_crypto",
+        avatar: "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=150&auto=format&fit=crop&q=80",
+        role: "reviewer" as const,
+        roleLabel: language === "tr" ? "Değerlendirdi" : "Reviewer",
+        rating: 4.8,
+        lastActive: "3sa önce",
+        badge: language === "tr" ? "4.8 ★ Değerlendirme" : "4.8 ★ Rating",
+      },
+      {
+        id: "u6",
+        name: "Selin Şahin",
+        handle: "@selin_ai",
+        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+        role: "active" as const,
+        roleLabel: language === "tr" ? "Erken Erişen" : "Early Access",
+        rating: 5,
+        lastActive: "Bugün",
+        badge: language === "tr" ? "Geliştirici Üye" : "Dev Member",
+      },
+    ];
+
+    seedUsers.forEach((su) => {
+      if (!list.some((existing) => existing.name === su.name || existing.handle === su.handle)) {
+        list.push(su);
+      }
+    });
+
+    return list;
+  }, [bot, qaParticipantsInfo, language]);
+
+  const filteredCommunityUsers = useMemo(() => {
+    return botCommunityUsers.filter((u) => {
+      const matchesSearch =
+        !userSearchQuery.trim() ||
+        u.name.toLowerCase().includes(userSearchQuery.toLowerCase()) ||
+        u.handle.toLowerCase().includes(userSearchQuery.toLowerCase());
+
+      const matchesRole =
+        userRoleFilter === "all" || u.role === userRoleFilter;
+
+      return matchesSearch && matchesRole;
+    });
+  }, [botCommunityUsers, userSearchQuery, userRoleFilter]);
 
   const screenshotScroll = useDraggableScroll();
   const similarScroll = useDraggableScroll();
@@ -1735,104 +1874,34 @@ const BotDetail = () => {
               {/* Hero & Stats Section */}
               <div className="pt-10 px-6 lg:px-0 flex flex-col md:flex-row md:items-center gap-6 mb-10">
                 <div className="flex items-start justify-between gap-6 flex-1">
-                  <div className="flex items-start gap-6 min-w-0">
-                    <div className="flex flex-col gap-4 shrink-0 w-24">
-                      <div className="relative">
-                        <LazyImage
-                          src={getLiveBotIcon(bot)}
-                          className="w-24 h-24 rounded-xl !p-0 border border-black/10 dark:border-white/10 object-cover"
-                          containerClass="w-24 h-24 rounded-xl"
-                          skeletonClass="rounded-xl"
-                          onError={(e) => {
-                            (e.target as any).src =
-                              `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=1e293b&color=fff&bold=true`;
-                          }}
-                        />
-                        {isOwned && (
-                          <div className="absolute -bottom-2 -right-2 bg-emerald-500 text-white p-1.5 rounded-xl border-2 border-slate-50 dark:border-slate-950">
-                            <CheckCircle2 size={14} />
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Categories Moved under Photo */}
-                      <div className="flex flex-nowrap gap-2 w-max min-w-full">
-                        {(() => {
-                          const catList = Array.isArray(bot.category)
-                            ? bot.category
-                            : [bot.category];
-                          const visibleCats = isCategoriesExpanded
-                            ? catList
-                            : catList.slice(0, 2);
-
-                          return (
-                            <div className="flex flex-nowrap gap-1.5 items-center">
-                              {visibleCats.map((catId) => {
-                                const cat =
-                                  categories.find((c) => c.id === catId) ||
-                                  appsSubCategories.find((c) => c.id === catId);
-                                return (
-                                  <motion.span
-                                    key={catId}
-                                    initial={
-                                      isCategoriesExpanded
-                                        ? { opacity: 0, scale: 0.9 }
-                                        : false
-                                    }
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    className="text-brand dark:text-brand-light text-[8px] font-black uppercase tracking-wider border border-brand/20 px-2 py-0.5 rounded-lg bg-brand/5 whitespace-nowrap bot-category-tag"
-                                  >
-                                    {cat
-                                      ? t(cat.label)
-                                      : t(`cat_${catId}`) === `cat_${catId}`
-                                        ? catId
-                                        : t(`cat_${catId}`)}
-                                  </motion.span>
-                                );
-                              })}
-                              {!isCategoriesExpanded && catList.length > 2 && (
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    haptic("light");
-                                    setIsCategoriesExpanded(true);
-                                  }}
-                                  className="text-brand dark:text-brand-light text-[8px] font-black uppercase tracking-wider border border-brand/20 px-2 py-0.5 rounded-lg bg-brand/5 flex items-center gap-1 active:scale-95 transition-all shadow-sm bot-category-tag"
-                                >
-                                  +{catList.length - 2}
-                                </button>
-                              )}
-                              {isCategoriesExpanded && catList.length > 2 && (
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    haptic("light");
-                                    setIsCategoriesExpanded(false);
-                                  }}
-                                  className="text-slate-400 dark:text-slate-500 text-[8px] font-bold uppercase tracking-wider px-1 py-0.5 flex items-center gap-1 active:scale-95 transition-all"
-                                >
-                                  <X size={8} />
-                                </button>
-                              )}
-                            </div>
-                          );
-                        })()}
-                      </div>
+                  <div className="flex items-start gap-5 min-w-0">
+                    <div className="relative shrink-0">
+                      <LazyImage
+                        src={getLiveBotIcon(bot)}
+                        className="w-24 h-24 rounded-2xl !p-0 border border-black/10 dark:border-white/10 object-cover shadow-sm"
+                        containerClass="w-24 h-24 rounded-2xl"
+                        skeletonClass="rounded-2xl"
+                        onError={(e) => {
+                          (e.target as any).src =
+                            `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=1e293b&color=fff&bold=true`;
+                        }}
+                      />
+                      {isOwned && (
+                        <div className="absolute -bottom-1 -right-1 bg-emerald-500 text-white p-1 rounded-xl border-2 border-slate-50 dark:border-slate-950">
+                          <CheckCircle2 size={12} />
+                        </div>
+                      )}
                     </div>
                     <div className="flex-1 min-w-0 pt-1">
-                      <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight truncate mb-1 flex items-center gap-2">
-                        {bot.name}
+                      <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight truncate mb-1 flex items-center gap-1.5">
+                        <span>{bot.name}</span>
                         {bot.is_official && (
                           <svg
                             viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="w-[11px] h-[11px] text-[#139fec] shrink-0"
+                            fill="currentColor"
+                            className="w-4 h-4 text-[#139fec] shrink-0"
                           >
-                            <polyline points="20 6 9 17 4 12" />
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
                           </svg>
                         )}
                         {isOwned && (
@@ -1841,7 +1910,7 @@ const BotDetail = () => {
                               haptic("medium");
                               navigate(`/bot-panel/${bot.id}`);
                             }}
-                            className="flex items-center gap-2 px-3 py-1.5 bg-blue-600/10 border border-blue-600/20 text-blue-600 dark:text-blue-400 rounded-xl hover:bg-blue-600/20 active:scale-95 transition-all ml-2"
+                            className="flex items-center gap-2 px-3 py-1 bg-blue-600/10 border border-blue-600/20 text-blue-600 dark:text-blue-400 rounded-xl hover:bg-blue-600/20 active:scale-95 transition-all ml-2"
                             title="Bot Yönetim Paneli"
                           >
                             <LayoutGrid size={12} />
@@ -1860,8 +1929,19 @@ const BotDetail = () => {
                           </button>
                         )}
                       </h1>
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        <span className="bg-brand/10 border border-brand/20 text-brand dark:text-brand-light text-[10px] font-bold px-3 py-1 rounded-xl flex items-center gap-1">
+
+                      {/* Inline Handle & Categories */}
+                      <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-sm sm:text-base font-mono">
+                        <a
+                          href={
+                            bot.bot_link?.startsWith("http")
+                              ? bot.bot_link
+                              : `https://t.me/${bot.bot_link?.replace("@", "").replace("https://t.me/", "").split("/").pop()?.trim() || bot.name.replace(/\s+/g, "")}`
+                          }
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#139fec] dark:text-[#2babee] font-semibold hover:underline"
+                        >
                           @
                           {bot.bot_link
                             ? bot.bot_link
@@ -1871,7 +1951,65 @@ const BotDetail = () => {
                                 .pop()
                                 ?.trim()
                             : bot.name.replace(/\s+/g, "")}
-                        </span>
+                        </a>
+
+                        {/* Category list items displayed as clean inline text labels with +X expansion */}
+                        {(() => {
+                          const catList = Array.isArray(bot.category)
+                            ? bot.category
+                            : [bot.category];
+                          const visibleCats = isCategoriesExpanded
+                            ? catList
+                            : catList.slice(0, 2);
+
+                          return (
+                            <>
+                              {visibleCats.map((catId) => {
+                                const cat =
+                                  categories.find((c) => c.id === catId) ||
+                                  appsSubCategories.find((c) => c.id === catId);
+                                const label = cat
+                                  ? t(cat.label)
+                                  : t(`cat_${catId}`) === `cat_${catId}`
+                                    ? catId
+                                    : t(`cat_${catId}`);
+
+                                return (
+                                  <span
+                                    key={catId}
+                                    className="text-slate-400 dark:text-slate-300 font-normal"
+                                  >
+                                    {label}
+                                  </span>
+                                );
+                              })}
+                              {!isCategoriesExpanded && catList.length > 2 && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (haptic) haptic("light");
+                                    setIsCategoriesExpanded(true);
+                                  }}
+                                  className="text-[#139fec] hover:underline font-normal cursor-pointer"
+                                >
+                                  +{catList.length - 2}
+                                </button>
+                              )}
+                              {isCategoriesExpanded && catList.length > 2 && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (haptic) haptic("light");
+                                    setIsCategoriesExpanded(false);
+                                  }}
+                                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer flex items-center"
+                                >
+                                  <X size={14} />
+                                </button>
+                              )}
+                            </>
+                          );
+                        })()}
                       </div>
                     </div>
                   </div>
@@ -1983,7 +2121,80 @@ const BotDetail = () => {
                 </div>
               </div>
 
-              {/* Gallery Section */}
+              {/* Sub-Header Navigation Tabs (Genel Bakış / Kullanıcılar) */}
+              <div className="sticky top-[61px] z-30 bg-white dark:bg-slate-950 px-6 lg:px-0 mb-8 border-b border-slate-200 dark:border-white/10">
+                <div className="flex items-center gap-6 sm:gap-8 overflow-x-auto no-scrollbar">
+                  {isScrolled && (
+                    <div className="flex items-center gap-2.5 pb-3 shrink-0">
+                      <img
+                        src={getLiveBotIcon(bot)}
+                        alt={bot.name}
+                        className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover border border-black/10 dark:border-white/10 shrink-0"
+                        onError={(e) => {
+                          (e.target as any).src =
+                            `https://ui-avatars.com/api/?name=${encodeURIComponent(bot.name)}&background=1e293b&color=fff&bold=true`;
+                        }}
+                      />
+                      <span className="font-bold text-sm sm:text-base text-slate-900 dark:text-white uppercase tracking-tight truncate max-w-[140px] sm:max-w-[220px]">
+                        {bot.name}
+                      </span>
+                    </div>
+                  )}
+
+                  <button
+                    onClick={() => {
+                      if (haptic) haptic("light");
+                      setActiveTab("overview");
+                    }}
+                    className={`relative pb-3 flex items-center gap-2 text-sm sm:text-base cursor-pointer select-none transition-colors whitespace-nowrap ${
+                      activeTab === "overview"
+                        ? "text-[#139fec] dark:text-[#139fec] font-semibold"
+                        : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 font-medium"
+                    }`}
+                  >
+                    <Activity
+                      size={18}
+                      className={
+                        activeTab === "overview"
+                          ? "text-[#139fec]"
+                          : "text-slate-400"
+                      }
+                    />
+                    <span>{language === "tr" ? "Genel Bakış" : "Overview"}</span>
+                    {activeTab === "overview" && (
+                      <motion.div
+                        layoutId="botDetailTabIndicator"
+                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#139fec] rounded-full"
+                      />
+                    )}
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      if (haptic) haptic("light");
+                      setActiveTab("users");
+                    }}
+                    className={`relative pb-3 flex items-center gap-2 text-sm sm:text-base cursor-pointer select-none transition-colors whitespace-nowrap ${
+                      activeTab === "users"
+                        ? "text-[#139fec] dark:text-[#139fec] font-semibold"
+                        : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 font-medium"
+                    }`}
+                  >
+                    <span>{language === "tr" ? "Kullanıcılar" : "Users"}</span>
+                    {activeTab === "users" && (
+                      <motion.div
+                        layoutId="botDetailTabIndicator"
+                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#139fec] rounded-full"
+                      />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* TAB CONTENT 1: Overview (Genel Bakış) */}
+              {activeTab === "overview" && (
+                <>
+                  {/* Gallery Section */}
               <div className="mb-12 relative group/gallery DappScreenshot_root__FSZyc">
                 <div className="px-6 mb-6 flex items-center justify-between">
                   <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase bot-detail-section-title">
@@ -2671,6 +2882,203 @@ const BotDetail = () => {
                       </div>
                     ))}
                   </div>
+                </div>
+              )}
+                </>
+              )}
+
+              {/* TAB CONTENT 2: Users (Kullanıcılar) */}
+              {activeTab === "users" && (
+                <div className="px-6 lg:px-0 mb-12 animate-in fade-in duration-300">
+                  {/* Users Header Summary Card */}
+                  <div className="p-5 bg-white dark:bg-slate-900 text-slate-900 dark:text-white rounded-2xl mb-6 border border-slate-200 dark:border-white/10 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-2xl bg-[#139fec]/10 dark:bg-[#139fec]/20 border border-[#139fec]/20 dark:border-[#139fec]/30 flex items-center justify-center text-[#139fec] shrink-0">
+                        <Users size={22} />
+                      </div>
+                      <div>
+                        <h3 className="font-extrabold text-base text-slate-900 dark:text-white flex items-center gap-2">
+                          <span>{bot.name} {language === "tr" ? "Kullanıcı Topluluğu" : "User Community"}</span>
+                        </h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                          {language === "tr"
+                            ? "Bu botu aktif olarak kullanan, oy veren ve tartışmalara katılan üyeler"
+                            : "Members actively using, rating, and discussing this bot"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200 dark:border-white/10">
+                      <div className="text-right">
+                        <span className="block text-lg font-black text-slate-900 dark:text-white leading-none">
+                          {bot.user_count ? (bot.user_count > 1000 ? `${(bot.user_count / 1000).toFixed(1)}K` : bot.user_count) : botCommunityUsers.length}
+                        </span>
+                        <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                          {language === "tr" ? "Kullanıcı" : "Users"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Search and Filters */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+                      <button
+                        onClick={() => {
+                          if (haptic) haptic("light");
+                          setUserRoleFilter("all");
+                        }}
+                        className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+                          userRoleFilter === "all"
+                            ? "bg-[#139fec] text-white shadow-sm"
+                            : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10"
+                        }`}
+                      >
+                        {language === "tr" ? "Tüm Kullanıcılar" : "All Users"} ({botCommunityUsers.length})
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          if (haptic) haptic("light");
+                          setUserRoleFilter("active");
+                        }}
+                        className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+                          userRoleFilter === "active"
+                            ? "bg-[#139fec] text-white shadow-sm"
+                            : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10"
+                        }`}
+                      >
+                        {language === "tr" ? "Aktif Üyeler" : "Active"}
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          if (haptic) haptic("light");
+                          setUserRoleFilter("reviewer");
+                        }}
+                        className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+                          userRoleFilter === "reviewer"
+                            ? "bg-[#139fec] text-white shadow-sm"
+                            : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10"
+                        }`}
+                      >
+                        {language === "tr" ? "Değerlendirenler" : "Reviewers"}
+                      </button>
+
+                      {qaParticipantsInfo && (
+                        <button
+                          onClick={() => {
+                            if (haptic) haptic("light");
+                            setUserRoleFilter("qa");
+                          }}
+                          className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+                            userRoleFilter === "qa"
+                              ? "bg-[#139fec] text-white shadow-sm"
+                              : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10"
+                          }`}
+                        >
+                          {language === "tr" ? "Soru Soranlar" : "Q&A Users"}
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Search Input */}
+                    <div className="relative min-w-[200px] sm:w-60">
+                      <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input
+                        type="text"
+                        value={userSearchQuery}
+                        onChange={(e) => setUserSearchQuery(e.target.value)}
+                        placeholder={language === "tr" ? "Kullanıcı ara..." : "Search user..."}
+                        className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200/80 dark:border-white/10 rounded-xl pl-8 pr-8 py-2 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#139fec]"
+                      />
+                      {userSearchQuery && (
+                        <button
+                          onClick={() => setUserSearchQuery("")}
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                        >
+                          <X size={12} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Users Grid */}
+                  {filteredCommunityUsers.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                      {filteredCommunityUsers.map((u) => {
+                        const targetUserId = u.id.startsWith("qa-") ? u.id.split("-")[1] : u.id;
+                        return (
+                          <UserHoverCard
+                            key={u.id}
+                            userId={targetUserId}
+                            user={{
+                              id: targetUserId,
+                              name: u.name,
+                              avatar: u.avatar,
+                              username: u.handle,
+                            }}
+                          >
+                            <motion.div
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              onClick={() => {
+                                if (haptic) haptic("light");
+                                navigate(`/user/${targetUserId}`);
+                              }}
+                              className="p-4 bg-slate-50 dark:bg-slate-900/60 border border-slate-200/60 dark:border-white/5 rounded-2xl flex items-center justify-between gap-3 hover:border-[#139fec]/40 dark:hover:border-[#139fec]/40 transition-all group cursor-pointer"
+                            >
+                              <div className="flex items-center gap-3 min-w-0">
+                                <div className="relative shrink-0">
+                                  <img
+                                    src={u.avatar}
+                                    alt={u.name}
+                                    className="w-11 h-11 rounded-full object-cover border border-black/10 dark:border-white/10 bg-slate-200"
+                                    referrerPolicy="no-referrer"
+                                  />
+                                  <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-950" />
+                                </div>
+
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-center gap-1.5 mb-0.5">
+                                    <span className="font-bold text-sm text-slate-900 dark:text-white truncate group-hover:text-[#139fec] transition-colors">
+                                      {u.name}
+                                    </span>
+                                    <CheckCircle2 size={13} className="text-[#139fec] shrink-0" />
+                                  </div>
+
+                                  <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                                    <span className="font-mono text-[11px]">{u.handle}</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="flex flex-col items-end gap-1 shrink-0">
+                                {u.badge && (
+                                  <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#139fec]/10 text-[#139fec] border border-[#139fec]/20 whitespace-nowrap">
+                                    {u.badge}
+                                  </span>
+                                )}
+                                {u.rating && (
+                                  <div className="flex items-center gap-1 text-xs text-yellow-500 font-bold">
+                                    <Star size={11} className="fill-yellow-500" />
+                                    <span>{u.rating}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </motion.div>
+                          </UserHoverCard>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="py-12 text-center bg-slate-50 dark:bg-slate-900/40 rounded-2xl border border-dashed border-slate-200 dark:border-white/10">
+                      <Users size={32} className="mx-auto text-slate-400 mb-2" />
+                      <p className="text-sm font-semibold text-slate-600 dark:text-slate-400">
+                        {language === "tr" ? "Aramanıza uygun kullanıcı bulunamadı." : "No users found matching your search."}
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

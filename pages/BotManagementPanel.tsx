@@ -852,7 +852,7 @@ const GroupSettingsView = ({ channel }: { channel: any }) => {
                     </div>
 
                     {/* Custom Bot Section */}
-                    <div className="group bg-gradient-to-br from-slate-900 to-[#0f1218] border border-white/5 p-6 sm:p-8 rounded-[24px] sm:rounded-[40px] relative overflow-hidden">
+                    <div className="group bg-slate-900 border border-white/5 p-6 sm:p-8 rounded-[24px] sm:rounded-[40px] relative overflow-hidden">
                         <div className="relative z-10">
                             <div className="flex items-center gap-3 mb-4">
                                 <h3 className="text-xl font-black text-white italic uppercase tracking-tighter">Özel Bot</h3>

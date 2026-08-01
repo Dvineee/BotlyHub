@@ -14,6 +14,23 @@
 @tailwind components;
 @tailwind utilities;
 
+@media (min-width: 640px) {
+  .sm\:text-base {
+    font-size: 0.875rem !important;
+    line-height: 1.5rem !important;
+  }
+}
+
+.mb-8 {
+  padding-top: 8px;
+  margin-top: 1.2rem !important;
+  margin-bottom: 1.2rem !important;
+}
+
+.top-\[57px\] {
+  top: 61px !important;
+}
+
 /* Premium Border Color Fallbacks and Design Synchronization */
 .border {
   border-color: var(--border-color);
