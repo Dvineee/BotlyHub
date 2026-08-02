@@ -624,7 +624,7 @@ const NavMenu = ({
     <>
       <header
         ref={internalMenuRef}
-        className="hidden md:block relative md:sticky md:top-0 z-40 bg-white dark:bg-slate-950 border-b border-[#f7f7f7] dark:border-white/5 w-full py-2.5 transition-colors"
+        className="hidden md:block relative md:sticky md:top-0 z-[300] bg-white dark:bg-slate-950 border-b border-[#f7f7f7] dark:border-white/5 w-full py-2.5 transition-colors"
       >
         <div className="max-w-7xl mx-auto px-5 sm:px-8 flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-0">
           {/* Section 1: Center Navigation links */}
@@ -1623,7 +1623,7 @@ const SearchPage = () => {
         />
         <div className="max-w-7xl mx-auto px-5 sm:px-8 pt-0 md:pt-0 pb-32">
           {/* Results */}
-          <div className="relative z-[200] bg-white dark:bg-slate-950 py-3 -mx-5 px-5 sm:-mx-8 sm:px-8 md:mx-0 md:px-0 flex items-center gap-3 mb-0 md:mb-2 transition-colors">
+          <div className="relative z-[100] bg-white dark:bg-slate-950 py-3 -mx-5 px-5 sm:-mx-8 sm:px-8 md:mx-0 md:px-0 flex items-center gap-3 mb-0 md:mb-2 transition-colors">
             <div className="flex-1 relative px-[8.5px]">
               <div className="relative flex items-center pl-3 pr-3.5 transition-all group premium-search-container h-[50px]">
                 <button

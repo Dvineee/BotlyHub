@@ -1217,12 +1217,15 @@ const BotDetail = () => {
   const descriptionRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
+    if (activeTab !== "overview") return;
     const el = descriptionRef.current;
     if (!el || !bot?.description) return;
 
     const checkIsLong = () => {
       if (!isDescriptionExpanded) {
-        setIsDescriptionLong(el.scrollHeight > el.clientHeight);
+        const isOverflowing = el.scrollHeight > el.clientHeight;
+        const isLongText = bot.description ? bot.description.length > 180 : false;
+        setIsDescriptionLong(isOverflowing || isLongText);
       }
     };
 
@@ -1239,7 +1242,7 @@ const BotDetail = () => {
       observer.disconnect();
       clearTimeout(timer);
     };
-  }, [bot?.description, isDescriptionExpanded, isLoading]);
+  }, [bot?.description, isDescriptionExpanded, isLoading, activeTab]);
 
   const [isSidebarDropdownOpen, setIsSidebarDropdownOpen] = useState(false);
   const [userRating, setUserRating] = useState<number | null>(null);
@@ -2180,6 +2183,14 @@ const BotDetail = () => {
                         : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 font-medium"
                     }`}
                   >
+                    <Users
+                      size={18}
+                      className={
+                        activeTab === "users"
+                          ? "text-[#139fec]"
+                          : "text-slate-400"
+                      }
+                    />
                     <span>{language === "tr" ? "Kullanıcılar" : "Users"}</span>
                     {activeTab === "users" && (
                       <motion.div
