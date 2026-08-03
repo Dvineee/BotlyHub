@@ -1356,15 +1356,7 @@ button.bg-brand:hover, button.bg-blue-500:hover, button.bg-blue-600:hover, a.bg-
   box-shadow: none;
 }
 
-.fancy-glass-card .text-slate-500 {
-    padding-bottom: 0px !important;
-    padding-top: 0px !important;
-    opacity: .95 !important;
-    font-size: 13px !important;
-    letter-spacing: .005em !important;
-}
-
-.light .absolute[class*="bg-[#"], .light [class*=dropdown-menu], .light [role=menu], .light .mega-menu-container {
+.light .absolute[class*="bg-[#"], .light [class*=dropdown-menu], .light [role=menu] {
     background-color: #fff !important;
     border: 1px solid rgb(19 159 236 / var(--tw-text-opacity, 1)) !important;
     box-shadow: 0 10px 30px -8px #0000000f !important;
@@ -1647,12 +1639,6 @@ img.rounded-xl, img.rounded-3xl, img.rounded-2xl, img.rounded-\[11px\], img.roun
   letter-spacing: .005em !important;
 }
 
-.fancy-glass-card .text-slate-500 {
-    opacity: 0.95 !important;
-    font-size: 13px !important;
-    letter-spacing: .005em !important;
-}
-
 .dark\:bg-\[\#0F1623\]:is(.dark *) {
     background-color: #1c1c1c !important;
     border: 1px solid rgb(255 255 255 / 0%) !important;
@@ -1906,6 +1892,7 @@ div.qa-last-24h-box, .qa-last-24h-box {
 
 .bg-slate-100 {
   --tw-bg-opacity: 1;
+  background-color: rgb(197 204 211 / 16%);
 }
 
 .fancy-glass-card, .stats-card-bg, .popular-content-card, .similar-post-card, .bot-card {
@@ -2390,10 +2377,10 @@ div.qa-last-24h-box, .qa-last-24h-box {
 
 /* Premium Search Bar Styling Rules */
 .premium-search-container {
-    background-color: #ffffff !important;
+    background-color: rgb(238 239 239 / var(--tw-bg-opacity, 1));
     border: 1.5px solid #e2e8f0 !important;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    border-radius: 16px !important;
+    border-radius: 0.75rem !important;
     box-shadow: none !important;
     padding-left: 0.5rem !important;
     padding-right: 0.5rem !important;
@@ -2830,14 +2817,6 @@ span.text-\[12px\].text-slate-500.dark\:text-slate-400.font-normal {
     }
 }
 
-.fancy-glass-card .text-slate-500 {
-    padding-bottom: 3px !important;
-    padding-top: 3px !important;
-    opacity: 0.95 !important;
-    font-size: 13px !important;
-    letter-spacing: .005em !important;
-}
-
 .bg-white.dark\:bg-\[\#111214\].rounded-2xl.p-5.shadow-xs.space-y-4.my-6.qa-last-24h-box {
     outline: solid 1px rgba(96, 165, 250, 0.1);
 }
@@ -2892,15 +2871,6 @@ html, body {
     background-color: #1c1c1c !important;
     border: 1px solid #26262699;
     box-shadow: 0 10px 30px -8px #0006 !important;
-}
-
-.light .absolute[class*="bg-[#"],
-.light [class*="dropdown-menu"],
-.light [role="menu"],
-.light .mega-menu-container {
-  background-color: #fff !important;
-  border: 1px solid rgb(19 159 236 / var(--tw-text-opacity, 1)) !important;
-  box-shadow: 0 10px 30px -8px #0000000f !important;
 }
 
 /* 4. Global Action Button Corner and Micro-Movement Symmetry */
@@ -3186,6 +3156,19 @@ html:not(.dark) .border, .light .border {
 .bottom-3 {
     bottom: .5rem !important;
 }
+
+@media (max-width: 767px) {
+    .mb-10 {
+        padding-left: 17px !important;
+    }
+}
+
+.dark\:bg-slate-900\/90:is(.dark *),
+.dark .dark\:bg-slate-900\/90,
+:is(.dark *) .dark\:bg-slate-900\/90 {
+    background-color: rgb(28 28 28) !important;
+}
+
 
 
 

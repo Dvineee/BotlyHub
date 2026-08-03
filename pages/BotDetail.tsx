@@ -1897,7 +1897,14 @@ const BotDetail = () => {
                     </div>
                     <div className="flex-1 min-w-0 pt-1">
                       <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight truncate mb-1 flex items-center gap-1.5">
-                        <span>{bot.name}</span>
+                        <span>
+                          <span className="inline sm:hidden">
+                            {bot.name && bot.name.length > 14 ? `${bot.name.slice(0, 14)}...` : bot.name}
+                          </span>
+                          <span className="hidden sm:inline">
+                            {bot.name}
+                          </span>
+                        </span>
                         {bot.is_official && (
                           <svg
                             viewBox="0 0 24 24"
@@ -1934,7 +1941,7 @@ const BotDetail = () => {
                       </h1>
 
                       {/* Inline Handle & Categories */}
-                      <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-sm sm:text-base font-mono">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-y-1 sm:gap-x-2.5 text-sm sm:text-base font-mono">
                         <a
                           href={
                             bot.bot_link?.startsWith("http")
@@ -1961,55 +1968,97 @@ const BotDetail = () => {
                           const catList = Array.isArray(bot.category)
                             ? bot.category
                             : [bot.category];
-                          const visibleCats = isCategoriesExpanded
-                            ? catList
-                            : catList.slice(0, 2);
+
+                          const getCatLabel = (catId: string) => {
+                            const cat =
+                              categories.find((c) => c.id === catId) ||
+                              appsSubCategories.find((c) => c.id === catId);
+                            return cat
+                              ? t(cat.label)
+                              : t(`cat_${catId}`) === `cat_${catId}`
+                                ? catId
+                                : t(`cat_${catId}`);
+                          };
 
                           return (
                             <>
-                              {visibleCats.map((catId) => {
-                                const cat =
-                                  categories.find((c) => c.id === catId) ||
-                                  appsSubCategories.find((c) => c.id === catId);
-                                const label = cat
-                                  ? t(cat.label)
-                                  : t(`cat_${catId}`) === `cat_${catId}`
-                                    ? catId
-                                    : t(`cat_${catId}`);
-
-                                return (
+                              {/* Mobile Layout: 1 category max, placed below username */}
+                              <div className="flex sm:hidden items-center gap-2 flex-wrap mt-0.5">
+                                {(isCategoriesExpanded
+                                  ? catList
+                                  : catList.slice(0, 1)
+                                ).map((catId) => (
                                   <span
                                     key={catId}
                                     className="text-slate-400 dark:text-slate-300 font-normal"
                                   >
-                                    {label}
+                                    {getCatLabel(catId)}
                                   </span>
-                                );
-                              })}
-                              {!isCategoriesExpanded && catList.length > 2 && (
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    if (haptic) haptic("light");
-                                    setIsCategoriesExpanded(true);
-                                  }}
-                                  className="text-[#139fec] hover:underline font-normal cursor-pointer"
-                                >
-                                  +{catList.length - 2}
-                                </button>
-                              )}
-                              {isCategoriesExpanded && catList.length > 2 && (
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    if (haptic) haptic("light");
-                                    setIsCategoriesExpanded(false);
-                                  }}
-                                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer flex items-center"
-                                >
-                                  <X size={14} />
-                                </button>
-                              )}
+                                ))}
+                                {!isCategoriesExpanded && catList.length > 1 && (
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      if (haptic) haptic("light");
+                                      setIsCategoriesExpanded(true);
+                                    }}
+                                    className="text-[#139fec] hover:underline font-normal cursor-pointer"
+                                  >
+                                    +{catList.length - 1}
+                                  </button>
+                                )}
+                                {isCategoriesExpanded && catList.length > 1 && (
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      if (haptic) haptic("light");
+                                      setIsCategoriesExpanded(false);
+                                    }}
+                                    className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer flex items-center"
+                                  >
+                                    <X size={14} />
+                                  </button>
+                                )}
+                              </div>
+
+                              {/* Desktop Layout: 2 categories max */}
+                              <div className="hidden sm:flex items-center gap-2.5 flex-wrap">
+                                {(isCategoriesExpanded
+                                  ? catList
+                                  : catList.slice(0, 2)
+                                ).map((catId) => (
+                                  <span
+                                    key={catId}
+                                    className="text-slate-400 dark:text-slate-300 font-normal"
+                                  >
+                                    {getCatLabel(catId)}
+                                  </span>
+                                ))}
+                                {!isCategoriesExpanded && catList.length > 2 && (
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      if (haptic) haptic("light");
+                                      setIsCategoriesExpanded(true);
+                                    }}
+                                    className="text-[#139fec] hover:underline font-normal cursor-pointer"
+                                  >
+                                    +{catList.length - 2}
+                                  </button>
+                                )}
+                                {isCategoriesExpanded && catList.length > 2 && (
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      if (haptic) haptic("light");
+                                      setIsCategoriesExpanded(false);
+                                    }}
+                                    className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer flex items-center"
+                                  >
+                                    <X size={14} />
+                                  </button>
+                                )}
+                              </div>
                             </>
                           );
                         })()}
@@ -2095,10 +2144,6 @@ const BotDetail = () => {
                           {bot.user_count && bot.user_count > 1000
                             ? `${(bot.user_count / 1000).toFixed(1)}K`
                             : bot.user_count || 0}
-                          <Users
-                            size={12}
-                            className="text-slate-500 dark:text-slate-400 fill-slate-500/10"
-                          />
                         </span>
                         <span className="text-[9px] text-slate-500 font-bold uppercase mt-0.5 tracking-wider">
                           Kullanıcı
@@ -2110,10 +2155,6 @@ const BotDetail = () => {
                           {bot.views && bot.views > 1000
                             ? `${(bot.views / 1000).toFixed(1)}K`
                             : bot.views || 0}
-                          <Eye
-                            size={12}
-                            className="text-slate-500 dark:text-slate-400"
-                          />
                         </span>
                         <span className="text-[9px] text-slate-500 font-bold uppercase mt-0.5 tracking-wider">
                           Görüntüleme
@@ -2139,7 +2180,12 @@ const BotDetail = () => {
                         }}
                       />
                       <span className="font-bold text-sm sm:text-base text-slate-900 dark:text-white uppercase tracking-tight truncate max-w-[140px] sm:max-w-[220px]">
-                        {bot.name}
+                        <span className="inline sm:hidden">
+                          {bot.name && bot.name.length > 6 ? `${bot.name.slice(0, 6)}...` : bot.name}
+                        </span>
+                        <span className="hidden sm:inline">
+                          {bot.name}
+                        </span>
                       </span>
                     </div>
                   )}
@@ -2206,104 +2252,94 @@ const BotDetail = () => {
               {activeTab === "overview" && (
                 <>
                   {/* Gallery Section */}
-              <div className="mb-12 relative group/gallery DappScreenshot_root__FSZyc">
-                <div className="px-6 mb-6 flex items-center justify-between">
-                  <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase bot-detail-section-title">
-                    {t("preview")}
-                  </h3>
+                  {bot.screenshots && bot.screenshots.length > 0 && (
+                    <div className="mb-12 relative group/gallery DappScreenshot_root__FSZyc">
+                      <div className="px-6 mb-6 flex items-center justify-between">
+                        <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase bot-detail-section-title">
+                          {t("preview")}
+                        </h3>
 
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => {
-                        if (screenshotScroll.ref.current) {
-                          screenshotScroll.ref.current.scrollBy({
-                            left: -340,
-                            behavior: "smooth",
-                          });
-                          haptic("light");
-                        }
-                      }}
-                      className="w-10 h-10 rounded-full bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 flex items-center justify-center text-slate-400 hover:text-brand hover:scale-110 shadow-lg transition-all active:scale-95"
-                    >
-                      <ChevronLeft size={20} />
-                    </button>
-                    <button
-                      onClick={() => {
-                        if (screenshotScroll.ref.current) {
-                          screenshotScroll.ref.current.scrollBy({
-                            left: 340,
-                            behavior: "smooth",
-                          });
-                          haptic("light");
-                        }
-                      }}
-                      className="w-10 h-10 rounded-full bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 flex items-center justify-center text-slate-400 hover:text-brand hover:scale-110 shadow-lg transition-all active:scale-95"
-                    >
-                      <ChevronRight size={20} />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="overflow-hidden">
-                  <div
-                    ref={screenshotScroll.ref}
-                    onMouseDown={screenshotScroll.onMouseDown}
-                    onMouseUp={screenshotScroll.onMouseUp}
-                    onMouseMove={screenshotScroll.onMouseMove}
-                    onMouseLeave={screenshotScroll.onMouseLeave}
-                    onContextMenu={screenshotScroll.onContextMenu}
-                    className={`flex gap-4 overflow-x-auto no-scrollbar px-6 snap-x pb-0 ${screenshotScroll.isDragging ? "cursor-grabbing" : "cursor-grab"} DappScreenshotsCarousel_root__s30Gy`}
-                  >
-                    {bot.screenshots && bot.screenshots.length > 0
-                      ? bot.screenshots.map((s, i) => (
-                          <motion.div
-                            key={i}
-                            className="h-[260px] w-[380px] rounded-[2.5rem] bg-slate-200 dark:bg-slate-950 border border-black/5 dark:border-white/10 overflow-hidden snap-center shrink-0 cursor-pointer group relative DappScreenshotsCarousel_emblaItem__s30Gy"
-                            onClick={() => openLightbox(i)}
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => {
+                              if (screenshotScroll.ref.current) {
+                                screenshotScroll.ref.current.scrollBy({
+                                  left: -340,
+                                  behavior: "smooth",
+                                });
+                                haptic("light");
+                              }
+                            }}
+                            className="w-10 h-10 rounded-full bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 flex items-center justify-center text-slate-400 hover:text-brand hover:scale-110 shadow-lg transition-all active:scale-95"
                           >
-                            {/* Blurred Background Layer - Using the image itself */}
-                            <div className="absolute inset-0 transform-gpu overflow-hidden">
-                              <img
-                                src={s}
-                                className="w-full h-full object-cover blur-[40px] opacity-70 dark:opacity-50 scale-150"
-                              />
-                              <div className="absolute inset-0 bg-white/20 dark:bg-black/40" />
-                            </div>
+                            <ChevronLeft size={20} />
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (screenshotScroll.ref.current) {
+                                screenshotScroll.ref.current.scrollBy({
+                                  left: 340,
+                                  behavior: "smooth",
+                                });
+                                haptic("light");
+                              }
+                            }}
+                            className="w-10 h-10 rounded-full bg-white dark:bg-slate-900 border border-black/5 dark:border-white/10 flex items-center justify-center text-slate-400 hover:text-brand hover:scale-110 shadow-lg transition-all active:scale-95"
+                          >
+                            <ChevronRight size={20} />
+                          </button>
+                        </div>
+                      </div>
 
-                            {/* Central Crisp Phone Mockup */}
-                            <div className="absolute inset-0 flex items-center justify-center p-0 z-10">
-                              <div className="h-full aspect-[9/19] relative group-hover:scale-105 transition-transform duration-700 ease-out">
+                      <div className="overflow-hidden">
+                        <div
+                          ref={screenshotScroll.ref}
+                          onMouseDown={screenshotScroll.onMouseDown}
+                          onMouseUp={screenshotScroll.onMouseUp}
+                          onMouseMove={screenshotScroll.onMouseMove}
+                          onMouseLeave={screenshotScroll.onMouseLeave}
+                          onContextMenu={screenshotScroll.onContextMenu}
+                          className={`flex gap-4 overflow-x-auto no-scrollbar px-6 snap-x pb-0 ${screenshotScroll.isDragging ? "cursor-grabbing" : "cursor-grab"} DappScreenshotsCarousel_root__s30Gy`}
+                        >
+                          {bot.screenshots.map((s, i) => (
+                            <motion.div
+                              key={i}
+                              className="h-[260px] w-[380px] rounded-[2.5rem] bg-slate-200 dark:bg-slate-950 border border-black/5 dark:border-white/10 overflow-hidden snap-center shrink-0 cursor-pointer group relative DappScreenshotsCarousel_emblaItem__s30Gy"
+                              onClick={() => openLightbox(i)}
+                            >
+                              {/* Blurred Background Layer - Using the image itself */}
+                              <div className="absolute inset-0 transform-gpu overflow-hidden">
                                 <img
                                   src={s}
-                                  loading="lazy"
-                                  className="h-full w-full object-cover rounded-xl relative z-10 border-2 border-white/40 dark:border-white/20"
+                                  className="w-full h-full object-cover blur-[40px] opacity-70 dark:opacity-50 scale-150"
                                 />
-                                {/* Glass Reflection */}
-                                <div className="absolute inset-0 bg-gradient-to-tr from-white/30 via-white/5 to-transparent z-20 rounded-xl" />
+                                <div className="absolute inset-0 bg-white/20 dark:bg-black/40" />
                               </div>
-                            </div>
 
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center pointer-events-none z-30">
-                              <div className="bg-white/20 backdrop-blur-md p-4 rounded-full opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100 border border-white/20">
-                                <Maximize2 size={24} className="text-white" />
+                              {/* Central Crisp Phone Mockup */}
+                              <div className="absolute inset-0 flex items-center justify-center p-0 z-10">
+                                <div className="h-full aspect-[9/19] relative group-hover:scale-105 transition-transform duration-700 ease-out">
+                                  <img
+                                    src={s}
+                                    loading="lazy"
+                                    className="h-full w-full object-cover rounded-xl relative z-10 border-2 border-white/40 dark:border-white/20"
+                                  />
+                                  {/* Glass Reflection */}
+                                  <div className="absolute inset-0 bg-gradient-to-tr from-white/30 via-white/5 to-transparent z-20 rounded-xl" />
+                                </div>
                               </div>
-                            </div>
-                          </motion.div>
-                        ))
-                      : [1, 2, 3].map((i) => (
-                          <div
-                            key={i}
-                            className="w-[380px] h-[260px] rounded-[2.5rem] bg-slate-100 dark:bg-slate-900/50 border border-black/5 dark:border-white/5 overflow-hidden snap-center shrink-0 flex items-center justify-center"
-                          >
-                            <ImageIcon
-                              className="text-slate-300 dark:text-slate-800"
-                              size={32}
-                            />
-                          </div>
-                        ))}
-                  </div>
-                </div>
-              </div>
+
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center pointer-events-none z-30">
+                                <div className="bg-white/20 backdrop-blur-md p-4 rounded-full opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100 border border-white/20">
+                                  <Maximize2 size={24} className="text-white" />
+                                </div>
+                              </div>
+                            </motion.div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
               {/* Rating Section */}
               {isOwned && (
@@ -3196,10 +3232,6 @@ const BotDetail = () => {
                         {bot.user_count && bot.user_count > 1000
                           ? `${(bot.user_count / 1000).toFixed(1)}K`
                           : bot.user_count || 0}
-                        <Users
-                          size={12}
-                          className="text-slate-500 dark:text-slate-400 fill-slate-500/10"
-                        />
                       </span>
                       <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">
                         {t("detail_users_count")}
@@ -3210,10 +3242,6 @@ const BotDetail = () => {
                         {bot.views && bot.views > 1000
                           ? `${(bot.views / 1000).toFixed(1)}K`
                           : bot.views || 0}
-                        <Eye
-                          size={12}
-                          className="text-slate-500 dark:text-slate-400"
-                        />
                       </span>
                       <span className="text-[10px] text-slate-500 font-medium uppercase mt-1 tracking-wider">
                         {t("detail_views")}

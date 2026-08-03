@@ -33,6 +33,10 @@ import {
   LogOut,
   MessageSquare,
   Globe,
+  SlidersHorizontal,
+  Tag,
+  CheckCircle2,
+  Check,
 } from "lucide-react";
 import { Bot, Notification, User as UserType } from "../types";
 import { categories, appsSubCategories } from "../data";
@@ -1282,10 +1286,14 @@ const SearchPage = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
-  const { activeFilter, searchMode, setSearchMode } = useFilter();
+  const { activeFilter, setActiveFilter, searchMode, setSearchMode } = useFilter();
   const [isModeMenuOpen, setIsModeMenuOpen] = useState(false);
+  const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
+  const [isTypeDropdownOpen, setIsTypeDropdownOpen] = useState(false);
   const menuRef = React.useRef<HTMLDivElement>(null);
   const modeMenuRef = React.useRef<HTMLDivElement>(null);
+  const filterDropdownRef = React.useRef<HTMLDivElement>(null);
+  const typeDropdownRef = React.useRef<HTMLDivElement>(null);
   const catScroll = useDraggableScroll();
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
@@ -1460,6 +1468,16 @@ const SearchPage = () => {
         !modeMenuRef.current.contains(event.target as Node)
       )
         setIsModeMenuOpen(false);
+      if (
+        filterDropdownRef.current &&
+        !filterDropdownRef.current.contains(event.target as Node)
+      )
+        setIsFilterDropdownOpen(false);
+      if (
+        typeDropdownRef.current &&
+        !typeDropdownRef.current.contains(event.target as Node)
+      )
+        setIsTypeDropdownOpen(false);
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -1622,8 +1640,8 @@ const SearchPage = () => {
           setActiveCategory={setActiveCategory}
         />
         <div className="max-w-7xl mx-auto px-5 sm:px-8 pt-0 md:pt-0 pb-32">
-          {/* Results */}
-          <div className="relative z-[100] bg-white dark:bg-slate-950 py-3 -mx-5 px-5 sm:-mx-8 sm:px-8 md:mx-0 md:px-0 flex items-center gap-3 mb-0 md:mb-2 transition-colors">
+          {/* Search Bar & Left-aligned Filters */}
+          <div className="relative z-[100] bg-white dark:bg-slate-950 py-3 -mx-5 px-5 sm:-mx-8 sm:px-8 md:mx-0 md:px-0 flex flex-col transition-colors">
             <div className="flex-1 relative px-[8.5px]">
               <div className="relative flex items-center pl-3 pr-3.5 transition-all group premium-search-container h-[50px]">
                 <button
@@ -1649,17 +1667,190 @@ const SearchPage = () => {
                   }
                   className="w-full bg-transparent py-2.5 px-2 text-[14.5px] text-slate-900 dark:text-white outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500 font-medium min-w-0"
                 />
-                <div className="flex items-center gap-2 pr-1 shrink-0">
-                  {query && (
+                {query && (
+                  <div className="flex items-center pr-1 shrink-0">
                     <button
                       onClick={() => setQuery("")}
                       className="w-8 h-8 flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors bg-transparent hover:bg-transparent"
                     >
                       <X size={16} />
                     </button>
-                  )}
-                  <FilterMenu />
-                </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Left-aligned Pill Filter Buttons */}
+            <div className="flex items-center gap-2.5 mt-3 px-[8.5px] relative z-[95] flex-wrap">
+              {/* 1. Verified Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (haptic) haptic("light");
+                  setActiveFilter(activeFilter === "bhub" ? "all" : "bhub");
+                }}
+                className={`h-9 px-3.5 rounded-full border text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition-all cursor-pointer select-none active:scale-95 ${
+                  activeFilter === "bhub"
+                    ? "bg-[#139fec]/10 border-[#139fec] text-[#139fec] dark:text-[#139fec] shadow-sm"
+                    : "bg-slate-100 dark:bg-slate-900/90 border-slate-200/80 dark:border-white/10 text-slate-800 dark:text-slate-200 hover:bg-slate-200/80 dark:hover:bg-slate-800"
+                }`}
+              >
+                <CheckCircle2
+                  size={16}
+                  className={
+                    activeFilter === "bhub"
+                      ? "text-[#139fec] fill-[#139fec]/20 shrink-0"
+                      : "text-[#139fec] shrink-0"
+                  }
+                />
+                <span>Verified</span>
+              </button>
+
+              {/* 2. Filter Dropdown Button */}
+              <div className="relative" ref={filterDropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (haptic) haptic("light");
+                    setIsFilterDropdownOpen((prev) => !prev);
+                    setIsTypeDropdownOpen(false);
+                  }}
+                  className={`h-9 px-3.5 rounded-full border text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition-all cursor-pointer select-none active:scale-95 ${
+                    isFilterDropdownOpen ||
+                    (activeFilter !== "all" && activeFilter !== "bhub")
+                      ? "bg-slate-200 dark:bg-slate-800 border-blue-500 text-blue-600 dark:text-blue-400 shadow-sm"
+                      : "bg-slate-100 dark:bg-slate-900/90 border-slate-200/80 dark:border-white/10 text-slate-800 dark:text-slate-200 hover:bg-slate-200/80 dark:hover:bg-slate-800"
+                  }`}
+                >
+                  <SlidersHorizontal
+                    size={14}
+                    className="text-slate-600 dark:text-slate-300 shrink-0"
+                  />
+                  <span>
+                    {activeFilter === "popular"
+                      ? t("filter_popular") || "Popüler"
+                      : activeFilter === "free"
+                      ? t("filter_free") || "Ücretsiz"
+                      : activeFilter === "paid"
+                      ? t("filter_paid") || "Ücretli"
+                      : t("filter_title") || "Filter"}
+                  </span>
+                  <ChevronDown
+                    size={14}
+                    className={`text-slate-400 transition-transform duration-200 shrink-0 ${
+                      isFilterDropdownOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {isFilterDropdownOpen && (
+                  <div className="absolute left-0 mt-2 w-48 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-white/10 py-1.5 z-[150] animate-in fade-in slide-in-from-top-2 duration-150">
+                    {[
+                      { id: "all", label: t("all") || "Tümü" },
+                      { id: "popular", label: t("filter_popular") || "Popüler" },
+                      { id: "free", label: t("filter_free") || "Ücretsiz" },
+                      { id: "paid", label: t("filter_paid") || "Ücretli" },
+                      { id: "bhub", label: t("filter_verified") || "Doğrulanmış" },
+                    ].map((opt) => (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => {
+                          if (haptic) haptic("light");
+                          setActiveFilter(opt.id as any);
+                          setIsFilterDropdownOpen(false);
+                        }}
+                        className={`w-full px-4 py-2 text-left text-xs sm:text-sm flex items-center justify-between font-medium transition-colors ${
+                          activeFilter === opt.id
+                            ? "text-blue-600 dark:text-blue-400 font-bold bg-blue-50 dark:bg-blue-950/40"
+                            : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60"
+                        }`}
+                      >
+                        <span>{opt.label}</span>
+                        {activeFilter === opt.id && (
+                          <Check size={14} className="text-blue-500 shrink-0" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* 3. Botlar / Uygulamalar Dropdown Button */}
+              <div className="relative" ref={typeDropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (haptic) haptic("light");
+                    setIsTypeDropdownOpen((prev) => !prev);
+                    setIsFilterDropdownOpen(false);
+                  }}
+                  className={`h-9 px-3.5 rounded-full border text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition-all cursor-pointer select-none active:scale-95 ${
+                    isTypeDropdownOpen
+                      ? "bg-slate-200 dark:bg-slate-800 border-blue-500 text-blue-600 dark:text-blue-400 shadow-sm"
+                      : "bg-slate-100 dark:bg-slate-900/90 border-slate-200/80 dark:border-white/10 text-slate-800 dark:text-slate-200 hover:bg-slate-200/80 dark:hover:bg-slate-800"
+                  }`}
+                >
+                  <Tag
+                    size={14}
+                    className="text-slate-600 dark:text-slate-300 shrink-0"
+                  />
+                  <span>
+                    {searchMode === "bots"
+                      ? t("cat_bots") || "Botlar"
+                      : t("cat_apps_nav") || t("apps") || "Uygulamalar"}
+                  </span>
+                  <ChevronDown
+                    size={14}
+                    className={`text-slate-400 transition-transform duration-200 shrink-0 ${
+                      isTypeDropdownOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {isTypeDropdownOpen && (
+                  <div className="absolute left-0 mt-2 w-44 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-white/10 py-1.5 z-[150] animate-in fade-in slide-in-from-top-2 duration-150">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (haptic) haptic("light");
+                        setSearchMode("bots");
+                        setIsTypeDropdownOpen(false);
+                      }}
+                      className={`w-full px-4 py-2 text-left text-xs sm:text-sm flex items-center justify-between font-medium transition-colors ${
+                        searchMode === "bots"
+                          ? "text-blue-600 dark:text-blue-400 font-bold bg-blue-50 dark:bg-blue-950/40"
+                          : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60"
+                      }`}
+                    >
+                      <span>{t("cat_bots") || "Botlar"}</span>
+                      {searchMode === "bots" && (
+                        <Check size={14} className="text-blue-500 shrink-0" />
+                      )}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (haptic) haptic("light");
+                        setSearchMode("apps");
+                        setIsTypeDropdownOpen(false);
+                      }}
+                      className={`w-full px-4 py-2 text-left text-xs sm:text-sm flex items-center justify-between font-medium transition-colors ${
+                        searchMode === "apps"
+                          ? "text-blue-600 dark:text-blue-400 font-bold bg-blue-50 dark:bg-blue-950/40"
+                          : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60"
+                      }`}
+                    >
+                      <span>
+                        {t("cat_apps_nav") || t("apps") || "Uygulamalar"}
+                      </span>
+                      {searchMode === "apps" && (
+                        <Check size={14} className="text-blue-500 shrink-0" />
+                      )}
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>

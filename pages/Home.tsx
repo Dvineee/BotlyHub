@@ -1259,7 +1259,7 @@ const NavMenu = ({
   return (
     <>
       <div
-        className="sticky top-0 z-[1] bg-white dark:bg-slate-900 border-b border-[#f7f7f7] dark:border-white/5 w-full py-2.5 md:pb-2 transition-colors"
+        className="sticky top-0 z-[300] bg-white dark:bg-slate-900 border-b border-[#f7f7f7] dark:border-white/5 w-full py-2.5 md:pb-2 transition-colors"
         ref={internalMenuRef}
       >
         <div className="max-w-7xl mx-auto px-5 sm:px-8 flex items-center justify-between">
@@ -2307,28 +2307,37 @@ const Home = () => {
 
   const filteredDropdownBots = useMemo(() => {
     if (!homeSearchQuery.trim()) return [];
-    return bots
-      .filter((bot) => {
-        const matchesQuery =
-          bot.name.toLowerCase().includes(homeSearchQuery.toLowerCase()) ||
-          bot.description.toLowerCase().includes(homeSearchQuery.toLowerCase());
+    let result = bots.filter((bot) => {
+      const matchesQuery =
+        bot.name.toLowerCase().includes(homeSearchQuery.toLowerCase()) ||
+        bot.description.toLowerCase().includes(homeSearchQuery.toLowerCase());
 
-        if (!matchesQuery) return false;
+      if (!matchesQuery) return false;
 
-        const isApp = Array.isArray(bot.category)
-          ? bot.category.includes("apps")
-          : bot.category === "apps";
+      const isApp = Array.isArray(bot.category)
+        ? bot.category.includes("apps")
+        : bot.category === "apps";
 
-        if (searchModalType === "bots") {
-          return !isApp;
-        }
-        if (searchModalType === "apps") {
-          return isApp;
-        }
-        return true;
-      })
-      .slice(0, 25);
-  }, [bots, homeSearchQuery, searchModalType]);
+      if (searchModalType === "bots") {
+        if (isApp) return false;
+      }
+      if (searchModalType === "apps") {
+        if (!isApp) return false;
+      }
+
+      if (homeActiveFilter === "paid" && bot.price === 0) return false;
+      if (homeActiveFilter === "free" && bot.price > 0) return false;
+      if (homeActiveFilter === "bhub" && !bot.is_official) return false;
+
+      return true;
+    });
+
+    if (homeActiveFilter === "popular") {
+      result = result.sort((a, b) => (b.views || 0) - (a.views || 0));
+    }
+
+    return result.slice(0, 25);
+  }, [bots, homeSearchQuery, searchModalType, homeActiveFilter]);
   const { activeFilter, searchMode, setSearchMode } = useFilter();
 
   useEffect(() => {
@@ -3071,14 +3080,14 @@ const Home = () => {
       </svg>
       {/* Top Background Wrapper (Sticky Header on Desktop and Mobile) */}
       <div
-        className="relative md:sticky md:top-0 z-[120] min-h-[56px] md:min-h-[64px] md:h-[72px] py-2 md:py-0 flex items-center bg-white dark:bg-slate-950 transition-all"
+        className="relative md:sticky md:top-0 z-[300] min-h-[56px] md:min-h-[64px] md:h-[72px] py-2 md:py-0 flex items-center bg-white dark:bg-slate-950 transition-all"
         onMouseLeave={() => {
           setOpenMenu(null);
           setNavState("main");
         }}
       >
         {/* Top Section */}
-        <div className="w-full relative z-[120]">
+        <div className="w-full relative z-[300]">
           <div className="max-w-7xl mx-auto px-5 sm:px-8">
             <div className="flex items-center justify-between px-1 md:gap-x-6">
               <div className="flex items-center order-1 md:w-36 lg:w-48 shrink-0">
@@ -3111,8 +3120,8 @@ const Home = () => {
                     {/* Vertical Divider */}
                     <div className="w-px h-5 bg-black/[0.08] dark:bg-white/[0.08] mx-1 shrink-0" />
 
-                    {/* Filter Menu (Decorative/Trigger in Modal) */}
-                    <div className="shrink-0 relative z-[140] pointer-events-none opacity-80">
+                    {/* Filter Menu */}
+                    <div className="shrink-0 relative z-[140]">
                       <FilterMenu />
                     </div>
                   </div>
@@ -3879,7 +3888,7 @@ const Home = () => {
         </AnimatePresence>
       </div>
       {/* Mobile-only Sticky Search Bar */}
-      <div className="relative z-[200] block md:hidden bg-white dark:bg-slate-950 p-3">
+      <div className="relative z-[100] block md:hidden bg-white dark:bg-slate-950 p-3">
         <div className="relative flex items-center bg-[#eeefef] dark:bg-slate-800 rounded-xl group transition-all h-[42px] px-3">
           <div
             onClick={() => {
@@ -4105,7 +4114,7 @@ const Home = () => {
                             <div className="sticky top-0 md:top-[72px] z-30 bg-white/90 dark:bg-transparent backdrop-blur-md sm:-mx-8 sm:px-8 md:mx-0 md:px-0 relative group/cat">
                               {/* Left Scroll Button & Fade Overlay */}
                               {showAppsLeftArrow && (
-                                <div className="flex absolute left-0 top-0 bottom-0 w-12 items-center justify-start bg-gradient-to-r from-[#f0f2f5] via-[#f0f2f5]/90 to-transparent dark:from-[#1c1c1c] dark:via-[#1c1c1c]/90 dark:to-transparent z-20 pointer-events-none rounded-l-2xl pl-1 transition-opacity duration-200">
+                                <div className="hidden md:flex absolute left-0 top-0 bottom-0 w-12 items-center justify-start bg-gradient-to-r from-[#f0f2f5] via-[#f0f2f5]/90 to-transparent dark:from-[#1c1c1c] dark:via-[#1c1c1c]/90 dark:to-transparent z-20 pointer-events-none rounded-l-2xl pl-1 transition-opacity duration-200">
                                   <button
                                     type="button"
                                     onClick={() => scrollAppsCategories("left")}
@@ -4119,7 +4128,7 @@ const Home = () => {
 
                               {/* Right Scroll Button & Fade Overlay */}
                               {showAppsRightArrow && (
-                                <div className="flex absolute right-0 top-0 bottom-0 w-12 items-center justify-end bg-gradient-to-l from-[#f0f2f5] via-[#f0f2f5]/90 to-transparent dark:from-[#1c1c1c] dark:via-[#1c1c1c]/90 dark:to-transparent z-20 pointer-events-none rounded-r-2xl pr-1 transition-opacity duration-200">
+                                <div className="hidden md:flex absolute right-0 top-0 bottom-0 w-12 items-center justify-end bg-gradient-to-l from-[#f0f2f5] via-[#f0f2f5]/90 to-transparent dark:from-[#1c1c1c] dark:via-[#1c1c1c]/90 dark:to-transparent z-20 pointer-events-none rounded-r-2xl pr-1 transition-opacity duration-200">
                                   <button
                                     type="button"
                                     onClick={() => scrollAppsCategories("right")}
@@ -4316,7 +4325,7 @@ const Home = () => {
                             <div className="sticky top-0 md:top-[72px] z-30 bg-white/90 dark:bg-transparent backdrop-blur-md sm:-mx-8 sm:px-8 md:mx-0 md:px-0 relative group/cat">
                               {/* Left Scroll Button & Fade Overlay */}
                               {showBotsLeftArrow && (
-                                <div className="flex absolute left-0 top-0 bottom-0 w-12 items-center justify-start bg-gradient-to-r from-[#f0f2f5] via-[#f0f2f5]/90 to-transparent dark:from-[#1c1c1c] dark:via-[#1c1c1c]/90 dark:to-transparent z-20 pointer-events-none rounded-l-2xl pl-1 transition-opacity duration-200">
+                                <div className="hidden md:flex absolute left-0 top-0 bottom-0 w-12 items-center justify-start bg-gradient-to-r from-[#f0f2f5] via-[#f0f2f5]/90 to-transparent dark:from-[#1c1c1c] dark:via-[#1c1c1c]/90 dark:to-transparent z-20 pointer-events-none rounded-l-2xl pl-1 transition-opacity duration-200">
                                   <button
                                     type="button"
                                     onClick={() => scrollBotsCategories("left")}
@@ -4330,7 +4339,7 @@ const Home = () => {
 
                               {/* Right Scroll Button & Fade Overlay */}
                               {showBotsRightArrow && (
-                                <div className="flex absolute right-0 top-0 bottom-0 w-12 items-center justify-end bg-gradient-to-l from-[#f0f2f5] via-[#f0f2f5]/90 to-transparent dark:from-[#1c1c1c] dark:via-[#1c1c1c]/90 dark:to-transparent z-20 pointer-events-none rounded-r-2xl pr-1 transition-opacity duration-200">
+                                <div className="hidden md:flex absolute right-0 top-0 bottom-0 w-12 items-center justify-end bg-gradient-to-l from-[#f0f2f5] via-[#f0f2f5]/90 to-transparent dark:from-[#1c1c1c] dark:via-[#1c1c1c]/90 dark:to-transparent z-20 pointer-events-none rounded-r-2xl pr-1 transition-opacity duration-200">
                                   <button
                                     type="button"
                                     onClick={() => scrollBotsCategories("right")}

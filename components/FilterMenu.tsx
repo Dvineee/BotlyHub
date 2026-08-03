@@ -87,42 +87,6 @@ export const FilterMenu: React.FC = () => {
               </button>
             </div>
 
-            {/* Bots / Apps Toggle Segment */}
-            <div className="px-1 pb-2.5 mb-2 border-b border-slate-100 dark:border-white/5">
-              <div className="flex bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl border border-slate-200/50 dark:border-white/5">
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    haptic('light');
-                    setSearchMode('bots');
-                  }}
-                  className={`flex-1 py-1.5 text-center text-[11px] font-black uppercase tracking-wider rounded-lg transition-all ${
-                    searchMode === 'bots'
-                      ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm border border-slate-200/60 dark:border-transparent'
-                      : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
-                  }`}
-                >
-                  {t("cat_bots") || "Botlar"}
-                </button>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    haptic('light');
-                    setSearchMode('apps');
-                  }}
-                  className={`flex-1 py-1.5 text-center text-[11px] font-black uppercase tracking-wider rounded-lg transition-all ${
-                    searchMode === 'apps'
-                      ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm border border-slate-200/60 dark:border-transparent'
-                      : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
-                  }`}
-                >
-                  {t("cat_apps_nav") || t("apps") || "Uygulamalar"}
-                </button>
-              </div>
-            </div>
-
             {options.map((opt) => (
               <button
                 key={opt.id}
