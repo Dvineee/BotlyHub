@@ -1242,8 +1242,8 @@ span, div, input {
 
 @media (min-width: 640px) {
 
-  .home-page .sm\:flex {
-    margin-top: 0px;
+  .sm\:flex {
+    margin-top: 0;
     display: flex;
   }
 }
